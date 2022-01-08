@@ -16,6 +16,7 @@
     <PackageReference Include="DisCatSharp.Common" Version="9.8.5-nightly-00254" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.5-nightly-00254" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.5-nightly-00254" />
+    <PackageReference Include="MySql.Data" Version="8.0.27" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
   </ItemGroup>
 

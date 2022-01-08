@@ -5,6 +5,8 @@ internal class Bot
     internal DiscordClient? DiscordClient;
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
+    internal static MySqlConnection? databaseConnection;
+
     internal async Task Init(string[] args)
     {
         if (!Directory.Exists("logs"))
@@ -139,6 +141,43 @@ internal class Bot
                     return;
                 }
             });
+        });
+
+        var loadDatabase = Task.Run(async () =>
+        {
+            try
+            {
+                Stopwatch databaseConnectionSc = new Stopwatch();
+                databaseConnectionSc.Start();
+
+                LogInfo($"Connecting to database..");
+                databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
+                databaseConnection.Open();
+
+                databaseConnectionSc.Stop();
+                LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+
+
+
+                databaseConnectionSc.Restart();
+                await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {Secrets.Secrets.DatabaseName}");
+
+                databaseConnectionSc.Stop();
+                LogInfo($"Created database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+
+
+                databaseConnectionSc.Restart();
+                await databaseConnection.ExecuteAsync($"USE {Secrets.Secrets.DatabaseName}");
+
+                databaseConnectionSc.Stop();
+                LogInfo($"Selected database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+            }
+            catch (Exception ex)
+            {
+                LogFatal($"An exception occured while trying to establish a connection to the database: {ex}");
+                await Task.Delay(5000);
+                Environment.Exit(ExitCodes.FailedDatabaseLogin);
+            }
         });
 
         await Task.Delay(-1);

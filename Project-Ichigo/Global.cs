@@ -18,6 +18,10 @@ global using System.Data.SQLite;
 global using System.Data.Common;
 global using System.Security.Cryptography;
 
+// Database
+
+global using MySql.Data.MySqlClient;
+
 // DisCatSharp
 
 global using DisCatSharp;
@@ -36,6 +40,8 @@ global using DisCatSharp.CommandsNext.Converters;
 // Own Utils
 
 global using static Project_Ichigo.Attributes.CustomAttributes;
+
+global using Project_Ichigo.Secrets;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;
