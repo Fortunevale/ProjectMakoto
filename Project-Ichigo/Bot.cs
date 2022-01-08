@@ -23,8 +23,7 @@ internal class Bot
                 $"UserName: {Environment.UserName}\n" +
                 $"UserDomain: {Environment.UserDomainName}\n\n" +
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
-                $"Commandline: {Environment.CommandLine}\n" +
-                $"Commandline-Arguments: {String.Join(' ', args)}\n");
+                $"Commandline: {Regex.Replace(Environment.CommandLine, @"(--token \S*)", "")}\n");
 
         if (!Directory.Exists("config-backups"))
             Directory.CreateDirectory("config-backups");
@@ -33,14 +32,25 @@ internal class Bot
         {
             string token = "";
 
-            if (File.Exists("token.cfg"))
+            try
+            {
+                if (args.Contains("--token"))
+                    token = args[ Array.IndexOf(args, "--token") + 1 ];
+            }
+            catch (Exception ex)
+            {
+                LogError($"An exception occured while trying to parse a token commandline argument: {ex}");
+            }
+
+            if (File.Exists("token.cfg") && !args.Contains("--token"))
                 token = File.ReadAllText("token.cfg");
 
             if (!(token.Length > 0))
             {
                 LogFatal("No token provided");
                 File.WriteAllText("token.cfg", "");
-                Environment.Exit(8);
+                await Task.Delay(1000);
+                Environment.Exit(ExitCodes.NoToken);
                 return;
             }
 
@@ -107,7 +117,7 @@ internal class Bot
             {
                 LogError($"An exception occured while trying to log into discord: {ex}");
                 await Task.Delay(5000);
-                Environment.Exit(9);
+                Environment.Exit(ExitCodes.FailedDiscordLogin);
                 return;
             }
 
