@@ -31,8 +31,11 @@ global using DisCatSharp.Interactivity;
 global using DisCatSharp.Net;
 global using DisCatSharp.Lavalink;
 global using DisCatSharp.Lavalink.EventArgs;
+global using DisCatSharp.CommandsNext.Converters;
 
 // Own Utils
+
+global using static Project_Ichigo.Attributes.CustomAttributes;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;

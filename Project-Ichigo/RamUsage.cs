@@ -1,4 +1,6 @@
-﻿namespace Kaffeemaschine;
+﻿namespace Project_Ichigo;
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 
 public class MemoryMetrics
 {
@@ -9,17 +11,15 @@ public class MemoryMetrics
 
 public class MemoryMetricsClient
 {
-    public MemoryMetrics GetMetrics()
+    public static MemoryMetrics GetMetrics()
     {
         if (IsUnix())
-        {
             return GetUnixMetrics();
-        }
 
         return GetWindowsMetrics();
     }
 
-    private bool IsUnix()
+    private static bool IsUnix()
     {
         var isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
                         RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -27,14 +27,16 @@ public class MemoryMetricsClient
         return isUnix;
     }
 
-    private MemoryMetrics GetWindowsMetrics()
+    private static MemoryMetrics GetWindowsMetrics()
     {
         var output = "";
 
-        var info = new ProcessStartInfo();
-        info.FileName = "wmic";
-        info.Arguments = "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value";
-        info.RedirectStandardOutput = true;
+        var info = new ProcessStartInfo
+        {
+            FileName = "wmic",
+            Arguments = "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value",
+            RedirectStandardOutput = true
+        };
 
         using (var process = Process.Start(info))
         {
@@ -45,25 +47,29 @@ public class MemoryMetricsClient
         var freeMemoryParts = lines[0].Split("=", StringSplitOptions.RemoveEmptyEntries);
         var totalMemoryParts = lines[1].Split("=", StringSplitOptions.RemoveEmptyEntries);
 
-        var metrics = new MemoryMetrics();
-        metrics.Total = Math.Round(double.Parse(totalMemoryParts[1]) / 1024, 0);
-        metrics.Free = Math.Round(double.Parse(freeMemoryParts[1]) / 1024, 0);
+        var metrics = new MemoryMetrics
+        {
+            Total = Math.Round(double.Parse(totalMemoryParts[ 1 ]) / 1024, 0),
+            Free = Math.Round(double.Parse(freeMemoryParts[ 1 ]) / 1024, 0)
+        };
         metrics.Used = metrics.Total - metrics.Free;
 
         return metrics;
     }
 
-    private MemoryMetrics GetUnixMetrics()
+    private static MemoryMetrics GetUnixMetrics()
     {
         var output = "";
 
-        var info = new ProcessStartInfo("free -m");
-        info.FileName = "/bin/bash";
-        info.Arguments = "-c \"free -m\"";
-        info.RedirectStandardOutput = true;
-        info.RedirectStandardError = true;
-        info.CreateNoWindow = true;
-        info.UseShellExecute = false;
+        var info = new ProcessStartInfo("free -m")
+        {
+            FileName = "/bin/bash",
+            Arguments = "-c \"free -m\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            CreateNoWindow = true,
+            UseShellExecute = false
+        };
 
         using (var process = Process.Start(info))
         {
@@ -74,10 +80,12 @@ public class MemoryMetricsClient
         var lines = output.Split("\n");
         var memory = lines[1].Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-        var metrics = new MemoryMetrics();
-        metrics.Total = double.Parse(memory[1]);
-        metrics.Used = double.Parse(memory[2]);
-        metrics.Free = double.Parse(memory[3]);
+        var metrics = new MemoryMetrics
+        {
+            Total = double.Parse(memory[ 1 ]),
+            Used = double.Parse(memory[ 2 ]),
+            Free = double.Parse(memory[ 3 ])
+        };
 
         return metrics;
     }

@@ -1,11 +1,4 @@
-﻿using DisCatSharp.CommandsNext.Converters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Kaffeemaschine;
+﻿namespace Project_Ichigo;
 
 internal class CustomArgumentConverter
 {
@@ -33,12 +26,12 @@ internal class CustomArgumentConverter
             value = value.ToLowerInvariant();
 
             var di = value.IndexOf('#');
-            var un = di != -1 ? value.Substring(0, di) : value;
-            var dv = di != -1 ? value.Substring(di + 1) : null;
+            var un = di != -1 ? value[ ..di ] : value;
+            var dv = di != -1 ? value[ (di + 1).. ] : null;
 
             var us = ctx.Client.Guilds.Values
                 .SelectMany(xkvp => xkvp.Members.Values)
-                .Where(xm => (xm.Username.ToLowerInvariant()) == un && ((dv != null && xm.Discriminator == dv) || dv == null));
+                .Where(xm => xm.Username.ToLowerInvariant() == un && ((dv != null && xm.Discriminator == dv) || dv == null));
 
             var usr = us.FirstOrDefault();
             return usr != null ? Optional.FromValue<DiscordUser>(usr) : Optional.FromNoValue<DiscordUser>();
@@ -49,9 +42,11 @@ internal class CustomArgumentConverter
     {
         public async Task<Optional<bool>> ConvertAsync(string value, CommandContext ctx)
         {
-            if (value.ToLower() == "true" || value.ToLower() == "y" || value.ToLower() == "enable" || value.ToLower() == "allow")
+            await Task.Delay(1);
+
+            if (value.ToLower() is "true" or "y" or "enable" or "allow")
                 return true;
-            else if (value.ToLower() == "false" || value.ToLower() == "n" || value.ToLower() == "disable" || value.ToLower() == "disallow")
+            else if (value.ToLower() is "false" or "n" or "disable" or "disallow")
                 return false;
 
             throw new Exception($"Invalid Argument");

@@ -1,14 +1,14 @@
-﻿namespace Kaffeemaschine;
+﻿namespace Project_Ichigo;
 
 public static class Extensions
 {
     public static string DigitsToEmotes(this long i) =>
-        digitsToEmotes(i.ToString());
+        DigitsToEmotes(i.ToString());
 
     public static string DigitsToEmotes(this int i) =>
-        digitsToEmotes(i.ToString());
+        DigitsToEmotes(i.ToString());
 
-    private static string digitsToEmotes(string str)
+    private static string DigitsToEmotes(string str)
     {
         return str.Replace("0", ":zero:")
             .Replace("1", ":one:")
@@ -47,8 +47,6 @@ public static class Extensions
         if (currentAmount > 0)
         {
             discordEmbeds.Add(currentEmbed);
-            currentEmbed = new DiscordEmbedBuilder() { Title = title };
-            currentAmount = 0;
         }
 
         discordEmbeds.First().Description = description;
@@ -91,13 +89,12 @@ public static class Extensions
         if (currentBuild.Length >= 0)
         {
             fields.Add(new KeyValuePair<string, string>(lastTitle, currentBuild));
-            currentBuild = "";
         }
 
         return fields;
     }
 
-    public static List<string> GetEmotes(this string content)
+    public static List<string>? GetEmotes(this string content)
     {
         if (Regex.IsMatch(content, @"(<:[^ ]*:\d*>)"))
             return Regex.Matches(content, @"(<:[^ ]*:\d*>)").Select(x => x.Value).ToList();
@@ -105,7 +102,7 @@ public static class Extensions
             return null;
     }
 
-    public static List<string> GetAnimatedEmotes(this string content)
+    public static List<string>? GetAnimatedEmotes(this string content)
     {
         if (Regex.IsMatch(content, @"(<a:[^ ]*:\d*>)"))
             return Regex.Matches(content, @"(<a:[^ ]*:\d*>)").Select(x => x.Value).ToList();
@@ -113,7 +110,7 @@ public static class Extensions
             return null;
     }
 
-    public static List<string> GetMentions(this string content)
+    public static List<string>? GetMentions(this string content)
     {
         if (Regex.IsMatch(content, @"(<@\d*>)"))
             return Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList();
@@ -121,112 +118,73 @@ public static class Extensions
             return null;
     }
 
-    public static List<DiscordActivity> Sanitize(this IReadOnlyList<DiscordActivity> activities)
-    {
-        List<DiscordActivity> _Activities = activities.ToList();
+    //public static bool IsProtected(this DiscordMember member)
+    //{
+    //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.antibotRoleId) || 
+    //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
+    //        (Objects.ProtectedAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
+    //        member.IsOwner)
+    //        return true;
 
-        foreach (var b in _Activities.ToList())
-        {
-            if (Objects.BlacklistedGames.Contains(b.Name) || b.ActivityType != ActivityType.Playing)
-            {
-                _Activities.Remove(b);
-            }
+    //    return false;
+    //}
 
-            if (Objects.GamesAlternativeNames.ContainsKey(b.Name))
-            {
-                _Activities.Remove(b);
+    //public static bool IsStaff(this DiscordMember member)
+    //{
+    //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
+    //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
+    //        member.IsOwner)
+    //        return true;
 
-                if (!_Activities.Any(x => x.Name == Objects.GamesAlternativeNames[b.Name]))
-                {
-                    _Activities.Add(b);
-                    _Activities.First(x => x.Name == b.Name).Name = Objects.GamesAlternativeNames[b.Name];
-                }
-            }
-        }
+    //    return false;
+    //}
 
-        foreach (var b in _Activities.ToList())
-        {
-            _Activities.First(x => x == b).Name = Regex.Replace(_Activities.First(x => x == b).Name, Objects.GamesRegex, "");
-        }
+    //public static bool IsMaintenance(this DiscordMember member)
+    //{
+    //    if (member.Id == 411950662662881290 || (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370))
+    //        return true;
 
-        foreach (var b in _Activities.ToList())
-        {
-            if (b.Name.Length < 2)
-            {
-                _Activities.Remove(b);
-            }
-        }
+    //    return false;
+    //}
 
-        return _Activities;
-    }
+    //public static bool IsAdmin(this DiscordMember member)
+    //{
+    //    if ((member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
+    //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
+    //        member.IsOwner)
+    //        return true;
 
-    public static bool IsProtected(this DiscordMember member)
-    {
-        if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.antibotRoleId) || 
-            (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
-            (Objects.ProtectedAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
-            member.IsOwner)
-            return true;
+    //    return false;
+    //}
 
-        return false;
-    }
+    //public static bool IsMod(this DiscordMember member)
+    //{
+    //    if ((member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
+    //        (member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
+    //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
+    //        member.IsOwner)
+    //        return true;
 
-    public static bool IsStaff(this DiscordMember member)
-    {
-        if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
-            (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
-            member.IsOwner)
-            return true;
+    //    return false;
+    //}
 
-        return false;
-    }
+    //public static bool IsDj(this DiscordMember member)
+    //{
+    //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
+    //        member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
+    //        member.Roles.Any(x => x.Name.ToLower() == "dj") ||
+    //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
+    //        member.IsOwner)
+    //        return true;
 
-    public static bool IsMaintenance(this DiscordMember member)
-    {
-        if (member.Id == 411950662662881290 || (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370))
-            return true;
-
-        return false;
-    }
-
-    public static bool IsAdmin(this DiscordMember member)
-    {
-        if ((member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
-            (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
-            member.IsOwner)
-            return true;
-
-        return false;
-    }
-
-    public static bool IsMod(this DiscordMember member)
-    {
-        if ((member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
-            (member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
-            (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
-            member.IsOwner)
-            return true;
-
-        return false;
-    }
-
-    public static bool IsDj(this DiscordMember member)
-    {
-        if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
-            member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
-            member.Roles.Any(x => x.Name.ToLower() == "dj") ||
-            (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
-            member.IsOwner)
-            return true;
-
-        return false;
-    }
+    //    return false;
+    //}
 }
 
 public class SqLiteBaseRepository

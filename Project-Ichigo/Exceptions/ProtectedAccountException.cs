@@ -1,4 +1,4 @@
-﻿namespace Kaffeemaschine.Exceptions;
+﻿namespace Project_Ichigo.Exceptions;
 
 internal class ProtectedAccountException : Exception
 {

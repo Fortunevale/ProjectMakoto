@@ -5,6 +5,10 @@ VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Ichigo", "Project-Ichigo.csproj", "{A47FCB9F-FEA3-4810-9C77-4CC47DB5BD19}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.Logger", "D:\Dokumente\GitHub\Xorog.Logger\Xorog.Logger.csproj", "{CFE9A7ED-5FA0-4505-BB71-6BE96751E51A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "D:\Dokumente\GitHub\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{4D7C899C-434C-490E-901D-F75B923790EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{A47FCB9F-FEA3-4810-9C77-4CC47DB5BD19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A47FCB9F-FEA3-4810-9C77-4CC47DB5BD19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A47FCB9F-FEA3-4810-9C77-4CC47DB5BD19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFE9A7ED-5FA0-4505-BB71-6BE96751E51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFE9A7ED-5FA0-4505-BB71-6BE96751E51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFE9A7ED-5FA0-4505-BB71-6BE96751E51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFE9A7ED-5FA0-4505-BB71-6BE96751E51A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D7C899C-434C-490E-901D-F75B923790EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D7C899C-434C-490E-901D-F75B923790EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D7C899C-434C-490E-901D-F75B923790EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D7C899C-434C-490E-901D-F75B923790EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,8 +1,10 @@
-﻿namespace Kaffeemaschine;
+﻿namespace Project_Ichigo;
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
 
 internal static class PreMadeEmbedsExtensions
 {
-    public static DiscordEmbedBuilder CreateMaintainencePermError(this CommandContext ctx)
+    public static DiscordEmbedBuilder GenerateMaintenanceError(this CommandContext ctx)
     {
         DiscordEmbedBuilder embed = new()
         {
@@ -25,7 +27,7 @@ internal static class PreMadeEmbedsExtensions
         return embed;
     }
 
-    public static DiscordEmbedBuilder CreateAdvancedModPermError(this CommandContext ctx)
+    public static DiscordEmbedBuilder GenerateAdminError(this CommandContext ctx)
     {
         DiscordEmbedBuilder embed = new()
         {
@@ -35,7 +37,7 @@ internal static class PreMadeEmbedsExtensions
                 Name = ctx.Guild.Name
             },
             Title = "",
-            Description = $"You dont have permissions to use this command. You need have the role {ctx.Guild.GetRole(Objects.Settings.advancedPermissionsRoleId).Mention} to use this command.",
+            Description = $"You dont have permissions to use this command. You need to be `Admin` to use this command.",
             Footer = new DiscordEmbedBuilder.EmbedFooter
             {
                 Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
@@ -48,7 +50,7 @@ internal static class PreMadeEmbedsExtensions
         return embed;
     }
 
-    public static DiscordEmbedBuilder CreateModPermError(this CommandContext ctx)
+    public static DiscordEmbedBuilder GenerateModError(this CommandContext ctx)
     {
         DiscordEmbedBuilder embed = new()
         {
@@ -58,7 +60,7 @@ internal static class PreMadeEmbedsExtensions
                 Name = ctx.Guild.Name
             },
             Title = "",
-            Description = $"You dont have permissions to use this command. You need have the role {ctx.Guild.GetRole(Objects.Settings.basicPermissionsRoleId).Mention} to use this command.",
+            Description = $"You dont have permissions to use this command. You need to be `Mod` to use this command.",
             Footer = new DiscordEmbedBuilder.EmbedFooter
             {
                 Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
@@ -98,50 +100,52 @@ internal static class PreMadeEmbedsExtensions
 
             try
             {
-                string RoleRequired = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString;
+                return embed;
 
-                if (RoleRequired == "user" || RoleRequired == "music")
-                {
-                    return embed;
-                }
-                if (RoleRequired == "mod")
-                {
-                    if (ctx.Guild.Members[ctx.User.Id].IsMod())
-                    {
-                        return embed;
-                    }
-                    else
-                    {
-                        return CreateModPermError(ctx);
-                    }
-                }
-                else if (RoleRequired == "admin")
-                {
-                    if (ctx.Guild.Members[ctx.User.Id].IsAdmin())
-                    {
-                        return embed;
-                    }
-                    else
-                    {
-                        return CreateAdvancedModPermError(ctx);
-                    }
-                }
-                else if (RoleRequired == "maintainence")
-                {
-                    if (ctx.Guild.Members[ ctx.User.Id ].IsMaintenance())
-                    {
-                        return embed;
-                    }
-                    else
-                    {
-                        return CreateMaintainencePermError(ctx);
-                    }
-                }
-                else
-                {
-                    LogWarn($"Specified Command Module wasn't found: {RoleRequired}");
-                    return embed;
-                }
+                //string RoleRequired = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString;
+
+                //if (RoleRequired == "user" || RoleRequired == "music")
+                //{
+                //    return embed;
+                //}
+                //if (RoleRequired == "mod")
+                //{
+                //    if (ctx.Guild.Members[ctx.User.Id].IsMod())
+                //    {
+                //        return embed;
+                //    }
+                //    else
+                //    {
+                //        return GenerateModError(ctx);
+                //    }
+                //}
+                //else if (RoleRequired == "admin")
+                //{
+                //    if (ctx.Guild.Members[ctx.User.Id].IsAdmin())
+                //    {
+                //        return embed;
+                //    }
+                //    else
+                //    {
+                //        return GenerateAdminError(ctx);
+                //    }
+                //}
+                //else if (RoleRequired == "maintainence")
+                //{
+                //    if (ctx.Guild.Members[ ctx.User.Id ].IsMaintenance())
+                //    {
+                //        return embed;
+                //    }
+                //    else
+                //    {
+                //        return GenerateMaintenanceError(ctx);
+                //    }
+                //}
+                //else
+                //{
+                //    LogWarn($"Specified Command Module wasn't found: {RoleRequired}");
+                //    return embed;
+                //}
             }
             catch (Exception ex)
             {

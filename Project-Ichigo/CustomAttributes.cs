@@ -1,4 +1,4 @@
-﻿namespace Kaffeemaschine.Attributes;
+﻿namespace Project_Ichigo.Attributes;
 
 internal class CustomAttributes
 {
