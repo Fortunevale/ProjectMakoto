@@ -147,7 +147,7 @@ internal class Bot
         {
             try
             {
-                Stopwatch databaseConnectionSc = new Stopwatch();
+                Stopwatch databaseConnectionSc = new();
                 databaseConnectionSc.Start();
 
                 LogInfo($"Connecting to database..");
@@ -166,11 +166,29 @@ internal class Bot
                 LogInfo($"Created database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
 
 
+
                 databaseConnectionSc.Restart();
                 await databaseConnection.ExecuteAsync($"USE {Secrets.Secrets.DatabaseName}");
 
                 databaseConnectionSc.Stop();
                 LogInfo($"Selected database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+
+
+
+                databaseConnectionSc.Restart();
+
+                List<string> SavedTables = new();
+
+                using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
+                { 
+                    while (reader.Read())
+                    {
+                        SavedTables.Add(reader.GetString(0));
+                    }
+                }
+
+                databaseConnectionSc.Stop();
+                LogInfo($"Loaded all tables from database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
             }
             catch (Exception ex)
             {
