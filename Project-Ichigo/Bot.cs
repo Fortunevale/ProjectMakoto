@@ -6,6 +6,12 @@ internal class Bot
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
     internal static MySqlConnection? databaseConnection;
+    
+
+
+    internal static Status _status = new Status();
+
+
 
     internal async Task Init(string[] args)
     {
@@ -104,6 +110,10 @@ internal class Bot
 
             DiscordClient.UseInteractivity(new InteractivityConfiguration { });
 
+            LogDebug($"Registering Events..");
+
+            DiscordClient.GuildDownloadCompleted += GuildDownloadCompleted;
+
             try
             {
                 var discordLoginSc = new Stopwatch();
@@ -114,6 +124,7 @@ internal class Bot
 
                 discordLoginSc.Stop();
                 LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
+                _status.DiscordInitialized = true;
             }
             catch (Exception ex)
             {
@@ -134,6 +145,8 @@ internal class Bot
                     LavalinkNodeConnection = await DiscordClient.GetLavalink().ConnectAsync(lavalinkConfig);
                     lavalinkSc.Stop();
                     LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
+
+                    _status.LavalinkInitialized = true;
                 }
                 catch (Exception ex)
                 {
@@ -154,41 +167,29 @@ internal class Bot
                 databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
                 databaseConnection.Open();
 
-                databaseConnectionSc.Stop();
-                LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
-
-
-
-                databaseConnectionSc.Restart();
                 await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {Secrets.Secrets.DatabaseName}");
-
-                databaseConnectionSc.Stop();
-                LogInfo($"Created database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
-
-
-
-                databaseConnectionSc.Restart();
                 await databaseConnection.ExecuteAsync($"USE {Secrets.Secrets.DatabaseName}");
 
                 databaseConnectionSc.Stop();
-                LogInfo($"Selected database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
-
-
-
-                databaseConnectionSc.Restart();
+                LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+                _status.DatabaseInitialized = true;
 
                 List<string> SavedTables = new();
 
                 using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
-                { 
+                {
                     while (reader.Read())
                     {
                         SavedTables.Add(reader.GetString(0));
                     }
                 }
 
-                databaseConnectionSc.Stop();
-                LogInfo($"Loaded all tables from database '{new String('*', Secrets.Secrets.DatabaseName.Length)}'. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+                foreach (string Table in SavedTables.Where(x => x.EndsWith("-settings")))
+                {
+                    LogDebug($"Loading server settings from table '{Table}'..");
+
+                    IEnumerable<Settings.ServerSettings> serverSettings = databaseConnection.Query<Settings.ServerSettings>($"SELECT Key, Value FROM {Table}");
+                }
             }
             catch (Exception ex)
             {
@@ -199,5 +200,16 @@ internal class Bot
         });
 
         await Task.Delay(-1);
+    }
+
+    private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
+    {
+        _ = Task.Run(async () =>
+        {
+            foreach (var b in e.Guilds)
+            {
+                
+            }
+        });
     }
 }

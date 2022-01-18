@@ -40,9 +40,10 @@ global using DisCatSharp.CommandsNext.Converters;
 
 // Own Utils
 
-global using static Project_Ichigo.Attributes.CustomAttributes;
-
 global using Project_Ichigo.Secrets;
+global using Project_Ichigo.Objects;
+
+global using static Project_Ichigo.Attributes.CustomAttributes;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;
