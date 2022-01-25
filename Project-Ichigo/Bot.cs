@@ -11,6 +11,7 @@ internal class Bot
 
     internal static Status _status = new Status();
 
+    internal static PhishingUrls _phishingUrls = new PhishingUrls();
 
 
     internal async Task Init(string[] args)
@@ -173,7 +174,16 @@ internal class Bot
                 databaseConnectionSc.Stop();
                 LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
                 _status.DatabaseInitialized = true;
+            }
+            catch (Exception ex)
+            {
+                LogFatal($"An exception occured while trying to establish a connection to the database: {ex}");
+                await Task.Delay(5000);
+                Environment.Exit(ExitCodes.FailedDatabaseLogin);
+            }
 
+            try
+            {
                 List<string> SavedTables = new();
 
                 using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
@@ -189,13 +199,22 @@ internal class Bot
                     LogDebug($"Loading server settings from table '{Table}'..");
 
                     IEnumerable<Settings.ServerSettings> serverSettings = databaseConnection.Query<Settings.ServerSettings>($"SELECT Key, Value FROM {Table}");
+
+                    Settings.Servers.Add(Convert.ToUInt64(Table.Replace("-settings", "")), serverSettings.First());
                 }
+
+                LogDebug($"Loading phishing urls from table 'scam_urls'..");
+
+                IEnumerable<PhishingUrls.UrlInfo> scamUrls = databaseConnection.Query<PhishingUrls.UrlInfo>($"SELECT url, origin, submitter FROM scam_urls");
+                _phishingUrls.List.AddRange(scamUrls);
+
+                LogDebug($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
             }
             catch (Exception ex)
             {
-                LogFatal($"An exception occured while trying to establish a connection to the database: {ex}");
+                LogFatal($"An exception occured while trying get data from the database: {ex}");
                 await Task.Delay(5000);
-                Environment.Exit(ExitCodes.FailedDatabaseLogin);
+                Environment.Exit(ExitCodes.FailedDatabaseLoad);
             }
         });
 
