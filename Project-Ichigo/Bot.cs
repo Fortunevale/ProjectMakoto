@@ -205,8 +205,13 @@ internal class Bot
 
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-                IEnumerable<PhishingUrls.UrlInfo> scamUrls = databaseConnection.Query<PhishingUrls.UrlInfo>($"SELECT url, origin, submitter FROM scam_urls");
-                _phishingUrls.List.AddRange(scamUrls);
+                IEnumerable<PhishingUrls.UrlInfoDatabase> scamUrls = databaseConnection.Query<PhishingUrls.UrlInfoDatabase>($"SELECT url, origin, submitter FROM scam_urls");
+                _phishingUrls.List.AddRange(scamUrls.Select(x => new PhishingUrls.UrlInfo
+                {
+                    Url = x.Url,
+                    Origin = JsonConvert.DeserializeObject<List<string>>(x.Origin),
+                    Submitter = x.Submitter
+                }));
 
                 LogDebug($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
             }
@@ -227,10 +232,7 @@ internal class Bot
         {
             try
             {
-                var test = await new PhishingUrlUpdater().GetUrls();
-
-                foreach (var b in test)
-                    LogInfo($"{b.Url}: {String.Join(", ", b.Origin)}");
+                await new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }
             catch (Exception ex)
             {
