@@ -38,57 +38,81 @@ public class PhishingUrlUpdater
                 LogDebug($"Removed '{b.Url}' ('{(b.Origin?.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') from the phishing url database");
             }
 
-        if (DatabaseUpdated)
+        if (!DatabaseUpdated)
         {
             LogDebug($"Nothing has been updated");
             return;
         }
 
-        List<PhishingUrls.UrlInfoDatabase> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrls.UrlInfoDatabase
-        {
-            Url = x.Url,
-            Origin = JsonConvert.SerializeObject(x.Origin),
-            Submitter = x.Submitter
-        }).OrderBy(x => x.Url).ToList();
+        await UpdateDatabase(phishingUrls);
+    }
 
-        if (Bot.databaseConnection == null)
+    private bool UpdateRunning = false;
+
+    public async Task UpdateDatabase(PhishingUrls phishingUrls)
+    {
+        if (UpdateRunning)
         {
-            throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
+            LogWarn($"A database update is already running, cancelling");
+            return;
         }
 
-        Stopwatch sw = Stopwatch.StartNew();
-
-        var clearcmd = Bot.databaseConnection.CreateCommand();
-        clearcmd.CommandText = "TRUNCATE TABLE scam_urls";
-        clearcmd.Connection = Bot.databaseConnection;
-        await clearcmd.ExecuteNonQueryAsync();
-
-        sw.Stop();
-        LogDebug($"Cleared table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
-
-        sw.Restart();
-
-        var cmd = Bot.databaseConnection.CreateCommand();
-        cmd.CommandText = @$"INSERT INTO scam_urls ( url, origin, submitter ) VALUES ";
-
-        for (int i = 0; i < DatabaseInserts.Count; i++)
+        try
         {
-            cmd.CommandText += @$"( @url{i}, @origin{i}, @submitter{i} ), ";
+            UpdateRunning = true;
+            List<PhishingUrls.UrlInfoDatabase> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrls.UrlInfoDatabase
+            {
+                Url = x.Url,
+                Origin = JsonConvert.SerializeObject(x.Origin),
+                Submitter = x.Submitter
+            }).OrderBy(x => x.Url).ToList();
 
-            cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].Url);
-            cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].Origin);
-            cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].Submitter);
+            if (Bot.databaseConnection == null)
+            {
+                throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
+            }
+
+            Stopwatch sw = Stopwatch.StartNew();
+
+            var clearcmd = Bot.databaseConnection.CreateCommand();
+            clearcmd.CommandText = "TRUNCATE TABLE scam_urls";
+            clearcmd.Connection = Bot.databaseConnection;
+            await clearcmd.ExecuteNonQueryAsync();
+
+            sw.Stop();
+            LogDebug($"Cleared table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+
+            sw.Restart();
+
+            var cmd = Bot.databaseConnection.CreateCommand();
+            cmd.CommandText = @$"INSERT INTO scam_urls ( ind, url, origin, submitter ) VALUES ";
+
+            for (int i = 0; i < DatabaseInserts.Count; i++)
+            {
+                cmd.CommandText += @$"( @ind{i}, @url{i}, @origin{i}, @submitter{i} ), ";
+
+                cmd.Parameters.AddWithValue($"ind{i}", i);
+                cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].Url);
+                cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].Origin);
+                cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].Submitter);
+            }
+
+            cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+
+            cmd.Connection = Bot.databaseConnection;
+
+            LogDebug($"Inserting {DatabaseInserts.Count} rows into table 'scam_urls'..");
+            await cmd.ExecuteNonQueryAsync();
+
+            sw.Stop();
+            LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+            UpdateRunning = false;
         }
-
-        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-
-        cmd.Connection = Bot.databaseConnection;
-
-        LogDebug($"Inserting {DatabaseInserts.Count} rows into table 'scam_urls'..");
-        await cmd.ExecuteNonQueryAsync();
-
-        sw.Stop();
-        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)"); 
+        catch (Exception)
+        {
+            UpdateRunning = false;
+            throw;
+        }
     }
 
     private async Task<List<PhishingUrls.UrlInfo>> GetUrls ()

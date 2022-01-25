@@ -205,7 +205,7 @@ internal class Bot
 
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-                IEnumerable<PhishingUrls.UrlInfoDatabase> scamUrls = databaseConnection.Query<PhishingUrls.UrlInfoDatabase>($"SELECT url, origin, submitter FROM scam_urls");
+                IEnumerable<PhishingUrls.UrlInfoDatabase> scamUrls = databaseConnection.Query<PhishingUrls.UrlInfoDatabase>($"SELECT ind, url, origin, submitter FROM scam_urls");
                 _phishingUrls.List.AddRange(scamUrls.Select(x => new PhishingUrls.UrlInfo
                 {
                     Url = x.Url,
@@ -214,6 +214,8 @@ internal class Bot
                 }));
 
                 LogDebug($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
+
+                _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }
             catch (Exception ex)
             {
@@ -230,15 +232,6 @@ internal class Bot
     {
         _ = Task.Run(async () =>
         {
-            try
-            {
-                await new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
-            }
-            catch (Exception ex)
-            {
-                LogError($"{ex}");
-            }
-
             foreach (var b in e.Guilds)
             {
                 
