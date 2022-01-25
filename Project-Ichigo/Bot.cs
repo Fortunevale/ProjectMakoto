@@ -225,6 +225,18 @@ internal class Bot
     {
         _ = Task.Run(async () =>
         {
+            try
+            {
+                var test = await new PhishingUrlUpdater().GetUrls();
+
+                foreach (var b in test)
+                    LogInfo($"{b.Url}: {String.Join(", ", b.Origin)}");
+            }
+            catch (Exception ex)
+            {
+                LogError($"{ex}");
+            }
+
             foreach (var b in e.Guilds)
             {
                 
