@@ -7,7 +7,7 @@ public class PhishingUrls
     public class UrlInfo
     {
         public string Url { get; set; } = "";
-        public List<string>? Origin { get; set; } = new();
+        public List<string> Origin { get; set; } = new();
         public ulong Submitter { get; set; } = 0;
     }
 

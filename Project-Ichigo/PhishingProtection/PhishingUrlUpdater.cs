@@ -16,26 +16,26 @@ public class PhishingUrlUpdater
                 DatabaseUpdated = true;
                 phishingUrls.List.Add(b);
 
-                LogDebug($"Added '{b.Url}' ('{(b.Origin?.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') to the phishing url database");
+                LogDebug($"Added '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') to the phishing url database");
             }
 
-            if (phishingUrls.List.Any(x => x.Url == b.Url && x.Origin?.Count != b.Origin?.Count || x.Submitter != x.Submitter))
+            if (phishingUrls.List.Any(x => x.Url == b.Url && x.Origin.Count != b.Origin.Count || x.Submitter != x.Submitter))
             {
                 DatabaseUpdated = true;
                 phishingUrls.List.Remove(phishingUrls.List.First(x => x.Url == b.Url));
                 phishingUrls.List.Add(b);
 
-                LogDebug($"Updated '{b.Url}' ('{(b.Origin?.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') in the phishing url database");
+                LogDebug($"Updated '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') in the phishing url database");
             }
         }
 
-        if (phishingUrls.List.Any(x => x.Origin?.Count != 0 && !urls.Any(y => y.Url == x.Url)))
+        if (phishingUrls.List.Any(x => x.Origin.Count != 0 && !urls.Any(y => y.Url == x.Url)))
             foreach (var b in phishingUrls.List.ToList())
             {
                 DatabaseUpdated = true;
                 phishingUrls.List.Remove(phishingUrls.List.First(x => x.Url == b.Url));
 
-                LogDebug($"Removed '{b.Url}' ('{(b.Origin?.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') from the phishing url database");
+                LogDebug($"Removed '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') from the phishing url database");
             }
 
         if (!DatabaseUpdated)
@@ -117,6 +117,8 @@ public class PhishingUrlUpdater
 
     private async Task<List<PhishingUrls.UrlInfo>> GetUrls ()
     {
+        Stopwatch sw = Stopwatch.StartNew();
+
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();
 
@@ -150,6 +152,9 @@ public class PhishingUrlUpdater
             }
         }
 
+        LogDebug($"Downloaded all phishing urls. ({sw.ElapsedMilliseconds}ms)");
+
+        sw.Restart();
         try
         {
             var urls = await DownloadList("https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt");
@@ -157,6 +162,9 @@ public class PhishingUrlUpdater
         }
         catch (Exception ex) { LogError($"An exception occured while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt': {ex}"); }
 
+        LogDebug($"Downloaded whitelist for phishing urls. ({sw.ElapsedMilliseconds}ms)");
+
+        sw.Restart();
         try
         {
             if (WhitelistedDomains is null || WhitelistedDomains.Count == 0)
@@ -167,6 +175,9 @@ public class PhishingUrlUpdater
                     SanitizedMatches.Remove(b);
         }
         catch (Exception ex) { LogError($"Failed to remove whitelisted domains from blacklist: {ex}"); }
+
+        LogDebug($"Removed whitelisted urls from phishing urls. ({sw.ElapsedMilliseconds}ms)");
+        sw.Stop();
 
         return SanitizedMatches.Select(x => new PhishingUrls.UrlInfo
         {
