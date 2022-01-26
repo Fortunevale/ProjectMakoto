@@ -213,7 +213,7 @@ internal class Bot
                     Submitter = x.Submitter
                 }));
 
-                LogDebug($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
+                LogInfo($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
 
                 _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }
@@ -232,10 +232,7 @@ internal class Bot
     {
         _ = Task.Run(async () =>
         {
-            foreach (var b in e.Guilds)
-            {
-                
-            }
+            LogInfo($"I'm on {e.Guilds.Count} guilds.");
         });
     }
 }

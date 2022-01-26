@@ -105,7 +105,7 @@ public class PhishingUrlUpdater
             await cmd.ExecuteNonQueryAsync();
 
             sw.Stop();
-            LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+            LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
             UpdateRunning = false;
         }
         catch (Exception)
@@ -120,140 +120,34 @@ public class PhishingUrlUpdater
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();
 
-        try
+        foreach (var url in new string[] 
         {
-            var list = await DownloadList("https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json");
-
-            foreach (var b in list)
+            "https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json",
+            "https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt",
+            "https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt",
+            "https://fortunevale.dd-dns.de/discord-scam-urls.txt",
+            "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt",
+            "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt",
+            "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt",
+            "https://raw.githubusercontent.com/Vytrah/videogame-scam-blocklist/main/list.txt"
+        })
+        {
+            try
             {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json");
-                else
-                    SanitizedMatches.Add(b, new List<string>{ "https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json" });
+                var list = await DownloadList(url);
+
+                foreach (var b in list)
+                {
+                    if (SanitizedMatches.ContainsKey(b))
+                        SanitizedMatches.First(x => x.Key == b).Value.Add(url);
+                    else
+                        SanitizedMatches.Add(b, new List<string> { url });
+                }
             }
-        }
-        catch (Exception ex) 
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt");
-
-            foreach (var b in list)
+            catch (Exception ex)
             {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt" });
+                throw new Exception($"An exception occured while trying to download URLs from '{url}': {ex}");
             }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt");
-
-            foreach (var b in list)
-            {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt" });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://fortunevale.dd-dns.de/discord-scam-urls.txt");
-
-            foreach (var b in list)
-            {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://fortunevale.dd-dns.de/discord-scam-urls.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://fortunevale.dd-dns.de/discord-scam-urls.txt" });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls.txt': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt");
-
-            foreach (var b in list)
-            {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt" });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt");
-
-            foreach (var b in list)
-            {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt" });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt");
-
-            foreach (var b in list)
-            {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt" });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt': {ex}");
-        }
-
-        try
-        {
-            var list = await DownloadList("https://raw.githubusercontent.com/Vytrah/videogame-scam-blocklist/main/list.txt");
-
-            foreach (var b in list)
-            {
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.First(x => x.Key == b).Value.Add("https://raw.githubusercontent.com/Vytrah/videogame-scam-blocklist/main/list.txt");
-                else
-                    SanitizedMatches.Add(b, new List<string> { "https://raw.githubusercontent.com/Vytrah/videogame-scam-blocklist/main/list.txt" });
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"An exception occured while trying to download URLs from 'https://raw.githubusercontent.com/Vytrah/videogame-scam-blocklist/main/list.txt': {ex}");
         }
 
         try
