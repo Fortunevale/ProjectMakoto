@@ -19,7 +19,7 @@ public class PhishingUrlUpdater
                 LogDebug($"Added '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') to the phishing url database");
             }
 
-            if (phishingUrls.List.Any(x => x.Url == b.Url && x.Origin.Count != b.Origin.Count || x.Submitter != x.Submitter))
+            if (phishingUrls.List.Any(x => (x.Url == b.Url && x.Origin.Count != b.Origin.Count) || x.Submitter != x.Submitter))
             {
                 DatabaseUpdated = true;
                 phishingUrls.List.Remove(phishingUrls.List.First(x => x.Url == b.Url));
@@ -191,7 +191,7 @@ public class PhishingUrlUpdater
     {
         LogDebug($"Downloading URLs as List from '{url}'..");
 
-        HttpClient client = new HttpClient();
+        HttpClient client = new();
         var urls = await client.GetStringAsync(url);
 
         return urls.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries)
@@ -201,6 +201,6 @@ public class PhishingUrlUpdater
                 .Replace(",", "")
                 .Replace("127.0.0.1", "").Trim())
                 .ToList()
-            .Where(x => !x.StartsWith("#") && !x.StartsWith("!") && x.Contains(".")).ToList();
+            .Where(x => !x.StartsWith("#") && !x.StartsWith("!") && x.Contains('.')).ToList();
     }
 }

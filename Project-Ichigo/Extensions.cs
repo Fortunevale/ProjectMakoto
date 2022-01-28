@@ -2,6 +2,24 @@
 
 public static class Extensions
 {
+    public static bool IsMaintenance(this DiscordMember member)
+    {
+        if (Bot._status.TeamMembers.Contains(member.Id))
+            return true;
+
+        return false;
+    }
+
+    public static bool IsAdmin(this DiscordMember member)
+    {
+        if ((member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed)) ||
+            (member.IsMaintenance()) ||
+            member.IsOwner)
+            return true;
+
+        return false;
+    }
+
     public static string DigitsToEmotes(this long i) =>
         DigitsToEmotes(i.ToString());
 

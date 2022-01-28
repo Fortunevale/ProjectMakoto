@@ -11,18 +11,22 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="9.8.5-nightly-00254" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.5-nightly-00254" />
-    <PackageReference Include="DisCatSharp.Common" Version="9.8.5-nightly-00254" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.5-nightly-00254" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.5-nightly-00254" />
-    <PackageReference Include="MySql.Data" Version="8.0.27" />
+    <PackageReference Include="DisCatSharp" Version="9.8.7-nightly-00278" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.7-nightly-00278" />
+    <PackageReference Include="DisCatSharp.Common" Version="9.8.7-nightly-00278" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.7-nightly-00278" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.7-nightly-00278" />
+    <PackageReference Include="MySql.Data" Version="8.0.28" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="D:\Dokumente\GitHub\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="D:\Dokumente\GitHub\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\Admin\" />
   </ItemGroup>
 
 </Project>

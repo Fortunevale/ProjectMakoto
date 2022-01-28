@@ -1,7 +1,5 @@
 ﻿namespace Project_Ichigo;
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-
 internal static class PreMadeEmbedsExtensions
 {
     public static DiscordEmbedBuilder GenerateMaintenanceError(this CommandContext ctx)
