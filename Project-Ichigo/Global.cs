@@ -42,6 +42,7 @@ global using DisCatSharp.CommandsNext.Converters;
 
 global using Project_Ichigo.Secrets;
 global using Project_Ichigo.Objects;
+global using Project_Ichigo.Objects.Database;
 global using Project_Ichigo.PhishingProtection;
 
 global using static Project_Ichigo.Attributes.CustomAttributes;

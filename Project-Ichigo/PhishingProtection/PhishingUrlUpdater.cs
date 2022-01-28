@@ -60,7 +60,7 @@ public class PhishingUrlUpdater
         try
         {
             UpdateRunning = true;
-            List<PhishingUrls.UrlInfoDatabase> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrls.UrlInfoDatabase
+            List<PhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrlInfo
             {
                 Url = x.Url,
                 Origin = JsonConvert.SerializeObject(x.Origin),

@@ -34,9 +34,6 @@ internal class Bot
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Regex.Replace(Environment.CommandLine, @"(--token \S*)", "")}\n");
 
-        if (!Directory.Exists("config-backups"))
-            Directory.CreateDirectory("config-backups");
-
         var logInToDiscord = Task.Run(async () =>
         {
             string token = "";
@@ -126,6 +123,19 @@ internal class Bot
                 discordLoginSc.Stop();
                 LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
                 _status.DiscordInitialized = true;
+
+                _ = Task.Run(() =>
+                {
+                    try
+                    {
+                        _status.TeamMembers.AddRange(DiscordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
+                        LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"An exception occured trying to add team members to administrator list. Is the current bot registered in a team?: {ex}");
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -205,7 +215,7 @@ internal class Bot
 
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-                IEnumerable<PhishingUrls.UrlInfoDatabase> scamUrls = databaseConnection.Query<PhishingUrls.UrlInfoDatabase>($"SELECT ind, url, origin, submitter FROM scam_urls");
+                IEnumerable<PhishingUrlInfo> scamUrls = databaseConnection.Query<PhishingUrlInfo>($"SELECT ind, url, origin, submitter FROM scam_urls");
                 _phishingUrls.List.AddRange(scamUrls.Select(x => new PhishingUrls.UrlInfo
                 {
                     Url = x.Url,
