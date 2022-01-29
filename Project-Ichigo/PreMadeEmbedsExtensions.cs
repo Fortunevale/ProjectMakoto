@@ -73,105 +73,66 @@ internal static class PreMadeEmbedsExtensions
 
     public static DiscordEmbedBuilder CreateSyntaxError(this CommandContext ctx)
     {
-        if (ctx.Client.GetCommandsNext().RegisteredCommands.ContainsKey(ctx.Command.Name) && ctx.Client.GetCommandsNext().RegisteredCommands.FirstOrDefault(x => x.Key == ctx.Command.Name).Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null)
+        var embed = new DiscordEmbedBuilder
         {
-            var embed = new DiscordEmbedBuilder
+            Author = new DiscordEmbedBuilder.EmbedAuthor
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = ctx.Guild.IconUrl,
-                    Name = ctx.Guild.Name
-                },
-                Title = "",
-                Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.Replace("`", "").Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.Name} {ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.User.Username}#{ctx.User.Discriminator}",
-                    IconUrl = ctx.User.AvatarUrl
-                },
-                Timestamp = DateTime.UtcNow,
-                Color = new DiscordColor("#ff6666")
-            };
-
-            if (ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString.Contains("@User"))
-                embed.Description += "\n\n_Tip: You might've accidentally copied a message id or channel id instead of the user id._";
-
-            try
+                IconUrl = ctx.Guild.IconUrl,
+                Name = ctx.Guild.Name
+            },
+            Title = "",
+            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.Replace("`", "").Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.Name}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+            Footer = new DiscordEmbedBuilder.EmbedFooter
             {
-                return embed;
+                Text = $"Command used by {ctx.User.Username}#{ctx.User.Discriminator}",
+                IconUrl = ctx.User.AvatarUrl
+            },
+            Timestamp = DateTime.UtcNow,
+            Color = new DiscordColor("#ff6666")
+        };
 
-                //string RoleRequired = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString;
+        if (ctx.Client.GetCommandsNext()
+            .RegisteredCommands[ ctx.Command.Name ].Overloads
+            .First().Arguments
+            .First().Type.Name is "DiscordUser" or "DiscordMember")
+            embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
 
-                //if (RoleRequired == "user" || RoleRequired == "music")
-                //{
-                //    return embed;
-                //}
-                //if (RoleRequired == "mod")
-                //{
-                //    if (ctx.Guild.Members[ctx.User.Id].IsMod())
-                //    {
-                //        return embed;
-                //    }
-                //    else
-                //    {
-                //        return GenerateModError(ctx);
-                //    }
-                //}
-                //else if (RoleRequired == "admin")
-                //{
-                //    if (ctx.Guild.Members[ctx.User.Id].IsAdmin())
-                //    {
-                //        return embed;
-                //    }
-                //    else
-                //    {
-                //        return GenerateAdminError(ctx);
-                //    }
-                //}
-                //else if (RoleRequired == "maintainence")
-                //{
-                //    if (ctx.Guild.Members[ ctx.User.Id ].IsMaintenance())
-                //    {
-                //        return embed;
-                //    }
-                //    else
-                //    {
-                //        return GenerateMaintenanceError(ctx);
-                //    }
-                //}
-                //else
-                //{
-                //    LogWarn($"Specified Command Module wasn't found: {RoleRequired}");
-                //    return embed;
-                //}
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to check roles of user {ctx.User.Username}#{ctx.User.Discriminator}: {ex}");
-                return embed;
-            }
-        }
-        else
+        return embed;
+    }
+
+    public static string GenerateUsage(this Command cmd)
+    {
+        string Usage = "";
+
+        if (cmd.Overloads.Count > 0)
         {
-            var embed = new DiscordEmbedBuilder
+            foreach (var b in cmd.Overloads.First().Arguments)
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = ctx.Guild.IconUrl,
-                    Name = ctx.Guild.Name
-                },
-                Title = "",
-                Description = $"You didn't use the command right. However, there was no command syntax available.",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.User.Username}#{ctx.User.Discriminator}",
-                    IconUrl = ctx.User.AvatarUrl
-                },
-                Timestamp = DateTime.UtcNow,
-                Color = new DiscordColor("#ff6666")
-            };
+                Usage += $" ";
 
-            return embed;
+                if (b.IsOptional)
+                    Usage += "[";
+                else
+                    Usage += "<";
+
+                if (b.Description != null && b.Description != "")
+                    Usage += b.Description;
+                else
+                    Usage += b.Type.Name;
+
+                if (b.IsOptional)
+                    Usage += "]";
+                else
+                    Usage += ">";
+            }
+
+            Usage = Usage.Replace("DiscordUser", "@User")
+                         .Replace("DiscordMember", "@Member")
+                         .Replace("Boolean", "true/false")
+                         .Replace("Int32", "Number")
+                         .Replace("Int64", "Number")
+                         .Replace("String", "Text");
         }
+        return Usage;
     }
 }

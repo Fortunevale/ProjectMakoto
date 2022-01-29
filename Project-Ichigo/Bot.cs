@@ -9,9 +9,9 @@ internal class Bot
     
 
 
-    internal static Status _status = new Status();
+    internal static Status _status = new();
 
-    internal static PhishingUrls _phishingUrls = new PhishingUrls();
+    internal static PhishingUrls _phishingUrls = new();
 
 
     internal async Task Init(string[] args)
@@ -106,6 +106,12 @@ internal class Bot
             LogDebug($"Registering Command Converters..");
             DiscordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());
             DiscordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.BoolConverter());
+
+            LogDebug($"Registering Command Events..");
+
+            CommandEvents commandEvents = new();
+            DiscordClient.GetCommandsNext().CommandExecuted += commandEvents.CommandExecuted;
+            DiscordClient.GetCommandsNext().CommandErrored += commandEvents.CommandError;
 
             LogDebug($"Registering Interactivity..");
 

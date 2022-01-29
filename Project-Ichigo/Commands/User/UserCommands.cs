@@ -2,7 +2,7 @@
 internal class UserCommands : BaseCommandModule
 {
     [Command("help"),
-    CommandModule("user"), CommandUsage(""),
+    CommandModule("user"),
     Description("Displays help")]
     public async Task Help(CommandContext ctx)
     {
@@ -15,35 +15,35 @@ internal class UserCommands : BaseCommandModule
 
                 Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "user")
                     .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
-                    $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null ? $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString != "" ? $" {x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}" : "")}" : "")}` - " +
+                    $"{x.Value.GenerateUsage()}` - " +
                     $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("User Commands", x)).ToList());
 
                 Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "music")
                     .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
-                    $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null ? $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString != "" ? $" {x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}" : "")}" : "")}` - " +
+                    $"{x.Value.GenerateUsage()}` - " +
                     $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Music Commands", x)).ToList());
 
                 Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "mod")
                     .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
-                    $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null ? $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString != "" ? $" {x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}" : "")}" : "")}` - " +
+                    $"{x.Value.GenerateUsage()}` - " +
                     $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Mod Commands", x)).ToList());
 
                 if (ctx.Member.IsAdmin())
                     Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "admin")
                         .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
-                        $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null ? $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString != "" ? $" {x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}" : "")}" : "")}` - " +
+                        $"{x.Value.GenerateUsage()}` - " +
                         $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Admin Commands", x)).ToList());
 
                 if (ctx.Member.IsMaintenance())
                     Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "maintainence")
                         .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
-                        $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null ? $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString != "" ? $" {x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}" : "")}" : "")}` - " +
+                        $"{x.Value.GenerateUsage()}` - " +
                         $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Maintenance Commands", x)).ToList());
 
                 if (ctx.Member.IsMaintenance())
                     Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "hidden")
                         .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
-                        $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault() is not null ? $"{(x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString != "" ? $" {x.Value.CustomAttributes.OfType<CommandUsageAttribute>().FirstOrDefault().UsageString}" : "")}" : "")}` - " +
+                        $"{x.Value.GenerateUsage()}` - " +
                         $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Hidden Commands", x)).ToList());
 
                 var Fields = Commands.PrepareEmbedFields();
