@@ -128,6 +128,8 @@ internal static class PreMadeEmbedsExtensions
 
             Usage = Usage.Replace("DiscordUser", "@User")
                          .Replace("DiscordMember", "@Member")
+                         .Replace("DiscordChannel", "#Channel")
+                         .Replace("DiscordRole", "@Role")
                          .Replace("Boolean", "true/false")
                          .Replace("Int32", "Number")
                          .Replace("Int64", "Number")
