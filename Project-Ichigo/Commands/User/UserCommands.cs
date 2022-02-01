@@ -320,10 +320,10 @@ internal class UserCommands : BaseCommandModule
         });
     }
 
-    [Command("user-info"),
+    [Command("user-info"), Aliases("userinfo"),
     CommandModule("user"),
     Description("Shows information about the mentioned user.")]
-    public async Task UserInfo(CommandContext ctx, DiscordUser victim = null)
+    public async Task UserInfo(CommandContext ctx, DiscordUser victim)
     {
         try
         {
