@@ -11,31 +11,36 @@ public class PhishingUrlUpdater
 
         foreach (var b in urls)
         {
-            if (!phishingUrls.List.Any(x => x.Url == b.Url))
+            if (!phishingUrls.List.ContainsKey(b.Url))
             {
                 DatabaseUpdated = true;
-                phishingUrls.List.Add(b);
+                phishingUrls.List.Add(b.Url, b);
 
                 LogDebug($"Added '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') to the phishing url database");
+                continue;
             }
 
-            if (phishingUrls.List.Any(x => (x.Url == b.Url && x.Origin.Count != b.Origin.Count) || x.Submitter != x.Submitter))
+            if (phishingUrls.List.ContainsKey(b.Url))
             {
-                DatabaseUpdated = true;
-                phishingUrls.List.Remove(phishingUrls.List.First(x => x.Url == b.Url));
-                phishingUrls.List.Add(b);
+                if (phishingUrls.List[b.Url].Origin.Count != b.Origin.Count)
+                {
+                    DatabaseUpdated = true;
+                    phishingUrls.List[ b.Url ].Origin = b.Origin;
+                    phishingUrls.List[ b.Url ].Submitter = b.Submitter;
 
-                LogDebug($"Updated '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') in the phishing url database");
+                    LogDebug($"Updated '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') in the phishing url database");
+                    continue;
+                }
             }
         }
 
-        if (phishingUrls.List.Any(x => x.Origin.Count != 0 && !urls.Any(y => y.Url == x.Url)))
+        if (phishingUrls.List.Any(x => x.Value.Origin.Count != 0 && !urls.Any(y => y.Url == x.Value.Url)))
             foreach (var b in phishingUrls.List.ToList())
             {
                 DatabaseUpdated = true;
-                phishingUrls.List.Remove(phishingUrls.List.First(x => x.Url == b.Url));
+                phishingUrls.List.Remove(b.Key);
 
-                LogDebug($"Removed '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') from the phishing url database");
+                LogDebug($"Removed '{b.Value.Url}' ('{(b.Value.Origin.Count != 0 ? String.Join(", ", b.Value.Origin) : $"{b.Value.Submitter}")}') from the phishing url database");
             }
 
         GC.Collect();
@@ -61,12 +66,13 @@ public class PhishingUrlUpdater
 
         try
         {
+            LogDebug($"Generating DatabaseInserts..");
             UpdateRunning = true;
             List<PhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrlInfo
             {
-                Url = x.Url,
-                Origin = JsonConvert.SerializeObject(x.Origin),
-                Submitter = x.Submitter
+                Url = x.Value.Url,
+                Origin = JsonConvert.SerializeObject(x.Value.Origin),
+                Submitter = x.Value.Submitter
             }).OrderBy(x => x.Url).ToList();
 
             if (Bot.databaseConnection == null)
@@ -90,12 +96,11 @@ public class PhishingUrlUpdater
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-            cmd.CommandText += " ON DUPLICATE KEY UPDATE origin=origin";
 
             cmd.Connection = Bot.databaseConnection;
 
             LogDebug($"Inserting {DatabaseInserts.Count} rows into table 'scam_urls'..");
-            var b = cmd.ExecuteNonQuery();
+            var b = await cmd.ExecuteNonQueryAsync();
 
             sw.Stop();
             LogInfo($"Inserted {b} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");

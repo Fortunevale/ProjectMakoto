@@ -226,12 +226,14 @@ internal class Bot
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
                 IEnumerable<PhishingUrlInfo> scamUrls = databaseConnection.Query<PhishingUrlInfo>($"SELECT ind, url, origin, submitter FROM scam_urls");
-                _phishingUrls.List.AddRange(scamUrls.Select(x => new PhishingUrls.UrlInfo
-                {
-                    Url = x.Url,
-                    Origin = JsonConvert.DeserializeObject<List<string>>(x.Origin),
-                    Submitter = x.Submitter
-                }));
+
+                foreach (var b in scamUrls)
+                    _phishingUrls.List.Add(b.Url, new PhishingUrls.UrlInfo
+                    {
+                        Url = b.Url,
+                        Origin = JsonConvert.DeserializeObject<List<string>>(b.Origin),
+                        Submitter = b.Submitter
+                    });
 
                 LogInfo($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
 

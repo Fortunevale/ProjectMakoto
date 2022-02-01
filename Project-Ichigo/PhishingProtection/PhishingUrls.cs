@@ -2,7 +2,7 @@ namespace Project_Ichigo.PhishingProtection;
 
 public class PhishingUrls
 {
-    internal List<UrlInfo> List = new();
+    internal Dictionary<string, UrlInfo> List = new();
 
     public class UrlInfo
     {
