@@ -38,6 +38,8 @@ public class PhishingUrlUpdater
                 LogDebug($"Removed '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') from the phishing url database");
             }
 
+        GC.Collect();
+
         if (!DatabaseUpdated)
         {
             LogDebug($"Nothing has been updated");
@@ -74,16 +76,6 @@ public class PhishingUrlUpdater
 
             Stopwatch sw = Stopwatch.StartNew();
 
-            var clearcmd = Bot.databaseConnection.CreateCommand();
-            clearcmd.CommandText = "TRUNCATE TABLE scam_urls";
-            clearcmd.Connection = Bot.databaseConnection;
-            await clearcmd.ExecuteNonQueryAsync();
-
-            sw.Stop();
-            LogDebug($"Cleared table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
-
-            sw.Restart();
-
             var cmd = Bot.databaseConnection.CreateCommand();
             cmd.CommandText = @$"INSERT INTO scam_urls ( ind, url, origin, submitter ) VALUES ";
 
@@ -98,20 +90,31 @@ public class PhishingUrlUpdater
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+            cmd.CommandText += " ON DUPLICATE KEY UPDATE origin=origin";
 
             cmd.Connection = Bot.databaseConnection;
 
             LogDebug($"Inserting {DatabaseInserts.Count} rows into table 'scam_urls'..");
-            await cmd.ExecuteNonQueryAsync();
+            var b = cmd.ExecuteNonQuery();
 
             sw.Stop();
-            LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+            LogInfo($"Inserted {b} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
             UpdateRunning = false;
+            DatabaseInserts.Clear();
+            DatabaseInserts = null;
+            sw = null;
+            cmd.Dispose();
         }
         catch (Exception)
         {
+            GC.Collect();
             UpdateRunning = false;
             throw;
+        }
+        finally
+        {
+            await Task.Delay(1000);
+            GC.Collect();
         }
     }
 
