@@ -2,9 +2,11 @@
 
 public static class Extensions
 {
-    public static bool IsMaintenance(this DiscordMember member)
+    public static bool IsMaintenance(this DiscordMember member) => (member as DiscordUser).IsMaintenance();
+
+    public static bool IsMaintenance(this DiscordUser user)
     {
-        if (Bot._status.TeamMembers.Contains(member.Id))
+        if (Bot._status.TeamMembers.Contains(user.Id))
             return true;
 
         return false;

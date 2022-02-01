@@ -29,7 +29,7 @@ internal class CommandEvents
 
                     try
                     {
-                        await e.Context.Channel.SendMessageAsync(embed: e.Context.CreateSyntaxError());
+                        await e.Context.SendSyntaxError();
                     }
                     catch { }
 

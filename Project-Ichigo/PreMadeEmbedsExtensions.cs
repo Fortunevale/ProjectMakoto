@@ -2,7 +2,7 @@
 
 internal static class PreMadeEmbedsExtensions
 {
-    public static DiscordEmbedBuilder GenerateMaintenanceError(this CommandContext ctx)
+    public static async Task<DiscordMessage> SendMaintenanceError(this CommandContext ctx)
     {
         DiscordEmbedBuilder embed = new()
         {
@@ -22,10 +22,12 @@ internal static class PreMadeEmbedsExtensions
             Color = new DiscordColor("#ff6666")
         };
 
-        return embed;
+        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
+
+        return msg;
     }
 
-    public static DiscordEmbedBuilder GenerateAdminError(this CommandContext ctx)
+    public static async Task<DiscordMessage> SendAdminError(this CommandContext ctx)
     {
         DiscordEmbedBuilder embed = new()
         {
@@ -45,10 +47,12 @@ internal static class PreMadeEmbedsExtensions
             Color = new DiscordColor("#ff6666")
         };
 
-        return embed;
+        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
+
+        return msg;
     }
 
-    public static DiscordEmbedBuilder GenerateModError(this CommandContext ctx)
+    public static async Task<DiscordMessage> SendModError(this CommandContext ctx)
     {
         DiscordEmbedBuilder embed = new()
         {
@@ -68,10 +72,12 @@ internal static class PreMadeEmbedsExtensions
             Color = new DiscordColor("#ff6666")
         };
 
-        return embed;
+        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
+
+        return msg;
     }
 
-    public static DiscordEmbedBuilder CreateSyntaxError(this CommandContext ctx)
+    public static async Task<DiscordMessage> SendSyntaxError(this CommandContext ctx)
     {
         var embed = new DiscordEmbedBuilder
         {
@@ -97,7 +103,9 @@ internal static class PreMadeEmbedsExtensions
             .First().Type.Name is "DiscordUser" or "DiscordMember")
             embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
 
-        return embed;
+        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
+
+        return msg;
     }
 
     public static string GenerateUsage(this Command cmd)

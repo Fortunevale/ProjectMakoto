@@ -140,7 +140,7 @@ internal class UserCommands : BaseCommandModule
     [Command("info"),
     CommandModule("user"),
     Description("Shows informations about the bot or the mentioned user.")]
-    public async Task InfoCommand(CommandContext ctx, DiscordUser victim = null)
+    public async Task Info(CommandContext ctx, DiscordUser victim = null)
     {
         _ = Task.Run(async () =>
         {
@@ -152,10 +152,10 @@ internal class UserCommands : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
-                            IconUrl = Resources.LoadingGifUrlBlue,
+                            IconUrl = Resources.StatusIndicators.LoadingBlue,
                             Name = "Informations about this server and bot"
                         },
-                        Color = DiscordColor.VeryDarkGray,
+                        Color = ColorHelper.HiddenSidebar,
                         Description = "",
                         Footer = new DiscordEmbedBuilder.EmbedFooter
                         {

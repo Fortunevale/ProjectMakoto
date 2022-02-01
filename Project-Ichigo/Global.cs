@@ -47,6 +47,7 @@ global using Project_Ichigo.Objects.Database;
 global using Project_Ichigo.PhishingProtection;
 global using Project_Ichigo.Commands;
 global using Project_Ichigo.Commands.User;
+global using Project_Ichigo.Commands.Admin;
 
 global using static Project_Ichigo.Attributes.CustomAttributes;
 
