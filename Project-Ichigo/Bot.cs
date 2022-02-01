@@ -245,6 +245,21 @@ internal class Bot
             }
         });
 
+        while (!loadDatabase.IsCompleted || !logInToDiscord.IsCompleted)
+            await Task.Delay(100);
+
+        if (!loadDatabase.IsCompletedSuccessfully)
+        {
+            LogFatal($"An uncaught exception occured while initializing the database.");
+            Environment.Exit(ExitCodes.FailedDatabaseLoad);
+        }
+
+        if (!logInToDiscord.IsCompletedSuccessfully)
+        {
+            LogFatal($"An uncaught exception occured while initializing the discord client.");
+            Environment.Exit(ExitCodes.FailedDiscordLogin);
+        }
+
         await Task.Delay(-1);
     }
 
