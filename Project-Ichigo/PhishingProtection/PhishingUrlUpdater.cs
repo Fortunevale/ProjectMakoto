@@ -15,8 +15,6 @@ public class PhishingUrlUpdater
             {
                 DatabaseUpdated = true;
                 phishingUrls.List.Add(b.Url, b);
-
-                LogDebug($"Added '{b.Url}' to the phishing url database");
                 continue;
             }
 
@@ -27,8 +25,6 @@ public class PhishingUrlUpdater
                     DatabaseUpdated = true;
                     phishingUrls.List[ b.Url ].Origin = b.Origin;
                     phishingUrls.List[ b.Url ].Submitter = b.Submitter;
-
-                    LogDebug($"Updated '{b.Url}' in the phishing url database");
                     continue;
                 }
             }
@@ -42,17 +38,12 @@ public class PhishingUrlUpdater
                 DatabaseUpdated = true;
                 phishingUrls.List.Remove(b.Key);
                 dropUrls.Add(b.Key);
-
-                LogDebug($"Removed '{b.Value.Url}' from the phishing url database");
             }
 
         GC.Collect();
 
         if (!DatabaseUpdated)
-        {
-            LogDebug($"Nothing has been updated");
             return;
-        }
 
         try
         {
@@ -76,7 +67,6 @@ public class PhishingUrlUpdater
 
         try
         {
-            LogDebug($"Generating DatabaseInserts..");
             UpdateRunning = true;
             List<PhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrlInfo
             {
@@ -89,8 +79,6 @@ public class PhishingUrlUpdater
             {
                 throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
             }
-
-            Stopwatch sw = Stopwatch.StartNew();
 
             var cmd = Bot.databaseConnection.CreateCommand();
             cmd.CommandText = @$"INSERT INTO scam_urls ( url, origin, submitter ) VALUES ";
@@ -108,12 +96,9 @@ public class PhishingUrlUpdater
             cmd.CommandText += " ON DUPLICATE KEY UPDATE origin=values(origin)";
 
             cmd.Connection = Bot.databaseConnection;
-
-            LogDebug($"Inserting {DatabaseInserts.Count} rows into table 'scam_urls'..");
             await cmd.ExecuteNonQueryAsync();
 
-            sw.Stop();
-            LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+            LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
             UpdateRunning = false;
             DatabaseInserts.Clear();
             DatabaseInserts = null;
@@ -121,19 +106,14 @@ public class PhishingUrlUpdater
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    sw.Restart();
-                    LogDebug($"Dropping '{b}' from table 'scam_urls'..");
-
                     cmd = Bot.databaseConnection.CreateCommand();
                     cmd.CommandText = $"DELETE FROM scam_urls WHERE url='{b}'";
                     cmd.Connection = Bot.databaseConnection;
                     await cmd.ExecuteNonQueryAsync();
 
-                    LogDebug($"Dropped '{b}' from table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
-                    sw.Stop();
+                    LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }
 
-            sw = null;
             cmd.Dispose();
         }
         catch (Exception)
@@ -151,8 +131,6 @@ public class PhishingUrlUpdater
 
     private async Task<List<PhishingUrls.UrlInfo>> GetUrls ()
     {
-        Stopwatch sw = Stopwatch.StartNew();
-
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();
 
@@ -186,9 +164,6 @@ public class PhishingUrlUpdater
             }
         }
 
-        LogDebug($"Downloaded all phishing urls. ({sw.ElapsedMilliseconds}ms)");
-
-        sw.Restart();
         try
         {
             var urls = await DownloadList("https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt");
@@ -196,9 +171,6 @@ public class PhishingUrlUpdater
         }
         catch (Exception ex) { LogError($"An exception occured while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt': {ex}"); }
 
-        LogDebug($"Downloaded whitelist for phishing urls. ({sw.ElapsedMilliseconds}ms)");
-
-        sw.Restart();
         try
         {
             if (WhitelistedDomains is null || WhitelistedDomains.Count == 0)
@@ -210,9 +182,6 @@ public class PhishingUrlUpdater
         }
         catch (Exception ex) { LogError($"Failed to remove whitelisted domains from blacklist: {ex}"); }
 
-        LogDebug($"Removed whitelisted urls from phishing urls. ({sw.ElapsedMilliseconds}ms)");
-        sw.Stop();
-
         return SanitizedMatches.Select(x => new PhishingUrls.UrlInfo
         {
             Url = x.Key,
@@ -223,8 +192,6 @@ public class PhishingUrlUpdater
 
     private async Task<List<string>> DownloadList(string url)
     {
-        LogDebug($"Downloading URLs as List from '{url}'..");
-
         HttpClient client = new();
         var urls = await client.GetStringAsync(url);
 
