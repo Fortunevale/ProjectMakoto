@@ -16,7 +16,7 @@ public class PhishingUrlUpdater
                 DatabaseUpdated = true;
                 phishingUrls.List.Add(b.Url, b);
 
-                LogDebug($"Added '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') to the phishing url database");
+                LogDebug($"Added '{b.Url}' to the phishing url database");
                 continue;
             }
 
@@ -28,19 +28,22 @@ public class PhishingUrlUpdater
                     phishingUrls.List[ b.Url ].Origin = b.Origin;
                     phishingUrls.List[ b.Url ].Submitter = b.Submitter;
 
-                    LogDebug($"Updated '{b.Url}' ('{(b.Origin.Count != 0 ? String.Join(", ", b.Origin) : $"{b.Submitter}")}') in the phishing url database");
+                    LogDebug($"Updated '{b.Url}' in the phishing url database");
                     continue;
                 }
             }
         }
 
+        List<string> dropUrls = new();
+
         if (phishingUrls.List.Any(x => x.Value.Origin.Count != 0 && !urls.Any(y => y.Url == x.Value.Url)))
-            foreach (var b in phishingUrls.List.ToList())
+            foreach (var b in phishingUrls.List.Where(x => x.Value.Origin.Count != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
             {
                 DatabaseUpdated = true;
                 phishingUrls.List.Remove(b.Key);
+                dropUrls.Add(b.Key);
 
-                LogDebug($"Removed '{b.Value.Url}' ('{(b.Value.Origin.Count != 0 ? String.Join(", ", b.Value.Origin) : $"{b.Value.Submitter}")}') from the phishing url database");
+                LogDebug($"Removed '{b.Value.Url}' from the phishing url database");
             }
 
         GC.Collect();
@@ -51,12 +54,19 @@ public class PhishingUrlUpdater
             return;
         }
 
-        await UpdateDatabase(phishingUrls);
+        try
+        {
+            await UpdateDatabase(phishingUrls, dropUrls);
+        }
+        catch (Exception ex)
+        {
+            LogError($"{ex}");
+        }
     }
 
     private bool UpdateRunning = false;
 
-    public async Task UpdateDatabase(PhishingUrls phishingUrls)
+    public async Task UpdateDatabase(PhishingUrls phishingUrls, List<string> dropUrls)
     {
         if (UpdateRunning)
         {
@@ -83,30 +93,46 @@ public class PhishingUrlUpdater
             Stopwatch sw = Stopwatch.StartNew();
 
             var cmd = Bot.databaseConnection.CreateCommand();
-            cmd.CommandText = @$"INSERT INTO scam_urls ( ind, url, origin, submitter ) VALUES ";
+            cmd.CommandText = @$"INSERT INTO scam_urls ( url, origin, submitter ) VALUES ";
 
             for (int i = 0; i < DatabaseInserts.Count; i++)
             {
-                cmd.CommandText += @$"( @ind{i}, @url{i}, @origin{i}, @submitter{i} ), ";
+                cmd.CommandText += @$"( @url{i}, @origin{i}, @submitter{i} ), ";
 
-                cmd.Parameters.AddWithValue($"ind{i}", i);
                 cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].Url);
                 cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].Origin);
                 cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].Submitter);
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+            cmd.CommandText += " ON DUPLICATE KEY UPDATE origin=values(origin)";
 
             cmd.Connection = Bot.databaseConnection;
 
             LogDebug($"Inserting {DatabaseInserts.Count} rows into table 'scam_urls'..");
-            var b = await cmd.ExecuteNonQueryAsync();
+            await cmd.ExecuteNonQueryAsync();
 
             sw.Stop();
-            LogInfo($"Inserted {b} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+            LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
             UpdateRunning = false;
             DatabaseInserts.Clear();
             DatabaseInserts = null;
+
+            if (dropUrls.Count != 0)
+                foreach (var b in dropUrls)
+                {
+                    sw.Restart();
+                    LogDebug($"Dropping '{b}' from table 'scam_urls'..");
+
+                    cmd = Bot.databaseConnection.CreateCommand();
+                    cmd.CommandText = $"DELETE FROM scam_urls WHERE url='{b}'";
+                    cmd.Connection = Bot.databaseConnection;
+                    await cmd.ExecuteNonQueryAsync();
+
+                    LogDebug($"Dropped '{b}' from table 'scam_urls'. ({sw.ElapsedMilliseconds}ms)");
+                    sw.Stop();
+                }
+
             sw = null;
             cmd.Dispose();
         }

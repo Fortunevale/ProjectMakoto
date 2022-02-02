@@ -225,7 +225,7 @@ internal class Bot
 
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-                IEnumerable<PhishingUrlInfo> scamUrls = databaseConnection.Query<PhishingUrlInfo>($"SELECT ind, url, origin, submitter FROM scam_urls");
+                IEnumerable<PhishingUrlInfo> scamUrls = databaseConnection.Query<PhishingUrlInfo>($"SELECT url, origin, submitter FROM scam_urls");
 
                 foreach (var b in scamUrls)
                     _phishingUrls.List.Add(b.Url, new PhishingUrls.UrlInfo
