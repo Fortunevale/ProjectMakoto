@@ -36,8 +36,8 @@ public class PhishingUrlUpdater
 
         List<string> dropUrls = new();
 
-        if (phishingUrls.List.Any(x => x.Value.Origin.Count != 0 && !urls.Any(y => y.Url == x.Value.Url)))
-            foreach (var b in phishingUrls.List.Where(x => x.Value.Origin.Count != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
+        if (phishingUrls.List.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
+            foreach (var b in phishingUrls.List.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
             {
                 DatabaseUpdated = true;
                 phishingUrls.List.Remove(b.Key);
