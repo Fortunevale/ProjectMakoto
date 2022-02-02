@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo;
+﻿namespace Project_Ichigo.Helpers;
 
 internal class ExitCodes
 {

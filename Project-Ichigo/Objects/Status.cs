@@ -3,6 +3,9 @@
 internal class Status
 {
     internal DateTime startupTime { get; set; } = DateTime.Now;
+
+    internal List<Task> runningTasks { get; set; } = new();
+
     internal bool DiscordInitialized { get; set; } = false;
     internal bool LavalinkInitialized { get; set; } = false;
     internal bool DatabaseInitialized { get; set; } = false;

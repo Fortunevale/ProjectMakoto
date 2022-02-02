@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo;
+﻿namespace Project_Ichigo.Extensions;
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 

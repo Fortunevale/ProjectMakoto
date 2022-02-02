@@ -41,6 +41,8 @@ global using DisCatSharp.CommandsNext.Converters;
 // Own Utils
 
 global using Project_Ichigo.Events;
+global using Project_Ichigo.Helpers;
+global using Project_Ichigo.Extensions;
 global using Project_Ichigo.Secrets;
 global using Project_Ichigo.Objects;
 global using Project_Ichigo.Objects.Database;
