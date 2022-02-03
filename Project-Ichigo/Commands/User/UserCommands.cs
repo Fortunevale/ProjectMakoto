@@ -56,7 +56,7 @@ internal class UserCommands : BaseCommandModule
                 try
                 {
                     foreach (var b in Embeds)
-                        await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter($"Command used by {ctx.Member.UsernameWithDiscriminator}").WithTimestamp(DateTime.UtcNow).WithColor(new DiscordColor("#36FFFF")).Build());
+                        await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter($"Command used by {ctx.Member.UsernameWithDiscriminator}").WithTimestamp(DateTime.UtcNow).WithColor(ColorHelper.Info).Build());
 
                     var successembed = new DiscordEmbedBuilder
                     {
@@ -72,7 +72,7 @@ internal class UserCommands : BaseCommandModule
                             IconUrl = ctx.Member.AvatarUrl
                         },
                         Timestamp = DateTime.UtcNow,
-                        Color = DiscordColor.Green
+                        Color = ColorHelper.Success
                     };
 
                     await ctx.Channel.SendMessageAsync(embed: successembed);
@@ -93,7 +93,7 @@ internal class UserCommands : BaseCommandModule
                             IconUrl = ctx.Member.AvatarUrl
                         },
                         Timestamp = DateTime.UtcNow,
-                        Color = DiscordColor.DarkRed,
+                        Color = ColorHelper.Error,
                         ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                     };
 
@@ -120,7 +120,7 @@ internal class UserCommands : BaseCommandModule
                             IconUrl = ctx.Member.AvatarUrl
                         },
                         Timestamp = DateTime.UtcNow,
-                        Color = DiscordColor.DarkRed,
+                        Color = ColorHelper.Error,
                         ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                     };
 
@@ -136,6 +136,44 @@ internal class UserCommands : BaseCommandModule
             }
         });
     }
+
+
+
+    [Command("avatar"), Aliases("pfp"),
+    CommandModule("user"),
+    Description("Sends the avatar of the user as an image.")]
+    public async Task AvatarCommand(CommandContext ctx, DiscordUser victim = null)
+    {
+        _ = Task.Run(async () =>
+        {
+            if (victim is null)
+            {
+                victim = ctx.Member;
+            }
+
+            var embed2 = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = $"{victim.Username}#{victim.Discriminator}'s Avatar",
+                    Url = victim.AvatarUrl
+                },
+                Title = "",
+                ImageUrl = victim.AvatarUrl,
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow,
+                Color = ColorHelper.Info
+            };
+
+            await ctx.Channel.SendMessageAsync(embed: embed2);
+        });
+    }
+
+
 
     [Command("info"),
     CommandModule("user"),
@@ -313,6 +351,8 @@ internal class UserCommands : BaseCommandModule
         });
     }
 
+
+
     [Command("user-info"), Aliases("userinfo"),
     CommandModule("user"),
     Description("Shows information about the mentioned user.")]
@@ -363,7 +403,7 @@ internal class UserCommands : BaseCommandModule
 
             var embed = new DiscordEmbedBuilder
             {
-                Color = DiscordColor.VeryDarkGray,
+                Color = ColorHelper.Info,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = victim.AvatarUrl,
