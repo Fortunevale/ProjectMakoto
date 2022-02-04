@@ -102,7 +102,10 @@ internal class Bot
 
             LogDebug($"Registering Commands..");
             DiscordClient.GetCommandsNext().RegisterCommands<User>();
-            // DiscordClient.GetCommandsNext().RegisterCommands<TestCommands>();
+            DiscordClient.GetCommandsNext().RegisterCommands<Mod>();
+            DiscordClient.GetCommandsNext().RegisterCommands<Admin>();
+
+            DiscordClient.GetCommandsNext().RegisterCommands<Test>();
 
             LogDebug($"Registering Command Converters..");
             DiscordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());

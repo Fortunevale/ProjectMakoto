@@ -14,7 +14,7 @@ public static class Extensions
 
     public static bool IsAdmin(this DiscordMember member)
     {
-        if ((member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed)) ||
+        if ((member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed || x.CheckPermission(Permissions.ManageGuild) == PermissionLevel.Allowed)) ||
             (member.IsMaintenance()) ||
             member.IsOwner)
             return true;
