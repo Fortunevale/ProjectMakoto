@@ -101,7 +101,7 @@ internal class Bot
             DiscordClient.UseLavalink();
 
             LogDebug($"Registering Commands..");
-            DiscordClient.GetCommandsNext().RegisterCommands<UserCommands>();
+            DiscordClient.GetCommandsNext().RegisterCommands<User>();
             // DiscordClient.GetCommandsNext().RegisterCommands<TestCommands>();
 
             LogDebug($"Registering Command Converters..");

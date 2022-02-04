@@ -13,6 +13,7 @@ internal class Settings
 
     public class PhishingDetectionSettings
     {
+        public bool DetectPhishing { get; set; } = true;
         public PhishingPunishmentType PunishmentType { get; set; } = PhishingPunishmentType.BAN;
         public string CustomPunishmentReason { get; set; } = "";
         public TimeSpan CustomPunishmentLength { get; set; } = TimeSpan.FromDays(14);

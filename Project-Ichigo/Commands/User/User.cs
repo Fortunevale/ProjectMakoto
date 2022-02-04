@@ -1,5 +1,5 @@
 ﻿namespace Project_Ichigo.Commands.User;
-internal class UserCommands : BaseCommandModule
+internal class User : BaseCommandModule
 {
     [Command("help"),
     CommandModule("user"),
