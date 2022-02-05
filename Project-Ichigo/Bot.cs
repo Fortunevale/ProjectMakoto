@@ -2,7 +2,7 @@
 
 internal class Bot
 {
-    internal DiscordClient? DiscordClient;
+    internal DiscordClient? discordClient;
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
     internal static MySqlConnection? databaseConnection;
@@ -62,11 +62,11 @@ internal class Bot
 
             LogDebug($"Registering DiscordClient..");
 
-            DiscordClient = new DiscordClient(new DiscordConfiguration
+            discordClient = new DiscordClient(new DiscordConfiguration
             {
                 Token = $"{token}",
                 TokenType = TokenType.Bot,
-                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Error,
+                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Warning,
                 Intents = DiscordIntents.All,
                 LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
                 AutoReconnect = true
@@ -74,7 +74,7 @@ internal class Bot
 
             LogDebug($"Registering CommandsNext..");
 
-            DiscordClient.UseCommandsNext(new CommandsNextConfiguration
+            discordClient.UseCommandsNext(new CommandsNextConfiguration
             {
                 StringPrefixes = new[] { "-" },
                 EnableDefaultHelp = false,
@@ -98,32 +98,32 @@ internal class Bot
                 SocketEndpoint = endpoint
             };
 
-            DiscordClient.UseLavalink();
+            discordClient.UseLavalink();
 
             LogDebug($"Registering Commands..");
-            DiscordClient.GetCommandsNext().RegisterCommands<User>();
-            DiscordClient.GetCommandsNext().RegisterCommands<Mod>();
-            DiscordClient.GetCommandsNext().RegisterCommands<Admin>();
+            discordClient.GetCommandsNext().RegisterCommands<User>();
+            discordClient.GetCommandsNext().RegisterCommands<Mod>();
+            discordClient.GetCommandsNext().RegisterCommands<Admin>();
 
-            DiscordClient.GetCommandsNext().RegisterCommands<Test>();
+            discordClient.GetCommandsNext().RegisterCommands<Test>();
 
             LogDebug($"Registering Command Converters..");
-            DiscordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());
-            DiscordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.BoolConverter());
+            discordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());
+            discordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.BoolConverter());
 
             LogDebug($"Registering Command Events..");
 
             CommandEvents commandEvents = new();
-            DiscordClient.GetCommandsNext().CommandExecuted += commandEvents.CommandExecuted;
-            DiscordClient.GetCommandsNext().CommandErrored += commandEvents.CommandError;
+            discordClient.GetCommandsNext().CommandExecuted += commandEvents.CommandExecuted;
+            discordClient.GetCommandsNext().CommandErrored += commandEvents.CommandError;
 
             LogDebug($"Registering Interactivity..");
 
-            DiscordClient.UseInteractivity(new InteractivityConfiguration { });
+            discordClient.UseInteractivity(new InteractivityConfiguration { });
 
             LogDebug($"Registering Events..");
 
-            DiscordClient.GuildDownloadCompleted += GuildDownloadCompleted;
+            discordClient.GuildDownloadCompleted += GuildDownloadCompleted;
 
             try
             {
@@ -131,7 +131,7 @@ internal class Bot
                 discordLoginSc.Start();
 
                 LogInfo("Connecting and authenticating with Discord..");
-                await DiscordClient.ConnectAsync();
+                await discordClient.ConnectAsync();
 
                 discordLoginSc.Stop();
                 LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
@@ -141,7 +141,7 @@ internal class Bot
                 {
                     try
                     {
-                        _status.TeamMembers.AddRange(DiscordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
+                        _status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
                         LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
                     }
                     catch (Exception ex)
@@ -166,7 +166,7 @@ internal class Bot
                     lavalinkSc.Start();
                     LogInfo("Connecting and authenticating with Lavalink..");
 
-                    LavalinkNodeConnection = await DiscordClient.GetLavalink().ConnectAsync(lavalinkConfig);
+                    LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
                     lavalinkSc.Stop();
                     LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
 

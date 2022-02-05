@@ -37,6 +37,7 @@ global using DisCatSharp.Net;
 global using DisCatSharp.Lavalink;
 global using DisCatSharp.Lavalink.EventArgs;
 global using DisCatSharp.CommandsNext.Converters;
+global using DisCatSharp.ApplicationCommands;
 
 // Own Utils
 

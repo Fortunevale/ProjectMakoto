@@ -18,12 +18,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ApplicationCommands\**" />
+    <EmbeddedResource Remove="ApplicationCommands\**" />
+    <None Remove="ApplicationCommands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="9.8.7-nightly-00278" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.7-nightly-00278" />
-    <PackageReference Include="DisCatSharp.Common" Version="9.8.7-nightly-00278" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.7-nightly-00278" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.7-nightly-00278" />
+    <PackageReference Include="DisCatSharp" Version="9.8.7-nightly-00282" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="9.8.7-nightly-00282" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.7-nightly-00282" />
+    <PackageReference Include="DisCatSharp.Common" Version="9.8.7-nightly-00282" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.7-nightly-00282" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.7-nightly-00282" />
     <PackageReference Include="MySql.Data" Version="8.0.28" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
   </ItemGroup>
