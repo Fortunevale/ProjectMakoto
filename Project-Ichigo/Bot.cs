@@ -130,6 +130,16 @@ internal class Bot
                 var discordLoginSc = new Stopwatch();
                 discordLoginSc.Start();
 
+                _ = Task.Delay(10000).ContinueWith(t =>
+                {
+                    if (!_status.DiscordInitialized)
+                    {
+                        LogError($"An exception occured while trying to log into discord: The log in took longer than 5 seconds");
+                        Environment.Exit(ExitCodes.FailedDiscordLogin);
+                        return;
+                    }
+                });
+
                 LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
@@ -273,6 +283,12 @@ internal class Bot
         _ = Task.Run(async () =>
         {
             LogInfo($"I'm on {e.Guilds.Count} guilds.");
+
+            foreach (var guild in e.Guilds)
+            {
+                if (!Settings.Servers.ContainsKey(guild.Key))
+                    Settings.Servers.Add(guild.Key, new Settings.ServerSettings());
+            }
         });
     }
 }

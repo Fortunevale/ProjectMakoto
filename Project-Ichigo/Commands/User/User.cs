@@ -195,7 +195,7 @@ internal class User : BaseCommandModule
                     IconUrl = Resources.StatusIndicators.LoadingBlue,
                     Name = "Informations about this server and bot"
                 },
-                Color = ColorHelper.HiddenSidebar,
+                Color = ColorHelper.Info,
                 Description = "",
                 Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
@@ -206,7 +206,7 @@ internal class User : BaseCommandModule
             };
 
             embed.AddField("General info", "󠂪 󠂪", true);
-            embed.Fields.First(x => x.Name == "General info").Value = "\n_All dates follow `DD.MM.YYYY` while time is set to the `Coordinated Universal Time (UTC), +00:00`._\n";
+            embed.Fields.First(x => x.Name == "General info").Value = "\n_All dates follow `DD.MM.YYYY` while the time zone is set to the `Coordinated Universal Time (UTC), +00:00`._\n";
 
             embed.AddField("Guild", "󠂪 󠂪", true);
             embed.Fields.First(x => x.Name == "Guild").Value = "**Guild name**\n`Loading..`\n" +
@@ -250,7 +250,7 @@ internal class User : BaseCommandModule
                 embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running software**\n`Loading..`", $"**Currently running software**\n`Project-Ichigo by TheXorog (GH-UNIDENTIFIED)`");
 
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running on**\n`Loading..`", $"**Currently running on**\n`{Environment.OSVersion.Platform} with DOTNET-{Environment.Version}`");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current bot lib and version**\n`Loading..`", $"**Current bot lib and version**\n`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`");
+            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current bot lib and version**\n`Loading..`", $"**Current bot lib and version**\n[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.Now - Bot._status.startupTime).TotalHours, 2)} hours`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current API Latency**\n`Loading..`", $"**Current API Latency**\n`{ctx.Client.Ping}ms`");
 

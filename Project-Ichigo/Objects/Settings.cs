@@ -15,7 +15,7 @@ internal class Settings
     {
         public bool DetectPhishing { get; set; } = true;
         public PhishingPunishmentType PunishmentType { get; set; } = PhishingPunishmentType.BAN;
-        public string CustomPunishmentReason { get; set; } = "";
+        public string CustomPunishmentReason { get; set; } = "Reason: %R (%u)";
         public TimeSpan CustomPunishmentLength { get; set; } = TimeSpan.FromDays(14);
     }
 

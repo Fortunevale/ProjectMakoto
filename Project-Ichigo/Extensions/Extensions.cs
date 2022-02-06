@@ -22,6 +22,11 @@ public static class Extensions
         return false;
     }
 
+    public static string BoolToEmote(this bool b)
+    {
+        return b ? ":white_check_mark:" : "<:white_x:939750475354472478>";
+    }
+
     public static string DigitsToEmotes(this long i) =>
         DigitsToEmotes(i.ToString());
 
