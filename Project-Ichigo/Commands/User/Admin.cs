@@ -20,7 +20,7 @@ internal class Admin : BaseCommandModule
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = ctx.Guild.Name },
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
@@ -34,7 +34,7 @@ internal class Admin : BaseCommandModule
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = ctx.Guild.Name },
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
@@ -49,7 +49,7 @@ internal class Admin : BaseCommandModule
                 {
                     DiscordEmbedBuilder embed = new()
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = ctx.Guild.Name },
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,

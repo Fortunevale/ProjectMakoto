@@ -229,15 +229,6 @@ internal class Bot
                     }
                 }
 
-                foreach (string Table in SavedTables.Where(x => x.EndsWith("-settings")))
-                {
-                    LogDebug($"Loading server settings from table '{Table}'..");
-
-                    IEnumerable<Settings.ServerSettings> serverSettings = databaseConnection.Query<Settings.ServerSettings>($"SELECT Key, Value FROM {Table}");
-
-                    Bot._guilds.Servers.Add(Convert.ToUInt64(Table.Replace("-settings", "")), serverSettings.First());
-                }
-
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
                 IEnumerable<DatabasePhishingUrlInfo> scamUrls = databaseConnection.Query<DatabasePhishingUrlInfo>($"SELECT url, origin, submitter FROM scam_urls");
@@ -251,6 +242,24 @@ internal class Bot
                     });
 
                 LogInfo($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
+
+                LogDebug($"Loading guilds from table 'guilds'..");
+
+                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
+
+                foreach (var b in serverSettings)
+                    _guilds.Servers.Add(b.serverid, new Settings.ServerSettings
+                    {
+                        PhishingDetectionSettings = new()
+                        {
+                            DetectPhishing = b.phishing_detect,
+                            PunishmentType = (Settings.PhishingPunishmentType)b.phishing_type,
+                            CustomPunishmentReason = b.phishing_reason,
+                            CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
+                        }
+                    });
+
+                LogInfo($"Loaded {_guilds.Servers.Count} guilds from table 'guilds'.");
 
                 _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }

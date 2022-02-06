@@ -7,9 +7,6 @@ internal class DatabaseHelper
     {
         while (true)
         {
-            foreach (var b in queuedUpdates)
-                Log(b.Status.ToString());
-
             if (queuedUpdates.Any(x => x.IsCompleted))
                 foreach (var task in queuedUpdates.Where(x => x.IsCompleted).ToList())
                     queuedUpdates.Remove(task);
@@ -31,8 +28,6 @@ internal class DatabaseHelper
             {
                 try
                 {
-                    LogDebug($"Triggered DatabaseUpdate");
-
                     List<DatabaseServerSettings> DatabaseInserts = Bot._guilds.Servers.Select(x => new DatabaseServerSettings
                     {
                         serverid = x.Key,
