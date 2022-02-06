@@ -1,8 +1,8 @@
 ﻿namespace Project_Ichigo.Objects.Database;
 
-public class PhishingUrlInfo
+public class DatabasePhishingUrlInfo
 {
-    public string Url { get; set; } = "";
-    public string Origin { get; set; } = "";
-    public ulong Submitter { get; set; }
+    public string url { get; set; } = "";
+    public string origin { get; set; } = "";
+    public ulong submitter { get; set; }
 }

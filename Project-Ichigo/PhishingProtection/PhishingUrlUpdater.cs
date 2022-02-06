@@ -68,12 +68,12 @@ public class PhishingUrlUpdater
         try
         {
             UpdateRunning = true;
-            List<PhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new PhishingUrlInfo
+            List<DatabasePhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new DatabasePhishingUrlInfo
             {
-                Url = x.Value.Url,
-                Origin = JsonConvert.SerializeObject(x.Value.Origin),
-                Submitter = x.Value.Submitter
-            }).OrderBy(x => x.Url).ToList();
+                url = x.Value.Url,
+                origin = JsonConvert.SerializeObject(x.Value.Origin),
+                submitter = x.Value.Submitter
+            }).OrderBy(x => x.url).ToList();
 
             if (Bot.databaseConnection == null)
             {
@@ -87,9 +87,9 @@ public class PhishingUrlUpdater
             {
                 cmd.CommandText += @$"( @url{i}, @origin{i}, @submitter{i} ), ";
 
-                cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].Url);
-                cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].Origin);
-                cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].Submitter);
+                cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url);
+                cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin);
+                cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].submitter);
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
