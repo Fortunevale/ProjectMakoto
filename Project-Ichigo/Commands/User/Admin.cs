@@ -70,8 +70,8 @@ internal class Admin : BaseCommandModule
                     } as IEnumerable<DiscordComponent>));
 
                     var interactivity = ctx.Client.GetInteractivity();
-                    var button = await interactivity.WaitForButtonAsync(msg, TimeSpan.FromSeconds(60));
-
+                    var button = await interactivity.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(60));
+                    
                     if (button.TimedOut)
                     {
                         embed.Footer.Text += " • Interaction timed out";
@@ -112,7 +112,7 @@ internal class Admin : BaseCommandModule
 
                             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                             {
-                                if (e.Message.Id == msg.Id)
+                                if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                                 {
                                     switch (e.Values.First())
                                     {
@@ -157,8 +157,7 @@ internal class Admin : BaseCommandModule
                             var msg3 = await ctx.Channel.SendMessageAsync("Please specify a new Ban Reason.\n" +
                                                                           "_Type `cancel` or `.` to cancel._\n\n" +
                                                                           "**Placeholders**\n" +
-                                                                          "`%R` - _A placeholder for the reason_\n" +
-                                                                          "`%u` - _A placeholder for the bot_");
+                                                                          "`%R` - _A placeholder for the reason_");
 
                             var reason = await interactivity.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
 

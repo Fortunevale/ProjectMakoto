@@ -119,6 +119,17 @@ internal class Bot
             discordClient.GetCommandsNext().CommandExecuted += commandEvents.CommandExecuted;
             discordClient.GetCommandsNext().CommandErrored += commandEvents.CommandError;
 
+            LogDebug($"Registering Phishing Events..");
+
+            PhishingProtectionEvents phishingProtectionEvents = new();
+            discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
+            discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
+
+            LogDebug($"Registering Discord Events..");
+
+            DiscordEvents discordEvents = new();
+            discordClient.GuildCreated += discordEvents.GuildCreated;
+
             LogDebug($"Registering Interactivity..");
 
             discordClient.UseInteractivity(new InteractivityConfiguration { });

@@ -19,7 +19,7 @@ internal class Settings
         public PhishingPunishmentType PunishmentType { get => _PunishmentType; set { _PunishmentType = value; _ = Bot._databaseHelper.SyncGuilds(); } }
 
 
-        private string _CustomPunishmentReason { get; set; } = "Reason: %R (%u)";
+        private string _CustomPunishmentReason { get; set; } = "%R";
         public string CustomPunishmentReason { get => _CustomPunishmentReason; set { _CustomPunishmentReason = value; _ = Bot._databaseHelper.SyncGuilds(); } }
 
 
