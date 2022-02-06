@@ -2,7 +2,7 @@
 
 internal class Settings
 {
-    internal static Dictionary<ulong, ServerSettings> Servers = new();
+    internal Dictionary<ulong, ServerSettings> Servers = new();
 
     internal class ServerSettings
     {
@@ -11,10 +11,20 @@ internal class Settings
 
     public class PhishingDetectionSettings
     {
-        public bool DetectPhishing { get; set; } = true;
-        public PhishingPunishmentType PunishmentType { get; set; } = PhishingPunishmentType.BAN;
-        public string CustomPunishmentReason { get; set; } = "Reason: %R (%u)";
-        public TimeSpan CustomPunishmentLength { get; set; } = TimeSpan.FromDays(14);
+        private bool _DetectPhishing { get; set; } = true;
+        public bool DetectPhishing { get => _DetectPhishing; set { _DetectPhishing = value; _ = Bot._databaseHelper.SyncGuilds(); } }
+
+
+        private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.BAN;
+        public PhishingPunishmentType PunishmentType { get => _PunishmentType; set { _PunishmentType = value; _ = Bot._databaseHelper.SyncGuilds(); } }
+
+
+        private string _CustomPunishmentReason { get; set; } = "Reason: %R (%u)";
+        public string CustomPunishmentReason { get => _CustomPunishmentReason; set { _CustomPunishmentReason = value; _ = Bot._databaseHelper.SyncGuilds(); } }
+
+
+        private TimeSpan _CustomPunishmentLength { get; set; } = TimeSpan.FromDays(14);
+        public TimeSpan CustomPunishmentLength { get => _CustomPunishmentLength; set { _CustomPunishmentLength = value; _ = Bot._databaseHelper.SyncGuilds(); } }
     }
 
     public enum PhishingPunishmentType

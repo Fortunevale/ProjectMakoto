@@ -10,8 +10,10 @@ internal class Bot
 
 
     internal static Status _status = new();
-
+    internal static Settings _guilds = new();
     internal static PhishingUrls _phishingUrls = new();
+
+    internal static DatabaseHelper _databaseHelper = new();
 
 
     internal async Task Init(string[] args)
@@ -233,7 +235,7 @@ internal class Bot
 
                     IEnumerable<Settings.ServerSettings> serverSettings = databaseConnection.Query<Settings.ServerSettings>($"SELECT Key, Value FROM {Table}");
 
-                    Settings.Servers.Add(Convert.ToUInt64(Table.Replace("-settings", "")), serverSettings.First());
+                    Bot._guilds.Servers.Add(Convert.ToUInt64(Table.Replace("-settings", "")), serverSettings.First());
                 }
 
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
@@ -275,6 +277,8 @@ internal class Bot
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
 
+        _ = _databaseHelper.QueueWatcher();
+
         await Task.Delay(-1);
     }
 
@@ -286,8 +290,8 @@ internal class Bot
 
             foreach (var guild in e.Guilds)
             {
-                if (!Settings.Servers.ContainsKey(guild.Key))
-                    Settings.Servers.Add(guild.Key, new Settings.ServerSettings());
+                if (!Bot._guilds.Servers.ContainsKey(guild.Key))
+                    Bot._guilds.Servers.Add(guild.Key, new Settings.ServerSettings());
             }
         });
     }
