@@ -329,6 +329,22 @@ internal class Bot
 
                 LogInfo($"Loaded {_submissionBans.BannedGuilds.Count} submission bans from table 'guild_submission_bans'.");
 
+
+
+                LogDebug($"Loading active submissions from table 'active_url_submissions'..");
+
+                IEnumerable<DatabaseSubmittedUrls> active_submissions = databaseConnection.Query<DatabaseSubmittedUrls>($"SELECT messageid, url, submitter, guild FROM active_url_submissions");
+
+                foreach (var b in active_submissions)
+                    _submittedUrls.Urls.Add(b.messageid, new SubmittedUrls.UrlInfo
+                    {
+                        Url = b.url,
+                        Submitter = b.submitter,
+                        GuildOrigin = b.guild
+                    });
+
+                LogInfo($"Loaded {_submittedUrls.Urls.Count} active submissions from table 'active_url_submissions'.");
+
                 _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }
             catch (Exception ex)
