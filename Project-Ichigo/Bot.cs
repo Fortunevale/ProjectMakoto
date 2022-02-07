@@ -320,14 +320,14 @@ internal class Bot
 
                 IEnumerable<DatabaseBanInfo> guildbans = databaseConnection.Query<DatabaseBanInfo>($"SELECT id, reason, moderator FROM guild_submission_bans");
 
-                foreach (var b in userbans)
+                foreach (var b in guildbans)
                     _submissionBans.BannedGuilds.Add(b.id, new SubmissionBans.BanInfo
                     {
                         Reason = b.reason,
                         Moderator = b.moderator
                     });
 
-                LogInfo($"Loaded {_submissionBans.BannedUsers.Count} submission bans from table 'guild_submission_bans'.");
+                LogInfo($"Loaded {_submissionBans.BannedGuilds.Count} submission bans from table 'guild_submission_bans'.");
 
                 _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }

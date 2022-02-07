@@ -214,6 +214,54 @@ internal class DatabaseHelper
                         LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
                     }
 
+                if (Bot._submittedUrls.Urls.Count > 0)
+                    try
+                    {
+                        List<DatabaseSubmittedUrls> DatabaseInserts = Bot._submittedUrls.Urls.Select(x => new DatabaseSubmittedUrls
+                        {
+                            messageid = x.Key,
+                            url = x.Value.Url,
+                            submitter = x.Value.Submitter,
+                            guild = x.Value.GuildOrigin
+                        }).ToList();
+
+                        if (Bot.databaseConnection == null)
+                        {
+                            throw new Exception($"Exception occured while trying to update active_url_submissions in database: Database connection not present");
+                        }
+
+                        var cmd = Bot.databaseConnection.CreateCommand();
+                        cmd.CommandText = @$"INSERT INTO active_url_submissions ( messageid, url, submitter, guild ) VALUES ";
+
+                        for (int i = 0; i < DatabaseInserts.Count; i++)
+                        {
+                            cmd.CommandText += @$"( @messageid{i}, @url{i}, @submitter{i}, @guild{i} ), ";
+
+                            cmd.Parameters.AddWithValue($"messageid{i}", DatabaseInserts[i].messageid);
+                            cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[i].url);
+                            cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[i].submitter);
+                            cmd.Parameters.AddWithValue($"guild{i}", DatabaseInserts[i].guild);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
+                                           "url=values(url), " +
+                                           "submitter=values(submitter), " +
+                                           "guild=values(guild)";
+
+                        cmd.Connection = Bot.databaseConnection;
+                        await cmd.ExecuteNonQueryAsync();
+
+                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
+                        DatabaseInserts.Clear();
+                        DatabaseInserts = null;
+                        cmd.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"An exception occured while trying to update the active_url_submissions table: {ex}");
+                    }
+
                 await Task.Delay(1000);
                 GC.Collect();
             }));
