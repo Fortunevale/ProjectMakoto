@@ -260,6 +260,8 @@ internal class Bot
 
                 LogInfo($"Loaded {_phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
 
+
+
                 LogDebug($"Loading guilds from table 'guilds'..");
 
                 IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
@@ -277,6 +279,55 @@ internal class Bot
                     });
 
                 LogInfo($"Loaded {_guilds.Servers.Count} guilds from table 'guilds'.");
+
+
+
+                LogDebug($"Loading users from table 'users'..");
+
+                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>($"SELECT userid, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime FROM users");
+
+                foreach (var b in users)
+                    _users.List.Add(b.userid, new Users.Info
+                    {
+                        UrlSubmissions = new()
+                        {
+                            AcceptedSubmissions = JsonConvert.DeserializeObject<List<string>>(b.submission_accepted_submissions),
+                            LastTime = b.submission_last_datetime,
+                            AcceptedTOS = b.submission_accepted_tos
+                        }
+                    });
+
+                LogInfo($"Loaded {_users.List.Count} users from table 'users'.");
+
+
+
+                LogDebug($"Loading submission bans from table 'user_submission_bans'..");
+
+                IEnumerable<DatabaseBanInfo> userbans = databaseConnection.Query<DatabaseBanInfo>($"SELECT id, reason, moderator FROM user_submission_bans");
+
+                foreach (var b in userbans)
+                    _submissionBans.BannedUsers.Add(b.id, new SubmissionBans.BanInfo
+                    {
+                        Reason = b.reason,
+                        Moderator = b.moderator
+                    });
+
+                LogInfo($"Loaded {_submissionBans.BannedUsers.Count} submission bans from table 'user_submission_bans'.");
+
+
+
+                LogDebug($"Loading submission bans from table 'guild_submission_bans'..");
+
+                IEnumerable<DatabaseBanInfo> guildbans = databaseConnection.Query<DatabaseBanInfo>($"SELECT id, reason, moderator FROM guild_submission_bans");
+
+                foreach (var b in userbans)
+                    _submissionBans.BannedGuilds.Add(b.id, new SubmissionBans.BanInfo
+                    {
+                        Reason = b.reason,
+                        Moderator = b.moderator
+                    });
+
+                LogInfo($"Loaded {_submissionBans.BannedUsers.Count} submission bans from table 'guild_submission_bans'.");
 
                 _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
             }
