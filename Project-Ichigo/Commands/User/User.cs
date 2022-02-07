@@ -422,7 +422,7 @@ internal class User : BaseCommandModule
     [Command("avatar"), Aliases("pfp"),
     CommandModule("user"),
     Description("Sends the user's avatar as an embedded image.")]
-    public async Task AvatarCommand(CommandContext ctx, DiscordUser victim = null)
+    public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
     {
         _ = Task.Run(async () =>
         {
@@ -450,6 +450,94 @@ internal class User : BaseCommandModule
             };
 
             await ctx.Channel.SendMessageAsync(embed: embed2);
+        });
+    }
+
+
+
+    [Command("submit-url"),
+    CommandModule("user"),
+    Description("Allows submission of new malicous urls to our database.")]
+    public async Task UrlSubmit(CommandContext ctx, string url)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (!Bot._users.List.ContainsKey(ctx.User.Id))
+                    Bot._users.List.Add(ctx.User.Id, new Users.Info());
+
+                if (!Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
+                {
+                    var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
+
+                    var embed = new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
+                        Color = ColorHelper.Warning,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Timestamp = DateTime.Now,
+                        Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
+                                      $"{2.DigitsToEmotes()}. You may not spam submissions.\n" +
+                                      $"{3.DigitsToEmotes()}. You may not submit unregistered domains.\n" +
+                                      $"{4.DigitsToEmotes()}. You may not submit shortened URLs.\n\n" +
+                                      $"We reserve the right to ban you for any reason that may not be listed.\n" +
+                                      $"**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n" +
+                                      $"**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**\n\n" +
+                                      $"To accept these conditions, please click the button below. If you do not see a button to interact with, update your discord client."
+                    };
+
+                    var tos_accept = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(button));
+
+                    async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                    {
+                        try
+                        {
+                            await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            if (e.Message.Id == tos_accept.Id && e.User.Id == ctx.User.Id)
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
+
+                                var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
+                                await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
+
+                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+
+                                _ = Task.Delay(10000).ContinueWith(x =>
+                                {
+                                    _ = tos_accept.DeleteAsync();
+                                });
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogError($"{ex}");
+                        }
+                    };
+
+                    ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+                    try
+                    {
+                        await Task.Delay(60000);
+                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        embed.Footer.Text += " • Interaction timed out";
+                        await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = tos_accept.DeleteAsync();
+                    }
+                    catch { }
+                    return;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                LogError($"{ex}");
+            }
         });
     }
 }
