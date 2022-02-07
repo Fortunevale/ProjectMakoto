@@ -131,6 +131,9 @@ internal class Bot
             discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
             discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
 
+            SubmissionEvents _submissionEvents = new();
+            discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
+
             LogDebug($"Registering Discord Events..");
 
             DiscordEvents discordEvents = new();
