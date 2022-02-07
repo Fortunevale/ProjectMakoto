@@ -5,6 +5,15 @@ internal class DatabaseHelper
 
     public async Task QueueWatcher()
     {
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                await Task.Delay(300000);
+                _ = Bot._databaseHelper.SyncDatabase();
+            }
+        });
+
         while (true)
         {
             if (queuedUpdates.Any(x => x.IsCompleted))
