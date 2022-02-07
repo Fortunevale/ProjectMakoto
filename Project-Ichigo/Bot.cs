@@ -10,8 +10,13 @@ internal class Bot
 
 
     internal static Status _status = new();
+
     internal static Settings _guilds = new();
+    internal static Users _users = new();
+
     internal static PhishingUrls _phishingUrls = new();
+    internal static SubmissionBans _submissionBans = new();
+    
 
     internal static DatabaseHelper _databaseHelper = new();
 
