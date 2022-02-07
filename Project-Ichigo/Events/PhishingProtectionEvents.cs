@@ -14,6 +14,11 @@ internal class PhishingProtectionEvents
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMember member, DiscordMessage e)
     {
+        if (e.Content.StartsWith($"-"))
+            foreach (var command in sender.GetCommandsNext().RegisteredCommands)
+                if (e.Content.StartsWith($"-{command.Key}"))
+                    return;
+        
         foreach (var url in Bot._phishingUrls.List)
         {
             if (e.Content.Contains(url.Key))
