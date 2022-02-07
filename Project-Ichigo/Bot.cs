@@ -16,6 +16,7 @@ internal class Bot
 
     internal static PhishingUrls _phishingUrls = new();
     internal static SubmissionBans _submissionBans = new();
+    internal static SubmittedUrls _submittedUrls = new();
     
 
     internal static DatabaseHelper _databaseHelper = new();

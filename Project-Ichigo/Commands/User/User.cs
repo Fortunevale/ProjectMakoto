@@ -471,7 +471,7 @@ internal class User : BaseCommandModule
                 {
                     var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
 
-                    var embed = new DiscordEmbedBuilder
+                    var tos_embed = new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
                         Color = ColorHelper.Warning,
@@ -487,7 +487,7 @@ internal class User : BaseCommandModule
                                       $"To accept these conditions, please click the button below. If you do not see a button to interact with, update your discord client."
                     };
 
-                    var tos_accept = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(button));
+                    var tos_accept = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
 
                     async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                     {
@@ -501,7 +501,7 @@ internal class User : BaseCommandModule
                                 Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
 
                                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
-                                await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
+                                await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
 
                                 _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
 
@@ -523,8 +523,8 @@ internal class User : BaseCommandModule
                     {
                         await Task.Delay(60000);
                         ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                        embed.Footer.Text += " • Interaction timed out";
-                        await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        tos_embed.Footer.Text += " • Interaction timed out";
+                        await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed));
                         await Task.Delay(5000);
                         _ = tos_accept.DeleteAsync();
                     }
@@ -532,7 +532,199 @@ internal class User : BaseCommandModule
                     return;
                 }
 
+                var embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Warning,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.Now,
+                    Description = $"`Processing your request..`"
+                };
 
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                if (Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance())
+                {
+                    embed.Description = $"`You cannot submit a domain for the next {Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
+                    embed.Color = ColorHelper.Error;
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    _ = msg.ModifyAsync(embed.Build());
+                    return;
+                }
+
+                if (Bot._submissionBans.BannedUsers.ContainsKey(ctx.User.Id))
+                {
+                    embed.Description = $"`You are banned from submitting URLs.`\n" +
+                                        $"`Reason: {Bot._submissionBans.BannedUsers[ctx.User.Id].Reason}`";
+                    embed.Color = ColorHelper.Error;
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    _ = msg.ModifyAsync(embed.Build());
+                    return;
+                }
+
+                if (Bot._submissionBans.BannedGuilds.ContainsKey(ctx.Guild.Id))
+                {
+                    embed.Description = $"`This guild is banned from submitting URLs.`\n" +
+                                        $"`Reason: {Bot._submissionBans.BannedGuilds[ctx.Guild.Id].Reason}`";
+                    embed.Color = ColorHelper.Error;
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    _ = msg.ModifyAsync(embed.Build());
+                    return;
+                }
+
+                string domain = url.ToLower();
+
+                if (domain.StartsWith("https://") || domain.StartsWith("http://"))
+                    domain = domain.Replace("https://", "").Replace("http://", "");
+
+                if (domain.Contains("/"))
+                    domain = domain.Remove(domain.IndexOf("/"), domain.Length - domain.IndexOf("/"));
+
+                if (!domain.Contains(".") || domain.Contains(" "))
+                {
+                    embed.Description = $"`The domain ('{domain.Replace("`", "")}') you're trying to submit is invalid.`";
+                    embed.Color = ColorHelper.Error;
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    _ = msg.ModifyAsync(embed.Build());
+                    return;
+                }
+
+                embed.Description = $"`You are about to submit the domain '{domain.Replace("`", "")}'. When submitting, your public user account and guild will be tracked and visible to verifiers. Do you want to proceed?`";
+                embed.Color = ColorHelper.Success;
+                embed.Author.IconUrl = Resources.LogIcons.Info;
+
+                var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "continue", "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")));
+                var cancel_button = new DiscordButtonComponent(ButtonStyle.Danger, "cancel", "Cancel", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
+
+
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
+                {
+                    { continue_button },
+                    { cancel_button }
+                }));
+
+                bool InteractionExecuted = false;
+
+                async Task RunSubmissionInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                            {
+                                InteractionExecuted = true;
+                                ctx.Client.ComponentInteractionCreated -= RunSubmissionInteraction;
+
+                                if (e.Interaction.Data.CustomId == "continue")
+                                {
+                                    embed.Description = $"`Submitting your domain..`";
+                                    embed.Color = ColorHelper.Loading;
+                                    embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                    embed.Description = $"`Checking if your domain is already in the database..`";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                    foreach (var b in Bot._phishingUrls.List)
+                                    {
+                                        if (domain.Contains(b.Key))
+                                        {
+                                            embed.Description = $"`The domain ('{domain.Replace("`", "")}') is already present in the database. Thanks for trying to contribute regardless.`";
+                                            embed.Color = ColorHelper.Error;
+                                            embed.Author.IconUrl = Resources.LogIcons.Error;
+                                            _ = msg.ModifyAsync(embed.Build());
+                                            return;
+                                        }
+                                    }
+
+                                    embed.Description = $"`Checking if your domain has already been submitted before..`";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                    foreach (var b in Bot._submittedUrls.Urls)
+                                    {
+                                        if (b.Value.Url == domain)
+                                        {
+                                            embed.Description = $"`The domain ('{domain.Replace("`", "")}') has already been submitted. Thanks for trying to contribute regardless.`";
+                                            embed.Color = ColorHelper.Error;
+                                            embed.Author.IconUrl = Resources.LogIcons.Error;
+                                            _ = msg.ModifyAsync(embed.Build());
+                                            return;
+                                        }
+                                    }
+
+                                    embed.Description = $"`Creating submission..`";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                    var channel = await ctx.Client.GetChannelAsync(940040486910066698);
+
+                                    var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "accept_submission", "Accept submission", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")));
+                                    var cancel_button = new DiscordButtonComponent(ButtonStyle.Danger, "deny_submission", "Deny submission", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
+                                    var ban_user_button = new DiscordButtonComponent(ButtonStyle.Danger, "ban_user", "Deny submission & ban submitter", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
+                                    var ban_guild_button = new DiscordButtonComponent(ButtonStyle.Danger, "ban_guild", "Deny submission & ban guild", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
+
+                                    var subbmited_msg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                                    {
+                                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Info, Name = $"Phishing Link Submission" },
+                                        Color = ColorHelper.Success,
+                                        Timestamp = DateTime.Now,
+                                        Description = $"`Submitted Url`: `{domain.Replace("`", "")}`\n" +
+                                                        $"`Submission by`: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
+                                                        $"`Submitted on `: `{ctx.Guild.Name} ({ctx.Guild.Id})`"
+                                    }).AddComponents(new List<DiscordComponent>
+                                    {
+                                        { continue_button },
+                                        { cancel_button },
+                                        { ban_user_button },
+                                        { ban_guild_button },
+                                    }));
+
+                                    Bot._submittedUrls.Urls.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
+                                    {
+                                        Url = domain,
+                                        Submitter = ctx.User.Id,
+                                        GuildOrigin = ctx.Guild.Id
+                                    });
+
+                                    Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
+
+                                    embed.Description = $"`Submission created. Thanks for your contribution.`";
+                                    embed.Color = ColorHelper.Success;
+                                    embed.Author.IconUrl = Resources.LogIcons.Info;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                }
+                                else if (e.Interaction.Data.CustomId == "cancel")
+                                {
+                                    _ = msg.DeleteAsync();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            LogError($"{ex}");
+                        }
+                    });
+                };
+
+                ctx.Client.ComponentInteractionCreated += RunSubmissionInteraction;
+
+                try
+                {
+                    await Task.Delay(60000);
+
+                    if (InteractionExecuted)
+                        return;
+
+                    ctx.Client.ComponentInteractionCreated -= RunSubmissionInteraction;
+
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                }
+                catch { }
             }
             catch (Exception ex)
             {

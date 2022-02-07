@@ -2,12 +2,16 @@
 
 internal class SubmissionBans
 {
-    public Dictionary<string, BanInfo> BannedUsers = new();
-    public Dictionary<string, BanInfo> BannedGuilds = new();
+    public Dictionary<ulong, BanInfo> BannedUsers = new();
+    public Dictionary<ulong, BanInfo> BannedGuilds = new();
 
     public class BanInfo
     {
-        public string Reason { get; set; }
-        public string Moderator { get; set; }
+        private string _Reason { get; set; }
+        public string Reason { get => _Reason; set { _Reason = value; _ = Bot._databaseHelper.SyncDatabase(); } }
+
+
+        private ulong _Moderator { get; set; }
+        public ulong Moderator { get => _Moderator; set { _Moderator = value; _ = Bot._databaseHelper.SyncDatabase(); } }
     }
 }
