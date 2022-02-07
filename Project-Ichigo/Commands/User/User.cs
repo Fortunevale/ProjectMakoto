@@ -139,42 +139,6 @@ internal class User : BaseCommandModule
 
 
 
-    [Command("avatar"), Aliases("pfp"),
-    CommandModule("user"),
-    Description("Sends the avatar of the user as an image.")]
-    public async Task AvatarCommand(CommandContext ctx, DiscordUser victim = null)
-    {
-        _ = Task.Run(async () =>
-        {
-            if (victim is null)
-            {
-                victim = ctx.Member;
-            }
-
-            var embed2 = new DiscordEmbedBuilder
-            {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"{victim.Username}#{victim.Discriminator}'s Avatar",
-                    Url = victim.AvatarUrl
-                },
-                Title = "",
-                ImageUrl = victim.AvatarUrl,
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
-                Timestamp = DateTime.UtcNow,
-                Color = ColorHelper.Info
-            };
-
-            await ctx.Channel.SendMessageAsync(embed: embed2);
-        });
-    }
-
-
-
     [Command("info"),
     CommandModule("user"),
     Description("Shows informations about the bot or the mentioned user.")]
@@ -451,5 +415,41 @@ internal class User : BaseCommandModule
         {
             LogError($"Error occured while trying to generate info about a user: {ex}");
         }
+    }
+
+
+
+    [Command("avatar"), Aliases("pfp"),
+    CommandModule("user"),
+    Description("Sends the user's avatar as an embedded image.")]
+    public async Task AvatarCommand(CommandContext ctx, DiscordUser victim = null)
+    {
+        _ = Task.Run(async () =>
+        {
+            if (victim is null)
+            {
+                victim = ctx.Member;
+            }
+
+            var embed2 = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = $"{victim.Username}#{victim.Discriminator}'s Avatar",
+                    Url = victim.AvatarUrl
+                },
+                Title = "",
+                ImageUrl = victim.AvatarUrl,
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow,
+                Color = ColorHelper.Info
+            };
+
+            await ctx.Channel.SendMessageAsync(embed: embed2);
+        });
     }
 }
