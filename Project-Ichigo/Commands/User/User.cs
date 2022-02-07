@@ -577,10 +577,10 @@ internal class User : BaseCommandModule
                 if (domain.StartsWith("https://") || domain.StartsWith("http://"))
                     domain = domain.Replace("https://", "").Replace("http://", "");
 
-                if (domain.Contains("/"))
+                if (domain.Contains('/'))
                     domain = domain.Remove(domain.IndexOf("/"), domain.Length - domain.IndexOf("/"));
 
-                if (!domain.Contains(".") || domain.Contains(" "))
+                if (!domain.Contains('.') || domain.Contains(' '))
                 {
                     embed.Description = $"`The domain ('{domain.Replace("`", "")}') you're trying to submit is invalid.`";
                     embed.Color = ColorHelper.Error;
