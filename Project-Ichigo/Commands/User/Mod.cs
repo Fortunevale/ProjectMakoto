@@ -804,6 +804,130 @@ internal class Mod : BaseCommandModule
 
 
 
+    [Command("kick"),
+    CommandModule("mod"),
+    Description("Kicks the specified user. ##n##(It is recommended to use `##Prefix##warn` instead.)")]
+    public async Task Kick(CommandContext ctx, DiscordMember victim, [RemainingText] string reason = "")
+    {
+        _ = Task.Run(async () =>
+        {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.KickMembers))
+            {
+                _ = ctx.SendPermissionError(Permissions.KickMembers);
+                return;
+            }
+
+            if (reason is null or "")
+                reason = "-";
+
+            var PerformingActionEmbed = new DiscordEmbedBuilder
+            {
+                Title = "",
+                Description = $"`Kicking {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
+                Color = DiscordColor.Orange,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = victim.AvatarUrl
+                },
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.Guild.Name,
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                },
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            };
+            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+            try
+            {
+                await victim.RemoveAsync(reason);
+
+                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` was kicked.\n\n" +
+                                                        $"Reason: `{reason}`\n" +
+                                                        $"Kicked by: {ctx.Member.Mention} `{ctx.Member.Username}#{ctx.Member.Discriminator}` (`{ctx.Member.Id}`)";
+            }
+            catch (Exception)
+            {
+                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $":x: Encountered an exception while trying to kick <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
+            }
+
+            await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+        });
+    }
+
+
+
+    [Command("ban"),
+    CommandModule("mod"),
+    Description("Bans the specified user. ##n##(It is recommended to use `##Prefix##warn` instead.)")]
+    public async Task Ban(CommandContext ctx, DiscordUser victim, [RemainingText] string reason = "")
+    {
+        _ = Task.Run(async () =>
+        {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.BanMembers))
+            {
+                _ = ctx.SendPermissionError(Permissions.BanMembers);
+                return;
+            }
+
+            if (reason is null or "")
+                reason = "-";
+
+            var PerformingActionEmbed = new DiscordEmbedBuilder
+            {
+                Title = "",
+                Description = $"`Banning {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
+                Color = DiscordColor.Orange,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = victim.AvatarUrl
+                },
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.Guild.Name,
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                },
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            };
+            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+            try
+            {
+                await ctx.Guild.BanMemberAsync(victim.Id, 7, reason);
+
+                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` was banned.\n\n" +
+                                                        $"Reason: `{reason}`\n" +
+                                                        $"Banned by: {ctx.Member.Mention} `{ctx.Member.Username}#{ctx.Member.Discriminator}` (`{ctx.Member.Id}`)";
+            }
+            catch (Exception)
+            {
+                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $":x: Encountered an exception while trying to ban <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
+            }
+
+            await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+        });
+    }
+
+
+
     [Command("unban"),
     CommandModule("mod"),
     Description("Unbans the specified user.")]
@@ -811,9 +935,9 @@ internal class Mod : BaseCommandModule
     {
         _ = Task.Run(async () =>
         {
-            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageChannels))
+            if (!ctx.Member.Permissions.HasPermission(Permissions.BanMembers))
             {
-                _ = ctx.SendPermissionError(Permissions.ManageChannels);
+                _ = ctx.SendPermissionError(Permissions.BanMembers);
                 return;
             }
 
