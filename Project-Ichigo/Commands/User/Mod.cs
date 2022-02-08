@@ -643,4 +643,174 @@ internal class Mod : BaseCommandModule
             }
         });
     }
+
+
+
+    [Command("timeout"), Aliases("time-out", "zone"),
+    CommandModule("mod"),
+    Description("Times the user for the specified amount of time out.")]
+    public async Task ZoneCommand(CommandContext ctx, DiscordMember victim = null, string duration = "")
+    {
+        _ = Task.Run(async () =>
+        {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.ModerateMembers))
+            {
+                _ = ctx.SendPermissionError(Permissions.ModerateMembers);
+                return;
+            }
+
+            if (victim is null)
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+
+            var PerformingActionEmbed = new DiscordEmbedBuilder
+            {
+                Title = "",
+                Description = $"`Timing {victim.Username}#{victim.Discriminator} ({victim.Id}) out..`",
+                Color = DiscordColor.Orange,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = victim.AvatarUrl
+                },
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.Guild.Name,
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                },
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            };
+            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+            try
+            {
+                if (!DateTime.TryParse(duration, out DateTime until))
+                {
+                    switch (duration[^1..])
+                    {
+                        case "Y":
+                            until = DateTime.UtcNow.AddYears(Convert.ToInt32(duration.Replace("Y", "")));
+                            break;
+                        case "M":
+                            until = DateTime.UtcNow.AddMonths(Convert.ToInt32(duration.Replace("M", "")));
+                            break;
+                        case "d":
+                            until = DateTime.UtcNow.AddDays(Convert.ToInt32(duration.Replace("d", "")));
+                            break;
+                        case "h":
+                            until = DateTime.UtcNow.AddHours(Convert.ToInt32(duration.Replace("h", "")));
+                            break;
+                        case "m":
+                            until = DateTime.UtcNow.AddMinutes(Convert.ToInt32(duration.Replace("m", "")));
+                            break;
+                        case "s":
+                            until = DateTime.UtcNow.AddSeconds(Convert.ToInt32(duration.Replace("s", "")));
+                            break;
+                        default:
+                            until = DateTime.UtcNow.AddMinutes(Convert.ToInt32(duration));
+                            return;
+                    }
+                }
+
+
+                if (victim.IsProtected())
+                {
+                    PerformingActionEmbed.Color = DiscordColor.Red;
+                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                    PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
+                    await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                    return;
+                }
+
+                try
+                {
+                    await victim.TimeoutAsync(until);
+                    PerformingActionEmbed.Color = DiscordColor.Green;
+                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                    PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) was timed out for {until.GetTotalSecondsUntil().GetHumanReadable(TimeFormat.HOURS)}.`";
+                }
+                catch (Exception)
+                {
+                    PerformingActionEmbed.Color = DiscordColor.Red;
+                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                    PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
+                }
+
+                await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+            }
+            catch (Exception)
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+        });
+    }
+
+
+
+    [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unzone"),
+    CommandModule("mod"),
+    Description("Removes the timeout for the specified user.")]
+    public async Task UnzoneCommand(CommandContext ctx, DiscordMember victim = null)
+    {
+        _ = Task.Run(async () =>
+        {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.ModerateMembers))
+            {
+                _ = ctx.SendPermissionError(Permissions.ModerateMembers);
+                return;
+            }
+
+            if (victim is null)
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+
+            var PerformingActionEmbed = new DiscordEmbedBuilder
+            {
+                Title = "",
+                Description = $"`Removing timeout for {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
+                Color = DiscordColor.Orange,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = victim.AvatarUrl
+                },
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.Guild.Name,
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                },
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            };
+            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+            try
+            {
+                await victim.RemoveTimeoutAsync();
+                PerformingActionEmbed.Color = DiscordColor.Green;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")} `Removed timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
+            }
+            catch (Exception)
+            {
+                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `Couldn't remove timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
+            }
+
+            await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+        });
+    }
 }

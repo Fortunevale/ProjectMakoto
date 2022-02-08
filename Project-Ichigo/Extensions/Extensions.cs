@@ -22,6 +22,16 @@ public static class Extensions
         return false;
     }
 
+    public static bool IsProtected(this DiscordMember member)
+    {
+        if (member.Permissions.HasPermission(Permissions.Administrator) || member.Permissions.HasPermission(Permissions.ModerateMembers) || 
+            member.IsMaintenance() || 
+            member.IsOwner)
+            return true;
+
+        return false;
+    }
+
     public static string BoolToEmote(this bool b)
     {
         return b ? ":white_check_mark:" : "<:white_x:939750475354472478>";
