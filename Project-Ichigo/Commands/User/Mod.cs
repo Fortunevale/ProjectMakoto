@@ -426,7 +426,7 @@ internal class Mod : BaseCommandModule
     [Command("purge"), Aliases("clear"),
     CommandModule("mod"),
     Description("Deletes the specified amount of messages.")]
-    public async Task Purge(CommandContext ctx, [Description("1-2000")] int number = -1, DiscordUser user = null)
+    public async Task Purge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser user = null)
     {
         _ = Task.Run(async () =>
         {
@@ -646,7 +646,7 @@ internal class Mod : BaseCommandModule
 
 
 
-    [Command("timeout"), Aliases("time-out", "zone"),
+    [Command("timeout"), Aliases("time-out"),
     CommandModule("mod"),
     Description("Times the user for the specified amount of time out.")]
     public async Task Timeout(CommandContext ctx, DiscordMember victim, [Description("Duration")] string duration)
@@ -748,7 +748,7 @@ internal class Mod : BaseCommandModule
 
 
 
-    [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unzone"),
+    [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout"),
     CommandModule("mod"),
     Description("Removes the timeout for the specified user.")]
     public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
