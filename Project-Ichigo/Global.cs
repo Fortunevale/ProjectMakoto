@@ -45,6 +45,7 @@ global using Project_Ichigo.Helpers;
 global using Project_Ichigo.Extensions;
 global using Project_Ichigo.Secrets;
 global using Project_Ichigo.Objects;
+global using Project_Ichigo.Objects.Entities;
 global using Project_Ichigo.Objects.Database;
 global using Project_Ichigo.PhishingProtection;
 global using Project_Ichigo.Commands;
