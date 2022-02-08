@@ -649,19 +649,13 @@ internal class Mod : BaseCommandModule
     [Command("timeout"), Aliases("time-out", "zone"),
     CommandModule("mod"),
     Description("Times the user for the specified amount of time out.")]
-    public async Task Timeout(CommandContext ctx, DiscordMember victim = null, string duration = "")
+    public async Task Timeout(CommandContext ctx, DiscordMember victim, [Description("Duration")] string duration)
     {
         _ = Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.ModerateMembers))
             {
                 _ = ctx.SendPermissionError(Permissions.ModerateMembers);
-                return;
-            }
-
-            if (victim is null)
-            {
-                _ = ctx.SendSyntaxError();
                 return;
             }
 
@@ -757,19 +751,13 @@ internal class Mod : BaseCommandModule
     [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unzone"),
     CommandModule("mod"),
     Description("Removes the timeout for the specified user.")]
-    public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim = null)
+    public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
     {
         _ = Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.ModerateMembers))
             {
                 _ = ctx.SendPermissionError(Permissions.ModerateMembers);
-                return;
-            }
-
-            if (victim is null)
-            {
-                _ = ctx.SendSyntaxError();
                 return;
             }
 
@@ -808,6 +796,63 @@ internal class Mod : BaseCommandModule
                 PerformingActionEmbed.Color = DiscordColor.Red;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `Couldn't remove timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
+            }
+
+            await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+        });
+    }
+
+
+
+    [Command("unban"),
+    CommandModule("mod"),
+    Description("Unbans the specified user.")]
+    public async Task Unban(CommandContext ctx, DiscordUser victim)
+    {
+        _ = Task.Run(async () =>
+        {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageChannels))
+            {
+                _ = ctx.SendPermissionError(Permissions.ManageChannels);
+                return;
+            }
+
+            var PerformingActionEmbed = new DiscordEmbedBuilder
+            {
+                Title = "",
+                Description = $"`Unbanning {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
+                Color = DiscordColor.Orange,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = victim.AvatarUrl
+                },
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.Guild.Name,
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                },
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            };
+            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+            try
+            {
+                await ctx.Guild.UnbanMemberAsync(victim);
+
+                PerformingActionEmbed.Color = DiscordColor.Green;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` was unbanned.";
+            }
+            catch (Exception)
+            {
+                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` **could not** be unbanned.";
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
