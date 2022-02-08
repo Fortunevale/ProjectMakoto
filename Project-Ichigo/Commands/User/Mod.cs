@@ -420,4 +420,227 @@ internal class Mod : BaseCommandModule
             }
         });
     }
+
+
+
+    [Command("purge"), Aliases("clear"),
+    CommandModule("mod"),
+    Description("Deletes the specified amount of messages.")]
+    public async Task PurgeCommand(CommandContext ctx, [Description("1-2000")] int number = -1, DiscordUser user = null)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                _ = ctx.Message.DeleteAsync();
+            }
+            catch { }
+
+            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageMessages))
+            {
+                _ = ctx.SendPermissionError(Permissions.ManageMessages);
+                return;
+            }
+
+            if (number is > 2000 or < 1)
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+
+            try
+            {
+                int FailedToDeleteAmount = 0;
+
+                if (number > 100)
+                {
+                    var PerformingActionEmbed = new DiscordEmbedBuilder
+                    {
+                        Description = $"`Fetching {number} messages..`",
+                        Color = DiscordColor.Orange,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                        },
+                        Footer = new DiscordEmbedBuilder.EmbedFooter
+                        {
+                            Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                            IconUrl = ctx.Member.AvatarUrl
+                        },
+                        Timestamp = DateTime.UtcNow
+                    };
+                    var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+                    List<DiscordMessage> fetchedMessages = (await ctx.Channel.GetMessagesAsync(100)).ToList();
+
+                    if (fetchedMessages.Any(x => x.Id == ctx.Message.Id))
+                        fetchedMessages.Remove(fetchedMessages.First(x => x.Id == ctx.Message.Id));
+
+                    if (fetchedMessages.Any(x => x.Id == msg1.Id))
+                        fetchedMessages.Remove(fetchedMessages.First(x => x.Id == msg1.Id));
+
+                    while (fetchedMessages.Count <= number)
+                    {
+                        IReadOnlyList<DiscordMessage> fetch;
+
+                        if (fetchedMessages.Count + 100 <= number)
+                            fetch = await ctx.Channel.GetMessagesBeforeAsync(fetchedMessages.Last().Id, 100);
+                        else
+                            fetch = await ctx.Channel.GetMessagesBeforeAsync(fetchedMessages.Last().Id, number - fetchedMessages.Count);
+
+                        if (fetch.Any())
+                            fetchedMessages.AddRange(fetch);
+                        else
+                            break;
+                    }
+
+                    if (user is not null)
+                    {
+                        foreach (var b in fetchedMessages.Where(x => x.Author.Id != user.Id).ToList())
+                        {
+                            fetchedMessages.Remove(b);
+                        }
+                    }
+
+                    int failed_deleted = 0;
+
+                    foreach (var b in fetchedMessages.Where(x => x.CreationTimestamp < DateTime.UtcNow.AddDays(-14)).ToList())
+                    {
+                        fetchedMessages.Remove(b);
+                        FailedToDeleteAmount++;
+                        failed_deleted++;
+                    }
+
+                    if (fetchedMessages.Count > 0)
+                    {
+                        PerformingActionEmbed.Description = $"`Fetched {fetchedMessages.Count} messages. Deleting..`";
+                        await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                    }
+                    else
+                    {
+                        PerformingActionEmbed.Description = $":x: `No messages were found with the specified filter.`";
+                        PerformingActionEmbed.Color = DiscordColor.Red;
+                        PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                        await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                    }
+
+                    int total = fetchedMessages.Count;
+                    int deleted = 0;
+                    
+                    List<Task> deletionOperations = new();
+
+                    try
+                    {
+                        while (fetchedMessages.Any())
+                        {
+                            var current_deletion = fetchedMessages.Take(100);
+
+                            deletionOperations.Add(ctx.Channel.DeleteMessagesAsync(current_deletion).ContinueWith(task =>
+                            {
+                                if (task.IsCompletedSuccessfully)
+                                    deleted += current_deletion.Count();
+                                else
+                                    failed_deleted += current_deletion.Count();
+                            }));
+
+                            foreach (var b in current_deletion.ToList())
+                                fetchedMessages.Remove(b);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"Failed to delete messages: {ex}");
+                        PerformingActionEmbed.Description = $":x: `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
+                        PerformingActionEmbed.Color = DiscordColor.Red;
+                        PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                        await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                        return;
+                    }
+
+                    while (!deletionOperations.All(x => x.IsCompleted))
+                    {
+                        await Task.Delay(1000);
+                        PerformingActionEmbed.Description = $"`Deleted {deleted}/{total} messages..`";
+                        _ = msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                    }
+
+                    PerformingActionEmbed.Description = $":white_check_mark: `Successfully deleted {total - failed_deleted} messages`";
+
+                    if (FailedToDeleteAmount > 0)
+                        PerformingActionEmbed.Description += $"\n`Failed to delete {failed_deleted} messages because they we're more than 14 days old`";
+
+                    PerformingActionEmbed.Color = DiscordColor.Green;
+                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                    PerformingActionEmbed.Footer.Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • This message will auto-delete in 5 seconds";
+
+                    _ = msg1.ModifyAsync(embed: PerformingActionEmbed.Build()).ContinueWith(_ =>
+                    {
+                        _ = Task.Delay(5000).ContinueWith(e =>
+                        {
+                            try
+                            {
+                                _ = msg1.DeleteAsync();
+                            }
+                            catch { }
+                        });
+                    });
+                    return;
+                }
+                else
+                {
+                    List<DiscordMessage> bMessages = (await ctx.Channel.GetMessagesAsync(number)).ToList();
+
+                    if (user is not null)
+                    {
+                        foreach (var b in bMessages.Where(x => x.Author.Id != user.Id).ToList())
+                        {
+                            bMessages.Remove(b);
+                        }
+                    }
+
+                    foreach (var b in bMessages.Where(x => x.CreationTimestamp < DateTime.UtcNow.AddDays(-14)).ToList())
+                    {
+                        bMessages.Remove(b);
+                        FailedToDeleteAmount++;
+                    }
+
+                    if (bMessages.Count > 0)
+                        await ctx.Channel.DeleteMessagesAsync(bMessages);
+                }
+
+                if (FailedToDeleteAmount > 0)
+                {
+                    var PerformingActionEmbed = new DiscordEmbedBuilder
+                    {
+                        Title = "",
+                        Description = $":x: `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`",
+                        Color = DiscordColor.Red,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = new DiscordEmbedBuilder.EmbedFooter
+                        {
+                            Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • This message will auto-delete in 5 seconds",
+                            IconUrl = ctx.Member.AvatarUrl
+                        },
+                        Timestamp = DateTime.UtcNow
+                    };
+                    var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+                    await Task.Delay(5000);
+                    try
+                    {
+                        await msg1.DeleteAsync();
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error while trying to delete {number} messages\n\n{ex}");
+            }
+        });
+    }
 }
