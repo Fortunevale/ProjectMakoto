@@ -19,7 +19,7 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = new DiscordColor("#ff6666")
+            Color = ColorHelper.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -44,7 +44,7 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = new DiscordColor("#ff6666")
+            Color = ColorHelper.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -69,7 +69,32 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = new DiscordColor("#ff6666")
+            Color = ColorHelper.Error
+        };
+
+        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
+
+        return msg;
+    }
+
+    public static async Task<DiscordMessage> SendPermissionError(this CommandContext ctx, Permissions perms)
+    {
+        DiscordEmbedBuilder embed = new()
+        {
+            Author = new DiscordEmbedBuilder.EmbedAuthor
+            {
+                IconUrl = ctx.Guild.IconUrl,
+                Name = ctx.Guild.Name
+            },
+            Title = "",
+            Description = $"You dont have permissions to use this command. You need `{perms.ToPermissionString()}` to use this command.",
+            Footer = new DiscordEmbedBuilder.EmbedFooter
+            {
+                Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
+                IconUrl = ctx.User.AvatarUrl
+            },
+            Timestamp = DateTime.UtcNow,
+            Color = ColorHelper.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -94,13 +119,11 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = new DiscordColor("#ff6666")
+            Color = ColorHelper.Error
         };
 
         if (ctx.Client.GetCommandsNext()
-            .RegisteredCommands[ ctx.Command.Name ].Overloads
-            .First().Arguments
-            .First().Type.Name is "DiscordUser" or "DiscordMember")
+            .RegisteredCommands[ ctx.Command.Name ].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
             embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -114,7 +137,7 @@ internal static class PreMadeEmbedsExtensions
 
         if (cmd.Overloads.Count > 0)
         {
-            foreach (var b in cmd.Overloads.First().Arguments)
+            foreach (var b in cmd.Overloads[0].Arguments)
             {
                 Usage += $" ";
 
@@ -123,7 +146,7 @@ internal static class PreMadeEmbedsExtensions
                 else
                     Usage += "<";
 
-                if (b.Description != null && b.Description != "")
+                if (b.Description is not null and not "")
                     Usage += b.Description;
                 else
                     Usage += b.Type.Name;
