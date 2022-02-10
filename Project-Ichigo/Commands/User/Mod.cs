@@ -806,7 +806,7 @@ internal class Mod : BaseCommandModule
 
     [Command("kick"),
     CommandModule("mod"),
-    Description("Kicks the specified user. ##n##(It is recommended to use `##Prefix##warn` instead.)")]
+    Description("Kicks the specified user.")]
     public async Task Kick(CommandContext ctx, DiscordMember victim, [RemainingText] string reason = "")
     {
         _ = Task.Run(async () =>
@@ -868,7 +868,7 @@ internal class Mod : BaseCommandModule
 
     [Command("ban"),
     CommandModule("mod"),
-    Description("Bans the specified user. ##n##(It is recommended to use `##Prefix##warn` instead.)")]
+    Description("Bans the specified user.")]
     public async Task Ban(CommandContext ctx, DiscordUser victim, [RemainingText] string reason = "")
     {
         _ = Task.Run(async () =>
