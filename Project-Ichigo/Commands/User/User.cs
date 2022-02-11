@@ -466,7 +466,7 @@ internal class User : BaseCommandModule
     [Command("submit-url"),
     CommandModule("user"),
     Description("Allows submission of new malicous urls to our database.")]
-    public async Task UrlSubmit(CommandContext ctx, string url)
+    public async Task UrlSubmit(CommandContext ctx, [Description("URL")]string url)
     {
         _ = Task.Run(async () =>
         {
