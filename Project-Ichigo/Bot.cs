@@ -2,24 +2,29 @@
 
 internal class Bot
 {
-    internal DiscordClient? discordClient;
+    internal DiscordClient discordClient;
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
-    internal static MySqlConnection? databaseConnection;
+    internal MySqlConnection databaseConnection;
     
 
 
-    internal static Status _status = new();
+    internal Status _status = new();
 
-    internal static Settings _guilds = new();
-    internal static Users _users = new();
+    internal Settings _guilds = new();
+    internal Users _users = new();
 
-    internal static PhishingUrls _phishingUrls = new();
-    internal static SubmissionBans _submissionBans = new();
-    internal static SubmittedUrls _submittedUrls = new();
+    internal PhishingUrls _phishingUrls = new();
+    internal SubmissionBans _submissionBans = new();
+    internal SubmittedUrls _submittedUrls = new();
+
+    internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
     
 
-    internal static DatabaseHelper _databaseHelper = new();
+    internal static DatabaseHelper _databaseHelper { get; set; }
+
+
+    ServiceProvider services { get; set; }
 
 
     internal async Task Init(string[] args)
@@ -42,176 +47,6 @@ internal class Bot
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Regex.Replace(Environment.CommandLine, @"(--token \S*)", "")}\n");
 
-        var logInToDiscord = Task.Run(async () =>
-        {
-            string token = "";
-
-            try
-            {
-                if (args.Contains("--token"))
-                    token = args[ Array.IndexOf(args, "--token") + 1 ];
-            }
-            catch (Exception ex)
-            {
-                LogError($"An exception occured while trying to parse a token commandline argument: {ex}");
-            }
-
-            if (File.Exists("token.cfg") && !args.Contains("--token"))
-                token = File.ReadAllText("token.cfg");
-
-            if (!(token.Length > 0))
-            {
-                LogFatal("No token provided");
-                File.WriteAllText("token.cfg", "");
-                await Task.Delay(1000);
-                Environment.Exit(ExitCodes.NoToken);
-                return;
-            }
-
-            LogDebug($"Registering DiscordClient..");
-
-            discordClient = new DiscordClient(new DiscordConfiguration
-            {
-                Token = $"{token}",
-                TokenType = TokenType.Bot,
-                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Warning,
-                Intents = DiscordIntents.All,
-                LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
-                AutoReconnect = true
-            });
-
-            LogDebug($"Registering CommandsNext..");
-
-            discordClient.UseCommandsNext(new CommandsNextConfiguration
-            {
-                StringPrefixes = new[] { "-" },
-                EnableDefaultHelp = false,
-                EnableMentionPrefix = false,
-                IgnoreExtraArguments = true,
-                EnableDms = false
-            });
-
-            LogDebug($"Registering Lavalink..");
-
-            var endpoint = new ConnectionEndpoint
-            {
-                Hostname = Secrets.Secrets.LavalinkUrl,
-                Port = Secrets.Secrets.LavalinkPort
-            };
-
-            var lavalinkConfig = new LavalinkConfiguration
-            {
-                Password = Secrets.Secrets.LavalinkPassword,
-                RestEndpoint = endpoint,
-                SocketEndpoint = endpoint
-            };
-
-            discordClient.UseLavalink();
-
-            LogDebug($"Registering Commands..");
-            discordClient.GetCommandsNext().RegisterCommands<User>();
-            discordClient.GetCommandsNext().RegisterCommands<Mod>();
-            discordClient.GetCommandsNext().RegisterCommands<Admin>();
-
-            discordClient.GetCommandsNext().RegisterCommands<Test>();
-
-            LogDebug($"Registering Command Converters..");
-            discordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());
-            discordClient.GetCommandsNext().RegisterConverter(new CustomArgumentConverter.BoolConverter());
-
-            LogDebug($"Registering Command Events..");
-
-            CommandEvents commandEvents = new();
-            discordClient.GetCommandsNext().CommandExecuted += commandEvents.CommandExecuted;
-            discordClient.GetCommandsNext().CommandErrored += commandEvents.CommandError;
-
-            LogDebug($"Registering Phishing Events..");
-
-            PhishingProtectionEvents phishingProtectionEvents = new();
-            discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
-            discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
-
-            SubmissionEvents _submissionEvents = new();
-            discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
-
-            LogDebug($"Registering Discord Events..");
-
-            DiscordEvents discordEvents = new();
-            discordClient.GuildCreated += discordEvents.GuildCreated;
-
-            LogDebug($"Registering Interactivity..");
-
-            discordClient.UseInteractivity(new InteractivityConfiguration { });
-
-            LogDebug($"Registering Events..");
-
-            discordClient.GuildDownloadCompleted += GuildDownloadCompleted;
-
-            try
-            {
-                var discordLoginSc = new Stopwatch();
-                discordLoginSc.Start();
-
-                _ = Task.Delay(10000).ContinueWith(t =>
-                {
-                    if (!_status.DiscordInitialized)
-                    {
-                        LogError($"An exception occured while trying to log into discord: The log in took longer than 5 seconds");
-                        Environment.Exit(ExitCodes.FailedDiscordLogin);
-                        return;
-                    }
-                });
-
-                LogInfo("Connecting and authenticating with Discord..");
-                await discordClient.ConnectAsync();
-
-                discordLoginSc.Stop();
-                LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
-                _status.DiscordInitialized = true;
-
-                _ = Task.Run(() =>
-                {
-                    try
-                    {
-                        _status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
-                        LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
-                    }
-                    catch (Exception ex)
-                    {
-                        LogError($"An exception occured trying to add team members to administrator list. Is the current bot registered in a team?: {ex}");
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                LogError($"An exception occured while trying to log into discord: {ex}");
-                await Task.Delay(5000);
-                Environment.Exit(ExitCodes.FailedDiscordLogin);
-                return;
-            }
-
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var lavalinkSc = new Stopwatch();
-                    lavalinkSc.Start();
-                    LogInfo("Connecting and authenticating with Lavalink..");
-
-                    LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
-                    lavalinkSc.Stop();
-                    LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
-
-                    _status.LavalinkInitialized = true;
-                }
-                catch (Exception ex)
-                {
-                    LogError($"An exception occured while trying to log into Lavalink: {ex}");
-                    return;
-                }
-            });
-        });
-
         var loadDatabase = Task.Run(async () =>
         {
             try
@@ -222,6 +57,8 @@ internal class Bot
                 LogInfo($"Connecting to database..");
                 databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
                 databaseConnection.Open();
+
+                _databaseHelper = new DatabaseHelper(databaseConnection, _guilds, _users, _submissionBans, _submittedUrls);
 
                 await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {Secrets.Secrets.DatabaseName}");
                 await databaseConnection.ExecuteAsync($"USE {Secrets.Secrets.DatabaseName}");
@@ -348,13 +185,224 @@ internal class Bot
 
                 LogInfo($"Loaded {_submittedUrls.Urls.Count} active submissions from table 'active_url_submissions'.");
 
-                _ = new PhishingUrlUpdater().UpdatePhishingUrlDatabase(_phishingUrls);
+                _phishingUrlUpdater = new(databaseConnection);
+                _ = _phishingUrlUpdater.UpdatePhishingUrlDatabase(_phishingUrls);
             }
             catch (Exception ex)
             {
                 LogFatal($"An exception occured while trying get data from the database: {ex}");
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDatabaseLoad);
+            }
+        });
+
+        await loadDatabase.WaitAsync(TimeSpan.FromSeconds(30));
+
+        var logInToDiscord = Task.Run(async () =>
+        {
+            try
+            {
+                string token = "";
+
+                try
+                {
+                    if (args.Contains("--token"))
+                        token = args[Array.IndexOf(args, "--token") + 1];
+                }
+                catch (Exception ex)
+                {
+                    LogError($"An exception occured while trying to parse a token commandline argument: {ex}");
+                }
+
+                if (File.Exists("token.cfg") && !args.Contains("--token"))
+                    token = File.ReadAllText("token.cfg");
+
+                if (!(token.Length > 0))
+                {
+                    LogFatal("No token provided");
+                    File.WriteAllText("token.cfg", "");
+                    await Task.Delay(1000);
+                    Environment.Exit(ExitCodes.NoToken);
+                    return;
+                }
+
+
+
+                LogDebug($"Registering DiscordClient..");
+
+                discordClient = new DiscordClient(new DiscordConfiguration
+                {
+                    Token = $"{token}",
+                    TokenType = TokenType.Bot,
+                    MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Warning,
+                    Intents = DiscordIntents.All,
+                    LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
+                    AutoReconnect = true
+                });
+
+
+
+                LogDebug($"Registering CommandsNext..");
+
+                services = new ServiceCollection()
+                    .AddSingleton(discordClient)
+                    .AddSingleton(_status)
+                    .AddSingleton(_guilds)
+                    .AddSingleton(_users)
+                    .AddSingleton(_phishingUrls)
+                    .AddSingleton(_submissionBans)
+                    .AddSingleton(_submittedUrls)
+                    .BuildServiceProvider();
+
+                var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
+                {
+                    StringPrefixes = new[] { "-" },
+                    EnableDefaultHelp = false,
+                    EnableMentionPrefix = false,
+                    IgnoreExtraArguments = true,
+                    EnableDms = false,
+                    ServiceProvider = services
+                });
+
+                
+
+                LogDebug($"Registering Lavalink..");
+
+                var endpoint = new ConnectionEndpoint
+                {
+                    Hostname = Secrets.Secrets.LavalinkUrl,
+                    Port = Secrets.Secrets.LavalinkPort
+                };
+
+                var lavalinkConfig = new LavalinkConfiguration
+                {
+                    Password = Secrets.Secrets.LavalinkPassword,
+                    RestEndpoint = endpoint,
+                    SocketEndpoint = endpoint
+                };
+
+                discordClient.UseLavalink();
+
+
+
+                LogDebug($"Registering Commands..");
+                cNext.RegisterCommands<User>();
+                cNext.RegisterCommands<Mod>();
+                cNext.RegisterCommands<Admin>();
+
+                cNext.RegisterCommands<Test>();
+
+
+
+                LogDebug($"Registering Command Converters..");
+                cNext.RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());
+                cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
+
+
+
+                LogDebug($"Registering Command Events..");
+
+                CommandEvents commandEvents = new();
+                cNext.CommandExecuted += commandEvents.CommandExecuted;
+                cNext.CommandErrored += commandEvents.CommandError;
+
+
+
+                LogDebug($"Registering Phishing Events..");
+
+                PhishingProtectionEvents phishingProtectionEvents = new(_phishingUrls, _guilds);
+                discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
+                discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
+
+                SubmissionEvents _submissionEvents = new(databaseConnection, _submittedUrls, _phishingUrls, _status, _submissionBans);
+                discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
+
+
+
+                LogDebug($"Registering Discord Events..");
+
+                DiscordEvents discordEvents = new();
+                discordClient.GuildCreated += discordEvents.GuildCreated;
+
+
+
+                LogDebug($"Registering Interactivity..");
+
+                discordClient.UseInteractivity(new InteractivityConfiguration { });
+
+
+
+                LogDebug($"Registering Events..");
+
+                discordClient.GuildDownloadCompleted += GuildDownloadCompleted;
+
+                try
+                {
+                    var discordLoginSc = new Stopwatch();
+                    discordLoginSc.Start();
+
+                    _ = Task.Delay(10000).ContinueWith(t =>
+                    {
+                        if (!_status.DiscordInitialized)
+                        {
+                            LogError($"An exception occured while trying to log into discord: The log in took longer than 5 seconds");
+                            Environment.Exit(ExitCodes.FailedDiscordLogin);
+                            return;
+                        }
+                    });
+
+                    LogInfo("Connecting and authenticating with Discord..");
+                    await discordClient.ConnectAsync();
+
+                    discordLoginSc.Stop();
+                    LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
+                    _status.DiscordInitialized = true;
+
+                    _ = Task.Run(() =>
+                    {
+                        try
+                        {
+                            _status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
+                            LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
+                        }
+                        catch (Exception ex)
+                        {
+                            LogError($"An exception occured trying to add team members to administrator list. Is the current bot registered in a team?: {ex}");
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError($"An exception occured while trying to log into discord: {ex}");
+                    await Task.Delay(5000);
+                    Environment.Exit(ExitCodes.FailedDiscordLogin);
+                    return;
+                }
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        var lavalinkSc = new Stopwatch();
+                        lavalinkSc.Start();
+                        LogInfo("Connecting and authenticating with Lavalink..");
+
+                        LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
+                        lavalinkSc.Stop();
+                        LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
+
+                        _status.LavalinkInitialized = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"An exception occured while trying to log into Lavalink: {ex}");
+                        return;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                LogError($"{ex}");
             }
         });
 
@@ -386,8 +434,8 @@ internal class Bot
 
             foreach (var guild in e.Guilds)
             {
-                if (!Bot._guilds.Servers.ContainsKey(guild.Key))
-                    Bot._guilds.Servers.Add(guild.Key, new Settings.ServerSettings());
+                if (!_guilds.Servers.ContainsKey(guild.Key))
+                    _guilds.Servers.Add(guild.Key, new Settings.ServerSettings());
             }
         });
     }

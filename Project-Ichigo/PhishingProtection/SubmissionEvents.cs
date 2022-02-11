@@ -2,33 +2,48 @@
 
 internal class SubmissionEvents
 {
+    internal SubmissionEvents(MySqlConnection databaseConnection, SubmittedUrls _submittedUrls, PhishingUrls _phishingUrls, Status _status, SubmissionBans _submissionBans)
+    {
+        this.databaseConnection = databaseConnection;
+        this._submittedUrls = _submittedUrls;
+        this._phishingUrls = _phishingUrls;
+        this._status = _status;
+        this._submissionBans = _submissionBans;
+    }
+
+    internal MySqlConnection databaseConnection { private get; set; }
+    internal SubmittedUrls _submittedUrls { private get; set; }
+    internal PhishingUrls _phishingUrls { private get; set; }
+    internal Status _status { private get; set; }
+    internal SubmissionBans _submissionBans { private get; set; }
+
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
     {
         _ = Task.Run(async () =>
         {
-            if (Bot._submittedUrls.Urls.ContainsKey(e.Message.Id))
+            if (_submittedUrls.Urls.ContainsKey(e.Message.Id))
             {
-                if (!e.User.IsMaintenance())
+                if (!e.User.IsMaintenance(_status))
                     return;
 
                 await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 if (e.Interaction.Data.CustomId == "accept_submission")
                 {
-                    Bot._phishingUrls.List.Add(Bot._submittedUrls.Urls[e.Message.Id].Url, new PhishingUrls.UrlInfo
+                    _phishingUrls.List.Add(_submittedUrls.Urls[e.Message.Id].Url, new PhishingUrls.UrlInfo
                     {
                         Origin = new(),
-                        Submitter = Bot._submittedUrls.Urls[e.Message.Id].Submitter,
-                        Url = Bot._submittedUrls.Urls[e.Message.Id].Url
+                        Submitter = _submittedUrls.Urls[e.Message.Id].Submitter,
+                        Url = _submittedUrls.Urls[e.Message.Id].Url
                     });
 
-                    Bot._submittedUrls.Urls.Remove(e.Message.Id);
+                    _submittedUrls.Urls.Remove(e.Message.Id);
 
                     try
                     {
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
                     }
                     catch { }
@@ -37,7 +52,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        _ = new PhishingUrlUpdater().UpdateDatabase(Bot._phishingUrls, new());
+                        _ = new PhishingUrlUpdater(databaseConnection).UpdateDatabase(_phishingUrls, new());
                     }
                     catch (Exception ex)
                     {
@@ -46,13 +61,13 @@ internal class SubmissionEvents
                 }
                 else if (e.Interaction.Data.CustomId == "deny_submission")
                 {
-                    Bot._submittedUrls.Urls.Remove(e.Message.Id);
+                    _submittedUrls.Urls.Remove(e.Message.Id);
 
                     try
                     {
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
                     }
                     catch { }
@@ -61,7 +76,7 @@ internal class SubmissionEvents
                 }
                 else if (e.Interaction.Data.CustomId == "ban_user")
                 {
-                    Bot._submissionBans.BannedUsers.Add(Bot._submittedUrls.Urls[e.Message.Id].Submitter, new SubmissionBans.BanInfo
+                    _submissionBans.BannedUsers.Add(_submittedUrls.Urls[e.Message.Id].Submitter, new SubmissionBans.BanInfo
                     {
                         Reason = "Too many denied requests | Manual ban",
                         Moderator = e.User.Id
@@ -69,20 +84,20 @@ internal class SubmissionEvents
 
                     try
                     {
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
                     }
                     catch { }
 
-                    Bot._submittedUrls.Urls.Remove(e.Message.Id);
+                    _submittedUrls.Urls.Remove(e.Message.Id);
 
                     _ = e.Message.DeleteAsync();
                 }
                 else if (e.Interaction.Data.CustomId == "ban_guild")
                 {
-                    Bot._submissionBans.BannedGuilds.Add(Bot._submittedUrls.Urls[e.Message.Id].GuildOrigin, new SubmissionBans.BanInfo
+                    _submissionBans.BannedGuilds.Add(_submittedUrls.Urls[e.Message.Id].GuildOrigin, new SubmissionBans.BanInfo
                     {
                         Reason = "Too many denied requests | Manual ban",
                         Moderator = e.User.Id
@@ -90,14 +105,14 @@ internal class SubmissionEvents
 
                     try
                     {
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
                     }
                     catch { }
 
-                    Bot._submittedUrls.Urls.Remove(e.Message.Id);
+                    _submittedUrls.Urls.Remove(e.Message.Id);
 
                     _ = e.Message.DeleteAsync();
                 }

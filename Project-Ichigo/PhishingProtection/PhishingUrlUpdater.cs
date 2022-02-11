@@ -2,6 +2,12 @@ namespace Project_Ichigo.PhishingProtection;
 
 public class PhishingUrlUpdater
 {
+    internal PhishingUrlUpdater(MySqlConnection con)
+    {
+        databaseConnection = con;
+    }
+
+    internal MySqlConnection databaseConnection { private get; set; }
 
     public async Task UpdatePhishingUrlDatabase(PhishingUrls phishingUrls)
     {
@@ -75,12 +81,12 @@ public class PhishingUrlUpdater
                 submitter = x.Value.Submitter
             }).OrderBy(x => x.url).ToList();
 
-            if (Bot.databaseConnection == null)
+            if (databaseConnection == null)
             {
                 throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
             }
 
-            var cmd = Bot.databaseConnection.CreateCommand();
+            var cmd = databaseConnection.CreateCommand();
             cmd.CommandText = @$"INSERT INTO scam_urls ( url, origin, submitter ) VALUES ";
 
             for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -95,7 +101,7 @@ public class PhishingUrlUpdater
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
             cmd.CommandText += " ON DUPLICATE KEY UPDATE origin=values(origin)";
 
-            cmd.Connection = Bot.databaseConnection;
+            cmd.Connection = databaseConnection;
             await cmd.ExecuteNonQueryAsync();
 
             LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
@@ -106,9 +112,9 @@ public class PhishingUrlUpdater
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    cmd = Bot.databaseConnection.CreateCommand();
+                    cmd = databaseConnection.CreateCommand();
                     cmd.CommandText = $"DELETE FROM scam_urls WHERE url='{b}'";
-                    cmd.Connection = Bot.databaseConnection;
+                    cmd.Connection = databaseConnection;
                     await cmd.ExecuteNonQueryAsync();
 
                     LogDebug($"Dropped '{b}' from table 'scam_urls'.");

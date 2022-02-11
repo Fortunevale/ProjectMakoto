@@ -1,6 +1,14 @@
 ﻿namespace Project_Ichigo.Commands.User;
 internal class User : BaseCommandModule
 {
+    public Status _status { private get; set; }
+    public Users _users { private get; set; }
+    public SubmissionBans _submissionBans { private get; set; }
+    public PhishingUrls _phishingUrls { private get; set; }
+    public SubmittedUrls _submittedUrls { private get; set; }
+
+
+
     [Command("help"),
     CommandModule("user"),
     Description("Shows all available commands, their usage and their description.")]
@@ -28,19 +36,19 @@ internal class User : BaseCommandModule
                     $"{x.Value.GenerateUsage()}` - " +
                     $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Mod Commands", x)).ToList());
 
-                if (ctx.Member.IsAdmin())
+                if (ctx.Member.IsAdmin(_status))
                     Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "admin")
                         .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
                         $"{x.Value.GenerateUsage()}` - " +
                         $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Admin Commands", x)).ToList());
 
-                if (ctx.Member.IsMaintenance())
+                if (ctx.Member.IsMaintenance(_status))
                     Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "maintainence")
                         .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
                         $"{x.Value.GenerateUsage()}` - " +
                         $"_{x.Value.Description}{(x.Value.Aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", x.Value.Aliases)}`)" : "")}_").Select(x => new KeyValuePair<string, string>("Maintenance Commands", x)).ToList());
 
-                if (ctx.Member.IsMaintenance())
+                if (ctx.Member.IsMaintenance(_status))
                     Commands.AddRange(ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).Where(x => x.Value.CustomAttributes.OfType<CommandModuleAttribute>() is not null && x.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString == "hidden")
                         .Select(x => $"`{ctx.Prefix}{x.Value.Name}" +
                         $"{x.Value.GenerateUsage()}` - " +
@@ -215,7 +223,7 @@ internal class User : BaseCommandModule
 
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running on**\n`Loading..`", $"**Currently running on**\n`{Environment.OSVersion.Platform} with DOTNET-{Environment.Version}`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current bot lib and version**\n`Loading..`", $"**Current bot lib and version**\n[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.Now - Bot._status.startupTime).TotalHours, 2)} hours`");
+            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.Now - _status.startupTime).TotalHours, 2)} hours`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current API Latency**\n`Loading..`", $"**Current API Latency**\n`{ctx.Client.Ping}ms`");
 
             await msg.ModifyAsync(embed: embed.Build());
@@ -464,10 +472,10 @@ internal class User : BaseCommandModule
         {
             try
             {
-                if (!Bot._users.List.ContainsKey(ctx.User.Id))
-                    Bot._users.List.Add(ctx.User.Id, new Users.Info());
+                if (!_users.List.ContainsKey(ctx.User.Id))
+                    _users.List.Add(ctx.User.Id, new Users.Info());
 
-                if (!Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
+                if (!_users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
                 {
                     var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
 
@@ -498,7 +506,7 @@ internal class User : BaseCommandModule
                             if (e.Message.Id == tos_accept.Id && e.User.Id == ctx.User.Id)
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                                Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
+                                _users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
 
                                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
                                 await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
@@ -543,29 +551,29 @@ internal class User : BaseCommandModule
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                if (Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance())
+                if (_users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(_status))
                 {
-                    embed.Description = $"`You cannot submit a domain for the next {Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
+                    embed.Description = $"`You cannot submit a domain for the next {_users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
                     embed.Color = ColorHelper.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     return;
                 }
 
-                if (Bot._submissionBans.BannedUsers.ContainsKey(ctx.User.Id))
+                if (_submissionBans.BannedUsers.ContainsKey(ctx.User.Id))
                 {
                     embed.Description = $"`You are banned from submitting URLs.`\n" +
-                                        $"`Reason: {Bot._submissionBans.BannedUsers[ctx.User.Id].Reason}`";
+                                        $"`Reason: {_submissionBans.BannedUsers[ctx.User.Id].Reason}`";
                     embed.Color = ColorHelper.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     return;
                 }
 
-                if (Bot._submissionBans.BannedGuilds.ContainsKey(ctx.Guild.Id))
+                if (_submissionBans.BannedGuilds.ContainsKey(ctx.Guild.Id))
                 {
                     embed.Description = $"`This guild is banned from submitting URLs.`\n" +
-                                        $"`Reason: {Bot._submissionBans.BannedGuilds[ctx.Guild.Id].Reason}`";
+                                        $"`Reason: {_submissionBans.BannedGuilds[ctx.Guild.Id].Reason}`";
                     embed.Color = ColorHelper.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
@@ -628,7 +636,7 @@ internal class User : BaseCommandModule
                                     embed.Description = $"`Checking if your domain is already in the database..`";
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                    foreach (var b in Bot._phishingUrls.List)
+                                    foreach (var b in _phishingUrls.List)
                                     {
                                         if (domain.Contains(b.Key))
                                         {
@@ -643,7 +651,7 @@ internal class User : BaseCommandModule
                                     embed.Description = $"`Checking if your domain has already been submitted before..`";
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                    foreach (var b in Bot._submittedUrls.Urls)
+                                    foreach (var b in _submittedUrls.Urls)
                                     {
                                         if (b.Value.Url == domain)
                                         {
@@ -681,14 +689,14 @@ internal class User : BaseCommandModule
                                         { ban_guild_button },
                                     }));
 
-                                    Bot._submittedUrls.Urls.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
+                                    _submittedUrls.Urls.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
                                     {
                                         Url = domain,
                                         Submitter = ctx.User.Id,
                                         GuildOrigin = ctx.Guild.Id
                                     });
 
-                                    Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
+                                    _users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                                     embed.Description = $"`Submission created. Thanks for your contribution.`";
                                     embed.Color = ColorHelper.Success;

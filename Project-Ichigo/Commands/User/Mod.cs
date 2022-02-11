@@ -1,6 +1,10 @@
 ﻿namespace Project_Ichigo.Commands.User;
 internal class Mod : BaseCommandModule
 {
+    public Status _status { private get; set; }
+
+
+
     [Command("emoji"), Aliases("emote"),
     CommandModule("mod"),
     Description("Steals emojis of the message that this command was replied to.")]
@@ -713,7 +717,7 @@ internal class Mod : BaseCommandModule
                 }
 
 
-                if (victim.IsProtected())
+                if (victim.IsProtected(_status))
                 {
                     PerformingActionEmbed.Color = DiscordColor.Red;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;

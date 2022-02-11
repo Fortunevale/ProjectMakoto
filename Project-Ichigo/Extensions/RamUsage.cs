@@ -1,7 +1,5 @@
 ﻿namespace Project_Ichigo.Extensions;
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-
 public class MemoryMetrics
 {
     public double Total;

@@ -1,6 +1,12 @@
 ﻿namespace Project_Ichigo.Commands.User;
 internal class Admin : BaseCommandModule
 {
+    public Status _status { private get; set; }
+    public Users _users { private get; set; }
+    public Settings _guilds { private get; set; }
+
+
+
     [Command("phishing-settings"),
     CommandModule("admin"),
     Description("Allows to review and change settings for phishing detection")]
@@ -10,7 +16,7 @@ internal class Admin : BaseCommandModule
         {
             try
             {
-                if (!ctx.Member.IsAdmin())
+                if (!ctx.Member.IsAdmin(_status))
                 {
                     _ = ctx.SendAdminError();
                     return;
@@ -38,10 +44,10 @@ internal class Admin : BaseCommandModule
                         Color = ColorHelper.Info,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
-                        Description = $"`Detect Phishing Links   ` : {Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
-                                      $"`Punishment Type         ` : `{Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
-                                      $"`Custom Punishment Reason` : `{Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
-                                      $"`Custom Timeout Length   ` : `{Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
+                        Description = $"`Detect Phishing Links   ` : {_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
+                                      $"`Punishment Type         ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
+                                      $"`Custom Punishment Reason` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
+                                      $"`Custom Timeout Length   ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
                     });
                     return;
                 }
@@ -53,16 +59,16 @@ internal class Admin : BaseCommandModule
                         Color = ColorHelper.Info,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
-                        Description = $"`Detect Phishing Links   ` : {Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
-                                      $"`Punishment Type         ` : `{Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
-                                      $"`Custom Punishment Reason` : `{Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
-                                      $"`Custom Timeout Length   ` : `{Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
+                        Description = $"`Detect Phishing Links   ` : {_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
+                                      $"`Punishment Type         ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
+                                      $"`Custom Punishment Reason` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
+                                      $"`Custom Timeout Length   ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
                     };
 
                     var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
                     .AddComponents(new List<DiscordComponent>
                     {
-                        { new DiscordButtonComponent((Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Detection") },
+                        { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Detection") },
                         { new DiscordButtonComponent(ButtonStyle.Primary, "2", "Change Punishment") },
                         { new DiscordButtonComponent(ButtonStyle.Secondary, "3", "Change Reason") },
                         { new DiscordButtonComponent(ButtonStyle.Secondary, "4", "Change Timeout Length") },
@@ -94,7 +100,7 @@ internal class Admin : BaseCommandModule
                         case "1":
                         {
                             _ = msg.DeleteAsync();
-                            Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
+                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
                             _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                             break;
                         }
@@ -117,16 +123,16 @@ internal class Admin : BaseCommandModule
                                     switch (e.Values.First())
                                     {
                                         case "Ban":
-                                            Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.BAN;
+                                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.BAN;
                                             break;
                                         case "Kick":
-                                            Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.KICK;
+                                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.KICK;
                                             break;
                                         case "Timeout":
-                                            Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.TIMEOUT;
+                                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.TIMEOUT;
                                             break;
                                         case "Delete":
-                                            Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.DELETE;
+                                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = Settings.PhishingPunishmentType.DELETE;
                                             break;
                                     }
 
@@ -176,7 +182,7 @@ internal class Admin : BaseCommandModule
                             }
 
                             if (reason.Result.Content.ToLower() is not "cancel" or ".")
-                                Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
+                                _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
 
                             _ = msg3.DeleteAsync();
                             _ = msg.DeleteAsync();
@@ -185,7 +191,7 @@ internal class Admin : BaseCommandModule
                         }
                         case "4":
                         {
-                            if (Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != Settings.PhishingPunishmentType.TIMEOUT)
+                            if (_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != Settings.PhishingPunishmentType.TIMEOUT)
                             {
                                 var msg4 = await ctx.Channel.SendMessageAsync("You aren't using `Timeout` as your Punishment");
                                 await Task.Delay(5000);
@@ -261,7 +267,7 @@ internal class Admin : BaseCommandModule
                                     return;
                                 }
 
-                                Bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
+                                _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
 
                                 _ = msg3.DeleteAsync();
                                 _ = msg.DeleteAsync();

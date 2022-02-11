@@ -1,6 +1,21 @@
 ﻿namespace Project_Ichigo;
 internal class DatabaseHelper
 {
+    internal DatabaseHelper(MySqlConnection databaseConnection2, Settings guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
+    {
+        databaseConnection = databaseConnection2;
+        _guilds = guilds;
+        _users = users;
+        _submissionBans = submissionBans;
+        _submittedUrls = submittedUrls;
+    }
+
+    internal MySqlConnection databaseConnection { private get; set; }
+    internal Settings _guilds { private set; get; }
+    internal Users _users { private get; set; }
+    internal SubmissionBans _submissionBans { private get; set; }
+    internal SubmittedUrls _submittedUrls { private get; set; }
+
     private List<Task> queuedUpdates = new();
 
     public async Task QueueWatcher()
@@ -10,7 +25,7 @@ internal class DatabaseHelper
             while (true)
             {
                 await Task.Delay(300000);
-                _ = Bot._databaseHelper.SyncDatabase();
+                _ = SyncDatabase();
             }
         });
 
@@ -37,7 +52,7 @@ internal class DatabaseHelper
             {
                 try
                 {
-                    List<DatabaseServerSettings> DatabaseInserts = Bot._guilds.Servers.Select(x => new DatabaseServerSettings
+                    List<DatabaseServerSettings> DatabaseInserts = _guilds.Servers.Select(x => new DatabaseServerSettings
                     {
                         serverid = x.Key,
                         phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
@@ -46,12 +61,12 @@ internal class DatabaseHelper
                         phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds)
                     }).ToList();
 
-                    if (Bot.databaseConnection == null)
+                    if (databaseConnection == null)
                     {
                         throw new Exception($"Exception occured while trying to update guilds in database: Database connection not present");
                     }
 
-                    var cmd = Bot.databaseConnection.CreateCommand();
+                    var cmd = databaseConnection.CreateCommand();
                     cmd.CommandText = @$"INSERT INTO guilds ( serverid, phishing_detect, phishing_type, phishing_reason, phishing_time ) VALUES ";
 
                     for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -72,7 +87,7 @@ internal class DatabaseHelper
                                        "phishing_reason=values(phishing_reason), " +
                                        "phishing_time=values(phishing_time)";
 
-                    cmd.Connection = Bot.databaseConnection;
+                    cmd.Connection = databaseConnection;
                     await cmd.ExecuteNonQueryAsync();
 
                     LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
@@ -85,10 +100,10 @@ internal class DatabaseHelper
                     LogError($"An exception occured while trying to update the guilds table: {ex}");
                 }
 
-                if (Bot._users.List.Count > 0)
+                if (_users.List.Count > 0)
                     try
                     {
-                        List<DatabaseUsers> DatabaseInserts = Bot._users.List.Select(x => new DatabaseUsers
+                        List<DatabaseUsers> DatabaseInserts = _users.List.Select(x => new DatabaseUsers
                         {
                             userid = x.Key,
                             submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
@@ -96,12 +111,12 @@ internal class DatabaseHelper
                             submission_last_datetime = x.Value.UrlSubmissions.LastTime
                         }).ToList();
 
-                        if (Bot.databaseConnection == null)
+                        if (databaseConnection == null)
                         {
                             throw new Exception($"Exception occured while trying to update users in database: Database connection not present");
                         }
 
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = @$"INSERT INTO users ( userid, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime ) VALUES ";
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -120,7 +135,7 @@ internal class DatabaseHelper
                                            "submission_accepted_submissions=values(submission_accepted_submissions), " +
                                            "submission_last_datetime=values(submission_last_datetime)";
 
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
@@ -133,22 +148,22 @@ internal class DatabaseHelper
                         LogError($"An exception occured while trying to update the users table: {ex}");
                     }
 
-                if (Bot._submissionBans.BannedUsers.Count > 0)
+                if (_submissionBans.BannedUsers.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = Bot._submissionBans.BannedUsers.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _submissionBans.BannedUsers.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (Bot.databaseConnection == null)
+                        if (databaseConnection == null)
                         {
                             throw new Exception($"Exception occured while trying to update user_submission_bans in database: Database connection not present");
                         }
 
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = @$"INSERT INTO user_submission_bans ( id, reason, moderator ) VALUES ";
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -165,7 +180,7 @@ internal class DatabaseHelper
                                            "reason=values(reason), " +
                                            "moderator=values(moderator)";
 
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
@@ -178,22 +193,22 @@ internal class DatabaseHelper
                         LogError($"An exception occured while trying to update the user_submission_bans table: {ex}");
                     }
 
-                if (Bot._submissionBans.BannedGuilds.Count > 0)
+                if (_submissionBans.BannedGuilds.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = Bot._submissionBans.BannedGuilds.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _submissionBans.BannedGuilds.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (Bot.databaseConnection == null)
+                        if (databaseConnection == null)
                         {
                             throw new Exception($"Exception occured while trying to update guild_submission_bans in database: Database connection not present");
                         }
 
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = @$"INSERT INTO guild_submission_bans ( id, reason, moderator ) VALUES ";
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -210,7 +225,7 @@ internal class DatabaseHelper
                                            "reason=values(reason), " +
                                            "moderator=values(moderator)";
 
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
@@ -223,10 +238,10 @@ internal class DatabaseHelper
                         LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
                     }
 
-                if (Bot._submittedUrls.Urls.Count > 0)
+                if (_submittedUrls.Urls.Count > 0)
                     try
                     {
-                        List<DatabaseSubmittedUrls> DatabaseInserts = Bot._submittedUrls.Urls.Select(x => new DatabaseSubmittedUrls
+                        List<DatabaseSubmittedUrls> DatabaseInserts = _submittedUrls.Urls.Select(x => new DatabaseSubmittedUrls
                         {
                             messageid = x.Key,
                             url = x.Value.Url,
@@ -234,12 +249,12 @@ internal class DatabaseHelper
                             guild = x.Value.GuildOrigin
                         }).ToList();
 
-                        if (Bot.databaseConnection == null)
+                        if (databaseConnection == null)
                         {
                             throw new Exception($"Exception occured while trying to update active_url_submissions in database: Database connection not present");
                         }
 
-                        var cmd = Bot.databaseConnection.CreateCommand();
+                        var cmd = databaseConnection.CreateCommand();
                         cmd.CommandText = @$"INSERT INTO active_url_submissions ( messageid, url, submitter, guild ) VALUES ";
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -258,7 +273,7 @@ internal class DatabaseHelper
                                            "submitter=values(submitter), " +
                                            "guild=values(guild)";
 
-                        cmd.Connection = Bot.databaseConnection;
+                        cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");

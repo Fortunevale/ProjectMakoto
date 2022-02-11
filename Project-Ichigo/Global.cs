@@ -18,6 +18,7 @@ global using System.Data.SQLite;
 global using System.Data.Common;
 global using System.Security.Cryptography;
 global using System.Data;
+global using Microsoft.Extensions.DependencyInjection;
 
 // Database
 

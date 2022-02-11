@@ -2,6 +2,17 @@
 
 internal class PhishingProtectionEvents
 {
+    internal PhishingProtectionEvents(PhishingUrls _phishingUrls, Settings _guilds)
+    {
+        this._phishingUrls = _phishingUrls;
+        this._guilds = _guilds;
+    }
+
+    internal PhishingUrls _phishingUrls { private get; set; }
+    public Settings _guilds { private get; set; }
+
+
+
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         _ = CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message);
@@ -19,7 +30,7 @@ internal class PhishingProtectionEvents
                 if (e.Content.StartsWith($"-{command.Key}"))
                     return;
         
-        foreach (var url in Bot._phishingUrls.List)
+        foreach (var url in _phishingUrls.List)
         {
             if (e.Content.Contains(url.Key))
             {
@@ -42,7 +53,7 @@ internal class PhishingProtectionEvents
 
                     if (unshortened_url != match.Value)
                     {
-                        foreach (var url in Bot._phishingUrls.List)
+                        foreach (var url in _phishingUrls.List)
                         {
                             if (unshortened_url.Contains(url.Key))
                             {
@@ -81,10 +92,10 @@ internal class PhishingProtectionEvents
 
     private async Task PunishMember(DiscordGuild guild, DiscordMember member, DiscordMessage e, string url)
     {
-        if (!Bot._guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
+        if (!_guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
             return;
 
-        switch (Bot._guilds.Servers[guild.Id].PhishingDetectionSettings.PunishmentType)
+        switch (_guilds.Servers[guild.Id].PhishingDetectionSettings.PunishmentType)
         {
             case Settings.PhishingPunishmentType.DELETE:
             {
@@ -94,19 +105,19 @@ internal class PhishingProtectionEvents
             case Settings.PhishingPunishmentType.TIMEOUT:
             {
                 _ = e.DeleteAsync();
-                _ = member.TimeoutAsync(Bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, Bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.TimeoutAsync(_guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, _guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
             case Settings.PhishingPunishmentType.KICK:
             {
                 _ = e.DeleteAsync();
-                _ = member.RemoveAsync(Bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.RemoveAsync(_guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
             case Settings.PhishingPunishmentType.BAN:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, Bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.BanAsync(7, _guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
         }

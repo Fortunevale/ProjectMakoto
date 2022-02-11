@@ -2,6 +2,9 @@
 
 internal class Users
 {
+    internal DatabaseHelper _databaseHelper { private get; set; }
+
+
     public Dictionary<ulong, Info> List { get; set; } = new();
 
     internal class Info

@@ -1,46 +1,46 @@
 ﻿namespace Project_Ichigo.Extensions;
 
-public static class Extensions
+internal static class Extensions
 {
-    public static bool IsMaintenance(this DiscordMember member) => (member as DiscordUser).IsMaintenance();
+    internal static bool IsMaintenance(this DiscordMember member, Status _status) => (member as DiscordUser).IsMaintenance(_status);
 
-    public static bool IsMaintenance(this DiscordUser user)
+    internal static bool IsMaintenance(this DiscordUser user, Status _status)
     {
-        if (Bot._status.TeamMembers.Contains(user.Id))
+        if (_status.TeamMembers.Contains(user.Id))
             return true;
 
         return false;
     }
 
-    public static bool IsAdmin(this DiscordMember member)
+    internal static bool IsAdmin(this DiscordMember member, Status _status)
     {
         if ((member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed || x.CheckPermission(Permissions.ManageGuild) == PermissionLevel.Allowed)) ||
-            (member.IsMaintenance()) ||
+            (member.IsMaintenance(_status)) ||
             member.IsOwner)
             return true;
 
         return false;
     }
 
-    public static bool IsProtected(this DiscordMember member)
+    internal static bool IsProtected(this DiscordMember member, Status _status)
     {
         if (member.Permissions.HasPermission(Permissions.Administrator) || member.Permissions.HasPermission(Permissions.ModerateMembers) || 
-            member.IsMaintenance() || 
+            member.IsMaintenance(_status) || 
             member.IsOwner)
             return true;
 
         return false;
     }
 
-    public static string BoolToEmote(this bool b)
+    internal static string BoolToEmote(this bool b)
     {
         return b ? ":white_check_mark:" : "<:white_x:939750475354472478>";
     }
 
-    public static string DigitsToEmotes(this long i) =>
+    internal static string DigitsToEmotes(this long i) =>
         DigitsToEmotes(i.ToString());
 
-    public static string DigitsToEmotes(this int i) =>
+    internal static string DigitsToEmotes(this int i) =>
         DigitsToEmotes(i.ToString());
 
     private static string DigitsToEmotes(string str)
@@ -57,7 +57,7 @@ public static class Extensions
             .Replace("9", ":nine:");
     }
 
-    public static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> list, string title, string description = "")
+    internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> list, string title, string description = "")
     {
         List<DiscordEmbedBuilder> discordEmbeds = new();
 
@@ -89,7 +89,7 @@ public static class Extensions
         return discordEmbeds;
     }
 
-    public static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")
+    internal static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")
     {
         if (startingText.Length > 1024)
             throw new Exception("startingText cant be more than 1024 characters");
@@ -129,7 +129,7 @@ public static class Extensions
         return fields;
     }
 
-    public static List<string>? GetEmotes(this string content)
+    internal static List<string>? GetEmotes(this string content)
     {
         if (Regex.IsMatch(content, @"(<:[^ ]*:\d*>)"))
             return Regex.Matches(content, @"(<:[^ ]*:\d*>)").Select(x => x.Value).ToList();
@@ -137,7 +137,7 @@ public static class Extensions
             return null;
     }
 
-    public static List<string>? GetAnimatedEmotes(this string content)
+    internal static List<string>? GetAnimatedEmotes(this string content)
     {
         if (Regex.IsMatch(content, @"(<a:[^ ]*:\d*>)"))
             return Regex.Matches(content, @"(<a:[^ ]*:\d*>)").Select(x => x.Value).ToList();
@@ -145,7 +145,7 @@ public static class Extensions
             return null;
     }
 
-    public static List<string>? GetMentions(this string content)
+    internal static List<string>? GetMentions(this string content)
     {
         if (Regex.IsMatch(content, @"(<@\d*>)"))
             return Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList();
@@ -153,7 +153,7 @@ public static class Extensions
             return null;
     }
 
-    //public static bool IsProtected(this DiscordMember member)
+    //internal static bool IsProtected(this DiscordMember member)
     //{
     //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
     //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
@@ -167,7 +167,7 @@ public static class Extensions
     //    return false;
     //}
 
-    //public static bool IsStaff(this DiscordMember member)
+    //internal static bool IsStaff(this DiscordMember member)
     //{
     //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
     //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
@@ -179,7 +179,7 @@ public static class Extensions
     //    return false;
     //}
 
-    //public static bool IsMaintenance(this DiscordMember member)
+    //internal static bool IsMaintenance(this DiscordMember member)
     //{
     //    if (member.Id == 411950662662881290 || (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370))
     //        return true;
@@ -187,7 +187,7 @@ public static class Extensions
     //    return false;
     //}
 
-    //public static bool IsAdmin(this DiscordMember member)
+    //internal static bool IsAdmin(this DiscordMember member)
     //{
     //    if ((member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
     //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
@@ -197,7 +197,7 @@ public static class Extensions
     //    return false;
     //}
 
-    //public static bool IsMod(this DiscordMember member)
+    //internal static bool IsMod(this DiscordMember member)
     //{
     //    if ((member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
     //        (member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) && member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId)) ||
@@ -208,7 +208,7 @@ public static class Extensions
     //    return false;
     //}
 
-    //public static bool IsDj(this DiscordMember member)
+    //internal static bool IsDj(this DiscordMember member)
     //{
     //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
     //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
@@ -222,9 +222,9 @@ public static class Extensions
     //}
 }
 
-public class SqLiteBaseRepository
+internal class SqLiteBaseRepository
 {
-    public static SQLiteConnection SimpleDbConnection(string file)
+    internal static SQLiteConnection SimpleDbConnection(string file)
     {
         return new SQLiteConnection("Data Source=" + file);
     }
