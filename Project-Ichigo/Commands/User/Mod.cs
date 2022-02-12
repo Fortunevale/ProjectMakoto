@@ -650,6 +650,128 @@ internal class Mod : BaseCommandModule
 
 
 
+    [Command("guild-purge"), Aliases("guild-clear", "server-purge", "server-clear"),
+    CommandModule("mod"),
+    Description("Scans the specified amount of messages for the given user's messages and deletes them. Similar to the `purge` command's behaviour.")]
+    public async Task GuildPurge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser user)
+    {
+        _ = Task.Run(async () =>
+        {
+            var status_embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Server Purge • {ctx.Guild.Name}" },
+                Color = ColorHelper.Warning,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.Now,
+                Description = $"`Scanning all channels for messages sent by '{user.UsernameWithDiscriminator}' ({user.Id})..`"
+            };
+
+            var status_message = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
+
+            int current_prog = 0;
+            int max_prog = ctx.Guild.Channels.Count;
+
+            int all_msg = 0;
+            Dictionary<ulong, List<DiscordMessage>> messages = new();
+
+            foreach (var channel in ctx.Guild.Channels.Where(x => x.Value.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.News))
+            {
+                all_msg = 0;
+                foreach (var b in messages)
+                    all_msg += b.Value.Count;
+
+                current_prog++;
+
+                status_embed.Description = $"`Scanning all channels for messages sent by '{user.UsernameWithDiscriminator}' ({user.Id})..`\n\n" +
+                                            $"`Current Channel`: `({current_prog}/{max_prog})` {channel.Value.Mention} `({channel.Value.Id})`\n" +
+                                            $"`Found Messages `: `{all_msg}`";
+                await status_message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
+
+                int MessageInt = number;
+
+                List<DiscordMessage> requested_messages = new();
+
+                var pre_request = await channel.Value.GetMessagesAsync(1);
+
+                if (pre_request.Count > 0)
+                {
+                    requested_messages.Add(pre_request[0]);
+                    MessageInt -= 1;
+                }
+
+                while (true)
+                {
+                    if (pre_request.Count == 0)
+                        break;
+
+                    if (MessageInt <= 0)
+                        break;
+
+                    if (MessageInt > 100)
+                    {
+                        var current_request = await channel.Value.GetMessagesBeforeAsync(requested_messages.Last().Id, 100);
+
+                        if (current_request.Count == 0)
+                            break;
+
+                        foreach (var b in current_request)
+                            requested_messages.Add(b);
+
+                        MessageInt -= 100;
+                    }
+                    else
+                    {
+                        var current_request = await channel.Value.GetMessagesBeforeAsync(requested_messages.Last().Id, MessageInt);
+
+                        if (current_request.Count == 0)
+                            break;
+
+                        foreach (var b in current_request)
+                            requested_messages.Add(b);
+
+                        MessageInt -= MessageInt;
+                    }
+                }
+
+                if (requested_messages.Count > 0)
+                    foreach (var b in requested_messages.ToList())
+                    {
+                        if (b.Author.Id == user.Id && b.CreationTimestamp.AddDays(14) > DateTime.UtcNow)
+                        {
+                            if (!messages.ContainsKey(channel.Key))
+                                messages.Add(channel.Key, new List<DiscordMessage>());
+
+                            messages[channel.Key].Add(b);
+                        }
+                    }
+            }
+
+            status_embed.Description = $"`Found {all_msg} messages sent by '{user.UsernameWithDiscriminator}' ({user.Id}). Deleting..`";
+            await status_message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
+
+            current_prog = 0;
+            max_prog = messages.Count;
+
+            foreach (var channel in messages)
+            {
+                current_prog++;
+                status_embed.Description = $"`Found {all_msg} messages sent by '{user.UsernameWithDiscriminator}' ({user.Id}). Deleting..`\n\n" +
+                                            $"`Current Channel`: `({current_prog}/{max_prog})` <#{channel.Key}> `({channel.Key})`\n" +
+                                            $"`Found Messages `: `{all_msg}`";
+                await status_message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
+
+                await ctx.Guild.GetChannel(channel.Key).DeleteMessagesAsync(channel.Value);
+            }
+
+            status_embed.Description = $"`Finished operation.`";
+            status_embed.Color = ColorHelper.Success;
+            status_embed.Author.IconUrl = Resources.LogIcons.Info;
+            await status_message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
+        });
+    }
+
+
+
     [Command("timeout"), Aliases("time-out"),
     CommandModule("mod"),
     Description("Times the user for the specified amount of time out.")]
