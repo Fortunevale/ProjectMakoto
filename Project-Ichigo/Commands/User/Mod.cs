@@ -657,6 +657,18 @@ internal class Mod : BaseCommandModule
     {
         _ = Task.Run(async () =>
         {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageMessages))
+            {
+                _ = ctx.SendPermissionError(Permissions.ManageMessages);
+                return;
+            }
+
+            if (number is > 2000 or < 1)
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+
             var status_embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Server Purge • {ctx.Guild.Name}" },
