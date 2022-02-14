@@ -10,6 +10,9 @@ internal class TaskWatcher
         {
             foreach (var b in tasks.ToList())
             {
+                if (!b.task.IsCompleted)
+                    continue;
+
                 if (b.task.IsCompletedSuccessfully)
                 {
                     tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
