@@ -1,7 +1,7 @@
 ﻿namespace Project_Ichigo;
 internal class DatabaseHelper
 {
-    internal DatabaseHelper(MySqlConnection databaseConnection2, Settings guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
+    internal DatabaseHelper(MySqlConnection databaseConnection2, ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
     {
         databaseConnection = databaseConnection2;
         _guilds = guilds;
@@ -11,7 +11,7 @@ internal class DatabaseHelper
     }
 
     internal MySqlConnection databaseConnection { private get; set; }
-    internal Settings _guilds { private set; get; }
+    internal ServerInfo _guilds { private set; get; }
     internal Users _users { private get; set; }
     internal SubmissionBans _submissionBans { private get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }

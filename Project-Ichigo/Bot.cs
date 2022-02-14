@@ -11,7 +11,7 @@ internal class Bot
 
     internal Status _status = new();
 
-    internal Settings _guilds = new();
+    internal ServerInfo _guilds = new();
     internal Users _users = new();
 
     internal PhishingUrls _phishingUrls = new();
@@ -109,12 +109,12 @@ internal class Bot
                 IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
 
                 foreach (var b in serverSettings)
-                    _guilds.Servers.Add(b.serverid, new Settings.ServerSettings
+                    _guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
                     {
                         PhishingDetectionSettings = new()
                         {
                             DetectPhishing = b.phishing_detect,
-                            PunishmentType = (Settings.PhishingPunishmentType)b.phishing_type,
+                            PunishmentType = (ServerInfo.PhishingPunishmentType)b.phishing_type,
                             CustomPunishmentReason = b.phishing_reason,
                             CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
                         }
@@ -439,7 +439,7 @@ internal class Bot
             foreach (var guild in e.Guilds)
             {
                 if (!_guilds.Servers.ContainsKey(guild.Key))
-                    _guilds.Servers.Add(guild.Key, new Settings.ServerSettings());
+                    _guilds.Servers.Add(guild.Key, new ServerInfo.ServerSettings());
             }
         });
     }

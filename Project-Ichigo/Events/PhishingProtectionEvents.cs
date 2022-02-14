@@ -2,14 +2,14 @@
 
 internal class PhishingProtectionEvents
 {
-    internal PhishingProtectionEvents(PhishingUrls _phishingUrls, Settings _guilds)
+    internal PhishingProtectionEvents(PhishingUrls _phishingUrls, ServerInfo _guilds)
     {
         this._phishingUrls = _phishingUrls;
         this._guilds = _guilds;
     }
 
     internal PhishingUrls _phishingUrls { private get; set; }
-    public Settings _guilds { private get; set; }
+    public ServerInfo _guilds { private get; set; }
 
 
 
@@ -97,24 +97,24 @@ internal class PhishingProtectionEvents
 
         switch (_guilds.Servers[guild.Id].PhishingDetectionSettings.PunishmentType)
         {
-            case Settings.PhishingPunishmentType.DELETE:
+            case ServerInfo.PhishingPunishmentType.DELETE:
             {
                 _ = e.DeleteAsync();
                 break;
             }
-            case Settings.PhishingPunishmentType.TIMEOUT:
+            case ServerInfo.PhishingPunishmentType.TIMEOUT:
             {
                 _ = e.DeleteAsync();
                 _ = member.TimeoutAsync(_guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, _guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
-            case Settings.PhishingPunishmentType.KICK:
+            case ServerInfo.PhishingPunishmentType.KICK:
             {
                 _ = e.DeleteAsync();
                 _ = member.RemoveAsync(_guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
-            case Settings.PhishingPunishmentType.BAN:
+            case ServerInfo.PhishingPunishmentType.BAN:
             {
                 _ = e.DeleteAsync();
                 _ = member.BanAsync(7, _guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));

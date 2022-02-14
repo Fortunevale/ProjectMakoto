@@ -1,6 +1,6 @@
 ﻿namespace Project_Ichigo.Objects;
 
-internal class Settings
+internal class ServerInfo
 {
     internal Dictionary<ulong, ServerSettings> Servers = new();
 
