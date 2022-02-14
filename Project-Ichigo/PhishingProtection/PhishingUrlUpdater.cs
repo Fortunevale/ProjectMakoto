@@ -11,6 +11,11 @@ public class PhishingUrlUpdater
 
     public async Task UpdatePhishingUrlDatabase(PhishingUrls phishingUrls)
     {
+        new Task(new Action(async () =>
+        {
+            _ = UpdatePhishingUrlDatabase(phishingUrls);
+        })).CreateScheduleTask(DateTime.UtcNow.AddMinutes(30), $"phishing-update");
+
         var urls = await GetUrls();
 
         bool DatabaseUpdated = false;
