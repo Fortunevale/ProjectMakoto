@@ -4,6 +4,7 @@ internal class Admin : BaseCommandModule
     public Status _status { private get; set; }
     public Users _users { private get; set; }
     public Settings _guilds { private get; set; }
+    public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
 
 
@@ -12,7 +13,7 @@ internal class Admin : BaseCommandModule
     Description("Allows to review and change settings for phishing detection")]
     public async Task PhishingSettings(CommandContext ctx, [Description("Action")] string action = "help")
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -291,6 +292,6 @@ internal class Admin : BaseCommandModule
             {
                 LogError($"{ex}");
             }
-        });
+        }).Add(_watcher, ctx);
     }
 }

@@ -2,6 +2,7 @@
 internal class Mod : BaseCommandModule
 {
     public Status _status { private get; set; }
+    public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
 
 
@@ -10,7 +11,7 @@ internal class Mod : BaseCommandModule
     Description("Steals emojis of the message that this command was replied to.")]
     public async Task EmojiStealer(CommandContext ctx)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers))
             {
@@ -422,7 +423,7 @@ internal class Mod : BaseCommandModule
             {
                 LogError($"Error occured downloading emotes: {ex}");
             }
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -432,7 +433,7 @@ internal class Mod : BaseCommandModule
     Description("Deletes the specified amount of messages.")]
     public async Task Purge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser user = null)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -645,7 +646,7 @@ internal class Mod : BaseCommandModule
             {
                 LogError($"Error while trying to delete {number} messages\n\n{ex}");
             }
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -655,7 +656,7 @@ internal class Mod : BaseCommandModule
     Description("Scans the specified amount of messages for the given user's messages and deletes them. Similar to the `purge` command's behaviour.")]
     public async Task GuildPurge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser user)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.ManageMessages))
             {
@@ -779,7 +780,7 @@ internal class Mod : BaseCommandModule
             status_embed.Color = ColorHelper.Success;
             status_embed.Author.IconUrl = Resources.LogIcons.Info;
             await status_message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -789,7 +790,7 @@ internal class Mod : BaseCommandModule
     Description("Times the user for the specified amount of time out.")]
     public async Task Timeout(CommandContext ctx, DiscordMember victim, [Description("Duration")] string duration)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.ModerateMembers))
             {
@@ -881,7 +882,7 @@ internal class Mod : BaseCommandModule
                 _ = ctx.SendSyntaxError();
                 return;
             }
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -891,7 +892,7 @@ internal class Mod : BaseCommandModule
     Description("Removes the timeout for the specified user.")]
     public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.ModerateMembers))
             {
@@ -937,7 +938,7 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -947,7 +948,7 @@ internal class Mod : BaseCommandModule
     Description("Kicks the specified user.")]
     public async Task Kick(CommandContext ctx, DiscordMember victim, [Description("Reason")][RemainingText] string reason = "")
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.KickMembers))
             {
@@ -999,7 +1000,7 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -1009,7 +1010,7 @@ internal class Mod : BaseCommandModule
     Description("Bans the specified user.")]
     public async Task Ban(CommandContext ctx, DiscordUser victim, [Description("Reason")][RemainingText] string reason = "")
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.BanMembers))
             {
@@ -1061,7 +1062,7 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -1071,7 +1072,7 @@ internal class Mod : BaseCommandModule
     Description("Unbans the specified user.")]
     public async Task Unban(CommandContext ctx, DiscordUser victim)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (!ctx.Member.Permissions.HasPermission(Permissions.BanMembers))
             {
@@ -1118,6 +1119,6 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        });
+        }).Add(_watcher, ctx);
     }
 }

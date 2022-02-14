@@ -6,6 +6,7 @@ internal class User : BaseCommandModule
     public SubmissionBans _submissionBans { private get; set; }
     public PhishingUrls _phishingUrls { private get; set; }
     public SubmittedUrls _submittedUrls { private get; set; }
+    public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
 
 
@@ -14,7 +15,7 @@ internal class User : BaseCommandModule
     Description("Shows all available commands, their usage and their description.")]
     public async Task Help(CommandContext ctx)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -142,7 +143,7 @@ internal class User : BaseCommandModule
             {
                 LogError($"{ex}");
             }
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -152,7 +153,7 @@ internal class User : BaseCommandModule
     Description("Shows informations about the bot or the mentioned user.")]
     public async Task Info(CommandContext ctx, DiscordUser victim = null)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (victim is not null)
             {
@@ -320,7 +321,7 @@ internal class User : BaseCommandModule
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
             await msg.ModifyAsync(embed: embed.Build());
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -330,99 +331,102 @@ internal class User : BaseCommandModule
     Description("Shows information about the mentioned user.")]
     public async Task UserInfo(CommandContext ctx, DiscordUser victim)
     {
-        try
+        Task.Run(async () =>
         {
-            DiscordMember bMember = null;
-
             try
             {
-                bMember = await ctx.Guild.GetMemberAsync(victim.Id);
-            }
-            catch (Exception ex)
-            {
-                LogDebug($"Failed to get user: {ex}");
-            }
+                DiscordMember bMember = null;
 
-            DateTime CreationAge = new DateTime().AddSeconds((DateTime.UtcNow - victim.CreationTimestamp.ToUniversalTime()).TotalSeconds);
-
-            DateTime JoinedAtAge = new();
-
-            if (bMember is not null)
-                JoinedAtAge = new DateTime().AddSeconds((DateTime.UtcNow - bMember.JoinedAt.ToUniversalTime()).TotalSeconds);
-
-            string GenerateRoles = "";
-
-            if (bMember is not null)
-            {
-                if (bMember.Roles.Any())
+                try
                 {
-                    foreach (var b in bMember.Roles)
-                    {
-                        GenerateRoles += $"{b.Mention}, ";
-                    }
+                    bMember = await ctx.Guild.GetMemberAsync(victim.Id);
+                }
+                catch (Exception ex)
+                {
+                    LogDebug($"Failed to get user: {ex}");
+                }
 
-                    GenerateRoles = GenerateRoles.Remove(GenerateRoles.Length - 2, 2);
+                DateTime CreationAge = new DateTime().AddSeconds((DateTime.UtcNow - victim.CreationTimestamp.ToUniversalTime()).TotalSeconds);
+
+                DateTime JoinedAtAge = new();
+
+                if (bMember is not null)
+                    JoinedAtAge = new DateTime().AddSeconds((DateTime.UtcNow - bMember.JoinedAt.ToUniversalTime()).TotalSeconds);
+
+                string GenerateRoles = "";
+
+                if (bMember is not null)
+                {
+                    if (bMember.Roles.Any())
+                    {
+                        foreach (var b in bMember.Roles)
+                        {
+                            GenerateRoles += $"{b.Mention}, ";
+                        }
+
+                        GenerateRoles = GenerateRoles.Remove(GenerateRoles.Length - 2, 2);
+                    }
+                    else
+                    {
+                        GenerateRoles = "`User doesn't have any roles.`";
+                    }
                 }
                 else
                 {
-                    GenerateRoles = "`User doesn't have any roles.`";
+                    GenerateRoles = "`Not yet implemented.`";
                 }
-            }
-            else
-            {
-                GenerateRoles = "`Not yet implemented.`";
-            }
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Color = ColorHelper.Info,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
+                var embed = new DiscordEmbedBuilder
                 {
-                    IconUrl = victim.AvatarUrl,
-                    Name = $"{victim.Username}#{victim.Discriminator} ({victim.Id})"
-                },
-                Description = $"[Avatar]({victim.AvatarUrl})",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
+                    Color = ColorHelper.Info,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        IconUrl = victim.AvatarUrl,
+                        Name = $"{victim.Username}#{victim.Discriminator} ({victim.Id})"
+                    },
+                    Description = $"[Avatar]({victim.AvatarUrl})",
+                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                    {
+                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                        IconUrl = ctx.Member.AvatarUrl
+                    },
+                    Timestamp = DateTime.UtcNow
+                };
+
+                if (bMember is null)
                 {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
-                Timestamp = DateTime.UtcNow
-            };
+                    embed.Description += "\n\n`Not yet implemented.`";
+                }
 
-            if (bMember is null)
-            {
-                embed.Description += "\n\n`Not yet implemented.`";
+                if (bMember is not null)
+                    embed.AddField("Roles", GenerateRoles.Truncate(1024), true);
+                else
+                    embed.AddField($"Roles (Backup)", GenerateRoles.Truncate(1024), true);
+
+                embed.AddField("Created at", $"`{victim.CreationTimestamp.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(CreationAge.Ticks).TotalDays, 0)} days ago)", true);
+
+                if (bMember is not null)
+                {
+                    embed.AddField("Joined at", $"`{bMember.JoinedAt.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(JoinedAtAge.Ticks).TotalDays, 0)} days ago)", true);
+                }
+                else
+                {
+                    embed.AddField("󠂪 󠂪", $"󠂪 󠂪", true);
+                }
+
+                embed.AddField("First joined at", $"`Not yet implemented.`", true);
+
+                embed.AddField("Invited by", $"`Not yet implemented.`", true);
+
+                embed.AddField("Users invited", $"`Not yet implemented.`", true);
+
+                await ctx.Channel.SendMessageAsync(embed: embed);
             }
-
-            if (bMember is not null)
-                embed.AddField("Roles", GenerateRoles.Truncate(1024), true);
-            else
-                embed.AddField($"Roles (Backup)", GenerateRoles.Truncate(1024), true);
-
-            embed.AddField("Created at", $"`{victim.CreationTimestamp.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(CreationAge.Ticks).TotalDays, 0)} days ago)", true);
-
-            if (bMember is not null)
+            catch (Exception ex)
             {
-                embed.AddField("Joined at", $"`{bMember.JoinedAt.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(JoinedAtAge.Ticks).TotalDays, 0)} days ago)", true);
+                LogError($"Error occured while trying to generate info about a user: {ex}");
             }
-            else
-            {
-                embed.AddField("󠂪 󠂪", $"󠂪 󠂪", true);
-            }
-
-            embed.AddField("First joined at", $"`Not yet implemented.`", true);
-
-            embed.AddField("Invited by", $"`Not yet implemented.`", true);
-
-            embed.AddField("Users invited", $"`Not yet implemented.`", true);
-
-            await ctx.Channel.SendMessageAsync(embed: embed);
-        }
-        catch (Exception ex)
-        {
-            LogError($"Error occured while trying to generate info about a user: {ex}");
-        }
+        }).Add(_watcher, ctx);
     }
 
 
@@ -432,7 +436,7 @@ internal class User : BaseCommandModule
     Description("Sends the user's avatar as an embedded image.")]
     public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             if (victim is null)
             {
@@ -458,7 +462,7 @@ internal class User : BaseCommandModule
             };
 
             await ctx.Channel.SendMessageAsync(embed: embed2);
-        });
+        }).Add(_watcher, ctx);
     }
 
 
@@ -468,7 +472,7 @@ internal class User : BaseCommandModule
     Description("Allows submission of new malicous urls to our database.")]
     public async Task UrlSubmit(CommandContext ctx, [Description("URL")]string url)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -738,6 +742,6 @@ internal class User : BaseCommandModule
             {
                 LogError($"{ex}");
             }
-        });
+        }).Add(_watcher, ctx);
     }
 }

@@ -18,6 +18,8 @@ internal class Bot
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
+    internal TaskWatcher.TaskWatcher _watcher = new();
+
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
     
 
@@ -252,6 +254,7 @@ internal class Bot
                     .AddSingleton(_phishingUrls)
                     .AddSingleton(_submissionBans)
                     .AddSingleton(_submittedUrls)
+                    .AddSingleton(_watcher)
                     .BuildServiceProvider();
 
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
@@ -422,6 +425,7 @@ internal class Bot
         }
 
         _ = _databaseHelper.QueueWatcher();
+        _watcher.Watcher();
 
         await Task.Delay(-1);
     }
