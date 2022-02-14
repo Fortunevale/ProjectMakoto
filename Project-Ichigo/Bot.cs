@@ -106,7 +106,7 @@ internal class Bot
 
                 LogDebug($"Loading guilds from table 'guilds'..");
 
-                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
+                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
 
                 foreach (var b in serverSettings)
                     _guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
