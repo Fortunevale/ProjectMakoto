@@ -117,6 +117,16 @@ internal class Bot
                             PunishmentType = (ServerInfo.PhishingPunishmentType)b.phishing_type,
                             CustomPunishmentReason = b.phishing_reason,
                             CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
+                        },
+                        BumpReminderSettings = new()
+                        {
+                            Enabled = b.bump_enabled,
+                            MessageId = b.bump_message,
+                            ChannelId = b.bump_channel,
+                            LastBump = b.bump_last_time,
+                            LastReminder = b.bump_last_time,
+                            LastUserId = b.bump_last_user,
+                            RoleId = b.bump_role
                         }
                     });
 

@@ -58,7 +58,15 @@ internal class DatabaseHelper
                         phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
                         phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
                         phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
-                        phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds)
+                        phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
+
+                        bump_enabled = x.Value.BumpReminderSettings.Enabled,
+                        bump_role = x.Value.BumpReminderSettings.RoleId,
+                        bump_channel = x.Value.BumpReminderSettings.ChannelId,
+                        bump_last_reminder = x.Value.BumpReminderSettings.LastReminder,
+                        bump_last_time = x.Value.BumpReminderSettings.LastBump,
+                        bump_last_user = x.Value.BumpReminderSettings.LastUserId,
+                        bump_message = x.Value.BumpReminderSettings.MessageId
                     }).ToList();
 
                     if (databaseConnection == null)
@@ -67,13 +75,22 @@ internal class DatabaseHelper
                     }
 
                     var cmd = databaseConnection.CreateCommand();
-                    cmd.CommandText = @$"INSERT INTO guilds ( serverid, phishing_detect, phishing_type, phishing_reason, phishing_time ) VALUES ";
+                    cmd.CommandText = @$"INSERT INTO guilds ( serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, phishing_detect, phishing_type, phishing_reason, phishing_time ) VALUES ";
 
                     for (int i = 0; i < DatabaseInserts.Count; i++)
                     {
-                        cmd.CommandText += @$"( @serverid{i}, @phishing_detect{i}, @phishing_type{i}, @phishing_reason{i}, @phishing_time{i} ), ";
+                        cmd.CommandText += @$"( @serverid{i}, @bump_enabled{i}, @bump_role{i}, @bump_channel{i}, @bump_last_reminder{i}, @bump_last_time{i}, @bump_last_user{i}, @bump_message{i}, @phishing_detect{i}, @phishing_type{i}, @phishing_reason{i}, @phishing_time{i} ), ";
 
                         cmd.Parameters.AddWithValue($"serverid{i}", DatabaseInserts[i].serverid);
+
+                        cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
+                        cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);
+                        cmd.Parameters.AddWithValue($"bump_channel{i}", DatabaseInserts[i].bump_channel);
+                        cmd.Parameters.AddWithValue($"bump_last_reminder{i}", DatabaseInserts[i].bump_last_reminder);
+                        cmd.Parameters.AddWithValue($"bump_last_time{i}", DatabaseInserts[i].bump_last_time);
+                        cmd.Parameters.AddWithValue($"bump_last_user{i}", DatabaseInserts[i].bump_last_user);
+                        cmd.Parameters.AddWithValue($"bump_message{i}", DatabaseInserts[i].bump_message);
+
                         cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
                         cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
                         cmd.Parameters.AddWithValue($"phishing_reason{i}", DatabaseInserts[i].phishing_reason);
@@ -82,6 +99,13 @@ internal class DatabaseHelper
 
                     cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                     cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
+                                       "bump_enabled=values(bump_enabled), " +
+                                       "bump_role=values(bump_role), " +
+                                       "bump_channel=values(bump_channel), " +
+                                       "bump_last_reminder=values(bump_last_reminder), " +
+                                       "bump_last_time=values(bump_last_time), " +
+                                       "bump_last_user=values(bump_last_user), " +
+                                       "bump_message=values(bump_message), " +
                                        "phishing_detect=values(phishing_detect), " +
                                        "phishing_type=values(phishing_type), " +
                                        "phishing_reason=values(phishing_reason), " +
