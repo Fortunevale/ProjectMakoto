@@ -8,7 +8,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("phishing-settings"),
+    [Command("phishing-settings"), Aliases("phishingsettings", "phishing"),
     CommandModule("admin"),
     Description("Allows to review and change settings for the phishing detection")]
     public async Task PhishingSettings(CommandContext ctx, [Description("Action")] string action = "help")
@@ -298,9 +298,9 @@ internal class Admin : BaseCommandModule
         }).Add(_watcher, ctx);
     }
 
-    [Command("bumpreminder"),
+    [Command("bumpreminder"), Aliases("bump-reminder"),
     CommandModule("admin"),
-    Description("Allows to review and change settings for the bump reminder")]
+    Description("Allows to review, set up and change settings for the Bump Reminder")]
     public async Task BumpReminder(CommandContext ctx, [Description("Action")] string action = "help")
     {
         Task.Run(async () =>
@@ -341,7 +341,7 @@ internal class Admin : BaseCommandModule
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
-                        Description = $"`The bump reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
+                        Description = $"`The Bump Reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
                     });
                     return;
                 }
@@ -368,7 +368,7 @@ internal class Admin : BaseCommandModule
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
-                        Description = $"`The bump reminder is already set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} config' to change it's settings instead.`"
+                        Description = $"`The Bump Reminder is already set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} config' to change it's settings instead.`"
                     });
                     return;
                 }
@@ -392,7 +392,7 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.Now,
-                    Description = $"`Setting up bump reminder..`"
+                    Description = $"`Setting up Bump Reminder..`"
                 };
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -418,7 +418,7 @@ internal class Admin : BaseCommandModule
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
-                        embed.Description = "`Setting up bump reminder..`";
+                        embed.Description = "`Setting up Bump Reminder..`";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                         ulong id;
@@ -485,7 +485,7 @@ internal class Admin : BaseCommandModule
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.Now,
-                        Description = $"`The bump reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
+                        Description = $"`The Bump Reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
                     });
                     return;
                 }
