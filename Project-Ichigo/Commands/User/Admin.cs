@@ -21,7 +21,7 @@ internal class Admin : BaseCommandModule
                 return;
             }
 
-            if (action.ToLower() == "help")
+            static async Task SendHelp(CommandContext ctx)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -30,9 +30,14 @@ internal class Admin : BaseCommandModule
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.Now,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
-                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
                 });
+            }
+
+            if (action.ToLower() == "help")
+            {
+                await SendHelp(ctx);
                 return;
             }
             else if (action.ToLower() == "review")
@@ -285,6 +290,11 @@ internal class Admin : BaseCommandModule
 
                 return;
             }
+            else
+            {
+                await SendHelp(ctx);
+                return;
+            }
         }).Add(_watcher, ctx);
     }
 
@@ -295,7 +305,13 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (action.ToLower() == "help")
+            if (!ctx.Member.IsAdmin(_status))
+            {
+                _ = ctx.SendAdminError();
+                return;
+            }
+
+            static async Task SendHelp(CommandContext ctx)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -304,9 +320,14 @@ internal class Admin : BaseCommandModule
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.Now,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
-                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
                 });
+            }
+
+            if (action.ToLower() == "help")
+            {
+                await SendHelp(ctx);
                 return;
             }
             else if (action.ToLower() == "review")
@@ -320,6 +341,11 @@ internal class Admin : BaseCommandModule
                     Description = $"`Bump Reminder Enabled` : {_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
                                   $"`Bump Reminder Channel` : <#{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`"
                 });
+                return;
+            }
+            else
+            {
+                await SendHelp(ctx);
                 return;
             }
         }).Add(_watcher, ctx);
