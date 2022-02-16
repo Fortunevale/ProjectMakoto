@@ -373,6 +373,19 @@ internal class Admin : BaseCommandModule
                     return;
                 }
 
+                if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == 302050872383242240))
+                {
+                    await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
+                        Color = ColorHelper.Error,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Timestamp = DateTime.Now,
+                        Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
+                    });
+                    return;
+                }
+
                 var embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
@@ -526,7 +539,7 @@ internal class Admin : BaseCommandModule
 
                                     await Task.Delay(5000);
                                     _ = msg.DeleteAsync();
-                                    break;
+                                    return;
                                 }
                                 case "2":
                                 {
