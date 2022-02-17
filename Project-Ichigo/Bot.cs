@@ -15,11 +15,13 @@ internal class Bot
     internal Users _users = new();
 
     internal PhishingUrls _phishingUrls = new();
+    
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
     internal TaskWatcher.TaskWatcher _watcher = new();
 
+    internal BumpReminder.BumpReminder _bumpReminder { get; set; }
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
     
 
@@ -48,6 +50,8 @@ internal class Bot
                 $"UserDomain: {Environment.UserDomainName}\n\n" +
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Regex.Replace(Environment.CommandLine, @"(--token \S*)", "")}\n");
+
+        _bumpReminder = new(_watcher, _guilds);
 
         var loadDatabase = Task.Run(async () =>
         {
@@ -106,7 +110,7 @@ internal class Bot
 
                 LogDebug($"Loading guilds from table 'guilds'..");
 
-                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
+                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, bump_persistent_msg, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
 
                 foreach (var b in serverSettings)
                     _guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
@@ -123,9 +127,10 @@ internal class Bot
                             Enabled = b.bump_enabled,
                             MessageId = b.bump_message,
                             ChannelId = b.bump_channel,
-                            LastBump = b.bump_last_time,
-                            LastReminder = b.bump_last_time,
+                            LastBump = new DateTime((long)b.bump_last_time).ToUniversalTime(),
+                            LastReminder = new DateTime((long)b.bump_last_reminder).ToUniversalTime(),
                             LastUserId = b.bump_last_user,
+                            PersistentMessageId = b.bump_persistent_msg,
                             RoleId = b.bump_role
                         }
                     });
@@ -265,6 +270,7 @@ internal class Bot
                     .AddSingleton(_submissionBans)
                     .AddSingleton(_submittedUrls)
                     .AddSingleton(_watcher)
+                    .AddSingleton(_bumpReminder)
                     .BuildServiceProvider();
 
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
@@ -315,7 +321,7 @@ internal class Bot
 
                 LogDebug($"Registering Command Events..");
 
-                CommandEvents commandEvents = new();
+                CommandEvents commandEvents = new(_watcher);
                 cNext.CommandExecuted += commandEvents.CommandExecuted;
                 cNext.CommandErrored += commandEvents.CommandError;
 
@@ -323,7 +329,7 @@ internal class Bot
 
                 LogDebug($"Registering Phishing Events..");
 
-                PhishingProtectionEvents phishingProtectionEvents = new(_phishingUrls, _guilds);
+                PhishingProtectionEvents phishingProtectionEvents = new(_phishingUrls, _guilds, _watcher);
                 discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
                 discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
 
@@ -336,6 +342,13 @@ internal class Bot
 
                 DiscordEvents discordEvents = new();
                 discordClient.GuildCreated += discordEvents.GuildCreated;
+                
+                
+                LogDebug($"Registering BumpReminder Events..");
+
+                BumpReminderEvents bumpReminderEvents = new(_watcher, _guilds, _bumpReminder);
+                discordClient.MessageCreated += bumpReminderEvents.MessageCreated;
+                discordClient.MessageDeleted += bumpReminderEvents.MessageDeleted;
 
 
 

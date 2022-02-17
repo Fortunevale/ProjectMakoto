@@ -2,9 +2,16 @@
 
 internal class CommandEvents
 {
+    TaskWatcher.TaskWatcher _watcher { get; set; }
+
+    internal CommandEvents(TaskWatcher.TaskWatcher watcher)
+    {
+        _watcher = watcher;
+    }
+
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             LogInfo($"Successfully executed '{e.Context.Prefix}{e.Command.Name}{(e.Context.RawArgumentString == "" ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}) ({e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds}ms)");
 
@@ -14,7 +21,7 @@ internal class CommandEvents
                 await e.Context.Message.DeleteAsync();
             }
             catch { }
-        });
+        }).Add(_watcher);
     }
 
     internal async Task CommandError(CommandsNextExtension sender, CommandErrorEventArgs e)
@@ -22,7 +29,7 @@ internal class CommandEvents
         if (e.Command is not null)
             if (e.Exception.GetType().FullName == "System.ArgumentException")
             {
-                _ = Task.Run(async () =>
+                Task.Run(async () =>
                 {
                     if (e.Command is not null)
                         LogWarn($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(e.Context.RawArgumentString == "" ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}): {e.Exception}");
@@ -39,11 +46,11 @@ internal class CommandEvents
                         await e.Context.Message.DeleteAsync();
                     }
                     catch { }
-                });
+                }).Add(_watcher);
             }
             else
             {
-                _ = Task.Run(async () =>
+                Task.Run(async () =>
                 {
                     LogError($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(e.Context.RawArgumentString == "" ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name}  on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}): {e.Exception}");
 
@@ -62,7 +69,7 @@ internal class CommandEvents
                         await e.Context.Message.DeleteAsync();
                     }
                     catch { }
-                });
+                }).Add(_watcher);
             }
     }
 }

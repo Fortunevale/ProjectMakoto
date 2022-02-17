@@ -2,7 +2,7 @@
 
 internal class Status
 {
-    internal DateTime startupTime { get; set; } = DateTime.Now;
+    internal DateTime startupTime { get; set; } = DateTime.UtcNow;
 
     internal List<Task> runningTasks { get; set; } = new();
 

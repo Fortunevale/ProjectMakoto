@@ -26,6 +26,10 @@ internal class ServerInfo
 
         private ulong _MessageId { get; set; } = 0;
         public ulong MessageId { get => _MessageId; set { _MessageId = value; _ = Bot._databaseHelper.SyncDatabase(); } }
+        
+
+        private ulong _PersistentMessageId { get; set; } = 0;
+        public ulong PersistentMessageId { get => _PersistentMessageId; set { _PersistentMessageId = value; _ = Bot._databaseHelper.SyncDatabase(); } }
 
 
         private ulong _LastUserId { get; set; } = 0;

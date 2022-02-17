@@ -5,6 +5,7 @@ internal class Admin : BaseCommandModule
     public Users _users { private get; set; }
     public ServerInfo _guilds { private get; set; }
     public TaskWatcher.TaskWatcher _watcher { private get; set; }
+    public BumpReminder.BumpReminder _reminder { private get; set; }
 
 
 
@@ -28,7 +29,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
@@ -47,7 +48,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`Detect Phishing Links   ` : {_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
                                     $"`Punishment Type         ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
                                     $"`Custom Punishment Reason` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
@@ -62,7 +63,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`Detect Phishing Links   ` : {_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
                                     $"`Punishment Type         ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
                                     $"`Custom Punishment Reason` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
@@ -318,7 +319,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} setup` - _Set up the current channel for bumping._\n" +
@@ -340,7 +341,7 @@ internal class Admin : BaseCommandModule
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Description = $"`The Bump Reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
                     });
                     return;
@@ -351,7 +352,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`Bump Reminder Enabled` : {_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
                                   $"`Bump Reminder Channel` : <#{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
                                   $"`Bump Reminder Role   ` : <@&{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId})`"
@@ -367,20 +368,20 @@ internal class Admin : BaseCommandModule
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Description = $"`The Bump Reminder is already set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} config' to change it's settings instead.`"
                     });
                     return;
                 }
 
-                if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == 302050872383242240))
+                if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == Resources.AccountIds.Disboard))
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
                     });
                     return;
@@ -391,7 +392,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`Setting up Bump Reminder..`"
                 };
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
@@ -450,6 +451,8 @@ internal class Admin : BaseCommandModule
 
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
+
+                        _reminder.SendPersistentMessage(e.Channel, null);
                     }).Add(_watcher, ctx);
                 }
 
@@ -484,7 +487,7 @@ internal class Admin : BaseCommandModule
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Description = $"`The Bump Reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
                     });
                     return;
@@ -495,7 +498,7 @@ internal class Admin : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`Bump Reminder Enabled` : {_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
                                   $"`Bump Reminder Channel` : <#{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
                                   $"`Bump Reminder Role   ` : <@&{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId})`"

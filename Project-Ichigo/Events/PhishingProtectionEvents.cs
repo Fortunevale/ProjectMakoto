@@ -2,25 +2,27 @@
 
 internal class PhishingProtectionEvents
 {
-    internal PhishingProtectionEvents(PhishingUrls _phishingUrls, ServerInfo _guilds)
+    internal PhishingProtectionEvents(PhishingUrls _phishingUrls, ServerInfo _guilds, TaskWatcher.TaskWatcher watcher)
     {
         this._phishingUrls = _phishingUrls;
         this._guilds = _guilds;
+        this._watcher = watcher;
     }
 
     internal PhishingUrls _phishingUrls { private get; set; }
     public ServerInfo _guilds { private get; set; }
+    TaskWatcher.TaskWatcher _watcher { get; set; }
 
 
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        _ = CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message);
+        CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message).Add(_watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
-        _ = CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message);
+        CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message).Add(_watcher);
     }
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMember member, DiscordMessage e)
