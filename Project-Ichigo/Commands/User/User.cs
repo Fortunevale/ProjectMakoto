@@ -224,7 +224,7 @@ internal class User : BaseCommandModule
 
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running on**\n`Loading..`", $"**Currently running on**\n`{Environment.OSVersion.Platform} with DOTNET-{Environment.Version}`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current bot lib and version**\n`Loading..`", $"**Current bot lib and version**\n[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.Now - _status.startupTime).TotalHours, 2)} hours`");
+            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2)} hours`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current API Latency**\n`Loading..`", $"**Current API Latency**\n`{ctx.Client.Ping}ms`");
 
             await msg.ModifyAsync(embed: embed.Build());
@@ -488,7 +488,7 @@ internal class User : BaseCommandModule
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
                         Color = ColorHelper.Warning,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
                                       $"{2.DigitsToEmotes()}. You may not spam submissions.\n" +
                                       $"{3.DigitsToEmotes()}. You may not submit unregistered domains.\n" +
@@ -549,7 +549,7 @@ internal class User : BaseCommandModule
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
                     Color = ColorHelper.Warning,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.Now,
+                    Timestamp = DateTime.UtcNow,
                     Description = $"`Processing your request..`"
                 };
 
@@ -681,7 +681,7 @@ internal class User : BaseCommandModule
                                     {
                                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Info, Name = $"Phishing Link Submission" },
                                         Color = ColorHelper.Success,
-                                        Timestamp = DateTime.Now,
+                                        Timestamp = DateTime.UtcNow,
                                         Description = $"`Submitted Url`: `{domain.Replace("`", "")}`\n" +
                                                         $"`Submission by`: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
                                                         $"`Submitted on `: `{ctx.Guild.Name} ({ctx.Guild.Id})`"
@@ -742,6 +742,39 @@ internal class User : BaseCommandModule
             {
                 LogError($"{ex}");
             }
+        }).Add(_watcher, ctx);
+    }
+
+
+
+    [Command("hug"),
+    CommandModule("user"),
+    Description("Hug another user!")]
+    public async Task Hug(CommandContext ctx, DiscordUser user)
+    {
+        Task.Run(async () =>
+        {
+            string[] urls = {
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950308369903636/1.gif",
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950308101472266/2.gif",
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950307820462100/3.gif",
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950307606536243/4.gif",
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950307296161803/5.gif",
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950306994176081/6.gif",
+            "https://cdn.discordapp.com/attachments/906976602557145110/943950306587312138/7.gif",
+            };
+
+            string[] phrases =
+            {
+                "%1 hugs %2! How sweet! \\♥",
+            };
+
+            _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Title = phrases[new Random().Next(0, phrases.Length)].Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                ImageUrl = urls[new Random().Next(0, urls.Length)],
+                Color = ColorHelper.HiddenSidebar
+            }));
         }).Add(_watcher, ctx);
     }
 }
