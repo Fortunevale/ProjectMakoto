@@ -21,7 +21,7 @@ internal class BumpReminder
             },
             Color = DiscordColor.Green,
             Description = $"**The server can be bumped {Formatter.Timestamp(_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump.AddHours(2), TimestampFormat.RelativeTime)}.**\n\n" +
-                                  $"The server was last bumped by <@{_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastUserId}> {Formatter.Timestamp(_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}",
+                          $"The server was last bumped by <@{_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastUserId}> {Formatter.Timestamp(_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(_guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}",
             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = $"{(bUser is null ? Resources.QuestionMarkIcon : bUser.AvatarUrl)}" }
         }.Build()).ContinueWith(async x =>
         {

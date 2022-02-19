@@ -127,8 +127,8 @@ internal class Bot
                             Enabled = b.bump_enabled,
                             MessageId = b.bump_message,
                             ChannelId = b.bump_channel,
-                            LastBump = new DateTime((long)b.bump_last_time).ToUniversalTime(),
-                            LastReminder = new DateTime((long)b.bump_last_reminder).ToUniversalTime(),
+                            LastBump = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_time),
+                            LastReminder = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_time),
                             LastUserId = b.bump_last_user,
                             PersistentMessageId = b.bump_persistent_msg,
                             RoleId = b.bump_role
@@ -450,7 +450,16 @@ internal class Bot
         _ = _databaseHelper.QueueWatcher();
         _watcher.Watcher();
 
+        AppDomain.CurrentDomain.ProcessExit += new EventHandler(FlushToDatabase);
+
         await Task.Delay(-1);
+    }
+
+    private async void FlushToDatabase(object? sender, EventArgs e)
+    {
+        LogInfo($"Flushing to database..");
+        await _databaseHelper.SyncDatabase(true);
+        LogInfo($"Flushed to database.");
     }
 
     private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
