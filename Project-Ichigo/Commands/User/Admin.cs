@@ -535,6 +535,11 @@ internal class Admin : BaseCommandModule
                                     _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
                                     _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = false;
+
+                                    if (GetScheduleTasks() != null)
+                                        if (GetScheduleTasks().Any(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}"))
+                                            DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}").Key);
+
                                     embed.Author.IconUrl = ctx.Guild.IconUrl;
                                     embed.Description = "`The Bump Reminder has been disabled.`";
                                     embed.Color = ColorHelper.Success;
