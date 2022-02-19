@@ -106,4 +106,36 @@ internal class BumpReminderEvents
             }
         }).Add(_watcher);
     }
+
+    internal async Task ReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (e.Guild == null || e.Channel.IsPrivate || !_guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+                return;
+
+            if (e.Message.Id == _guilds.Servers[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
+            {
+                var member = await e.Guild.GetMemberAsync(e.User.Id);
+
+                await member.GrantRoleAsync(e.Guild.GetRole(_guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId));
+            }
+        }).Add(_watcher);
+    }
+
+    internal async Task ReactionRemoved(DiscordClient sender, MessageReactionRemoveEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (e.Guild == null || e.Channel.IsPrivate || !_guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+                return;
+
+            if (e.Message.Id == _guilds.Servers[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
+            {
+                var member = await e.Guild.GetMemberAsync(e.User.Id);
+
+                await member.RevokeRoleAsync(e.Guild.GetRole(_guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId));
+            }
+        }).Add(_watcher);
+    }
 }

@@ -405,7 +405,7 @@ internal class Admin : BaseCommandModule
 
                 foreach (var role in ctx.Guild.Roles)
                 {
-                    if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged)
+                    if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
                         roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString()));
                 }
 
@@ -606,7 +606,7 @@ internal class Admin : BaseCommandModule
 
                                     foreach (var role in ctx.Guild.Roles)
                                     {
-                                        if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged)
+                                        if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
                                             roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString()));
                                     }
 
