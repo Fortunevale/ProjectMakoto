@@ -118,7 +118,7 @@ internal class Bot
                         PhishingDetectionSettings = new()
                         {
                             DetectPhishing = b.phishing_detect,
-                            PunishmentType = (ServerInfo.PhishingPunishmentType)b.phishing_type,
+                            PunishmentType = (PhishingPunishmentType)b.phishing_type,
                             CustomPunishmentReason = b.phishing_reason,
                             CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
                         },
@@ -128,7 +128,7 @@ internal class Bot
                             MessageId = b.bump_message,
                             ChannelId = b.bump_channel,
                             LastBump = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_time),
-                            LastReminder = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_time),
+                            LastReminder = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_reminder),
                             LastUserId = b.bump_last_user,
                             PersistentMessageId = b.bump_persistent_msg,
                             RoleId = b.bump_role
@@ -472,6 +472,11 @@ internal class Bot
             {
                 if (!_guilds.Servers.ContainsKey(guild.Key))
                     _guilds.Servers.Add(guild.Key, new ServerInfo.ServerSettings());
+
+                if (_guilds.Servers[guild.Key].BumpReminderSettings.Enabled)
+                {
+                    _bumpReminder.ScheduleBump(sender, guild.Key);
+                }
             }
         });
     }

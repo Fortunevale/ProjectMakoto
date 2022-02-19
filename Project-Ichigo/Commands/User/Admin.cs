@@ -128,16 +128,16 @@ internal class Admin : BaseCommandModule
                                 switch (e.Values.First())
                                 {
                                     case "Ban":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = ServerInfo.PhishingPunishmentType.BAN;
+                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
                                         break;
                                     case "Kick":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = ServerInfo.PhishingPunishmentType.KICK;
+                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
                                         break;
                                     case "Timeout":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = ServerInfo.PhishingPunishmentType.TIMEOUT;
+                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
                                         break;
                                     case "Delete":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = ServerInfo.PhishingPunishmentType.DELETE;
+                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
                                         break;
                                 }
 
@@ -196,7 +196,7 @@ internal class Admin : BaseCommandModule
                     }
                     case "4":
                     {
-                        if (_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != ServerInfo.PhishingPunishmentType.TIMEOUT)
+                        if (_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != PhishingPunishmentType.TIMEOUT)
                         {
                             var msg4 = await ctx.Channel.SendMessageAsync("You aren't using `Timeout` as your Punishment");
                             await Task.Delay(5000);
@@ -452,7 +452,7 @@ internal class Admin : BaseCommandModule
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
 
-                        _reminder.SendPersistentMessage(e.Channel, null);
+                        _reminder.SendPersistentMessage(ctx.Client, e.Channel, null);
                     }).Add(_watcher, ctx);
                 }
 

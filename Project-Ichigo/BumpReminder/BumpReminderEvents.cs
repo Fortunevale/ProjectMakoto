@@ -30,8 +30,8 @@ internal class BumpReminderEvents
 
             getuser.Wait(10000);
 
-            if (e.Author.Id != sender.CurrentUser.Id && !e.Message.Embeds.Any())
-                _reminder.SendPersistentMessage(e.Channel, bUser);
+            if (!(e.Author.Id == sender.CurrentUser.Id && e.Message.Embeds.Any()))
+                _reminder.SendPersistentMessage(sender, e.Channel, bUser);
 
             if (e.Author.Id != Resources.AccountIds.Disboard || !e.Message.Embeds.Any())
                 return;
@@ -51,6 +51,8 @@ internal class BumpReminderEvents
 
                 e.Channel.SendMessageAsync($"**{_bumper.Mention} Thanks a lot for supporting the server!**\n\n" +
                                            $"_**You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message!**_").Add(_watcher);
+
+                _reminder.ScheduleBump(sender, e.Guild.Id);
             }
             else
             {
@@ -69,8 +71,10 @@ internal class BumpReminderEvents
                             _guilds.Servers[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddMinutes(_minutes - 120);
                             _guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
-                            await e.Channel.SendMessageAsync($":warning: It seems the last bump was not registered properly.\n" +
-                                $"The last time the server was bumped was determined to be around `{Formatter.Timestamp(_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}`.");
+                            e.Channel.SendMessageAsync($":warning: It seems the last bump was not registered properly.\n" +
+                                $"The last time the server was bumped was determined to be around `{Formatter.Timestamp(_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}`.").Add(_watcher);
+
+                            _reminder.ScheduleBump(sender, e.Guild.Id);
                         }
                         catch (Exception ex) { LogDebug(ex.ToString()); }
                     }
@@ -98,7 +102,7 @@ internal class BumpReminderEvents
 
                 getuser.Wait(10000);
 
-                _reminder.SendPersistentMessage(e.Channel, bUser);
+                _reminder.SendPersistentMessage(sender, e.Channel, bUser);
             }
         }).Add(_watcher);
     }
