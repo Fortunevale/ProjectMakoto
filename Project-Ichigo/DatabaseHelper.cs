@@ -1,7 +1,7 @@
 ﻿namespace Project_Ichigo;
 internal class DatabaseHelper
 {
-    internal DatabaseHelper(MySqlConnection databaseConnection2, Settings guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
+    internal DatabaseHelper(MySqlConnection databaseConnection2, ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
     {
         databaseConnection = databaseConnection2;
         _guilds = guilds;
@@ -11,15 +11,17 @@ internal class DatabaseHelper
     }
 
     internal MySqlConnection databaseConnection { private get; set; }
-    internal Settings _guilds { private set; get; }
+    internal ServerInfo _guilds { private set; get; }
     internal Users _users { private get; set; }
     internal SubmissionBans _submissionBans { private get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }
 
-    private List<Task> queuedUpdates = new();
+    private Dictionary<Task, bool> queuedUpdates = new();
 
     public async Task QueueWatcher()
     {
+        CancellationTokenSource tokenSource = new();
+
         _ = Task.Run(async () =>
         {
             while (true)
@@ -29,26 +31,55 @@ internal class DatabaseHelper
             }
         });
 
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                if (queuedUpdates.Any(x => x.Value))
+                {
+                    foreach (var b in queuedUpdates.Where(x => !x.Value).ToList())
+                        queuedUpdates.Remove(b.Key);
+
+                    tokenSource.Cancel();
+                    tokenSource = new();
+                }
+
+                Thread.Sleep(100);
+            }
+        });
+
         while (true)
         {
-            if (queuedUpdates.Any(x => x.IsCompleted))
-                foreach (var task in queuedUpdates.Where(x => x.IsCompleted).ToList())
-                    queuedUpdates.Remove(task);
-
-            foreach (var task in queuedUpdates.Where(x => x.Status == TaskStatus.Created).ToList())
+            try
             {
-                task.Start();
-                await Task.Delay(30000);
-            }
+                if (queuedUpdates.Any(x => x.Key.IsCompleted))
+                    foreach (var task in queuedUpdates.Where(x => x.Key.IsCompleted).ToList())
+                        queuedUpdates.Remove(task.Key);
 
-            await Task.Delay(1000);
+                foreach (var task in queuedUpdates.Where(x => x.Key.Status == TaskStatus.Created).ToList())
+                {
+                    task.Key.Start();
+                    await Task.Delay(30000, tokenSource.Token);
+                }
+
+                await Task.Delay(1000);
+            }
+            catch (TaskCanceledException)
+            {
+                continue;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 
-    public async Task SyncDatabase()
+    public async Task SyncDatabase(bool Important = false)
     {
-        if (queuedUpdates.Count < 2)
-            queuedUpdates.Add(new Task(async () =>
+        if (queuedUpdates.Count < 2 || Important)
+        {
+            Task key = new(async () =>
             {
                 try
                 {
@@ -58,7 +89,16 @@ internal class DatabaseHelper
                         phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
                         phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
                         phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
-                        phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds)
+                        phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
+
+                        bump_enabled = x.Value.BumpReminderSettings.Enabled,
+                        bump_role = x.Value.BumpReminderSettings.RoleId,
+                        bump_channel = x.Value.BumpReminderSettings.ChannelId,
+                        bump_last_reminder = Convert.ToUInt64(x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks),
+                        bump_last_time = Convert.ToUInt64(x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks),
+                        bump_last_user = x.Value.BumpReminderSettings.LastUserId,
+                        bump_message = x.Value.BumpReminderSettings.MessageId,
+                        bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId
                     }).ToList();
 
                     if (databaseConnection == null)
@@ -67,13 +107,23 @@ internal class DatabaseHelper
                     }
 
                     var cmd = databaseConnection.CreateCommand();
-                    cmd.CommandText = @$"INSERT INTO guilds ( serverid, phishing_detect, phishing_type, phishing_reason, phishing_time ) VALUES ";
+                    cmd.CommandText = @$"INSERT INTO guilds ( serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, bump_persistent_msg, phishing_detect, phishing_type, phishing_reason, phishing_time ) VALUES ";
 
                     for (int i = 0; i < DatabaseInserts.Count; i++)
                     {
-                        cmd.CommandText += @$"( @serverid{i}, @phishing_detect{i}, @phishing_type{i}, @phishing_reason{i}, @phishing_time{i} ), ";
+                        cmd.CommandText += @$"( @serverid{i}, @bump_enabled{i}, @bump_role{i}, @bump_channel{i}, @bump_last_reminder{i}, @bump_last_time{i}, @bump_last_user{i}, @bump_message{i}, @bump_persistent_msg{i}, @phishing_detect{i}, @phishing_type{i}, @phishing_reason{i}, @phishing_time{i} ), ";
 
                         cmd.Parameters.AddWithValue($"serverid{i}", DatabaseInserts[i].serverid);
+
+                        cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
+                        cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);
+                        cmd.Parameters.AddWithValue($"bump_channel{i}", DatabaseInserts[i].bump_channel);
+                        cmd.Parameters.AddWithValue($"bump_last_reminder{i}", DatabaseInserts[i].bump_last_reminder);
+                        cmd.Parameters.AddWithValue($"bump_last_time{i}", DatabaseInserts[i].bump_last_time);
+                        cmd.Parameters.AddWithValue($"bump_last_user{i}", DatabaseInserts[i].bump_last_user);
+                        cmd.Parameters.AddWithValue($"bump_message{i}", DatabaseInserts[i].bump_message);
+                        cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
+
                         cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
                         cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
                         cmd.Parameters.AddWithValue($"phishing_reason{i}", DatabaseInserts[i].phishing_reason);
@@ -82,10 +132,18 @@ internal class DatabaseHelper
 
                     cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                     cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                       "phishing_detect=values(phishing_detect), " +
-                                       "phishing_type=values(phishing_type), " +
-                                       "phishing_reason=values(phishing_reason), " +
-                                       "phishing_time=values(phishing_time)";
+                                        "bump_enabled=values(bump_enabled), " +
+                                        "bump_role=values(bump_role), " +
+                                        "bump_channel=values(bump_channel), " +
+                                        "bump_last_reminder=values(bump_last_reminder), " +
+                                        "bump_last_time=values(bump_last_time), " +
+                                        "bump_last_user=values(bump_last_user), " +
+                                        "bump_message=values(bump_message), " +
+                                        "bump_persistent_msg=values(bump_persistent_msg), " +
+                                        "phishing_detect=values(phishing_detect), " +
+                                        "phishing_type=values(phishing_type), " +
+                                        "phishing_reason=values(phishing_reason), " +
+                                        "phishing_time=values(phishing_time)";
 
                     cmd.Connection = databaseConnection;
                     await cmd.ExecuteNonQueryAsync();
@@ -131,9 +189,9 @@ internal class DatabaseHelper
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                           "submission_accepted_tos=values(submission_accepted_tos), " +
-                                           "submission_accepted_submissions=values(submission_accepted_submissions), " +
-                                           "submission_last_datetime=values(submission_last_datetime)";
+                                            "submission_accepted_tos=values(submission_accepted_tos), " +
+                                            "submission_accepted_submissions=values(submission_accepted_submissions), " +
+                                            "submission_last_datetime=values(submission_last_datetime)";
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -177,8 +235,8 @@ internal class DatabaseHelper
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                           "reason=values(reason), " +
-                                           "moderator=values(moderator)";
+                                            "reason=values(reason), " +
+                                            "moderator=values(moderator)";
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -222,8 +280,8 @@ internal class DatabaseHelper
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                           "reason=values(reason), " +
-                                           "moderator=values(moderator)";
+                                            "reason=values(reason), " +
+                                            "moderator=values(moderator)";
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -269,9 +327,9 @@ internal class DatabaseHelper
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                           "url=values(url), " +
-                                           "submitter=values(submitter), " +
-                                           "guild=values(guild)";
+                                            "url=values(url), " +
+                                            "submitter=values(submitter), " +
+                                            "guild=values(guild)";
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -288,6 +346,18 @@ internal class DatabaseHelper
 
                 await Task.Delay(1000);
                 GC.Collect();
-            }));
+            });
+
+            queuedUpdates.Add(key, Important);
+
+            if (Important)
+            {
+                while (!key.IsCompleted)
+                {
+                    Thread.Sleep(100);
+                }
+                await Task.Delay(2000);
+            }
+        }
     }
 }

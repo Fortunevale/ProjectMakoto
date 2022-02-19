@@ -21,16 +21,20 @@ internal class TaskWatcher
 
                 var ctx = b.ctx;
 
-                LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString == "" ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id}): {b.task.Exception}");
+                if (ctx != null)
+                    LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString == "" ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id}): {b.task.Exception}");
+                else
+                    LogError($"A non-command task failed to execute: {b.task.Exception}");
 
-                try
-                {
-                    await ctx.Channel.SendMessageAsync($"{ctx.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`\n\n" +
-                                                                    $"```csharp\n" +
-                                                                    $"{b.task.Exception}" +
-                                                                    $"\n```");
-                }
-                catch { }
+                if (ctx != null)
+                    try
+                    {
+                        await ctx.Channel.SendMessageAsync($"{ctx.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`\n\n" +
+                                                           $"```csharp\n" +
+                                                           $"{b.task.Exception}" +
+                                                           $"\n```");
+                    }
+                    catch { }
                 
                 tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
             }

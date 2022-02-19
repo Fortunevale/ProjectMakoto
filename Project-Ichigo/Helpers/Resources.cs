@@ -2,6 +2,7 @@
 internal class Resources
 {
     public static readonly string Github = "https://cdn.discordapp.com/attachments/712761268393738301/893958382896173096/Github.png";
+    public static readonly string QuestionMarkIcon = "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png";
 
     public class LogIcons
     {
@@ -35,5 +36,10 @@ internal class Resources
         public static readonly string DiscordGenericLoading = "https://cdn.discordapp.com/attachments/906976602557145110/940100450403889172/L1.gif";
         public static readonly string DiscordBallsLoading = "https://cdn.discordapp.com/attachments/906976602557145110/940100451649613864/L2.gif";
         public static readonly string DiscordCircleLoading = "https://cdn.discordapp.com/attachments/906976602557145110/940100451213385778/L3.gif";
+    }
+
+    public class AccountIds
+    {
+        public static readonly ulong Disboard = 302050872383242240;
     }
 }
