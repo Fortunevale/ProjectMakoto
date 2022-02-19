@@ -401,11 +401,12 @@ internal class Admin : BaseCommandModule
 
                 roles.Add(new DiscordSelectComponentOption("Create one for me..", "create"));
 
+                var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+
                 foreach (var role in ctx.Guild.Roles)
                 {
-                    roles.Add(new DiscordSelectComponentOption(
-                        $"@{role.Value.Name} ({role.Value.Id})",
-                        role.Value.Id.ToString()));
+                    if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged)
+                        roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString()));
                 }
 
                 async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
@@ -601,11 +602,12 @@ internal class Admin : BaseCommandModule
                                 {
                                     List<DiscordSelectComponentOption> roles = new();
 
+                                    var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+
                                     foreach (var role in ctx.Guild.Roles)
                                     {
-                                        roles.Add(new DiscordSelectComponentOption(
-                                            $"@{role.Value.Name} ({role.Value.Id})",
-                                            role.Value.Id.ToString()));
+                                        if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged)
+                                            roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString()));
                                     }
 
                                     async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
