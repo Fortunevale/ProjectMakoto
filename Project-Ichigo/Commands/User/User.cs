@@ -747,6 +747,34 @@ internal class User : BaseCommandModule
 
 
 
+    [Command("afk"),
+    CommandModule("user"),
+    Description("Set yourself afk: Notify users pinging you that you're currently not around.")]
+    public async Task Afk(CommandContext ctx, string reason = "-")
+    {
+        Task.Run(async () =>
+        {
+            if (!_users.List.ContainsKey(ctx.User.Id))
+                _users.List.Add(ctx.User.Id, new Users.Info());
+
+            _users.List[ctx.User.Id].AfkStatus.Reason = Formatter.Sanitize(reason).Replace("@", "").Replace("&", "").Replace("#", "").Replace("<", "").Replace(">", "");
+            _users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.Now;
+
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Afk Status • {ctx.Guild.Name}" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"{ctx.User.Mention} `You're now set to be afk. Next time you send a message, your afk status will be removed.`"
+            });
+            await Task.Delay(10000);
+            _ = msg.DeleteAsync();
+        }).Add(_watcher, ctx);
+    }
+
+
+
     [Command("hug"),
     CommandModule("user"),
     Description("Hug another user!")]

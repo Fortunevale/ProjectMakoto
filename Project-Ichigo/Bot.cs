@@ -151,6 +151,11 @@ internal class Bot
                             AcceptedSubmissions = JsonConvert.DeserializeObject<List<string>>(b.submission_accepted_submissions),
                             LastTime = b.submission_last_datetime,
                             AcceptedTOS = b.submission_accepted_tos
+                        },
+                        AfkStatus = new()
+                        {
+                            Reason = b.afk_reason,
+                            TimeStamp = new DateTime().ToUniversalTime().AddTicks((long)b.afk_since)
                         }
                     });
 
@@ -324,6 +329,11 @@ internal class Bot
                 CommandEvents commandEvents = new(_watcher);
                 cNext.CommandExecuted += commandEvents.CommandExecuted;
                 cNext.CommandErrored += commandEvents.CommandError;
+                
+                LogDebug($"Registering Afk Events..");
+
+                AfkEvents afkEvents = new(_watcher, _users);
+                discordClient.MessageCreated += afkEvents.MessageCreated;
 
 
 
