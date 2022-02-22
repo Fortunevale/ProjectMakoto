@@ -20,10 +20,10 @@ internal class AfkEvents
             if (!_users.List.ContainsKey(e.Author.Id))
                 _users.List.Add(e.Author.Id, new Users.Info());
 
-            if (_users.List[e.Author.Id].AfkStatus.TimeStamp != DateTime.MinValue)
+            if (_users.List[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _users.List[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
             {
                 _users.List[e.Author.Id].AfkStatus.Reason = "";
-                _users.List[e.Author.Id].AfkStatus.TimeStamp = DateTime.MinValue;
+                _users.List[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
 
                 _ = e.Message.RespondAsync(new DiscordEmbedBuilder
                 {
@@ -48,19 +48,25 @@ internal class AfkEvents
                     if (!_users.List.ContainsKey(b.Id))
                         _users.List.Add(b.Id, new Users.Info());
 
-                    if (_users.List[b.Id].AfkStatus.TimeStamp != DateTime.MinValue)
+                    if (_users.List[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
                     {
+                        if (_users.List[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
+                            return;
+
+                        _users.List[e.Author.Id].AfkStatus.LastMentionTrigger = DateTime.UtcNow;
+
                         _ = e.Message.RespondAsync(new DiscordEmbedBuilder
                         {
                             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"Afk Status • {e.Guild.Name}" },
                             Color = ColorHelper.Info,
                             Timestamp = DateTime.UtcNow,
-                            Description = $"{b.Mention} `is currently AFK, they most likely wont answer your message: '{_users.List[b.Id].AfkStatus.Reason}'`"
+                            Description = $"{b.Mention} `is currently AFK and has been since`{Formatter.Timestamp(_users.List[b.Id].AfkStatus.TimeStamp)}`, they most likely wont answer your message: '{_users.List[b.Id].AfkStatus.Reason}'`"
                         }).ContinueWith(async x =>
                         {
                             await Task.Delay(10000);
                             _ = x.Result.DeleteAsync();
                         });
+                        return;
                     }
                 }
             }

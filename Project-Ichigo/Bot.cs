@@ -141,7 +141,7 @@ internal class Bot
 
                 LogDebug($"Loading users from table 'users'..");
 
-                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>($"SELECT userid, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime FROM users");
+                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>($"SELECT userid, afk_reason, afk_since, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime FROM users");
 
                 foreach (var b in users)
                     _users.List.Add(b.userid, new Users.Info
@@ -155,7 +155,7 @@ internal class Bot
                         AfkStatus = new()
                         {
                             Reason = b.afk_reason,
-                            TimeStamp = new DateTime().ToUniversalTime().AddTicks((long)b.afk_since)
+                            TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since))
                         }
                     });
 

@@ -758,7 +758,7 @@ internal class User : BaseCommandModule
                 _users.List.Add(ctx.User.Id, new Users.Info());
 
             _users.List[ctx.User.Id].AfkStatus.Reason = Formatter.Sanitize(reason).Replace("@", "").Replace("&", "").Replace("#", "").Replace("<", "").Replace(">", "");
-            _users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.Now;
+            _users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
 
             var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
