@@ -19,11 +19,15 @@ internal class Bot
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
+    
+
     internal TaskWatcher.TaskWatcher _watcher = new();
 
     internal BumpReminder.BumpReminder _bumpReminder { get; set; }
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
-    
+    internal ScoreSaberClient _scoreSaberClient { get; set; }
+
+
 
     internal static DatabaseHelper _databaseHelper { get; set; }
 
@@ -39,6 +43,7 @@ internal class Bot
         StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
 
         LogInfo("Starting up..");
+        _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
 
         LogDebug($"Enviroment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
@@ -141,7 +146,7 @@ internal class Bot
 
                 LogDebug($"Loading users from table 'users'..");
 
-                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>($"SELECT userid, afk_reason, afk_since, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime FROM users");
+                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>($"SELECT userid, scoresaber_id, afk_reason, afk_since, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime FROM users");
 
                 foreach (var b in users)
                     _users.List.Add(b.userid, new Users.Info
@@ -156,6 +161,10 @@ internal class Bot
                         {
                             Reason = b.afk_reason,
                             TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since))
+                        },
+                        ScoreSaber = new()
+                        {
+                            Id = b.scoresaber_id
                         }
                     });
 
@@ -275,6 +284,7 @@ internal class Bot
                     .AddSingleton(_submissionBans)
                     .AddSingleton(_submittedUrls)
                     .AddSingleton(_watcher)
+                    .AddSingleton(_scoreSaberClient)
                     .AddSingleton(_bumpReminder)
                     .BuildServiceProvider();
 

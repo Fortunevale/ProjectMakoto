@@ -168,7 +168,8 @@ internal class DatabaseHelper
                             afk_reason = x.Value.AfkStatus.Reason,
                             submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
                             submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
-                            submission_last_datetime = x.Value.UrlSubmissions.LastTime
+                            submission_last_datetime = x.Value.UrlSubmissions.LastTime,
+                            scoresaber_id = x.Value.ScoreSaber.Id
                         }).ToList();
 
                         if (databaseConnection == null)
@@ -177,13 +178,14 @@ internal class DatabaseHelper
                         }
 
                         var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = @$"INSERT INTO users ( userid, afk_since, afk_reason, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime ) VALUES ";
+                        cmd.CommandText = @$"INSERT INTO users ( userid, scoresaber_id, afk_since, afk_reason, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime ) VALUES ";
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += @$"( @userid{i}, @afk_since{i}, @afk_reason{i}, @submission_accepted_tos{i}, @submission_accepted_submissions{i}, @submission_last_datetime{i} ), ";
+                            cmd.CommandText += @$"( @userid{i}, @scoresaber_id{i}, @afk_since{i}, @afk_reason{i}, @submission_accepted_tos{i}, @submission_accepted_submissions{i}, @submission_last_datetime{i} ), ";
 
                             cmd.Parameters.AddWithValue($"userid{i}", DatabaseInserts[i].userid);
+                            cmd.Parameters.AddWithValue($"scoresaber_id{i}", DatabaseInserts[i].scoresaber_id);
                             cmd.Parameters.AddWithValue($"afk_since{i}", DatabaseInserts[i].afk_since);
                             cmd.Parameters.AddWithValue($"afk_reason{i}", DatabaseInserts[i].afk_reason);
                             cmd.Parameters.AddWithValue($"submission_accepted_tos{i}", DatabaseInserts[i].submission_accepted_tos);
@@ -193,6 +195,7 @@ internal class DatabaseHelper
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
+                                            "scoresaber_id=values(scoresaber_id), " +
                                             "afk_since=values(afk_since), " +
                                             "afk_reason=values(afk_reason), " +
                                             "submission_accepted_tos=values(submission_accepted_tos), " +

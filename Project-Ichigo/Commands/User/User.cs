@@ -6,6 +6,7 @@ internal class User : BaseCommandModule
     public SubmissionBans _submissionBans { private get; set; }
     public PhishingUrls _phishingUrls { private get; set; }
     public SubmittedUrls _submittedUrls { private get; set; }
+    public ScoreSaberClient _scoreSaberClient { private get; set; }
     public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
 
@@ -770,6 +771,164 @@ internal class User : BaseCommandModule
             });
             await Task.Delay(10000);
             _ = msg.DeleteAsync();
+        }).Add(_watcher, ctx);
+    }
+
+
+
+    [Command("scoresaber"), Aliases("ss"),
+    CommandModule("user"),
+    Description("Get show a users scoresaber profile by id")]
+    public async Task ScoreSaber(CommandContext ctx, [Description("ID")]string id)
+    {
+        Task.Run(async () =>
+        {
+            var embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                Color = ColorHelper.Warning,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"`Looking for player..`"
+            };
+
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+            try
+            {
+                var player = await _scoreSaberClient.GetPlayerById(id);
+
+                embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
+                embed.Color = ColorHelper.Info;
+                embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
+                embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
+                embed.AddField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true);
+                embed.AddField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
+                embed.AddField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true);
+                embed.AddField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true);
+                embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
+                embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                var file = $"{Guid.NewGuid()}.png";
+
+                try
+                {
+                    Chart qc = new Chart();
+                    qc.Width = 1000;
+                    qc.Height = 500;
+                    qc.Config = $@"{{
+                        type: 'line',
+	                    data: 
+	                    {{
+                            labels: 
+		                    [
+			                    '48 days ago','',
+			                    '46 days ago','',
+			                    '44 days ago','',
+			                    '42 days ago','',
+			                    '40 days ago','',
+			                    '38 days ago','',
+			                    '36 days ago','',
+			                    '34 days ago','',
+			                    '32 days ago','',
+			                    '30 days ago','',
+			                    '28 days ago','',
+			                    '26 days ago','',
+			                    '24 days ago','',
+			                    '22 days ago','',
+			                    '20 days ago','',
+			                    '18 days ago','',
+			                    '16 days ago','',
+			                    '14 days ago','',
+			                    '12 days ago','',
+			                    '10 days ago','',
+			                    '8 days ago','',
+			                    '6 days ago','',
+			                    '4 days ago','',
+			                    '2 days ago','',
+			                    'Today'
+                            ],
+		                    datasets: 
+		                    [
+			                    {{
+				                    label: 'Placements',
+				                    data: [{player.histories}],
+				                    fill: false,
+				                    borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
+				                    reverse: true,
+				                    id: ""yaxis2""
+
+                                }}
+		                    ]
+
+                        }},
+	                    options: 
+	                    {{
+		                    legend: 
+		                    {{
+			                    display: false
+		                    }},
+		                    scales: 
+		                    {{
+			                    yAxes: 
+			                    [{{
+                                    reverse: true,
+                                    ticks:
+  			                        {{
+                                        reverse: true  
+  			                        }}
+			                    }}]
+		                    }}
+	                    }}
+                    }}";
+
+                    qc.ToFile(file);
+
+                    using (FileStream stream = File.Open(file, FileMode.Open))
+                    {
+                        var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+
+                        embed.Author.IconUrl = ctx.Guild.IconUrl;
+                        embed.ImageUrl = asset.Attachments[0].Url;
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    embed.Author.IconUrl = ctx.Guild.IconUrl;
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    LogError(ex.ToString());
+                }
+                await Task.Delay(1000);
+                File.Delete(file);
+                
+            }
+            catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+            {
+                embed.Author.IconUrl = Resources.LogIcons.Error;
+                embed.Color = ColorHelper.Error;
+                embed.Description = $"`Couldn't find the specified player.`";
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            }
+            catch (Exception)
+            {
+                _ = msg.DeleteAsync();
+                throw;
+            }
+        }).Add(_watcher, ctx);
+    }
+
+
+
+    [Command("scoresaber-search"), Aliases("sss", "scoresabersearch"),
+    CommandModule("user"),
+    Description("Search a user on score saber by name")]
+    public async Task ScoreSaberSearch(CommandContext ctx, [Description("ID")] string name)
+    {
+        Task.Run(async () =>
+        {
+
         }).Add(_watcher, ctx);
     }
 

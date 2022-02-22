@@ -24,6 +24,10 @@ global using Microsoft.Extensions.DependencyInjection;
 
 global using MySql.Data.MySqlClient;
 
+// QuickChart
+
+global using QuickChart;
+
 // DisCatSharp
 
 global using DisCatSharp;
@@ -56,6 +60,8 @@ global using Project_Ichigo.Commands.User;
 global using Project_Ichigo.Commands.Admin;
 
 global using static Project_Ichigo.Attributes.CustomAttributes;
+
+global using Xorog.ScoreSaber;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;

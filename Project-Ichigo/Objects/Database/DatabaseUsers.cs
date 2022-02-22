@@ -3,6 +3,7 @@
 internal class DatabaseUsers
 {
     public ulong userid { get; set; }
+    public ulong scoresaber_id { get; set; }
     public ulong afk_since { get; set; }
     public string afk_reason { get; set; }
     public bool submission_accepted_tos { get; set; }

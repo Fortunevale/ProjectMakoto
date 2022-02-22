@@ -27,6 +27,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <COMReference Include="{d37e2a3e-8545-3a39-9f4f-31827c9124ab}">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>4</VersionMinor>
+      <VersionMajor>2</VersionMajor>
+      <Guid>d37e2a3e-8545-3a39-9f4f-31827c9124ab</Guid>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="DisCatSharp" Version="9.8.7-nightly-00284" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.7-nightly-00284" />
@@ -34,10 +43,12 @@
     <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.7-nightly-00284" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.7-nightly-00284" />
     <PackageReference Include="MySql.Data" Version="8.0.28" />
+    <PackageReference Include="QuickChart" Version="2.2.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Xorog.ScoreSaber\Xorog.ScoreSaber.csproj" />
     <ProjectReference Include="D:\Dokumente\GitHub\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="D:\Dokumente\GitHub\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
   </ItemGroup>
@@ -55,6 +66,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="GraphTemplate.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
