@@ -1036,7 +1036,7 @@ internal class User : BaseCommandModule
 
             var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
             var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
-            
+
             var embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Search • {ctx.Guild.Name}" },
@@ -1229,7 +1229,7 @@ internal class User : BaseCommandModule
                                 {
                                     currentPage += 1;
                                     _ = RefreshCountryList();
-                                }                            
+                                }
                             }
                             else if (e.Interaction.Data.CustomId == "continent_selection")
                             {
@@ -1255,6 +1255,13 @@ internal class User : BaseCommandModule
                             }
                             catch { }
                         }
+                    }
+                    catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+                    {
+                        embed.Author.IconUrl = Resources.LogIcons.Error;
+                        embed.Color = ColorHelper.Error;
+                        embed.Description = $"`Couldn't find any player with the specified criteria.`";
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     }
                     catch (Exception)
                     {
