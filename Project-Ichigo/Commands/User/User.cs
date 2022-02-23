@@ -779,8 +779,8 @@ internal class User : BaseCommandModule
 
     [Command("scoresaber"), Aliases("ss"),
     CommandModule("user"),
-    Description("Get show a users scoresaber profile by id")]
-    public async Task ScoreSaber(CommandContext ctx, [Description("ID")]string id)
+    Description("Get show a users Score Saber profile by id")]
+    public async Task ScoreSaber(CommandContext ctx, [Description("ID")]string id = "")
     {
         Task.Run(async () =>
         {
@@ -788,8 +788,24 @@ internal class User : BaseCommandModule
         }).Add(_watcher, ctx);
     }
 
-    private async Task SendScoreSaberProfile(CommandContext ctx, string id)
+    private async Task SendScoreSaberProfile(CommandContext ctx, string id = "")
     {
+        if (!_users.List.ContainsKey(ctx.User.Id))
+            _users.List.Add(ctx.User.Id, new Users.Info());
+
+        if (id == "")
+        {
+            if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
+            {
+                id = _users.List[ctx.User.Id].ScoreSaber.Id.ToString();
+            }
+            else
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+        }
+
         var embed = new DiscordEmbedBuilder
         {
             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
@@ -805,6 +821,37 @@ internal class User : BaseCommandModule
         {
             var player = await _scoreSaberClient.GetPlayerById(id);
 
+            async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+            {
+                Task.Run(async () =>
+                {
+                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        _users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
+
+                        var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                            Color = ColorHelper.Success,
+                            Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                            Timestamp = DateTime.UtcNow,
+                            Description = $"{ctx.User.Mention} `Linked '{player.name}' ({player.id}) to your account. You can now run '-scoresaber' without an argument to get your profile in an instant.`\n" +
+                                          $"`To remove the link, run '-scoresaber-unlink'.`"
+                        }));
+
+                        _ = Task.Delay(10000).ContinueWith(x =>
+                        {
+                            _ = new_msg.DeleteAsync();
+                        });
+                    }
+                }).Add(_watcher, ctx);
+            }
+
             embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
             embed.Color = ColorHelper.Info;
             embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
@@ -815,9 +862,17 @@ internal class User : BaseCommandModule
             embed.AddField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true);
             embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
             embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
-            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            
+            DiscordButtonComponent components = new DiscordButtonComponent(ButtonStyle.Primary, "thats_me", "Link Score Saber Account to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
+            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
+            if (_users.List[ctx.User.Id].ScoreSaber.Id == 0)
+                builder.AddComponents(components);
+
+            _ = msg.ModifyAsync(builder);
             var file = $"{Guid.NewGuid()}.png";
+
+            ctx.Client.ComponentInteractionCreated += RunInteraction;
 
             try
             {
@@ -898,7 +953,8 @@ internal class User : BaseCommandModule
 
                     embed.Author.IconUrl = ctx.Guild.IconUrl;
                     embed.ImageUrl = asset.Attachments[0].Url;
-                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    builder = builder.WithEmbed(embed);
+                    _ = msg.ModifyAsync(builder);
                 }
             }
             catch (Exception ex)
@@ -907,8 +963,26 @@ internal class User : BaseCommandModule
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 LogError(ex.ToString());
             }
-            await Task.Delay(1000);
-            File.Delete(file);
+
+            try
+            {
+                await Task.Delay(1000);
+                File.Delete(file);
+            }
+            catch { }
+
+            try
+            {
+                if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
+                {
+                    await Task.Delay(120000);
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                    ctx.Client.ComponentInteractionCreated -= RunInteraction; 
+                }
+            }
+            catch { }
         }
         catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
         {
@@ -926,7 +1000,7 @@ internal class User : BaseCommandModule
 
     [Command("scoresaber-search"), Aliases("sss", "scoresabersearch"),
     CommandModule("user"),
-    Description("Search a user on score saber by name")]
+    Description("Search a user on Score Saber by name")]
     public async Task ScoreSaberSearch(CommandContext ctx, [Description("Name")] string name)
     {
         Task.Run(async () =>
@@ -1038,7 +1112,7 @@ internal class User : BaseCommandModule
                                 var playerList = lastSearch.players.Skip((currentPage - 1) * 25).Take(25).ToList();
                                 foreach (var b in playerList)
                                 {
-                                    playerDropDownOptions.Add(new DiscordSelectComponentOption($"{b.name} | {b.pp}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
+                                    playerDropDownOptions.Add(new DiscordSelectComponentOption($"{b.name} | {b.pp.ToString().Replace(",", ".")}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
                                 }
                                 var player_dropdown = new DiscordSelectComponent("player_selection", "Select a player..", playerDropDownOptions as IEnumerable<DiscordSelectComponentOption>);
 
@@ -1201,6 +1275,55 @@ internal class User : BaseCommandModule
             catch { }
 
             return;
+        }).Add(_watcher, ctx);
+    }
+
+
+
+    [Command("scoresaber-unlink"), Aliases("ssu", "scoresaberunlink"),
+    CommandModule("user"),
+    Description("Unlink your Score Saber Account from your Discord Account")]
+    public async Task ScoreSaberUnlink(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!_users.List.ContainsKey(ctx.User.Id))
+                _users.List.Add(ctx.User.Id, new Users.Info());
+
+            if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
+            {
+                _users.List[ctx.User.Id].ScoreSaber.Id = 0;
+
+                var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Error,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"{ctx.User.Mention} `Unlinked your Score Saber Profile from your Discord Account`"
+                }));
+
+                _ = Task.Delay(10000).ContinueWith(x =>
+                {
+                    _ = new_msg.DeleteAsync();
+                });
+            }
+            else
+            {
+                var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Error,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"{ctx.User.Mention} `There is no Score Saber Account linked to your Discord Account.`"
+                }));
+
+                _ = Task.Delay(10000).ContinueWith(x =>
+                {
+                    _ = new_msg.DeleteAsync();
+                });
+            }
         }).Add(_watcher, ctx);
     }
 
