@@ -821,6 +821,8 @@ internal class User : BaseCommandModule
         {
             var player = await _scoreSaberClient.GetPlayerById(id);
 
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
                 Task.Run(async () =>
@@ -830,6 +832,7 @@ internal class User : BaseCommandModule
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        cancellationTokenSource.Cancel();
 
                         _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         _users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
@@ -975,7 +978,7 @@ internal class User : BaseCommandModule
             {
                 if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
                 {
-                    await Task.Delay(120000);
+                    await Task.Delay(120000, cancellationTokenSource.Token);
                     embed.Footer.Text += " • Interaction timed out";
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
