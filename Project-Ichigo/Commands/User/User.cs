@@ -7,6 +7,7 @@ internal class User : BaseCommandModule
     public PhishingUrls _phishingUrls { private get; set; }
     public SubmittedUrls _submittedUrls { private get; set; }
     public ScoreSaberClient _scoreSaberClient { private get; set; }
+    public CountryCodes _countryCodes { private get; set; }
     public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
 
@@ -783,41 +784,47 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            var embed = new DiscordEmbedBuilder
-            {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
-                Color = ColorHelper.Warning,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                Timestamp = DateTime.UtcNow,
-                Description = $"`Looking for player..`"
-            };
+            await SendScoreSaberProfile(ctx, id);
+        }).Add(_watcher, ctx);
+    }
 
-            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+    private async Task SendScoreSaberProfile(CommandContext ctx, string id)
+    {
+        var embed = new DiscordEmbedBuilder
+        {
+            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+            Color = ColorHelper.Warning,
+            Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+            Timestamp = DateTime.UtcNow,
+            Description = $"`Looking for player..`"
+        };
+
+        var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+        try
+        {
+            var player = await _scoreSaberClient.GetPlayerById(id);
+
+            embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
+            embed.Color = ColorHelper.Info;
+            embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
+            embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
+            embed.AddField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true);
+            embed.AddField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
+            embed.AddField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true);
+            embed.AddField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true);
+            embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
+            embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
+            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+            var file = $"{Guid.NewGuid()}.png";
 
             try
             {
-                var player = await _scoreSaberClient.GetPlayerById(id);
-
-                embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
-                embed.Color = ColorHelper.Info;
-                embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
-                embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
-                embed.AddField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true);
-                embed.AddField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
-                embed.AddField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true);
-                embed.AddField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true);
-                embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
-                embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                var file = $"{Guid.NewGuid()}.png";
-
-                try
-                {
-                    Chart qc = new Chart();
-                    qc.Width = 1000;
-                    qc.Height = 500;
-                    qc.Config = $@"{{
+                Chart qc = new Chart();
+                qc.Width = 1000;
+                qc.Height = 500;
+                qc.Config = $@"{{
                         type: 'line',
 	                    data: 
 	                    {{
@@ -883,52 +890,317 @@ internal class User : BaseCommandModule
 	                    }}
                     }}";
 
-                    qc.ToFile(file);
+                qc.ToFile(file);
 
-                    using (FileStream stream = File.Open(file, FileMode.Open))
-                    {
-                        var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
-
-                        embed.Author.IconUrl = ctx.Guild.IconUrl;
-                        embed.ImageUrl = asset.Attachments[0].Url;
-                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                    }
-                }
-                catch (Exception ex)
+                using (FileStream stream = File.Open(file, FileMode.Open))
                 {
+                    var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+
                     embed.Author.IconUrl = ctx.Guild.IconUrl;
+                    embed.ImageUrl = asset.Attachments[0].Url;
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                    LogError(ex.ToString());
                 }
-                await Task.Delay(1000);
-                File.Delete(file);
-                
             }
-            catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+            catch (Exception ex)
             {
-                embed.Author.IconUrl = Resources.LogIcons.Error;
-                embed.Color = ColorHelper.Error;
-                embed.Description = $"`Couldn't find the specified player.`";
+                embed.Author.IconUrl = ctx.Guild.IconUrl;
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                LogError(ex.ToString());
             }
-            catch (Exception)
-            {
-                _ = msg.DeleteAsync();
-                throw;
-            }
-        }).Add(_watcher, ctx);
+            await Task.Delay(1000);
+            File.Delete(file);
+        }
+        catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+        {
+            embed.Author.IconUrl = Resources.LogIcons.Error;
+            embed.Color = ColorHelper.Error;
+            embed.Description = $"`Couldn't find the specified player.`";
+            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        }
+        catch (Exception)
+        {
+            _ = msg.DeleteAsync();
+            throw;
+        }
     }
-
-
 
     [Command("scoresaber-search"), Aliases("sss", "scoresabersearch"),
     CommandModule("user"),
     Description("Search a user on score saber by name")]
-    public async Task ScoreSaberSearch(CommandContext ctx, [Description("ID")] string name)
+    public async Task ScoreSaberSearch(CommandContext ctx, [Description("Name")] string name)
     {
         Task.Run(async () =>
         {
+            DiscordSelectComponent GetContinents(string default_code)
+            {
+                List<DiscordSelectComponentOption> continents = new();
+                continents.Add(new DiscordSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")));
+                foreach (var b in _countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
+                {
+                    continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentCode}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
+                }
+                return new DiscordSelectComponent("continent_selection", "Select a country..", continents as IEnumerable<DiscordSelectComponentOption>);
+            }
 
+            DiscordSelectComponent GetCountries(string continent_code, string default_country, int page)
+            {
+                List<DiscordSelectComponentOption> countries = new();
+                var currentCountryList = _countryCodes.List.GroupBy(x => x.Value.ContinentCode).First().Skip((page - 1) * 25).Take(25).ToList();
+
+                foreach (var b in currentCountryList)
+                {
+                    countries.Add(new DiscordSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country)));
+                }
+                return new DiscordSelectComponent("country_selection", "Select a country..", countries as IEnumerable<DiscordSelectComponentOption>);
+            }
+
+            var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", "Start Search", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":mag:")));
+            var next_step_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_step", "Next step", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+            var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+            var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+            
+            var embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Search • {ctx.Guild.Name}" },
+                Color = ColorHelper.Warning,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"`Please select a continent filter below.`"
+            };
+
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents("no_country")).AddComponents(start_search_button));
+            CancellationTokenSource tokenSource = new();
+
+            string selectedContinent = "no_country";
+            string selectedCountry = "no_country";
+            int lastFetchedPage = -1;
+            int currentPage = 1;
+            int currentFetchedPage = 1;
+            bool playerSelection = false;
+            PlayerSearch.SearchResult lastSearch = null;
+
+            async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            async Task RefreshCountryList()
+                            {
+                                embed.Description = "`Please select a country filter below.`";
+
+                                if (selectedCountry != "no_country")
+                                {
+                                    embed.Description += $"\n`Selected country: '{_countryCodes.List[selectedCountry].Name}'`";
+                                }
+
+                                var page = GetCountries(selectedContinent, selectedCountry, currentPage);
+                                var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(page);
+
+                                if (currentPage == 1 && _countryCodes.List.GroupBy(x => x.Value.ContinentCode).First().Count() > 25)
+                                {
+                                    builder.AddComponents(next_page_button);
+                                }
+
+                                if (currentPage != 1)
+                                {
+                                    if (_countryCodes.List.GroupBy(x => x.Value.ContinentCode).First().Skip((currentPage - 1) * 25).Count() > 25)
+                                        builder.AddComponents(next_page_button);
+
+                                    builder.AddComponents(previous_page_button);
+                                }
+
+                                if (selectedCountry != "no_country")
+                                    builder.AddComponents(start_search_button);
+
+                                _ = msg.ModifyAsync(builder);
+                            }
+
+                            async Task RefreshPlayerList()
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                                embed.Description = "`Searching for players with specified criteria..`";
+                                embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                if (currentFetchedPage != lastFetchedPage)
+                                {
+                                    lastSearch = await _scoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
+                                    lastFetchedPage = currentFetchedPage;
+                                }
+
+                                List<DiscordSelectComponentOption> playerDropDownOptions = new();
+                                var playerList = lastSearch.players.Skip((currentPage - 1) * 25).Take(25).ToList();
+                                foreach (var b in playerList)
+                                {
+                                    playerDropDownOptions.Add(new DiscordSelectComponentOption($"{b.name} | {b.pp}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
+                                }
+                                var player_dropdown = new DiscordSelectComponent("player_selection", "Select a player..", playerDropDownOptions as IEnumerable<DiscordSelectComponentOption>);
+
+                                var builder = new DiscordMessageBuilder().AddComponents(player_dropdown);
+
+                                bool added_next = false;
+
+                                if (currentPage == 1 && lastSearch.players.Count() > 25)
+                                {
+                                    builder.AddComponents(next_page_button);
+                                    added_next = true;
+                                }
+
+                                if (currentPage != 1 || lastFetchedPage != 1)
+                                {
+                                    if ((lastSearch.players.Skip((currentPage - 1) * 25).Take(25).Count() > 25 || (((lastSearch.metadata.total - (currentFetchedPage - 1)) * 50) > 0) && player_dropdown.Options.Count == 25) && !added_next)
+                                        builder.AddComponents(next_page_button);
+
+                                    builder.AddComponents(previous_page_button);
+                                }
+
+                                ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
+
+                                embed.Description = $"`Found {lastSearch.metadata.total} players. Fetched {lastSearch.players.Count()} players. Showing {playerDropDownOptions.Count} players.`";
+                                embed.Author.IconUrl = ctx.Guild.IconUrl;
+                                builder.WithEmbed(embed);
+                                await msg.ModifyAsync(builder);
+                            }
+
+                            if (e.Interaction.Data.CustomId == "start_search")
+                            {
+                                tokenSource.Cancel();
+                                tokenSource = null;
+
+                                playerSelection = true;
+                                currentPage = 1;
+                                await RefreshPlayerList();
+
+                                tokenSource = new();
+                            }
+                            else if (e.Interaction.Data.CustomId == "player_selection")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                                tokenSource.Cancel();
+                                tokenSource = null;
+
+                                embed.Description = "`Getting profile..`";
+                                embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                await SendScoreSaberProfile(ctx, e.Values.First());
+                                _ = msg.DeleteAsync();
+
+                                return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "next_step")
+                            {
+                                _ = RefreshCountryList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "country_selection")
+                            {
+                                selectedCountry = e.Values.First();
+
+                                _ = RefreshCountryList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "prev_page")
+                            {
+                                if (playerSelection)
+                                {
+                                    if (currentPage == 1)
+                                    {
+                                        currentPage = 2;
+                                        currentFetchedPage -= 1;
+                                    }
+                                    else
+                                        currentPage -= 1;
+
+                                    tokenSource.Cancel();
+                                    tokenSource = null;
+
+                                    await RefreshPlayerList();
+
+                                    tokenSource = new();
+                                }
+                                else
+                                {
+                                    currentPage -= 1;
+                                    _ = RefreshCountryList();
+                                }
+                            }
+                            else if (e.Interaction.Data.CustomId == "next_page")
+                            {
+                                if (playerSelection)
+                                {
+                                    if (currentPage == 2)
+                                    {
+                                        currentPage = 1;
+                                        currentFetchedPage += 1;
+                                    }
+                                    else
+                                        currentPage += 1;
+
+                                    tokenSource.Cancel();
+                                    tokenSource = null;
+
+                                    await RefreshPlayerList();
+
+                                    tokenSource = new();
+                                }
+                                else
+                                {
+                                    currentPage += 1;
+                                    _ = RefreshCountryList();
+                                }                            
+                            }
+                            else if (e.Interaction.Data.CustomId == "continent_selection")
+                            {
+                                selectedContinent = e.Values.First();
+
+                                if (selectedContinent != "no_country")
+                                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents(selectedContinent)).AddComponents(next_step_button));
+                                else
+                                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents(selectedContinent)).AddComponents(start_search_button));
+                            }
+
+                            try
+                            {
+                                tokenSource.Cancel();
+                                tokenSource = new();
+                                await Task.Delay(120000, tokenSource.Token);
+                                embed.Footer.Text += " • Interaction timed out";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                await Task.Delay(5000);
+                                _ = msg.DeleteAsync();
+
+                                ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                            }
+                            catch { }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                        throw;
+                    }
+                }).Add(_watcher, ctx);
+            }
+            ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
+
+            try
+            {
+                await Task.Delay(120000, tokenSource.Token);
+                embed.Footer.Text += " • Interaction timed out";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                await Task.Delay(5000);
+                _ = msg.DeleteAsync();
+
+                ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+            }
+            catch { }
+
+            return;
         }).Add(_watcher, ctx);
     }
 

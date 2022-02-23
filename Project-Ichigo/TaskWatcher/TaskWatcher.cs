@@ -26,6 +26,11 @@ internal class TaskWatcher
                 else
                     LogError($"A non-command task failed to execute: {b.task.Exception}");
 
+                if (b.task.Exception.InnerException.GetType() == typeof(DisCatSharp.Exceptions.BadRequestException))
+                {
+                    LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
+                }
+
                 if (ctx != null)
                     try
                     {

@@ -18,6 +18,7 @@ global using System.Data.SQLite;
 global using System.Data.Common;
 global using System.Security.Cryptography;
 global using System.Data;
+global using System.ComponentModel.DataAnnotations;
 global using Microsoft.Extensions.DependencyInjection;
 
 // Database
@@ -62,6 +63,7 @@ global using Project_Ichigo.Commands.Admin;
 global using static Project_Ichigo.Attributes.CustomAttributes;
 
 global using Xorog.ScoreSaber;
+global using Xorog.ScoreSaber.Objects;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;

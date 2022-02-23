@@ -26,6 +26,7 @@ internal class Bot
     internal BumpReminder.BumpReminder _bumpReminder { get; set; }
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
     internal ScoreSaberClient _scoreSaberClient { get; set; }
+    internal CountryCodes _countryCodes { get; set; }
 
 
 
@@ -64,6 +65,16 @@ internal class Bot
             {
                 Stopwatch databaseConnectionSc = new();
                 databaseConnectionSc.Start();
+
+                LogInfo($"Loading Country Codes..");
+                _countryCodes = new();
+                List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>((await new HttpClient().GetStringAsync("https://fortunevale.dd-dns.de/Countries.json")));
+                foreach (var b in cc)
+                {
+                    _countryCodes.List.Add(b[2], new CountryCodes.CountryInfo { Name = b[0], ContinentCode = b[1] });
+                }
+                LogInfo($"Loaded {_countryCodes.List.Count} countries.");
+
 
                 LogInfo($"Connecting to database..");
                 databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
@@ -284,6 +295,7 @@ internal class Bot
                     .AddSingleton(_submissionBans)
                     .AddSingleton(_submittedUrls)
                     .AddSingleton(_watcher)
+                    .AddSingleton(_countryCodes)
                     .AddSingleton(_scoreSaberClient)
                     .AddSingleton(_bumpReminder)
                     .BuildServiceProvider();
