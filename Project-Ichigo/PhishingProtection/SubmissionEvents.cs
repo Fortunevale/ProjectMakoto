@@ -2,9 +2,10 @@
 
 internal class SubmissionEvents
 {
-    internal SubmissionEvents(MySqlConnection databaseConnection, SubmittedUrls _submittedUrls, PhishingUrls _phishingUrls, Status _status, SubmissionBans _submissionBans)
+    internal SubmissionEvents(MySqlConnection databaseConnection, DatabaseHelper databaseHelper, SubmittedUrls _submittedUrls, PhishingUrls _phishingUrls, Status _status, SubmissionBans _submissionBans)
     {
         this.databaseConnection = databaseConnection;
+        this.databaseHelper = databaseHelper;
         this._submittedUrls = _submittedUrls;
         this._phishingUrls = _phishingUrls;
         this._status = _status;
@@ -12,6 +13,7 @@ internal class SubmissionEvents
     }
 
     internal MySqlConnection databaseConnection { private get; set; }
+    internal DatabaseHelper databaseHelper { private get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }
     internal PhishingUrls _phishingUrls { private get; set; }
     internal Status _status { private get; set; }
@@ -41,10 +43,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = databaseConnection;
-                        await cmd.ExecuteNonQueryAsync();
+                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -52,7 +51,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        _ = new PhishingUrlUpdater(databaseConnection).UpdateDatabase(_phishingUrls, new());
+                        _ = new PhishingUrlUpdater(databaseConnection, databaseHelper).UpdateDatabase(_phishingUrls, new());
                     }
                     catch (Exception ex)
                     {
@@ -65,10 +64,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = databaseConnection;
-                        await cmd.ExecuteNonQueryAsync();
+                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -84,10 +80,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = databaseConnection;
-                        await cmd.ExecuteNonQueryAsync();
+                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -105,10 +98,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = $"DELETE FROM active_url_submissions WHERE messageid='{e.Message.Id}'";
-                        cmd.Connection = databaseConnection;
-                        await cmd.ExecuteNonQueryAsync();
+                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 

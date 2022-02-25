@@ -2,12 +2,14 @@ namespace Project_Ichigo.PhishingProtection;
 
 public class PhishingUrlUpdater
 {
-    internal PhishingUrlUpdater(MySqlConnection con)
+    internal PhishingUrlUpdater(MySqlConnection con, DatabaseHelper helper)
     {
         databaseConnection = con;
+        databaseHelper = helper;
     }
 
     internal MySqlConnection databaseConnection { private get; set; }
+    internal DatabaseHelper databaseHelper { private get; set; }
 
     public async Task UpdatePhishingUrlDatabase(PhishingUrls phishingUrls)
     {
@@ -92,11 +94,11 @@ public class PhishingUrlUpdater
             }
 
             var cmd = databaseConnection.CreateCommand();
-            cmd.CommandText = @$"INSERT INTO scam_urls ( url, origin, submitter ) VALUES ";
+            cmd.CommandText = databaseHelper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
 
             for (int i = 0; i < DatabaseInserts.Count; i++)
             {
-                cmd.CommandText += @$"( @url{i}, @origin{i}, @submitter{i} ), ";
+                cmd.CommandText += databaseHelper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
 
                 cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url);
                 cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin);
@@ -104,7 +106,7 @@ public class PhishingUrlUpdater
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-            cmd.CommandText += " ON DUPLICATE KEY UPDATE origin=values(origin)";
+            cmd.CommandText += databaseHelper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
 
             cmd.Connection = databaseConnection;
             await cmd.ExecuteNonQueryAsync();
@@ -117,10 +119,7 @@ public class PhishingUrlUpdater
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    cmd = databaseConnection.CreateCommand();
-                    cmd.CommandText = $"DELETE FROM scam_urls WHERE url='{b}'";
-                    cmd.Connection = databaseConnection;
-                    await cmd.ExecuteNonQueryAsync();
+                    await databaseHelper.DeleteRow("scam_urls", "url", $"{b}");
 
                     LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }

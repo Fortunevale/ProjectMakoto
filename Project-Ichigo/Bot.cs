@@ -77,13 +77,9 @@ internal class Bot
 
 
                 LogInfo($"Connecting to database..");
-                databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
-                databaseConnection.Open();
-
-                _databaseHelper = new DatabaseHelper(databaseConnection, _guilds, _users, _submissionBans, _submittedUrls);
-
-                await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {Secrets.Secrets.DatabaseName}");
-                await databaseConnection.ExecuteAsync($"USE {Secrets.Secrets.DatabaseName}");
+                
+                _databaseHelper = await DatabaseHelper.InitializeDatabase(_guilds, _users, _submissionBans, _submittedUrls);
+                databaseConnection = _databaseHelper.databaseConnection;
 
                 databaseConnectionSc.Stop();
                 LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
@@ -95,22 +91,12 @@ internal class Bot
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDatabaseLogin);
             }
-
+            
             try
             {
-                List<string> SavedTables = new();
-
-                using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
-                {
-                    while (reader.Read())
-                    {
-                        SavedTables.Add(reader.GetString(0));
-                    }
-                }
-
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-                IEnumerable<DatabasePhishingUrlInfo> scamUrls = databaseConnection.Query<DatabasePhishingUrlInfo>($"SELECT url, origin, submitter FROM scam_urls");
+                IEnumerable<DatabasePhishingUrlInfo> scamUrls = databaseConnection.Query<DatabasePhishingUrlInfo>(_databaseHelper.GetLoadCommand("scam_urls", DatabaseColumnLists.scam_urls));
 
                 foreach (var b in scamUrls)
                     _phishingUrls.List.Add(b.url, new PhishingUrls.UrlInfo
@@ -126,7 +112,7 @@ internal class Bot
 
                 LogDebug($"Loading guilds from table 'guilds'..");
 
-                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>($"SELECT serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, bump_persistent_msg, phishing_detect, phishing_type, phishing_reason, phishing_time FROM guilds");
+                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>(_databaseHelper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
                 foreach (var b in serverSettings)
                     _guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
@@ -157,7 +143,7 @@ internal class Bot
 
                 LogDebug($"Loading users from table 'users'..");
 
-                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>($"SELECT userid, scoresaber_id, afk_reason, afk_since, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime FROM users");
+                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>(_databaseHelper.GetLoadCommand("users", DatabaseColumnLists.users));
 
                 foreach (var b in users)
                     _users.List.Add(b.userid, new Users.Info
@@ -185,7 +171,7 @@ internal class Bot
 
                 LogDebug($"Loading submission bans from table 'user_submission_bans'..");
 
-                IEnumerable<DatabaseBanInfo> userbans = databaseConnection.Query<DatabaseBanInfo>($"SELECT id, reason, moderator FROM user_submission_bans");
+                IEnumerable<DatabaseBanInfo> userbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
 
                 foreach (var b in userbans)
                     _submissionBans.BannedUsers.Add(b.id, new SubmissionBans.BanInfo
@@ -200,7 +186,7 @@ internal class Bot
 
                 LogDebug($"Loading submission bans from table 'guild_submission_bans'..");
 
-                IEnumerable<DatabaseBanInfo> guildbans = databaseConnection.Query<DatabaseBanInfo>($"SELECT id, reason, moderator FROM guild_submission_bans");
+                IEnumerable<DatabaseBanInfo> guildbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
 
                 foreach (var b in guildbans)
                     _submissionBans.BannedGuilds.Add(b.id, new SubmissionBans.BanInfo
@@ -215,7 +201,7 @@ internal class Bot
 
                 LogDebug($"Loading active submissions from table 'active_url_submissions'..");
 
-                IEnumerable<DatabaseSubmittedUrls> active_submissions = databaseConnection.Query<DatabaseSubmittedUrls>($"SELECT messageid, url, submitter, guild FROM active_url_submissions");
+                IEnumerable<DatabaseSubmittedUrls> active_submissions = databaseConnection.Query<DatabaseSubmittedUrls>(_databaseHelper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
 
                 foreach (var b in active_submissions)
                     _submittedUrls.Urls.Add(b.messageid, new SubmittedUrls.UrlInfo
@@ -227,7 +213,7 @@ internal class Bot
 
                 LogInfo($"Loaded {_submittedUrls.Urls.Count} active submissions from table 'active_url_submissions'.");
 
-                _phishingUrlUpdater = new(databaseConnection);
+                _phishingUrlUpdater = new(databaseConnection, _databaseHelper);
                 _ = _phishingUrlUpdater.UpdatePhishingUrlDatabase(_phishingUrls);
             }
             catch (Exception ex)
@@ -365,7 +351,7 @@ internal class Bot
                 discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
                 discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
 
-                SubmissionEvents _submissionEvents = new(databaseConnection, _submittedUrls, _phishingUrls, _status, _submissionBans);
+                SubmissionEvents _submissionEvents = new(databaseConnection, _databaseHelper, _submittedUrls, _phishingUrls, _status, _submissionBans);
                 discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
 
 

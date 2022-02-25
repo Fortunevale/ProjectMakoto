@@ -1,16 +1,7 @@
 ﻿namespace Project_Ichigo;
 internal class DatabaseHelper
 {
-    internal DatabaseHelper(MySqlConnection databaseConnection2, ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
-    {
-        databaseConnection = databaseConnection2;
-        _guilds = guilds;
-        _users = users;
-        _submissionBans = submissionBans;
-        _submittedUrls = submittedUrls;
-    }
-
-    internal MySqlConnection databaseConnection { private get; set; }
+    internal MySqlConnection databaseConnection { get; set; }
     internal ServerInfo _guilds { private set; get; }
     internal Users _users { private get; set; }
     internal SubmissionBans _submissionBans { private get; set; }
@@ -75,6 +66,73 @@ internal class DatabaseHelper
         }
     }
 
+    public static async Task<DatabaseHelper> InitializeDatabase(ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
+    {
+        var helper = new DatabaseHelper();
+        helper._guilds = guilds;
+        helper._users = users;
+        helper._submissionBans = submissionBans;
+        helper._submittedUrls = submittedUrls;
+
+        helper.databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
+        helper.databaseConnection.Open();
+
+        await helper.SelectDatabase(Secrets.Secrets.DatabaseName);
+
+        return helper;
+    }
+
+    public async Task SelectDatabase(string databaseName, bool CreateIfNotExist = false)
+    {
+        if (CreateIfNotExist)
+            await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {databaseName}");
+
+        await databaseConnection.ExecuteAsync($"USE {databaseName}");
+    }
+
+    public async Task<IEnumerable<string>> ListTables()
+    {
+        List<string> SavedTables = new();
+
+        using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
+        {
+            while (reader.Read())
+            {
+                SavedTables.Add(reader.GetString(0));
+            }
+        }
+
+        return SavedTables as IEnumerable<string>;
+    }
+
+    public async Task DeleteRow(string table, string row_match, string value)
+    {
+        var cmd = databaseConnection.CreateCommand();
+        cmd.CommandText = $"DELETE FROM {table} WHERE {row_match}='{value}'";
+        cmd.Connection = databaseConnection;
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    public string GetLoadCommand(string table, List<string> columns)
+    {
+        return $"SELECT {string.Join(", ", columns)} FROM {table}";
+    }
+    
+    public string GetSaveCommand(string table, List<string> columns)
+    {
+        return $"INSERT INTO {table} ( {string.Join(", ", columns)} ) VALUES ";
+    }
+    
+    public string GetValueCommand(List<string> columns, int i)
+    {
+        return $"( {string.Join(", ", columns.Select(x => $"@{x}{i}"))} ), ";
+    }
+    
+    public string GetOverwriteCommand(List<string> columns)
+    {
+        return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x}=values({x})"))}";
+    }
+
     public async Task SyncDatabase(bool Important = false)
     {
         if (queuedUpdates.Count < 2 || Important)
@@ -107,11 +165,11 @@ internal class DatabaseHelper
                     }
 
                     var cmd = databaseConnection.CreateCommand();
-                    cmd.CommandText = @$"INSERT INTO guilds ( serverid, bump_enabled, bump_role, bump_channel, bump_last_reminder, bump_last_time, bump_last_user, bump_message, bump_persistent_msg, phishing_detect, phishing_type, phishing_reason, phishing_time ) VALUES ";
+                    cmd.CommandText = GetSaveCommand("guilds", DatabaseColumnLists.guilds);
 
                     for (int i = 0; i < DatabaseInserts.Count; i++)
                     {
-                        cmd.CommandText += @$"( @serverid{i}, @bump_enabled{i}, @bump_role{i}, @bump_channel{i}, @bump_last_reminder{i}, @bump_last_time{i}, @bump_last_user{i}, @bump_message{i}, @bump_persistent_msg{i}, @phishing_detect{i}, @phishing_type{i}, @phishing_reason{i}, @phishing_time{i} ), ";
+                        cmd.CommandText += GetValueCommand(DatabaseColumnLists.guilds, i);
 
                         cmd.Parameters.AddWithValue($"serverid{i}", DatabaseInserts[i].serverid);
 
@@ -131,19 +189,7 @@ internal class DatabaseHelper
                     }
 
                     cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                    cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                        "bump_enabled=values(bump_enabled), " +
-                                        "bump_role=values(bump_role), " +
-                                        "bump_channel=values(bump_channel), " +
-                                        "bump_last_reminder=values(bump_last_reminder), " +
-                                        "bump_last_time=values(bump_last_time), " +
-                                        "bump_last_user=values(bump_last_user), " +
-                                        "bump_message=values(bump_message), " +
-                                        "bump_persistent_msg=values(bump_persistent_msg), " +
-                                        "phishing_detect=values(phishing_detect), " +
-                                        "phishing_type=values(phishing_type), " +
-                                        "phishing_reason=values(phishing_reason), " +
-                                        "phishing_time=values(phishing_time)";
+                    cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guilds);
 
                     cmd.Connection = databaseConnection;
                     await cmd.ExecuteNonQueryAsync();
@@ -178,11 +224,11 @@ internal class DatabaseHelper
                         }
 
                         var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = @$"INSERT INTO users ( userid, scoresaber_id, afk_since, afk_reason, submission_accepted_tos, submission_accepted_submissions, submission_last_datetime ) VALUES ";
+                        cmd.CommandText = cmd.CommandText = GetSaveCommand("users", DatabaseColumnLists.users);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += @$"( @userid{i}, @scoresaber_id{i}, @afk_since{i}, @afk_reason{i}, @submission_accepted_tos{i}, @submission_accepted_submissions{i}, @submission_last_datetime{i} ), ";
+                            cmd.CommandText += GetValueCommand(DatabaseColumnLists.users, i);
 
                             cmd.Parameters.AddWithValue($"userid{i}", DatabaseInserts[i].userid);
                             cmd.Parameters.AddWithValue($"scoresaber_id{i}", DatabaseInserts[i].scoresaber_id);
@@ -194,13 +240,7 @@ internal class DatabaseHelper
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                            "scoresaber_id=values(scoresaber_id), " +
-                                            "afk_since=values(afk_since), " +
-                                            "afk_reason=values(afk_reason), " +
-                                            "submission_accepted_tos=values(submission_accepted_tos), " +
-                                            "submission_accepted_submissions=values(submission_accepted_submissions), " +
-                                            "submission_last_datetime=values(submission_last_datetime)";
+                        cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.users);
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -231,11 +271,11 @@ internal class DatabaseHelper
                         }
 
                         var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = @$"INSERT INTO user_submission_bans ( id, reason, moderator ) VALUES ";
+                        cmd.CommandText = GetSaveCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += @$"( @id{i}, @reason{i}, @moderator{i} ), ";
+                            cmd.CommandText += GetValueCommand(DatabaseColumnLists.user_submission_bans, i);
 
                             cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
                             cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
@@ -243,9 +283,7 @@ internal class DatabaseHelper
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                            "reason=values(reason), " +
-                                            "moderator=values(moderator)";
+                        cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.user_submission_bans);
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -276,11 +314,11 @@ internal class DatabaseHelper
                         }
 
                         var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = @$"INSERT INTO guild_submission_bans ( id, reason, moderator ) VALUES ";
+                        cmd.CommandText = GetSaveCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += @$"( @id{i}, @reason{i}, @moderator{i} ), ";
+                            cmd.CommandText += GetValueCommand(DatabaseColumnLists.guild_submission_bans, i);
 
                             cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
                             cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
@@ -288,9 +326,7 @@ internal class DatabaseHelper
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                            "reason=values(reason), " +
-                                            "moderator=values(moderator)";
+                        cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
@@ -322,11 +358,11 @@ internal class DatabaseHelper
                         }
 
                         var cmd = databaseConnection.CreateCommand();
-                        cmd.CommandText = @$"INSERT INTO active_url_submissions ( messageid, url, submitter, guild ) VALUES ";
+                        cmd.CommandText = GetSaveCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += @$"( @messageid{i}, @url{i}, @submitter{i}, @guild{i} ), ";
+                            cmd.CommandText += GetValueCommand(DatabaseColumnLists.active_url_submissions, i);
 
                             cmd.Parameters.AddWithValue($"messageid{i}", DatabaseInserts[i].messageid);
                             cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[i].url);
@@ -335,10 +371,7 @@ internal class DatabaseHelper
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += " ON DUPLICATE KEY UPDATE " +
-                                            "url=values(url), " +
-                                            "submitter=values(submitter), " +
-                                            "guild=values(guild)";
+                        cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.active_url_submissions);
 
                         cmd.Connection = databaseConnection;
                         await cmd.ExecuteNonQueryAsync();
