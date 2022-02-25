@@ -932,8 +932,15 @@ internal class User : BaseCommandModule
 	                    {{
 		                    legend: 
 		                    {{
-			                    display: false
+			                    display: false,
 		                    }},
+                            elements:
+                            {{
+                                point:
+                                {{
+                                    radius: 0
+                                }}
+                            }},
 		                    scales: 
 		                    {{
 			                    yAxes: 
@@ -941,7 +948,7 @@ internal class User : BaseCommandModule
                                     reverse: true,
                                     ticks:
   			                        {{
-                                        reverse: true  
+                                        reverse: true
   			                        }}
 			                    }}]
 		                    }}
@@ -976,7 +983,7 @@ internal class User : BaseCommandModule
 
             try
             {
-                if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
+                if (_users.List[ctx.User.Id].ScoreSaber.Id == 0)
                 {
                     await Task.Delay(120000, cancellationTokenSource.Token);
                     embed.Footer.Text += " • Interaction timed out";
