@@ -821,7 +821,7 @@ internal class User : BaseCommandModule
         {
             var player = await _scoreSaberClient.GetPlayerById(id);
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            CancellationTokenSource cancellationTokenSource = new();
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
@@ -866,7 +866,7 @@ internal class User : BaseCommandModule
             embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
             embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
             
-            DiscordButtonComponent components = new DiscordButtonComponent(ButtonStyle.Primary, "thats_me", "Link Score Saber Account to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
+            DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Account to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
             if (_users.List[ctx.User.Id].ScoreSaber.Id == 0)
@@ -879,7 +879,7 @@ internal class User : BaseCommandModule
 
             try
             {
-                Chart qc = new Chart();
+                Chart qc = new();
                 qc.Width = 1000;
                 qc.Height = 500;
                 qc.Config = $@"{{
@@ -1132,7 +1132,7 @@ internal class User : BaseCommandModule
 
                                 bool added_next = false;
 
-                                if (currentPage == 1 && lastSearch.players.Count() > 25)
+                                if (currentPage == 1 && lastSearch.players.Length > 25)
                                 {
                                     builder.AddComponents(next_page_button);
                                     added_next = true;
@@ -1140,7 +1140,7 @@ internal class User : BaseCommandModule
 
                                 if (currentPage != 1 || lastFetchedPage != 1)
                                 {
-                                    if ((lastSearch.players.Skip((currentPage - 1) * 25).Take(25).Count() > 25 || (((lastSearch.metadata.total - (currentFetchedPage - 1)) * 50) > 0) && player_dropdown.Options.Count == 25) && !added_next)
+                                    if ((lastSearch.players.Skip((currentPage - 1) * 25).Take(25).Count() > 25 || ((((lastSearch.metadata.total - (currentFetchedPage - 1)) * 50) > 0) && player_dropdown.Options.Count == 25)) && !added_next)
                                         builder.AddComponents(next_page_button);
 
                                     builder.AddComponents(previous_page_button);
@@ -1148,7 +1148,7 @@ internal class User : BaseCommandModule
 
                                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-                                embed.Description = $"`Found {lastSearch.metadata.total} players. Fetched {lastSearch.players.Count()} players. Showing {playerDropDownOptions.Count} players.`";
+                                embed.Description = $"`Found {lastSearch.metadata.total} players. Fetched {lastSearch.players.Length} players. Showing {playerDropDownOptions.Count} players.`";
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                                 builder.WithEmbed(embed);
                                 await msg.ModifyAsync(builder);
