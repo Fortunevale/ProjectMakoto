@@ -944,13 +944,15 @@ internal class User : BaseCommandModule
 		                    scales: 
 		                    {{
 			                    yAxes: 
-			                    [{{
-                                    reverse: true,
-                                    ticks:
-  			                        {{
-                                        reverse: true
-  			                        }}
-			                    }}]
+			                    [
+                                    {{
+                                        reverse: true,
+                                        ticks:
+  			                            {{
+                                            reverse: true
+  			                            }}
+			                        }}
+                                ]
 		                    }}
 	                    }}
                     }}";
