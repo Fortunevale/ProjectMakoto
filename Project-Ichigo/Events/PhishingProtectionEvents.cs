@@ -17,21 +17,32 @@ internal class PhishingProtectionEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message).Add(_watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(_watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Guild.Members[e.Message.Author.Id], e.Message).Add(_watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(_watcher);
     }
 
-    private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMember member, DiscordMessage e)
+    private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
         if (e.Content.StartsWith($"-"))
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Content.StartsWith($"-{command.Key}"))
                     return;
-        
+
+        DiscordMember member;
+
+        try
+        {
+            member = await guild.GetMemberAsync(e.Author.Id);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
         foreach (var url in _phishingUrls.List)
         {
             if (e.Content.Contains(url.Key))
