@@ -179,7 +179,7 @@ public class PhishingUrlUpdater
             var urls = await DownloadList("https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt");
             WhitelistedDomains.AddRange(urls);
         }
-        catch (Exception ex) { LogError($"An exception occured while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt': {ex}"); }
+        catch (Exception ex) { throw new Exception($"An exception occured while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt': {ex}"); }
 
         try
         {
@@ -190,7 +190,7 @@ public class PhishingUrlUpdater
                 if (SanitizedMatches.ContainsKey(b))
                     SanitizedMatches.Remove(b);
         }
-        catch (Exception ex) { LogError($"Failed to remove whitelisted domains from blacklist: {ex}"); }
+        catch (Exception ex) { throw new Exception($"Failed to remove whitelisted domains from blacklist: {ex}"); }
 
         return SanitizedMatches.Select(x => new PhishingUrls.UrlInfo
         {

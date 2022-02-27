@@ -68,13 +68,15 @@ internal class DatabaseHelper
 
     public static async Task<DatabaseHelper> InitializeDatabase(ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
     {
-        var helper = new DatabaseHelper();
-        helper._guilds = guilds;
-        helper._users = users;
-        helper._submissionBans = submissionBans;
-        helper._submittedUrls = submittedUrls;
+        var helper = new DatabaseHelper
+        {
+            _guilds = guilds,
+            _users = users,
+            _submissionBans = submissionBans,
+            _submittedUrls = submittedUrls,
 
-        helper.databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};");
+            databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};")
+        };
         helper.databaseConnection.Open();
 
         await helper.SelectDatabase(Secrets.Secrets.DatabaseName);

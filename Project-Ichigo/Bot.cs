@@ -480,6 +480,13 @@ internal class Bot
         LogInfo($"Flushing to database..");
         await _databaseHelper.SyncDatabase(true);
         LogInfo($"Flushed to database.");
+
+        LogInfo($"Closing database..");
+        await databaseConnection.CloseAsync();
+        LogInfo($"Closed database.");
+
+        Thread.Sleep(1000);
+        LogInfo($"Goodbye!");
     }
 
     private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
