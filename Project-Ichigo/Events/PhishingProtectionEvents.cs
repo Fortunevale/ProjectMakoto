@@ -22,7 +22,8 @@ internal class PhishingProtectionEvents
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(_watcher);
+        if (e.MessageBefore.Content != e.Message.Content)
+            CheckMessage(sender, e.Guild, e.Message).Add(_watcher);
     }
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
@@ -31,6 +32,9 @@ internal class PhishingProtectionEvents
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Content.StartsWith($"-{command.Key}"))
                     return;
+
+        if (e.WebhookMessage)
+            return;
 
         DiscordMember member;
 
@@ -56,6 +60,8 @@ internal class PhishingProtectionEvents
 
         if (matches.Count > 0)
         {
+            _ = e.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 940100205720784936));
+
             Dictionary<string, string> redirectUrls = new();
 
             foreach (Match match in matches)
@@ -79,11 +85,30 @@ internal class PhishingProtectionEvents
                             redirectUrls.Add(match.Value, unshortened_url);
                     }
                 }
+                catch (HttpRequestException ex)
+                {
+                    if (ex.Message.Contains("Cannot write more bytes"))
+                    {
+                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                        {
+                            Title = $":no_entry: Couldn't check this link for malicous redirects. Please proceed with caution.",
+                            Color = ColorHelper.Error
+                        });
+                    }
+                }
                 catch (Exception ex)
                 {
                     LogError($"An exception occured while trying to unshorten url '{match.Value}': {ex}");
+
+                    _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Title = $":no_entry: An unknown error occured while trying to check for malicous redirects. Please proceed with caution.",
+                        Color = ColorHelper.Error
+                    });
                 }
             }
+
+            _ = e.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 940100205720784936));
 
             if (redirectUrls.Count > 0)
             {
@@ -97,7 +122,7 @@ internal class PhishingProtectionEvents
                 {
                     Title = $":warning: Found at least one (or more) redirected URLs in this message.",
                     Description = $"`{string.Join("`\n`", redirectUrls.Select(x => x.Value))}`",
-                    Color = DiscordColor.Orange
+                    Color = ColorHelper.Warning
                 });
             }
         }
