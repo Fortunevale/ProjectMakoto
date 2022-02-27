@@ -780,15 +780,43 @@ internal class User : BaseCommandModule
     [Command("scoresaber"), Aliases("ss"),
     CommandModule("user"),
     Description("Get show a users Score Saber profile by id")]
-    public async Task ScoreSaber(CommandContext ctx, [Description("ID")]string id = "")
+    public async Task ScoreSaber(CommandContext ctx, [Description("ID|@User")]string id = "")
     {
         Task.Run(async () =>
         {
-            await SendScoreSaberProfile(ctx, id);
+            bool AddLinkButton = true;
+
+            if ((id == "" || id.Contains("@")) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
+            {
+                if (!_users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
+                    _users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
+                
+                if (_users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id != 0)
+                {
+                    id = _users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id.ToString();
+                    AddLinkButton = false;
+                }
+                else
+                {
+                    var embed = new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                        Color = ColorHelper.Error,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"`This user has no Score Saber Profile linked to their Discord Account.`"
+                    };
+
+                    _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    return;
+                }
+            }
+
+            await SendScoreSaberProfile(ctx, id, AddLinkButton);
         }).Add(_watcher, ctx);
     }
 
-    private async Task SendScoreSaberProfile(CommandContext ctx, string id = "")
+    private async Task SendScoreSaberProfile(CommandContext ctx, string id = "", bool AddLinkButton = true)
     {
         if (!_users.List.ContainsKey(ctx.User.Id))
             _users.List.Add(ctx.User.Id, new Users.Info());
@@ -866,10 +894,10 @@ internal class User : BaseCommandModule
             embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
             embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
             
-            DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Account to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
+            DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            if (_users.List[ctx.User.Id].ScoreSaber.Id == 0)
+            if (_users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                 builder.AddComponents(components);
 
             _ = msg.ModifyAsync(builder);
@@ -985,7 +1013,7 @@ internal class User : BaseCommandModule
 
             try
             {
-                if (_users.List[ctx.User.Id].ScoreSaber.Id == 0)
+                if (_users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                 {
                     await Task.Delay(120000, cancellationTokenSource.Token);
                     embed.Footer.Text += " • Interaction timed out";
@@ -1308,7 +1336,7 @@ internal class User : BaseCommandModule
 
     [Command("scoresaber-unlink"), Aliases("ssu", "scoresaberunlink"),
     CommandModule("user"),
-    Description("Unlink your Score Saber Account from your Discord Account")]
+    Description("Unlink your Score Saber Profile from your Discord Account")]
     public async Task ScoreSaberUnlink(CommandContext ctx)
     {
         Task.Run(async () =>
@@ -1342,7 +1370,7 @@ internal class User : BaseCommandModule
                     Color = ColorHelper.Error,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"{ctx.User.Mention} `There is no Score Saber Account linked to your Discord Account.`"
+                    Description = $"{ctx.User.Mention} `There is no Score Saber Profile linked to your Discord Account.`"
                 }));
 
                 _ = Task.Delay(10000).ContinueWith(x =>
