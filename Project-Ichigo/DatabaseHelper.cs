@@ -89,9 +89,32 @@ internal class DatabaseHelper
             {
                 LogWarn($"Missing table '{b.Key}'. Creating..");
                 string sql = $"CREATE TABLE `{Secrets.Secrets.DatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
-                LogDebug(sql);
+                
                 await helper.databaseConnection.ExecuteAsync(sql);
-                LogWarn($"Created table '{b.Key}'.");
+                LogInfo($"Created table '{b.Key}'.");
+            }
+
+            var Columns = await helper.ListColumns(b.Key);
+
+            foreach (var col in b.Value)
+            {
+                if (!Columns.ContainsKey(col.Name))
+                {
+                    LogWarn($"Missing column '{col.Name}' in '{b.Key}'. Creating..");
+                    string sql = $"ALTER TABLE `{b.Key}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                    await helper.databaseConnection.ExecuteAsync(sql);
+                    LogInfo($"Created column '{col.Name}' in '{b.Key}'.");
+                    Columns = await helper.ListColumns(b.Key);
+                }
+
+                if (Columns[col.Name].ToLower() != col.Type.ToLower())
+                {
+                    LogWarn($"Wrong data type for column '{col.Name}' in '{b.Key}'");
+                    string sql = $"ALTER TABLE `{b.Key}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                    await helper.databaseConnection.ExecuteAsync(sql);
+                    LogInfo($"Changed column '{col.Name}' in '{b.Key}' to datatype '{col.Type.ToUpper()}'.");
+                    Columns = await helper.ListColumns(b.Key);
+                }
             }
         }
 
@@ -119,6 +142,21 @@ internal class DatabaseHelper
         }
 
         return SavedTables as IEnumerable<string>;
+    }
+    
+    public async Task<Dictionary<string, string>> ListColumns(string table)
+    {
+        Dictionary<string, string> Columns = new();
+
+        using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW FIELDS FROM {table}"))
+        {
+            while (reader.Read())
+            {
+                Columns.Add(reader.GetString(0), reader.GetString(1));
+            }
+        }
+
+        return Columns;
     }
 
     public async Task DeleteRow(string table, string row_match, string value)
