@@ -1066,11 +1066,13 @@ internal class User : BaseCommandModule
             DiscordSelectComponent GetCountries(string continent_code, string default_country, int page)
             {
                 List<DiscordSelectComponentOption> countries = new();
-                var currentCountryList = _countryCodes.List.GroupBy(x => x.Value.ContinentCode).First().Skip((page - 1) * 25).Take(25).ToList();
+                var currentCountryList = _countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == continent_code.ToLower()).Skip((page - 1) * 25).Take(25).ToList();
 
                 foreach (var b in currentCountryList)
                 {
-                    countries.Add(new DiscordSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country)));
+                    DiscordEmoji flag_emote = null;
+                    try { flag_emote = DiscordEmoji.FromName(ctx.Client, $":flag_{b.Key.ToLower()}:"); } catch (Exception) { flag_emote = DiscordEmoji.FromName(ctx.Client, $":white_large_square:"); }
+                    countries.Add(new DiscordSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country), new DiscordComponentEmoji(flag_emote)));
                 }
                 return new DiscordSelectComponent("country_selection", "Select a country..", countries as IEnumerable<DiscordSelectComponentOption>);
             }
@@ -1123,14 +1125,14 @@ internal class User : BaseCommandModule
                                 var page = GetCountries(selectedContinent, selectedCountry, currentPage);
                                 var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(page);
 
-                                if (currentPage == 1 && _countryCodes.List.GroupBy(x => x.Value.ContinentCode).First().Count() > 25)
+                                if (currentPage == 1 && _countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Count() > 25)
                                 {
                                     builder.AddComponents(next_page_button);
                                 }
 
                                 if (currentPage != 1)
                                 {
-                                    if (_countryCodes.List.GroupBy(x => x.Value.ContinentCode).First().Skip((currentPage - 1) * 25).Count() > 25)
+                                    if (_countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Skip((currentPage - 1) * 25).Count() > 25)
                                         builder.AddComponents(next_page_button);
 
                                     builder.AddComponents(previous_page_button);
@@ -1139,7 +1141,7 @@ internal class User : BaseCommandModule
                                 if (selectedCountry != "no_country")
                                     builder.AddComponents(start_search_button);
 
-                                _ = msg.ModifyAsync(builder);
+                                msg.ModifyAsync(builder).Add(_watcher, ctx);
                             }
 
                             async Task RefreshPlayerList()

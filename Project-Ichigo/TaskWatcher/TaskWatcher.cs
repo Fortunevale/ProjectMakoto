@@ -29,6 +29,8 @@ internal class TaskWatcher
                 if (b.task.Exception.InnerException.GetType() == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {
                     LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
+                    LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest.Url}");
+                    LogError($"{JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented)}");
                 }
 
                 if (ctx != null)
