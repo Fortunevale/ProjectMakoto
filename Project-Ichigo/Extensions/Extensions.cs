@@ -73,7 +73,7 @@ internal static class Extensions
                 currentAmount = 0;
             }
 
-            currentEmbed.AddField(new DiscordEmbedField(b.Key, b.Value));
+            currentEmbed.AddField(b.Key, b.Value);
 
             currentAmount += b.Key.Length;
             currentAmount += b.Value.Length;

@@ -180,16 +180,16 @@ internal class User : BaseCommandModule
                 Timestamp = DateTime.UtcNow
             };
 
-            embed.AddField(new DiscordEmbedField("General info", "󠂪 󠂪", true));
+            embed.AddField("General info", "󠂪 󠂪", true);
             embed.Fields.First(x => x.Name == "General info").Value = "\n_All dates follow `DD.MM.YYYY` while the time zone is set to the `Coordinated Universal Time (UTC), +00:00`._\n";
 
-            embed.AddField(new DiscordEmbedField("Guild", "󠂪 󠂪", true));
+            embed.AddField("Guild", "󠂪 󠂪", true);
             embed.Fields.First(x => x.Name == "Guild").Value = "**Guild name**\n`Loading..`\n" +
                                                                 "**Guild created at**\n`Loading..`\n" +
                                                                 "**Owner of this guild**\n`Loading..`\n" +
                                                                 "**Current member count**\n`Loading..`";
 
-            embed.AddField(new DiscordEmbedField("Bot", "󠂪 󠂪", true));
+            embed.AddField("Bot", "󠂪 󠂪", true);
             embed.Fields.First(x => x.Name == "Bot").Value = "**Currently running as**\n`Loading..`\n" +
                                                                 "**Currently running software**\n`Loading..`\n" +
                                                                 "**Currently running on**\n`Loading..`\n" +
@@ -197,7 +197,7 @@ internal class User : BaseCommandModule
                                                                 "**Bot uptime**\n`Loading..`\n" +
                                                                 "**Current API Latency**\n`Loading..`";
 
-            embed.AddField(new DiscordEmbedField("Host", "󠂪 󠂪", true));
+            embed.AddField("Host", "󠂪 󠂪", true);
             embed.Fields.First(x => x.Name == "Host").Value = "**Current CPU load**\n`Loading..`\n" +
                                                                 "**Current RAM usage**\n`Loading..`\n" +
                                                                 "**Current temperature**\n`Loading..`\n" +
@@ -401,26 +401,26 @@ internal class User : BaseCommandModule
                 }
 
                 if (bMember is not null)
-                    embed.AddField(new DiscordEmbedField("Roles", GenerateRoles.Truncate(1024), true));
+                    embed.AddField("Roles", GenerateRoles.Truncate(1024), true);
                 else
-                    embed.AddField(new DiscordEmbedField($"Roles (Backup)", GenerateRoles.Truncate(1024), true));
+                    embed.AddField($"Roles (Backup)", GenerateRoles.Truncate(1024), true);
 
-                embed.AddField(new DiscordEmbedField("Created at", $"`{victim.CreationTimestamp.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(CreationAge.Ticks).TotalDays, 0)} days ago)", true));
+                embed.AddField("Created at", $"`{victim.CreationTimestamp.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(CreationAge.Ticks).TotalDays, 0)} days ago)", true);
 
                 if (bMember is not null)
                 {
-                    embed.AddField(new DiscordEmbedField("Joined at", $"`{bMember.JoinedAt.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(JoinedAtAge.Ticks).TotalDays, 0)} days ago)", true));
+                    embed.AddField("Joined at", $"`{bMember.JoinedAt.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(JoinedAtAge.Ticks).TotalDays, 0)} days ago)", true);
                 }
                 else
                 {
-                    embed.AddField(new DiscordEmbedField("󠂪 󠂪", $"󠂪 󠂪", true));
+                    embed.AddField("󠂪 󠂪", $"󠂪 󠂪", true);
                 }
 
-                embed.AddField(new DiscordEmbedField("First joined at", $"`Not yet implemented.`", true));
+                embed.AddField("First joined at", $"`Not yet implemented.`", true);
 
-                embed.AddField(new DiscordEmbedField("Invited by", $"`Not yet implemented.`", true));
+                embed.AddField("Invited by", $"`Not yet implemented.`", true);
 
-                embed.AddField(new DiscordEmbedField("Users invited", $"`Not yet implemented.`", true));
+                embed.AddField("Users invited", $"`Not yet implemented.`", true);
 
                 await ctx.Channel.SendMessageAsync(embed: embed);
             }
@@ -859,12 +859,12 @@ internal class User : BaseCommandModule
             embed.Color = ColorHelper.Info;
             embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
             embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
-            embed.AddField(new DiscordEmbedField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true));
-            embed.AddField(new DiscordEmbedField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-            embed.AddField(new DiscordEmbedField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
-            embed.AddField(new DiscordEmbedField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true));
-            embed.AddField(new DiscordEmbedField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-            embed.AddField(new DiscordEmbedField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true));
+            embed.AddField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true);
+            embed.AddField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
+            embed.AddField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true);
+            embed.AddField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true);
+            embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
+            embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
             
             DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Account to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
