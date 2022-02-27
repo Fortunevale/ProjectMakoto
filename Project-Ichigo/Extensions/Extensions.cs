@@ -1,4 +1,6 @@
-﻿namespace Project_Ichigo.Extensions;
+﻿using System.Drawing;
+
+namespace Project_Ichigo.Extensions;
 
 internal static class Extensions
 {
@@ -151,6 +153,26 @@ internal static class Extensions
             return Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList();
         else
             return null;
+    }
+
+    internal static DiscordEmoji GetClosestColorEmoji(this DiscordColor discordColor, DiscordClient client)
+    {
+        Dictionary<Color, string> colorArray = new()
+        {
+            { Color.FromArgb(49, 55, 61) , ":black_circle:" },
+            { Color.FromArgb(85, 172, 238) , ":blue_circle:" },
+            { Color.FromArgb(192, 105, 79) , ":brown_circle:" },
+            { Color.FromArgb(120, 177, 89) , ":green_circle:" },
+            { Color.FromArgb(244, 144, 12) , ":orange_circle:" },
+            { Color.FromArgb(170, 142, 214) , ":purple_circle:" },
+            { Color.FromArgb(221, 46, 68) , ":red_circle:" },
+            { Color.FromArgb(230, 231, 232) , ":white_circle:" },
+            { Color.FromArgb(253, 203, 88) , ":yellow_circle:" },
+        };
+
+        var color = GetClosestColor(colorArray.Select(x => x.Key).ToList(), Color.FromArgb(discordColor.R, discordColor.G, discordColor.B));
+
+        return DiscordEmoji.FromName(client, colorArray[color]);
     }
 
     //internal static bool IsProtected(this DiscordMember member)

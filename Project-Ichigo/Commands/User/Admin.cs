@@ -403,10 +403,29 @@ internal class Admin : BaseCommandModule
 
                 var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
 
-                foreach (var role in ctx.Guild.Roles)
+                foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
                 {
                     if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
-                        roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString()));
+                        roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                }
+
+                int current_page = 0;
+
+                async Task RefreshRoleList()
+                {
+                    var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                    var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                    var dropdown = new DiscordSelectComponent("selection", "Select a role..", roles.Skip(current_page * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+                    var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                    if (roles.Skip(current_page * 25).Count() > 25)
+                        builder.AddComponents(next_page_button);
+
+                    if (current_page != 0)
+                        builder.AddComponents(previous_page_button);
+
+                    await msg.ModifyAsync(builder);
                 }
 
                 async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
@@ -416,54 +435,67 @@ internal class Admin : BaseCommandModule
                         if (e.Message.Id != msg.Id || e.User.Id != ctx.User.Id)
                             return;
 
-                        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
-                        embed.Description = "`Setting up Bump Reminder..`";
-                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        if (e.Interaction.Data.CustomId == "selection")
+                        {
+                            ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                        ulong id;
 
-                        if (e.Values.First() == "create")
-                            id = (await ctx.Guild.CreateRoleAsync("BumpReminder")).Id;
-                        else
-                            id = Convert.ToUInt64(e.Values.First());
+                            embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                            embed.Description = "`Setting up Bump Reminder..`";
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                        var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with :white_check_mark: to receive notifications as soon as the server can be bumped again.");
-                        _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
-                        _ = bump_reaction_msg.PinAsync();
+                            ulong id;
 
-                        _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
+                            if (e.Values.First() == "create")
+                                id = (await ctx.Guild.CreateRoleAsync("BumpReminder")).Id;
+                            else
+                                id = Convert.ToUInt64(e.Values.First());
 
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = id;
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = ctx.Channel.Id;
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.MessageId = bump_reaction_msg.Id;
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddHours(-2);
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddHours(-2);
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
+                            var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with :white_check_mark: to receive notifications as soon as the server can be bumped again.");
+                            _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+                            _ = bump_reaction_msg.PinAsync();
 
-                        _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = true;
+                            _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
 
-                        embed.Author.IconUrl = ctx.Guild.IconUrl;
-                        embed.Description = "`The Bump Reminder has been set up.`";
-                        embed.Color = ColorHelper.Success;
-                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = id;
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = ctx.Channel.Id;
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.MessageId = bump_reaction_msg.Id;
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddHours(-2);
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddHours(-2);
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
-                        await Task.Delay(5000);
-                        _ = msg.DeleteAsync();
+                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = true;
 
-                        _reminder.SendPersistentMessage(ctx.Client, e.Channel, null);
+                            embed.Author.IconUrl = ctx.Guild.IconUrl;
+                            embed.Description = "`The Bump Reminder has been set up.`";
+                            embed.Color = ColorHelper.Success;
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+
+                            _reminder.SendPersistentMessage(ctx.Client, e.Channel, null);
+                        }
+                        else if (e.Interaction.Data.CustomId == "prev_page")
+                        {
+                            current_page--;
+                            await RefreshRoleList();
+                        }
+                        else if (e.Interaction.Data.CustomId == "next_page")
+                        {
+                            current_page++;
+                            await RefreshRoleList();
+                        }
                     }).Add(_watcher, ctx);
                 }
 
                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-                var dropdown = new DiscordSelectComponent("selection", "Select a role..", roles as IEnumerable<DiscordSelectComponentOption>);
-
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Description = "`Please select a role to ping when the server can be bumped.`";
-                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
+                await RefreshRoleList();
 
                 try
                 {
@@ -563,26 +595,58 @@ internal class Admin : BaseCommandModule
                                                 $"{(category.Key != 0 ? $"{channel.Parent.Name} " : "")}"));
                                     }
 
+                                    int current_page = 0;
+
+                                    async Task RefreshChannelList()
+                                    {
+                                        var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                                        var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                                        var dropdown = new DiscordSelectComponent("selection", "Select a channel..", channels.Skip(current_page * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+                                        var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                                        if (channels.Skip(current_page * 25).Count() > 25)
+                                            builder.AddComponents(next_page_button);
+
+                                        if (current_page != 0)
+                                            builder.AddComponents(previous_page_button);
+
+                                        await msg.ModifyAsync(builder);
+                                    }
+
                                     async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                                     {
                                         Task.Run(async () =>
                                         {
                                             if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                                             {
-                                                ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                                                _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = Convert.ToUInt64(e.Values.First());
-                                                _ = msg.DeleteAsync();
-                                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                                if (e.Interaction.Data.CustomId == "selection")
+                                                {
+                                                    ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                                                    
+                                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = Convert.ToUInt64(e.Values.First());
+                                                    _ = msg.DeleteAsync();
+                                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx); 
+                                                }
+                                                else if (e.Interaction.Data.CustomId == "prev_page")
+                                                {
+                                                    current_page--;
+                                                    await RefreshChannelList();
+                                                }
+                                                else if (e.Interaction.Data.CustomId == "next_page")
+                                                {
+                                                    current_page++;
+                                                    await RefreshChannelList();
+                                                }
                                             }
                                         }).Add(_watcher, ctx);
                                     }
 
                                     ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-                                    var dropdown = new DiscordSelectComponent("selection", "Select a channel..", channels as IEnumerable<DiscordSelectComponentOption>);
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
+                                    await RefreshChannelList();
 
                                     try
                                     {
@@ -604,10 +668,29 @@ internal class Admin : BaseCommandModule
 
                                     var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
 
-                                    foreach (var role in ctx.Guild.Roles)
+                                    foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
                                     {
                                         if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
-                                            roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString()));
+                                            roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                                    }
+
+                                    int current_page = 0;
+
+                                    async Task RefreshRoleList()
+                                    {
+                                        var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                                        var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                                        var dropdown = new DiscordSelectComponent("selection", "Select a role..", roles.Skip(current_page * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+                                        var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                                        if (roles.Skip(current_page * 25).Count() > 25)
+                                            builder.AddComponents(next_page_button);
+
+                                        if (current_page != 0)
+                                            builder.AddComponents(previous_page_button);
+
+                                        await msg.ModifyAsync(builder);
                                     }
 
                                     async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
@@ -616,20 +699,33 @@ internal class Admin : BaseCommandModule
                                         {
                                             if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                                             {
-                                                ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                                                _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = Convert.ToUInt64(e.Values.First());
-                                                _ = msg.DeleteAsync();
-                                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                                if (e.Interaction.Data.CustomId == "selection")
+                                                {
+                                                    ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                                                    
+                                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = Convert.ToUInt64(e.Values.First());
+                                                    _ = msg.DeleteAsync();
+                                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx); 
+                                                }
+                                                else if (e.Interaction.Data.CustomId == "prev_page")
+                                                {
+                                                    current_page--;
+                                                    await RefreshRoleList();
+                                                }
+                                                else if (e.Interaction.Data.CustomId == "next_page")
+                                                {
+                                                    current_page++;
+                                                    await RefreshRoleList();
+                                                }
                                             }
                                         }).Add(_watcher, ctx);
                                     }
 
                                     ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-                                    var dropdown = new DiscordSelectComponent("selection", "Select a role..", roles as IEnumerable<DiscordSelectComponentOption>);
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
+                                    await RefreshRoleList();
 
                                     try
                                     {

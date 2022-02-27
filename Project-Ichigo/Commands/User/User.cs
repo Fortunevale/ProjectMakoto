@@ -786,7 +786,7 @@ internal class User : BaseCommandModule
         {
             bool AddLinkButton = true;
 
-            if ((id == "" || id.Contains("@")) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
+            if ((id == "" || id.Contains('@')) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
             {
                 if (!_users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
                     _users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
