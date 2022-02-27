@@ -1003,6 +1003,13 @@ internal class User : BaseCommandModule
             embed.Description = $"`Couldn't find the specified player.`";
             _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
         }
+        catch (Xorog.ScoreSaber.Exceptions.UnprocessableEntity)
+        {
+            embed.Author.IconUrl = Resources.LogIcons.Error;
+            embed.Color = ColorHelper.Error;
+            embed.Description = $"`Please provide an user id.`";
+            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        }
         catch (Exception)
         {
             _ = msg.DeleteAsync();
@@ -1013,7 +1020,7 @@ internal class User : BaseCommandModule
     [Command("scoresaber-search"), Aliases("sss", "scoresabersearch"),
     CommandModule("user"),
     Description("Search a user on Score Saber by name")]
-    public async Task ScoreSaberSearch(CommandContext ctx, [Description("Name")] string name)
+    public async Task ScoreSaberSearch(CommandContext ctx, [Description("Name")] [RemainingText]string name)
     {
         Task.Run(async () =>
         {
