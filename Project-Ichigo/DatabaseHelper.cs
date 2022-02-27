@@ -79,7 +79,21 @@ internal class DatabaseHelper
         };
         helper.databaseConnection.Open();
 
-        await helper.SelectDatabase(Secrets.Secrets.DatabaseName);
+        await helper.SelectDatabase(Secrets.Secrets.DatabaseName, true);
+
+        var Tables = await helper.ListTables();
+
+        foreach (var b in DatabaseColumnLists.Tables)
+        {
+            if (!Tables.Contains(b.Key))
+            {
+                LogWarn($"Missing table '{b.Key}'. Creating..");
+                string sql = $"CREATE TABLE `{Secrets.Secrets.DatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
+                LogDebug(sql);
+                await helper.databaseConnection.ExecuteAsync(sql);
+                LogWarn($"Created table '{b.Key}'.");
+            }
+        }
 
         return helper;
     }
@@ -115,24 +129,24 @@ internal class DatabaseHelper
         await cmd.ExecuteNonQueryAsync();
     }
 
-    public string GetLoadCommand(string table, List<string> columns)
+    public string GetLoadCommand(string table, List<DatabaseColumnLists.Column> columns)
     {
-        return $"SELECT {string.Join(", ", columns)} FROM {table}";
+        return $"SELECT {string.Join(", ", columns.Select(x => x.Name))} FROM {table}";
     }
     
-    public string GetSaveCommand(string table, List<string> columns)
+    public string GetSaveCommand(string table, List<DatabaseColumnLists.Column> columns)
     {
-        return $"INSERT INTO {table} ( {string.Join(", ", columns)} ) VALUES ";
+        return $"INSERT INTO {table} ( {string.Join(", ", columns.Select(x => x.Name))} ) VALUES ";
     }
     
-    public string GetValueCommand(List<string> columns, int i)
+    public string GetValueCommand(List<DatabaseColumnLists.Column> columns, int i)
     {
-        return $"( {string.Join(", ", columns.Select(x => $"@{x}{i}"))} ), ";
+        return $"( {string.Join(", ", columns.Select(x => $"@{x.Name}{i}"))} ), ";
     }
     
-    public string GetOverwriteCommand(List<string> columns)
+    public string GetOverwriteCommand(List<DatabaseColumnLists.Column> columns)
     {
-        return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x}=values({x})"))}";
+        return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
     public async Task SyncDatabase(bool Important = false)

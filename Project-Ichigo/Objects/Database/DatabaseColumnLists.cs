@@ -2,60 +2,88 @@
 
 internal class DatabaseColumnLists
 {
-    internal readonly static List<string> scam_urls = new() 
+    internal readonly static List<Column> scam_urls = new()
     {
-        "url", 
-        "origin", 
-        "submitter", 
+        new Column("url", "varchar(500)", "utf8mb4_0900_ai_ci", false, true),
+        new Column("origin", "text", "utf8mb4_0900_ai_ci", false, false),
+        new Column("submitter", "bigint"), 
     };
     
-    internal readonly static List<string> user_submission_bans = new() 
+    internal readonly static List<Column> user_submission_bans = new() 
     {
-        "id",
-        "reason",
-        "moderator",
+        new Column("id", "bigint", primary: true),
+        new Column("reason", "text", "utf8mb4_0900_ai_ci"),
+        new Column("moderator", "bigint"),
     };
     
-    internal readonly static List<string> guild_submission_bans = new() 
+    internal readonly static List<Column> guild_submission_bans = new() 
     {
-        "id",
-        "reason",
-        "moderator",
+        new Column("id", "bigint", primary: true),
+        new Column("reason", "text", "utf8mb4_0900_ai_ci"),
+        new Column("moderator", "bigint"),
     };
     
-    internal readonly static List<string> active_url_submissions = new() 
+    internal readonly static List<Column> active_url_submissions = new() 
     {
-        "messageid",
-        "url",
-        "submitter",
-        "guild",
+        new Column("messageid", "bigint", primary: true),
+        new Column("url", "text", "utf8mb4_0900_ai_ci"),
+        new Column("submitter", "bigint"),
+        new Column("guild", "bigint"),
     };
     
-    internal readonly static List<string> users = new() 
+    internal readonly static List<Column> users = new() 
     {
-        "userid",
-        "scoresaber_id",
-        "afk_reason",
-        "afk_since",
-        "submission_accepted_tos",
-        "submission_accepted_submissions",
-        "submission_last_datetime",
+        new Column("userid", "bigint", primary: true),
+        new Column("scoresaber_id", "bigint"),
+        new Column("afk_since", "bigint"),
+        new Column("afk_reason", "text", "utf8mb4_0900_ai_ci"),
+        new Column("submission_accepted_tos", "tinyint(1)"),
+        new Column("submission_accepted_submissions", "text", "utf8mb4_0900_ai_ci"),
+        new Column("submission_last_datetime", "datetime"),
     };
     
-    internal readonly static List<string> guilds = new() 
+    internal readonly static List<Column> guilds = new() 
     { 
-        "serverid", 
-        "bump_enabled", 
-        "bump_role", 
-        "bump_channel", 
-        "bump_last_reminder", 
-        "bump_last_time", 
-        "bump_last_user", 
-        "bump_message", 
-        "bump_persistent_msg", 
-        "phishing_detect", 
-        "phishing_type", 
-        "phishing_reason", 
-        "phishing_time", 
+        new Column("serverid", "bigint", primary: true), 
+        new Column("bump_enabled", "tinyint(1)"), 
+        new Column("bump_role", "bigint"), 
+        new Column("bump_channel", "bigint"), 
+        new Column("bump_last_reminder", "bigint"), 
+        new Column("bump_last_time", "bigint"), 
+        new Column("bump_last_user", "bigint"), 
+        new Column("bump_message", "bigint"), 
+        new Column("bump_persistent_msg", "bigint"), 
+        new Column("phishing_detect", "tinyint(1)"), 
+        new Column("phishing_type", "int"), 
+        new Column("phishing_reason", "text", "utf8mb4_0900_ai_ci"),
+        new Column("phishing_time", "bigint"), 
     };
+
+    internal readonly static Dictionary<string, List<Column>> Tables = new()
+    {
+        { "scam_urls", scam_urls },
+        { "user_submission_bans", user_submission_bans },
+        { "guild_submission_bans", guild_submission_bans },
+        { "active_url_submissions", active_url_submissions },
+        { "users", users },
+        { "guilds", guilds },
+    };
+
+    public class Column
+    {
+        public Column(string name, string type, string Collation = "", bool nullable = false, bool primary = false)
+        {
+            this.Name = name;
+            this.Type = type;
+            this.Collation = Collation;
+            this.Nullable = nullable;
+            this.Primary = primary;
+        }
+
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Collation { get; set; }
+        public bool Nullable { get; set; }
+        public bool Primary { get; set; }
+    }
 }
