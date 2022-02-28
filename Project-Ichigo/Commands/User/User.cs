@@ -752,12 +752,18 @@ internal class User : BaseCommandModule
     [Command("afk"),
     CommandModule("user"),
     Description("Set yourself afk: Notify users pinging you that you're currently not around.")]
-    public async Task Afk(CommandContext ctx, string reason = "-")
+    public async Task Afk(CommandContext ctx, [RemainingText][Description("Text (<128 characters)")]string reason = "-")
     {
         Task.Run(async () =>
         {
             if (!_users.List.ContainsKey(ctx.User.Id))
                 _users.List.Add(ctx.User.Id, new Users.Info());
+
+            if (reason.Length > 128)
+            {
+                await ctx.SendSyntaxError();
+                return;
+            }
 
             _users.List[ctx.User.Id].AfkStatus.Reason = Formatter.Sanitize(reason).Replace("@", "").Replace("&", "").Replace("#", "").Replace("<", "").Replace(">", "");
             _users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
