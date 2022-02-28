@@ -288,7 +288,7 @@ internal class Bot
 
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefixes = new[] { "-" },
+                    StringPrefixes = new[] { ";;" },
                     EnableDefaultHelp = false,
                     EnableMentionPrefix = false,
                     IgnoreExtraArguments = true,
