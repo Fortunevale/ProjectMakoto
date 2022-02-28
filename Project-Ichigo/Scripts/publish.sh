@@ -12,15 +12,15 @@ git push
 echo ""
 echo Building..
 echo ""
-dotnet publish --runtime linux-x64 --self-contained false --output "ProjectIchigo/"
+dotnet publish --runtime linux-x64 --self-contained false --output "Project_Ichigo/"
 
 echo ""
 echo Getting latest git hash..
 echo ""
-git rev-parse --short HEAD > ProjectIchigo/LatestGitPush.cfg
-git branch --show-current >> ProjectIchigo/LatestGitPush.cfg
-echo %date% >> ProjectIchigo/LatestGitPush.cfg
-echo %time% >> ProjectIchigo/LatestGitPush.cfg
+git rev-parse --short HEAD > Project_Ichigo/LatestGitPush.cfg
+git branch --show-current >> Project_Ichigo/LatestGitPush.cfg
+echo %date% >> Project_Ichigo/LatestGitPush.cfg
+echo %time% >> Project_Ichigo/LatestGitPush.cfg
 
 echo Clearing current latestBotVersion..
 ssh xorog@192.168.178.29 -p 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-key.openssh" "cd /home/xorog/Desktop && rm -rf ./latestProjectIchigo"
@@ -28,9 +28,10 @@ ssh xorog@192.168.178.29 -p 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-k
 echo ""
 echo Uploading..
 echo ""
-scp -P 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-key.openssh" -r "ProjectIchigo/" xorog@192.168.178.29:/home/xorog/Desktop/ProjectIchigo
-ssh xorog@192.168.178.29 -p 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-key.openssh" "cd /home/xorog/Desktop && mv ProjectIchigo latestProjectIchigo"
-rm -rf "ProjectIchigo/"
+scp -P 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-key.openssh" -r "Project_Ichigo/" xorog@192.168.178.29:/home/xorog/Desktop/Project_Ichigo
+ssh xorog@192.168.178.29 -p 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-key.openssh" "cd /home/xorog/Desktop && mv Project_Ichigo latestProjectIchigo"
+sleep 1
+rm -rf "Project_Ichigo/"
 
 echo ""
 echo Restarting bots..

@@ -75,7 +75,7 @@ internal class BumpReminderEvents
                             _guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
                             e.Channel.SendMessageAsync($":warning: It seems the last bump was not registered properly.\n" +
-                                $"The last time the server was bumped was determined to be around `{Formatter.Timestamp(_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}`.").Add(_watcher);
+                                $"The last time the server was bumped was determined to be around {Formatter.Timestamp(_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}.").Add(_watcher);
 
                             _reminder.ScheduleBump(sender, e.Guild.Id);
                         }
