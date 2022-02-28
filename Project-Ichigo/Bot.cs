@@ -472,6 +472,22 @@ internal class Bot
 
         AppDomain.CurrentDomain.ProcessExit += new EventHandler(FlushToDatabase);
 
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                if (File.Exists("updated"))
+                {
+                    File.Delete("updated");
+                    FlushToDatabase(null, null);
+                    await Task.Delay(10000);
+                    Environment.Exit(0);
+                }
+
+                await Task.Delay(1000);
+            }
+        });
+
         await Task.Delay(-1);
     }
 

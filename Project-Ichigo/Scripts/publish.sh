@@ -37,9 +37,7 @@ echo ""
 echo Restarting bots..
 echo ""
 
-echo "" | tee updated
-#scp -P 6969 -i "/mnt/01D7DB05B77BEAF0/Dokumente/Keys/fortunevale-key.openssh" "updated" xorog@192.168.178.29:/home/xorog/Desktop/Serverproject
-rm updated
+ssh xorog@192.168.178.29 -p 6969 -i "C:/Users/Xorog/Documents/Keys/fortunevale-key.openssh" "touch /home/xorog/Desktop/ProjectIchigo/updated"
 
 sleep 1
 

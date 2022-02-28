@@ -785,7 +785,7 @@ internal class Mod : BaseCommandModule
 
 
 
-    [Command("timeout"), Aliases("time-out"),
+    [Command("timeout"), Aliases("time-out", "mute"),
     CommandModule("mod"),
     Description("Times the user for the specified amount of time out.")]
     public async Task Timeout(CommandContext ctx, DiscordMember victim, [Description("Duration")] string duration)
@@ -887,7 +887,7 @@ internal class Mod : BaseCommandModule
 
 
 
-    [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout"),
+    [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unmute"),
     CommandModule("mod"),
     Description("Removes the timeout for the specified user.")]
     public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
