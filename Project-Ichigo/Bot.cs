@@ -482,6 +482,7 @@ internal class Bot
                     FlushToDatabase(null, null);
                     await Task.Delay(10000);
                     Environment.Exit(0);
+                    return;
                 }
 
                 await Task.Delay(1000);
