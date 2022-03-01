@@ -118,7 +118,35 @@ internal class DatabaseHelper
             }
         }
 
+        new Task(new Action(async () =>
+        {
+            _ = helper.CheckDatabaseConnection();
+        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
+
         return helper;
+    }
+
+    private async Task CheckDatabaseConnection()
+    {
+        new Task(new Action(async () =>
+        {
+            _ = CheckDatabaseConnection();
+        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
+
+        if (!databaseConnection.Ping())
+        {
+            try
+            {
+                LogWarn("Pinging the database failed, attempting reconnect.");
+                databaseConnection.Open();
+                await SelectDatabase(Secrets.Secrets.DatabaseName, true);
+            }
+            catch (Exception ex)
+            {
+                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                return;
+            }
+        }
     }
 
     public async Task SelectDatabase(string databaseName, bool CreateIfNotExist = false)
