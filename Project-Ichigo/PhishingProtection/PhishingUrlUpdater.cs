@@ -86,6 +86,7 @@ public class PhishingUrlUpdater
                 {
                     LogWarn("Pinging the database failed, attempting reconnect.");
                     databaseConnection.Open();
+                    await databaseHelper.SelectDatabase(Secrets.Secrets.DatabaseName, true);
                 }
                 catch (Exception ex)
                 {

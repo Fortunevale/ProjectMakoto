@@ -199,6 +199,7 @@ internal class DatabaseHelper
                     {
                         LogWarn("Pinging the database failed, attempting reconnect.");
                         databaseConnection.Open();
+                        await SelectDatabase(Secrets.Secrets.DatabaseName, true);
                     }
                     catch (Exception ex)
                     {
