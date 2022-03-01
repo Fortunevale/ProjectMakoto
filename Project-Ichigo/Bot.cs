@@ -19,7 +19,9 @@ internal class Bot
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
-    
+
+    internal GlobalBans _globalBans = new();
+
 
     internal TaskWatcher.TaskWatcher _watcher = new();
 
@@ -44,6 +46,11 @@ internal class Bot
         StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
 
         LogInfo("Starting up..");
+
+#if DEBUG
+        LogFatal("Running in debug mode");
+#endif
+
         _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
 
         LogDebug($"Enviroment Details\n\n" +
@@ -78,7 +85,7 @@ internal class Bot
 
                 LogInfo($"Connecting to database..");
                 
-                _databaseHelper = await DatabaseHelper.InitializeDatabase(_guilds, _users, _submissionBans, _submittedUrls);
+                _databaseHelper = await DatabaseHelper.InitializeDatabase(_guilds, _users, _submissionBans, _submittedUrls, _globalBans);
                 databaseConnection = _databaseHelper.databaseConnection;
 
                 databaseConnectionSc.Stop();
@@ -134,6 +141,11 @@ internal class Bot
                             LastUserId = b.bump_last_user,
                             PersistentMessageId = b.bump_persistent_msg,
                             RoleId = b.bump_role
+                        },
+                        JoinSettings = new()
+                        {
+                            AutoAssignRoleId = b.auto_assign_role_id,
+                            JoinlogChannelId = b.joinlog_channel_id
                         }
                     });
 
@@ -169,6 +181,21 @@ internal class Bot
 
 
 
+                LogDebug($"Loading global bans from table 'globalbans'..");
+
+                IEnumerable<DatabaseBanInfo> globalbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
+
+                foreach (var b in globalbans)
+                    _globalBans.Users.Add(b.id, new GlobalBans.BanInfo
+                    {
+                        Reason = b.reason,
+                        Moderator = b.moderator
+                    });
+
+                LogInfo($"Loaded {_globalBans.Users.Count} submission bans from table 'globalbans'.");
+                
+                
+                
                 LogDebug($"Loading submission bans from table 'user_submission_bans'..");
 
                 IEnumerable<DatabaseBanInfo> userbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
@@ -288,13 +315,18 @@ internal class Bot
 
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
                 {
+#if DEBUG
+                    StringPrefixes = new[] { ">>" },
+#endif
+#if !DEBUG
                     StringPrefixes = new[] { ";;" },
+#endif
                     EnableDefaultHelp = false,
                     EnableMentionPrefix = false,
                     IgnoreExtraArguments = true,
                     EnableDms = false,
                     ServiceProvider = services
-                });
+                }); 
 
                 
 
@@ -362,6 +394,14 @@ internal class Bot
                 discordClient.GuildCreated += discordEvents.GuildCreated;
                 
                 
+                
+                LogDebug($"Registering Join Events..");
+
+                JoinEvents joinEvents = new(_guilds, _globalBans, _watcher);
+                discordClient.GuildMemberAdded += joinEvents.GuildMemberAdded;
+                
+
+
                 LogDebug($"Registering BumpReminder Events..");
 
                 BumpReminderEvents bumpReminderEvents = new(_watcher, _guilds, _bumpReminder);
@@ -470,7 +510,17 @@ internal class Bot
         _ = _databaseHelper.QueueWatcher();
         _watcher.Watcher();
 
-        AppDomain.CurrentDomain.ProcessExit += new EventHandler(FlushToDatabase);
+        AppDomain.CurrentDomain.ProcessExit += async delegate
+        {
+            await FlushToDatabase(null, null);
+        };
+
+        //Console.CancelKeyPress += async delegate 
+        //{
+        //    LogInfo("Exiting, please wait..");
+        //    await FlushToDatabase(null, null);
+        //};
+
 
         _ = Task.Run(async () =>
         {
@@ -479,8 +529,7 @@ internal class Bot
                 if (File.Exists("updated"))
                 {
                     File.Delete("updated");
-                    FlushToDatabase(null, null);
-                    await Task.Delay(10000);
+                    await FlushToDatabase(null, null);
                     Environment.Exit(0);
                     return;
                 }
@@ -492,14 +541,18 @@ internal class Bot
         await Task.Delay(-1);
     }
 
-    private async void FlushToDatabase(object? sender, EventArgs e)
+    private async Task FlushToDatabase(object? sender, EventArgs e)
     {
         LogInfo($"Flushing to database..");
         await _databaseHelper.SyncDatabase(true);
         LogInfo($"Flushed to database.");
 
+        LogInfo($"Closing Discord Client..");
+        await discordClient.DisconnectAsync();
+        LogInfo($"Closed Discord Client.");
+
         LogInfo($"Closing database..");
-        await databaseConnection.CloseAsync();
+        await _databaseHelper.Dispose();
         LogInfo($"Closed database.");
 
         Thread.Sleep(1000);

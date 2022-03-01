@@ -9,6 +9,273 @@ internal class Admin : BaseCommandModule
 
 
 
+    [Command("join-settings"), Aliases("joinsettings"),
+    CommandModule("admin"),
+    Description("Allows to review and change settings in the event somebody joins")]
+    public async Task JoinSettings(CommandContext ctx, [Description("Action")] string action = "help")
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.Member.IsAdmin(_status))
+            {
+                _ = ctx.SendAdminError();
+                return;
+            }
+
+            static async Task SendHelp(CommandContext ctx)
+            {
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
+                });
+            }
+
+            if (action.ToLower() == "help")
+            {
+                await SendHelp(ctx);
+                return;
+            }
+            else if (action.ToLower() == "review")
+            {
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Autoban Globally Banned Users` : {_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
+                                  $"`Joinlog Channel              ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                                  $"`Role On Join                 ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
+                });
+                return;
+            }
+            else if (action.ToLower() == "config")
+            {
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Autoban Globally Banned Users` : {_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
+                                  $"`Joinlog Channel              ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                                  $"`Role On Join                 ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
+                };
+
+                var builder = new DiscordMessageBuilder().WithEmbed(embed);
+
+                var msg = await ctx.Channel.SendMessageAsync(builder.AddComponents(new List<DiscordComponent>
+                {
+                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Global Bans") },
+                    { new DiscordButtonComponent(ButtonStyle.Primary, "2", "Change Joinlog Channel") },
+                    { new DiscordButtonComponent(ButtonStyle.Primary, "3", "Change Role assigned on join") },
+                    { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
+                } as IEnumerable<DiscordComponent>));
+
+                CancellationTokenSource cancellationTokenSource = new();
+
+                int current_page = 0;
+
+                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            List<DiscordSelectComponentOption> channels = new();
+                            List<DiscordSelectComponentOption> roles = new();
+
+                            async Task RefreshChannelList()
+                            {
+                                var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page_channel", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                                var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page_channel", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                                var dropdown = new DiscordSelectComponent("channel_selection", "Select a channel..", channels.Skip(current_page * 20).Take(20) as IEnumerable<DiscordSelectComponentOption>);
+                                var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                                if (channels.Skip(current_page * 20).Count() > 20)
+                                    builder.AddComponents(next_page_button);
+
+                                if (current_page != 0)
+                                    builder.AddComponents(previous_page_button);
+
+                                await msg.ModifyAsync(builder);
+                            }
+
+                            async Task RefreshRoleList()
+                            {
+                                var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page_role", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                                var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page_role", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                                var dropdown = new DiscordSelectComponent("role_selection", "Select a role..", roles.Skip(current_page * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+                                var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                                if (roles.Skip(current_page * 25).Count() > 25)
+                                    builder.AddComponents(next_page_button);
+
+                                if (current_page != 0)
+                                    builder.AddComponents(previous_page_button);
+
+                                await msg.ModifyAsync(builder);
+                            }
+
+                            if (e.Interaction.Data.CustomId == "1")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                                _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
+
+                                _ = msg.DeleteAsync();
+                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                cancellationTokenSource.Cancel();
+                                return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "2")
+                            {
+                                channels.Add(new DiscordSelectComponentOption("Disable Joinlog", "disable_channel"));
+                                channels.Add(new DiscordSelectComponentOption("Create one for me..", "create_channel"));
+
+                                foreach (var category in await ctx.Guild.GetOrderedChannelsAsync())
+                                {
+                                    foreach (var channel in category.Value)
+                                        channels.Add(new DiscordSelectComponentOption(
+                                            $"#{channel.Name} ({channel.Id})",
+                                            channel.Id.ToString(),
+                                            $"{(category.Key != 0 ? $"{channel.Parent.Name} " : "")}"));
+                                }
+
+                                await RefreshChannelList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "3")
+                            {
+                                roles.Add(new DiscordSelectComponentOption("Disable Role on join", "disable_role"));
+                                roles.Add(new DiscordSelectComponentOption("Create one for me..", "create_role"));
+
+                                var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+
+                                foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
+                                {
+                                    if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
+                                        roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                                }
+
+                                await RefreshRoleList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "channel_selection")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                                if (e.Values.First() == "disable_channel")
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
+                                else if (e.Values.First() == "create_channel")
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = (await ctx.Guild.CreateChannelAsync("joinlog", ChannelType.Text, overwrites: new List<DiscordOverwriteBuilder> 
+                                    { 
+                                        new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) 
+                                        { 
+                                            Allowed = Permissions.ReadMessageHistory | Permissions.AccessChannels, Denied = Permissions.SendMessages 
+                                        } 
+                                    } as IEnumerable<DiscordOverwriteBuilder>)).Id;
+                                else
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = Convert.ToUInt64(e.Values.First());
+
+                                cancellationTokenSource.Cancel();
+                                _ = msg.DeleteAsync();
+                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "role_selection")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                                if (e.Values.First() == "disable_role")
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
+                                else if (e.Values.First() == "create_role")
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = (await ctx.Guild.CreateRoleAsync("AutoAssignedRole")).Id;
+                                else
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = Convert.ToUInt64(e.Values.First());
+
+                                cancellationTokenSource.Cancel();
+                                _ = msg.DeleteAsync();
+                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "prev_page_role")
+                            {
+                                current_page--;
+                                await RefreshRoleList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "next_page_role")
+                            {
+                                current_page++;
+                                await RefreshRoleList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "prev_page_channel")
+                            {
+                                current_page--;
+                                await RefreshChannelList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "next_page_channel")
+                            {
+                                current_page++;
+                                await RefreshChannelList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "cancel")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                _ = msg.DeleteAsync();
+                                cancellationTokenSource.Cancel();
+                                return;
+                            }
+
+                            try
+                            {
+                                cancellationTokenSource.Cancel();
+                                cancellationTokenSource = new();
+                                await Task.Delay(120000, cancellationTokenSource.Token);
+                                embed.Footer.Text += " • Interaction timed out";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                await Task.Delay(5000);
+                                _ = msg.DeleteAsync();
+
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                            }
+                            catch { }
+                        }
+                    }).Add(_watcher, ctx);
+                }
+
+                ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+                try
+                {
+                    await Task.Delay(120000, cancellationTokenSource.Token);
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+
+                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                }
+                catch { }
+            }
+            else
+            {
+                await SendHelp(ctx);
+                return;
+            }
+        }).Add(_watcher, ctx);
+    }
+
+
+
     [Command("phishing-settings"), Aliases("phishingsettings", "phishing"),
     CommandModule("admin"),
     Description("Allows to review and change settings for the phishing detection")]
@@ -298,6 +565,8 @@ internal class Admin : BaseCommandModule
             }
         }).Add(_watcher, ctx);
     }
+
+
 
     [Command("bumpreminder"), Aliases("bump-reminder"),
     CommandModule("admin"),

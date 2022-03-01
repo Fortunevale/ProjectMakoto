@@ -3,6 +3,9 @@
 public class DatabaseServerSettings
 {
     public ulong serverid { get; set; }
+    public ulong auto_assign_role_id { get; set; }
+    public ulong joinlog_channel_id { get; set; }
+    public bool autoban_global_ban { get; set; }
     public bool bump_enabled { get; set; }
     public ulong bump_role { get; set; }
     public ulong bump_channel { get; set; }

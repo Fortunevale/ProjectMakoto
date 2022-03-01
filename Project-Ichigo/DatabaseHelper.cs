@@ -5,7 +5,10 @@ internal class DatabaseHelper
     internal ServerInfo _guilds { private set; get; }
     internal Users _users { private get; set; }
     internal SubmissionBans _submissionBans { private get; set; }
+    internal GlobalBans _globalbans { private get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }
+
+    bool Disposed = false;
 
     private Dictionary<Task, bool> queuedUpdates = new();
 
@@ -18,6 +21,10 @@ internal class DatabaseHelper
             while (true)
             {
                 await Task.Delay(300000);
+
+                if (Disposed)
+                    return;
+
                 _ = SyncDatabase();
             }
         });
@@ -26,6 +33,9 @@ internal class DatabaseHelper
         {
             while (true)
             {
+                if (Disposed)
+                    return;
+
                 if (queuedUpdates.Any(x => x.Value))
                 {
                     foreach (var b in queuedUpdates.Where(x => !x.Value).ToList())
@@ -41,6 +51,9 @@ internal class DatabaseHelper
 
         while (true)
         {
+            if (Disposed)
+                return;
+
             try
             {
                 if (queuedUpdates.Any(x => x.Key.IsCompleted))
@@ -50,7 +63,7 @@ internal class DatabaseHelper
                 foreach (var task in queuedUpdates.Where(x => x.Key.Status == TaskStatus.Created).ToList())
                 {
                     task.Key.Start();
-                    await Task.Delay(30000, tokenSource.Token);
+                    await Task.Delay(10000, tokenSource.Token);
                 }
 
                 await Task.Delay(1000);
@@ -66,7 +79,7 @@ internal class DatabaseHelper
         }
     }
 
-    public static async Task<DatabaseHelper> InitializeDatabase(ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls)
+    public static async Task<DatabaseHelper> InitializeDatabase(ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls, GlobalBans globalbans)
     {
         var helper = new DatabaseHelper
         {
@@ -74,6 +87,7 @@ internal class DatabaseHelper
             _users = users,
             _submissionBans = submissionBans,
             _submittedUrls = submittedUrls,
+            _globalbans = globalbans,
 
             databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};")
         };
@@ -133,6 +147,9 @@ internal class DatabaseHelper
             _ = CheckDatabaseConnection();
         })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
 
+        if (Disposed)
+            return;
+
         if (!databaseConnection.Ping())
         {
             try
@@ -151,6 +168,9 @@ internal class DatabaseHelper
 
     public async Task SelectDatabase(string databaseName, bool CreateIfNotExist = false)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         if (CreateIfNotExist)
             await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {databaseName}");
 
@@ -159,6 +179,9 @@ internal class DatabaseHelper
 
     public async Task<IEnumerable<string>> ListTables()
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         List<string> SavedTables = new();
 
         using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
@@ -174,6 +197,9 @@ internal class DatabaseHelper
     
     public async Task<Dictionary<string, string>> ListColumns(string table)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         Dictionary<string, string> Columns = new();
 
         using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW FIELDS FROM {table}"))
@@ -189,6 +215,9 @@ internal class DatabaseHelper
 
     public async Task DeleteRow(string table, string row_match, string value)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         var cmd = databaseConnection.CreateCommand();
         cmd.CommandText = $"DELETE FROM {table} WHERE {row_match}='{value}'";
         cmd.Connection = databaseConnection;
@@ -197,26 +226,41 @@ internal class DatabaseHelper
 
     public string GetLoadCommand(string table, List<DatabaseColumnLists.Column> columns)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         return $"SELECT {string.Join(", ", columns.Select(x => x.Name))} FROM {table}";
     }
     
     public string GetSaveCommand(string table, List<DatabaseColumnLists.Column> columns)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         return $"INSERT INTO {table} ( {string.Join(", ", columns.Select(x => x.Name))} ) VALUES ";
     }
     
     public string GetValueCommand(List<DatabaseColumnLists.Column> columns, int i)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         return $"( {string.Join(", ", columns.Select(x => $"@{x.Name}{i}"))} ), ";
     }
     
     public string GetOverwriteCommand(List<DatabaseColumnLists.Column> columns)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
     public async Task SyncDatabase(bool Important = false)
     {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
         if (queuedUpdates.Count < 2 || Important)
         {
             Task key = new(async () =>
@@ -236,70 +280,80 @@ internal class DatabaseHelper
                     }
                 }
 
-                try
-                {
-                    List<DatabaseServerSettings> DatabaseInserts = _guilds.Servers.Select(x => new DatabaseServerSettings
+                if (_guilds.Servers.Count > 0)
+                    try
                     {
-                        serverid = x.Key,
-                        phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
-                        phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
-                        phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
-                        phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
+                        List<DatabaseServerSettings> DatabaseInserts = _guilds.Servers.Select(x => new DatabaseServerSettings
+                        {
+                            serverid = x.Key,
 
-                        bump_enabled = x.Value.BumpReminderSettings.Enabled,
-                        bump_role = x.Value.BumpReminderSettings.RoleId,
-                        bump_channel = x.Value.BumpReminderSettings.ChannelId,
-                        bump_last_reminder = Convert.ToUInt64(x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks),
-                        bump_last_time = Convert.ToUInt64(x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks),
-                        bump_last_user = x.Value.BumpReminderSettings.LastUserId,
-                        bump_message = x.Value.BumpReminderSettings.MessageId,
-                        bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId
-                    }).ToList();
+                            auto_assign_role_id = x.Value.JoinSettings.AutoAssignRoleId,
+                            joinlog_channel_id = x.Value.JoinSettings.JoinlogChannelId,
+                            autoban_global_ban = x.Value.JoinSettings.AutoBanGlobalBans,
 
-                    if (databaseConnection == null)
-                    {
-                        throw new Exception($"Exception occured while trying to update guilds in database: Database connection not present");
+                            phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
+                            phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
+                            phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
+                            phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
+
+                            bump_enabled = x.Value.BumpReminderSettings.Enabled,
+                            bump_role = x.Value.BumpReminderSettings.RoleId,
+                            bump_channel = x.Value.BumpReminderSettings.ChannelId,
+                            bump_last_reminder = Convert.ToUInt64(x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks),
+                            bump_last_time = Convert.ToUInt64(x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks),
+                            bump_last_user = x.Value.BumpReminderSettings.LastUserId,
+                            bump_message = x.Value.BumpReminderSettings.MessageId,
+                            bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId
+                        }).ToList();
+
+                        if (databaseConnection == null)
+                        {
+                            throw new Exception($"Exception occured while trying to update guilds in database: Database connection not present");
+                        }
+
+                        var cmd = databaseConnection.CreateCommand();
+                        cmd.CommandText = GetSaveCommand("guilds", DatabaseColumnLists.guilds);
+
+                        for (int i = 0; i < DatabaseInserts.Count; i++)
+                        {
+                            cmd.CommandText += GetValueCommand(DatabaseColumnLists.guilds, i);
+
+                            cmd.Parameters.AddWithValue($"serverid{i}", DatabaseInserts[i].serverid);
+
+                            cmd.Parameters.AddWithValue($"auto_assign_role_id{i}", DatabaseInserts[i].auto_assign_role_id);
+                            cmd.Parameters.AddWithValue($"joinlog_channel_id{i}", DatabaseInserts[i].joinlog_channel_id);
+                            cmd.Parameters.AddWithValue($"autoban_global_ban{i}", DatabaseInserts[i].autoban_global_ban);
+
+                            cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
+                            cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);
+                            cmd.Parameters.AddWithValue($"bump_channel{i}", DatabaseInserts[i].bump_channel);
+                            cmd.Parameters.AddWithValue($"bump_last_reminder{i}", DatabaseInserts[i].bump_last_reminder);
+                            cmd.Parameters.AddWithValue($"bump_last_time{i}", DatabaseInserts[i].bump_last_time);
+                            cmd.Parameters.AddWithValue($"bump_last_user{i}", DatabaseInserts[i].bump_last_user);
+                            cmd.Parameters.AddWithValue($"bump_message{i}", DatabaseInserts[i].bump_message);
+                            cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
+
+                            cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
+                            cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
+                            cmd.Parameters.AddWithValue($"phishing_reason{i}", DatabaseInserts[i].phishing_reason);
+                            cmd.Parameters.AddWithValue($"phishing_time{i}", DatabaseInserts[i].phishing_time);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guilds);
+
+                        cmd.Connection = databaseConnection;
+                        await cmd.ExecuteNonQueryAsync();
+
+                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
+                        DatabaseInserts.Clear();
+                        DatabaseInserts = null;
+                        cmd.Dispose();
                     }
-
-                    var cmd = databaseConnection.CreateCommand();
-                    cmd.CommandText = GetSaveCommand("guilds", DatabaseColumnLists.guilds);
-
-                    for (int i = 0; i < DatabaseInserts.Count; i++)
+                    catch (Exception ex)
                     {
-                        cmd.CommandText += GetValueCommand(DatabaseColumnLists.guilds, i);
-
-                        cmd.Parameters.AddWithValue($"serverid{i}", DatabaseInserts[i].serverid);
-
-                        cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
-                        cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);
-                        cmd.Parameters.AddWithValue($"bump_channel{i}", DatabaseInserts[i].bump_channel);
-                        cmd.Parameters.AddWithValue($"bump_last_reminder{i}", DatabaseInserts[i].bump_last_reminder);
-                        cmd.Parameters.AddWithValue($"bump_last_time{i}", DatabaseInserts[i].bump_last_time);
-                        cmd.Parameters.AddWithValue($"bump_last_user{i}", DatabaseInserts[i].bump_last_user);
-                        cmd.Parameters.AddWithValue($"bump_message{i}", DatabaseInserts[i].bump_message);
-                        cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
-
-                        cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
-                        cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
-                        cmd.Parameters.AddWithValue($"phishing_reason{i}", DatabaseInserts[i].phishing_reason);
-                        cmd.Parameters.AddWithValue($"phishing_time{i}", DatabaseInserts[i].phishing_time);
+                        LogError($"An exception occured while trying to update the guilds table: {ex}");
                     }
-
-                    cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                    cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guilds);
-
-                    cmd.Connection = databaseConnection;
-                    await cmd.ExecuteNonQueryAsync();
-
-                    LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
-                    DatabaseInserts.Clear();
-                    DatabaseInserts = null;
-                    cmd.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    LogError($"An exception occured while trying to update the guilds table: {ex}");
-                }
 
                 if (_users.List.Count > 0)
                     try
@@ -437,6 +491,49 @@ internal class DatabaseHelper
                     {
                         LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
                     }
+                
+                if (_globalbans.Users.Count > 0)
+                    try
+                    {
+                        List<DatabaseBanInfo> DatabaseInserts = _globalbans.Users.Select(x => new DatabaseBanInfo
+                        {
+                            id = x.Key,
+                            reason = x.Value.Reason,
+                            moderator = x.Value.Moderator
+                        }).ToList();
+
+                        if (databaseConnection == null)
+                        {
+                            throw new Exception($"Exception occured while trying to update globalbans in database: Database connection not present");
+                        }
+
+                        var cmd = databaseConnection.CreateCommand();
+                        cmd.CommandText = GetSaveCommand("globalbans", DatabaseColumnLists.guild_submission_bans);
+
+                        for (int i = 0; i < DatabaseInserts.Count; i++)
+                        {
+                            cmd.CommandText += GetValueCommand(DatabaseColumnLists.guild_submission_bans, i);
+
+                            cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
+                            cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
+                            cmd.Parameters.AddWithValue($"moderator{i}", DatabaseInserts[i].moderator);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
+
+                        cmd.Connection = databaseConnection;
+                        await cmd.ExecuteNonQueryAsync();
+
+                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
+                        DatabaseInserts.Clear();
+                        DatabaseInserts = null;
+                        cmd.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
+                    }
 
                 if (_submittedUrls.Urls.Count > 0)
                     try
@@ -491,12 +588,25 @@ internal class DatabaseHelper
 
             if (Important)
             {
-                while (!key.IsCompleted)
+                while (!key.IsCompleted && queuedUpdates.ContainsKey(key))
                 {
-                    Thread.Sleep(100);
+                    Log(key.Status.ToString());
+                    await Task.Delay(100);
                 }
-                await Task.Delay(2000);
+                Log(key.Status.ToString());
+                return;
             }
         }
+    }
+
+    public async Task Dispose()
+    {
+        foreach (var b in GetScheduleTasks())
+            if (b.Value.customId == "database-connection-watcher")
+                DeleteScheduleTask(b.Key);
+
+        Disposed = true;
+
+        await databaseConnection.CloseAsync();
     }
 }
