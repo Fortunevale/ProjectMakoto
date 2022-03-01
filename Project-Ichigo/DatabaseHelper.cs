@@ -193,6 +193,20 @@ internal class DatabaseHelper
         {
             Task key = new(async () =>
             {
+                if (!databaseConnection.Ping())
+                {
+                    try
+                    {
+                        LogWarn("Pinging the database failed, attempting reconnect.");
+                        databaseConnection.Open();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                        return;
+                    }
+                }
+
                 try
                 {
                     List<DatabaseServerSettings> DatabaseInserts = _guilds.Servers.Select(x => new DatabaseServerSettings

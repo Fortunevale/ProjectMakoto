@@ -80,6 +80,20 @@ public class PhishingUrlUpdater
 
         try
         {
+            if (!databaseConnection.Ping())
+            {
+                try
+                {
+                    LogWarn("Pinging the database failed, attempting reconnect.");
+                    databaseConnection.Open();
+                }
+                catch (Exception ex)
+                {
+                    LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                    return;
+                }
+            }
+
             UpdateRunning = true;
             List<DatabasePhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new DatabasePhishingUrlInfo
             {
