@@ -36,6 +36,12 @@ internal class PhishingProtectionEvents
         if (e.WebhookMessage)
             return;
 
+        if (!_guilds.Servers.ContainsKey(guild.Id))
+            _guilds.Servers.Add(guild.Id, new ServerInfo.ServerSettings());
+
+        if (!_guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
+            return;
+
         DiscordMember member;
 
         try
