@@ -302,6 +302,7 @@ internal class Bot
                 services = new ServiceCollection()
                     .AddSingleton(discordClient)
                     .AddSingleton(_status)
+                    .AddSingleton(_databaseHelper)
                     .AddSingleton(_guilds)
                     .AddSingleton(_users)
                     .AddSingleton(_phishingUrls)
@@ -311,6 +312,7 @@ internal class Bot
                     .AddSingleton(_countryCodes)
                     .AddSingleton(_scoreSaberClient)
                     .AddSingleton(_bumpReminder)
+                    .AddSingleton(_globalBans)
                     .BuildServiceProvider();
 
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
@@ -354,7 +356,7 @@ internal class Bot
                 cNext.RegisterCommands<Mod>();
                 cNext.RegisterCommands<Admin>();
 
-                cNext.RegisterCommands<Test>();
+                cNext.RegisterCommands<Maintainers>();
 
 
 

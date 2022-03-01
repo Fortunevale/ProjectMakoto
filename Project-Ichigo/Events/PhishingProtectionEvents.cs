@@ -33,7 +33,7 @@ internal class PhishingProtectionEvents
                 if (e.Content.StartsWith($"-{command.Key}"))
                     return;
 
-        if (e.WebhookMessage)
+        if (e.WebhookMessage || guild is null)
             return;
 
         if (!_guilds.Servers.ContainsKey(guild.Id))
