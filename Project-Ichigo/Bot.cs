@@ -401,6 +401,7 @@ internal class Bot
 
                 JoinEvents joinEvents = new(_guilds, _globalBans, _watcher);
                 discordClient.GuildMemberAdded += joinEvents.GuildMemberAdded;
+                discordClient.GuildMemberRemoved += joinEvents.GuildMemberAdded;
                 
 
 

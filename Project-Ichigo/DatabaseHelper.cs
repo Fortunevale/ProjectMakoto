@@ -89,7 +89,7 @@ internal class DatabaseHelper
             _submittedUrls = submittedUrls,
             _globalbans = globalbans,
 
-            databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};")
+            databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
         };
         helper.databaseConnection.Open();
 
@@ -157,10 +157,45 @@ internal class DatabaseHelper
                 LogWarn("Pinging the database failed, attempting reconnect.");
                 databaseConnection.Open();
                 await SelectDatabase(Secrets.Secrets.DatabaseName, true);
+                LogInfo($"Reconnected to database.");
             }
             catch (Exception ex)
             {
                 LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                return;
+            }
+        }
+
+        try
+        {
+            var cmd = databaseConnection.CreateCommand();
+            cmd.CommandText = GetSaveCommand("writetester", DatabaseColumnLists.writetester);
+
+            cmd.CommandText += GetValueCommand(DatabaseColumnLists.writetester, 1);
+
+            cmd.Parameters.AddWithValue($"aaa1", 1);
+
+            cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+            cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.writetester);
+
+            cmd.Connection = databaseConnection;
+            await cmd.ExecuteNonQueryAsync();
+
+            await DeleteRow("writetester", "aaa", "1");
+        }
+        catch (Exception ex)
+        {
+            try
+            {
+                LogWarn($"Creating a test value in database failed, reconnecting to database: {ex}");
+                databaseConnection.Close();
+                databaseConnection.Open();
+                await SelectDatabase(Secrets.Secrets.DatabaseName, true);
+                LogInfo($"Reconnected to database.");
+            }
+            catch (Exception ex1)
+            {
+                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex1}");
                 return;
             }
         }

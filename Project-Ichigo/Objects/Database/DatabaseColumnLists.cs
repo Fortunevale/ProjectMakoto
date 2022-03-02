@@ -2,6 +2,11 @@
 
 internal class DatabaseColumnLists
 {
+    internal readonly static List<Column> writetester = new()
+    {
+        new Column("aaa", "tinyint(1)", primary: true)
+    };
+
     internal readonly static List<Column> scam_urls = new()
     {
         new Column("url", "varchar(500)", "utf8mb4_0900_ai_ci", false, true),
@@ -78,6 +83,7 @@ internal class DatabaseColumnLists
         { "active_url_submissions", active_url_submissions },
         { "users", users },
         { "guilds", guilds },
+        { "writetester", writetester },
     };
 
     public class Column

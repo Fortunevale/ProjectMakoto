@@ -60,4 +60,36 @@ internal class JoinEvents
             }
         }).Add(_watcher);
     }
+
+    internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (!_guilds.Servers.ContainsKey(e.Guild.Id))
+                _guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+
+            if (_guilds.Servers[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
+            {
+                if (e.Guild.Channels.ContainsKey(_guilds.Servers[e.Guild.Id].JoinSettings.JoinlogChannelId))
+                {
+                    _ = e.Guild.GetChannel(_guilds.Servers[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            IconUrl = Resources.AuditLogIcons.UserLeft,
+                            Name = $"{e.Member.Username}#{e.Member.Discriminator}"
+                        },
+                        Description = $"left the server. Sad to see you go. {DiscordEmoji.FromName(sender, ":wave:")}\n\n" +
+                                      $"**Time on the server**: {e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}",
+                        Timestamp = DateTime.UtcNow,
+                        Color = DiscordColor.Red,
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                        {
+                            Url = e.Member.AvatarUrl
+                        }
+                    });
+                }
+            }
+        }).Add(_watcher);
+    }
 }
