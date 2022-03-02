@@ -82,6 +82,9 @@ internal class Admin : BaseCommandModule
 
                 int current_page = 0;
 
+                List<DiscordSelectComponentOption> channels = new();
+                List<DiscordSelectComponentOption> roles = new();
+
                 async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                 {
                     Task.Run(async () =>
@@ -89,9 +92,6 @@ internal class Admin : BaseCommandModule
                         if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                            List<DiscordSelectComponentOption> channels = new();
-                            List<DiscordSelectComponentOption> roles = new();
 
                             async Task RefreshChannelList()
                             {
@@ -115,10 +115,10 @@ internal class Admin : BaseCommandModule
                                 var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page_role", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
                                 var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page_role", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
 
-                                var dropdown = new DiscordSelectComponent("role_selection", "Select a role..", roles.Skip(current_page * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+                                var dropdown = new DiscordSelectComponent("role_selection", "Select a role..", roles.Skip(current_page * 20).Take(20) as IEnumerable<DiscordSelectComponentOption>);
                                 var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
 
-                                if (roles.Skip(current_page * 25).Count() > 25)
+                                if (roles.Skip(current_page * 20).Count() > 20)
                                     builder.AddComponents(next_page_button);
 
                                 if (current_page != 0)

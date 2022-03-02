@@ -17,10 +17,13 @@ internal class BumpReminderEvents
     {
         Task.Run(async () =>
         {
+            if (e.Guild == null)
+                return;
+
             if (!_guilds.Servers.ContainsKey(e.Guild.Id))
                 _guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
 
-            if (e.Guild == null || e.Channel.IsPrivate || !_guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+            if (e.Channel.IsPrivate || !_guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
             DiscordUser bUser = null;
