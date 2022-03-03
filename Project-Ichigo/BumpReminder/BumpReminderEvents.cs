@@ -42,7 +42,7 @@ internal class BumpReminderEvents
             if (e.Author.Id != Resources.AccountIds.Disboard || !e.Message.Embeds.Any())
                 return;
 
-            if (e.Message.Embeds[0].Description.ToLower().Contains(":thumbsup:"))
+            if (e.Message.Embeds[0].Description.ToLower().Contains("bump done"))
             {
                 List<string> Mentions = e.Message.Embeds[0].Description.ToLower().GetMentions();
 

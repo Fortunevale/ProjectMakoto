@@ -9,5 +9,6 @@ internal class ServerInfo
         public PhishingDetectionSettings PhishingDetectionSettings { get; set; } = new();
         public BumpReminderSettings BumpReminderSettings { get; set; } = new();
         public JoinSettings JoinSettings { get; set; } = new();
+        public Dictionary<ulong, Members> Members { get; set; } = new();
     }
 }
