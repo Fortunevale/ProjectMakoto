@@ -43,7 +43,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -64,7 +64,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -80,7 +80,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -98,7 +98,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow("active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 

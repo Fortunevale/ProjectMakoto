@@ -73,6 +73,13 @@ internal class DatabaseColumnLists
         new Column("phishing_reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("phishing_time", "bigint"), 
     };
+    
+    internal readonly static List<Column> guild_users = new() 
+    { 
+        new Column("userid", "bigint", primary: true),
+        new Column("experience", "bigint"),
+        new Column("level", "bigint"),
+    };
 
     internal readonly static Dictionary<string, List<Column>> Tables = new()
     {

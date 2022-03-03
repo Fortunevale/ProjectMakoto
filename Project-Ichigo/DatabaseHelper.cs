@@ -1,7 +1,8 @@
 ﻿namespace Project_Ichigo;
 internal class DatabaseHelper
 {
-    internal MySqlConnection databaseConnection { get; set; }
+    internal MySqlConnection mainDatabaseConnection { get; set; }
+    internal MySqlConnection guildDatabaseConnection { get; set; }
     internal ServerInfo _guilds { private set; get; }
     internal Users _users { private get; set; }
     internal SubmissionBans _submissionBans { private get; set; }
@@ -20,7 +21,7 @@ internal class DatabaseHelper
         {
             while (true)
             {
-                await Task.Delay(300000);
+                await Task.Delay(600000);
 
                 if (Disposed)
                     return;
@@ -89,74 +90,165 @@ internal class DatabaseHelper
             _submittedUrls = submittedUrls,
             _globalbans = globalbans,
 
-            databaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
+            mainDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;"),
+            guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
         };
-        helper.databaseConnection.Open();
+        helper.mainDatabaseConnection.Open();
+        helper.guildDatabaseConnection.Open();
 
-        await helper.SelectDatabase(Secrets.Secrets.DatabaseName, true);
+        await helper.SelectDatabase(helper.mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
+        await helper.SelectDatabase(helper.guildDatabaseConnection, Secrets.Secrets.GuildDatabaseName, true);
 
-        var Tables = await helper.ListTables();
-
-        foreach (var b in DatabaseColumnLists.Tables)
+        try
         {
-            if (!Tables.Contains(b.Key))
-            {
-                LogWarn($"Missing table '{b.Key}'. Creating..");
-                string sql = $"CREATE TABLE `{Secrets.Secrets.DatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
-                
-                await helper.databaseConnection.ExecuteAsync(sql);
-                LogInfo($"Created table '{b.Key}'.");
-            }
+            var MainTables = await helper.ListTables(helper.mainDatabaseConnection);
 
-            var Columns = await helper.ListColumns(b.Key);
-
-            foreach (var col in b.Value)
+            foreach (var b in DatabaseColumnLists.Tables)
             {
-                if (!Columns.ContainsKey(col.Name))
+                if (!MainTables.Contains(b.Key))
                 {
-                    LogWarn($"Missing column '{col.Name}' in '{b.Key}'. Creating..");
-                    string sql = $"ALTER TABLE `{b.Key}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
-                    await helper.databaseConnection.ExecuteAsync(sql);
-                    LogInfo($"Created column '{col.Name}' in '{b.Key}'.");
-                    Columns = await helper.ListColumns(b.Key);
+                    LogWarn($"Missing table '{b.Key}'. Creating..");
+                    string sql = $"CREATE TABLE `{Secrets.Secrets.MainDatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
+
+                    await helper.mainDatabaseConnection.ExecuteAsync(sql);
+                    LogInfo($"Created table '{b.Key}'.");
                 }
 
-                if (Columns[col.Name].ToLower() != col.Type.ToLower())
+                var Columns = await helper.ListColumns(helper.mainDatabaseConnection, b.Key);
+
+                foreach (var col in b.Value)
                 {
-                    LogWarn($"Wrong data type for column '{col.Name}' in '{b.Key}'");
-                    string sql = $"ALTER TABLE `{b.Key}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
-                    await helper.databaseConnection.ExecuteAsync(sql);
-                    LogInfo($"Changed column '{col.Name}' in '{b.Key}' to datatype '{col.Type.ToUpper()}'.");
-                    Columns = await helper.ListColumns(b.Key);
+                    if (!Columns.ContainsKey(col.Name))
+                    {
+                        LogWarn($"Missing column '{col.Name}' in '{b.Key}'. Creating..");
+                        string sql = $"ALTER TABLE `{b.Key}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                        await helper.mainDatabaseConnection.ExecuteAsync(sql);
+                        LogInfo($"Created column '{col.Name}' in '{b.Key}'.");
+                        Columns = await helper.ListColumns(helper.mainDatabaseConnection, b.Key);
+                    }
+
+                    if (Columns[col.Name].ToLower() != col.Type.ToLower())
+                    {
+                        LogWarn($"Wrong data type for column '{col.Name}' in '{b.Key}'");
+                        string sql = $"ALTER TABLE `{b.Key}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                        await helper.mainDatabaseConnection.ExecuteAsync(sql);
+                        LogInfo($"Changed column '{col.Name}' in '{b.Key}' to datatype '{col.Type.ToUpper()}'.");
+                        Columns = await helper.ListColumns(helper.mainDatabaseConnection, b.Key);
+                    }
                 }
             }
+        }
+        catch (Exception)
+        {
+            throw;
         }
 
         new Task(new Action(async () =>
         {
-            _ = helper.CheckDatabaseConnection();
+            _ = helper.CheckDatabaseConnection(helper.mainDatabaseConnection);
+            _ = helper.CheckDatabaseConnection(helper.guildDatabaseConnection);
         })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
 
         return helper;
     }
 
-    private async Task CheckDatabaseConnection()
+    public async Task CheckGuildTables()
+    {
+        var GuildTables = await ListTables(guildDatabaseConnection);
+
+        foreach (var b in _guilds.Servers)
+        {
+            if (!GuildTables.Contains($"guild-{b.Key}"))
+            {
+                LogWarn($"Missing table 'guild-{b.Key}'. Creating..");
+                string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`guild-{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
+
+                await guildDatabaseConnection.ExecuteAsync(sql);
+                LogInfo($"Created table 'guild-{b.Key}'.");
+            }
+        }
+
+        GuildTables = await ListTables(guildDatabaseConnection);
+
+        foreach (var b in GuildTables)
+        {
+            if (b.StartsWith("guild-"))
+            {
+                var Columns = await ListColumns(guildDatabaseConnection, b);
+
+                foreach (var col in DatabaseColumnLists.guild_users)
+                {
+                    if (!Columns.ContainsKey(col.Name))
+                    {
+                        LogWarn($"Missing column '{col.Name}' in '{b}'. Creating..");
+                        string sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                        await guildDatabaseConnection.ExecuteAsync(sql);
+                        LogInfo($"Created column '{col.Name}' in '{b}'.");
+                        Columns = await ListColumns(guildDatabaseConnection, "writetester");
+                    }
+
+                    if (Columns[col.Name].ToLower() != col.Type.ToLower())
+                    {
+                        LogWarn($"Wrong data type for column '{col.Name}' in '{b}'");
+                        string sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                        await guildDatabaseConnection.ExecuteAsync(sql);
+                        LogInfo($"Changed column '{col.Name}' in '{b}' to datatype '{col.Type.ToUpper()}'.");
+                        Columns = await ListColumns(guildDatabaseConnection, "writetester");
+                    }
+                }
+            }
+        }
+
+        if (!GuildTables.Contains("writetester"))
+        {
+            LogWarn($"Missing table 'writetester'. Creating..");
+            string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`writetester` ( {string.Join(", ", DatabaseColumnLists.Tables["writetester"].Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.Tables["writetester"].Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.Tables["writetester"].First(x => x.Primary).Name}`)" : "")})";
+
+            await guildDatabaseConnection.ExecuteAsync(sql);
+            LogInfo($"Created table 'writetester'.");
+        }
+
+        var GuildColumns = await ListColumns(guildDatabaseConnection, "writetester");
+
+        foreach (var col in DatabaseColumnLists.Tables["writetester"])
+        {
+            if (!GuildColumns.ContainsKey(col.Name))
+            {
+                LogWarn($"Missing column '{col.Name}' in 'writetester'. Creating..");
+                string sql = $"ALTER TABLE `writetester` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                await guildDatabaseConnection.ExecuteAsync(sql);
+                LogInfo($"Created column '{col.Name}' in 'writetester'.");
+                GuildColumns = await ListColumns(guildDatabaseConnection, "writetester");
+            }
+
+            if (GuildColumns[col.Name].ToLower() != col.Type.ToLower())
+            {
+                LogWarn($"Wrong data type for column '{col.Name}' in 'writetester'");
+                string sql = $"ALTER TABLE `writetester` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
+                await guildDatabaseConnection.ExecuteAsync(sql);
+                LogInfo($"Changed column '{col.Name}' in 'writetester' to datatype '{col.Type.ToUpper()}'.");
+                GuildColumns = await ListColumns(guildDatabaseConnection, "writetester");
+            }
+        }
+    }
+
+    private async Task CheckDatabaseConnection(MySqlConnection connection)
     {
         new Task(new Action(async () =>
         {
-            _ = CheckDatabaseConnection();
-        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
+            _ = CheckDatabaseConnection(connection);
+        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(20), "database-connection-watcher");
 
         if (Disposed)
             return;
 
-        if (!databaseConnection.Ping())
+        if (!connection.Ping())
         {
             try
             {
                 LogWarn("Pinging the database failed, attempting reconnect.");
-                databaseConnection.Open();
-                await SelectDatabase(Secrets.Secrets.DatabaseName, true);
+                connection.Open();
+                await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
                 LogInfo($"Reconnected to database.");
             }
             catch (Exception ex)
@@ -168,7 +260,7 @@ internal class DatabaseHelper
 
         try
         {
-            var cmd = databaseConnection.CreateCommand();
+            var cmd = connection.CreateCommand();
             cmd.CommandText = GetSaveCommand("writetester", DatabaseColumnLists.writetester);
 
             cmd.CommandText += GetValueCommand(DatabaseColumnLists.writetester, 1);
@@ -178,19 +270,19 @@ internal class DatabaseHelper
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
             cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.writetester);
 
-            cmd.Connection = databaseConnection;
+            cmd.Connection = connection;
             await cmd.ExecuteNonQueryAsync();
 
-            await DeleteRow("writetester", "aaa", "1");
+            await DeleteRow(connection, "writetester", "aaa", "1");
         }
         catch (Exception ex)
         {
             try
             {
                 LogWarn($"Creating a test value in database failed, reconnecting to database: {ex}");
-                databaseConnection.Close();
-                databaseConnection.Open();
-                await SelectDatabase(Secrets.Secrets.DatabaseName, true);
+                connection.Close();
+                connection.Open();
+                await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
                 LogInfo($"Reconnected to database.");
             }
             catch (Exception ex1)
@@ -201,25 +293,25 @@ internal class DatabaseHelper
         }
     }
 
-    public async Task SelectDatabase(string databaseName, bool CreateIfNotExist = false)
+    public async Task SelectDatabase(MySqlConnection connection, string databaseName, bool CreateIfNotExist = false)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
         if (CreateIfNotExist)
-            await databaseConnection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {databaseName}");
+            await connection.ExecuteAsync($"CREATE DATABASE IF NOT EXISTS {databaseName}");
 
-        await databaseConnection.ExecuteAsync($"USE {databaseName}");
+        await connection.ChangeDatabaseAsync(databaseName);
     }
 
-    public async Task<IEnumerable<string>> ListTables()
+    public async Task<IEnumerable<string>> ListTables(MySqlConnection connection)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
         List<string> SavedTables = new();
 
-        using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW TABLES"))
+        using (IDataReader reader = connection.ExecuteReader($"SHOW TABLES"))
         {
             while (reader.Read())
             {
@@ -230,14 +322,14 @@ internal class DatabaseHelper
         return SavedTables as IEnumerable<string>;
     }
     
-    public async Task<Dictionary<string, string>> ListColumns(string table)
+    public async Task<Dictionary<string, string>> ListColumns(MySqlConnection connection, string table)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
         Dictionary<string, string> Columns = new();
 
-        using (IDataReader reader = databaseConnection.ExecuteReader($"SHOW FIELDS FROM {table}"))
+        using (IDataReader reader = connection.ExecuteReader($"SHOW FIELDS FROM {table}"))
         {
             while (reader.Read())
             {
@@ -248,14 +340,14 @@ internal class DatabaseHelper
         return Columns;
     }
 
-    public async Task DeleteRow(string table, string row_match, string value)
+    public async Task DeleteRow(MySqlConnection connection, string table, string row_match, string value)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
-        var cmd = databaseConnection.CreateCommand();
+        var cmd = connection.CreateCommand();
         cmd.CommandText = $"DELETE FROM {table} WHERE {row_match}='{value}'";
-        cmd.Connection = databaseConnection;
+        cmd.Connection = connection;
         await cmd.ExecuteNonQueryAsync();
     }
 
@@ -291,22 +383,25 @@ internal class DatabaseHelper
         return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
-    public async Task SyncDatabase(bool Important = false)
+    public async Task SyncDatabase(bool Important = false, MySqlConnection connection = null)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
+
+        if (connection is null)
+            connection = mainDatabaseConnection;
 
         if (queuedUpdates.Count < 2 || Important)
         {
             Task key = new(async () =>
             {
-                if (!databaseConnection.Ping())
+                if (!connection.Ping())
                 {
                     try
                     {
                         LogWarn("Pinging the database failed, attempting reconnect.");
-                        databaseConnection.Open();
-                        await SelectDatabase(Secrets.Secrets.DatabaseName, true);
+                        connection.Open();
+                        await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
                     }
                     catch (Exception ex)
                     {
@@ -341,12 +436,12 @@ internal class DatabaseHelper
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId
                         }).ToList();
 
-                        if (databaseConnection == null)
+                        if (connection == null)
                         {
                             throw new Exception($"Exception occured while trying to update guilds in database: Database connection not present");
                         }
 
-                        var cmd = databaseConnection.CreateCommand();
+                        var cmd = connection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("guilds", DatabaseColumnLists.guilds);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -377,7 +472,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guilds);
 
-                        cmd.Connection = databaseConnection;
+                        cmd.Connection = connection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
@@ -404,12 +499,12 @@ internal class DatabaseHelper
                             scoresaber_id = x.Value.ScoreSaber.Id
                         }).ToList();
 
-                        if (databaseConnection == null)
+                        if (connection == null)
                         {
                             throw new Exception($"Exception occured while trying to update users in database: Database connection not present");
                         }
 
-                        var cmd = databaseConnection.CreateCommand();
+                        var cmd = connection.CreateCommand();
                         cmd.CommandText = cmd.CommandText = GetSaveCommand("users", DatabaseColumnLists.users);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -428,7 +523,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.users);
 
-                        cmd.Connection = databaseConnection;
+                        cmd.Connection = connection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
@@ -451,12 +546,12 @@ internal class DatabaseHelper
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (databaseConnection == null)
+                        if (connection == null)
                         {
                             throw new Exception($"Exception occured while trying to update user_submission_bans in database: Database connection not present");
                         }
 
-                        var cmd = databaseConnection.CreateCommand();
+                        var cmd = connection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -471,7 +566,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.user_submission_bans);
 
-                        cmd.Connection = databaseConnection;
+                        cmd.Connection = connection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
@@ -494,12 +589,12 @@ internal class DatabaseHelper
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (databaseConnection == null)
+                        if (connection == null)
                         {
                             throw new Exception($"Exception occured while trying to update guild_submission_bans in database: Database connection not present");
                         }
 
-                        var cmd = databaseConnection.CreateCommand();
+                        var cmd = connection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -514,7 +609,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
 
-                        cmd.Connection = databaseConnection;
+                        cmd.Connection = connection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
@@ -537,12 +632,12 @@ internal class DatabaseHelper
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (databaseConnection == null)
+                        if (connection == null)
                         {
                             throw new Exception($"Exception occured while trying to update globalbans in database: Database connection not present");
                         }
 
-                        var cmd = databaseConnection.CreateCommand();
+                        var cmd = connection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("globalbans", DatabaseColumnLists.guild_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -557,7 +652,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
 
-                        cmd.Connection = databaseConnection;
+                        cmd.Connection = connection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
@@ -581,12 +676,12 @@ internal class DatabaseHelper
                             guild = x.Value.GuildOrigin
                         }).ToList();
 
-                        if (databaseConnection == null)
+                        if (connection == null)
                         {
                             throw new Exception($"Exception occured while trying to update active_url_submissions in database: Database connection not present");
                         }
 
-                        var cmd = databaseConnection.CreateCommand();
+                        var cmd = connection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -602,7 +697,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.active_url_submissions);
 
-                        cmd.Connection = databaseConnection;
+                        cmd.Connection = connection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
@@ -642,6 +737,6 @@ internal class DatabaseHelper
 
         Disposed = true;
 
-        await databaseConnection.CloseAsync();
+        await mainDatabaseConnection.CloseAsync();
     }
 }

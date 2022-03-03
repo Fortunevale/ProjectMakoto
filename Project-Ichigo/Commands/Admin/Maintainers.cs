@@ -84,7 +84,7 @@ internal class Maintainers : BaseCommandModule
                 return;
 
             _globalBans.Users.Remove(victim.Id);
-            await _databaseHelper.DeleteRow("globalbans", "id", $"{victim.Id}");
+            await _databaseHelper.DeleteRow(_databaseHelper.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {

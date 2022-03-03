@@ -5,7 +5,7 @@ internal class Bot
     internal DiscordClient discordClient;
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
-    internal MySqlConnection databaseConnection;
+    internal MySqlConnection mainDatabaseConnection;
     
 
 
@@ -86,7 +86,7 @@ internal class Bot
                 LogInfo($"Connecting to database..");
                 
                 _databaseHelper = await DatabaseHelper.InitializeDatabase(_guilds, _users, _submissionBans, _submittedUrls, _globalBans);
-                databaseConnection = _databaseHelper.databaseConnection;
+                mainDatabaseConnection = _databaseHelper.mainDatabaseConnection;
 
                 databaseConnectionSc.Stop();
                 LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
@@ -103,7 +103,7 @@ internal class Bot
             {
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-                IEnumerable<DatabasePhishingUrlInfo> scamUrls = databaseConnection.Query<DatabasePhishingUrlInfo>(_databaseHelper.GetLoadCommand("scam_urls", DatabaseColumnLists.scam_urls));
+                IEnumerable<DatabasePhishingUrlInfo> scamUrls = mainDatabaseConnection.Query<DatabasePhishingUrlInfo>(_databaseHelper.GetLoadCommand("scam_urls", DatabaseColumnLists.scam_urls));
 
                 foreach (var b in scamUrls)
                     _phishingUrls.List.Add(b.url, new PhishingUrls.UrlInfo
@@ -119,7 +119,7 @@ internal class Bot
 
                 LogDebug($"Loading guilds from table 'guilds'..");
 
-                IEnumerable<DatabaseServerSettings> serverSettings = databaseConnection.Query<DatabaseServerSettings>(_databaseHelper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
+                IEnumerable<DatabaseServerSettings> serverSettings = mainDatabaseConnection.Query<DatabaseServerSettings>(_databaseHelper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
                 foreach (var b in serverSettings)
                     _guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
@@ -155,7 +155,7 @@ internal class Bot
 
                 LogDebug($"Loading users from table 'users'..");
 
-                IEnumerable<DatabaseUsers> users = databaseConnection.Query<DatabaseUsers>(_databaseHelper.GetLoadCommand("users", DatabaseColumnLists.users));
+                IEnumerable<DatabaseUsers> users = mainDatabaseConnection.Query<DatabaseUsers>(_databaseHelper.GetLoadCommand("users", DatabaseColumnLists.users));
 
                 foreach (var b in users)
                     _users.List.Add(b.userid, new Users.Info
@@ -183,7 +183,7 @@ internal class Bot
 
                 LogDebug($"Loading global bans from table 'globalbans'..");
 
-                IEnumerable<DatabaseBanInfo> globalbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
+                IEnumerable<DatabaseBanInfo> globalbans = mainDatabaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
 
                 foreach (var b in globalbans)
                     _globalBans.Users.Add(b.id, new GlobalBans.BanInfo
@@ -198,7 +198,7 @@ internal class Bot
                 
                 LogDebug($"Loading submission bans from table 'user_submission_bans'..");
 
-                IEnumerable<DatabaseBanInfo> userbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
+                IEnumerable<DatabaseBanInfo> userbans = mainDatabaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
 
                 foreach (var b in userbans)
                     _submissionBans.BannedUsers.Add(b.id, new SubmissionBans.BanInfo
@@ -213,7 +213,7 @@ internal class Bot
 
                 LogDebug($"Loading submission bans from table 'guild_submission_bans'..");
 
-                IEnumerable<DatabaseBanInfo> guildbans = databaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
+                IEnumerable<DatabaseBanInfo> guildbans = mainDatabaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
 
                 foreach (var b in guildbans)
                     _submissionBans.BannedGuilds.Add(b.id, new SubmissionBans.BanInfo
@@ -228,7 +228,7 @@ internal class Bot
 
                 LogDebug($"Loading active submissions from table 'active_url_submissions'..");
 
-                IEnumerable<DatabaseSubmittedUrls> active_submissions = databaseConnection.Query<DatabaseSubmittedUrls>(_databaseHelper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
+                IEnumerable<DatabaseSubmittedUrls> active_submissions = mainDatabaseConnection.Query<DatabaseSubmittedUrls>(_databaseHelper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
 
                 foreach (var b in active_submissions)
                     _submittedUrls.Urls.Add(b.messageid, new SubmittedUrls.UrlInfo
@@ -240,7 +240,7 @@ internal class Bot
 
                 LogInfo($"Loaded {_submittedUrls.Urls.Count} active submissions from table 'active_url_submissions'.");
 
-                _phishingUrlUpdater = new(databaseConnection, _databaseHelper);
+                _phishingUrlUpdater = new(mainDatabaseConnection, _databaseHelper);
                 _ = _phishingUrlUpdater.UpdatePhishingUrlDatabase(_phishingUrls);
             }
             catch (Exception ex)
@@ -385,7 +385,7 @@ internal class Bot
                 discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
                 discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
 
-                SubmissionEvents _submissionEvents = new(databaseConnection, _databaseHelper, _submittedUrls, _phishingUrls, _status, _submissionBans);
+                SubmissionEvents _submissionEvents = new(mainDatabaseConnection, _databaseHelper, _submittedUrls, _phishingUrls, _status, _submissionBans);
                 discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
 
 
@@ -578,6 +578,8 @@ internal class Bot
                     _bumpReminder.ScheduleBump(sender, guild.Key);
                 }
             }
+
+            await _databaseHelper.CheckGuildTables();
         });
     }
 }

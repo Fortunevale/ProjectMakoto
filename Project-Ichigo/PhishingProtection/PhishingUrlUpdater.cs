@@ -86,7 +86,7 @@ public class PhishingUrlUpdater
                 {
                     LogWarn("Pinging the database failed, attempting reconnect.");
                     databaseConnection.Open();
-                    await databaseHelper.SelectDatabase(Secrets.Secrets.DatabaseName, true);
+                    await databaseHelper.SelectDatabase(databaseConnection, Secrets.Secrets.MainDatabaseName, true);
                 }
                 catch (Exception ex)
                 {
@@ -134,7 +134,7 @@ public class PhishingUrlUpdater
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    await databaseHelper.DeleteRow("scam_urls", "url", $"{b}");
+                    await databaseHelper.DeleteRow(databaseConnection, "scam_urls", "url", $"{b}");
 
                     LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }
