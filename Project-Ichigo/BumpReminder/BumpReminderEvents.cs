@@ -62,7 +62,7 @@ internal class BumpReminderEvents
             }
             else
             {
-                if (_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump < DateTime.UtcNow.AddHours(-2))
+                if (_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump > DateTime.UtcNow.AddHours(2))
                 {
                     if (e.Message.Embeds[0].Description.ToLower().Contains("please wait another"))
                     {
