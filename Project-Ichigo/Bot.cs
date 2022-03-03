@@ -564,7 +564,7 @@ internal class Bot
 
     private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
@@ -580,6 +580,6 @@ internal class Bot
             }
 
             await _databaseHelper.CheckGuildTables();
-        });
+        }).Add(_watcher);
     }
 }

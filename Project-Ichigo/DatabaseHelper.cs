@@ -146,6 +146,7 @@ internal class DatabaseHelper
         new Task(new Action(async () =>
         {
             _ = helper.CheckDatabaseConnection(helper.mainDatabaseConnection);
+            await Task.Delay(10000);
             _ = helper.CheckDatabaseConnection(helper.guildDatabaseConnection);
         })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
 
@@ -329,7 +330,7 @@ internal class DatabaseHelper
 
         Dictionary<string, string> Columns = new();
 
-        using (IDataReader reader = connection.ExecuteReader($"SHOW FIELDS FROM {table}"))
+        using (IDataReader reader = connection.ExecuteReader($"SHOW FIELDS FROM `{table}`"))
         {
             while (reader.Read())
             {
@@ -346,7 +347,7 @@ internal class DatabaseHelper
             throw new Exception("DatabaseHelper is disposed");
 
         var cmd = connection.CreateCommand();
-        cmd.CommandText = $"DELETE FROM {table} WHERE {row_match}='{value}'";
+        cmd.CommandText = $"DELETE FROM `{table}` WHERE {row_match}='{value}'";
         cmd.Connection = connection;
         await cmd.ExecuteNonQueryAsync();
     }
@@ -356,7 +357,7 @@ internal class DatabaseHelper
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
-        return $"SELECT {string.Join(", ", columns.Select(x => x.Name))} FROM {table}";
+        return $"SELECT {string.Join(", ", columns.Select(x => x.Name))} FROM `{table}`";
     }
     
     public string GetSaveCommand(string table, List<DatabaseColumnLists.Column> columns)
@@ -364,7 +365,7 @@ internal class DatabaseHelper
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
-        return $"INSERT INTO {table} ( {string.Join(", ", columns.Select(x => x.Name))} ) VALUES ";
+        return $"INSERT INTO `{table}` ( {string.Join(", ", columns.Select(x => x.Name))} ) VALUES ";
     }
     
     public string GetValueCommand(List<DatabaseColumnLists.Column> columns, int i)
