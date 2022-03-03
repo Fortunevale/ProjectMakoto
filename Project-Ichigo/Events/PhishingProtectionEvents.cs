@@ -66,8 +66,6 @@ internal class PhishingProtectionEvents
 
         if (matches.Count > 0)
         {
-            _ = e.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 940100205720784936));
-
             Dictionary<string, string> redirectUrls = new();
 
             foreach (Match match in matches)
@@ -113,8 +111,6 @@ internal class PhishingProtectionEvents
                     });
                 }
             }
-
-            _ = e.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 940100205720784936));
 
             if (redirectUrls.Count > 0)
             {
