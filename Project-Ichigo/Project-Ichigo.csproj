@@ -26,8 +26,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="%2a%2a\**" />
     <Compile Remove="ApplicationCommands\**" />
+    <EmbeddedResource Remove="%2a%2a\**" />
     <EmbeddedResource Remove="ApplicationCommands\**" />
+    <None Remove="%2a%2a\**" />
     <None Remove="ApplicationCommands\**" />
   </ItemGroup>
 

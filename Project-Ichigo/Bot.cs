@@ -6,7 +6,7 @@ internal class Bot
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
     internal MySqlConnection mainDatabaseConnection;
-    
+
 
 
     internal Status _status = new();
@@ -15,7 +15,7 @@ internal class Bot
     internal Users _users = new();
 
     internal PhishingUrls _phishingUrls = new();
-    
+
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
@@ -84,7 +84,7 @@ internal class Bot
 
 
                 LogInfo($"Connecting to database..");
-                
+
                 _databaseHelper = await DatabaseHelper.InitializeDatabase(_guilds, _users, _submissionBans, _submittedUrls, _globalBans);
                 mainDatabaseConnection = _databaseHelper.mainDatabaseConnection;
 
@@ -98,7 +98,7 @@ internal class Bot
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDatabaseLogin);
             }
-            
+
             try
             {
                 LogDebug($"Loading phishing urls from table 'scam_urls'..");
@@ -193,9 +193,9 @@ internal class Bot
                     });
 
                 LogInfo($"Loaded {_globalBans.Users.Count} submission bans from table 'globalbans'.");
-                
-                
-                
+
+
+
                 LogDebug($"Loading submission bans from table 'user_submission_bans'..");
 
                 IEnumerable<DatabaseBanInfo> userbans = mainDatabaseConnection.Query<DatabaseBanInfo>(_databaseHelper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
@@ -328,9 +328,9 @@ internal class Bot
                     IgnoreExtraArguments = true,
                     EnableDms = false,
                     ServiceProvider = services
-                }); 
+                });
 
-                
+
 
                 LogDebug($"Registering Lavalink..");
 
@@ -371,7 +371,7 @@ internal class Bot
                 CommandEvents commandEvents = new(_watcher);
                 cNext.CommandExecuted += commandEvents.CommandExecuted;
                 cNext.CommandErrored += commandEvents.CommandError;
-                
+
                 LogDebug($"Registering Afk Events..");
 
                 AfkEvents afkEvents = new(_watcher, _users);
@@ -394,15 +394,15 @@ internal class Bot
 
                 DiscordEvents discordEvents = new();
                 discordClient.GuildCreated += discordEvents.GuildCreated;
-                
-                
-                
+
+
+
                 LogDebug($"Registering Join Events..");
 
                 JoinEvents joinEvents = new(_guilds, _globalBans, _watcher);
                 discordClient.GuildMemberAdded += joinEvents.GuildMemberAdded;
                 discordClient.GuildMemberRemoved += joinEvents.GuildMemberRemoved;
-                
+
 
 
                 LogDebug($"Registering BumpReminder Events..");
@@ -518,7 +518,7 @@ internal class Bot
             await FlushToDatabase(null, null);
         };
 
-        //Console.CancelKeyPress += async delegate 
+        //Console.CancelKeyPress += async delegate
         //{
         //    LogInfo("Exiting, please wait..");
         //    await FlushToDatabase(null, null);

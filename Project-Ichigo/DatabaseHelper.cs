@@ -322,7 +322,7 @@ internal class DatabaseHelper
 
         return SavedTables as IEnumerable<string>;
     }
-    
+
     public async Task<Dictionary<string, string>> ListColumns(MySqlConnection connection, string table)
     {
         if (Disposed)
@@ -359,7 +359,7 @@ internal class DatabaseHelper
 
         return $"SELECT {string.Join(", ", columns.Select(x => x.Name))} FROM `{table}`";
     }
-    
+
     public string GetSaveCommand(string table, List<DatabaseColumnLists.Column> columns)
     {
         if (Disposed)
@@ -367,7 +367,7 @@ internal class DatabaseHelper
 
         return $"INSERT INTO `{table}` ( {string.Join(", ", columns.Select(x => x.Name))} ) VALUES ";
     }
-    
+
     public string GetValueCommand(List<DatabaseColumnLists.Column> columns, int i)
     {
         if (Disposed)
@@ -375,7 +375,7 @@ internal class DatabaseHelper
 
         return $"( {string.Join(", ", columns.Select(x => $"@{x.Name}{i}"))} ), ";
     }
-    
+
     public string GetOverwriteCommand(List<DatabaseColumnLists.Column> columns)
     {
         if (Disposed)
@@ -622,7 +622,7 @@ internal class DatabaseHelper
                     {
                         LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
                     }
-                
+
                 if (_globalbans.Users.Count > 0)
                     try
                     {
