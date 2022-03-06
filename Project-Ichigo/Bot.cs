@@ -546,6 +546,9 @@ internal class Bot
 
     private async Task FlushToDatabase(object? sender, EventArgs e)
     {
+        if (_databaseHelper.Disposed)
+            return;
+
         LogInfo($"Flushing to database..");
         await _databaseHelper.SyncDatabase(true);
         LogInfo($"Flushed to database.");

@@ -9,7 +9,7 @@ internal class DatabaseHelper
     internal GlobalBans _globalbans { private get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }
 
-    bool Disposed = false;
+    internal bool Disposed { get; private set; } = false;
 
     private Dictionary<Task, bool> queuedUpdates = new();
 
