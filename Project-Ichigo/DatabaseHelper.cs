@@ -396,17 +396,36 @@ internal class DatabaseHelper
         {
             Task key = new(async () =>
             {
-                if (!connection.Ping())
+                try
+                {
+                    if (!connection.Ping())
+                    {
+                        try
+                        {
+                            LogWarn("Pinging the database failed, attempting reconnect.");
+                            connection.Open();
+                            await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                            return;
+                        }
+                    }
+                }
+                catch (Exception ex)
                 {
                     try
                     {
-                        LogWarn("Pinging the database failed, attempting reconnect.");
+                        LogWarn($"Pinging the database failed, attempting reconnect: {ex}");
+                        connection.Close();
                         connection.Open();
                         await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
+                        LogInfo($"Reconnected to database.");
                     }
-                    catch (Exception ex)
+                    catch (Exception ex1)
                     {
-                        LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                        LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex1}");
                         return;
                     }
                 }
