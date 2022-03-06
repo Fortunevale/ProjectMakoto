@@ -14,7 +14,7 @@ internal class AfkEvents
     {
         Task.Run(async () =>
         {
-            if (e.Guild == null || e.Channel.IsPrivate)
+            if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)
                 return;
 
             if (!_users.List.ContainsKey(e.Author.Id))
