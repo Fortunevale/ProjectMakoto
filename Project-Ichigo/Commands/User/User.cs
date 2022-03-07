@@ -796,7 +796,7 @@ internal class User : BaseCommandModule
             {
                 if (!_users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
                     _users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
-                
+
                 if (_users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id != 0)
                 {
                     id = _users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id.ToString();
@@ -899,7 +899,7 @@ internal class User : BaseCommandModule
             embed.AddField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true);
             embed.AddField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true);
             embed.AddField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true);
-            
+
             DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -922,6 +922,7 @@ internal class User : BaseCommandModule
 	                    {{
                             labels: 
 		                    [
+			                    '49 days ago','',
 			                    '48 days ago','',
 			                    '46 days ago','',
 			                    '44 days ago','',
@@ -952,7 +953,7 @@ internal class User : BaseCommandModule
 		                    [
 			                    {{
 				                    label: 'Placements',
-				                    data: [{player.histories}],
+				                    data: [{player.histories},{player.rank}],
 				                    fill: false,
 				                    borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
 				                    reverse: true,
@@ -962,9 +963,9 @@ internal class User : BaseCommandModule
 		                    ]
 
                         }},
-	                    options: 
+	                    options:
 	                    {{
-		                    legend: 
+		                    legend:
 		                    {{
 			                    display: false,
 		                    }},
@@ -975,9 +976,9 @@ internal class User : BaseCommandModule
                                     radius: 0
                                 }}
                             }},
-		                    scales: 
+		                    scales:
 		                    {{
-			                    yAxes: 
+			                    yAxes:
 			                    [
                                     {{
                                         reverse: true,
@@ -1025,7 +1026,7 @@ internal class User : BaseCommandModule
                     embed.Footer.Text += " • Interaction timed out";
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                    ctx.Client.ComponentInteractionCreated -= RunInteraction; 
+                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
                 }
             }
             catch { }
