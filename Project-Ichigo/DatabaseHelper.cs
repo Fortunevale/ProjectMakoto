@@ -21,7 +21,7 @@ internal class DatabaseHelper
         {
             while (true)
             {
-                await Task.Delay(600000);
+                await Task.Delay(1800000);
 
                 if (Disposed)
                     return;
@@ -64,7 +64,7 @@ internal class DatabaseHelper
                 foreach (var task in queuedUpdates.Where(x => x.Key.Status == TaskStatus.Created).ToList())
                 {
                     task.Key.Start();
-                    await Task.Delay(10000, tokenSource.Token);
+                    await Task.Delay(60000, tokenSource.Token);
                 }
 
                 await Task.Delay(1000);
@@ -513,6 +513,8 @@ internal class DatabaseHelper
                             userid = x.Key,
                             afk_since = Convert.ToUInt64(x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks),
                             afk_reason = x.Value.AfkStatus.Reason,
+                            afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
+                            afk_pingamount = x.Value.AfkStatus.MessagesAmount,
                             submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
                             submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
                             submission_last_datetime = x.Value.UrlSubmissions.LastTime,
@@ -535,6 +537,8 @@ internal class DatabaseHelper
                             cmd.Parameters.AddWithValue($"scoresaber_id{i}", DatabaseInserts[i].scoresaber_id);
                             cmd.Parameters.AddWithValue($"afk_since{i}", DatabaseInserts[i].afk_since);
                             cmd.Parameters.AddWithValue($"afk_reason{i}", DatabaseInserts[i].afk_reason);
+                            cmd.Parameters.AddWithValue($"afk_pings{i}", DatabaseInserts[i].afk_pings);
+                            cmd.Parameters.AddWithValue($"afk_pingamount{i}", DatabaseInserts[i].afk_pingamount);
                             cmd.Parameters.AddWithValue($"submission_accepted_tos{i}", DatabaseInserts[i].submission_accepted_tos);
                             cmd.Parameters.AddWithValue($"submission_accepted_submissions{i}", DatabaseInserts[i].submission_accepted_submissions);
                             cmd.Parameters.AddWithValue($"submission_last_datetime{i}", DatabaseInserts[i].submission_last_datetime);

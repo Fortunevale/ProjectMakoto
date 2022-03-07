@@ -169,7 +169,9 @@ internal class Bot
                         AfkStatus = new()
                         {
                             Reason = b.afk_reason,
-                            TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since))
+                            TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since)),
+                            Messages = JsonConvert.DeserializeObject<List<AfkStatusMessageCache>>(b.afk_pings),
+                            MessagesAmount = b.afk_pingamount
                         },
                         ScoreSaber = new()
                         {
