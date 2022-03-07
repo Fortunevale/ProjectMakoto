@@ -922,7 +922,7 @@ internal class User : BaseCommandModule
 	                    {{
                             labels: 
 		                    [
-			                    '49 days ago','',
+			                    '',
 			                    '48 days ago','',
 			                    '46 days ago','',
 			                    '44 days ago','',
