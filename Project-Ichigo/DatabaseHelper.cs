@@ -8,6 +8,7 @@ internal class DatabaseHelper
     internal SubmissionBans _submissionBans { private get; set; }
     internal GlobalBans _globalbans { private get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }
+    public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
     internal bool Disposed { get; private set; } = false;
 
@@ -80,7 +81,7 @@ internal class DatabaseHelper
         }
     }
 
-    public static async Task<DatabaseHelper> InitializeDatabase(ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls, GlobalBans globalbans)
+    public static async Task<DatabaseHelper> InitializeDatabase(TaskWatcher.TaskWatcher watcher, ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls, GlobalBans globalbans)
     {
         var helper = new DatabaseHelper
         {
@@ -89,6 +90,7 @@ internal class DatabaseHelper
             _submissionBans = submissionBans,
             _submittedUrls = submittedUrls,
             _globalbans = globalbans,
+            _watcher = watcher,
 
             mainDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;"),
             guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
@@ -384,13 +386,10 @@ internal class DatabaseHelper
         return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
-    public async Task SyncDatabase(bool Important = false, MySqlConnection connection = null)
+    public async Task SyncDatabase(bool Important = false)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
-
-        if (connection is null)
-            connection = mainDatabaseConnection;
 
         if (queuedUpdates.Count < 2 || Important)
         {
@@ -398,13 +397,13 @@ internal class DatabaseHelper
             {
                 try
                 {
-                    if (!connection.Ping())
+                    if (!mainDatabaseConnection.Ping())
                     {
                         try
                         {
                             LogWarn("Pinging the database failed, attempting reconnect.");
-                            connection.Open();
-                            await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
+                            mainDatabaseConnection.Open();
+                            await SelectDatabase(mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
                         }
                         catch (Exception ex)
                         {
@@ -418,9 +417,9 @@ internal class DatabaseHelper
                     try
                     {
                         LogWarn($"Pinging the database failed, attempting reconnect: {ex}");
-                        connection.Close();
-                        connection.Open();
-                        await SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
+                        mainDatabaseConnection.Close();
+                        mainDatabaseConnection.Open();
+                        await SelectDatabase(mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
                         LogInfo($"Reconnected to database.");
                     }
                     catch (Exception ex1)
@@ -456,12 +455,12 @@ internal class DatabaseHelper
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId
                         }).ToList();
 
-                        if (connection == null)
+                        if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update guilds in database: Database connection not present");
+                            throw new Exception($"Exception occured while trying to update guilds in database: Database mainDatabaseConnection not present");
                         }
 
-                        var cmd = connection.CreateCommand();
+                        var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("guilds", DatabaseColumnLists.guilds);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -492,7 +491,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guilds);
 
-                        cmd.Connection = connection;
+                        cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
@@ -504,6 +503,60 @@ internal class DatabaseHelper
                     {
                         LogError($"An exception occured while trying to update the guilds table: {ex}");
                     }
+
+                var check = CheckGuildTables();
+
+                check.Add(_watcher);
+                check.Wait();
+
+                if (_guilds.Servers.Count > 0)
+                    foreach (var guild in _guilds.Servers)
+                        if (guild.Value.Members.Count > 0)
+                        {
+                            try
+                            {
+                                List<DatabaseMembers> DatabaseInserts = guild.Value.Members.Select(x => new DatabaseMembers
+                                {
+                                    userid = x.Key,
+
+                                    experience = x.Value.Experience,
+                                    level = x.Value.Level
+                                }).ToList();
+
+                                if (mainDatabaseConnection == null)
+                                {
+                                    throw new Exception($"Exception occured while trying to update guilds in database: Database mainDatabaseConnection not present");
+                                }
+
+                                var cmd = mainDatabaseConnection.CreateCommand();
+                                cmd.CommandText = GetSaveCommand($"guild-{guild.Key}", DatabaseColumnLists.guild_users);
+
+                                for (int i = 0; i < DatabaseInserts.Count; i++)
+                                {
+                                    cmd.CommandText += GetValueCommand(DatabaseColumnLists.guild_users, i);
+
+                                    cmd.Parameters.AddWithValue($"userid{i}", DatabaseInserts[i].userid);
+
+                                    cmd.Parameters.AddWithValue($"experience{i}", DatabaseInserts[i].experience);
+                                    cmd.Parameters.AddWithValue($"level{i}", DatabaseInserts[i].level);
+                                }
+
+                                cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                                cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_users);
+
+                                cmd.Connection = guildDatabaseConnection;
+                                await cmd.ExecuteNonQueryAsync();
+
+                                LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guild-{guild.Key}'.");
+                                DatabaseInserts.Clear();
+                                DatabaseInserts = null;
+                                cmd.Dispose();
+                            }
+                            catch (Exception ex)
+                            {
+                                LogError($"An exception occured while trying to update the guild-{guild.Key} table: {ex}");
+                            }
+                        }
 
                 if (_users.List.Count > 0)
                     try
@@ -521,12 +574,12 @@ internal class DatabaseHelper
                             scoresaber_id = x.Value.ScoreSaber.Id
                         }).ToList();
 
-                        if (connection == null)
+                        if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update users in database: Database connection not present");
+                            throw new Exception($"Exception occured while trying to update users in database: Database mainDatabaseConnection not present");
                         }
 
-                        var cmd = connection.CreateCommand();
+                        var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = cmd.CommandText = GetSaveCommand("users", DatabaseColumnLists.users);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -547,7 +600,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.users);
 
-                        cmd.Connection = connection;
+                        cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
@@ -570,12 +623,12 @@ internal class DatabaseHelper
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (connection == null)
+                        if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update user_submission_bans in database: Database connection not present");
+                            throw new Exception($"Exception occured while trying to update user_submission_bans in database: Database mainDatabaseConnection not present");
                         }
 
-                        var cmd = connection.CreateCommand();
+                        var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -590,7 +643,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.user_submission_bans);
 
-                        cmd.Connection = connection;
+                        cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
@@ -613,12 +666,12 @@ internal class DatabaseHelper
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (connection == null)
+                        if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update guild_submission_bans in database: Database connection not present");
+                            throw new Exception($"Exception occured while trying to update guild_submission_bans in database: Database mainDatabaseConnection not present");
                         }
 
-                        var cmd = connection.CreateCommand();
+                        var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -633,7 +686,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
 
-                        cmd.Connection = connection;
+                        cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
@@ -656,12 +709,12 @@ internal class DatabaseHelper
                             moderator = x.Value.Moderator
                         }).ToList();
 
-                        if (connection == null)
+                        if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update globalbans in database: Database connection not present");
+                            throw new Exception($"Exception occured while trying to update globalbans in database: Database mainDatabaseConnection not present");
                         }
 
-                        var cmd = connection.CreateCommand();
+                        var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("globalbans", DatabaseColumnLists.guild_submission_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -676,7 +729,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
 
-                        cmd.Connection = connection;
+                        cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
@@ -700,12 +753,12 @@ internal class DatabaseHelper
                             guild = x.Value.GuildOrigin
                         }).ToList();
 
-                        if (connection == null)
+                        if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update active_url_submissions in database: Database connection not present");
+                            throw new Exception($"Exception occured while trying to update active_url_submissions in database: Database mainDatabaseConnection not present");
                         }
 
-                        var cmd = connection.CreateCommand();
+                        var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = GetSaveCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
@@ -721,7 +774,7 @@ internal class DatabaseHelper
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
                         cmd.CommandText += GetOverwriteCommand(DatabaseColumnLists.active_url_submissions);
 
-                        cmd.Connection = connection;
+                        cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
                         LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
@@ -744,10 +797,8 @@ internal class DatabaseHelper
             {
                 while (!key.IsCompleted && queuedUpdates.ContainsKey(key))
                 {
-                    Log(key.Status.ToString());
                     await Task.Delay(100);
                 }
-                Log(key.Status.ToString());
                 return;
             }
         }

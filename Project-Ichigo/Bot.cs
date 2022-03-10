@@ -85,7 +85,7 @@ internal class Bot
 
                 LogInfo($"Connecting to database..");
 
-                _databaseHelper = await DatabaseHelper.InitializeDatabase(_guilds, _users, _submissionBans, _submittedUrls, _globalBans);
+                _databaseHelper = await DatabaseHelper.InitializeDatabase(_watcher, _guilds, _users, _submissionBans, _submittedUrls, _globalBans);
                 mainDatabaseConnection = _databaseHelper.mainDatabaseConnection;
 
                 databaseConnectionSc.Stop();
@@ -582,9 +582,17 @@ internal class Bot
                 {
                     _bumpReminder.ScheduleBump(sender, guild.Key);
                 }
+
+                foreach (var member in guild.Value.Members)
+                    if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Value.Id))
+                    {
+                        LogDebug($"Added {member.Value.Id} to {guild.Key}");
+                        _guilds.Servers[guild.Key].Members.Add(member.Value.Id, new());
+                    }
             }
 
             await _databaseHelper.CheckGuildTables();
+
         }).Add(_watcher);
     }
 }
