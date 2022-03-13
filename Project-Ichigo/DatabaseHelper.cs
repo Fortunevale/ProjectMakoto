@@ -161,13 +161,13 @@ internal class DatabaseHelper
 
         foreach (var b in _guilds.Servers)
         {
-            if (!GuildTables.Contains($"guild-{b.Key}"))
+            if (!GuildTables.Contains($"{b.Key}"))
             {
-                LogWarn($"Missing table 'guild-{b.Key}'. Creating..");
-                string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`guild-{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
+                LogWarn($"Missing table '{b.Key}'. Creating..");
+                string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
 
                 await guildDatabaseConnection.ExecuteAsync(sql);
-                LogInfo($"Created table 'guild-{b.Key}'.");
+                LogInfo($"Created table '{b.Key}'.");
             }
         }
 
@@ -175,7 +175,7 @@ internal class DatabaseHelper
 
         foreach (var b in GuildTables)
         {
-            if (b.StartsWith("guild-"))
+            if (b != "writetester")
             {
                 var Columns = await ListColumns(guildDatabaseConnection, b);
 
@@ -350,6 +350,17 @@ internal class DatabaseHelper
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DELETE FROM `{table}` WHERE {row_match}='{value}'";
+        cmd.Connection = connection;
+        await cmd.ExecuteNonQueryAsync();
+    }
+
+    public async Task DropTable(MySqlConnection connection, string table)
+    {
+        if (Disposed)
+            throw new Exception("DatabaseHelper is disposed");
+
+        var cmd = connection.CreateCommand();
+        cmd.CommandText = $"DROP TABLE IF EXISTS `{table}`";
         cmd.Connection = connection;
         await cmd.ExecuteNonQueryAsync();
     }
@@ -529,7 +540,7 @@ internal class DatabaseHelper
                                 }
 
                                 var cmd = mainDatabaseConnection.CreateCommand();
-                                cmd.CommandText = GetSaveCommand($"guild-{guild.Key}", DatabaseColumnLists.guild_users);
+                                cmd.CommandText = GetSaveCommand($"{guild.Key}", DatabaseColumnLists.guild_users);
 
                                 for (int i = 0; i < DatabaseInserts.Count; i++)
                                 {
@@ -547,14 +558,14 @@ internal class DatabaseHelper
                                 cmd.Connection = guildDatabaseConnection;
                                 await cmd.ExecuteNonQueryAsync();
 
-                                LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guild-{guild.Key}'.");
+                                LogInfo($"Inserted {DatabaseInserts.Count} rows into table '{guild.Key}'.");
                                 DatabaseInserts.Clear();
                                 DatabaseInserts = null;
                                 cmd.Dispose();
                             }
                             catch (Exception ex)
                             {
-                                LogError($"An exception occured while trying to update the guild-{guild.Key} table: {ex}");
+                                LogError($"An exception occured while trying to update the {guild.Key} table: {ex}");
                             }
                         }
 

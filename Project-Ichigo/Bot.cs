@@ -6,6 +6,7 @@ internal class Bot
     internal LavalinkNodeConnection? LavalinkNodeConnection;
 
     internal MySqlConnection mainDatabaseConnection;
+    internal MySqlConnection guildDatabaseConnection;
 
 
 
@@ -87,6 +88,7 @@ internal class Bot
 
                 _databaseHelper = await DatabaseHelper.InitializeDatabase(_watcher, _guilds, _users, _submissionBans, _submittedUrls, _globalBans);
                 mainDatabaseConnection = _databaseHelper.mainDatabaseConnection;
+                guildDatabaseConnection = _databaseHelper.guildDatabaseConnection;
 
                 databaseConnectionSc.Stop();
                 LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
@@ -151,6 +153,37 @@ internal class Bot
 
                 LogInfo($"Loaded {_guilds.Servers.Count} guilds from table 'guilds'.");
 
+                foreach (var table in await _databaseHelper.ListTables(guildDatabaseConnection))
+                {
+                    if (table.StartsWith("guild-"))
+                    {
+                        LogWarn($"Table '{table}' uses old format. Dropping table.");
+                        await _databaseHelper.DropTable(guildDatabaseConnection, table);
+                        continue;
+                    }
+
+                    if (Regex.IsMatch(table, @"^\d+$"))
+                    {
+                        LogDebug($"Loading members from table '{table}'..");
+                        IEnumerable<DatabaseMembers> memberList = guildDatabaseConnection.Query<DatabaseMembers>(_databaseHelper.GetLoadCommand(table, DatabaseColumnLists.guild_users));
+
+                        if (!_guilds.Servers.ContainsKey(Convert.ToUInt64(table)))
+                        {
+                            LogWarn($"Table '{table}' has no server attached to it. Dropping table.");
+                            await _databaseHelper.DropTable(guildDatabaseConnection, table);
+                            continue;
+                        }
+
+                        foreach (var b in memberList)
+                            _guilds.Servers[Convert.ToUInt64(table)].Members.Add(b.userid, new Members
+                            {
+                                Level = b.level,
+                                Experience = b.experience,
+                            });
+
+                        LogInfo($"Loaded {_guilds.Servers[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
+                    }
+                }
 
 
                 LogDebug($"Loading users from table 'users'..");
