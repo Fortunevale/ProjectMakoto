@@ -26,12 +26,17 @@ internal static class Extensions
 
     internal static bool IsProtected(this DiscordMember member, Status _status)
     {
-        if (member.Permissions.HasPermission(Permissions.Administrator) || member.Permissions.HasPermission(Permissions.ModerateMembers) || 
-            member.IsMaintenance(_status) || 
+        if (member.Permissions.HasPermission(Permissions.Administrator) || member.Permissions.HasPermission(Permissions.ModerateMembers) ||
+            member.IsMaintenance(_status) ||
             member.IsOwner)
             return true;
 
         return false;
+    }
+
+    internal static async Task<DiscordMember> ConvertToMember(this DiscordUser user, DiscordGuild guild)
+    {
+        return await guild.GetMemberAsync(user.Id);
     }
 
     internal static string BoolToEmote(this bool b)
@@ -180,7 +185,7 @@ internal static class Extensions
     //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||
     //        member.Roles.Any(x => x.Id == Objects.Settings.advancedPermissionsRoleId) ||
     //        member.Roles.Any(x => x.Id == Objects.Settings.teamRoleId) ||
-    //        member.Roles.Any(x => x.Id == Objects.Settings.antibotRoleId) || 
+    //        member.Roles.Any(x => x.Id == Objects.Settings.antibotRoleId) ||
     //        (Objects.MaintenanceAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
     //        (Objects.ProtectedAccounts.Contains(member.Id) && Objects.Settings.serverId != 494984485201379370) ||
     //        member.IsOwner)

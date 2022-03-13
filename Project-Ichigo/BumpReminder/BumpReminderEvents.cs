@@ -42,7 +42,9 @@ internal class BumpReminderEvents
             if (e.Author.Id != Resources.AccountIds.Disboard || !e.Message.Embeds.Any())
                 return;
 
-            if (e.Message.Embeds[0].Description.ToLower().Contains("bump done"))
+            LogDebug($"{JsonConvert.SerializeObject(e.Message.Embeds, Formatting.Indented)}");
+
+            if (e.Message.Embeds[0].Description.ToLower().Contains(":thumbsup:"))
             {
                 List<string> Mentions = e.Message.Embeds[0].Description.ToLower().GetMentions();
 
@@ -62,7 +64,7 @@ internal class BumpReminderEvents
             }
             else
             {
-                if (_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump > DateTime.UtcNow.AddHours(2))
+                if (_guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump < DateTime.UtcNow.AddHours(-2))
                 {
                     if (e.Message.Embeds[0].Description.ToLower().Contains("please wait another"))
                     {

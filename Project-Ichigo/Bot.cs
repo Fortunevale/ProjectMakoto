@@ -450,8 +450,8 @@ internal class Bot
 
                 LogDebug($"Registering Experience Events..");
 
-                ExperienceEvents experienceEvents = new(_watcher, _guilds);
-                discordClient.MessageCreated += bumpReminderEvents.MessageCreated;
+                //ExperienceEvents experienceEvents = new(_watcher, _guilds);
+                //discordClient.MessageCreated += experienceEvents.MessageCreated;
 
 
 
