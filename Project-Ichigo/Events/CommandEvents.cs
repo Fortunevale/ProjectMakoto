@@ -13,7 +13,7 @@ internal class CommandEvents
     {
         Task.Run(async () =>
         {
-            LogInfo($"Successfully executed '{e.Context.Prefix}{e.Command.Name}{(e.Context.RawArgumentString == "" ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}) ({e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds}ms)");
+            LogInfo($"Successfully executed '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}) ({e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds}ms)");
 
             try
             {
@@ -32,7 +32,7 @@ internal class CommandEvents
                 Task.Run(async () =>
                 {
                     if (e.Command is not null)
-                        LogWarn($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(e.Context.RawArgumentString == "" ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}): {e.Exception}");
+                        LogWarn($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}): {e.Exception}");
 
                     try
                     {
@@ -52,7 +52,7 @@ internal class CommandEvents
             {
                 Task.Run(async () =>
                 {
-                    LogError($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(e.Context.RawArgumentString == "" ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name}  on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}): {e.Exception}");
+                    LogError($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name}  on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}): {e.Exception}");
 
                     try
                     {

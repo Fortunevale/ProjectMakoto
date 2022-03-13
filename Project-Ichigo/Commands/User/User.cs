@@ -792,10 +792,11 @@ internal class User : BaseCommandModule
         {
             bool AddLinkButton = true;
 
-            if ((id == "" || id.Contains('@')) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
+            if ((string.IsNullOrWhiteSpace(id) || id.Contains('@')) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
             {
-                if (!_users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
-                    _users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
+                if (id.Contains('@'))
+                    if (!_users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
+                        _users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
 
                 if (_users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id != 0)
                 {
@@ -827,7 +828,7 @@ internal class User : BaseCommandModule
         if (!_users.List.ContainsKey(ctx.User.Id))
             _users.List.Add(ctx.User.Id, new Users.Info());
 
-        if (id == "")
+        if (string.IsNullOrWhiteSpace(id))
         {
             if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
             {

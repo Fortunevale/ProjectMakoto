@@ -13,6 +13,12 @@ internal class Resources
         public static readonly string Debug = "https://cdn.discordapp.com/attachments/712761268393738301/839854418861359114/Debug.png";
     }
 
+    public class Regex
+    {
+        public static readonly string YouTubeUrl = @"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$";
+        public static readonly string Url = @"((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?)";
+    }
+
     public class AuditLogIcons
     {
         public static readonly string GuildUpdated = "https://cdn.discordapp.com/attachments/712761268393738301/846833791079415878/GuildUpdated.png";

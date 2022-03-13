@@ -22,7 +22,7 @@ internal class TaskWatcher
                 var ctx = b.ctx;
 
                 if (ctx != null)
-                    LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString == "" ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id}): {b.task.Exception}");
+                    LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id}): {b.task.Exception}");
                 else
                     LogError($"A non-command task failed to execute: {b.task.Exception}");
 
@@ -42,7 +42,7 @@ internal class TaskWatcher
                                                            $"\n```");
                     }
                     catch { }
-                
+
                 tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
             }
 

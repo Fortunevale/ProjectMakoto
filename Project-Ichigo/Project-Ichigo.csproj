@@ -35,6 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="DatabaseHelper.cs~RF4ad72e.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00289" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00289" />

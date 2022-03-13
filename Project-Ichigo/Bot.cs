@@ -448,6 +448,11 @@ internal class Bot
                 discordClient.MessageReactionAdded += bumpReminderEvents.ReactionAdded;
                 discordClient.MessageReactionRemoved += bumpReminderEvents.ReactionRemoved;
 
+                LogDebug($"Registering Experience Events..");
+
+                ExperienceEvents experienceEvents = new(_watcher, _guilds);
+                discordClient.MessageCreated += bumpReminderEvents.MessageCreated;
+
 
 
                 LogDebug($"Registering Interactivity..");
