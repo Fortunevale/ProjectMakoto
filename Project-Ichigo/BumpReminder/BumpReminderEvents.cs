@@ -42,8 +42,6 @@ internal class BumpReminderEvents
             if (e.Author.Id != Resources.AccountIds.Disboard || !e.Message.Embeds.Any())
                 return;
 
-            LogDebug($"{JsonConvert.SerializeObject(e.Message.Embeds, Formatting.Indented)}");
-
             if (e.Message.Embeds[0].Description.ToLower().Contains(":thumbsup:"))
             {
                 _guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow;
