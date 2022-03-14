@@ -2,7 +2,7 @@
   "profiles": {
     "Project-Ichigo": {
       "commandName": "Project",
-      "commandLineArgs": "--token OTI5MzczODA2NDM3NDcwMjYw.YdmYzg.AQBejkP5rI-B4qYGYKfRiMioLbU"
+      "commandLineArgs": "--debug --token OTI5MzczODA2NDM3NDcwMjYw.YdmYzg.AQBejkP5rI-B4qYGYKfRiMioLbU"
     }
   }
 }

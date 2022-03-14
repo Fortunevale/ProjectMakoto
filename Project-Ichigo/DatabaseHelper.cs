@@ -505,7 +505,7 @@ internal class DatabaseHelper
                         cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
-                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
+                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -558,7 +558,7 @@ internal class DatabaseHelper
                                 cmd.Connection = guildDatabaseConnection;
                                 await cmd.ExecuteNonQueryAsync();
 
-                                LogInfo($"Inserted {DatabaseInserts.Count} rows into table '{guild.Key}'.");
+                                LogDebug($"Inserted {DatabaseInserts.Count} rows into table '{guild.Key}'.");
                                 DatabaseInserts.Clear();
                                 DatabaseInserts = null;
                                 cmd.Dispose();
@@ -614,7 +614,7 @@ internal class DatabaseHelper
                         cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
-                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
+                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -657,7 +657,7 @@ internal class DatabaseHelper
                         cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
-                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
+                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -700,7 +700,7 @@ internal class DatabaseHelper
                         cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
-                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
+                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -743,7 +743,7 @@ internal class DatabaseHelper
                         cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
-                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
+                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -788,7 +788,7 @@ internal class DatabaseHelper
                         cmd.Connection = mainDatabaseConnection;
                         await cmd.ExecuteNonQueryAsync();
 
-                        LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
+                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();

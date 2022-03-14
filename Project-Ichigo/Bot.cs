@@ -44,13 +44,22 @@ internal class Bot
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
 
-        StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
+        StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
 
         LogInfo("Starting up..");
 
-#if DEBUG
-        LogFatal("Running in debug mode");
-#endif
+        try
+        {
+            if (args.Contains("--debug"))
+            {
+                ChangeLogLevel(LogLevel.DEBUG);
+                LogInfo("Debug logs enabled");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogError($"An exception occured while to enable debug logs: {ex}");
+        }
 
         _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
 
@@ -324,7 +333,7 @@ internal class Bot
                 {
                     Token = $"{token}",
                     TokenType = TokenType.Bot,
-                    MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Warning,
+                    MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Information,
                     Intents = DiscordIntents.All,
                     LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
                     AutoReconnect = true
@@ -591,15 +600,15 @@ internal class Bot
 
         LogInfo($"Flushing to database..");
         await _databaseHelper.SyncDatabase(true);
-        LogInfo($"Flushed to database.");
+        LogDebug($"Flushed to database.");
 
         LogInfo($"Closing Discord Client..");
         await discordClient.DisconnectAsync();
-        LogInfo($"Closed Discord Client.");
+        LogDebug($"Closed Discord Client.");
 
         LogInfo($"Closing database..");
         await _databaseHelper.Dispose();
-        LogInfo($"Closed database.");
+        LogDebug($"Closed database.");
 
         Thread.Sleep(1000);
         LogInfo($"Goodbye!");

@@ -126,7 +126,7 @@ public class PhishingUrlUpdater
             cmd.Connection = databaseConnection;
             await cmd.ExecuteNonQueryAsync();
 
-            LogInfo($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
+            LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
             UpdateRunning = false;
             DatabaseInserts.Clear();
             DatabaseInserts = null;
@@ -159,7 +159,7 @@ public class PhishingUrlUpdater
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();
 
-        foreach (var url in new string[] 
+        foreach (var url in new string[]
         {
             "https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json",
             "https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt",
