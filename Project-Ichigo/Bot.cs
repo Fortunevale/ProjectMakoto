@@ -218,6 +218,10 @@ internal class Bot
                         ScoreSaber = new()
                         {
                             Id = b.scoresaber_id
+                        },
+                        ExperienceUserSettings = new()
+                        {
+                            DirectMessageOptOut = b.experience_directmessageoptout
                         }
                     });
 

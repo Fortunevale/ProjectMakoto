@@ -51,6 +51,7 @@ internal class DatabaseColumnLists
         new Column("afk_reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("afk_pings", "text", "utf8mb4_0900_ai_ci"),
         new Column("afk_pingamount", "bigint"),
+        new Column("experience_directmessageoptout", "tinyint(1)"),
         new Column("submission_accepted_tos", "tinyint(1)"),
         new Column("submission_accepted_submissions", "text", "utf8mb4_0900_ai_ci"),
         new Column("submission_last_datetime", "datetime"),

@@ -9,5 +9,6 @@ internal class Users
         public UrlSubmissions UrlSubmissions { get; set; } = new();
         public AfkStatus AfkStatus { get; set; } = new();
         public ScoreSaber ScoreSaber { get; set; } = new();
+        public ExperienceUserSettings ExperienceUserSettings { get; set; } = new();
     }
 }

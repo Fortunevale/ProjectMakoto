@@ -133,7 +133,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static string GenerateUsage(this Command cmd)
     {
-        string Usage = "";
+        string Usage = cmd.Name;
 
         if (cmd.Overloads.Count > 0)
         {
@@ -167,5 +167,10 @@ internal static class PreMadeEmbedsExtensions
                          .Replace("String", "Text");
         }
         return Usage;
+    }
+
+    public static string GenerateAliases(this IReadOnlyList<string> aliases)
+    {
+        return $"{(aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", aliases)}`)" : "")}";
     }
 }

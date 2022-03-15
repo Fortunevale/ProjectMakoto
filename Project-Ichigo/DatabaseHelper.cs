@@ -579,6 +579,7 @@ internal class DatabaseHelper
                             afk_reason = x.Value.AfkStatus.Reason,
                             afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
                             afk_pingamount = x.Value.AfkStatus.MessagesAmount,
+                            experience_directmessageoptout = x.Value.ExperienceUserSettings.DirectMessageOptOut,
                             submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
                             submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
                             submission_last_datetime = x.Value.UrlSubmissions.LastTime,
@@ -603,6 +604,7 @@ internal class DatabaseHelper
                             cmd.Parameters.AddWithValue($"afk_reason{i}", DatabaseInserts[i].afk_reason);
                             cmd.Parameters.AddWithValue($"afk_pings{i}", DatabaseInserts[i].afk_pings);
                             cmd.Parameters.AddWithValue($"afk_pingamount{i}", DatabaseInserts[i].afk_pingamount);
+                            cmd.Parameters.AddWithValue($"experience_directmessageoptout{i}", DatabaseInserts[i].experience_directmessageoptout);
                             cmd.Parameters.AddWithValue($"submission_accepted_tos{i}", DatabaseInserts[i].submission_accepted_tos);
                             cmd.Parameters.AddWithValue($"submission_accepted_submissions{i}", DatabaseInserts[i].submission_accepted_submissions);
                             cmd.Parameters.AddWithValue($"submission_last_datetime{i}", DatabaseInserts[i].submission_last_datetime);
