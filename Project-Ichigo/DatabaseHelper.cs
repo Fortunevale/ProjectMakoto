@@ -531,7 +531,8 @@ internal class DatabaseHelper
                                     userid = x.Key,
 
                                     experience = x.Value.Experience,
-                                    level = x.Value.Level
+                                    experience_level = x.Value.Level,
+                                    experience_last_message = Convert.ToUInt64(x.Value.Last_Message.ToUniversalTime().Ticks)
                                 }).ToList();
 
                                 if (mainDatabaseConnection == null)
@@ -549,7 +550,8 @@ internal class DatabaseHelper
                                     cmd.Parameters.AddWithValue($"userid{i}", DatabaseInserts[i].userid);
 
                                     cmd.Parameters.AddWithValue($"experience{i}", DatabaseInserts[i].experience);
-                                    cmd.Parameters.AddWithValue($"level{i}", DatabaseInserts[i].level);
+                                    cmd.Parameters.AddWithValue($"level{i}", DatabaseInserts[i].experience_level);
+                                    cmd.Parameters.AddWithValue($"experience_last_message{i}", DatabaseInserts[i].experience_last_message);
                                 }
 
                                 cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

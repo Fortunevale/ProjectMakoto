@@ -186,8 +186,9 @@ internal class Bot
                         foreach (var b in memberList)
                             _guilds.Servers[Convert.ToUInt64(table)].Members.Add(b.userid, new Members
                             {
-                                Level = b.level,
+                                Level = b.experience_level,
                                 Experience = b.experience,
+                                Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message))
                             });
 
                         LogInfo($"Loaded {_guilds.Servers[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");

@@ -3,5 +3,6 @@ internal class DatabaseMembers
 {
     public ulong userid { get; set; }
     public long experience { get; set; }
-    public long level { get; set; }
+    public ulong experience_last_message { get; set; }
+    public long experience_level { get; set; }
 }

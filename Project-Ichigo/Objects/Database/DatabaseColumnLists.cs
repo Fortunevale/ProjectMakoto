@@ -80,8 +80,9 @@ internal class DatabaseColumnLists
     internal readonly static List<Column> guild_users = new()
     {
         new Column("userid", "bigint", primary: true),
+        new Column("experience_last_message", "bigint"),
         new Column("experience", "bigint"),
-        new Column("level", "bigint"),
+        new Column("experience_level", "bigint"),
     };
 
     internal readonly static Dictionary<string, List<Column>> Tables = new()
