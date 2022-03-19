@@ -85,11 +85,6 @@ internal class ExperienceHandler
             server.Servers[guild.Id].Members[user.Id].Experience = 1;
         }
 
-        for (int i = 0; i < 101; i++)
-        {
-            LogDebug($"{CalculateLevelRequirement(i)}");
-        }
-
         server.Servers[guild.Id].Members[user.Id].Experience += Amount;
 
         long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user.Id].Level - 1);
@@ -218,8 +213,6 @@ internal class ExperienceHandler
     {
         if (!LevelCache.ContainsKey(Level))
         {
-            LogDebug($"Calculating Level Requirement for {Level}");
-
             long v = (long)Math.Ceiling(Math.Pow((double)Level, 1.60) * 92);
             LevelCache.Add(Level, v);
         }

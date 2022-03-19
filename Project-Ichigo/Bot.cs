@@ -628,6 +628,11 @@ internal class Bot
         {
             LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
+            for (int i = 0; i < 251; i++)
+            {
+                _experienceHandler.CalculateLevelRequirement(i);
+            }
+
             foreach (var guild in e.Guilds)
             {
                 if (!_guilds.Servers.ContainsKey(guild.Key))
