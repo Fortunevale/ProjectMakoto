@@ -138,12 +138,24 @@ internal class DatabaseHelper
                         Columns = await helper.ListColumns(helper.mainDatabaseConnection, b.Key);
                     }
                 }
+
+                foreach (var col in Columns)
+                {
+                    if (!b.Value.Any(x => x.Name == col.Key))
+                    {
+                        LogWarn($"Invalid column '{col.Key}' in '{b}'");
+
+                        await helper.mainDatabaseConnection.ExecuteAsync($"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`");
+                    }
+                }
             }
         }
         catch (Exception)
         {
             throw;
         }
+
+        await helper.CheckGuildTables();
 
         new Task(new Action(async () =>
         {
@@ -187,7 +199,7 @@ internal class DatabaseHelper
                         string sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
                         await guildDatabaseConnection.ExecuteAsync(sql);
                         LogInfo($"Created column '{col.Name}' in '{b}'.");
-                        Columns = await ListColumns(guildDatabaseConnection, "writetester");
+                        Columns = await ListColumns(guildDatabaseConnection, b);
                     }
 
                     if (Columns[col.Name].ToLower() != col.Type.ToLower())
@@ -196,7 +208,17 @@ internal class DatabaseHelper
                         string sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
                         await guildDatabaseConnection.ExecuteAsync(sql);
                         LogInfo($"Changed column '{col.Name}' in '{b}' to datatype '{col.Type.ToUpper()}'.");
-                        Columns = await ListColumns(guildDatabaseConnection, "writetester");
+                        Columns = await ListColumns(guildDatabaseConnection, b);
+                    }
+                }
+
+                foreach (var col in Columns)
+                {
+                    if (!DatabaseColumnLists.guild_users.Any(x => x.Name == col.Key))
+                    {
+                        LogWarn($"Invalid column '{col.Key}' in '{b}'");
+
+                        await guildDatabaseConnection.ExecuteAsync($"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`");
                     }
                 }
             }
@@ -231,6 +253,16 @@ internal class DatabaseHelper
                 await guildDatabaseConnection.ExecuteAsync(sql);
                 LogInfo($"Changed column '{col.Name}' in 'writetester' to datatype '{col.Type.ToUpper()}'.");
                 GuildColumns = await ListColumns(guildDatabaseConnection, "writetester");
+            }
+        }
+
+        foreach (var col in GuildColumns)
+        {
+            if (!DatabaseColumnLists.Tables["writetester"].Any(x => x.Name == col.Key))
+            {
+                LogWarn($"Invalid column '{col.Key}' in 'writetester'");
+
+                await guildDatabaseConnection.ExecuteAsync($"ALTER TABLE `writetester` DROP COLUMN `{col.Key}`");
             }
         }
     }
@@ -550,7 +582,7 @@ internal class DatabaseHelper
                                     cmd.Parameters.AddWithValue($"userid{i}", DatabaseInserts[i].userid);
 
                                     cmd.Parameters.AddWithValue($"experience{i}", DatabaseInserts[i].experience);
-                                    cmd.Parameters.AddWithValue($"level{i}", DatabaseInserts[i].experience_level);
+                                    cmd.Parameters.AddWithValue($"experience_level{i}", DatabaseInserts[i].experience_level);
                                     cmd.Parameters.AddWithValue($"experience_last_message{i}", DatabaseInserts[i].experience_last_message);
                                 }
 
