@@ -365,6 +365,7 @@ internal class Bot
                     .AddSingleton(_scoreSaberClient)
                     .AddSingleton(_bumpReminder)
                     .AddSingleton(_globalBans)
+                    .AddSingleton(_experienceHandler)
                     .BuildServiceProvider();
 
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
@@ -656,6 +657,7 @@ internal class Bot
             }
 
             await _databaseHelper.CheckGuildTables();
+            await _databaseHelper.SyncDatabase(true);
 
         }).Add(_watcher);
     }

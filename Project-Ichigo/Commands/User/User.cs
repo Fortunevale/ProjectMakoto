@@ -3,6 +3,8 @@ internal class User : BaseCommandModule
 {
     public Status _status { private get; set; }
     public Users _users { private get; set; }
+    public ServerInfo _guilds { private get; set; }
+    public ExperienceHandler _experienceHandler { private get; set; }
     public SubmissionBans _submissionBans { private get; set; }
     public PhishingUrls _phishingUrls { private get; set; }
     public SubmittedUrls _submittedUrls { private get; set; }
@@ -427,6 +429,59 @@ internal class User : BaseCommandModule
             };
 
             await ctx.Channel.SendMessageAsync(embed: embed2);
+        }).Add(_watcher, ctx);
+    }
+
+
+
+    [Command("rank"), Aliases("level", "lvl"),
+    CommandModule("user"),
+    Description("Shows you your current level and progress")]
+    public async Task RankCommand(CommandContext ctx, DiscordUser victim = null)
+    {
+        Task.Run(async () =>
+        {
+            if (!_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            {
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Error,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesystem config' to configure the experience system.`"
+                });
+                return;
+            }
+
+            if (victim is null)
+            {
+                victim = ctx.Member;
+            }
+
+            long current = (long)Math.Floor((decimal)(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+            long max = (long)Math.Floor((decimal)(_experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level) - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+
+            _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = $"Experience • {ctx.Guild.Name}",
+                    IconUrl = ctx.Guild.IconUrl
+                },
+                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US"))}` XP**\n\n" +
+                              $"**Level {(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
+                              $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
+                              $"`{GenerateASCIIProgressbar(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1), _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level) - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1), 44)}` " +
+                              $"`{current}/{max} XP`",
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow,
+                Color = DiscordColor.Aquamarine
+            });
         }).Add(_watcher, ctx);
     }
 
