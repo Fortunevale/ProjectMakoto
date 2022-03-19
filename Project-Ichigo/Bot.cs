@@ -20,7 +20,6 @@ internal class Bot
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
-
     internal GlobalBans _globalBans = new();
 
 
@@ -32,7 +31,7 @@ internal class Bot
     internal CountryCodes _countryCodes { get; set; }
 
 
-
+    internal ExperienceHandler _experienceHandler { get; set; }
     internal static DatabaseHelper _databaseHelper { get; set; }
 
 
@@ -344,7 +343,7 @@ internal class Bot
                     AutoReconnect = true
                 });
 
-
+                _experienceHandler = new(discordClient, _watcher, _guilds, _users);
 
                 LogDebug($"Registering CommandsNext..");
 
@@ -464,8 +463,8 @@ internal class Bot
 
                 LogDebug($"Registering Experience Events..");
 
-                //ExperienceEvents experienceEvents = new(_watcher, _guilds);
-                //discordClient.MessageCreated += experienceEvents.MessageCreated;
+                ExperienceEvents experienceEvents = new(_watcher, _guilds, _experienceHandler);
+                discordClient.MessageCreated += experienceEvents.MessageCreated;
 
 
 
