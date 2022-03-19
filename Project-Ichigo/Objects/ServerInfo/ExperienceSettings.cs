@@ -2,6 +2,6 @@
 
 internal class ExperienceSettings
 {
-    private bool _UseExperience { get; set; } = true;
+    private bool _UseExperience { get; set; } = false;
     public bool UseExperience { get => _UseExperience; set { _UseExperience = value; _ = Bot._databaseHelper.SyncDatabase(); } }
 }
