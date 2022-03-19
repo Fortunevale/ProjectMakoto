@@ -156,6 +156,10 @@ internal class Bot
                         {
                             AutoAssignRoleId = b.auto_assign_role_id,
                             JoinlogChannelId = b.joinlog_channel_id
+                        },
+                        ExperienceSettings = new()
+                        {
+                            UseExperience = b.experience_use
                         }
                     });
 
@@ -635,11 +639,15 @@ internal class Bot
                 }
 
                 foreach (var member in guild.Value.Members)
+                {
                     if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Value.Id))
                     {
                         LogDebug($"Added {member.Value.Id} to {guild.Key}");
                         _guilds.Servers[guild.Key].Members.Add(member.Value.Id, new());
                     }
+
+                    _experienceHandler.CheckExperience(member.Key, guild.Value);
+                }
             }
 
             await _databaseHelper.CheckGuildTables();

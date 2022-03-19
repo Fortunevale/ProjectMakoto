@@ -479,6 +479,8 @@ internal class DatabaseHelper
                         {
                             serverid = x.Key,
 
+                            experience_use = x.Value.ExperienceSettings.UseExperience,
+
                             auto_assign_role_id = x.Value.JoinSettings.AutoAssignRoleId,
                             joinlog_channel_id = x.Value.JoinSettings.JoinlogChannelId,
                             autoban_global_ban = x.Value.JoinSettings.AutoBanGlobalBans,
@@ -511,6 +513,8 @@ internal class DatabaseHelper
                             cmd.CommandText += GetValueCommand(DatabaseColumnLists.guilds, i);
 
                             cmd.Parameters.AddWithValue($"serverid{i}", DatabaseInserts[i].serverid);
+
+                            cmd.Parameters.AddWithValue($"experience_use{i}", DatabaseInserts[i].experience_use);
 
                             cmd.Parameters.AddWithValue($"auto_assign_role_id{i}", DatabaseInserts[i].auto_assign_role_id);
                             cmd.Parameters.AddWithValue($"joinlog_channel_id{i}", DatabaseInserts[i].joinlog_channel_id);

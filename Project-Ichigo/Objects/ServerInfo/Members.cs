@@ -8,7 +8,13 @@ internal class Members
 
 
     private long _Level { get; set; } = 1;
-    public long Level { get => _Level; set { _Level = value; _ = Bot._databaseHelper.SyncDatabase(); } }
+    public long Level { get
+        {
+            if (_Level <= 0)
+                return 1;
+
+            return _Level;
+        } set { _Level = value; _ = Bot._databaseHelper.SyncDatabase(); } }
 
 
     private DateTime _Last_Message { get; set; } = DateTime.UnixEpoch;

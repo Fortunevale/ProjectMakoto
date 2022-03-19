@@ -85,6 +85,11 @@ internal class ExperienceHandler
             server.Servers[guild.Id].Members[user.Id].Experience = 1;
         }
 
+        for (int i = 0; i < 101; i++)
+        {
+            LogDebug($"{CalculateLevelRequirement(i)}");
+        }
+
         server.Servers[guild.Id].Members[user.Id].Experience += Amount;
 
         long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user.Id].Level - 1);
@@ -188,9 +193,25 @@ internal class ExperienceHandler
         }
     }
 
-    internal async void CheckExperience(DiscordMember user, DiscordGuild guild)
+    internal async void CheckExperience(ulong user, DiscordGuild guild)
     {
+        long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level - 1);
+        long RequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level);
 
+        while (RequiredRepuationForNextLevel <= server.Servers[guild.Id].Members[user].Experience)
+        {
+            server.Servers[guild.Id].Members[user].Level++;
+
+            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level - 1);
+            RequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level);
+        }
+
+        while (PreviousRequiredRepuationForNextLevel >= server.Servers[guild.Id].Members[user].Experience)
+        {
+            server.Servers[guild.Id].Members[user].Level--;
+
+            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level - 1);
+        }
     }
 
     internal long CalculateLevelRequirement(long Level)
@@ -199,7 +220,7 @@ internal class ExperienceHandler
         {
             LogDebug($"Calculating Level Requirement for {Level}");
 
-            long v = (long)Math.Ceiling(Math.Pow((double)Level, 1.40) * 247);
+            long v = (long)Math.Ceiling(Math.Pow((double)Level, 1.60) * 92);
             LevelCache.Add(Level, v);
         }
 
