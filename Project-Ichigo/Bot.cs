@@ -361,7 +361,7 @@ internal class Bot
                     .AddSingleton(_experienceHandler)
                     .BuildServiceProvider();
 
-                string Prefix = ";;";
+                string Prefix = ">>";
 
                 bool IsDev = false;
                 bool DevOnline = false;

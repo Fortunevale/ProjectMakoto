@@ -176,12 +176,12 @@ internal class Admin : BaseCommandModule
                                 if (e.Values.First() == "disable_channel")
                                     _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
                                 else if (e.Values.First() == "create_channel")
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = (await ctx.Guild.CreateChannelAsync("joinlog", ChannelType.Text, overwrites: new List<DiscordOverwriteBuilder> 
-                                    { 
-                                        new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) 
-                                        { 
-                                            Allowed = Permissions.ReadMessageHistory | Permissions.AccessChannels, Denied = Permissions.SendMessages 
-                                        } 
+                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = (await ctx.Guild.CreateChannelAsync("joinlog", ChannelType.Text, overwrites: new List<DiscordOverwriteBuilder>
+                                    {
+                                        new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole)
+                                        {
+                                            Allowed = Permissions.ReadMessageHistory | Permissions.AccessChannels, Denied = Permissions.SendMessages
+                                        }
                                     } as IEnumerable<DiscordOverwriteBuilder>)).Id;
                                 else
                                     _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = Convert.ToUInt64(e.Values.First());
@@ -276,6 +276,127 @@ internal class Admin : BaseCommandModule
 
 
 
+    [Command("experience-settings"), Aliases("experiencesettings"),
+    CommandModule("admin"),
+    Description("Allows to review and change settings related to experience")]
+    public async Task ExperienceSettings(CommandContext ctx, [Description("Action")] string action = "help")
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.Member.IsAdmin(_status))
+            {
+                _ = ctx.SendAdminError();
+                return;
+            }
+
+            static async Task SendHelp(CommandContext ctx)
+            {
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
+                });
+            }
+
+            if (action.ToLower() == "help")
+            {
+                await SendHelp(ctx);
+                return;
+            }
+            else if (action.ToLower() == "review")
+            {
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Experience Enabled          ` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
+                                  $"`Experience Boost for Bumpers` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
+                });
+                return;
+            }
+            else if (action.ToLower() == "config")
+            {
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Experience Enabled          ` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
+                                  $"`Experience Boost for Bumpers` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
+                };
+
+                var builder = new DiscordMessageBuilder().WithEmbed(embed);
+
+                var msg = await ctx.Channel.SendMessageAsync(builder.AddComponents(new List<DiscordComponent>
+                {
+                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Experience System") },
+                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), "2", "Toggle Experience Boost for Bumpers") },
+                    { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
+                } as IEnumerable<DiscordComponent>));
+
+                CancellationTokenSource cancellationTokenSource = new();
+
+                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            if (e.Interaction.Data.CustomId == "1")
+                            {
+                                _guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience = !_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience;
+                            }
+                            else if (e.Interaction.Data.CustomId == "2")
+                            {
+                                _guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder = !_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder;
+                            }
+                            else if (e.Interaction.Data.CustomId == "cancel")
+                            {
+                                cancellationTokenSource.Cancel();
+                                _ = msg.DeleteAsync();
+                                return;
+                            }
+
+                            cancellationTokenSource.Cancel();
+                            _ = msg.DeleteAsync();
+                            _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                            return;
+                        }
+                    }).Add(_watcher, ctx);
+                }
+
+                ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+                try
+                {
+                    await Task.Delay(60000, cancellationTokenSource.Token);
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+
+                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                }
+                catch { }
+            }
+            else
+            {
+                await SendHelp(ctx);
+                return;
+            }
+        }).Add(_watcher, ctx);
+    }
+
+
+
     [Command("phishing-settings"), Aliases("phishingsettings", "phishing"),
     CommandModule("admin"),
     Description("Allows to review and change settings for the phishing detection")]
@@ -349,7 +470,7 @@ internal class Admin : BaseCommandModule
 
                 var interactivity = ctx.Client.GetInteractivity();
                 var button = await interactivity.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(60));
-                    
+
                 if (button.TimedOut)
                 {
                     embed.Footer.Text += " • Interaction timed out";
@@ -859,7 +980,7 @@ internal class Admin : BaseCommandModule
                                     {
                                         foreach (var channel in category.Value)
                                             channels.Add(new DiscordSelectComponentOption(
-                                                $"#{channel.Name} ({channel.Id})", 
+                                                $"#{channel.Name} ({channel.Id})",
                                                 channel.Id.ToString(),
                                                 $"{(category.Key != 0 ? $"{channel.Parent.Name} " : "")}"));
                                     }
@@ -894,10 +1015,10 @@ internal class Admin : BaseCommandModule
                                                 if (e.Interaction.Data.CustomId == "selection")
                                                 {
                                                     ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
-                                                    
+
                                                     _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = Convert.ToUInt64(e.Values.First());
                                                     _ = msg.DeleteAsync();
-                                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx); 
+                                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                                                 }
                                                 else if (e.Interaction.Data.CustomId == "prev_page")
                                                 {
@@ -973,10 +1094,10 @@ internal class Admin : BaseCommandModule
                                                 if (e.Interaction.Data.CustomId == "selection")
                                                 {
                                                     ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
-                                                    
+
                                                     _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = Convert.ToUInt64(e.Values.First());
                                                     _ = msg.DeleteAsync();
-                                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx); 
+                                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                                                 }
                                                 else if (e.Interaction.Data.CustomId == "prev_page")
                                                 {
