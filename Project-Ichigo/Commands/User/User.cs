@@ -472,7 +472,7 @@ internal class User : BaseCommandModule
                 Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US"))}` XP**\n\n" +
                               $"**Level {(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
-                              $"`{GenerateASCIIProgressbar(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1), _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level) - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1), 44)}` " +
+                              $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
                 Footer = new DiscordEmbedBuilder.EmbedFooter
                 {

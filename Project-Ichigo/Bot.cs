@@ -32,7 +32,6 @@ internal class Bot
 
     ServiceProvider services { get; set; }
 
-
     internal async Task Init(string[] args)
     {
         if (!Directory.Exists("logs"))
@@ -362,19 +361,31 @@ internal class Bot
                     .AddSingleton(_experienceHandler)
                     .BuildServiceProvider();
 
+                string Prefix = ";;";
+
+                bool IsDev = false;
+                bool DevOnline = false;
+
+                Task<int> GetPrefix(DiscordMessage message)
+                {
+                    return Task<int>.Run(() =>
+                    {
+                        if (!IsDev)
+                            if (DevOnline)
+                                return -1;
+
+                        return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
+                    });
+                }
+
                 var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
                 {
-#if DEBUG
-                    StringPrefixes = new[] { ">>" },
-#endif
-#if !DEBUG
-                    StringPrefixes = new[] { ";;" },
-#endif
                     EnableDefaultHelp = false,
                     EnableMentionPrefix = false,
                     IgnoreExtraArguments = true,
                     EnableDms = false,
-                    ServiceProvider = services
+                    ServiceProvider = services,
+                    PrefixResolver = new PrefixResolverDelegate(GetPrefix)
                 });
 
 
@@ -498,6 +509,25 @@ internal class Bot
                     discordLoginSc.Stop();
                     LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
                     _status.DiscordInitialized = true;
+
+                    IsDev = (discordClient.CurrentApplication.Id == 929373806437470260);
+
+                    if (!IsDev)
+                        Task.Run(async () =>
+                        {
+                            while (true)
+                            {
+                                try
+                                {
+                                    DevOnline = ((await discordClient.GetUserAsync(929373806437470260)).Presence.ClientStatus.Desktop.Value != UserStatus.Offline);
+                                }
+                                catch (Exception)
+                                {
+                                    LogError($"An exception occured while trying to request the status of the developer client.");
+                                }
+                                await Task.Delay(10000);
+                            }
+                        }).Add(_watcher);
 
                     _ = Task.Run(() =>
                     {
