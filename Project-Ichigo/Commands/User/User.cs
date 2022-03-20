@@ -492,7 +492,7 @@ internal class User : BaseCommandModule
     Description("Shows the current leaderboard of people with most people invited.")]
     public async Task LeaderboardCommand(CommandContext ctx, [Description("3-50")]int ShowAmount = 10)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             try
             {
@@ -584,7 +584,7 @@ internal class User : BaseCommandModule
             {
                 LogError($"Failed to display leaderboard: {ex}");
             }
-        });
+        }).Add(_watcher, ctx);
     }
 
 
