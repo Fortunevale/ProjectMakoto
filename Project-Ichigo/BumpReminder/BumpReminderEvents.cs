@@ -5,12 +5,14 @@ internal class BumpReminderEvents
     TaskWatcher.TaskWatcher _watcher { get; set; }
     ServerInfo _guilds { get; set; }
     BumpReminder _reminder { get; set; }
+    ExperienceHandler _experienceHandler { get; set; }
 
-    internal BumpReminderEvents(TaskWatcher.TaskWatcher watcher, ServerInfo _guilds, BumpReminder _reminder)
+    internal BumpReminderEvents(TaskWatcher.TaskWatcher watcher, ServerInfo _guilds, BumpReminder _reminder, ExperienceHandler _experienceHandler)
     {
         _watcher = watcher;
         this._guilds = _guilds;
         this._reminder = _reminder;
+        this._experienceHandler = _experienceHandler;
     }
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
@@ -70,6 +72,13 @@ internal class BumpReminderEvents
 
                     e.Channel.SendMessageAsync($"**{_bumper.Mention} Thanks a lot for supporting the server!**\n\n" +
                                                $"_**You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message!**_").Add(_watcher);
+
+                    try
+                    {
+                        if (_guilds.Servers[e.Guild.Id].ExperienceSettings.UseExperience && _guilds.Servers[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
+                            _experienceHandler.ModifyExperience(_bumper, e.Guild, e.Channel, 50);
+                    }
+                    catch { }
 
                     _reminder.ScheduleBump(sender, e.Guild.Id);
                 }

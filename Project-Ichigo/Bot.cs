@@ -465,7 +465,7 @@ internal class Bot
 
                 LogDebug($"Registering BumpReminder Events..");
 
-                BumpReminderEvents bumpReminderEvents = new(_watcher, _guilds, _bumpReminder);
+                BumpReminderEvents bumpReminderEvents = new(_watcher, _guilds, _bumpReminder, _experienceHandler);
                 discordClient.MessageCreated += bumpReminderEvents.MessageCreated;
                 discordClient.MessageDeleted += bumpReminderEvents.MessageDeleted;
                 discordClient.MessageReactionAdded += bumpReminderEvents.ReactionAdded;

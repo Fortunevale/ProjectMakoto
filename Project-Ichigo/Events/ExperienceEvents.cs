@@ -30,8 +30,14 @@ internal class ExperienceEvents
             {
                 var exp = _experienceHandler.CalculateMessageExperience(e.Message);
 
+                if (_guilds.Servers[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
+                {
+                    exp = (int)Math.Round(((await e.Author.ConvertToMember(e.Guild)).Roles.Any(x => x.Id == _guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId) ? exp * 1.5 : exp), 0);
+                }
+
                 if (exp > 0)
                 {
+                    LogDebug(exp.ToString());
                     _guilds.Servers[e.Guild.Id].Members[e.Author.Id].Last_Message = DateTime.UtcNow;
                     _experienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
                 }
