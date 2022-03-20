@@ -20,7 +20,7 @@ internal class Maintainers : BaseCommandModule
             throw new NotImplementedException();
         }).Add(_watcher, ctx);
     }
-    
+
     [Command("globalban"), Aliases("global-ban"),
     CommandModule("maintainence"),
     Description("Bans a user from all servers opted into globalbans")]
@@ -71,8 +71,8 @@ internal class Maintainers : BaseCommandModule
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' from {Success} guilds.`";
             _ = msg.ModifyAsync(embed.Build());
         }).Add(_watcher, ctx);
-    }    
-    
+    }
+
     [Command("globalunban"), Aliases("global-unban"),
     CommandModule("maintainence"),
     Description("Removes a user from global bans (doesn't unban user from all servers)")]
@@ -84,7 +84,7 @@ internal class Maintainers : BaseCommandModule
                 return;
 
             _globalBans.Users.Remove(victim.Id);
-            await _databaseHelper.DeleteRow(_databaseHelper.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
+            await _databaseHelper._helper.DeleteRow(_databaseHelper.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
