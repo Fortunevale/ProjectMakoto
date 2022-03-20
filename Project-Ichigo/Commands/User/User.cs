@@ -449,7 +449,7 @@ internal class User : BaseCommandModule
                     Color = ColorHelper.Error,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesystem config' to configure the experience system.`"
+                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
                 });
                 return;
             }
@@ -469,7 +469,7 @@ internal class User : BaseCommandModule
                     Name = $"Experience • {ctx.Guild.Name}",
                     IconUrl = ctx.Guild.IconUrl
                 },
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US"))}` XP**\n\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "").Replace(",", ".")}` XP**\n\n" +
                               $"**Level {(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
@@ -480,9 +480,111 @@ internal class User : BaseCommandModule
                     IconUrl = ctx.Member.AvatarUrl
                 },
                 Timestamp = DateTime.UtcNow,
-                Color = DiscordColor.Aquamarine
+                Color = ColorHelper.HiddenSidebar
             });
         }).Add(_watcher, ctx);
+    }
+
+
+
+    [Command("leaderboard"),
+    CommandModule("user"),
+    Description("Shows the current leaderboard of people with most people invited.")]
+    public async Task LeaderboardCommand(CommandContext ctx, [Description("3-50")]int ShowAmount = 10)
+    {
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                if (!_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+                {
+                    await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
+                        Color = ColorHelper.Error,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
+                    });
+                    return;
+                }
+
+                if (ShowAmount is > 50 or < 3)
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
+
+                var PerformingActionEmbed = new DiscordEmbedBuilder
+                {
+                    Color = ColorHelper.HiddenSidebar,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
+                        Name = $"Experience Leaderboard"
+                    },
+                    Description = $"`Loading Leaderboard, please wait..`",
+                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                    {
+                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                        IconUrl = ctx.Member.AvatarUrl
+                    },
+                    Timestamp = DateTime.UtcNow
+                };
+
+                var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+
+                string build = "";
+                int count = 0;
+
+                int currentuserplacement = 0;
+
+                foreach (var b in _guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+                {
+                    currentuserplacement++;
+                    if (b.Key == ctx.User.Id)
+                        break;
+                }
+
+                foreach (var b in _guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+                {
+                    try
+                    {
+                        DiscordMember bMember = await ctx.Guild.GetMemberAsync(b.Key);
+
+                        if (bMember.IsBot)
+                            continue;
+
+                        if (b.Value.Experience <= 1)
+                            break;
+
+                        count++;
+                        build += $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.Username}#{bMember.Discriminator}` (`Level {b.Value.Level} with {b.Value.Experience} XP`)\n";
+
+                        if (count >= ShowAmount)
+                            break;
+                    }
+                    catch { }
+                }
+
+                if (build != "")
+                {
+                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                    PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.\n\n{build}";
+                    await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                }
+                else
+                {
+                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                    PerformingActionEmbed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
+                    await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to display leaderboard: {ex}");
+            }
+        });
     }
 
 
