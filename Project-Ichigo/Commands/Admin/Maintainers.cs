@@ -21,6 +21,20 @@ internal class Maintainers : BaseCommandModule
         }).Add(_watcher, ctx);
     }
 
+    [Command("stop"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task Stop(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_status))
+                return;
+
+            File.WriteAllText("updated", "");
+        }).Add(_watcher, ctx);
+    }
+
     [Command("globalban"), Aliases("global-ban"),
     CommandModule("maintainence"),
     Description("Bans a user from all servers opted into globalbans")]
