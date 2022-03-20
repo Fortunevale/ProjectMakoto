@@ -188,7 +188,7 @@ internal class ExperienceHandler
         }
     }
 
-    internal async void CheckExperience(ulong user, DiscordGuild guild)
+    internal void CheckExperience(ulong user, DiscordGuild guild)
     {
         long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level - 1);
         long RequiredRepuationForNextLevel = CalculateLevelRequirement(server.Servers[guild.Id].Members[user].Level);

@@ -456,9 +456,7 @@ internal class DatabaseClient
                     }
 
                 var check = CheckGuildTables();
-
                 check.Add(_watcher);
-                check.Wait();
 
                 if (_guilds.Servers.Count > 0)
                     foreach (var guild in _guilds.Servers)

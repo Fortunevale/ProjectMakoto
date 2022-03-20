@@ -6,6 +6,7 @@ internal class Maintainers : BaseCommandModule
     public GlobalBans _globalBans { private get; set; }
     public DatabaseClient _databaseHelper { private get; set; }
     public TaskWatcher.TaskWatcher _watcher { private get; set; }
+    public ExperienceHandler _experienceHandler { private get; set; }
 
     [Command("throw"),
     CommandModule("hidden"),
@@ -108,6 +109,67 @@ internal class Maintainers : BaseCommandModule
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
             });
+        }).Add(_watcher, ctx);
+    }
+
+    [Command("import"),
+    CommandModule("maintainence"),
+    Description("Allows import of Kaffeemaschine settings")]
+    public async Task SettingsImport(CommandContext ctx, string load)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_status))
+                return;
+
+            if (ctx.Message.Attachments.Count == 0)
+                throw new Exception($"File required");
+
+            if (ctx.Message.Attachments[0].FileName.ToLower() == "usercache.json")
+            {
+                string file_content = await new HttpClient().GetStringAsync(ctx.Message.Attachments[0].Url);
+
+                Dictionary<ulong, UserCache.UserCacheObjects> Users = JsonConvert.DeserializeObject<Dictionary<ulong, UserCache.UserCacheObjects>>(file_content);
+
+                await _databaseHelper.SyncDatabase(true);
+
+                switch (load.ToLower())
+                {
+                    case "xp":
+                    case "exp":
+                    {
+                        try
+                        {
+                            foreach (var user in Users)
+                            {
+                                if ((long)user.Value.Experience <= 0)
+                                    continue;
+
+                                if (!_guilds.Servers[ctx.Guild.Id].Members.ContainsKey(user.Key))
+                                    _guilds.Servers[ctx.Guild.Id].Members.Add(user.Key, new());
+
+                                _guilds.Servers[ctx.Guild.Id].Members[user.Key].Experience = (long)user.Value.Experience;
+                                _experienceHandler.CheckExperience(user.Key, ctx.Guild);
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
+
+                        _ = ctx.Channel.SendMessageAsync($"`Imported {Users.Count} users`");
+
+                        break;
+                    }
+                    default:
+                        throw new Exception("Unknown load type");
+                }
+
+                await _databaseHelper.SyncDatabase(true);
+            }
+            else
+                throw new Exception($"Unhandled file");
+
         }).Add(_watcher, ctx);
     }
 }
