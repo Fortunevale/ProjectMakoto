@@ -2,14 +2,12 @@ namespace Project_Ichigo.PhishingProtection;
 
 public class PhishingUrlUpdater
 {
-    internal PhishingUrlUpdater(MySqlConnection con, DatabaseHelper helper)
+    internal PhishingUrlUpdater(DatabaseClient helper)
     {
-        databaseConnection = con;
-        databaseHelper = helper;
+        _databaseClient = helper;
     }
 
-    internal MySqlConnection databaseConnection { private get; set; }
-    internal DatabaseHelper databaseHelper { private get; set; }
+    internal DatabaseClient _databaseClient { private get; set; }
 
     public async Task UpdatePhishingUrlDatabase(PhishingUrls phishingUrls)
     {
@@ -80,13 +78,13 @@ public class PhishingUrlUpdater
 
         try
         {
-            if (!databaseConnection.Ping())
+            if (!_databaseClient.mainDatabaseConnection.Ping())
             {
                 try
                 {
                     LogWarn("Pinging the database failed, attempting reconnect.");
-                    databaseConnection.Open();
-                    await databaseHelper.SelectDatabase(databaseConnection, Secrets.Secrets.MainDatabaseName, true);
+                    _databaseClient.mainDatabaseConnection.Open();
+                    await _databaseClient._helper.SelectDatabase(_databaseClient.mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
                 }
                 catch (Exception ex)
                 {
@@ -103,17 +101,17 @@ public class PhishingUrlUpdater
                 submitter = x.Value.Submitter
             }).OrderBy(x => x.url).ToList();
 
-            if (databaseConnection == null)
+            if (_databaseClient.mainDatabaseConnection == null)
             {
                 throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
             }
 
-            var cmd = databaseConnection.CreateCommand();
-            cmd.CommandText = databaseHelper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
+            var cmd = _databaseClient.mainDatabaseConnection.CreateCommand();
+            cmd.CommandText = _databaseClient._helper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
 
             for (int i = 0; i < DatabaseInserts.Count; i++)
             {
-                cmd.CommandText += databaseHelper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
+                cmd.CommandText += _databaseClient._helper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
 
                 cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url);
                 cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin);
@@ -121,9 +119,9 @@ public class PhishingUrlUpdater
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-            cmd.CommandText += databaseHelper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
+            cmd.CommandText += _databaseClient._helper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
 
-            cmd.Connection = databaseConnection;
+            cmd.Connection = _databaseClient.mainDatabaseConnection;
             await cmd.ExecuteNonQueryAsync();
 
             LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
@@ -134,7 +132,7 @@ public class PhishingUrlUpdater
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    await databaseHelper.DeleteRow(databaseConnection, "scam_urls", "url", $"{b}");
+                    await _databaseClient._helper.DeleteRow(_databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
 
                     LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }

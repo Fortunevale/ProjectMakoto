@@ -7,6 +7,7 @@ public class DatabaseServerSettings
     public ulong joinlog_channel_id { get; set; }
     public bool autoban_global_ban { get; set; }
     public bool experience_use { get; set; }
+    public bool experience_boost_bumpreminder { get; set; }
     public bool bump_enabled { get; set; }
     public ulong bump_role { get; set; }
     public ulong bump_channel { get; set; }

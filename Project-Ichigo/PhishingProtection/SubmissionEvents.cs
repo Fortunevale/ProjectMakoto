@@ -2,18 +2,16 @@
 
 internal class SubmissionEvents
 {
-    internal SubmissionEvents(MySqlConnection databaseConnection, DatabaseHelper databaseHelper, SubmittedUrls _submittedUrls, PhishingUrls _phishingUrls, Status _status, SubmissionBans _submissionBans)
+    internal SubmissionEvents(DatabaseClient client, SubmittedUrls _submittedUrls, PhishingUrls _phishingUrls, Status _status, SubmissionBans _submissionBans)
     {
-        this.databaseConnection = databaseConnection;
-        this.databaseHelper = databaseHelper;
+        this._databaseClient = client;
         this._submittedUrls = _submittedUrls;
         this._phishingUrls = _phishingUrls;
         this._status = _status;
         this._submissionBans = _submissionBans;
     }
 
-    internal MySqlConnection databaseConnection { private get; set; }
-    internal DatabaseHelper databaseHelper { private get; set; }
+    internal DatabaseClient _databaseClient { get; set; }
     internal SubmittedUrls _submittedUrls { private get; set; }
     internal PhishingUrls _phishingUrls { private get; set; }
     internal Status _status { private get; set; }
@@ -43,7 +41,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await _databaseClient._helper.DeleteRow(_databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -51,7 +49,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        _ = new PhishingUrlUpdater(databaseConnection, databaseHelper).UpdateDatabase(_phishingUrls, new());
+                        _ = new PhishingUrlUpdater(_databaseClient).UpdateDatabase(_phishingUrls, new());
                     }
                     catch (Exception ex)
                     {
@@ -64,7 +62,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await _databaseClient._helper.DeleteRow(_databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -80,7 +78,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await _databaseClient._helper.DeleteRow(_databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 
@@ -98,7 +96,7 @@ internal class SubmissionEvents
 
                     try
                     {
-                        await databaseHelper.DeleteRow(databaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                        await _databaseClient._helper.DeleteRow(_databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                     }
                     catch { }
 

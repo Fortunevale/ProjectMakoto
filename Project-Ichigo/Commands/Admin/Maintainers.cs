@@ -4,7 +4,7 @@ internal class Maintainers : BaseCommandModule
     public Status _status { private get; set; }
     public ServerInfo _guilds { private get; set; }
     public GlobalBans _globalBans { private get; set; }
-    public DatabaseHelper _databaseHelper { private get; set; }
+    public DatabaseClient _databaseHelper { private get; set; }
     public TaskWatcher.TaskWatcher _watcher { private get; set; }
 
     [Command("throw"),

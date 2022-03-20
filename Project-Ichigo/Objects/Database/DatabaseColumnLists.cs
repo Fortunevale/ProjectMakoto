@@ -63,6 +63,7 @@ internal class DatabaseColumnLists
         new Column("auto_assign_role_id", "bigint"),
         new Column("joinlog_channel_id", "bigint"),
         new Column("experience_use", "tinyint(1)"),
+        new Column("experience_boost_bumpreminder", "tinyint(1)"),
         new Column("autoban_global_ban", "tinyint(1)"),
         new Column("bump_enabled", "tinyint(1)"),
         new Column("bump_role", "bigint"),

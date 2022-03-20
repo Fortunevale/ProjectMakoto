@@ -60,6 +60,7 @@ global using Project_Ichigo.Commands;
 global using Project_Ichigo.Commands.User;
 global using Project_Ichigo.Commands.Admin;
 global using Project_Ichigo.Experience;
+global using Project_Ichigo.Database;
 
 global using static Project_Ichigo.Attributes.CustomAttributes;
 
