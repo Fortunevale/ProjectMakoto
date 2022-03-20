@@ -469,7 +469,7 @@ internal class User : BaseCommandModule
                     Name = $"Experience • {ctx.Guild.Name}",
                     IconUrl = ctx.Guild.IconUrl
                 },
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "").Replace(",", ".")}` XP**\n\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
                               $"**Level {(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
@@ -546,11 +546,16 @@ internal class User : BaseCommandModule
                         break;
                 }
 
+                var members = await ctx.Guild.GetAllMembersAsync();
+
                 foreach (var b in _guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
                 {
                     try
                     {
-                        DiscordMember bMember = await ctx.Guild.GetMemberAsync(b.Key);
+                        if (!members.Any(x => x.Id == b.Key))
+                            continue;
+
+                        DiscordMember bMember = members.First(x => x.Id == b.Key);
 
                         if (bMember.IsBot)
                             continue;
