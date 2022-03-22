@@ -373,7 +373,8 @@ internal class Bot
                         if (!IsDev)
                             if (DevOnline)
                                 if (_status.TeamMembers.Any(x => x == message.Author.Id))
-                                    return -1;
+                                    if (message.Channel.GuildId is 929365338544545802 or 938490069839380510)
+                                        return -1;
 
                         if (IsDev)
                             if (!_status.TeamMembers.Any(x => x == message.Author.Id))
