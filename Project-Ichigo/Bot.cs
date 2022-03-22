@@ -519,7 +519,15 @@ internal class Bot
                             {
                                 try
                                 {
-                                    DevOnline = ((await discordClient.GetUserAsync(929373806437470260)).Presence.ClientStatus.Desktop.Value != UserStatus.Offline);
+                                    var bot = await discordClient.GetUserAsync(929373806437470260);
+
+                                    if (bot.Presence is null)
+                                    {
+                                        DevOnline = false;
+                                        continue;
+                                    }
+
+                                    DevOnline = (bot.Presence.ClientStatus.Web.Value != UserStatus.Offline);
                                 }
                                 catch (Exception ex)
                                 {
