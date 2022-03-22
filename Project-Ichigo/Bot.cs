@@ -361,7 +361,7 @@ internal class Bot
                     .AddSingleton(_experienceHandler)
                     .BuildServiceProvider();
 
-                string Prefix = ">>";
+                string Prefix = ";;";
 
                 bool IsDev = false;
                 bool DevOnline = false;
@@ -372,7 +372,8 @@ internal class Bot
                     {
                         if (!IsDev)
                             if (DevOnline)
-                                return -1;
+                                if (_status.TeamMembers.Any(x => x == message.Author.Id))
+                                    return -1;
 
                         return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
                     });
@@ -519,21 +520,30 @@ internal class Bot
                             {
                                 try
                                 {
-                                    var bot = await discordClient.GetUserAsync(929373806437470260);
+                                    var bot = await discordClient.GetUserAsync(929373806437470260, true);
 
                                     if (bot.Presence is null)
                                     {
+                                        LogDebug($"Presence is null, not online.");
                                         DevOnline = false;
+                                        await Task.Delay(8000);
                                         continue;
                                     }
 
-                                    DevOnline = (bot.Presence.ClientStatus.Web.Value != UserStatus.Offline);
+                                    bool isOnline = (bot.Presence.ClientStatus.Web.Value == UserStatus.Online);
+                                    LogDebug($"Presence is {bot.Presence.ClientStatus.Web.Value.ToString()}");
+
+                                    if (isOnline != DevOnline)
+                                    {
+                                        DevOnline = isOnline;
+                                        LogWarn($"Developer client status changed: {isOnline}");
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
                                     LogError($"An exception occured while trying to request the status of the developer client: {ex}");
                                 }
-                                await Task.Delay(10000);
+                                await Task.Delay(8000);
                             }
                         }).Add(_watcher);
 
@@ -644,6 +654,9 @@ internal class Bot
         LogDebug($"Flushed to database.");
 
         LogInfo($"Closing Discord Client..");
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await Task.Delay(1000);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.DisconnectAsync();
         LogDebug($"Closed Discord Client.");
 
