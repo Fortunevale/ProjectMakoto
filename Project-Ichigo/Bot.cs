@@ -375,6 +375,10 @@ internal class Bot
                                 if (_status.TeamMembers.Any(x => x == message.Author.Id))
                                     return -1;
 
+                        if (IsDev)
+                            if (!_status.TeamMembers.Any(x => x == message.Author.Id))
+                                return -1;
+
                         return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
                     });
                 }
