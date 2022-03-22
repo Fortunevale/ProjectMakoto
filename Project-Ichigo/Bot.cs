@@ -3,31 +3,29 @@
 internal class Bot
 {
     internal DiscordClient discordClient;
-    internal LavalinkNodeConnection? LavalinkNodeConnection;
+    internal LavalinkNodeConnection LavalinkNodeConnection;
+
+    internal static DatabaseClient _databaseClient { get; set; }
 
     internal Status _status = new();
-
     internal ServerInfo _guilds = new();
     internal Users _users = new();
 
-    internal PhishingUrls _phishingUrls = new();
+    internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
 
+    internal PhishingUrls _phishingUrls = new();
     internal SubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
     internal GlobalBans _globalBans = new();
 
-
-    internal TaskWatcher.TaskWatcher _watcher = new();
-
-    internal BumpReminder.BumpReminder _bumpReminder { get; set; }
-    internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
     internal ScoreSaberClient _scoreSaberClient { get; set; }
     internal CountryCodes _countryCodes { get; set; }
 
-
+    internal BumpReminder.BumpReminder _bumpReminder { get; set; }
     internal ExperienceHandler _experienceHandler { get; set; }
-    internal static DatabaseClient _databaseClient { get; set; }
+
+    internal TaskWatcher.TaskWatcher _watcher = new();
 
 
     ServiceProvider services { get; set; }
