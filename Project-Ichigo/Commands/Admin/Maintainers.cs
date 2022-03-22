@@ -22,6 +22,8 @@ internal class Maintainers : BaseCommandModule
         }).Add(_watcher, ctx);
     }
 
+
+
     [Command("stop"),
     CommandModule("hidden"),
     Description(" ")]
@@ -35,6 +37,8 @@ internal class Maintainers : BaseCommandModule
             File.WriteAllText("updated", "");
         }).Add(_watcher, ctx);
     }
+
+
 
     [Command("globalban"), Aliases("global-ban"),
     CommandModule("maintainence"),
@@ -88,6 +92,8 @@ internal class Maintainers : BaseCommandModule
         }).Add(_watcher, ctx);
     }
 
+
+
     [Command("globalunban"), Aliases("global-unban"),
     CommandModule("maintainence"),
     Description("Removes a user from global bans (doesn't unban user from all servers)")]
@@ -111,6 +117,8 @@ internal class Maintainers : BaseCommandModule
             });
         }).Add(_watcher, ctx);
     }
+
+
 
     [Command("import"),
     CommandModule("maintainence"),

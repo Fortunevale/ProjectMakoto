@@ -44,15 +44,6 @@ internal class UserCache
         public Dictionary<string, DateTime> CurrentActivities { get; set; } = new();
 
         public Dictionary<string, Int64> StoredActivities { get; set; } = new();
-
-        [JsonProperty("ReputationLevel")]
-        private int MigrationReputationLevel { set { LogDebug($"Migrated RepuationLevel to ExperienceLevel"); ExperienceLevel = value; } }
-
-        [JsonProperty("Reputation")]
-        private float MigrationReputation { set { LogDebug($"Migrated Repuation to Experience"); Experience = value; } }
-
-        [JsonProperty("ReputationMultiplier")]
-        private Dictionary<string, Experience.MultiplierInfo> MigrationReputationMultiplier { set { LogDebug($"Migrated ReputationMultiplier to ExperienceMultiplier"); ExperienceMultiplier = value; } }
     }
 
     internal class SavedRole
