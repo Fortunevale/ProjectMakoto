@@ -531,7 +531,7 @@ internal class Bot
                                     }
 
                                     bool isOnline = (bot.Presence.ClientStatus.Web.Value == UserStatus.Online);
-                                    LogDebug($"Presence is {bot.Presence.ClientStatus.Web.Value.ToString()}");
+                                    LogDebug($"Presence is {bot.Presence.ClientStatus.Web.Value}");
 
                                     if (isOnline != DevOnline)
                                     {
