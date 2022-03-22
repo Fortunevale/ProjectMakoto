@@ -5,7 +5,7 @@ internal class Bot
     internal DiscordClient discordClient;
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
-    internal DatabaseClient _databaseClient { get; set; }
+    internal static DatabaseClient _databaseClient { get; set; }
 
     internal Status _status = new();
     internal ServerInfo _guilds = new();
