@@ -1003,8 +1003,8 @@ internal class User : BaseCommandModule
                             Color = ColorHelper.Success,
                             Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                             Timestamp = DateTime.UtcNow,
-                            Description = $"{ctx.User.Mention} `Linked '{player.name}' ({player.id}) to your account. You can now run '-scoresaber' without an argument to get your profile in an instant.`\n" +
-                                          $"`To remove the link, run '-scoresaber-unlink'.`"
+                            Description = $"{ctx.User.Mention} `Linked '{player.name}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
+                                          $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
                         }));
 
                         _ = Task.Delay(10000).ContinueWith(x =>
