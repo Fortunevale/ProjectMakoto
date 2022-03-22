@@ -521,9 +521,9 @@ internal class Bot
                                 {
                                     DevOnline = ((await discordClient.GetUserAsync(929373806437470260)).Presence.ClientStatus.Desktop.Value != UserStatus.Offline);
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
-                                    LogError($"An exception occured while trying to request the status of the developer client.");
+                                    LogError($"An exception occured while trying to request the status of the developer client: {ex}");
                                 }
                                 await Task.Delay(10000);
                             }
