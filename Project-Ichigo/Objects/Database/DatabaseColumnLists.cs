@@ -9,8 +9,8 @@ internal class DatabaseColumnLists
 
     internal readonly static List<Column> scam_urls = new()
     {
-        new Column("url", "varchar(500)", "utf8mb4_0900_ai_ci", false, true),
-        new Column("origin", "text", "utf8mb4_0900_ai_ci", false, false),
+        new Column("url", "varchar(500)", "utf8mb4_0900_ai_ci", "", false, true),
+        new Column("origin", "text", "utf8mb4_0900_ai_ci", "", false, false),
         new Column("submitter", "bigint"),
     };
 
@@ -102,11 +102,12 @@ internal class DatabaseColumnLists
 
     public class Column
     {
-        public Column(string name, string type, string Collation = "", bool nullable = false, bool primary = false)
+        public Column(string name, string type, string Collation = "", string Default = "", bool nullable = false, bool primary = false)
         {
             this.Name = name;
             this.Type = type;
             this.Collation = Collation;
+            this.Default = Default;
             this.Nullable = nullable;
             this.Primary = primary;
         }
@@ -114,6 +115,7 @@ internal class DatabaseColumnLists
         public string Name { get; set; }
         public string Type { get; set; }
         public string Collation { get; set; }
+        public string Default { get; set; }
         public bool Nullable { get; set; }
         public bool Primary { get; set; }
     }
