@@ -400,7 +400,8 @@ internal class DatabaseClient
                             bump_last_time = Convert.ToUInt64(x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks),
                             bump_last_user = x.Value.BumpReminderSettings.LastUserId,
                             bump_message = x.Value.BumpReminderSettings.MessageId,
-                            bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId
+                            bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
+                            levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards)
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -423,6 +424,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"auto_assign_role_id{i}", DatabaseInserts[i].auto_assign_role_id);
                             cmd.Parameters.AddWithValue($"joinlog_channel_id{i}", DatabaseInserts[i].joinlog_channel_id);
                             cmd.Parameters.AddWithValue($"autoban_global_ban{i}", DatabaseInserts[i].autoban_global_ban);
+
+                            cmd.Parameters.AddWithValue($"levelrewards{i}", DatabaseInserts[i].levelrewards);
 
                             cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
                             cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);

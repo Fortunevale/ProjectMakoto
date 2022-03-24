@@ -61,7 +61,8 @@ internal class DatabaseInit
                 {
                     UseExperience = b.experience_use,
                     BoostXpForBumpReminder = b.experience_boost_bumpreminder
-                }
+                },
+                LevelRewards = JsonConvert.DeserializeObject<List<LevelRewards>>(b.levelrewards),
             });
 
         LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");

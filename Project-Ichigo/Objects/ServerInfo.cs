@@ -10,6 +10,7 @@ internal class ServerInfo
         public BumpReminderSettings BumpReminderSettings { get; set; } = new();
         public JoinSettings JoinSettings { get; set; } = new();
         public ExperienceSettings ExperienceSettings { get; set; } = new();
+        public List<LevelRewards> LevelRewards { get; set; } = new();
         public Dictionary<ulong, Members> Members { get; set; } = new();
     }
 }
