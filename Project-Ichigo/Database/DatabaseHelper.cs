@@ -90,7 +90,7 @@ internal class DatabaseHelper
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DELETE FROM `{table}` WHERE {row_match}='{value}'";
         cmd.Connection = connection;
-        await cmd.ExecuteNonQueryAsync();
+        await _databaseClient._queue.RunCommand(cmd);
     }
 
     public async Task DropTable(MySqlConnection connection, string table)
@@ -101,7 +101,7 @@ internal class DatabaseHelper
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DROP TABLE IF EXISTS `{table}`";
         cmd.Connection = connection;
-        await cmd.ExecuteNonQueryAsync();
+        await _databaseClient._queue.RunCommand(cmd);
     }
 
     public async Task SelectDatabase(MySqlConnection connection, string databaseName, bool CreateIfNotExist = false)

@@ -122,7 +122,7 @@ internal class PhishingUrlUpdater
             cmd.CommandText += _bot._databaseClient._helper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
 
             cmd.Connection = _bot._databaseClient.mainDatabaseConnection;
-            await cmd.ExecuteNonQueryAsync();
+            await _bot._databaseClient._queue.RunCommand(cmd);
 
             LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
             UpdateRunning = false;
