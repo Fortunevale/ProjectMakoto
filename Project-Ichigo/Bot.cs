@@ -442,6 +442,8 @@ internal class Bot
         await DatabaseClient.SyncDatabase(true);
         LogDebug($"Flushed to database.");
 
+        await Task.Delay(1000);
+
         LogInfo($"Closing database..");
         await DatabaseClient.Dispose();
         LogDebug($"Closed database.");
@@ -454,6 +456,7 @@ internal class Bot
         await Task.Delay(1000);
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.DisconnectAsync();
+        discordClient = null;
         LogDebug($"Closed Discord Client.");
     }
 
@@ -462,8 +465,8 @@ internal class Bot
         if (DatabaseClient.IsDisposed())
             return;
 
-        await FlushToDatabase();
         await LogOffDiscord();
+        await FlushToDatabase();
 
         Thread.Sleep(1000);
         LogInfo($"Goodbye!");

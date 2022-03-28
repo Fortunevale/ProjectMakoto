@@ -819,6 +819,14 @@ internal class DatabaseClient
             if (b.Value.customId == "database-connection-watcher")
                 DeleteScheduleTask(b.Key);
 
+        int timeout = 0;
+
+        while (timeout < 30 && _queue.QueueCount() != 0)
+        {
+            timeout++;
+            await Task.Delay(1000);
+        }
+
         Disposed = true;
 
         await mainDatabaseConnection.CloseAsync();
