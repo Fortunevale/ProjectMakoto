@@ -156,10 +156,11 @@ internal class Admin : BaseCommandModule
                                 roles.Add(new DiscordSelectComponentOption("Create one for me..", "create_role"));
 
                                 var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+                                var HighestRoleOnUser = (await ctx.Guild.GetMemberAsync(ctx.User.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
 
                                 foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
                                 {
-                                    if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
+                                    if (HighestRoleOnBot > role.Value.Position && HighestRoleOnUser > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
                                         roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
                                 }
 
@@ -388,6 +389,277 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("levelrewards"), Aliases("level-rewards"),
+    CommandModule("admin"),
+    Description("Allows to review, add and remove levelreward roles")]
+    public async Task LevelRewards(CommandContext ctx, [Description("Action")] string action = "help")
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.Member.IsAdmin(_bot._status))
+            {
+                _ = ctx.SendAdminError();
+                return;
+            }
+
+            static async Task SendHelp(CommandContext ctx)
+            {
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Level Rewards • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} list` - _Displays a list of all level rewards._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} add` - _Adds new level rewards._\n" +
+                                 $"`{ctx.Prefix}{ctx.Command.Name} modify` - _Allows deletion and modification of existing level rewards._\n"
+                });
+            }
+
+            if (action.ToLower() == "help")
+            {
+                _ = SendHelp(ctx);
+                return;
+            }
+            else if (action.ToLower() == "add")
+            {
+                int current_page = 0;
+                List<DiscordSelectComponentOption> roles = new();
+
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Level Rewards • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Select a role to assign.`"
+                };
+
+                var msg = await ctx.Channel.SendMessageAsync(embed);
+
+                async Task RefreshRoleList()
+                {
+                    var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page_role", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                    var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page_role", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                    var dropdown = new DiscordSelectComponent("role_selection", "Select a role..", roles.Skip(current_page * 20).Take(20) as IEnumerable<DiscordSelectComponentOption>);
+                    var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                    if (roles.Skip(current_page * 20).Count() > 20)
+                        builder.AddComponents(next_page_button);
+
+                    if (current_page != 0)
+                        builder.AddComponents(previous_page_button);
+
+                    await msg.ModifyAsync(builder);
+                }
+
+                var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+                var HighestRoleOnUser = (await ctx.Guild.GetMemberAsync(ctx.User.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+
+                foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
+                {
+                    if (HighestRoleOnBot > role.Value.Position && HighestRoleOnUser > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
+                        roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                }
+
+                CancellationTokenSource cancellationTokenSource = new();
+
+                async Task SelectRoleInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            if (e.Interaction.Data.CustomId == "role_selection")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= SelectRoleInteraction;
+
+                                var role = Convert.ToUInt64(e.Values.First());
+
+                                cancellationTokenSource.Cancel();
+                                cancellationTokenSource = new();
+
+                                if (_bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role))
+                                {
+                                    embed.Description = "`The role you're trying to add has already been assigned to a level.`";
+                                    embed.Color = ColorHelper.Error;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                embed.Description = $"`Selected` <@&{role}> `({role}). At what Level should this role be assigned?`";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                var result = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+
+                                if (result.TimedOut)
+                                {
+                                    embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                int level;
+
+                                try
+                                {
+                                    level = Convert.ToInt32(result.Result.Content);
+                                }
+                                catch (Exception)
+                                {
+                                    embed.Description = "`You must specify a valid level.`";
+                                    embed.Color = ColorHelper.Error;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                embed.Description = $"`Selected` <@&{role}> `({role}). It will be assigned at Level {level}. Do you want to display a custom message when the role gets assigned?`";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
+                                {
+                                    { new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes") },
+                                    { new DiscordButtonComponent(ButtonStyle.Danger, "no", "No") }
+                                }));
+
+                                _ = result.Result.DeleteAsync();
+
+                                async Task CustomMessageInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                                {
+                                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                                    {
+                                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                                        cancellationTokenSource.Cancel();
+                                        cancellationTokenSource = new();
+
+                                        string Message = "";
+
+                                        if (e.Interaction.Data.CustomId == "yes")
+                                        {
+                                            embed.Description = $"`Selected` <@&{role}> `({role}). It will be assigned at Level {level}. Please type out your custom message. (<256 characters)`";
+                                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                            var result = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id, TimeSpan.FromMinutes(5));
+
+                                            if (result.TimedOut)
+                                            {
+                                                embed.Footer.Text += " • Interaction timed out";
+                                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                                await Task.Delay(5000);
+                                                _ = msg.DeleteAsync();
+                                                return;
+                                            }
+
+                                            if (result.Result.Content.Length > 256)
+                                            {
+                                                embed.Description = "`Your custom message can't contain more than 256 characters.`";
+                                                embed.Color = ColorHelper.Error;
+                                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                                await Task.Delay(5000);
+                                                _ = msg.DeleteAsync();
+                                                return;
+                                            }
+
+                                            Message = result.Result.Content;
+                                        }
+
+                                        _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Add(new Objects.LevelRewards
+                                        {
+                                            Level = level,
+                                            RoleId = role,
+                                            Message = (string.IsNullOrEmpty(Message) ? "You received ##Role##!" : Message)
+                                        });
+
+                                        embed.Description = $"`The role` <@&{role}> `({role}) will be assigned at Level {level}.`";
+                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    }
+                                }
+
+                                ctx.Client.ComponentInteractionCreated += CustomMessageInteraction;
+
+                                try
+                                {
+                                    await Task.Delay(120000, cancellationTokenSource.Token);
+                                    embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+
+                                    ctx.Client.ComponentInteractionCreated -= CustomMessageInteraction;
+                                }
+                                catch { }
+
+                                return;
+                            }
+                        }
+                    }).Add(_bot._watcher, ctx);
+                }
+
+                ctx.Client.ComponentInteractionCreated += SelectRoleInteraction;
+                await RefreshRoleList();
+
+                try
+                {
+                    await Task.Delay(120000, cancellationTokenSource.Token);
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+
+                    ctx.Client.ComponentInteractionCreated -= SelectRoleInteraction;
+                }
+                catch { }
+            }
+            else if (action.ToLower() == "list")
+            {
+                string Build = "";
+                if (_bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Count != 0)
+                {
+                    foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.OrderBy(x => x.Level))
+                    {
+                        Build += $"**Level**: `{b.Level}`\n" +
+                                    $"**Role**: <@&{b.RoleId}> (`{b.RoleId}`)\n" +
+                                    $"**Message**: `{b.Message}`\n";
+
+                        Build += "\n\n";
+                    }
+                }
+                else
+                {
+                    Build = $"`No level rewards are set up. Run '{ctx.Prefix}{ctx.Command.Name} add' to add one.`";
+                }
+
+                var ListEmbed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Level Rewards • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"{Build}"
+                };
+                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                return;
+            }
+            else
+            {
+                _ = SendHelp(ctx);
+                return;
+            }
+
         }).Add(_bot._watcher, ctx);
     }
 
@@ -788,10 +1060,11 @@ internal class Admin : BaseCommandModule
                 roles.Add(new DiscordSelectComponentOption("Create one for me..", "create"));
 
                 var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+                var HighestRoleOnUser = (await ctx.Guild.GetMemberAsync(ctx.User.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
 
                 foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
                 {
-                    if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
+                    if (HighestRoleOnBot > role.Value.Position && HighestRoleOnUser > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
                         roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
                 }
 
@@ -1053,10 +1326,11 @@ internal class Admin : BaseCommandModule
                                     List<DiscordSelectComponentOption> roles = new();
 
                                     var HighestRoleOnBot = (await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+                                    var HighestRoleOnUser = (await ctx.Guild.GetMemberAsync(ctx.User.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
 
                                     foreach (var role in (await ctx.Client.GetGuildAsync(ctx.Guild.Id)).Roles.OrderByDescending(x => x.Value.Position))
                                     {
-                                        if (HighestRoleOnBot > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
+                                        if (HighestRoleOnBot > role.Value.Position && HighestRoleOnUser > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
                                             roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
                                     }
 
