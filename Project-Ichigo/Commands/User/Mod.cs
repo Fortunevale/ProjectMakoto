@@ -1,8 +1,7 @@
 ﻿namespace Project_Ichigo.Commands.User;
 internal class Mod : BaseCommandModule
 {
-    public Status _status { private get; set; }
-    public TaskWatcher.TaskWatcher _watcher { private get; set; }
+    public Bot _bot { private get; set; }
 
 
 
@@ -423,7 +422,7 @@ internal class Mod : BaseCommandModule
             {
                 LogError($"Error occured downloading emotes: {ex}");
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -532,7 +531,7 @@ internal class Mod : BaseCommandModule
 
                     int total = fetchedMessages.Count;
                     int deleted = 0;
-                    
+
                     List<Task> deletionOperations = new();
 
                     try
@@ -646,7 +645,7 @@ internal class Mod : BaseCommandModule
             {
                 LogError($"Error while trying to delete {number} messages\n\n{ex}");
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -780,7 +779,7 @@ internal class Mod : BaseCommandModule
             status_embed.Color = ColorHelper.Success;
             status_embed.Author.IconUrl = Resources.LogIcons.Info;
             await status_message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(status_embed));
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -852,7 +851,7 @@ internal class Mod : BaseCommandModule
                 }
 
 
-                if (victim.IsProtected(_status))
+                if (victim.IsProtected(_bot._status))
                 {
                     PerformingActionEmbed.Color = DiscordColor.Red;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
@@ -882,7 +881,7 @@ internal class Mod : BaseCommandModule
                 _ = ctx.SendSyntaxError();
                 return;
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -938,7 +937,7 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -1000,7 +999,7 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -1062,7 +1061,7 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -1119,6 +1118,6 @@ internal class Mod : BaseCommandModule
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 }

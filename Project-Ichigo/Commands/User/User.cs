@@ -1,16 +1,7 @@
 ﻿namespace Project_Ichigo.Commands.User;
 internal class User : BaseCommandModule
 {
-    public Status _status { private get; set; }
-    public Users _users { private get; set; }
-    public ServerInfo _guilds { private get; set; }
-    public ExperienceHandler _experienceHandler { private get; set; }
-    public SubmissionBans _submissionBans { private get; set; }
-    public PhishingUrls _phishingUrls { private get; set; }
-    public SubmittedUrls _submittedUrls { private get; set; }
-    public ScoreSaberClient _scoreSaberClient { private get; set; }
-    public CountryCodes _countryCodes { private get; set; }
-    public TaskWatcher.TaskWatcher _watcher { private get; set; }
+    public Bot _bot { private get; set; }
 
 
 
@@ -34,11 +25,11 @@ internal class User : BaseCommandModule
                 switch (module)
                 {
                     case "admin":
-                        if (!ctx.Member.IsAdmin(_status))
+                        if (!ctx.Member.IsAdmin(_bot._status))
                             continue;
                         break;
                     case "maintainence":
-                        if (!ctx.Member.IsMaintenance(_status))
+                        if (!ctx.Member.IsMaintenance(_bot._status))
                             continue;
                         break;
                     case "hidden":
@@ -110,7 +101,7 @@ internal class User : BaseCommandModule
             {
                 throw;
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -191,7 +182,7 @@ internal class User : BaseCommandModule
 
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running on**\n`Loading..`", $"**Currently running on**\n`{Environment.OSVersion.Platform} with DOTNET-{Environment.Version}`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current bot lib and version**\n`Loading..`", $"**Current bot lib and version**\n[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2)} hours`");
+            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.UtcNow - _bot._status.startupTime).TotalHours, 2)} hours`");
             embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current API Latency**\n`Loading..`", $"**Current API Latency**\n`{ctx.Client.Ping}ms`");
 
             await msg.ModifyAsync(embed: embed.Build());
@@ -288,7 +279,7 @@ internal class User : BaseCommandModule
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
             await msg.ModifyAsync(embed: embed.Build());
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -393,7 +384,7 @@ internal class User : BaseCommandModule
             {
                 LogError($"Error occured while trying to generate info about a user: {ex}");
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -429,7 +420,7 @@ internal class User : BaseCommandModule
             };
 
             await ctx.Channel.SendMessageAsync(embed: embed2);
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -441,7 +432,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            if (!_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -459,8 +450,8 @@ internal class User : BaseCommandModule
                 victim = ctx.Member;
             }
 
-            long current = (long)Math.Floor((decimal)(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
-            long max = (long)Math.Floor((decimal)(_experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level) - _experienceHandler.CalculateLevelRequirement(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+            long current = (long)Math.Floor((decimal)(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+            long max = (long)Math.Floor((decimal)(_bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level) - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
 
             _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
             {
@@ -469,8 +460,8 @@ internal class User : BaseCommandModule
                     Name = $"Experience • {ctx.Guild.Name}",
                     IconUrl = ctx.Guild.IconUrl
                 },
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
-                              $"**Level {(_guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
+                              $"**Level {(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
@@ -482,7 +473,7 @@ internal class User : BaseCommandModule
                 Timestamp = DateTime.UtcNow,
                 Color = ColorHelper.HiddenSidebar
             });
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -496,7 +487,7 @@ internal class User : BaseCommandModule
         {
             try
             {
-                if (!_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+                if (!_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
@@ -539,7 +530,7 @@ internal class User : BaseCommandModule
 
                 int currentuserplacement = 0;
 
-                foreach (var b in _guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+                foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
                 {
                     currentuserplacement++;
                     if (b.Key == ctx.User.Id)
@@ -548,7 +539,7 @@ internal class User : BaseCommandModule
 
                 var members = await ctx.Guild.GetAllMembersAsync();
 
-                foreach (var b in _guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+                foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
                 {
                     try
                     {
@@ -589,7 +580,7 @@ internal class User : BaseCommandModule
             {
                 LogError($"Failed to display leaderboard: {ex}");
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -603,10 +594,10 @@ internal class User : BaseCommandModule
         {
             try
             {
-                if (!_users.List.ContainsKey(ctx.User.Id))
-                    _users.List.Add(ctx.User.Id, new Users.Info());
+                if (!_bot._users.List.ContainsKey(ctx.User.Id))
+                    _bot._users.List.Add(ctx.User.Id, new Users.Info());
 
-                if (!_users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
+                if (!_bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
                 {
                     var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
 
@@ -637,7 +628,7 @@ internal class User : BaseCommandModule
                             if (e.Message.Id == tos_accept.Id && e.User.Id == ctx.User.Id)
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                                _users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
+                                _bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
 
                                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
                                 await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
@@ -682,29 +673,29 @@ internal class User : BaseCommandModule
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                if (_users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(_status))
+                if (_bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(_bot._status))
                 {
-                    embed.Description = $"`You cannot submit a domain for the next {_users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
+                    embed.Description = $"`You cannot submit a domain for the next {_bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
                     embed.Color = ColorHelper.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     return;
                 }
 
-                if (_submissionBans.BannedUsers.ContainsKey(ctx.User.Id))
+                if (_bot._submissionBans.BannedUsers.ContainsKey(ctx.User.Id))
                 {
                     embed.Description = $"`You are banned from submitting URLs.`\n" +
-                                        $"`Reason: {_submissionBans.BannedUsers[ctx.User.Id].Reason}`";
+                                        $"`Reason: {_bot._submissionBans.BannedUsers[ctx.User.Id].Reason}`";
                     embed.Color = ColorHelper.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     return;
                 }
 
-                if (_submissionBans.BannedGuilds.ContainsKey(ctx.Guild.Id))
+                if (_bot._submissionBans.BannedGuilds.ContainsKey(ctx.Guild.Id))
                 {
                     embed.Description = $"`This guild is banned from submitting URLs.`\n" +
-                                        $"`Reason: {_submissionBans.BannedGuilds[ctx.Guild.Id].Reason}`";
+                                        $"`Reason: {_bot._submissionBans.BannedGuilds[ctx.Guild.Id].Reason}`";
                     embed.Color = ColorHelper.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
@@ -767,7 +758,7 @@ internal class User : BaseCommandModule
                                     embed.Description = $"`Checking if your domain is already in the database..`";
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                    foreach (var b in _phishingUrls.List)
+                                    foreach (var b in _bot._phishingUrls.List)
                                     {
                                         if (domain.Contains(b.Key))
                                         {
@@ -782,7 +773,7 @@ internal class User : BaseCommandModule
                                     embed.Description = $"`Checking if your domain has already been submitted before..`";
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                    foreach (var b in _submittedUrls.Urls)
+                                    foreach (var b in _bot._submittedUrls.Urls)
                                     {
                                         if (b.Value.Url == domain)
                                         {
@@ -820,14 +811,14 @@ internal class User : BaseCommandModule
                                         { ban_guild_button },
                                     }));
 
-                                    _submittedUrls.Urls.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
+                                    _bot._submittedUrls.Urls.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
                                     {
                                         Url = domain,
                                         Submitter = ctx.User.Id,
                                         GuildOrigin = ctx.Guild.Id
                                     });
 
-                                    _users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
+                                    _bot._users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                                     embed.Description = $"`Submission created. Thanks for your contribution.`";
                                     embed.Color = ColorHelper.Success;
@@ -869,7 +860,7 @@ internal class User : BaseCommandModule
             {
                 LogError($"{ex}");
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -881,8 +872,8 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!_users.List.ContainsKey(ctx.User.Id))
-                _users.List.Add(ctx.User.Id, new Users.Info());
+            if (!_bot._users.List.ContainsKey(ctx.User.Id))
+                _bot._users.List.Add(ctx.User.Id, new Users.Info());
 
             if (reason.Length > 128)
             {
@@ -890,8 +881,8 @@ internal class User : BaseCommandModule
                 return;
             }
 
-            _users.List[ctx.User.Id].AfkStatus.Reason = Formatter.Sanitize(reason).Replace("@", "").Replace("&", "").Replace("#", "").Replace("<", "").Replace(">", "");
-            _users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
+            _bot._users.List[ctx.User.Id].AfkStatus.Reason = Formatter.Sanitize(reason).Replace("@", "").Replace("&", "").Replace("#", "").Replace("<", "").Replace(">", "");
+            _bot._users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
 
             var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
@@ -903,7 +894,7 @@ internal class User : BaseCommandModule
             });
             await Task.Delay(10000);
             _ = msg.DeleteAsync();
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -920,12 +911,12 @@ internal class User : BaseCommandModule
             if ((string.IsNullOrWhiteSpace(id) || id.Contains('@')) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
             {
                 if (id.Contains('@'))
-                    if (!_users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
-                        _users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
+                    if (!_bot._users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
+                        _bot._users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
 
-                if (_users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id != 0)
+                if (_bot._users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id != 0)
                 {
-                    id = _users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id.ToString();
+                    id = _bot._users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id.ToString();
                     AddLinkButton = false;
                 }
                 else
@@ -945,19 +936,19 @@ internal class User : BaseCommandModule
             }
 
             await SendScoreSaberProfile(ctx, id, AddLinkButton);
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
     private async Task SendScoreSaberProfile(CommandContext ctx, string id = "", bool AddLinkButton = true)
     {
-        if (!_users.List.ContainsKey(ctx.User.Id))
-            _users.List.Add(ctx.User.Id, new Users.Info());
+        if (!_bot._users.List.ContainsKey(ctx.User.Id))
+            _bot._users.List.Add(ctx.User.Id, new Users.Info());
 
         if (string.IsNullOrWhiteSpace(id))
         {
-            if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
+            if (_bot._users.List[ctx.User.Id].ScoreSaber.Id != 0)
             {
-                id = _users.List[ctx.User.Id].ScoreSaber.Id.ToString();
+                id = _bot._users.List[ctx.User.Id].ScoreSaber.Id.ToString();
             }
             else
             {
@@ -979,7 +970,7 @@ internal class User : BaseCommandModule
 
         try
         {
-            var player = await _scoreSaberClient.GetPlayerById(id);
+            var player = await _bot._scoreSaberClient.GetPlayerById(id);
 
             CancellationTokenSource cancellationTokenSource = new();
 
@@ -995,7 +986,7 @@ internal class User : BaseCommandModule
                         cancellationTokenSource.Cancel();
 
                         _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                        _users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
+                        _bot._users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                         var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -1012,7 +1003,7 @@ internal class User : BaseCommandModule
                             _ = new_msg.DeleteAsync();
                         });
                     }
-                }).Add(_watcher, ctx);
+                }).Add(_bot._watcher, ctx);
             }
 
             embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
@@ -1029,7 +1020,7 @@ internal class User : BaseCommandModule
             DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            if (_users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+            if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                 builder.AddComponents(components);
 
             _ = msg.ModifyAsync(builder);
@@ -1146,7 +1137,7 @@ internal class User : BaseCommandModule
 
             try
             {
-                if (_users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                 {
                     await Task.Delay(120000, cancellationTokenSource.Token);
                     embed.Footer.Text += " • Interaction timed out";
@@ -1189,7 +1180,7 @@ internal class User : BaseCommandModule
             {
                 List<DiscordSelectComponentOption> continents = new();
                 continents.Add(new DiscordSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")));
-                foreach (var b in _countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
+                foreach (var b in _bot._countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
                 {
                     continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentCode}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
                 }
@@ -1199,7 +1190,7 @@ internal class User : BaseCommandModule
             DiscordSelectComponent GetCountries(string continent_code, string default_country, int page)
             {
                 List<DiscordSelectComponentOption> countries = new();
-                var currentCountryList = _countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == continent_code.ToLower()).Skip((page - 1) * 25).Take(25).ToList();
+                var currentCountryList = _bot._countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == continent_code.ToLower()).Skip((page - 1) * 25).Take(25).ToList();
 
                 foreach (var b in currentCountryList)
                 {
@@ -1252,20 +1243,20 @@ internal class User : BaseCommandModule
 
                                 if (selectedCountry != "no_country")
                                 {
-                                    embed.Description += $"\n`Selected country: '{_countryCodes.List[selectedCountry].Name}'`";
+                                    embed.Description += $"\n`Selected country: '{_bot._countryCodes.List[selectedCountry].Name}'`";
                                 }
 
                                 var page = GetCountries(selectedContinent, selectedCountry, currentPage);
                                 var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(page);
 
-                                if (currentPage == 1 && _countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Count() > 25)
+                                if (currentPage == 1 && _bot._countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Count() > 25)
                                 {
                                     builder.AddComponents(next_page_button);
                                 }
 
                                 if (currentPage != 1)
                                 {
-                                    if (_countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Skip((currentPage - 1) * 25).Count() > 25)
+                                    if (_bot._countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Skip((currentPage - 1) * 25).Count() > 25)
                                         builder.AddComponents(next_page_button);
 
                                     builder.AddComponents(previous_page_button);
@@ -1274,7 +1265,7 @@ internal class User : BaseCommandModule
                                 if (selectedCountry != "no_country")
                                     builder.AddComponents(start_search_button);
 
-                                msg.ModifyAsync(builder).Add(_watcher, ctx);
+                                msg.ModifyAsync(builder).Add(_bot._watcher, ctx);
                             }
 
                             async Task RefreshPlayerList()
@@ -1286,7 +1277,7 @@ internal class User : BaseCommandModule
 
                                 if (currentFetchedPage != lastFetchedPage)
                                 {
-                                    lastSearch = await _scoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
+                                    lastSearch = await _bot._scoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
                                     lastFetchedPage = currentFetchedPage;
                                 }
 
@@ -1447,7 +1438,7 @@ internal class User : BaseCommandModule
                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                         throw;
                     }
-                }).Add(_watcher, ctx);
+                }).Add(_bot._watcher, ctx);
             }
             ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
@@ -1464,7 +1455,7 @@ internal class User : BaseCommandModule
             catch { }
 
             return;
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -1476,12 +1467,12 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!_users.List.ContainsKey(ctx.User.Id))
-                _users.List.Add(ctx.User.Id, new Users.Info());
+            if (!_bot._users.List.ContainsKey(ctx.User.Id))
+                _bot._users.List.Add(ctx.User.Id, new Users.Info());
 
-            if (_users.List[ctx.User.Id].ScoreSaber.Id != 0)
+            if (_bot._users.List[ctx.User.Id].ScoreSaber.Id != 0)
             {
-                _users.List[ctx.User.Id].ScoreSaber.Id = 0;
+                _bot._users.List[ctx.User.Id].ScoreSaber.Id = 0;
 
                 var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -1513,7 +1504,7 @@ internal class User : BaseCommandModule
                     _ = new_msg.DeleteAsync();
                 });
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -1546,6 +1537,6 @@ internal class User : BaseCommandModule
                 ImageUrl = urls[new Random().Next(0, urls.Length)],
                 Color = ColorHelper.HiddenSidebar
             }));
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 }

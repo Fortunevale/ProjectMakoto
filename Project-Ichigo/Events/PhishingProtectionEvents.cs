@@ -2,28 +2,24 @@
 
 internal class PhishingProtectionEvents
 {
-    internal PhishingProtectionEvents(PhishingUrls _phishingUrls, ServerInfo _guilds, TaskWatcher.TaskWatcher watcher)
+    internal PhishingProtectionEvents(Bot _bot)
     {
-        this._phishingUrls = _phishingUrls;
-        this._guilds = _guilds;
-        this._watcher = watcher;
+        this._bot = _bot;
     }
 
-    internal PhishingUrls _phishingUrls { private get; set; }
-    public ServerInfo _guilds { private get; set; }
-    TaskWatcher.TaskWatcher _watcher { get; set; }
+    public Bot _bot { private get; set; }
 
 
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(_watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(_bot._watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore.Content != e.Message.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(_watcher);
+            CheckMessage(sender, e.Guild, e.Message).Add(_bot._watcher);
     }
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
@@ -36,10 +32,10 @@ internal class PhishingProtectionEvents
         if (e.WebhookMessage || guild is null)
             return;
 
-        if (!_guilds.Servers.ContainsKey(guild.Id))
-            _guilds.Servers.Add(guild.Id, new ServerInfo.ServerSettings());
+        if (!_bot._guilds.Servers.ContainsKey(guild.Id))
+            _bot._guilds.Servers.Add(guild.Id, new ServerInfo.ServerSettings());
 
-        if (!_guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
+        if (!_bot._guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
             return;
 
         DiscordMember member;
@@ -53,7 +49,7 @@ internal class PhishingProtectionEvents
             throw;
         }
 
-        foreach (var url in _phishingUrls.List)
+        foreach (var url in _bot._phishingUrls.List)
         {
             if (e.Content.Contains(url.Key))
             {
@@ -76,7 +72,7 @@ internal class PhishingProtectionEvents
 
                     if (unshortened_url != match.Value)
                     {
-                        foreach (var url in _phishingUrls.List)
+                        foreach (var url in _bot._phishingUrls.List)
                         {
                             if (unshortened_url.Contains(url.Key))
                             {
@@ -132,10 +128,10 @@ internal class PhishingProtectionEvents
 
     private async Task PunishMember(DiscordGuild guild, DiscordMember member, DiscordMessage e, string url)
     {
-        if (!_guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
+        if (!_bot._guilds.Servers[guild.Id].PhishingDetectionSettings.DetectPhishing)
             return;
 
-        switch (_guilds.Servers[guild.Id].PhishingDetectionSettings.PunishmentType)
+        switch (_bot._guilds.Servers[guild.Id].PhishingDetectionSettings.PunishmentType)
         {
             case PhishingPunishmentType.DELETE:
             {
@@ -145,19 +141,19 @@ internal class PhishingProtectionEvents
             case PhishingPunishmentType.TIMEOUT:
             {
                 _ = e.DeleteAsync();
-                _ = member.TimeoutAsync(_guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, _guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.TimeoutAsync(_bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, _bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
             case PhishingPunishmentType.KICK:
             {
                 _ = e.DeleteAsync();
-                _ = member.RemoveAsync(_guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.RemoveAsync(_bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
             case PhishingPunishmentType.BAN:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, _guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.BanAsync(7, _bot._guilds.Servers[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
                 break;
             }
         }

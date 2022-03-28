@@ -2,16 +2,12 @@
 
 internal class ExperienceEvents
 {
-    TaskWatcher.TaskWatcher _watcher { get; set; }
-    ServerInfo _guilds { get; set; }
-    ExperienceHandler _experienceHandler { get; set; }
-
-    internal ExperienceEvents(TaskWatcher.TaskWatcher _watcher, ServerInfo _guilds, ExperienceHandler _experienceHandler)
+    internal ExperienceEvents(Bot _bot)
     {
-        this._watcher = _watcher;
-        this._guilds = _guilds;
-        this._experienceHandler = _experienceHandler;
+        this._bot = _bot;
     }
+
+    public Bot _bot { private get; set; }
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
@@ -20,29 +16,29 @@ internal class ExperienceEvents
             if (e.Message.WebhookMessage || e.Guild is null)
                 return;
 
-            if (!_guilds.Servers.ContainsKey(e.Guild.Id))
-                _guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+            if (!_bot._guilds.Servers.ContainsKey(e.Guild.Id))
+                _bot._guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
 
-            if (!_guilds.Servers[e.Guild.Id].ExperienceSettings.UseExperience)
+            if (!_bot._guilds.Servers[e.Guild.Id].ExperienceSettings.UseExperience)
                 return;
 
-            if (_guilds.Servers[e.Guild.Id].Members[e.Author.Id].Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
+            if (_bot._guilds.Servers[e.Guild.Id].Members[e.Author.Id].Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
             {
-                var exp = _experienceHandler.CalculateMessageExperience(e.Message);
+                var exp = _bot._experienceHandler.CalculateMessageExperience(e.Message);
 
-                if (_guilds.Servers[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
+                if (_bot._guilds.Servers[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
                 {
-                    exp = (int)Math.Round(((await e.Author.ConvertToMember(e.Guild)).Roles.Any(x => x.Id == _guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId) ? exp * 1.5 : exp), 0);
+                    exp = (int)Math.Round(((await e.Author.ConvertToMember(e.Guild)).Roles.Any(x => x.Id == _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId) ? exp * 1.5 : exp), 0);
                 }
 
                 if (exp > 0)
                 {
                     LogDebug(exp.ToString());
-                    _guilds.Servers[e.Guild.Id].Members[e.Author.Id].Last_Message = DateTime.UtcNow;
-                    _experienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
+                    _bot._guilds.Servers[e.Guild.Id].Members[e.Author.Id].Last_Message = DateTime.UtcNow;
+                    _bot._experienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
                 }
             }
 
-        }).Add(_watcher);
+        }).Add(_bot._watcher);
     }
 }

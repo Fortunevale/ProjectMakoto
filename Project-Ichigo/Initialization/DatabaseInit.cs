@@ -13,9 +13,9 @@ internal class DatabaseInit
     {
         LogDebug($"Loading phishing urls from table 'scam_urls'..");
 
-        IEnumerable<DatabasePhishingUrlInfo> scamUrls = Bot._databaseClient.mainDatabaseConnection.Query<DatabasePhishingUrlInfo>(Bot._databaseClient._helper.GetLoadCommand("scam_urls", DatabaseColumnLists.scam_urls));
+        IEnumerable<DatabasePhishingUrlInfo> scamUrls = _bot._databaseClient.mainDatabaseConnection.Query<DatabasePhishingUrlInfo>(_bot._databaseClient._helper.GetLoadCommand("scam_urls", DatabaseColumnLists.scam_urls));
 
-        foreach (var b in scamUrls)
+        foreach (DatabasePhishingUrlInfo b in scamUrls)
             _bot._phishingUrls.List.Add(b.url, new PhishingUrls.UrlInfo
             {
                 Url = b.url,
@@ -29,7 +29,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading guilds from table 'guilds'..");
 
-        IEnumerable<DatabaseServerSettings> serverSettings = Bot._databaseClient.mainDatabaseConnection.Query<DatabaseServerSettings>(Bot._databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
+        IEnumerable<DatabaseServerSettings> serverSettings = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseServerSettings>(_bot._databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
         foreach (var b in serverSettings)
             _bot._guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
@@ -67,24 +67,24 @@ internal class DatabaseInit
 
         LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");
 
-        foreach (var table in await Bot._databaseClient._helper.ListTables(Bot._databaseClient.guildDatabaseConnection))
+        foreach (var table in await _bot._databaseClient._helper.ListTables(_bot._databaseClient.guildDatabaseConnection))
         {
             if (table.StartsWith("guild-"))
             {
                 LogWarn($"Table '{table}' uses old format. Dropping table.");
-                await Bot._databaseClient._helper.DropTable(Bot._databaseClient.guildDatabaseConnection, table);
+                await _bot._databaseClient._helper.DropTable(_bot._databaseClient.guildDatabaseConnection, table);
                 continue;
             }
 
             if (Regex.IsMatch(table, @"^\d+$"))
             {
                 LogDebug($"Loading members from table '{table}'..");
-                IEnumerable<DatabaseMembers> memberList = Bot._databaseClient.guildDatabaseConnection.Query<DatabaseMembers>(Bot._databaseClient._helper.GetLoadCommand(table, DatabaseColumnLists.guild_users));
+                IEnumerable<DatabaseMembers> memberList = _bot._databaseClient.guildDatabaseConnection.Query<DatabaseMembers>(_bot._databaseClient._helper.GetLoadCommand(table, DatabaseColumnLists.guild_users));
 
                 if (!_bot._guilds.Servers.ContainsKey(Convert.ToUInt64(table)))
                 {
                     LogWarn($"Table '{table}' has no server attached to it. Dropping table.");
-                    await Bot._databaseClient._helper.DropTable(Bot._databaseClient.guildDatabaseConnection, table);
+                    await _bot._databaseClient._helper.DropTable(_bot._databaseClient.guildDatabaseConnection, table);
                     continue;
                 }
 
@@ -103,7 +103,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading users from table 'users'..");
 
-        IEnumerable<DatabaseUsers> users = Bot._databaseClient.mainDatabaseConnection.Query<DatabaseUsers>(Bot._databaseClient._helper.GetLoadCommand("users", DatabaseColumnLists.users));
+        IEnumerable<DatabaseUsers> users = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseUsers>(_bot._databaseClient._helper.GetLoadCommand("users", DatabaseColumnLists.users));
 
         foreach (var b in users)
             _bot._users.List.Add(b.userid, new Users.Info
@@ -137,7 +137,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading global bans from table 'globalbans'..");
 
-        IEnumerable<DatabaseBanInfo> globalbans = Bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(Bot._databaseClient._helper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
+        IEnumerable<DatabaseBanInfo> globalbans = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot._databaseClient._helper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
 
         foreach (var b in globalbans)
             _bot._globalBans.Users.Add(b.id, new GlobalBans.BanInfo
@@ -152,7 +152,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading submission bans from table 'user_submission_bans'..");
 
-        IEnumerable<DatabaseBanInfo> userbans = Bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(Bot._databaseClient._helper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
+        IEnumerable<DatabaseBanInfo> userbans = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot._databaseClient._helper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
 
         foreach (var b in userbans)
             _bot._submissionBans.BannedUsers.Add(b.id, new SubmissionBans.BanInfo
@@ -167,7 +167,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading submission bans from table 'guild_submission_bans'..");
 
-        IEnumerable<DatabaseBanInfo> guildbans = Bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(Bot._databaseClient._helper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
+        IEnumerable<DatabaseBanInfo> guildbans = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot._databaseClient._helper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
 
         foreach (var b in guildbans)
             _bot._submissionBans.BannedGuilds.Add(b.id, new SubmissionBans.BanInfo
@@ -182,7 +182,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading active submissions from table 'active_url_submissions'..");
 
-        IEnumerable<DatabaseSubmittedUrls> active_submissions = Bot._databaseClient.mainDatabaseConnection.Query<DatabaseSubmittedUrls>(Bot._databaseClient._helper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
+        IEnumerable<DatabaseSubmittedUrls> active_submissions = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseSubmittedUrls>(_bot._databaseClient._helper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
 
         foreach (var b in active_submissions)
             _bot._submittedUrls.Urls.Add(b.messageid, new SubmittedUrls.UrlInfo

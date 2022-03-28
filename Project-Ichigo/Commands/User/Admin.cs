@@ -1,11 +1,7 @@
 ﻿namespace Project_Ichigo.Commands.User;
 internal class Admin : BaseCommandModule
 {
-    public Status _status { private get; set; }
-    public Users _users { private get; set; }
-    public ServerInfo _guilds { private get; set; }
-    public TaskWatcher.TaskWatcher _watcher { private get; set; }
-    public BumpReminder.BumpReminder _reminder { private get; set; }
+    public Bot _bot { private get; set; }
 
 
 
@@ -16,7 +12,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.Member.IsAdmin(_status))
+            if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
                 return;
@@ -49,9 +45,9 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Autoban Globally Banned Users` : {_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
-                                  $"`Joinlog Channel              ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                  $"`Role On Join                 ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
+                    Description = $"`Autoban Globally Banned Users` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
+                                  $"`Joinlog Channel              ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                                  $"`Role On Join                 ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
                 });
                 return;
             }
@@ -63,16 +59,16 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Autoban Globally Banned Users` : {_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
-                                  $"`Joinlog Channel              ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                  $"`Role On Join                 ` : {(_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
+                    Description = $"`Autoban Globally Banned Users` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
+                                  $"`Joinlog Channel              ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                                  $"`Role On Join                 ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
                 };
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder.AddComponents(new List<DiscordComponent>
                 {
-                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Global Bans") },
+                    { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Global Bans") },
                     { new DiscordButtonComponent(ButtonStyle.Primary, "2", "Change Joinlog Channel") },
                     { new DiscordButtonComponent(ButtonStyle.Primary, "3", "Change Role assigned on join") },
                     { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
@@ -131,7 +127,7 @@ internal class Admin : BaseCommandModule
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                                _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !_guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
+                                _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
 
                                 _ = msg.DeleteAsync();
                                 _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
@@ -174,9 +170,9 @@ internal class Admin : BaseCommandModule
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 if (e.Values.First() == "disable_channel")
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
+                                    _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
                                 else if (e.Values.First() == "create_channel")
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = (await ctx.Guild.CreateChannelAsync("joinlog", ChannelType.Text, overwrites: new List<DiscordOverwriteBuilder>
+                                    _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = (await ctx.Guild.CreateChannelAsync("joinlog", ChannelType.Text, overwrites: new List<DiscordOverwriteBuilder>
                                     {
                                         new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole)
                                         {
@@ -184,7 +180,7 @@ internal class Admin : BaseCommandModule
                                         }
                                     } as IEnumerable<DiscordOverwriteBuilder>)).Id;
                                 else
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = Convert.ToUInt64(e.Values.First());
+                                    _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId = Convert.ToUInt64(e.Values.First());
 
                                 cancellationTokenSource.Cancel();
                                 _ = msg.DeleteAsync();
@@ -196,11 +192,11 @@ internal class Admin : BaseCommandModule
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 if (e.Values.First() == "disable_role")
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
+                                    _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
                                 else if (e.Values.First() == "create_role")
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = (await ctx.Guild.CreateRoleAsync("AutoAssignedRole")).Id;
+                                    _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = (await ctx.Guild.CreateRoleAsync("AutoAssignedRole")).Id;
                                 else
-                                    _guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = Convert.ToUInt64(e.Values.First());
+                                    _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = Convert.ToUInt64(e.Values.First());
 
                                 cancellationTokenSource.Cancel();
                                 _ = msg.DeleteAsync();
@@ -249,7 +245,7 @@ internal class Admin : BaseCommandModule
                             }
                             catch { }
                         }
-                    }).Add(_watcher, ctx);
+                    }).Add(_bot._watcher, ctx);
                 }
 
                 ctx.Client.ComponentInteractionCreated += RunInteraction;
@@ -271,7 +267,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -283,7 +279,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.Member.IsAdmin(_status))
+            if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
                 return;
@@ -316,8 +312,8 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Experience Enabled          ` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
-                                  $"`Experience Boost for Bumpers` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
+                    Description = $"`Experience Enabled          ` : {_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
+                                  $"`Experience Boost for Bumpers` : {_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
                 });
                 return;
             }
@@ -329,16 +325,16 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Experience Enabled          ` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
-                                  $"`Experience Boost for Bumpers` : {_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
+                    Description = $"`Experience Enabled          ` : {_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
+                                  $"`Experience Boost for Bumpers` : {_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
                 };
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder.AddComponents(new List<DiscordComponent>
                 {
-                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Experience System") },
-                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), "2", "Toggle Experience Boost for Bumpers") },
+                    { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Experience System") },
+                    { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), "2", "Toggle Experience Boost for Bumpers") },
                     { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
                 } as IEnumerable<DiscordComponent>));
 
@@ -352,11 +348,11 @@ internal class Admin : BaseCommandModule
                         {
                             if (e.Interaction.Data.CustomId == "1")
                             {
-                                _guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience = !_guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience;
+                                _bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience = !_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience;
                             }
                             else if (e.Interaction.Data.CustomId == "2")
                             {
-                                _guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder = !_guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder;
+                                _bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder = !_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder;
                             }
                             else if (e.Interaction.Data.CustomId == "cancel")
                             {
@@ -370,7 +366,7 @@ internal class Admin : BaseCommandModule
                             _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                             return;
                         }
-                    }).Add(_watcher, ctx);
+                    }).Add(_bot._watcher, ctx);
                 }
 
                 ctx.Client.ComponentInteractionCreated += RunInteraction;
@@ -392,7 +388,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -404,7 +400,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.Member.IsAdmin(_status))
+            if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
                 return;
@@ -437,10 +433,10 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Detect Phishing Links   ` : {_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
-                                    $"`Punishment Type         ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
-                                    $"`Custom Punishment Reason` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
-                                    $"`Custom Timeout Length   ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
+                    Description = $"`Detect Phishing Links   ` : {_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
+                                    $"`Punishment Type         ` : `{_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
+                                    $"`Custom Punishment Reason` : `{_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
+                                    $"`Custom Timeout Length   ` : `{_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
                 });
                 return;
             }
@@ -452,16 +448,16 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Detect Phishing Links   ` : {_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
-                                    $"`Punishment Type         ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
-                                    $"`Custom Punishment Reason` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
-                                    $"`Custom Timeout Length   ` : `{_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
+                    Description = $"`Detect Phishing Links   ` : {_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote()}\n" +
+                                    $"`Punishment Type         ` : `{_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
+                                    $"`Custom Punishment Reason` : `{_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
+                                    $"`Custom Timeout Length   ` : `{_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
                 };
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
                 {
-                    { new DiscordButtonComponent((_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Detection") },
+                    { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Detection") },
                     { new DiscordButtonComponent(ButtonStyle.Primary, "2", "Change Punishment") },
                     { new DiscordButtonComponent(ButtonStyle.Secondary, "3", "Change Reason") },
                     { new DiscordButtonComponent(ButtonStyle.Secondary, "4", "Change Timeout Length") },
@@ -493,7 +489,7 @@ internal class Admin : BaseCommandModule
                     case "1":
                     {
                         _ = msg.DeleteAsync();
-                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
+                        _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
                         _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                         break;
                     }
@@ -516,16 +512,16 @@ internal class Admin : BaseCommandModule
                                 switch (e.Values.First())
                                 {
                                     case "Ban":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
+                                        _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
                                         break;
                                     case "Kick":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
+                                        _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
                                         break;
                                     case "Timeout":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
+                                        _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
                                         break;
                                     case "Delete":
-                                        _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
+                                        _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
                                         break;
                                 }
 
@@ -575,7 +571,7 @@ internal class Admin : BaseCommandModule
                         }
 
                         if (reason.Result.Content.ToLower() is not "cancel" or ".")
-                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
+                            _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
 
                         _ = msg3.DeleteAsync();
                         _ = msg.DeleteAsync();
@@ -584,7 +580,7 @@ internal class Admin : BaseCommandModule
                     }
                     case "4":
                     {
-                        if (_guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != PhishingPunishmentType.TIMEOUT)
+                        if (_bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != PhishingPunishmentType.TIMEOUT)
                         {
                             var msg4 = await ctx.Channel.SendMessageAsync("You aren't using `Timeout` as your Punishment");
                             await Task.Delay(5000);
@@ -660,7 +656,7 @@ internal class Admin : BaseCommandModule
                                 return;
                             }
 
-                            _guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
+                            _bot._guilds.Servers[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
 
                             _ = msg3.DeleteAsync();
                             _ = msg.DeleteAsync();
@@ -684,7 +680,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -696,7 +692,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.Member.IsAdmin(_status))
+            if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
                 return;
@@ -724,7 +720,7 @@ internal class Admin : BaseCommandModule
             }
             else if (action.ToLower() == "review")
             {
-                if (!_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled)
+                if (!_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled)
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
@@ -743,15 +739,15 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Bump Reminder Enabled` : {_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
-                                  $"`Bump Reminder Channel` : <#{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
-                                  $"`Bump Reminder Role   ` : <@&{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId})`"
+                    Description = $"`Bump Reminder Enabled` : {_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
+                                  $"`Bump Reminder Channel` : <#{_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
+                                  $"`Bump Reminder Role   ` : <@&{_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId})`"
                 });
                 return;
             }
             else if (action.ToLower() == "setup")
             {
-                if (_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled)
+                if (_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled)
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
@@ -849,14 +845,14 @@ internal class Admin : BaseCommandModule
 
                             _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
 
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = id;
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = ctx.Channel.Id;
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.MessageId = bump_reaction_msg.Id;
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddHours(-2);
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddHours(-2);
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = id;
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = ctx.Channel.Id;
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.MessageId = bump_reaction_msg.Id;
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddHours(-2);
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddHours(-2);
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
-                            _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = true;
+                            _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = true;
 
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
                             embed.Description = "`The Bump Reminder has been set up.`";
@@ -866,7 +862,7 @@ internal class Admin : BaseCommandModule
                             await Task.Delay(5000);
                             _ = msg.DeleteAsync();
 
-                            _reminder.SendPersistentMessage(ctx.Client, e.Channel, null);
+                            _bot._bumpReminder.SendPersistentMessage(ctx.Client, e.Channel, null);
                         }
                         else if (e.Interaction.Data.CustomId == "prev_page")
                         {
@@ -878,7 +874,7 @@ internal class Admin : BaseCommandModule
                             current_page++;
                             await RefreshRoleList();
                         }
-                    }).Add(_watcher, ctx);
+                    }).Add(_bot._watcher, ctx);
                 }
 
                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -903,7 +899,7 @@ internal class Admin : BaseCommandModule
             }
             else if (action.ToLower() == "config")
             {
-                if (!_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled)
+                if (!_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled)
                 {
                     await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                     {
@@ -922,15 +918,15 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Bump Reminder Enabled` : {_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
-                                  $"`Bump Reminder Channel` : <#{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
-                                  $"`Bump Reminder Role   ` : <@&{_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId})`"
+                    Description = $"`Bump Reminder Enabled` : {_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote()}\n" +
+                                  $"`Bump Reminder Channel` : <#{_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
+                                  $"`Bump Reminder Role   ` : <@&{_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId})`"
                 };
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
                     {
-                        { new DiscordButtonComponent(ButtonStyle.Danger, "1", "Disable Bump Reminder", !_guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled) },
+                        { new DiscordButtonComponent(ButtonStyle.Danger, "1", "Disable Bump Reminder", !_bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled) },
                         { new DiscordButtonComponent(ButtonStyle.Primary, "2", "Change Channel") },
                         { new DiscordButtonComponent(ButtonStyle.Primary, "3", "Change Role") },
                         { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
@@ -950,14 +946,14 @@ internal class Admin : BaseCommandModule
                             {
                                 case "1":
                                 {
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = 0;
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = 0;
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.MessageId = 0;
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.MinValue;
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.MinValue;
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = 0;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = 0;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.MessageId = 0;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.MinValue;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.MinValue;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
-                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = false;
+                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.Enabled = false;
 
                                     if (GetScheduleTasks() != null)
                                         if (GetScheduleTasks().Any(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}"))
@@ -1016,7 +1012,7 @@ internal class Admin : BaseCommandModule
                                                 {
                                                     ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = Convert.ToUInt64(e.Values.First());
+                                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.ChannelId = Convert.ToUInt64(e.Values.First());
                                                     _ = msg.DeleteAsync();
                                                     _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                                                 }
@@ -1031,7 +1027,7 @@ internal class Admin : BaseCommandModule
                                                     await RefreshChannelList();
                                                 }
                                             }
-                                        }).Add(_watcher, ctx);
+                                        }).Add(_bot._watcher, ctx);
                                     }
 
                                     ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -1095,7 +1091,7 @@ internal class Admin : BaseCommandModule
                                                 {
                                                     ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                                                    _guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = Convert.ToUInt64(e.Values.First());
+                                                    _bot._guilds.Servers[ctx.Guild.Id].BumpReminderSettings.RoleId = Convert.ToUInt64(e.Values.First());
                                                     _ = msg.DeleteAsync();
                                                     _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                                                 }
@@ -1110,7 +1106,7 @@ internal class Admin : BaseCommandModule
                                                     await RefreshRoleList();
                                                 }
                                             }
-                                        }).Add(_watcher, ctx);
+                                        }).Add(_bot._watcher, ctx);
                                     }
 
                                     ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -1139,7 +1135,7 @@ internal class Admin : BaseCommandModule
                             _ = msg.DeleteAsync();
                             _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                         }
-                    }).Add(_watcher, ctx);
+                    }).Add(_bot._watcher, ctx);
                 };
 
                 ctx.Client.ComponentInteractionCreated += RunInteraction;
@@ -1161,6 +1157,6 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 }

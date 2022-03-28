@@ -1,12 +1,7 @@
 ﻿namespace Project_Ichigo.Commands.Admin;
 internal class Maintainers : BaseCommandModule
 {
-    public Status _status { private get; set; }
-    public ServerInfo _guilds { private get; set; }
-    public GlobalBans _globalBans { private get; set; }
-    public DatabaseClient _databaseHelper { private get; set; }
-    public TaskWatcher.TaskWatcher _watcher { private get; set; }
-    public ExperienceHandler _experienceHandler { private get; set; }
+    public Bot _bot { private get; set; }
 
     [Command("throw"),
     CommandModule("hidden"),
@@ -15,11 +10,11 @@ internal class Maintainers : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.User.IsMaintenance(_status))
+            if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
             throw new NotImplementedException();
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -31,11 +26,11 @@ internal class Maintainers : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.User.IsMaintenance(_status))
+            if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
             File.WriteAllText("updated", "");
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -47,7 +42,7 @@ internal class Maintainers : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.User.IsMaintenance(_status))
+            if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -61,17 +56,17 @@ internal class Maintainers : BaseCommandModule
 
             var msg = await ctx.Channel.SendMessageAsync(embed);
 
-            _globalBans.Users.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
+            _bot._globalBans.Users.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
 
             int Success = 0;
             int Failed = 0;
 
             foreach (var b in ctx.Client.Guilds)
             {
-                if (!_guilds.Servers.ContainsKey(b.Key))
-                    _guilds.Servers.Add(b.Key, new ServerInfo.ServerSettings());
+                if (!_bot._guilds.Servers.ContainsKey(b.Key))
+                    _bot._guilds.Servers.Add(b.Key, new ServerInfo.ServerSettings());
 
-                if (_guilds.Servers[b.Key].JoinSettings.AutoBanGlobalBans)
+                if (_bot._guilds.Servers[b.Key].JoinSettings.AutoBanGlobalBans)
                 {
                     try
                     {
@@ -89,7 +84,7 @@ internal class Maintainers : BaseCommandModule
             embed.Color = ColorHelper.Info;
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' from {Success} guilds.`";
             _ = msg.ModifyAsync(embed.Build());
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -101,11 +96,11 @@ internal class Maintainers : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.User.IsMaintenance(_status))
+            if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
-            _globalBans.Users.Remove(victim.Id);
-            await _databaseHelper._helper.DeleteRow(_databaseHelper.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
+            _bot._globalBans.Users.Remove(victim.Id);
+            await _bot._databaseClient._helper.DeleteRow(_bot._databaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
@@ -115,7 +110,7 @@ internal class Maintainers : BaseCommandModule
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
             });
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 
 
@@ -127,7 +122,7 @@ internal class Maintainers : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!ctx.User.IsMaintenance(_status))
+            if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
             if (ctx.Message.Attachments.Count == 0)
@@ -139,7 +134,7 @@ internal class Maintainers : BaseCommandModule
 
                 Dictionary<ulong, UserCache.UserCacheObjects> Users = JsonConvert.DeserializeObject<Dictionary<ulong, UserCache.UserCacheObjects>>(file_content);
 
-                await _databaseHelper.SyncDatabase(true);
+                await _bot._databaseClient.SyncDatabase(true);
 
                 switch (load.ToLower())
                 {
@@ -153,11 +148,11 @@ internal class Maintainers : BaseCommandModule
                                 if ((long)user.Value.Experience <= 0)
                                     continue;
 
-                                if (!_guilds.Servers[ctx.Guild.Id].Members.ContainsKey(user.Key))
-                                    _guilds.Servers[ctx.Guild.Id].Members.Add(user.Key, new());
+                                if (!_bot._guilds.Servers[ctx.Guild.Id].Members.ContainsKey(user.Key))
+                                    _bot._guilds.Servers[ctx.Guild.Id].Members.Add(user.Key, new());
 
-                                _guilds.Servers[ctx.Guild.Id].Members[user.Key].Experience = (long)user.Value.Experience;
-                                _experienceHandler.CheckExperience(user.Key, ctx.Guild);
+                                _bot._guilds.Servers[ctx.Guild.Id].Members[user.Key].Experience = (long)user.Value.Experience;
+                                _bot._experienceHandler.CheckExperience(user.Key, ctx.Guild);
                             }
                         }
                         catch (Exception)
@@ -173,11 +168,11 @@ internal class Maintainers : BaseCommandModule
                         throw new Exception("Unknown load type");
                 }
 
-                await _databaseHelper.SyncDatabase(true);
+                await _bot._databaseClient.SyncDatabase(true);
             }
             else
                 throw new Exception($"Unhandled file");
 
-        }).Add(_watcher, ctx);
+        }).Add(_bot._watcher, ctx);
     }
 }

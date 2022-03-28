@@ -3,13 +3,9 @@ internal class DatabaseClient
 {
     internal MySqlConnection mainDatabaseConnection { get; set; }
     internal MySqlConnection guildDatabaseConnection { get; set; }
-    internal ServerInfo _guilds { private set; get; }
-    internal Users _users { private get; set; }
-    internal SubmissionBans _submissionBans { private get; set; }
-    internal GlobalBans _globalbans { private get; set; }
-    internal SubmittedUrls _submittedUrls { private get; set; }
-    internal TaskWatcher.TaskWatcher _watcher { private get; set; }
     internal DatabaseHelper _helper { get; private set; }
+
+    public Bot _bot { private get; set; }
 
     private bool Disposed { get; set; } = false;
 
@@ -82,16 +78,11 @@ internal class DatabaseClient
         }
     }
 
-    public static async Task<DatabaseClient> InitializeDatabase(TaskWatcher.TaskWatcher watcher, ServerInfo guilds, Users users, SubmissionBans submissionBans, SubmittedUrls submittedUrls, GlobalBans globalbans)
+    public static async Task<DatabaseClient> InitializeDatabase(Bot _bot)
     {
         var databaseClient = new DatabaseClient
         {
-            _guilds = guilds,
-            _users = users,
-            _submissionBans = submissionBans,
-            _submittedUrls = submittedUrls,
-            _globalbans = globalbans,
-            _watcher = watcher,
+            _bot = _bot,
 
             mainDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;"),
             guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
@@ -174,7 +165,7 @@ internal class DatabaseClient
     {
         var GuildTables = await _helper.ListTables(guildDatabaseConnection);
 
-        foreach (var b in _guilds.Servers)
+        foreach (var b in _bot._guilds.Servers)
         {
             if (!GuildTables.Contains($"{b.Key}"))
             {
@@ -374,10 +365,10 @@ internal class DatabaseClient
                     }
                 }
 
-                if (_guilds.Servers.Count > 0)
+                if (_bot._guilds.Servers.Count > 0)
                     try
                     {
-                        List<DatabaseServerSettings> DatabaseInserts = _guilds.Servers.Select(x => new DatabaseServerSettings
+                        List<DatabaseServerSettings> DatabaseInserts = _bot._guilds.Servers.Select(x => new DatabaseServerSettings
                         {
                             serverid = x.Key,
 
@@ -459,10 +450,10 @@ internal class DatabaseClient
                     }
 
                 var check = CheckGuildTables();
-                check.Add(_watcher);
+                check.Add(_bot._watcher);
 
-                if (_guilds.Servers.Count > 0)
-                    foreach (var guild in _guilds.Servers)
+                if (_bot._guilds.Servers.Count > 0)
+                    foreach (var guild in _bot._guilds.Servers)
                         if (guild.Value.Members.Count > 0)
                         {
                             try
@@ -512,10 +503,10 @@ internal class DatabaseClient
                             }
                         }
 
-                if (_users.List.Count > 0)
+                if (_bot._users.List.Count > 0)
                     try
                     {
-                        List<DatabaseUsers> DatabaseInserts = _users.List.Select(x => new DatabaseUsers
+                        List<DatabaseUsers> DatabaseInserts = _bot._users.List.Select(x => new DatabaseUsers
                         {
                             userid = x.Key,
                             afk_since = Convert.ToUInt64(x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks),
@@ -569,10 +560,10 @@ internal class DatabaseClient
                         LogError($"An exception occured while trying to update the users table: {ex}");
                     }
 
-                if (_submissionBans.BannedUsers.Count > 0)
+                if (_bot._submissionBans.BannedUsers.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = _submissionBans.BannedUsers.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _bot._submissionBans.BannedUsers.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
@@ -612,10 +603,10 @@ internal class DatabaseClient
                         LogError($"An exception occured while trying to update the user_submission_bans table: {ex}");
                     }
 
-                if (_submissionBans.BannedGuilds.Count > 0)
+                if (_bot._submissionBans.BannedGuilds.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = _submissionBans.BannedGuilds.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _bot._submissionBans.BannedGuilds.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
@@ -655,10 +646,10 @@ internal class DatabaseClient
                         LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
                     }
 
-                if (_globalbans.Users.Count > 0)
+                if (_bot._globalBans.Users.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = _globalbans.Users.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _bot._globalBans.Users.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
@@ -698,10 +689,10 @@ internal class DatabaseClient
                         LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
                     }
 
-                if (_submittedUrls.Urls.Count > 0)
+                if (_bot._submittedUrls.Urls.Count > 0)
                     try
                     {
-                        List<DatabaseSubmittedUrls> DatabaseInserts = _submittedUrls.Urls.Select(x => new DatabaseSubmittedUrls
+                        List<DatabaseSubmittedUrls> DatabaseInserts = _bot._submittedUrls.Urls.Select(x => new DatabaseSubmittedUrls
                         {
                             messageid = x.Key,
                             url = x.Value.Url,

@@ -2,12 +2,12 @@
 
 internal class CommandEvents
 {
-    TaskWatcher.TaskWatcher _watcher { get; set; }
-
-    internal CommandEvents(TaskWatcher.TaskWatcher watcher)
+    internal CommandEvents(Bot _bot)
     {
-        _watcher = watcher;
+        this._bot = _bot;
     }
+
+    public Bot _bot { private get; set; }
 
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
     {
@@ -21,7 +21,7 @@ internal class CommandEvents
                 await e.Context.Message.DeleteAsync();
             }
             catch { }
-        }).Add(_watcher);
+        }).Add(_bot._watcher);
     }
 
     internal async Task CommandError(CommandsNextExtension sender, CommandErrorEventArgs e)
@@ -46,7 +46,7 @@ internal class CommandEvents
                         await e.Context.Message.DeleteAsync();
                     }
                     catch { }
-                }).Add(_watcher);
+                }).Add(_bot._watcher);
             }
             else
             {
@@ -69,7 +69,7 @@ internal class CommandEvents
                         await e.Context.Message.DeleteAsync();
                     }
                     catch { }
-                }).Add(_watcher);
+                }).Add(_bot._watcher);
             }
     }
 }

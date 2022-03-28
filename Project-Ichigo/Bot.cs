@@ -5,7 +5,8 @@ internal class Bot
     internal DiscordClient discordClient;
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
-    internal static DatabaseClient _databaseClient { get; set; }
+    internal static DatabaseClient DatabaseClient { get; set; }
+    internal DatabaseClient _databaseClient { get; set; }
 
     internal Status _status = new();
     internal ServerInfo _guilds = new();
@@ -26,9 +27,6 @@ internal class Bot
     internal ExperienceHandler _experienceHandler { get; set; }
 
     internal TaskWatcher.TaskWatcher _watcher = new();
-
-
-    ServiceProvider services { get; set; }
 
     internal async Task Init(string[] args)
     {
@@ -65,7 +63,7 @@ internal class Bot
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Regex.Replace(Environment.CommandLine, @"(--token \S*)", "")}\n");
 
-        _bumpReminder = new(_watcher, _guilds);
+        _bumpReminder = new(this);
 
         var loadDatabase = Task.Run(async () =>
         {
@@ -75,7 +73,8 @@ internal class Bot
                 databaseConnectionSc.Start();
                 LogInfo($"Connecting to database..");
 
-                _databaseClient = await DatabaseClient.InitializeDatabase(_watcher, _guilds, _users, _submissionBans, _submittedUrls, _globalBans);
+                DatabaseClient = await DatabaseClient.InitializeDatabase(this);
+                _databaseClient = DatabaseClient;
 
                 databaseConnectionSc.Stop();
                 LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
@@ -93,7 +92,7 @@ internal class Bot
                 Environment.Exit(ExitCodes.FailedDatabaseLogin);
             }
 
-            _phishingUrlUpdater = new(_databaseClient);
+            _phishingUrlUpdater = new(this);
             _ = _phishingUrlUpdater.UpdatePhishingUrlDatabase(_phishingUrls);
         });
 
@@ -141,26 +140,9 @@ internal class Bot
                     AutoReconnect = true
                 });
 
-                _experienceHandler = new(discordClient, _watcher, _guilds, _users);
+                _experienceHandler = new(this);
 
                 LogDebug($"Registering CommandsNext..");
-
-                services = new ServiceCollection()
-                    .AddSingleton(discordClient)
-                    .AddSingleton(_status)
-                    .AddSingleton(_databaseClient)
-                    .AddSingleton(_guilds)
-                    .AddSingleton(_users)
-                    .AddSingleton(_phishingUrls)
-                    .AddSingleton(_submissionBans)
-                    .AddSingleton(_submittedUrls)
-                    .AddSingleton(_watcher)
-                    .AddSingleton(_countryCodes)
-                    .AddSingleton(_scoreSaberClient)
-                    .AddSingleton(_bumpReminder)
-                    .AddSingleton(_globalBans)
-                    .AddSingleton(_experienceHandler)
-                    .BuildServiceProvider();
 
                 string Prefix = ";;";
 
@@ -191,7 +173,9 @@ internal class Bot
                     EnableMentionPrefix = false,
                     IgnoreExtraArguments = true,
                     EnableDms = false,
-                    ServiceProvider = services,
+                    ServiceProvider = new ServiceCollection()
+                                    .AddSingleton(this)
+                                    .BuildServiceProvider(),
                     PrefixResolver = new PrefixResolverDelegate(GetPrefix)
                 });
 
@@ -233,24 +217,24 @@ internal class Bot
 
                 LogDebug($"Registering Command Events..");
 
-                CommandEvents commandEvents = new(_watcher);
+                CommandEvents commandEvents = new(this);
                 cNext.CommandExecuted += commandEvents.CommandExecuted;
                 cNext.CommandErrored += commandEvents.CommandError;
 
                 LogDebug($"Registering Afk Events..");
 
-                AfkEvents afkEvents = new(_watcher, _users);
+                AfkEvents afkEvents = new(this);
                 discordClient.MessageCreated += afkEvents.MessageCreated;
 
 
 
                 LogDebug($"Registering Phishing Events..");
 
-                PhishingProtectionEvents phishingProtectionEvents = new(_phishingUrls, _guilds, _watcher);
+                PhishingProtectionEvents phishingProtectionEvents = new(this);
                 discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
                 discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
 
-                SubmissionEvents _submissionEvents = new(_databaseClient, _submittedUrls, _phishingUrls, _status, _submissionBans);
+                SubmissionEvents _submissionEvents = new(this);
                 discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
 
 
@@ -264,7 +248,7 @@ internal class Bot
 
                 LogDebug($"Registering Join Events..");
 
-                JoinEvents joinEvents = new(_guilds, _globalBans, _watcher);
+                JoinEvents joinEvents = new(this);
                 discordClient.GuildMemberAdded += joinEvents.GuildMemberAdded;
                 discordClient.GuildMemberRemoved += joinEvents.GuildMemberRemoved;
 
@@ -272,7 +256,7 @@ internal class Bot
 
                 LogDebug($"Registering BumpReminder Events..");
 
-                BumpReminderEvents bumpReminderEvents = new(_watcher, _guilds, _bumpReminder, _experienceHandler);
+                BumpReminderEvents bumpReminderEvents = new(this);
                 discordClient.MessageCreated += bumpReminderEvents.MessageCreated;
                 discordClient.MessageDeleted += bumpReminderEvents.MessageDeleted;
                 discordClient.MessageReactionAdded += bumpReminderEvents.ReactionAdded;
@@ -280,7 +264,7 @@ internal class Bot
 
                 LogDebug($"Registering Experience Events..");
 
-                ExperienceEvents experienceEvents = new(_watcher, _guilds, _experienceHandler);
+                ExperienceEvents experienceEvents = new(this);
                 discordClient.MessageCreated += experienceEvents.MessageCreated;
 
 
@@ -416,7 +400,7 @@ internal class Bot
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
 
-        _ = _databaseClient.QueueWatcher();
+        _ = DatabaseClient.QueueWatcher();
         _watcher.Watcher();
 
         AppDomain.CurrentDomain.ProcessExit += async delegate
@@ -455,11 +439,11 @@ internal class Bot
     private async Task FlushToDatabase()
     {
         LogInfo($"Flushing to database..");
-        await _databaseClient.SyncDatabase(true);
+        await DatabaseClient.SyncDatabase(true);
         LogDebug($"Flushed to database.");
 
         LogInfo($"Closing database..");
-        await _databaseClient.Dispose();
+        await DatabaseClient.Dispose();
         LogDebug($"Closed database.");
     }
 
@@ -475,7 +459,7 @@ internal class Bot
 
     private async Task RunExitTasks(object? sender, EventArgs e)
     {
-        if (_databaseClient.IsDisposed())
+        if (DatabaseClient.IsDisposed())
             return;
 
         await FlushToDatabase();
@@ -518,8 +502,8 @@ internal class Bot
                 }
             }
 
-            await _databaseClient.CheckGuildTables();
-            await _databaseClient.SyncDatabase(true);
+            await DatabaseClient.CheckGuildTables();
+            await DatabaseClient.SyncDatabase(true);
 
         }).Add(_watcher);
     }
