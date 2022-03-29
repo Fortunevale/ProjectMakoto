@@ -48,13 +48,21 @@ internal class Maintainers : BaseCommandModule
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                Color = ColorHelper.Warning,
+                Color = ColorHelper.Processing,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
             };
 
             var msg = await ctx.Channel.SendMessageAsync(embed);
+
+            if (_bot._status.TeamMembers.Contains(victim.Id))
+            {
+                embed.Color = ColorHelper.Error;
+                embed.Description = $"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`";
+                _ = msg.ModifyAsync(embed.Build());
+                return;
+            }
 
             _bot._globalBans.Users.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
 
@@ -81,7 +89,7 @@ internal class Maintainers : BaseCommandModule
                 }
             }
 
-            embed.Color = ColorHelper.Info;
+            embed.Color = ColorHelper.Success;
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' from {Success} guilds.`";
             _ = msg.ModifyAsync(embed.Build());
         }).Add(_bot._watcher, ctx);
