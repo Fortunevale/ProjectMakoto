@@ -40,7 +40,7 @@ internal class DatabaseQueue
             }
             catch (MySqlException ex)
             {
-                LogError($"{ex}");
+                LogError($"An exception occured while trying to execute a mysql command: {ex}");
                 LogError($"{ex.Number}");
             }
             catch (Exception ex)
