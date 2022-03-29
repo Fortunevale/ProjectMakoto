@@ -451,9 +451,25 @@ internal class Bot
 
     private async Task LogOffDiscord()
     {
+        // Apparently spamming status changes makes it more consistent. Dont ask me how.
+        // It's important that the status changes before the bot shuts down to work around a library issue.
+
         LogInfo($"Closing Discord Client..");
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
         await Task.Delay(1000);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.DisconnectAsync();
         discordClient = null;

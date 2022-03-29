@@ -30,7 +30,7 @@ internal class TaskWatcher
                 {
                     LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
                     LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest.Url}");
-                    LogError($"{JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented)}");
+                    LogError($"{JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented).Replace("\\", "")}");
                 }
 
                 if (ctx != null)

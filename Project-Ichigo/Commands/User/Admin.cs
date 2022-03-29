@@ -445,8 +445,8 @@ internal class Admin : BaseCommandModule
 
                 async Task RefreshRoleList()
                 {
-                    var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page_role", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
-                    var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page_role", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+                    var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                    var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
 
                     var dropdown = new DiscordSelectComponent("role_selection", "Select a role..", roles.Skip(current_page * 20).Take(20) as IEnumerable<DiscordSelectComponentOption>);
                     var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
@@ -605,6 +605,16 @@ internal class Admin : BaseCommandModule
 
                                 return;
                             }
+                            else if (e.Interaction.Data.CustomId == "prev_page")
+                            {
+                                current_page--;
+                                await RefreshRoleList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "next_page")
+                            {
+                                current_page++;
+                                await RefreshRoleList();
+                            }
                         }
                     }).Add(_bot._watcher, ctx);
                 }
@@ -621,6 +631,161 @@ internal class Admin : BaseCommandModule
                     _ = msg.DeleteAsync();
 
                     ctx.Client.ComponentInteractionCreated -= SelectRoleInteraction;
+                }
+                catch { }
+            }
+            else if (action.ToLower() == "modify")
+            {
+                int current_page = 0;
+
+                if (_bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Count == 0)
+                {
+                    var ListEmbed = new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Level Rewards • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"`No level rewards are set up. Run '{ctx.Prefix}{ctx.Command.Name} add' to add one.`"
+                    };
+                    await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                    return;
+                }
+
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Level Rewards • {ctx.Guild.Name}" },
+                    Color = ColorHelper.AwaitingInput,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Select a level reward to modify.`"
+                };
+
+                var msg = await ctx.Channel.SendMessageAsync(embed);
+
+                string selected = "";
+
+                async Task RefreshRewardList()
+                {
+                    List<DiscordSelectComponentOption> roles = new();
+
+                    foreach (var reward in _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.ToList().OrderBy(x => x.Level))
+                    {
+                        if (!ctx.Guild.Roles.ContainsKey(reward.RoleId))
+                        {
+                            _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Remove(reward);
+                            continue;
+                        }
+
+                        var role = ctx.Guild.GetRole(reward.RoleId);
+
+                        roles.Add(new DiscordSelectComponentOption($"Level {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
+
+                        if (selected == role.Id.ToString())
+                        {
+                            embed.Description = $"\n\n" +
+                                                $"**Level**: `{reward.Level}`\n" +
+                                                $"**Role**: <@&{reward.RoleId}> (`{reward.RoleId}`)\n" +
+                                                $"**Message**: `{reward.Message}`\n";
+                        }
+                    }
+
+                    var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                    var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                    var modify_button = new DiscordButtonComponent(ButtonStyle.Primary, "modify", "Modify", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrows_counterclockwise:")));
+                    var delete_button = new DiscordButtonComponent(ButtonStyle.Danger, "delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
+
+                    var dropdown = new DiscordSelectComponent("reward_selection", "Select a level reward..", roles.Skip(current_page * 20).Take(20) as IEnumerable<DiscordSelectComponentOption>);
+                    var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
+
+                    if (roles.Skip(current_page * 20).Count() > 20)
+                        builder.AddComponents(next_page_button);
+
+                    if (current_page != 0)
+                        builder.AddComponents(previous_page_button);
+
+                    if (selected != "")
+                    {
+                        builder.AddComponents(new List<DiscordComponent> { modify_button, delete_button});
+                    }
+
+                    await msg.ModifyAsync(builder);
+                }
+
+                CancellationTokenSource cancellationTokenSource = new();
+
+                async Task SelectInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            cancellationTokenSource.Cancel();
+                            cancellationTokenSource = new();
+
+                            if (e.Interaction.Data.CustomId == "reward_selection")
+                            {
+                                selected = e.Values.First();
+                                await RefreshRewardList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "delete")
+                            {
+                                _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Remove(_bot._guilds.Servers[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
+
+                                if (_bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Count == 0)
+                                {
+                                    embed.Description = $"`There are no more level reward to display.`";
+                                    embed.Color = ColorHelper.Success;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                await RefreshRewardList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "prev_page")
+                            {
+                                current_page--;
+                                await RefreshRewardList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "next_page")
+                            {
+                                current_page++;
+                                await RefreshRewardList();
+                            }
+                        }
+
+                        try
+                        {
+                            await Task.Delay(120000, cancellationTokenSource.Token);
+                            embed.Footer.Text += " • Interaction timed out";
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+
+                            ctx.Client.ComponentInteractionCreated -= SelectInteraction;
+                        }
+                        catch { }
+                    }).Add(_bot._watcher, ctx);
+                }
+
+                await RefreshRewardList();
+
+                ctx.Client.ComponentInteractionCreated += SelectInteraction;
+
+                try
+                {
+                    await Task.Delay(120000, cancellationTokenSource.Token);
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+
+                    ctx.Client.ComponentInteractionCreated -= SelectInteraction;
                 }
                 catch { }
             }
