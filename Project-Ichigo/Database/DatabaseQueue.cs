@@ -51,8 +51,16 @@ internal class DatabaseQueue
             finally
             {
                 lastResolve = b.Key;
-                await Task.Delay(500);
+                await Task.Delay(1000);
             }
+
+            GC.KeepAlive(b);
+            GC.KeepAlive(b.Key);
+            GC.KeepAlive(b.Value);
+            GC.KeepAlive(b.Value.Failed);
+            GC.KeepAlive(b.Value.Command);
+            GC.KeepAlive(b.Value.Executed);
+            GC.KeepAlive(b.Value.Exception);
         }
     }
 
@@ -63,7 +71,7 @@ internal class DatabaseQueue
         Queue.Add(key, new RequestQueue { Command = cmd });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
-            await Task.Delay(100);
+            await Task.Delay(50);
 
         var response = Queue[key];
         Queue.Remove(key);

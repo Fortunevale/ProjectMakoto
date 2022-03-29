@@ -472,7 +472,6 @@ internal class Bot
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.DisconnectAsync();
-        discordClient = null;
         LogDebug($"Closed Discord Client.");
     }
 

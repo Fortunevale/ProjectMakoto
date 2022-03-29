@@ -683,8 +683,7 @@ internal class Admin : BaseCommandModule
 
                         if (selected == role.Id.ToString())
                         {
-                            embed.Description = $"\n\n" +
-                                                $"**Level**: `{reward.Level}`\n" +
+                            embed.Description = $"**Level**: `{reward.Level}`\n" +
                                                 $"**Role**: <@&{reward.RoleId}> (`{reward.RoleId}`)\n" +
                                                 $"**Message**: `{reward.Message}`\n";
                         }
@@ -693,8 +692,10 @@ internal class Admin : BaseCommandModule
                     var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
                     var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
 
-                    var modify_button = new DiscordButtonComponent(ButtonStyle.Primary, "modify", "Modify", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrows_counterclockwise:")));
+                    var modify_button = new DiscordButtonComponent(ButtonStyle.Primary, "modify", "Modify Message", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrows_counterclockwise:")));
                     var delete_button = new DiscordButtonComponent(ButtonStyle.Danger, "delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
+
+                    var cancel_button = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
 
                     var dropdown = new DiscordSelectComponent("reward_selection", "Select a level reward..", roles.Skip(current_page * 20).Take(20) as IEnumerable<DiscordSelectComponentOption>);
                     var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown);
@@ -709,6 +710,8 @@ internal class Admin : BaseCommandModule
                     {
                         builder.AddComponents(new List<DiscordComponent> { modify_button, delete_button});
                     }
+
+                    builder.AddComponents(cancel_button);
 
                     await msg.ModifyAsync(builder);
                 }
@@ -745,6 +748,42 @@ internal class Admin : BaseCommandModule
                                     return;
                                 }
 
+                                embed.Description = $"`Select a level reward to modify.`";
+                                selected = "";
+
+                                await RefreshRewardList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "modify")
+                            {
+                                embed.Description = $"{embed.Description}\n\n`Please type out your new custom message (<256 characters). Type 'cancel' to cancel.`";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                var result = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id, TimeSpan.FromMinutes(5));
+
+                                if (result.TimedOut)
+                                {
+                                    embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                if (result.Result.Content.Length > 256)
+                                {
+                                    embed.Description = "`Your custom message can't contain more than 256 characters.`";
+                                    embed.Color = ColorHelper.Error;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                if (result.Result.Content.ToLower() != "cancel")
+                                {
+                                    _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result.Result.Content;
+                                }
+
                                 await RefreshRewardList();
                             }
                             else if (e.Interaction.Data.CustomId == "prev_page")
@@ -756,6 +795,11 @@ internal class Admin : BaseCommandModule
                             {
                                 current_page++;
                                 await RefreshRewardList();
+                            }
+                            else if (e.Interaction.Data.CustomId == "cancel")
+                            {
+                                _ = msg.DeleteAsync();
+                                return;
                             }
                         }
 
