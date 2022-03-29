@@ -194,9 +194,9 @@ internal class DatabaseClient
                 LogWarn($"Missing table '{b.Key}'. Creating..");
                 string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
 
-                var cmd = mainDatabaseConnection.CreateCommand();
+                var cmd = guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = sql;
-                cmd.Connection = mainDatabaseConnection;
+                cmd.Connection = guildDatabaseConnection;
 
                 await _queue.RunCommand(cmd);
                 LogInfo($"Created table '{b.Key}'.");
@@ -218,9 +218,9 @@ internal class DatabaseClient
                         LogWarn($"Missing column '{col.Name}' in '{b}'. Creating..");
                         string sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
-                        var cmd = mainDatabaseConnection.CreateCommand();
+                        var cmd = guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
-                        cmd.Connection = mainDatabaseConnection;
+                        cmd.Connection = guildDatabaseConnection;
 
                         await _queue.RunCommand(cmd);
 
@@ -233,9 +233,9 @@ internal class DatabaseClient
                         LogWarn($"Wrong data type for column '{col.Name}' in '{b}'");
                         string sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
-                        var cmd = mainDatabaseConnection.CreateCommand();
+                        var cmd = guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = sql;
-                        cmd.Connection = mainDatabaseConnection;
+                        cmd.Connection = guildDatabaseConnection;
 
                         await _queue.RunCommand(cmd);
 
@@ -250,9 +250,9 @@ internal class DatabaseClient
                     {
                         LogWarn($"Invalid column '{col.Key}' in '{b}'");
 
-                        var cmd = mainDatabaseConnection.CreateCommand();
+                        var cmd = guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
-                        cmd.Connection = mainDatabaseConnection;
+                        cmd.Connection = guildDatabaseConnection;
 
                         await _queue.RunCommand(cmd);
                     }
@@ -265,9 +265,9 @@ internal class DatabaseClient
             LogWarn($"Missing table 'writetester'. Creating..");
             string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`writetester` ( {string.Join(", ", DatabaseColumnLists.Tables["writetester"].Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.Tables["writetester"].Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.Tables["writetester"].First(x => x.Primary).Name}`)" : "")})";
 
-            var cmd = mainDatabaseConnection.CreateCommand();
+            var cmd = guildDatabaseConnection.CreateCommand();
             cmd.CommandText = sql;
-            cmd.Connection = mainDatabaseConnection;
+            cmd.Connection = guildDatabaseConnection;
 
             await _queue.RunCommand(cmd);
             LogInfo($"Created table 'writetester'.");
@@ -282,9 +282,9 @@ internal class DatabaseClient
                 LogWarn($"Missing column '{col.Name}' in 'writetester'. Creating..");
                 string sql = $"ALTER TABLE `writetester` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
-                var cmd = mainDatabaseConnection.CreateCommand();
+                var cmd = guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = sql;
-                cmd.Connection = mainDatabaseConnection;
+                cmd.Connection = guildDatabaseConnection;
 
                 await _queue.RunCommand(cmd);
 
@@ -297,9 +297,9 @@ internal class DatabaseClient
                 LogWarn($"Wrong data type for column '{col.Name}' in 'writetester'");
                 string sql = $"ALTER TABLE `writetester` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
-                var cmd = mainDatabaseConnection.CreateCommand();
+                var cmd = guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = sql;
-                cmd.Connection = mainDatabaseConnection;
+                cmd.Connection = guildDatabaseConnection;
 
                 await _queue.RunCommand(cmd);
 
@@ -314,9 +314,9 @@ internal class DatabaseClient
             {
                 LogWarn($"Invalid column '{col.Key}' in 'writetester'");
 
-                var cmd = mainDatabaseConnection.CreateCommand();
+                var cmd = guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = $"ALTER TABLE `writetester` DROP COLUMN `{col.Key}`";
-                cmd.Connection = mainDatabaseConnection;
+                cmd.Connection = guildDatabaseConnection;
 
                 await _queue.RunCommand(cmd);
             }
