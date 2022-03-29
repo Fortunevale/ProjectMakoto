@@ -34,7 +34,7 @@ internal class Mod : BaseCommandModule
             {
                 Title = "",
                 Description = $"`Downloading emotes of this message..`",
-                Color = DiscordColor.Orange,
+                Color = ColorHelper.Processing,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = ctx.Guild.Name,
@@ -228,7 +228,7 @@ internal class Mod : BaseCommandModule
                         }
 
                         PerformingActionEmbed.Thumbnail = null;
-                        PerformingActionEmbed.Color = DiscordColor.Green;
+                        PerformingActionEmbed.Color = ColorHelper.Success;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                         PerformingActionEmbed.Description = $":white_check_mark: `Downloaded and added {SanitizedEmoteList.Count} emotes to the server.`";
                         await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -238,6 +238,7 @@ internal class Mod : BaseCommandModule
                     else
                     {
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                        PerformingActionEmbed.Color = ColorHelper.AwaitingInput;
                         PerformingActionEmbed.Description = $"`How do you want to receive the emotes?`\n" +
                                                             $":mailbox_with_mail: - `Via DMs, one message for one emote (Recommended for mobile)`\n" +
                                                             $":file_folder: - `Via DMs, in a zip file (Recommended for desktop)`\n" +
@@ -255,6 +256,8 @@ internal class Mod : BaseCommandModule
                         IReadOnlyList<DiscordUser> ZipFileInChat = await msg1.GetReactionsAsync(DiscordEmoji.FromName(ctx.Client, ":card_box:"));
 
                         await msg1.DeleteAllReactionsAsync();
+
+                        PerformingActionEmbed.Color = ColorHelper.Processing;
 
                         if (OneMessageForOneEmote.Count >= 2)
                         {
@@ -290,7 +293,7 @@ internal class Mod : BaseCommandModule
                                         IconUrl = ctx.Member.AvatarUrl
                                     },
                                     Timestamp = DateTime.UtcNow,
-                                    Color = DiscordColor.DarkRed,
+                                    Color = ColorHelper.Error,
                                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                                 };
 
@@ -303,7 +306,7 @@ internal class Mod : BaseCommandModule
                             }
 
                             PerformingActionEmbed.Thumbnail = null;
-                            PerformingActionEmbed.Color = DiscordColor.Green;
+                            PerformingActionEmbed.Color = ColorHelper.Success;
                             PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                             PerformingActionEmbed.Description = $":white_check_mark: `Downloaded and sent {SanitizedEmoteList.Count} emotes to your DMs.`";
                             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -366,7 +369,7 @@ internal class Mod : BaseCommandModule
                                             IconUrl = ctx.Member.AvatarUrl
                                         },
                                         Timestamp = DateTime.UtcNow,
-                                        Color = DiscordColor.DarkRed,
+                                        Color = ColorHelper.Error,
                                         ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                                     };
 
@@ -380,7 +383,7 @@ internal class Mod : BaseCommandModule
                                 }
 
                                 PerformingActionEmbed.Thumbnail = null;
-                                PerformingActionEmbed.Color = DiscordColor.Green;
+                                PerformingActionEmbed.Color = ColorHelper.Success;
                                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                                 PerformingActionEmbed.Description = $":white_check_mark: `Downloaded and sent {SanitizedEmoteList.Count} emotes to your DMs.`";
                                 await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -391,7 +394,7 @@ internal class Mod : BaseCommandModule
                                 await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
 
                                 PerformingActionEmbed.Thumbnail = null;
-                                PerformingActionEmbed.Color = DiscordColor.Green;
+                                PerformingActionEmbed.Color = ColorHelper.Success;
                                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                                 PerformingActionEmbed.Description = $":white_check_mark: `Downloaded {SanitizedEmoteList.Count} emotes. Attached is a Zip File containing them.`";
 
@@ -411,7 +414,7 @@ internal class Mod : BaseCommandModule
                 {
                     PerformingActionEmbed.Description = $"`This message doesn't contain any emotes.`\n\n" +
                     $"```{bMessage.Content}```";
-                    PerformingActionEmbed.Color = DiscordColor.DarkRed;
+                    PerformingActionEmbed.Color = ColorHelper.Error;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                     await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
 
@@ -461,7 +464,7 @@ internal class Mod : BaseCommandModule
                     var PerformingActionEmbed = new DiscordEmbedBuilder
                     {
                         Description = $"`Fetching {number} messages..`",
-                        Color = DiscordColor.Orange,
+                        Color = ColorHelper.Processing,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -524,7 +527,7 @@ internal class Mod : BaseCommandModule
                     else
                     {
                         PerformingActionEmbed.Description = $":x: `No messages were found with the specified filter.`";
-                        PerformingActionEmbed.Color = DiscordColor.Red;
+                        PerformingActionEmbed.Color = ColorHelper.Error;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                         await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
                     }
@@ -556,7 +559,7 @@ internal class Mod : BaseCommandModule
                     {
                         LogError($"Failed to delete messages: {ex}");
                         PerformingActionEmbed.Description = $":x: `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
-                        PerformingActionEmbed.Color = DiscordColor.Red;
+                        PerformingActionEmbed.Color = ColorHelper.Error;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                         await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
                         return;
@@ -574,7 +577,7 @@ internal class Mod : BaseCommandModule
                     if (FailedToDeleteAmount > 0)
                         PerformingActionEmbed.Description += $"\n`Failed to delete {failed_deleted} messages because they we're more than 14 days old`";
 
-                    PerformingActionEmbed.Color = DiscordColor.Green;
+                    PerformingActionEmbed.Color = ColorHelper.Success;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                     PerformingActionEmbed.Footer.Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • This message will auto-delete in 5 seconds";
 
@@ -619,7 +622,7 @@ internal class Mod : BaseCommandModule
                     {
                         Title = "",
                         Description = $":x: `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`",
-                        Color = DiscordColor.Red,
+                        Color = ColorHelper.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -801,7 +804,7 @@ internal class Mod : BaseCommandModule
             {
                 Title = "",
                 Description = $"`Timing {victim.Username}#{victim.Discriminator} ({victim.Id}) out..`",
-                Color = DiscordColor.Orange,
+                Color = ColorHelper.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -853,7 +856,7 @@ internal class Mod : BaseCommandModule
 
                 if (victim.IsProtected(_bot._status))
                 {
-                    PerformingActionEmbed.Color = DiscordColor.Red;
+                    PerformingActionEmbed.Color = ColorHelper.Error;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                     PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
                     await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -863,13 +866,13 @@ internal class Mod : BaseCommandModule
                 try
                 {
                     await victim.TimeoutAsync(until);
-                    PerformingActionEmbed.Color = DiscordColor.Green;
+                    PerformingActionEmbed.Color = ColorHelper.Success;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                     PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) was timed out for {until.GetTotalSecondsUntil().GetHumanReadable(TimeFormat.HOURS)}.`";
                 }
                 catch (Exception)
                 {
-                    PerformingActionEmbed.Color = DiscordColor.Red;
+                    PerformingActionEmbed.Color = ColorHelper.Error;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                     PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
                 }
@@ -903,7 +906,7 @@ internal class Mod : BaseCommandModule
             {
                 Title = "",
                 Description = $"`Removing timeout for {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
-                Color = DiscordColor.Orange,
+                Color = ColorHelper.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -925,13 +928,13 @@ internal class Mod : BaseCommandModule
             try
             {
                 await victim.RemoveTimeoutAsync();
-                PerformingActionEmbed.Color = DiscordColor.Green;
+                PerformingActionEmbed.Color = ColorHelper.Success;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")} `Removed timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
             }
             catch (Exception)
             {
-                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `Couldn't remove timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
             }
@@ -962,7 +965,7 @@ internal class Mod : BaseCommandModule
             {
                 Title = "",
                 Description = $"`Kicking {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
-                Color = DiscordColor.Orange,
+                Color = ColorHelper.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -985,7 +988,7 @@ internal class Mod : BaseCommandModule
             {
                 await victim.RemoveAsync(reason);
 
-                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Color = ColorHelper.Success;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` was kicked.\n\n" +
                                                         $"Reason: `{reason}`\n" +
@@ -993,7 +996,7 @@ internal class Mod : BaseCommandModule
             }
             catch (Exception)
             {
-                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $":x: Encountered an exception while trying to kick <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
             }
@@ -1024,7 +1027,7 @@ internal class Mod : BaseCommandModule
             {
                 Title = "",
                 Description = $"`Banning {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
-                Color = DiscordColor.Orange,
+                Color = ColorHelper.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -1047,7 +1050,7 @@ internal class Mod : BaseCommandModule
             {
                 await ctx.Guild.BanMemberAsync(victim.Id, 7, reason);
 
-                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Color = ColorHelper.Success;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` was banned.\n\n" +
                                                         $"Reason: `{reason}`\n" +
@@ -1055,7 +1058,7 @@ internal class Mod : BaseCommandModule
             }
             catch (Exception)
             {
-                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $":x: Encountered an exception while trying to ban <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
             }
@@ -1083,7 +1086,7 @@ internal class Mod : BaseCommandModule
             {
                 Title = "",
                 Description = $"`Unbanning {victim.Username}#{victim.Discriminator} ({victim.Id})..`",
-                Color = DiscordColor.Orange,
+                Color = ColorHelper.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -1106,13 +1109,13 @@ internal class Mod : BaseCommandModule
             {
                 await ctx.Guild.UnbanMemberAsync(victim);
 
-                PerformingActionEmbed.Color = DiscordColor.Green;
+                PerformingActionEmbed.Color = ColorHelper.Success;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` was unbanned.";
             }
             catch (Exception)
             {
-                PerformingActionEmbed.Color = DiscordColor.Red;
+                PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                 PerformingActionEmbed.Description = $"<@{victim.Id}> `{victim.Username}#{victim.Discriminator}` **could not** be unbanned.";
             }

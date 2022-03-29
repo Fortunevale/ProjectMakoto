@@ -46,7 +46,7 @@ internal class JoinEvents
                         },
                         Description = $"joined the server.",
                         Timestamp = DateTime.UtcNow,
-                        Color = new DiscordColor("#00ff00"),
+                        Color = ColorHelper.Success,
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                         {
                             Url = e.Member.AvatarUrl
@@ -78,7 +78,7 @@ internal class JoinEvents
                         Description = $"left the server. Sad to see you go. {DiscordEmoji.FromName(sender, ":wave:")}\n\n" +
                                       $"**Time on the server**: {e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}",
                         Timestamp = DateTime.UtcNow,
-                        Color = DiscordColor.Red,
+                        Color = ColorHelper.Error,
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                         {
                             Url = e.Member.AvatarUrl
