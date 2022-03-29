@@ -604,7 +604,7 @@ internal class User : BaseCommandModule
                     var tos_embed = new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
-                        Color = ColorHelper.Warning,
+                        Color = ColorHelper.Important,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.UtcNow,
                         Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
@@ -665,7 +665,7 @@ internal class User : BaseCommandModule
                 var embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Warning,
+                    Color = ColorHelper.Processing,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Processing your request..`"
@@ -960,7 +960,7 @@ internal class User : BaseCommandModule
         var embed = new DiscordEmbedBuilder
         {
             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
-            Color = ColorHelper.Warning,
+            Color = ColorHelper.Processing,
             Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
             Timestamp = DateTime.UtcNow,
             Description = $"`Looking for player..`"
@@ -1210,7 +1210,7 @@ internal class User : BaseCommandModule
             var embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Search • {ctx.Guild.Name}" },
-                Color = ColorHelper.Warning,
+                Color = ColorHelper.AwaitingInput,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Please select a continent filter below.`"

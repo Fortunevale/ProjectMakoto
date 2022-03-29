@@ -27,7 +27,7 @@ internal class BumpReminder
         {
             embed.Description = $"**The server can be bumped!**\n\n" +
                           $"The server was last bumped by <@{_bot._guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastUserId}> {Formatter.Timestamp(_bot._guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(_bot._guilds.Servers[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}";
-            embed.Color = ColorHelper.Error;
+            embed.Color = ColorHelper.AwaitingInput;
         }
 
         _ = channel.SendMessageAsync(embed.Build()).ContinueWith(async x =>
