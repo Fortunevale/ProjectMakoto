@@ -564,6 +564,8 @@ internal class Admin : BaseCommandModule
                                                 return;
                                             }
 
+                                            _ = result.Result.DeleteAsync();
+
                                             if (result.Result.Content.Length > 256)
                                             {
                                                 embed.Description = "`Your custom message can't contain more than 256 characters.`";
@@ -768,6 +770,8 @@ internal class Admin : BaseCommandModule
                                     _ = msg.DeleteAsync();
                                     return;
                                 }
+
+                                _ = result.Result.DeleteAsync();
 
                                 if (result.Result.Content.Length > 256)
                                 {
