@@ -30,8 +30,6 @@ internal class Bot
 
     internal async Task Init(string[] args)
     {
-        // test
-
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
 
