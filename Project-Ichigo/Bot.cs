@@ -439,10 +439,7 @@ internal class Bot
             {
                 try
                 {
-                    string guilds = discordClient.Guilds.Count.ToString("N");
-                    guilds = guilds.Remove(guilds.Length - 3, 3);
-
-                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{guilds} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0")} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
                     await Task.Delay(60000);
                 }
                 catch (Exception ex)
