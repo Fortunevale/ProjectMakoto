@@ -431,6 +431,28 @@ internal class Bot
             }
         });
 
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(5000);
+
+            while (true)
+            {
+                try
+                {
+                    string guilds = discordClient.Guilds.Count.ToString("N");
+                    guilds = guilds.Remove(guilds.Length - 3, 3);
+
+                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{guilds} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
+                    await Task.Delay(60000);
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Failed to update user status: {ex}");
+                    await Task.Delay(60000);
+                }
+            }
+        });
+
         await Task.Delay(-1);
     }
 
