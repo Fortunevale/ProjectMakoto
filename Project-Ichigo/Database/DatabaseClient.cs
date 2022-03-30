@@ -89,7 +89,7 @@ internal class DatabaseClient
             guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
         };
         databaseClient._helper = new(databaseClient);
-        databaseClient._queue = new(databaseClient);
+        databaseClient._queue = new();
 
         databaseClient.mainDatabaseConnection.Open();
         databaseClient.guildDatabaseConnection.Open();

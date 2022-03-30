@@ -2,12 +2,8 @@
 
 internal class DatabaseQueue
 {
-    DatabaseClient _databaseClient { get; set; }
-
-    internal DatabaseQueue(DatabaseClient client)
+    internal DatabaseQueue()
     {
-        this._databaseClient = client;
-
         _ = QueueHandler();
     }
 

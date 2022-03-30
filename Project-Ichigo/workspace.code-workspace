@@ -2,7 +2,32 @@
 	"folders": [
 		{
 			"path": ".."
+		},
+		{
+			"path": "..\\..\\Xorog.Logger"
+		},
+		{
+			"path": "..\\..\\Xorog.ScoreSaber"
+		},
+		{
+			"path": "..\\..\\Xorog.UniversalExtensions"
+		},
+		{
+			"path": "..\\..\\Xorog.YoutubeDownloader"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.exclude": {
+			"**/.editorconfig": true,
+			"**/.gitattributes": true,
+			"**/.vs": true,
+			"**/.vscode": true,
+			"**.code-workspace": true,
+			"**/bin": true,
+			"**/LICENSE": true,
+			"**/obj": true,
+			"**/README.md": true,
+			"**/**.pdn": true,
+		}
+	}
 }
