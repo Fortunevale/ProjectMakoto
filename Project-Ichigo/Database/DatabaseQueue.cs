@@ -9,55 +9,58 @@ internal class DatabaseQueue
 
     internal async Task QueueHandler()
     {
-        string lastResolve = "";
-
-        while (true)
+        _ = Task.Run(async () =>
         {
-            if (Queue.Count == 0)
+            string lastResolve = "";
+    
+            while (true)
             {
-                await Task.Delay(100);
-                continue;
+                if (Queue.Count == 0)
+                {
+                    Thread.Sleep(100);
+                    continue;
+                }
+    
+                if (Queue.ContainsKey(lastResolve))
+                    Queue.Remove(lastResolve);
+    
+                if (Queue.Count == 0)
+                    continue;
+    
+                var b = Queue.First();
+    
+                try
+                {
+                    LogDebug($"Executing mysql command for '{b.Value.Command.Connection.Database}': {b.Value.Command.CommandText.TruncateWithIndication(100)}");
+                    b.Value.Command.ExecuteNonQuery();
+    
+                    Queue[b.Key].Executed = true;
+                }
+                catch (MySqlException ex)
+                {
+                    LogError($"An exception occured while trying to execute a mysql command: {ex}");
+                    LogError($"{ex.Number}");
+                }
+                catch (Exception ex)
+                {
+                    Queue[b.Key].Failed = true;
+                    Queue[b.Key].Exception = ex;
+                }
+                finally
+                {
+                    lastResolve = b.Key;
+                    Thread.Sleep(1000);
+                }
+    
+                GC.KeepAlive(b);
+                GC.KeepAlive(b.Key);
+                GC.KeepAlive(b.Value);
+                GC.KeepAlive(b.Value.Failed);
+                GC.KeepAlive(b.Value.Command);
+                GC.KeepAlive(b.Value.Executed);
+                GC.KeepAlive(b.Value.Exception);
             }
-
-            if (Queue.ContainsKey(lastResolve))
-                Queue.Remove(lastResolve);
-
-            if (Queue.Count == 0)
-                continue;
-
-            var b = Queue.First();
-
-            try
-            {
-                LogDebug($"Executing mysql command for '{b.Value.Command.Connection.Database}': {b.Value.Command.CommandText.TruncateWithIndication(100)}");
-                b.Value.Command.ExecuteNonQuery();
-
-                Queue[b.Key].Executed = true;
-            }
-            catch (MySqlException ex)
-            {
-                LogError($"An exception occured while trying to execute a mysql command: {ex}");
-                LogError($"{ex.Number}");
-            }
-            catch (Exception ex)
-            {
-                Queue[b.Key].Failed = true;
-                Queue[b.Key].Exception = ex;
-            }
-            finally
-            {
-                lastResolve = b.Key;
-                await Task.Delay(1000);
-            }
-
-            GC.KeepAlive(b);
-            GC.KeepAlive(b.Key);
-            GC.KeepAlive(b.Value);
-            GC.KeepAlive(b.Value.Failed);
-            GC.KeepAlive(b.Value.Command);
-            GC.KeepAlive(b.Value.Executed);
-            GC.KeepAlive(b.Value.Exception);
-        }
+        });
     }
 
     internal async Task RunCommand(MySqlCommand cmd)
@@ -67,7 +70,7 @@ internal class DatabaseQueue
         Queue.Add(key, new RequestQueue { Command = cmd });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
-            await Task.Delay(50);
+            Thread.Sleep(50);
 
         var response = Queue[key];
         Queue.Remove(key);
