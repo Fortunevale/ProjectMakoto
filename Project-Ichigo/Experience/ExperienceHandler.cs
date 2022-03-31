@@ -91,11 +91,24 @@ internal class ExperienceHandler
 
             if (_bot._guilds.Servers[guild.Id].Members[user.Id].Level > PreviousLevel)
             {
+                string build = $":stars: Congrats, {user.Mention}! You gained {(_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel is 1 ? $"{_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel} level" : $"{_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel} levels")}.\n\n" +
+                                $"You're now on Level {_bot._guilds.Servers[guild.Id].Members[user.Id].Level}.";
+
                 if (_bot._guilds.Servers[guild.Id].LevelRewards.Any(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
                 {
+                    build += "\n\n";
+
                     foreach (var reward in _bot._guilds.Servers[guild.Id].LevelRewards.Where(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
                     {
-                        
+                        if (!guild.Roles.ContainsKey(reward.RoleId))
+                        {
+                            _bot._guilds.Servers[guild.Id].LevelRewards.Remove(reward);
+                            continue;
+                        }
+
+                        await user.GrantRoleAsync(guild.GetRole(reward.RoleId));
+
+                        build += $"`{reward.Message.Replace("##Role##", $"{guild.GetRole(reward.RoleId).Name}")}`\n";
                     }
                 }
 
@@ -107,8 +120,7 @@ internal class ExperienceHandler
                         Name = guild.Name
                     },
                     Title = "",
-                    Description = $":stars: Congrats, {user.Mention}! You gained {(_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel is 1 ? $"{_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel} level" : $"{_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel} levels")}.\n\n" +
-                                  $"You're now on Level {_bot._guilds.Servers[guild.Id].Members[user.Id].Level}.",
+                    Description = build,
                     Timestamp = DateTime.UtcNow,
                     Color = new DiscordColor("#4287f5"),
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = user.AvatarUrl },
