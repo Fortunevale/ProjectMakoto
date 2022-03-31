@@ -94,10 +94,12 @@ internal class ExperienceHandler
                 string build = $":stars: Congrats, {user.Mention}! You gained {(_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel is 1 ? $"{_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel} level" : $"{_bot._guilds.Servers[guild.Id].Members[user.Id].Level - PreviousLevel} levels")}.\n\n" +
                                 $"You're now on Level {_bot._guilds.Servers[guild.Id].Members[user.Id].Level}.";
 
+                int delete_delay = 10000;
+
                 if (_bot._guilds.Servers[guild.Id].LevelRewards.Any(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
                 {
                     build += "\n\n";
-
+                    
                     foreach (var reward in _bot._guilds.Servers[guild.Id].LevelRewards.Where(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
                     {
                         if (!guild.Roles.ContainsKey(reward.RoleId))
@@ -108,6 +110,8 @@ internal class ExperienceHandler
 
                         if (user.Roles.Any(x => x.Id == reward.RoleId))
                             continue;
+
+                        delete_delay = 20000;
 
                         await user.GrantRoleAsync(guild.GetRole(reward.RoleId));
 
@@ -129,7 +133,7 @@ internal class ExperienceHandler
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = user.AvatarUrl },
                     Footer = new DiscordEmbedBuilder.EmbedFooter
                     {
-                        Text = "This message will be automatically deleted in 10 seconds"
+                        Text = $"This message will be automatically deleted in {delete_delay / 1000} seconds"
                     }
                 };
 
@@ -140,7 +144,7 @@ internal class ExperienceHandler
                         if (!x.IsCompletedSuccessfully)
                             return;
 
-                        await Task.Delay(10000);
+                        await Task.Delay(delete_delay);
                         _ = x.Result.DeleteAsync();
                     });
                 }
