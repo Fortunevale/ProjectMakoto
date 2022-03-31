@@ -844,6 +844,12 @@ internal class Admin : BaseCommandModule
                 {
                     foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.OrderBy(x => x.Level))
                     {
+                        if (!ctx.Guild.Roles.ContainsKey(b.RoleId))
+                        {
+                            _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Remove(b);
+                            continue;
+                        }
+
                         Build += $"**Level**: `{b.Level}`\n" +
                                     $"**Role**: <@&{b.RoleId}> (`{b.RoleId}`)\n" +
                                     $"**Message**: `{b.Message}`\n";
