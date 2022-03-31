@@ -81,26 +81,9 @@ internal class ExperienceHandler
 
         _bot._guilds.Servers[guild.Id].Members[user.Id].Experience += Amount;
 
-        long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(_bot._guilds.Servers[guild.Id].Members[user.Id].Level - 1);
-        long RequiredRepuationForNextLevel = CalculateLevelRequirement(_bot._guilds.Servers[guild.Id].Members[user.Id].Level);
-
         long PreviousLevel = _bot._guilds.Servers[guild.Id].Members[user.Id].Level;
 
-        while (RequiredRepuationForNextLevel <= _bot._guilds.Servers[guild.Id].Members[user.Id].Experience)
-        {
-            _bot._guilds.Servers[guild.Id].Members[user.Id].Level++;
-
-            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(_bot._guilds.Servers[guild.Id].Members[user.Id].Level - 1);
-            RequiredRepuationForNextLevel = CalculateLevelRequirement(_bot._guilds.Servers[guild.Id].Members[user.Id].Level);
-        }
-
-        while (PreviousRequiredRepuationForNextLevel >= _bot._guilds.Servers[guild.Id].Members[user.Id].Experience)
-        {
-            _bot._guilds.Servers[guild.Id].Members[user.Id].Level--;
-
-            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(_bot._guilds.Servers[guild.Id].Members[user.Id].Level - 1);
-            RequiredRepuationForNextLevel = CalculateLevelRequirement(_bot._guilds.Servers[guild.Id].Members[user.Id].Level);
-        }
+        CheckExperience(user.Id, guild);
 
         if (_bot._guilds.Servers[guild.Id].Members[user.Id].Level != PreviousLevel && channel != null && channel.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread)
         {
@@ -108,6 +91,14 @@ internal class ExperienceHandler
 
             if (_bot._guilds.Servers[guild.Id].Members[user.Id].Level > PreviousLevel)
             {
+                if (_bot._guilds.Servers[guild.Id].LevelRewards.Any(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
+                {
+                    foreach (var reward in _bot._guilds.Servers[guild.Id].LevelRewards.Where(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
+                    {
+                        
+                    }
+                }
+
                 embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor
