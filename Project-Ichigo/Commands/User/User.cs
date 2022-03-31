@@ -523,7 +523,6 @@ internal class User : BaseCommandModule
 
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
 
-            string build = "";
             int count = 0;
 
             int currentuserplacement = 0;
@@ -536,6 +535,8 @@ internal class User : BaseCommandModule
             }
 
             var members = await ctx.Guild.GetAllMembersAsync();
+
+            List<KeyValuePair<string, string>> Board = new();
 
             foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
             {
@@ -556,7 +557,8 @@ internal class User : BaseCommandModule
                         break;
 
                     count++;
-                    build += $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.Username}#{bMember.Discriminator}` (`Level {b.Value.Level} with {b.Value.Experience} XP`)\n";
+
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.Username}#{bMember.Discriminator}` (`Level {b.Value.Level} with {b.Value.Experience} XP`)"));
 
                     if (count >= ShowAmount)
                         break;
@@ -564,10 +566,15 @@ internal class User : BaseCommandModule
                 catch { }
             }
 
-            if (build != "")
+            var fields = Board.PrepareEmbedFields();
+
+            foreach (var field in fields)
+                PerformingActionEmbed.AddField(field.Key, field.Value);
+
+            if (count != 0)
             {
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.\n\n{build}";
+                PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.";
                 await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
             }
             else
