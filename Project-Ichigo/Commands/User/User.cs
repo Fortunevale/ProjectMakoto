@@ -485,100 +485,96 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            try
+            if (!_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
-                if (!_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
-                    await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                    {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                        Color = ColorHelper.Error,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                        Timestamp = DateTime.UtcNow,
-                        Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                    });
-                    return;
-                }
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Error,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
+                });
+                return;
+            }
 
-                if (ShowAmount is > 50 or < 3)
+            if (ShowAmount is > 50 or < 3)
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+
+            var PerformingActionEmbed = new DiscordEmbedBuilder
+            {
+                Color = ColorHelper.HiddenSidebar,
+                Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    _ = ctx.SendSyntaxError();
-                    return;
-                }
-
-                var PerformingActionEmbed = new DiscordEmbedBuilder
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
+                    Name = $"Experience Leaderboard"
+                },
+                Description = $"`Loading Leaderboard, please wait..`",
+                Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
-                    Color = ColorHelper.HiddenSidebar,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
-                        Name = $"Experience Leaderboard"
-                    },
-                    Description = $"`Loading Leaderboard, please wait..`",
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                        IconUrl = ctx.Member.AvatarUrl
-                    },
-                    Timestamp = DateTime.UtcNow
-                };
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            };
 
-                var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
+            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
 
-                string build = "";
-                int count = 0;
+            string build = "";
+            int count = 0;
 
-                int currentuserplacement = 0;
+            int currentuserplacement = 0;
 
-                foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            {
+                currentuserplacement++;
+                if (b.Key == ctx.User.Id)
+                    break;
+            }
+
+            var members = await ctx.Guild.GetAllMembersAsync();
+
+            foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            {
+                try
                 {
-                    currentuserplacement++;
-                    if (b.Key == ctx.User.Id)
+                    if (!members.Any(x => x.Id == b.Key))
+                        continue;
+
+                    DiscordMember bMember = members.First(x => x.Id == b.Key);
+
+                    if (bMember is null)
+                        continue;
+
+                    if (bMember.IsBot)
+                        continue;
+
+                    if (b.Value.Experience <= 1)
+                        break;
+
+                    count++;
+                    build += $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.Username}#{bMember.Discriminator}` (`Level {b.Value.Level} with {b.Value.Experience} XP`)\n";
+
+                    if (count >= ShowAmount)
                         break;
                 }
-
-                var members = await ctx.Guild.GetAllMembersAsync();
-
-                foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
-                {
-                    try
-                    {
-                        if (!members.Any(x => x.Id == b.Key))
-                            continue;
-
-                        DiscordMember bMember = members.First(x => x.Id == b.Key);
-
-                        if (bMember.IsBot)
-                            continue;
-
-                        if (b.Value.Experience <= 1)
-                            break;
-
-                        count++;
-                        build += $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.Username}#{bMember.Discriminator}` (`Level {b.Value.Level} with {b.Value.Experience} XP`)\n";
-
-                        if (count >= ShowAmount)
-                            break;
-                    }
-                    catch { }
-                }
-
-                if (build != "")
-                {
-                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                    PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.\n\n{build}";
-                    await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-                }
-                else
-                {
-                    PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                    PerformingActionEmbed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
-                    await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-                }
+                catch { }
             }
-            catch (Exception ex)
+
+            if (build != "")
             {
-                LogError($"Failed to display leaderboard: {ex}");
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.\n\n{build}";
+                await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
+            }
+            else
+            {
+                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
+                PerformingActionEmbed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
+                await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
             }
         }).Add(_bot._watcher, ctx);
     }
