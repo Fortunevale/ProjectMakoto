@@ -7,7 +7,7 @@ internal class Mod : BaseCommandModule
 
     [Command("emoji"), Aliases("emote"),
     CommandModule("mod"),
-    Description("Steals emojis of the message that this command was replied to.")]
+    Description("Steals emojis of the message that this command was replied to")]
     public async Task EmojiStealer(CommandContext ctx)
     {
         Task.Run(async () =>
@@ -432,7 +432,7 @@ internal class Mod : BaseCommandModule
 
     [Command("purge"), Aliases("clear"),
     CommandModule("mod"),
-    Description("Deletes the specified amount of messages.")]
+    Description("Deletes the specified amount of messages")]
     public async Task Purge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser user = null)
     {
         Task.Run(async () =>
@@ -789,7 +789,7 @@ internal class Mod : BaseCommandModule
 
     [Command("timeout"), Aliases("time-out", "mute"),
     CommandModule("mod"),
-    Description("Times the user for the specified amount of time out.")]
+    Description("Times the user for the specified amount of time out")]
     public async Task Timeout(CommandContext ctx, DiscordMember victim, [Description("Duration")] string duration)
     {
         Task.Run(async () =>
@@ -891,7 +891,7 @@ internal class Mod : BaseCommandModule
 
     [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unmute"),
     CommandModule("mod"),
-    Description("Removes the timeout for the specified user.")]
+    Description("Removes the timeout for the specified user")]
     public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
     {
         Task.Run(async () =>
@@ -947,7 +947,7 @@ internal class Mod : BaseCommandModule
 
     [Command("kick"),
     CommandModule("mod"),
-    Description("Kicks the specified user.")]
+    Description("Kicks the specified user")]
     public async Task Kick(CommandContext ctx, DiscordMember victim, [Description("Reason")][RemainingText] string reason = "")
     {
         Task.Run(async () =>
@@ -1009,7 +1009,7 @@ internal class Mod : BaseCommandModule
 
     [Command("ban"),
     CommandModule("mod"),
-    Description("Bans the specified user.")]
+    Description("Bans the specified user")]
     public async Task Ban(CommandContext ctx, DiscordUser victim, [Description("Reason")][RemainingText] string reason = "")
     {
         Task.Run(async () =>
@@ -1071,7 +1071,7 @@ internal class Mod : BaseCommandModule
 
     [Command("unban"),
     CommandModule("mod"),
-    Description("Unbans the specified user.")]
+    Description("Unbans the specified user")]
     public async Task Unban(CommandContext ctx, DiscordUser victim)
     {
         Task.Run(async () =>

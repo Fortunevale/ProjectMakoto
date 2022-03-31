@@ -7,7 +7,7 @@ internal class User : BaseCommandModule
 
     [Command("help"),
     CommandModule("user"),
-    Description("Shows all available commands, their usage and their description.")]
+    Description("Shows all available commands, their usage and their description")]
     public async Task Help(CommandContext ctx)
     {
         Task.Run(async () =>
@@ -108,7 +108,7 @@ internal class User : BaseCommandModule
 
     [Command("info"),
     CommandModule("user"),
-    Description("Shows informations about the bot or the mentioned user.")]
+    Description("Shows informations about the bot or the mentioned user")]
     public async Task Info(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -286,7 +286,7 @@ internal class User : BaseCommandModule
 
     [Command("user-info"), Aliases("userinfo"),
     CommandModule("user"),
-    Description("Shows information about the mentioned user.")]
+    Description("Shows information about the mentioned user")]
     public async Task UserInfo(CommandContext ctx, DiscordUser victim)
     {
         Task.Run(async () =>
@@ -391,7 +391,7 @@ internal class User : BaseCommandModule
 
     [Command("avatar"), Aliases("pfp"),
     CommandModule("user"),
-    Description("Sends the user's avatar as an embedded image.")]
+    Description("Sends the user's avatar as an embedded image")]
     public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -480,7 +480,7 @@ internal class User : BaseCommandModule
 
     [Command("leaderboard"),
     CommandModule("user"),
-    Description("Shows the current leaderboard of people with most people invited.")]
+    Description("Shows the current experience leaderboard")]
     public async Task LeaderboardCommand(CommandContext ctx, [Description("3-50")]int ShowAmount = 10)
     {
         Task.Run(async () =>
@@ -590,7 +590,7 @@ internal class User : BaseCommandModule
 
     [Command("submit-url"),
     CommandModule("user"),
-    Description("Allows submission of new malicous urls to our database.")]
+    Description("Allows submission of new malicous urls to our database")]
     public async Task UrlSubmit(CommandContext ctx, [Description("URL")]string url)
     {
         Task.Run(async () =>
@@ -870,7 +870,7 @@ internal class User : BaseCommandModule
 
     [Command("afk"),
     CommandModule("user"),
-    Description("Set yourself afk: Notify users pinging you that you're currently not around.")]
+    Description("Set yourself afk: Notify users pinging you that you're currently not around")]
     public async Task Afk(CommandContext ctx, [RemainingText][Description("Text (<128 characters)")]string reason = "-")
     {
         Task.Run(async () =>
