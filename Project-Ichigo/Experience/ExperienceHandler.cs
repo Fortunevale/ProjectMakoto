@@ -111,7 +111,7 @@ internal class ExperienceHandler
 
                         await user.GrantRoleAsync(guild.GetRole(reward.RoleId));
 
-                        build += $"`{reward.Message.Replace("##Role##", $"{guild.GetRole(reward.RoleId).Name}")}`\n";
+                        build += $"`{Formatter.Sanitize(reward.Message.Replace("##Role##", $"{guild.GetRole(reward.RoleId).Name}")).Replace("`", "")}`\n";
                     }
                 }
 
