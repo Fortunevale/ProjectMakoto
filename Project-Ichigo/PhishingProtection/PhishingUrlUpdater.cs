@@ -78,21 +78,6 @@ internal class PhishingUrlUpdater
 
         try
         {
-            if (!_bot._databaseClient.mainDatabaseConnection.Ping())
-            {
-                try
-                {
-                    LogWarn("Pinging the database failed, attempting reconnect.");
-                    _bot._databaseClient.mainDatabaseConnection.Open();
-                    await _bot._databaseClient._helper.SelectDatabase(_bot._databaseClient.mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
-                }
-                catch (Exception ex)
-                {
-                    LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
-                    return;
-                }
-            }
-
             UpdateRunning = true;
             List<DatabasePhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new DatabasePhishingUrlInfo
             {

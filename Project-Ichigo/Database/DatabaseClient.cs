@@ -393,40 +393,6 @@ internal class DatabaseClient
         {
             Task key = new(async () =>
             {
-                try
-                {
-                    if (!mainDatabaseConnection.Ping())
-                    {
-                        try
-                        {
-                            LogWarn("Pinging the database failed, attempting reconnect.");
-                            mainDatabaseConnection.Open();
-                            await _helper.SelectDatabase(mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
-                            return;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    try
-                    {
-                        LogWarn($"Pinging the database failed, attempting reconnect: {ex}");
-                        mainDatabaseConnection.Close();
-                        mainDatabaseConnection.Open();
-                        await _helper.SelectDatabase(mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
-                        LogInfo($"Reconnected to database.");
-                    }
-                    catch (Exception ex1)
-                    {
-                        LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex1}");
-                        return;
-                    }
-                }
-
                 if (_bot._guilds.Servers.Count > 0)
                     try
                     {
