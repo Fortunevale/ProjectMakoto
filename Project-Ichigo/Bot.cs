@@ -35,7 +35,7 @@ internal class Bot
 
         StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
 
-        LogRaised += TestHandler;
+        LogRaised += LogHandler;
 
         LogInfo("Starting up..");
 
@@ -458,7 +458,7 @@ internal class Bot
         await Task.Delay(-1);
     }
 
-    private void TestHandler(object? sender, LogMessageEventArgs e)
+    private void LogHandler(object? sender, LogMessageEventArgs e)
     {
         if (e.LogEntry.LogLevel is LogLevel.ERROR or LogLevel.FATAL)
             _status.ExceptionsRaised++;
