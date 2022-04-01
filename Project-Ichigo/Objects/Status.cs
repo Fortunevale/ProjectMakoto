@@ -12,5 +12,9 @@ internal class Status
 
     internal List<ulong> TeamMembers { get; set; } = new();
 
-    internal long ExceptionsRaised = 0;
+    internal long DebugRaised = 0;
+    internal long InfoRaised = 0;
+    internal long WarnRaised = 0;
+    internal long ErrorRaised = 0;
+    internal long FatalRaised = 0;
 }

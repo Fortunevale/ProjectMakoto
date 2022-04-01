@@ -444,7 +444,7 @@ internal class Bot
                     if (_databaseClient.IsDisposed())
                         return;
 
-                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.ExceptionsRaised} EXC", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(60000);
                 }
                 catch (Exception ex)
@@ -460,8 +460,24 @@ internal class Bot
 
     private void LogHandler(object? sender, LogMessageEventArgs e)
     {
-        if (e.LogEntry.LogLevel is LogLevel.ERROR or LogLevel.FATAL)
-            _status.ExceptionsRaised++;
+        switch (e.LogEntry.LogLevel)
+        {
+            case LogLevel.DEBUG:
+                _status.DebugRaised++;
+                break;
+            case LogLevel.INFO:
+                _status.InfoRaised++;
+                break;
+            case LogLevel.WARN:
+                _status.WarnRaised++;
+                break;
+            case LogLevel.ERROR:
+                _status.ErrorRaised++;
+                break;
+            case LogLevel.FATAL:
+                _status.FatalRaised++;
+                break;
+        }
     }
 
     private async Task FlushToDatabase()
