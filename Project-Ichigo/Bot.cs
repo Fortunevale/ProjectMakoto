@@ -35,6 +35,8 @@ internal class Bot
 
         StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
 
+        LogRaised += TestHandler;
+
         LogInfo("Starting up..");
 
         try
@@ -442,7 +444,7 @@ internal class Bot
                     if (_databaseClient.IsDisposed())
                         return;
 
-                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.ExceptionsRaised} EXC", ActivityType.Playing));
                     await Task.Delay(60000);
                 }
                 catch (Exception ex)
@@ -456,7 +458,11 @@ internal class Bot
         await Task.Delay(-1);
     }
 
-
+    private void TestHandler(object? sender, LogMessageEventArgs e)
+    {
+        if (e.LogEntry.LogLevel is LogLevel.ERROR or LogLevel.FATAL)
+            _status.ExceptionsRaised++;
+    }
 
     private async Task FlushToDatabase()
     {

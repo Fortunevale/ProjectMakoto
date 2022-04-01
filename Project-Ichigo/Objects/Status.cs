@@ -11,4 +11,6 @@ internal class Status
     internal bool DatabaseInitialized { get; set; } = false;
 
     internal List<ulong> TeamMembers { get; set; } = new();
+
+    internal long ExceptionsRaised = 0;
 }
