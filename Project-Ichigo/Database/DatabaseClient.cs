@@ -185,6 +185,9 @@ internal class DatabaseClient
 
     public async Task CheckGuildTables()
     {
+        while (_queue.QueueCount() != 0)
+            await Task.Delay(500);
+
         var GuildTables = await _helper.ListTables(guildDatabaseConnection);
 
         foreach (var b in _bot._guilds.Servers)
