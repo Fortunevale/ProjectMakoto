@@ -17,10 +17,13 @@ internal class ExperienceEvents
                 return;
 
             if (!_bot._guilds.Servers.ContainsKey(e.Guild.Id))
-                _bot._guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+                _bot._guilds.Servers.Add(e.Guild.Id, new());
 
             if (!_bot._guilds.Servers[e.Guild.Id].ExperienceSettings.UseExperience)
                 return;
+
+            if (!_bot._guilds.Servers[e.Guild.Id].Members.ContainsKey(e.Author.Id))
+                _bot._guilds.Servers[e.Guild.Id].Members.Add(e.Author.Id, new());
 
             if (_bot._guilds.Servers[e.Guild.Id].Members[e.Author.Id].Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
             {
