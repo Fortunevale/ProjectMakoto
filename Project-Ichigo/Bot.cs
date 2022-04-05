@@ -212,7 +212,6 @@ internal class Bot
 
 
                 LogDebug($"Registering Command Converters..");
-                cNext.RegisterConverter(new CustomArgumentConverter.DiscordUserConverter());
                 cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
 
 
@@ -515,6 +514,7 @@ internal class Bot
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await Task.Delay(1000);
         await discordClient.DisconnectAsync();
         LogDebug($"Closed Discord Client.");
     }
@@ -558,7 +558,6 @@ internal class Bot
                 {
                     if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Value.Id))
                     {
-                        LogDebug($"Added {member.Value.Id} to {guild.Key}");
                         _guilds.Servers[guild.Key].Members.Add(member.Value.Id, new());
                     }
 
