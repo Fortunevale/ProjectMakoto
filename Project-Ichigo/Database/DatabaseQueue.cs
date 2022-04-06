@@ -12,7 +12,7 @@ internal class DatabaseQueue
         _ = Task.Run(async () =>
         {
             string lastResolve = "";
-    
+
             while (true)
             {
                 if (Queue.Count == 0)
@@ -20,26 +20,24 @@ internal class DatabaseQueue
                     Thread.Sleep(100);
                     continue;
                 }
-    
+
                 if (Queue.ContainsKey(lastResolve))
                     Queue.Remove(lastResolve);
-    
+
                 if (Queue.Count == 0)
                     continue;
-    
+
                 var b = Queue.First();
-    
+
                 try
                 {
-                    LogDebug($"Executing mysql command for '{b.Value.Command.Connection.Database}': {b.Value.Command.CommandText.TruncateWithIndication(100)}");
                     b.Value.Command.ExecuteNonQuery();
-    
+
                     Queue[b.Key].Executed = true;
                 }
                 catch (MySqlException ex)
                 {
                     LogError($"An exception occured while trying to execute a mysql command: {ex}");
-                    LogError($"{ex.Number}");
                 }
                 catch (Exception ex)
                 {
@@ -51,7 +49,7 @@ internal class DatabaseQueue
                     lastResolve = b.Key;
                     Thread.Sleep(1000);
                 }
-    
+
                 GC.KeepAlive(b);
                 GC.KeepAlive(b.Key);
                 GC.KeepAlive(b.Value);

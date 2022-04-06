@@ -250,6 +250,20 @@ internal class Bot
 
                 ActionlogEvents actionlogEvents = new(this);
 
+                discordClient.GuildMemberAdded += actionlogEvents.UserJoined;
+                discordClient.GuildMemberRemoved += actionlogEvents.UserLeft;
+                discordClient.MessageDeleted += actionlogEvents.MessageDeleted;
+                discordClient.MessagesBulkDeleted += actionlogEvents.MessageBulkDeleted;
+                discordClient.MessageUpdated += actionlogEvents.MessageUpdated;
+                discordClient.GuildMemberUpdated += actionlogEvents.MemberUpdated;
+                discordClient.GuildRoleCreated += actionlogEvents.RoleCreated;
+                discordClient.GuildRoleDeleted += actionlogEvents.RoleDeleted;
+                discordClient.GuildRoleUpdated += actionlogEvents.RoleModified;
+                discordClient.GuildBanAdded += actionlogEvents.BanAdded;
+                discordClient.GuildBanRemoved += actionlogEvents.BanRemoved;
+                discordClient.GuildUpdated += actionlogEvents.GuildUpdated;
+                discordClient.InviteCreated += actionlogEvents.InviteCreated;
+                discordClient.InviteDeleted += actionlogEvents.InviteDeleted;
 
                 LogDebug($"Registering Join Events..");
 
