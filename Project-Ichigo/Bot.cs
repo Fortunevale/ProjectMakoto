@@ -434,7 +434,7 @@ internal class Bot
 
         _ = Task.Run(async () =>
         {
-            await Task.Delay(5000);
+            await Task.Delay(10000);
 
             while (true)
             {
@@ -498,23 +498,13 @@ internal class Bot
         // It's important that the status changes before the bot shuts down to work around a library issue.
 
         LogInfo($"Closing Discord Client..");
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+
+        for (int i = 0; i < 10; i++)
+            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
         await Task.Delay(1000);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await Task.Delay(1000);
+        for (int i = 0; i < 10; i++)
+            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await Task.Delay(5000);
         await discordClient.DisconnectAsync();
         LogDebug($"Closed Discord Client.");
     }
