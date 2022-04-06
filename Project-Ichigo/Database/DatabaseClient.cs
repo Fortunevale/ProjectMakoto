@@ -468,6 +468,17 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
                             cmd.Parameters.AddWithValue($"phishing_reason{i}", DatabaseInserts[i].phishing_reason);
                             cmd.Parameters.AddWithValue($"phishing_time{i}", DatabaseInserts[i].phishing_time);
+
+                            cmd.Parameters.AddWithValue($"actionlog_channel{i}", DatabaseInserts[i].actionlog_channel);
+                            cmd.Parameters.AddWithValue($"actionlog_attempt_further_detail{i}", DatabaseInserts[i].actionlog_attempt_further_detail);
+                            cmd.Parameters.AddWithValue($"actionlog_log_members_modified{i}", DatabaseInserts[i].actionlog_log_members_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_member_modified{i}", DatabaseInserts[i].actionlog_log_member_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_message_deleted{i}", DatabaseInserts[i].actionlog_log_message_deleted);
+                            cmd.Parameters.AddWithValue($"actionlog_log_message_updated{i}", DatabaseInserts[i].actionlog_log_message_updated);
+                            cmd.Parameters.AddWithValue($"actionlog_log_roles_modified{i}", DatabaseInserts[i].actionlog_log_roles_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_banlist_modified{i}", DatabaseInserts[i].actionlog_log_banlist_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_guild_modified{i}", DatabaseInserts[i].actionlog_log_guild_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_invites_modified{i}", DatabaseInserts[i].actionlog_log_invites_modified);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
