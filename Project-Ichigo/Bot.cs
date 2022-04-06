@@ -444,12 +444,12 @@ internal class Bot
                         return;
 
                     await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
-                    await Task.Delay(60000);
+                    await Task.Delay(30000);
                 }
                 catch (Exception ex)
                 {
                     LogError($"Failed to update user status: {ex}");
-                    await Task.Delay(60000);
+                    await Task.Delay(30000);
                 }
             }
         });

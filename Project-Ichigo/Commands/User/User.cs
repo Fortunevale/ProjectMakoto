@@ -977,6 +977,11 @@ internal class User : BaseCommandModule
 
             CancellationTokenSource cancellationTokenSource = new();
 
+            DiscordButtonComponent ShowProfileButton = new(ButtonStyle.Primary, "getmain", "Show Profile", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":bust_in_silhouette:")));
+            DiscordButtonComponent TopScoresButton = new(ButtonStyle.Primary, "gettopscores", "Show Top Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":sparkler:")));
+            DiscordButtonComponent RecentScoresButton = new(ButtonStyle.Primary, "getrecentscores", "Show Recent Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":clock3:")));
+            DiscordLinkButtonComponent OpenProfileInBrowser = new($"https://scoresaber.com/u/{id}", "Open in browser", false);
+
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
                 Task.Run(async () =>
@@ -985,58 +990,112 @@ internal class User : BaseCommandModule
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        if (e.Interaction.Data.CustomId == "thats_me")
+                        {
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                            cancellationTokenSource.Cancel();
+
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(TopScoresButton).AddComponents(RecentScoresButton));
+                            _bot._users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
+
+                            var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                            {
+                                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                                Color = ColorHelper.Success,
+                                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                                Timestamp = DateTime.UtcNow,
+                                Description = $"{ctx.User.Mention} `Linked '{player.name}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
+                                              $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
+                            }));
+
+                            _ = Task.Delay(10000).ContinueWith(x =>
+                            {
+                                _ = new_msg.DeleteAsync();
+                            });
+                            return;
+                        }
+                        else if (e.Interaction.Data.CustomId == "gettopscores")
+                        {
+                            var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+                            ShowScores(scores, RequestParameters.ScoreType.TOP).Add(_bot._watcher, ctx);
+                        }
+                        else if (e.Interaction.Data.CustomId == "getrecentscores")
+                        {
+                            var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+                            ShowScores(scores, RequestParameters.ScoreType.RECENT).Add(_bot._watcher, ctx);
+                        }
+                        else if (e.Interaction.Data.CustomId == "getmain")
+                        {
+                            ShowProfile().Add(_bot._watcher, ctx);
+                        }
+
                         cancellationTokenSource.Cancel();
+                        cancellationTokenSource = new();
 
-                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                        _bot._users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
-
-                        var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        try
                         {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
-                            Color = ColorHelper.Success,
-                            Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                            Timestamp = DateTime.UtcNow,
-                            Description = $"{ctx.User.Mention} `Linked '{player.name}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
-                                          $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
-                        }));
+                            await Task.Delay(120000, cancellationTokenSource.Token);
+                            embed.Footer.Text += " • Interaction timed out";
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                        _ = Task.Delay(10000).ContinueWith(x =>
-                        {
-                            _ = new_msg.DeleteAsync();
-                        });
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        }
+                        catch { }
                     }
                 }).Add(_bot._watcher, ctx);
             }
 
-            embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
-            embed.Color = ColorHelper.Info;
-            embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
-            embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
-            embed.AddField(new DiscordEmbedField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true));
-            embed.AddField(new DiscordEmbedField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-            embed.AddField(new DiscordEmbedField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
-            embed.AddField(new DiscordEmbedField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true));
-            embed.AddField(new DiscordEmbedField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-            embed.AddField(new DiscordEmbedField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true));
-
-            DiscordButtonComponent components = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
-            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
-
-            if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
-                builder.AddComponents(components);
-
-            _ = msg.ModifyAsync(builder);
-            var file = $"{Guid.NewGuid()}.png";
-
-            ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-            try
+            async Task ShowScores(PlayerScores scores, RequestParameters.ScoreType scoreType)
             {
-                Chart qc = new();
-                qc.Width = 1000;
-                qc.Height = 500;
-                qc.Config = $@"{{
+                embed.ClearFields();
+                embed.ImageUrl = "";
+                embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n\n" +
+                                    $"{(scoreType == RequestParameters.ScoreType.TOP ? "**Top Scores**" : "**Recent Scores**")}";
+
+                foreach (var score in scores.playerScores.Take(5))
+                {
+                    embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $"{ score.leaderboard.songSubName}" : "")} - {score.leaderboard.songAuthorName} [{score.leaderboard.levelAuthorName}]".TruncateWithIndication(256),
+                        $":globe_with_meridians: **#{score.score.rank}**  󠂪 󠂪| 󠂪 󠂪 {Formatter.Timestamp(score.score.timeSet, TimestampFormat.RelativeTime)}\n" +
+                        $"**`{((decimal)((decimal)score.score.modifiedScore / (decimal)score.leaderboard.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp [{(score.score.pp * score.score.weight).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp]`**\n" +
+                        $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.score.missedNotes + score.score.badCuts}`")}**"));
+                }
+
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(OpenProfileInBrowser).AddComponents(ShowProfileButton).AddComponents((scoreType == RequestParameters.ScoreType.TOP ? RecentScoresButton : TopScoresButton)));
+            }
+
+            async Task ShowProfile()
+            {
+                embed.ClearFields();
+                embed.Title = $"{player.name} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString().Replace(",", ".")}pp`";
+                embed.Color = ColorHelper.Info;
+                embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
+                embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
+                embed.AddField(new DiscordEmbedField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true));
+                embed.AddField(new DiscordEmbedField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
+                embed.AddField(new DiscordEmbedField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
+                embed.AddField(new DiscordEmbedField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true));
+                embed.AddField(new DiscordEmbedField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
+                embed.AddField(new DiscordEmbedField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true));
+
+                DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
+
+                DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
+
+                builder.AddComponents(OpenProfileInBrowser);
+
+                if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                    builder.AddComponents(LinkButton);
+
+                msg.ModifyAsync(builder).Add(_bot._watcher, ctx);
+
+                var file = $"{Guid.NewGuid()}.png";
+
+                try
+                {
+                    Chart qc = new();
+                    qc.Width = 1000;
+                    qc.Height = 500;
+                    qc.Config = $@"{{
                         type: 'line',
 	                    data: 
 	                    {{
@@ -1112,42 +1171,48 @@ internal class User : BaseCommandModule
 	                    }}
                     }}";
 
-                qc.ToFile(file);
+                    qc.ToFile(file);
 
-                using (FileStream stream = File.Open(file, FileMode.Open))
+                    using (FileStream stream = File.Open(file, FileMode.Open))
+                    {
+                        var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+
+                        embed.Author.IconUrl = ctx.Guild.IconUrl;
+                        embed.ImageUrl = asset.Attachments[0].Url;
+                        builder = builder.WithEmbed(embed);
+                        builder.AddComponents(TopScoresButton);
+                        builder.AddComponents(RecentScoresButton);
+                        _ = msg.ModifyAsync(builder);
+                    }
+                }
+                catch (Exception ex)
                 {
-                    var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
-
                     embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.ImageUrl = asset.Attachments[0].Url;
-                    builder = builder.WithEmbed(embed);
+                    builder.AddComponents(TopScoresButton);
+                    builder.AddComponents(RecentScoresButton);
                     _ = msg.ModifyAsync(builder);
+                    LogError(ex.ToString());
                 }
-            }
-            catch (Exception ex)
-            {
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                LogError(ex.ToString());
-            }
 
-            try
-            {
-                await Task.Delay(1000);
-                File.Delete(file);
-            }
-            catch { }
-
-            try
-            {
-                if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                try
                 {
-                    await Task.Delay(120000, cancellationTokenSource.Token);
-                    embed.Footer.Text += " • Interaction timed out";
-                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                    await Task.Delay(1000);
+                    File.Delete(file);
                 }
+                catch { }
+            }
+
+            ShowProfile().Add(_bot._watcher, ctx);
+
+            ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+            try
+            {
+                await Task.Delay(120000, cancellationTokenSource.Token);
+                embed.Footer.Text += " • Interaction timed out";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                ctx.Client.ComponentInteractionCreated -= RunInteraction;
             }
             catch { }
         }
