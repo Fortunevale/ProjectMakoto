@@ -1054,7 +1054,7 @@ internal class User : BaseCommandModule
 
                 foreach (var score in scores.playerScores.Take(5))
                 {
-                    embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $"{ score.leaderboard.songSubName}" : "")} - {score.leaderboard.songAuthorName} [{score.leaderboard.levelAuthorName}]".TruncateWithIndication(256),
+                    embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $" {score.leaderboard.songSubName}" : "")} - {score.leaderboard.songAuthorName} [{score.leaderboard.levelAuthorName}]".TruncateWithIndication(256),
                         $":globe_with_meridians: **#{score.score.rank}**  󠂪 󠂪| 󠂪 󠂪 {Formatter.Timestamp(score.score.timeSet, TimestampFormat.RelativeTime)}\n" +
                         $"{(score.leaderboard.ranked ? $"**`{((decimal)((decimal)score.score.modifiedScore / (decimal)score.leaderboard.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp [{(score.score.pp * score.score.weight).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp]`**\n" : "\n")}" +
                         $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.score.missedNotes + score.score.badCuts}`")}**"));

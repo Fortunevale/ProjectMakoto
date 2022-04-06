@@ -28,10 +28,13 @@
   <ItemGroup>
     <Compile Remove="%2a%2a\**" />
     <Compile Remove="ApplicationCommands\**" />
+    <Compile Remove="Project_Ichigo\**" />
     <EmbeddedResource Remove="%2a%2a\**" />
     <EmbeddedResource Remove="ApplicationCommands\**" />
+    <EmbeddedResource Remove="Project_Ichigo\**" />
     <None Remove="%2a%2a\**" />
     <None Remove="ApplicationCommands\**" />
+    <None Remove="Project_Ichigo\**" />
   </ItemGroup>
 
   <ItemGroup>
