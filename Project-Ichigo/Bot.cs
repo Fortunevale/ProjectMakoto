@@ -100,6 +100,9 @@ internal class Bot
 
         await loadDatabase.WaitAsync(TimeSpan.FromSeconds(30));
 
+        bool IsDev = false;
+        bool DevOnline = false;
+
         var logInToDiscord = Task.Run(async () =>
         {
             try
@@ -147,9 +150,6 @@ internal class Bot
                 LogDebug($"Registering CommandsNext..");
 
                 string Prefix = ";;";
-
-                bool IsDev = false;
-                bool DevOnline = false;
 
                 Task<int> GetPrefix(DiscordMessage message)
                 {
@@ -443,7 +443,7 @@ internal class Bot
                     if (_databaseClient.IsDisposed())
                         return;
 
-                    await discordClient.UpdateStatusAsync(new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(60000);
                 }
                 catch (Exception ex)
