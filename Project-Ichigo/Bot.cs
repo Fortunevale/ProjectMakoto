@@ -242,9 +242,13 @@ internal class Bot
 
                 LogDebug($"Registering Discord Events..");
 
-                DiscordEvents discordEvents = new();
+                DiscordEvents discordEvents = new(this);
                 discordClient.GuildCreated += discordEvents.GuildCreated;
 
+
+                LogDebug($"Registering Actionlog Events..");
+
+                ActionlogEvents actionlogEvents = new(this);
 
 
                 LogDebug($"Registering Join Events..");
