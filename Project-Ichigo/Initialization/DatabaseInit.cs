@@ -63,6 +63,19 @@ internal class DatabaseInit
                     BoostXpForBumpReminder = b.experience_boost_bumpreminder
                 },
                 LevelRewards = JsonConvert.DeserializeObject<List<LevelRewards>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
+                ActionLogSettings = new()
+                {
+                    Channel = b.actionlog_channel,
+                    AttemptGettingMoreDetails = b.actionlog_attempt_further_detail,
+                    MemberModified = b.actionlog_log_member_modified,
+                    MembersModified = b.actionlog_log_members_modified,
+                    BanlistModified = b.actionlog_log_banlist_modified,
+                    GuildModified = b.actionlog_log_guild_modified,
+                    InvitesModified = b.actionlog_log_invites_modified,
+                    MessageDeleted = b.actionlog_log_message_deleted,
+                    MessageModified = b.actionlog_log_message_updated,
+                    RolesModified = b.actionlog_log_roles_modified,
+                }
             });
 
         LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");

@@ -544,19 +544,19 @@ internal class Admin : BaseCommandModule
                                         if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                                         {
                                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-    
+
                                             cancellationTokenSource.Cancel();
                                             cancellationTokenSource = new();
-    
+
                                             string Message = "";
-    
+
                                             if (e.Interaction.Data.CustomId == "yes")
                                             {
                                                 embed.Description = $"`Selected` <@&{role}> `({role}). It will be assigned at Level {level}. Please type out your custom message. (<256 characters)`";
                                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-    
+
                                                 var result = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id, TimeSpan.FromMinutes(5));
-    
+
                                                 if (result.TimedOut)
                                                 {
                                                     embed.Footer.Text += " • Interaction timed out";
@@ -565,9 +565,9 @@ internal class Admin : BaseCommandModule
                                                     _ = msg.DeleteAsync();
                                                     return;
                                                 }
-    
+
                                                 _ = result.Result.DeleteAsync();
-    
+
                                                 if (result.Result.Content.Length > 256)
                                                 {
                                                     embed.Description = "`Your custom message can't contain more than 256 characters.`";
@@ -577,17 +577,17 @@ internal class Admin : BaseCommandModule
                                                     _ = msg.DeleteAsync();
                                                     return;
                                                 }
-    
+
                                                 Message = result.Result.Content;
                                             }
-    
+
                                             _bot._guilds.Servers[ctx.Guild.Id].LevelRewards.Add(new Objects.LevelRewards
                                             {
                                                 Level = level,
                                                 RoleId = role,
                                                 Message = (string.IsNullOrEmpty(Message) ? "You received ##Role##!" : Message)
                                             });
-    
+
                                             embed.Description = $"`The role` <@&{role}> `({role}) will be assigned at Level {level}.`";
                                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                         }

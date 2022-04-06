@@ -418,7 +418,18 @@ internal class DatabaseClient
                             bump_last_user = x.Value.BumpReminderSettings.LastUserId,
                             bump_message = x.Value.BumpReminderSettings.MessageId,
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
-                            levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards)
+                            levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
+
+                            actionlog_channel = x.Value.ActionLogSettings.Channel,
+                            actionlog_attempt_further_detail = x.Value.ActionLogSettings.AttemptGettingMoreDetails,
+                            actionlog_log_members_modified = x.Value.ActionLogSettings.MembersModified,
+                            actionlog_log_member_modified = x.Value.ActionLogSettings.MemberModified,
+                            actionlog_log_message_deleted = x.Value.ActionLogSettings.MessageDeleted,
+                            actionlog_log_message_updated = x.Value.ActionLogSettings.MessageModified,
+                            actionlog_log_roles_modified = x.Value.ActionLogSettings.RolesModified,
+                            actionlog_log_banlist_modified = x.Value.ActionLogSettings.BanlistModified,
+                            actionlog_log_guild_modified = x.Value.ActionLogSettings.GuildModified,
+                            actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified
                         }).ToList();
 
                         if (mainDatabaseConnection == null)

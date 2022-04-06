@@ -21,4 +21,15 @@ public class DatabaseServerSettings
     public int phishing_type { get; set; }
     public string phishing_reason { get; set; }
     public long phishing_time { get; set; }
+
+    public ulong actionlog_channel { get; set; }
+    public bool actionlog_attempt_further_detail { get; set; }
+    public bool actionlog_log_members_modified { get; set; }
+    public bool actionlog_log_member_modified { get; set; }
+    public bool actionlog_log_message_deleted { get; set; }
+    public bool actionlog_log_message_updated { get; set; }
+    public bool actionlog_log_roles_modified { get; set; }
+    public bool actionlog_log_banlist_modified { get; set; }
+    public bool actionlog_log_guild_modified { get; set; }
+    public bool actionlog_log_invites_modified { get; set; }
 }

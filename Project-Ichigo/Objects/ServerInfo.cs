@@ -12,5 +12,6 @@ internal class ServerInfo
         public ExperienceSettings ExperienceSettings { get; set; } = new();
         public List<LevelRewards> LevelRewards { get; set; } = new();
         public Dictionary<ulong, Members> Members { get; set; } = new();
+        public ActionLogSettings ActionLogSettings { get; set; } = new();
     }
 }

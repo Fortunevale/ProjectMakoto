@@ -78,6 +78,15 @@ internal class DatabaseColumnLists
         new Column("phishing_type", "int"),
         new Column("phishing_reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("phishing_time", "bigint"),
+        new Column("actionlog_channel", "bigint"),
+        new Column("actionlog_log_members_modified", "tinyint(1)"),
+        new Column("actionlog_log_member_modified", "tinyint(1)"),
+        new Column("actionlog_log_message_deleted", "tinyint(1)"),
+        new Column("actionlog_log_message_updated", "tinyint(1)"),
+        new Column("actionlog_log_roles_modified", "tinyint(1)"),
+        new Column("actionlog_log_banlist_modified", "tinyint(1)"),
+        new Column("actionlog_log_guild_modified", "tinyint(1)"),
+        new Column("actionlog_log_invites_modified", "tinyint(1)"),
     };
 
     internal readonly static List<Column> guild_users = new()
