@@ -24,7 +24,7 @@ internal class PhishingProtectionEvents
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        if (e.Content.StartsWith($";;") || e.Content.StartsWith($">>"))
+        if (e.Content.StartsWith($";;"))
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Content.StartsWith($";;{command.Key}") || e.Content.StartsWith($">>{command.Key}"))
                     return;
