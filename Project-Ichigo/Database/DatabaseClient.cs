@@ -85,17 +85,14 @@ internal class DatabaseClient
         {
             _bot = _bot,
 
-            mainDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;"),
-            guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;")
+            mainDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;Database={Secrets.Secrets.MainDatabaseName};"),
+            guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;Database={Secrets.Secrets.GuildDatabaseName};")
         };
         databaseClient._helper = new(databaseClient);
         databaseClient._queue = new();
 
         databaseClient.mainDatabaseConnection.Open();
         databaseClient.guildDatabaseConnection.Open();
-
-        await databaseClient._helper.SelectDatabase(databaseClient.mainDatabaseConnection, Secrets.Secrets.MainDatabaseName, true);
-        await databaseClient._helper.SelectDatabase(databaseClient.guildDatabaseConnection, Secrets.Secrets.GuildDatabaseName, true);
 
         try
         {
@@ -342,7 +339,6 @@ internal class DatabaseClient
             {
                 LogWarn("Pinging the database failed, attempting reconnect.");
                 connection.Open();
-                await _helper.SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
                 LogInfo($"Reconnected to database.");
             }
             catch (Exception ex)
@@ -376,7 +372,6 @@ internal class DatabaseClient
                 LogWarn($"Creating a test value in database failed, reconnecting to database: {ex}");
                 connection.Close();
                 connection.Open();
-                await _helper.SelectDatabase(connection, Secrets.Secrets.MainDatabaseName, true);
                 LogInfo($"Reconnected to database.");
             }
             catch (Exception ex1)
