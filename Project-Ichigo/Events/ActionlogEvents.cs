@@ -592,7 +592,19 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.BanlistModified)
+                return;
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanned, Name = $"User banned" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
+                                $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
+            }));
         }).Add(_bot._watcher);
     }
 
@@ -600,7 +612,18 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.BanlistModified)
+                return;
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanRemoved, Name = $"User unbanned" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`"
+            }));
         }).Add(_bot._watcher);
     }
 
