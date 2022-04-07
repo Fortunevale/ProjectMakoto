@@ -1721,6 +1721,7 @@ internal class Admin : BaseCommandModule
                                   $"`Role Updates                      ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote()}\n" +
                                   $"`Bans & Unbans                     ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
                                   $"`Server Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
+                                  $"`Channel Modifications             ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified.BoolToEmote()}\n" +
                                   $"`Invite Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
                 });
                 return;
@@ -1743,6 +1744,7 @@ internal class Admin : BaseCommandModule
                                   $"`Role Updates                      ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote()}\n" +
                                   $"`Bans & Unbans                     ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
                                   $"`Server Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
+                                  $"`Channel Modifications             ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified.BoolToEmote()}\n" +
                                   $"`Invite Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
                 };
 
@@ -1777,6 +1779,7 @@ internal class Admin : BaseCommandModule
                         new DiscordSelectComponentOption("Toggle 'Role Updates'", "log_roles_modified"),
                         new DiscordSelectComponentOption("Toggle 'Bans & Unbans'", "log_banlist_modified"),
                         new DiscordSelectComponentOption("Toggle 'Server Modifications'", "log_guild_modified"),
+                        new DiscordSelectComponentOption("Toggle 'Channel Modifications'", "log_channels_modified"),
                         new DiscordSelectComponentOption("Toggle 'Invite Modifications'", "log_invites_modified"),
                     }));
 
@@ -1811,6 +1814,7 @@ internal class Admin : BaseCommandModule
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified = false;
+                                _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified = false;
 
@@ -1922,6 +1926,7 @@ internal class Admin : BaseCommandModule
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified;
+                                        _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified;
                                         break;
                                     case "log_members_modified":
@@ -1947,6 +1952,9 @@ internal class Admin : BaseCommandModule
                                         break;
                                     case "log_guild_modified":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified;
+                                        break;
+                                    case "log_channels_modified":
+                                        _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.ChannelsModified;
                                         break;
                                     case "log_invites_modified":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified;

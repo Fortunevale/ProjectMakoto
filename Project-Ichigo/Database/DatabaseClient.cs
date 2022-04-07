@@ -430,7 +430,8 @@ internal class DatabaseClient
                             actionlog_log_roles_modified = x.Value.ActionLogSettings.RolesModified,
                             actionlog_log_banlist_modified = x.Value.ActionLogSettings.BanlistModified,
                             actionlog_log_guild_modified = x.Value.ActionLogSettings.GuildModified,
-                            actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified
+                            actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified,
+                            actionlog_log_channels_modified = x.Value.ActionLogSettings.ChannelsModified
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -480,6 +481,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"actionlog_log_roles_modified{i}", DatabaseInserts[i].actionlog_log_roles_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_banlist_modified{i}", DatabaseInserts[i].actionlog_log_banlist_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_guild_modified{i}", DatabaseInserts[i].actionlog_log_guild_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_channels_modified{i}", DatabaseInserts[i].actionlog_log_channels_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_invites_modified{i}", DatabaseInserts[i].actionlog_log_invites_modified);
                         }
 

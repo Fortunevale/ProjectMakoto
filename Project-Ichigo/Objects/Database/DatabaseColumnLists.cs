@@ -87,6 +87,7 @@ internal class DatabaseColumnLists
         new Column("actionlog_log_roles_modified", "tinyint(1)"),
         new Column("actionlog_log_banlist_modified", "tinyint(1)"),
         new Column("actionlog_log_guild_modified", "tinyint(1)"),
+        new Column("actionlog_log_channels_modified", "tinyint(1)"),
         new Column("actionlog_log_invites_modified", "tinyint(1)"),
     };
 

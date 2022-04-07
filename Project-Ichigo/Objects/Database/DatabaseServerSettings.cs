@@ -32,5 +32,6 @@ public class DatabaseServerSettings
     public bool actionlog_log_roles_modified { get; set; }
     public bool actionlog_log_banlist_modified { get; set; }
     public bool actionlog_log_guild_modified { get; set; }
+    public bool actionlog_log_channels_modified { get; set; }
     public bool actionlog_log_invites_modified { get; set; }
 }

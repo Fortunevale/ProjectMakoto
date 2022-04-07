@@ -75,7 +75,8 @@ internal class DatabaseInit
                     MessageDeleted = b.actionlog_log_message_deleted,
                     MessageModified = b.actionlog_log_message_updated,
                     RolesModified = b.actionlog_log_roles_modified,
-                    MemberProfileModified = b.actionlog_log_memberprofile_modified
+                    MemberProfileModified = b.actionlog_log_memberprofile_modified,
+                    ChannelsModified = b.actionlog_log_channels_modified,
                 }
             });
 

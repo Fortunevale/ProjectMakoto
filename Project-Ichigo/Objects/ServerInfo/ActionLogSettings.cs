@@ -32,6 +32,9 @@ internal class ActionLogSettings
     private bool _GuildModified { get; set; } = false;
     public bool GuildModified { get => _GuildModified; set { _GuildModified = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 
+    private bool _ChannelsModified { get; set; } = false;
+    public bool ChannelsModified { get => _ChannelsModified; set { _ChannelsModified = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+
     private bool _InvitesModified { get; set; } = false;
     public bool InvitesModified { get => _InvitesModified; set { _InvitesModified = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 }

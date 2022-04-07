@@ -29,6 +29,7 @@ internal class ActionlogEvents
             _bot._guilds.Servers[guild.Id].ActionLogSettings.RolesModified = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.BanlistModified = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.GuildModified = false;
+            _bot._guilds.Servers[guild.Id].ActionLogSettings.ChannelsModified = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.InvitesModified = false;
             return false;
         }
