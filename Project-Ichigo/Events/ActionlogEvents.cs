@@ -23,6 +23,7 @@ internal class ActionlogEvents
             _bot._guilds.Servers[guild.Id].ActionLogSettings.AttemptGettingMoreDetails = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.MembersModified = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.MemberModified = false;
+            _bot._guilds.Servers[guild.Id].ActionLogSettings.MemberProfileModified = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.MessageDeleted = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.MessageModified = false;
             _bot._guilds.Servers[guild.Id].ActionLogSettings.RolesModified = false;
@@ -50,7 +51,7 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
                 Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
-                              $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
+                                $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
             }));
         }).Add(_bot._watcher);
     }
@@ -70,7 +71,7 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
                 Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
-                              $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
+                                $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
             }));
         }).Add(_bot._watcher);
     }
@@ -79,7 +80,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Message is null)
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null)
                 return;
 
             if (!string.IsNullOrEmpty(e.Message.Content))
@@ -207,7 +208,42 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Author.IsBot || e.Message is null || e.Message.Author is null)
+                return;
+
+            if (!string.IsNullOrEmpty(e.Message.Content))
+                if (e.Message.Content.StartsWith($";;"))
+                    foreach (var command in sender.GetCommandsNext().RegisteredCommands)
+                        if (e.Message.Content.StartsWith($";;{command.Key}") || e.Message.Content.StartsWith($">>{command.Key}"))
+                            return;
+
+            DiscordEmbedBuilder embed = new()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.MessageEdited, Name = $"Message updated" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Message.Author.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
+                Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.UsernameWithDiscriminator}`\n" +
+                                $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`\n" +
+                                $"**Message**: [`Jump to message`]({e.Message.JumpLink})"
+            };
+
+            if (e.MessageBefore.Content != e.Message.Content)
+            {
+                if (!string.IsNullOrWhiteSpace(e.MessageBefore.Content))
+                    embed.AddField(new DiscordEmbedField("Previous Content", $"`{e.MessageBefore.Content.TruncateWithIndication(2022)}`"));
+
+                if (!string.IsNullOrWhiteSpace(e.Message.Content))
+                    embed.AddField(new DiscordEmbedField("New Content", $"`{e.Message.Content.TruncateWithIndication(2022)}`"));
+            }
+            else
+            {
+                return;
+            }
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
         }).Add(_bot._watcher);
     }
 
@@ -215,7 +251,181 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MemberModified)
+                return;
+
+            if (e.NicknameBefore != e.NicknameAfter)
+            {
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Nickname updated" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                    Timestamp = DateTime.UtcNow,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`"
+                };
+
+                if (string.IsNullOrWhiteSpace(e.NicknameBefore))
+                    embed.Author.Name = "Nickname added";
+                else
+                    embed.AddField(new DiscordEmbedField("Previous Nickname", $"`{e.NicknameBefore}`"));
+
+                if (string.IsNullOrWhiteSpace(e.NicknameAfter))
+                    embed.Author.Name = "Nickname removed";
+                else
+                    embed.AddField(new DiscordEmbedField("New Nickname", $"`{e.NicknameAfter}`"));
+
+                _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            }
+
+            bool RolesUpdated = false;
+
+            foreach (var role in e.RolesBefore)
+            {
+                if (!e.RolesAfter.Any(x => x.Id == role.Id))
+                {
+                    RolesUpdated = true;
+                    break;
+                }
+            }
+
+            if (!RolesUpdated)
+                foreach (var role in e.RolesAfter)
+                {
+                    if (!e.RolesBefore.Any(x => x.Id == role.Id))
+                    {
+                        RolesUpdated = true;
+                        break;
+                    }
+                }
+
+            if (RolesUpdated)
+            {
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Roles updated" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                    Timestamp = DateTime.UtcNow,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`"
+                };
+
+                string Roles = "";
+
+                bool RolesAdded = false;
+                bool RolesRemoved = false;
+
+                foreach (var role in e.RolesAfter)
+                {
+                    if (!e.RolesBefore.Any(x => x.Id == role.Id))
+                    {
+                        Roles += $"`+` {role.Mention} `{role.Name}` `({role.Id})`\n";
+                        RolesAdded = true;
+                    }
+                }
+
+                foreach (var role in e.RolesBefore)
+                {
+                    if (!e.RolesAfter.Any(x => x.Id == role.Id))
+                    {
+                        Roles += $"`-` {role.Mention} `{role.Name}` `({role.Id})`\n";
+                        RolesRemoved = true;
+                    }
+                }
+
+                if (RolesAdded && !RolesRemoved)
+                    embed.Author.Name = "Roles added";
+                else if (!RolesAdded && RolesRemoved)
+                    embed.Author.Name = "Roles removed";
+                else
+                    embed.Author.Name = "Roles updated";
+
+                embed.Description += $"\n\n{Roles}";
+
+                _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            }
+
+            if (e.TimeoutBefore != e.TimeoutAfter)
+            {
+                // Timeouts don't seem to fire the member updated event, will keep this code for potential future updates.
+
+                if (e.TimeoutAfter?.ToUniversalTime() > e.TimeoutBefore?.ToUniversalTime())
+                    _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanned, Name = $"User timed out" },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                        Timestamp = DateTime.UtcNow,
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                        Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
+                                        $"**Timed out until**: {Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.LongDateTime)} ({Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.RelativeTime)})"
+                    }));
+
+                if (e.TimeoutAfter?.ToUniversalTime() < e.TimeoutBefore?.ToUniversalTime())
+                    _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanRemoved, Name = $"User timeout removed" },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                        Timestamp = DateTime.UtcNow,
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                        Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`"
+                    }));
+            }
+
+            if (e.PendingBefore != e.PendingAfter)
+            {
+                try
+                {
+                    if ((e.PendingBefore is null && e.PendingAfter is true) || (e.PendingAfter is true && e.PendingBefore is false))
+                        _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                        {
+                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"Membership approved" },
+                            Color = ColorHelper.Info,
+                            Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                            Timestamp = DateTime.UtcNow,
+                            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                            Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`"
+                        }));
+                }
+                catch { }
+            }
+
+            if (!_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MemberProfileModified)
+                return;
+
+            if (e.AvatarHashBefore != e.AvatarHashAfter)
+            {
+                // Normal avatar updates don't seem to fire the member updated event, will keep this code for potential future updates.
+
+                _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Member Profile Picture updated" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                    Timestamp = DateTime.UtcNow,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`",
+                    ImageUrl = e.Member.AvatarUrl
+                }));
+            }
+
+            if (e.GuildAvatarHashBefore != e.GuildAvatarHashAfter)
+            {
+                _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Member Guild Profile Picture updated" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
+                    Timestamp = DateTime.UtcNow,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`",
+                    ImageUrl = e.Member.GuildAvatarUrl
+                }));
+            }
+
         }).Add(_bot._watcher);
     }
 
@@ -223,7 +433,39 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.RolesModified)
+                return;
+
+            string GeneratePermissions = string.Join(", ", e.Role.Permissions.ToString().Split(", ").Select(x => $"`{x}`"));
+            string Integration = "";
+
+            if (e.Role.IsManaged)
+            {
+                if (e.Role.Tags.IsPremiumSubscriber)
+                    Integration = "**Integration**: `Server Booster`\n\n";
+
+                if (e.Role.Tags.BotId is not null && e.Role.Tags.BotId != 0)
+                {
+                    var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
+
+                    Integration = $"**Integration**: {bot.Mention} `{bot.UsernameWithDiscriminator}`\n\n";
+                }
+            }
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"Role created" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Role**: {e.Role.Mention} `{e.Role.Name}`\n" +
+                                $"**Color**: `{ToHex(e.Role.Color.R, e.Role.Color.G, e.Role.Color.B)}`\n" +
+                                $"{(e.Role.IsManaged ? "\n`This role belongs to an integration and cannot be deleted.`\n" : "")}" +
+                                $"{Integration}" +
+                                $"{(e.Role.IsMentionable ? "`Everyone can mention this role.`\n" : "")}" +
+                                $"{(e.Role.IsHoisted ? "`Role members are displayed seperately from others.`\n" : "")}" +
+                                $"\n**Permissions**: {GeneratePermissions}"
+            }));
         }).Add(_bot._watcher);
     }
 
@@ -231,7 +473,39 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.RolesModified)
+                return;
+
+            string GeneratePermissions = string.Join(", ", e.Role.Permissions.ToString().Split(", ").Select(x => $"`{x}`"));
+            string Integration = "";
+
+            if (e.Role.IsManaged)
+            {
+                if (e.Role.Tags.IsPremiumSubscriber)
+                    Integration = "**Integration**: `Server Booster`\n\n";
+
+                if (e.Role.Tags.BotId is not null && e.Role.Tags.BotId != 0)
+                {
+                    var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
+
+                    Integration = $"**Integration**: {bot.Mention} `{bot.UsernameWithDiscriminator}`\n\n";
+                }
+            }
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserLeft, Name = $"Role deleted" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Role**: {e.Role.Mention} `{e.Role.Name}`\n" +
+                                $"**Color**: `{e.Role.Color.ToHex()}`\n" +
+                                $"{(e.Role.IsManaged ? "\n`This role belonged to an integration and was therefor deleted automatically.`\n" : "")}" +
+                                $"{Integration}" +
+                                $"{(e.Role.IsMentionable ? "`Everyone could mention this role.`\n" : "")}" +
+                                $"{(e.Role.IsHoisted ? "`Role members were displayed seperately from others.`\n" : "")}" +
+                                $"\n**Permissions**: {GeneratePermissions}"
+            }));
         }).Add(_bot._watcher);
     }
 
@@ -239,7 +513,78 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.RolesModified)
+                return;
+
+            string[] BeforePermissions = e.RoleBefore.Permissions.ToString().Split(", ");
+            string[] AfterPermissions = e.RoleAfter.Permissions.ToString().Split(", ");
+
+            bool PermissionsAdded = false;
+            bool PermissionsRemoved = false;
+            string PermissionDifference = "";
+
+            foreach (string perm in AfterPermissions)
+            {
+                if (perm == "None")
+                    continue;
+
+                if (!BeforePermissions.Contains(perm))
+                {
+                    PermissionsAdded = true;
+                    PermissionDifference += $"`+` `{perm}`\n";
+                }
+            }
+
+            foreach (string perm in BeforePermissions)
+            {
+                if (perm == "None")
+                    continue;
+
+                if (!AfterPermissions.Contains(perm))
+                {
+                    PermissionsRemoved = true;
+                    PermissionDifference += $"`-` `{perm}`\n";
+                }
+            }
+
+            if (PermissionDifference.Length > 0)
+                if (!PermissionsAdded && PermissionsRemoved)
+                    PermissionDifference = $"\n**Permissions removed**:\n{PermissionDifference}";
+                else if (PermissionsAdded && !PermissionsRemoved)
+                    PermissionDifference = $"\n**Permissions added**:\n{PermissionDifference}";
+                else
+                    PermissionDifference = $"\n**Permissions updated**:\n{PermissionDifference}";
+
+            string Integration = "";
+
+            if (e.RoleAfter.IsManaged)
+            {
+                if (e.RoleAfter.Tags.IsPremiumSubscriber)
+                    Integration = "**Integration**: `Server Booster`\n\n";
+
+                if (e.RoleAfter.Tags.BotId is not null && e.RoleAfter.Tags.BotId != 0)
+                {
+                    var bot = await sender.GetUserAsync((ulong)e.RoleAfter.Tags.BotId);
+
+                    Integration = $"**Integration**: {bot.Mention} `{bot.UsernameWithDiscriminator}`\n\n";
+                }
+            }
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Role updated" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.RoleAfter.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Role**: {e.RoleAfter.Mention} {(e.RoleBefore.Name != e.RoleAfter.Name ? $"`{e.RoleBefore.Name}` :arrow_right: `{e.RoleAfter.Name}`" : $"`{e.RoleAfter.Name}`")}\n" +
+                                $"{(e.RoleBefore.Color.ToHex() != e.RoleAfter.Color.ToHex() ? $"**Color**: `{e.RoleBefore.Color.ToHex()}` :arrow_right: `{e.RoleAfter.Color.ToHex()}`\n" : "")}" +
+                                $"{(e.RoleAfter.IsManaged ? "\n`This role belongs to an integration and cannot be deleted.`\n" : "")}" +
+                                $"{Integration}" +
+                                $"{(e.RoleBefore.IsMentionable != e.RoleAfter.IsMentionable ? $"{(!e.RoleBefore.IsMentionable && e.RoleAfter.IsMentionable ? "`Everyone can mention this role now.`\n" : "`The role can no longer be mentioned by everyone.`\n")}" : "")}" +
+                                $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"{(!e.RoleBefore.IsHoisted && e.RoleAfter.IsHoisted ? "`Role members now display seperately from others.`\n" : "`Role members no longer display seperately from others.`\n")}" : "")}" +
+                                $"{PermissionDifference}"
+            }));
+
         }).Add(_bot._watcher);
     }
 
