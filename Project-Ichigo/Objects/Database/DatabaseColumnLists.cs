@@ -79,6 +79,7 @@ internal class DatabaseColumnLists
         new Column("phishing_reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("phishing_time", "bigint"),
         new Column("actionlog_channel", "bigint"),
+        new Column("actionlog_attempt_further_detail", "tinyint(1)"),
         new Column("actionlog_log_members_modified", "tinyint(1)"),
         new Column("actionlog_log_member_modified", "tinyint(1)"),
         new Column("actionlog_log_memberprofile_modified", "tinyint(1)"),
