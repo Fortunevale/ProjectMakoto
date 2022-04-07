@@ -96,6 +96,8 @@ internal static class Extensions
         return discordEmbeds;
     }
 
+    internal static string ToHex(this DiscordColor c) => UniversalExtensions.ToHex(c.R, c.G, c.B);
+
     internal static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")
     {
         if (startingText.Length > 1024)
