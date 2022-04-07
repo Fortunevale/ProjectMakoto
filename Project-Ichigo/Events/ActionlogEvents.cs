@@ -566,7 +566,7 @@ internal class ActionlogEvents
                 Color = ColorHelper.Info,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
                 Timestamp = DateTime.UtcNow,
-                Description = $"**Role**: {e.Role.Mention} `{e.Role.Name}`\n" +
+                Description = $"**Role**: `{e.Role.Name}`\n" +
                                             $"**Color**: `{e.Role.Color.ToHex()}`\n" +
                                             $"{(e.Role.IsManaged ? "\n`This role belonged to an integration and was therefor deleted automatically.`\n" : "")}" +
                                             $"{Integration}" +
@@ -1073,12 +1073,13 @@ internal class ActionlogEvents
 
                 if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot._guilds.Servers[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot._guilds.Servers[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
+                    var Entry = (DiscordAuditLogInviteEntry)AuditLogEntries.First(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot._guilds.Servers[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
                     _bot._guilds.Servers[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
+                    embed.Footer = new();
                     embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
