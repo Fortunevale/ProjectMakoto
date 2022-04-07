@@ -14,6 +14,9 @@ internal class ActionLogSettings
     private bool _MemberModified { get; set; } = false;
     public bool MemberModified { get => _MemberModified; set { _MemberModified = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 
+    private bool _MemberProfileModified { get; set; } = false;
+    public bool MemberProfileModified { get => _MemberProfileModified; set { _MemberProfileModified = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+
     private bool _MessageDeleted { get; set; } = false;
     public bool MessageDeleted { get => _MessageDeleted; set { _MessageDeleted = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 

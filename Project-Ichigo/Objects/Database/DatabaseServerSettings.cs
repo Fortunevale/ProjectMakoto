@@ -26,6 +26,7 @@ public class DatabaseServerSettings
     public bool actionlog_attempt_further_detail { get; set; }
     public bool actionlog_log_members_modified { get; set; }
     public bool actionlog_log_member_modified { get; set; }
+    public bool actionlog_log_memberprofile_modified { get; set; }
     public bool actionlog_log_message_deleted { get; set; }
     public bool actionlog_log_message_updated { get; set; }
     public bool actionlog_log_roles_modified { get; set; }

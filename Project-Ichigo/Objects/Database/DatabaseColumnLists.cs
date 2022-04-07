@@ -81,6 +81,7 @@ internal class DatabaseColumnLists
         new Column("actionlog_channel", "bigint"),
         new Column("actionlog_log_members_modified", "tinyint(1)"),
         new Column("actionlog_log_member_modified", "tinyint(1)"),
+        new Column("actionlog_log_memberprofile_modified", "tinyint(1)"),
         new Column("actionlog_log_message_deleted", "tinyint(1)"),
         new Column("actionlog_log_message_updated", "tinyint(1)"),
         new Column("actionlog_log_roles_modified", "tinyint(1)"),

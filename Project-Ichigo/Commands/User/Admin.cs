@@ -1711,16 +1711,17 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Actionlog Channel             ` : <#{_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
-                                  $"`Attempt gathering more details` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote()}\n" +
-                                  $"`Join, Leaves & Kicks          ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified.BoolToEmote()}\n" +
-                                  $"`Nickname, Role Updates        ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified.BoolToEmote()}\n" +
-                                  $"`Message Deletions             ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted.BoolToEmote()}\n" +
-                                  $"`Message Modifications         ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified.BoolToEmote()}\n" +
-                                  $"`Role Updates                  ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote()}\n" +
-                                  $"`Bans & Unbans                 ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
-                                  $"`Server Modifications          ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
-                                  $"`Invite Modifications          ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
+                    Description = $"`Actionlog Channel                 ` : <#{_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
+                                  $"`Attempt gathering more details    ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote()}\n" +
+                                  $"`Join, Leaves & Kicks              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified.BoolToEmote()}\n" +
+                                  $"`Nickname, Role, Membership Updates` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified.BoolToEmote()}\n" +
+                                  $"`User Profile Updates              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified.BoolToEmote()}\n" +
+                                  $"`Message Deletions                 ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted.BoolToEmote()}\n" +
+                                  $"`Message Modifications             ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified.BoolToEmote()}\n" +
+                                  $"`Role Updates                      ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote()}\n" +
+                                  $"`Bans & Unbans                     ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
+                                  $"`Server Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
+                                  $"`Invite Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
                 });
                 return;
             }
@@ -1732,16 +1733,17 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Actionlog Channel             ` : <#{_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
-                                  $"`Attempt gathering more details` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote()}\n" +
-                                  $"`Join, Leaves & Kicks          ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified.BoolToEmote()}\n" +
-                                  $"`Nickname, Role Updates        ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified.BoolToEmote()}\n" +
-                                  $"`Message Deletions             ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted.BoolToEmote()}\n" +
-                                  $"`Message Modifications         ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified.BoolToEmote()}\n" +
-                                  $"`Role Updates                  ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote()}\n" +
-                                  $"`Bans & Unbans                 ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
-                                  $"`Server Modifications          ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
-                                  $"`Invite Modifications          ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
+                    Description = $"`Actionlog Channel                 ` : <#{_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
+                                  $"`Attempt gathering more details    ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote()}\n" +
+                                  $"`Join, Leaves & Kicks              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified.BoolToEmote()}\n" +
+                                  $"`Nickname, Role, Membership Updates` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified.BoolToEmote()}\n" +
+                                  $"`User Profile Updates              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified.BoolToEmote()}\n" +
+                                  $"`Message Deletions                 ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted.BoolToEmote()}\n" +
+                                  $"`Message Modifications             ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified.BoolToEmote()}\n" +
+                                  $"`Role Updates                      ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote()}\n" +
+                                  $"`Bans & Unbans                     ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
+                                  $"`Server Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
+                                  $"`Invite Modifications              ` : {_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
                 };
 
                 if (_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.Channel == 0)
@@ -1769,6 +1771,7 @@ internal class Admin : BaseCommandModule
                         new DiscordSelectComponentOption("Toggle all options below", "toggle_all"),
                         new DiscordSelectComponentOption("Toggle 'Join, Leaves & Kicks'", "log_members_modified"),
                         new DiscordSelectComponentOption("Toggle 'Nickname, Role Updates'", "log_member_modified"),
+                        new DiscordSelectComponentOption("Toggle 'User Profile Updates'", "log_memberprofile_modified"),
                         new DiscordSelectComponentOption("Toggle 'Message Deletions'", "log_message_deleted"),
                         new DiscordSelectComponentOption("Toggle 'Message Modifications'", "log_message_updated"),
                         new DiscordSelectComponentOption("Toggle 'Role Updates'", "log_roles_modified"),
@@ -1803,6 +1806,7 @@ internal class Admin : BaseCommandModule
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified = false;
+                                _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified = false;
                                 _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified = false;
@@ -1912,6 +1916,7 @@ internal class Admin : BaseCommandModule
                                     case "toggle_all":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified;
+                                        _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageDeleted;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MessageModified;
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.RolesModified;
@@ -1921,6 +1926,9 @@ internal class Admin : BaseCommandModule
                                         break;
                                     case "log_members_modified":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified;
+                                        break;
+                                    case "log_memberprofile_modified":
+                                        _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberProfileModified;
                                         break;
                                     case "log_member_modified":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MemberModified;

@@ -424,6 +424,7 @@ internal class DatabaseClient
                             actionlog_attempt_further_detail = x.Value.ActionLogSettings.AttemptGettingMoreDetails,
                             actionlog_log_members_modified = x.Value.ActionLogSettings.MembersModified,
                             actionlog_log_member_modified = x.Value.ActionLogSettings.MemberModified,
+                            actionlog_log_memberprofile_modified = x.Value.ActionLogSettings.MemberProfileModified,
                             actionlog_log_message_deleted = x.Value.ActionLogSettings.MessageDeleted,
                             actionlog_log_message_updated = x.Value.ActionLogSettings.MessageModified,
                             actionlog_log_roles_modified = x.Value.ActionLogSettings.RolesModified,
@@ -473,6 +474,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"actionlog_attempt_further_detail{i}", DatabaseInserts[i].actionlog_attempt_further_detail);
                             cmd.Parameters.AddWithValue($"actionlog_log_members_modified{i}", DatabaseInserts[i].actionlog_log_members_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_member_modified{i}", DatabaseInserts[i].actionlog_log_member_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_memberprofile_modified{i}", DatabaseInserts[i].actionlog_log_memberprofile_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_message_deleted{i}", DatabaseInserts[i].actionlog_log_message_deleted);
                             cmd.Parameters.AddWithValue($"actionlog_log_message_updated{i}", DatabaseInserts[i].actionlog_log_message_updated);
                             cmd.Parameters.AddWithValue($"actionlog_log_roles_modified{i}", DatabaseInserts[i].actionlog_log_roles_modified);
