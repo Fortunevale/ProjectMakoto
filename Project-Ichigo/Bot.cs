@@ -262,6 +262,9 @@ internal class Bot
                 discordClient.GuildBanAdded += actionlogEvents.BanAdded;
                 discordClient.GuildBanRemoved += actionlogEvents.BanRemoved;
                 discordClient.GuildUpdated += actionlogEvents.GuildUpdated;
+                discordClient.ChannelCreated += actionlogEvents.ChannelCreated;
+                discordClient.ChannelDeleted += actionlogEvents.ChannelDeleted;
+                discordClient.ChannelUpdated += actionlogEvents.ChannelUpdated;
                 discordClient.InviteCreated += actionlogEvents.InviteCreated;
                 discordClient.InviteDeleted += actionlogEvents.InviteDeleted;
 

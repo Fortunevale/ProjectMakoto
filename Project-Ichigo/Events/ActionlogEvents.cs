@@ -183,7 +183,7 @@ internal class ActionlogEvents
 
             string FileName = $"{Guid.NewGuid()}.txt";
             File.WriteAllText(FileName, FileContent);
-            using (FileStream fileStream = new FileStream(FileName, FileMode.Open))
+            using (FileStream fileStream = new(FileName, FileMode.Open))
             {
                 await e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
             }
@@ -445,7 +445,7 @@ internal class ActionlogEvents
                 if (e.Role.Tags.IsPremiumSubscriber)
                     Integration = "**Integration**: `Server Booster`\n\n";
 
-                if (e.Role.Tags.BotId is not null && e.Role.Tags.BotId != 0)
+                if (e.Role.Tags.BotId is not null and not 0)
                 {
                     var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 
@@ -485,7 +485,7 @@ internal class ActionlogEvents
                 if (e.Role.Tags.IsPremiumSubscriber)
                     Integration = "**Integration**: `Server Booster`\n\n";
 
-                if (e.Role.Tags.BotId is not null && e.Role.Tags.BotId != 0)
+                if (e.Role.Tags.BotId is not null and not 0)
                 {
                     var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 
@@ -563,7 +563,7 @@ internal class ActionlogEvents
                 if (e.RoleAfter.Tags.IsPremiumSubscriber)
                     Integration = "**Integration**: `Server Booster`\n\n";
 
-                if (e.RoleAfter.Tags.BotId is not null && e.RoleAfter.Tags.BotId != 0)
+                if (e.RoleAfter.Tags.BotId is not null and not 0)
                 {
                     var bot = await sender.GetUserAsync((ulong)e.RoleAfter.Tags.BotId);
 
@@ -665,7 +665,7 @@ internal class ActionlogEvents
             if (Description.Length == 0)
                 return;
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+            DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.GuildUpdated, Name = $"Guild updated" },
                 Color = ColorHelper.Info,
@@ -679,6 +679,30 @@ internal class ActionlogEvents
                 embed.ImageUrl = e.GuildAfter.IconUrl;
 
             _ = e.GuildAfter.GetChannel(_bot._guilds.Servers[e.GuildAfter.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        }).Add(_bot._watcher);
+    }
+
+    internal async Task ChannelCreated(DiscordClient sender, ChannelCreateEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+
+        }).Add(_bot._watcher);
+    }
+
+    internal async Task ChannelDeleted(DiscordClient sender, ChannelDeleteEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            throw new NotImplementedException();
+        }).Add(_bot._watcher);
+    }
+
+    internal async Task ChannelUpdated(DiscordClient sender, ChannelUpdateEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            throw new NotImplementedException();
         }).Add(_bot._watcher);
     }
 
