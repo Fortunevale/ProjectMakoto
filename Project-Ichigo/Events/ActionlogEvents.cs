@@ -632,7 +632,53 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.GuildAfter) || !_bot._guilds.Servers[e.GuildAfter.Id].ActionLogSettings.GuildModified)
+                return;
+
+            string Description = "";
+
+            try { Description += $"{(e.GuildBefore.Owner.Id != e.GuildAfter.Owner.Id ? $"**Owner**: {e.GuildBefore.Owner.Mention} `{e.GuildBefore.Owner.UsernameWithDiscriminator}` :arrow_right: {e.GuildAfter.Owner.Mention} `{e.GuildAfter.Owner.UsernameWithDiscriminator}`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.Name != e.GuildAfter.Name ? $"**Name**: `{e.GuildBefore.Name}` :arrow_right: `{e.GuildAfter.Name}`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.Description != e.GuildAfter.Description ? $"**Description**: `{e.GuildBefore.Description}` :arrow_right: `{e.GuildAfter.Description}`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.IconHash != e.GuildAfter.IconHash ? $"`Icon updated`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.DefaultMessageNotifications != e.GuildAfter.DefaultMessageNotifications ? $"`Default Notifaction Settings: '{e.GuildAfter.DefaultMessageNotifications}'`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.VerificationLevel != e.GuildAfter.VerificationLevel ? $"`Verification Level changed: '{e.GuildAfter.VerificationLevel}'`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.BannerHash != e.GuildAfter.BannerHash ? $"`Banner updated`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.SplashHash != e.GuildAfter.SplashHash ? $"`Splash updated`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.DiscoverySplashHash != e.GuildAfter.DiscoverySplashHash ? $"`Discovery Splash updated`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.MfaLevel != e.GuildAfter.MfaLevel ? $"`Required Mfa Level changed: '{e.GuildAfter.MfaLevel}'`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.ExplicitContentFilter != e.GuildAfter.ExplicitContentFilter ? $"`Explicit Content Filter updated: '{e.GuildAfter.ExplicitContentFilter}'`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.WidgetEnabled != e.GuildAfter.WidgetEnabled ? $"{(!(bool)e.GuildBefore.WidgetEnabled && (bool)e.GuildAfter.WidgetEnabled ? "`Enabled Server Widget`" : "`Disabled Server Widget`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.WidgetChannel?.Id != e.GuildAfter.WidgetChannel?.Id ? $"**Widget Channel**: {e.GuildBefore.WidgetChannel.Mention} `[#{e.GuildBefore.WidgetChannel.Name}]` :arrow_right: {e.GuildAfter.WidgetChannel.Mention} `[#{e.GuildAfter.WidgetChannel.Name}]`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.IsLarge != e.GuildAfter.IsLarge ? $"{(!e.GuildBefore.IsLarge && e.GuildAfter.IsLarge ? "`The server is now considered 'Large'`" : "`The server is no longer considered 'Large'`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.IsNsfw != e.GuildAfter.IsNsfw ? $"{(!e.GuildBefore.IsNsfw && e.GuildAfter.IsNsfw ? "`The server is now considered as explicit`" : "`The server is no longer considered explicit`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.IsCommunity != e.GuildAfter.IsCommunity ? $"{(!e.GuildBefore.IsCommunity && e.GuildAfter.IsCommunity ? "`Enabled Community Features`" : "`Disabled Community Features`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.HasMemberVerificationGate != e.GuildAfter.HasMemberVerificationGate ? $"{(!e.GuildBefore.HasMemberVerificationGate && e.GuildAfter.HasMemberVerificationGate ? "`Enabled Membership Screening`" : "`Disabled Membership Screening`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.HasWelcomeScreen != e.GuildAfter.HasWelcomeScreen ? $"{(!e.GuildBefore.HasWelcomeScreen && e.GuildAfter.HasWelcomeScreen ? "`Enabled Welcome Screen`" : "`Disabled Welcome Screen`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.PremiumProgressBarEnabled != e.GuildAfter.PremiumProgressBarEnabled ? $"{(!e.GuildBefore.PremiumProgressBarEnabled && e.GuildAfter.PremiumProgressBarEnabled ? "`Enabled Boost Progress Bar`" : "`Disabled Boost Progress Bar`")}\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.RulesChannel?.Id != e.GuildAfter.RulesChannel?.Id ? $"**Rules Channel**: {e.GuildBefore.RulesChannel.Mention} `[#{e.GuildBefore.RulesChannel.Name}]` :arrow_right: {e.GuildAfter.RulesChannel.Mention} `[#{e.GuildAfter.RulesChannel.Name}]`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.AfkChannel?.Id != e.GuildAfter.AfkChannel?.Id ? $"**Afk Channel**: {e.GuildBefore.AfkChannel.Mention} `[#{e.GuildBefore.AfkChannel.Name}]` :arrow_right: {e.GuildAfter.AfkChannel.Mention} `[#{e.GuildAfter.AfkChannel.Name}]`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.SystemChannel?.Id != e.GuildAfter.SystemChannel?.Id ? $"**System Channel**: {e.GuildBefore.SystemChannel.Mention} `[#{e.GuildBefore.SystemChannel.Name}]` :arrow_right: {e.GuildAfter.SystemChannel.Mention} `[#{e.GuildAfter.SystemChannel.Name}]`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.PublicUpdatesChannel?.Id != e.GuildAfter.PublicUpdatesChannel?.Id ? $"**Discord Update Channel**: {e.GuildBefore.PublicUpdatesChannel.Mention} `[#{e.GuildBefore.PublicUpdatesChannel.Name}]` :arrow_right: {e.GuildAfter.PublicUpdatesChannel.Mention} `[#{e.GuildAfter.PublicUpdatesChannel.Name}]`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.MaxMembers != e.GuildAfter.MaxMembers ? $"`Maximum members updated to {e.GuildAfter.MaxMembers}`\n" : "")}"; } catch { }
+
+            if (Description.Length == 0)
+                return;
+
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.GuildUpdated, Name = $"Guild updated" },
+                Color = ColorHelper.Info,
+                Timestamp = DateTime.UtcNow,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.GuildAfter.IconUrl },
+                Description = Description
+
+            };
+
+            if (e.GuildBefore.IconHash != e.GuildAfter.IconHash)
+                embed.ImageUrl = e.GuildAfter.IconUrl;
+
+            _ = e.GuildAfter.GetChannel(_bot._guilds.Servers[e.GuildAfter.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
         }).Add(_bot._watcher);
     }
 
