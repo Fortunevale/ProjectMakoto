@@ -686,7 +686,17 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.ChannelsModified)
+                return;
 
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.ChannelAdded, Name = $"Channel created" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Channel-Id: {e.Channel.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Name**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`\n"
+            }));
         }).Add(_bot._watcher);
     }
 
@@ -694,7 +704,17 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.ChannelsModified)
+                return;
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.ChannelRemoved, Name = $"Channel deleted" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Channel-Id: {e.Channel.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Name**: `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`\n"
+            }));
         }).Add(_bot._watcher);
     }
 
@@ -702,7 +722,25 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.ChannelsModified)
+                return;
+
+            string Icon = $"{(e.ChannelAfter.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.ChannelAfter.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}";
+
+            string Description = $"{(e.ChannelBefore.Name != e.ChannelAfter.Name ? $"**Name**: {e.ChannelBefore.Mention} `[{Icon}{e.ChannelBefore.Name}]` :arrow_right: `[{Icon}{e.ChannelAfter.Name}]`\n" : $"{e.ChannelAfter.Mention} `[{Icon}{e.ChannelAfter.Name}]`\n")}" +
+                                    $"{(e.ChannelBefore.IsNsfw != e.ChannelAfter.IsNsfw ? $"{(!e.ChannelBefore.IsNsfw && e.ChannelAfter.IsNsfw ? "`The channel is now marked as NSFW.`" : "`The channel is no longer marked as NSFW.`")}\n" : "")}";
+
+            if (Description.Length == 0)
+                return;
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.ChannelModified, Name = $"Channel updated" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Channel-Id: {e.ChannelAfter.Id}" },
+                Timestamp = DateTime.UtcNow,
+                Description = Description
+            }));
         }).Add(_bot._watcher);
     }
 
