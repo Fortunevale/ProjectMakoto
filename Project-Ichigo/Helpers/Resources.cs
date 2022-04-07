@@ -21,13 +21,24 @@ internal class Resources
 
     public class AuditLogIcons
     {
+        public static readonly string QuestionMark = "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png";
+
         public static readonly string GuildUpdated = "https://cdn.discordapp.com/attachments/712761268393738301/846833791079415878/GuildUpdated.png";
         public static readonly string MessageDeleted = "https://cdn.discordapp.com/attachments/712761268393738301/839566709903720518/MessageRemoved.png";
         public static readonly string MessageEdited = "https://cdn.discordapp.com/attachments/712761268393738301/839566700328517703/MessageUpdated.png";
-        public static readonly string QuestionMark = "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png";
+
         public static readonly string UserAdded = "https://cdn.discordapp.com/attachments/712761268393738301/839566702190526514/UserAdded.png";
+
         public static readonly string UserBanned = "https://cdn.discordapp.com/attachments/712761268393738301/839911327056527380/UserBanned.png";
         public static readonly string UserBanRemoved = "https://cdn.discordapp.com/attachments/712761268393738301/846830397220323328/BanRemoved.png";
+
+        public static readonly string InviteAdded = "https://cdn.discordapp.com/attachments/906976602557145110/961732412562374716/InviteAdded.png";
+        public static readonly string InviteRemoved = "https://cdn.discordapp.com/attachments/906976602557145110/961732781841457232/InviteRemoved.png";
+
+        public static readonly string ChannelAdded = "https://cdn.discordapp.com/attachments/906976602557145110/961723848364011540/ChannelAdded.png";
+        public static readonly string ChannelRemoved = "https://cdn.discordapp.com/attachments/906976602557145110/961723848569544754/ChannelRemoved.png";
+        public static readonly string ChannelModified = "https://cdn.discordapp.com/attachments/906976602557145110/961723848137539684/ChannelUpdated.png";
+
         public static readonly string UserKicked = "https://cdn.discordapp.com/attachments/712761268393738301/839911329229176842/UserKicked.png";
         public static readonly string UserLeft = "https://cdn.discordapp.com/attachments/712761268393738301/839566703477260348/UserRemoved.png";
         public static readonly string UserUpdated = "https://cdn.discordapp.com/attachments/712761268393738301/839566706032640088/UserUpdated.png";

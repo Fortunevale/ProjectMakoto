@@ -748,7 +748,18 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.InvitesModified)
+                return;
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.InviteAdded, Name = $"Invite created" },
+                Color = ColorHelper.Info,
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
+                                $"**Created by**: {e.Invite.Inviter.Mention} `{e.Invite.Inviter.UsernameWithDiscriminator}`\n" +
+                                $"**Channel**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`"
+            }));
         }).Add(_bot._watcher);
     }
 
@@ -756,7 +767,18 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            throw new NotImplementedException();
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.InvitesModified)
+                return;
+
+            _ = e.Guild.GetChannel(_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.InviteRemoved, Name = $"Invite deleted" },
+                Color = ColorHelper.Info,
+                Timestamp = DateTime.UtcNow,
+                Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
+                                $"**Created by**: {e.Invite.Inviter.Mention} `{e.Invite.Inviter.UsernameWithDiscriminator}`\n" +
+                                $"**Channel**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`"
+            }));
         }).Add(_bot._watcher);
     }
 }
