@@ -1691,15 +1691,103 @@ internal class User : BaseCommandModule
 
             string[] phrases =
             {
-                "%1 hugs %2! How sweet! \\♥",
+                "%1 hugs %2! How sweet! ♥",
+                "%1 gives %2 a big fat hug! <:fv_woah:961993656129175592>",
+                "%2, watch out! %1 is coming to squeeze you tight! <:fv_woah:961993656129175592>",
             };
+
+            string[] self_phrases =
+            {
+                "There, there.. I'll hug you %1 😢",
+                "Does no one else hug you, %1? There, there.. I'll hug you.. 😢",
+                "There, there.. I'll hug you %1. 😢 Sorry if i'm a bit cold, i'm not human y'know.. 😓",
+                "You look lonely there, %1..",
+            };
+
+            if (ctx.Member.Id == user.Id)
+            {
+                _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
+                    Color = ColorHelper.HiddenSidebar,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                }));
+                return;
+            }
 
             _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Title = phrases[new Random().Next(0, phrases.Length)].Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = urls[new Random().Next(0, urls.Length)],
-                Color = ColorHelper.HiddenSidebar
+                Color = ColorHelper.HiddenSidebar,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
             }));
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("pat"), Aliases("pet", "headpat", "headpet"),
+    CommandModule("user"),
+    Description("Give someone some headpats!")]
+    public async Task Pat(CommandContext ctx, DiscordUser user)
+    {
+        Task.Run(async () =>
+        {
+            Task.Run(async () =>
+            {
+                string[] urls = {
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995160328228914/senpai-ga-uzai-kouhai-no-hanashi-futaba.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995160726700092/anime-head-pat-anime-head-rub.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995161150291968/neko-anime-girl.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995161720737822/anime-anime-headrub.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995162253422633/charlotte-pat.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995162815438908/anime-head-pat.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995163146780732/pat-pat-head.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995163352326224/fantasista-doll-anime.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995165801807912/headpats-anime.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995166514806904/mai-headpats.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995188463628318/behave-anime.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995188912390165/anime-head-pat_1.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995189482819594/kanna-kanna-kamui.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995190267162674/kanna-kamui-pat.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995191034736690/nagi-no-asukara-manaka-mukaido.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995191449964564/anime-headpats.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995191965876324/head-pat-anime.gif",
+                    "https://cdn.discordapp.com/attachments/906976602557145110/961995192267862016/anime-anime-head-rub.gif",
+                };
+
+                string[] phrases =
+                {
+                    "%1 gives %2 headpats!",
+                };
+
+                string[] self_phrases =
+                {
+                    "There, there.. I'll give you some headpats, %1 😢",
+                    "I'll give you some headpats, %1.. 😢",
+                    "You look lonely there, %1..",
+                };
+
+                if (ctx.Member.Id == user.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
+                        Color = ColorHelper.HiddenSidebar,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    }));
+                    return;
+                }
+
+                _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                    ImageUrl = urls[new Random().Next(0, urls.Length)],
+                    Color = ColorHelper.HiddenSidebar,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                }));
+            }).Add(_bot._watcher, ctx);
         }).Add(_bot._watcher, ctx);
     }
 }
