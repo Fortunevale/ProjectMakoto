@@ -99,8 +99,8 @@ internal class ExperienceHandler
                 if (_bot._guilds.Servers[guild.Id].LevelRewards.Any(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
                 {
                     build += "\n\n";
-                    
-                    foreach (var reward in _bot._guilds.Servers[guild.Id].LevelRewards.Where(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
+
+                    foreach (var reward in _bot._guilds.Servers[guild.Id].LevelRewards.ToList().Where(x => x.Level <= _bot._guilds.Servers[guild.Id].Members[user.Id].Level))
                     {
                         if (!guild.Roles.ContainsKey(reward.RoleId))
                         {
