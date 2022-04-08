@@ -84,10 +84,10 @@ internal class DatabaseInit
         foreach (var b in _bot._guilds.Servers)
             b.Value.ProcessedAuditLogs.CollectionChanged += (s, e) =>
             {
-                LogDebug($"{b.Value.ProcessedAuditLogs.Count}");
-
                 if (b.Value.ProcessedAuditLogs.Count > 50)
                     b.Value.ProcessedAuditLogs.Remove(b.Value.ProcessedAuditLogs[0]);
+
+                _ = _bot._databaseClient.SyncDatabase();
             };
 
         LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");
