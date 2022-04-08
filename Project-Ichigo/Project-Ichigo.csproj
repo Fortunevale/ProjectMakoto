@@ -39,11 +39,11 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00305-fork2" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00305-fork2" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.0.0-nightly-00305-fork2" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00305-fork2" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00305-fork2" />
+    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00305-fork3" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00305-fork3" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.0.0-nightly-00305-fork3" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00305-fork3" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00305-fork3" />
     <PackageReference Include="MySql.Data" Version="8.0.28" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
