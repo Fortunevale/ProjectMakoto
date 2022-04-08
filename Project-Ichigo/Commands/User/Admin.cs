@@ -1916,6 +1916,13 @@ internal class Admin : BaseCommandModule
                                 {
                                     case "attempt_further_detail":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails;
+
+                                        if (_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+                                        {
+                                            embed.Description = $":warning: `This may result in inaccurate details being displayed. Please make sure to double check the audit log on serious concerns.`";
+                                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                            await Task.Delay(10000);
+                                        }
                                         break;
                                     case "toggle_all":
                                         _bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified = !_bot._guilds.Servers[ctx.Guild.Id].ActionLogSettings.MembersModified;
