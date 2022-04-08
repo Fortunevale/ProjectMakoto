@@ -1016,13 +1016,67 @@ internal class User : BaseCommandModule
                         }
                         else if (e.Interaction.Data.CustomId == "gettopscores")
                         {
-                            var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
-                            ShowScores(scores, RequestParameters.ScoreType.TOP).Add(_bot._watcher, ctx);
+                            try
+                            {
+                                var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+                                ShowScores(scores, RequestParameters.ScoreType.TOP).Add(_bot._watcher, ctx);
+                            }
+                            catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+                            {
+                                embed.Author.IconUrl = Resources.LogIcons.Error;
+                                embed.Color = ColorHelper.Error;
+                                embed.Description = $"`An internal server exception occured. Please retry later.`";
+                                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                cancellationTokenSource.Cancel();
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                return;
+                            }
+                            catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+                            {
+                                embed.Author.IconUrl = Resources.LogIcons.Error;
+                                embed.Color = ColorHelper.Error;
+                                embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                cancellationTokenSource.Cancel();
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                return;
+                            }
+                            catch (Exception)
+                            {
+                                throw;
+                            }
                         }
                         else if (e.Interaction.Data.CustomId == "getrecentscores")
                         {
-                            var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
-                            ShowScores(scores, RequestParameters.ScoreType.RECENT).Add(_bot._watcher, ctx);
+                            try
+                            {
+                                var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+                                ShowScores(scores, RequestParameters.ScoreType.RECENT).Add(_bot._watcher, ctx);
+                            }
+                            catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+                            {
+                                embed.Author.IconUrl = Resources.LogIcons.Error;
+                                embed.Color = ColorHelper.Error;
+                                embed.Description = $"`An internal server exception occured. Please retry later.`";
+                                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                cancellationTokenSource.Cancel();
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                return;
+                            }
+                            catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+                            {
+                                embed.Author.IconUrl = Resources.LogIcons.Error;
+                                embed.Color = ColorHelper.Error;
+                                embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                cancellationTokenSource.Cancel();
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                return;
+                            }
+                            catch (Exception)
+                            {
+                                throw;
+                            }
                         }
                         else if (e.Interaction.Data.CustomId == "getmain")
                         {
@@ -1216,6 +1270,20 @@ internal class User : BaseCommandModule
             }
             catch { }
         }
+        catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+        {
+            embed.Author.IconUrl = Resources.LogIcons.Error;
+            embed.Color = ColorHelper.Error;
+            embed.Description = $"`An internal server exception occured. Please retry later.`";
+            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        }
+        catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+        {
+            embed.Author.IconUrl = Resources.LogIcons.Error;
+            embed.Color = ColorHelper.Error;
+            embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        }
         catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
         {
             embed.Author.IconUrl = Resources.LogIcons.Error;
@@ -1345,7 +1413,34 @@ internal class User : BaseCommandModule
 
                                 if (currentFetchedPage != lastFetchedPage)
                                 {
-                                    lastSearch = await _bot._scoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
+                                    try
+                                    {
+                                        lastSearch = await _bot._scoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
+                                    }
+                                    catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+                                    {
+                                        embed.Author.IconUrl = Resources.LogIcons.Error;
+                                        embed.Color = ColorHelper.Error;
+                                        embed.Description = $"`An internal server exception occured. Please retry later.`";
+                                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                        tokenSource.Cancel();
+                                        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                                        return;
+                                    }
+                                    catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+                                    {
+                                        embed.Author.IconUrl = Resources.LogIcons.Error;
+                                        embed.Color = ColorHelper.Error;
+                                        embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                        tokenSource.Cancel();
+                                        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                                        return;
+                                    }
+                                    catch (Exception)
+                                    {
+                                        throw;
+                                    }
                                     lastFetchedPage = currentFetchedPage;
                                 }
 
