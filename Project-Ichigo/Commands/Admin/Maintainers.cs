@@ -34,6 +34,21 @@ internal class Maintainers : BaseCommandModule
     }
 
 
+    [Command("save"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task Save(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            await _bot._databaseClient.SyncDatabase(true);
+        }).Add(_bot._watcher, ctx);
+    }
+
+
 
     [Command("globalban"), Aliases("global-ban"),
     CommandModule("maintainence"),
