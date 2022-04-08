@@ -96,7 +96,7 @@ internal class ActionlogEvents
                         embed.Description += $"\n**Reason**: {Entry.Reason.Replace("`", "´")}";
 
                     embed.Footer = new();
-                    embed.Footer.Text += "\n(Please note that the 'Kicked by' and 'Reason' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Kicked by' and 'Reason' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -526,7 +526,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                    embed.Footer.Text += "\n(Please note that the 'Created by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Created by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -592,7 +592,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                    embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -706,7 +706,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                    embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -753,7 +753,7 @@ internal class ActionlogEvents
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
                         embed.Description += $"\n**Reason**: {Entry.Reason.Replace("`", "´")}";
 
-                    embed.Footer.Text += "\n(Please note that the 'Banned by' and 'Reason' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Banned by' and 'Reason' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -797,7 +797,7 @@ internal class ActionlogEvents
 
                     embed.Description += $"\n\n**Unbanned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
-                    embed.Footer.Text += "\n(Please note that the 'Unbanned by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Unbanned by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -875,7 +875,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
                     embed.Footer = new();
-                    embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -919,7 +919,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                    embed.Footer.Text += "\n(Please note that the 'Created by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Created by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -963,7 +963,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                    embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -1015,7 +1015,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
-                    embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
@@ -1080,7 +1080,7 @@ internal class ActionlogEvents
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer = new();
-                    embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot cant differentiate between similar audit log entries that affect the same things.)";
+                    embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                     break;
