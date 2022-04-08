@@ -126,9 +126,9 @@ internal class ActionlogEvents
                 return;
 
             if (!string.IsNullOrEmpty(e.Message.Content))
-                if (e.Message.Content.StartsWith($";;"))
+                if (e.Message.Content.ToLower().StartsWith($";;"))
                     foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                        if (e.Message.Content.StartsWith($";;{command.Key}") || e.Message.Content.StartsWith($">>{command.Key}"))
+                        if (e.Message.Content.ToLower().StartsWith($";;{command.Key}"))
                             return;
 
             DiscordEmbedBuilder embed = new()
