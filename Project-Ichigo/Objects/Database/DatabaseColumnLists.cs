@@ -62,6 +62,7 @@ internal class DatabaseColumnLists
         new Column("serverid", "bigint", primary: true),
         new Column("auto_assign_role_id", "bigint"),
         new Column("levelrewards", "text", "utf8mb4_0900_ai_ci"),
+        new Column("auditlogcache", "text", "utf8mb4_0900_ai_ci"),
         new Column("joinlog_channel_id", "bigint"),
         new Column("experience_use", "tinyint(1)"),
         new Column("experience_boost_bumpreminder", "tinyint(1)"),

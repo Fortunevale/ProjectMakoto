@@ -4,6 +4,7 @@ public class DatabaseServerSettings
 {
     public ulong serverid { get; set; }
     public string levelrewards { get; set; }
+    public string auditlogcache { get; set; }
     public ulong auto_assign_role_id { get; set; }
     public ulong joinlog_channel_id { get; set; }
     public bool autoban_global_ban { get; set; }

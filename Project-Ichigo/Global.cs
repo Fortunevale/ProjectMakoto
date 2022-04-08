@@ -20,6 +20,7 @@ global using System.Security.Cryptography;
 global using System.Data;
 global using System.ComponentModel.DataAnnotations;
 global using Microsoft.Extensions.DependencyInjection;
+global using System.Collections.ObjectModel;
 
 // Database
 

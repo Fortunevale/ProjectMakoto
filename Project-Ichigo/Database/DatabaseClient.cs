@@ -419,6 +419,7 @@ internal class DatabaseClient
                             bump_message = x.Value.BumpReminderSettings.MessageId,
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
                             levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
+                            auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
 
                             actionlog_channel = x.Value.ActionLogSettings.Channel,
                             actionlog_attempt_further_detail = x.Value.ActionLogSettings.AttemptGettingMoreDetails,
@@ -456,6 +457,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"autoban_global_ban{i}", DatabaseInserts[i].autoban_global_ban);
 
                             cmd.Parameters.AddWithValue($"levelrewards{i}", DatabaseInserts[i].levelrewards);
+                            cmd.Parameters.AddWithValue($"auditlogcache{i}", DatabaseInserts[i].auditlogcache);
 
                             cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
                             cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);

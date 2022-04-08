@@ -13,6 +13,6 @@ internal class ServerInfo
         public List<LevelRewards> LevelRewards { get; set; } = new();
         public Dictionary<ulong, Members> Members { get; set; } = new();
         public ActionLogSettings ActionLogSettings { get; set; } = new();
-        public List<ulong> ProcessedAuditLogs { get; set; } = new();
+        public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
     }
 }

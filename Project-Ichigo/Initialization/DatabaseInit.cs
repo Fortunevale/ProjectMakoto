@@ -63,6 +63,7 @@ internal class DatabaseInit
                     BoostXpForBumpReminder = b.experience_boost_bumpreminder
                 },
                 LevelRewards = JsonConvert.DeserializeObject<List<LevelRewards>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
+                ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
                 ActionLogSettings = new()
                 {
                     Channel = b.actionlog_channel,
@@ -79,6 +80,15 @@ internal class DatabaseInit
                     ChannelsModified = b.actionlog_log_channels_modified,
                 }
             });
+
+        foreach (var b in _bot._guilds.Servers)
+            b.Value.ProcessedAuditLogs.CollectionChanged += (s, e) =>
+            {
+                LogDebug($"{b.Value.ProcessedAuditLogs.Count}");
+
+                if (b.Value.ProcessedAuditLogs.Count > 50)
+                    b.Value.ProcessedAuditLogs.Remove(b.Value.ProcessedAuditLogs[0]);
+            };
 
         LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");
 
