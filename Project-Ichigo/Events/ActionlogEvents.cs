@@ -122,7 +122,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null)
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
                 return;
 
             if (!string.IsNullOrEmpty(e.Message.Content))
@@ -250,7 +250,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Author.IsBot || e.Message is null || e.Message.Author is null)
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.Servers[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Author.IsBot || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
                 return;
 
             if (!string.IsNullOrEmpty(e.Message.Content))
