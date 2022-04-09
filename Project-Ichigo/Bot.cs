@@ -336,14 +336,12 @@ internal class Bot
 
                                     if (bot.Presence is null)
                                     {
-                                        LogDebug($"Presence is null, not online.");
                                         DevOnline = false;
                                         await Task.Delay(8000);
                                         continue;
                                     }
 
                                     bool isOnline = (bot.Presence.ClientStatus.Web.Value == UserStatus.Online);
-                                    LogDebug($"Presence is {bot.Presence.ClientStatus.Web.Value}");
 
                                     if (isOnline != DevOnline)
                                     {
