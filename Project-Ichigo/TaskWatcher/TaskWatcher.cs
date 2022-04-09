@@ -22,15 +22,15 @@ internal class TaskWatcher
                 var ctx = b.ctx;
 
                 if (ctx != null)
-                    LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id}): {b.task.Exception}");
+                    LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id})", b.task.Exception);
                 else
                     LogError($"A non-command task failed to execute: {b.task.Exception}");
 
                 if (b.task.Exception.InnerException.GetType() == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {
-                    LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
-                    LogError($"{((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest.Url}");
-                    LogError($"{JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented).Replace("\\", "")}");
+                    LogError($"WebRequestUrl: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest.Url}\n\n" +
+                            $"WebRequest: {JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented).Replace("\\", "")}\n\n" +
+                            $"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
                 }
 
                 if (ctx != null)

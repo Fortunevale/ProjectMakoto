@@ -112,7 +112,7 @@ internal class Mod : BaseCommandModule
                             }
                             catch (Exception ex)
                             {
-                                LogError($"{ex}");
+                                LogError($"Failed to download an emote", ex);
                                 SanitizedEmoteList.Remove(b.Key);
                             }
                         }
@@ -142,7 +142,7 @@ internal class Mod : BaseCommandModule
                             }
                             catch (Exception ex)
                             {
-                                LogError($"{ex}");
+                                LogError($"Failed to download an emote", ex);
                                 SanitizedEmoteList.Remove(b.Key);
                             }
                         }
@@ -223,7 +223,7 @@ internal class Mod : BaseCommandModule
                             }
                             catch (Exception ex)
                             {
-                                LogError($"{ex}");
+                                LogError($"Failed to add an emote to guild", ex);
                             }
                         }
 
@@ -423,7 +423,7 @@ internal class Mod : BaseCommandModule
             }
             catch (Exception ex)
             {
-                LogError($"Error occured downloading emotes: {ex}");
+                LogError($"Error occured downloading emotes", ex);
             }
         }).Add(_bot._watcher, ctx);
     }
@@ -557,7 +557,7 @@ internal class Mod : BaseCommandModule
                     }
                     catch (Exception ex)
                     {
-                        LogError($"Failed to delete messages: {ex}");
+                        LogError($"Failed to delete messages", ex);
                         PerformingActionEmbed.Description = $":x: `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
                         PerformingActionEmbed.Color = ColorHelper.Error;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
@@ -646,7 +646,7 @@ internal class Mod : BaseCommandModule
             }
             catch (Exception ex)
             {
-                LogError($"Error while trying to delete {number} messages\n\n{ex}");
+                LogError($"Exception occured while trying to deleted {number} messages", ex);
             }
         }).Add(_bot._watcher, ctx);
     }

@@ -343,7 +343,7 @@ internal class DatabaseClient
             }
             catch (Exception ex)
             {
-                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex}");
+                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex);
                 return;
             }
         }
@@ -369,14 +369,14 @@ internal class DatabaseClient
         {
             try
             {
-                LogWarn($"Creating a test value in database failed, reconnecting to database: {ex}");
+                LogWarn($"Creating a test value in database failed, reconnecting to database", ex);
                 connection.Close();
                 connection.Open();
                 LogInfo($"Reconnected to database.");
             }
             catch (Exception ex1)
             {
-                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database: {ex1}");
+                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex1);
                 return;
             }
         }
@@ -500,7 +500,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the guilds table: {ex}");
+                        LogError($"An exception occured while trying to update the guilds table", ex);
                     }
 
                 var check = CheckGuildTables();
@@ -553,7 +553,7 @@ internal class DatabaseClient
                             }
                             catch (Exception ex)
                             {
-                                LogError($"An exception occured while trying to update the {guild.Key} table: {ex}");
+                                LogError($"An exception occured while trying to update the {guild.Key} table", ex);
                             }
                         }
 
@@ -611,7 +611,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the users table: {ex}");
+                        LogError($"An exception occured while trying to update the users table", ex);
                     }
 
                 if (_bot._submissionBans.BannedUsers.Count > 0)
@@ -654,7 +654,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the user_submission_bans table: {ex}");
+                        LogError($"An exception occured while trying to update the user_submission_bans table", ex);
                     }
 
                 if (_bot._submissionBans.BannedGuilds.Count > 0)
@@ -697,7 +697,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
+                        LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
                     }
 
                 if (_bot._globalBans.Users.Count > 0)
@@ -740,7 +740,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the guild_submission_bans table: {ex}");
+                        LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
                     }
 
                 if (_bot._submittedUrls.Urls.Count > 0)
@@ -785,7 +785,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the active_url_submissions table: {ex}");
+                        LogError($"An exception occured while trying to update the active_url_submissions table", ex);
                     }
 
                 await Task.Delay(1000);

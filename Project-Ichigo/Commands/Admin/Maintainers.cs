@@ -98,7 +98,7 @@ internal class Maintainers : BaseCommandModule
                     }
                     catch (Exception ex)
                     {
-                        LogError($"Exception occured while trying to ban user from {b.Key}: {ex}");
+                        LogError($"Exception occured while trying to ban user from {b.Key}", ex);
                         Failed++;
                     }
                 }

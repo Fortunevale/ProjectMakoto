@@ -45,7 +45,7 @@ internal class SubmissionEvents
                     }
                     catch (Exception ex)
                     {
-                        LogError($"{ex}");
+                        LogError($"Failed to update database", ex);
                     }
                 }
                 else if (e.Interaction.Data.CustomId == "deny_submission")
