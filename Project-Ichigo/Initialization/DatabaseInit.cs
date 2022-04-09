@@ -64,6 +64,7 @@ internal class DatabaseInit
                 },
                 LevelRewards = JsonConvert.DeserializeObject<List<LevelRewards>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
                 ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
+                CrosspostChannels = JsonConvert.DeserializeObject<List<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
                 ActionLogSettings = new()
                 {
                     Channel = b.actionlog_channel,
