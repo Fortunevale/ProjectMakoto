@@ -64,7 +64,7 @@ internal class DatabaseInit
                 },
                 LevelRewards = JsonConvert.DeserializeObject<List<LevelRewards>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
                 ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
-                CrosspostChannels = JsonConvert.DeserializeObject<List<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
+                CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
                 ActionLogSettings = new()
                 {
                     Channel = b.actionlog_channel,
@@ -83,13 +83,18 @@ internal class DatabaseInit
             });
 
         foreach (var b in _bot._guilds.Servers)
-            b.Value.ProcessedAuditLogs.CollectionChanged += (s, e) =>
+            try
             {
-                if (b.Value.ProcessedAuditLogs.Count > 50)
-                    b.Value.ProcessedAuditLogs.Remove(b.Value.ProcessedAuditLogs[0]);
+                b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
+                b.Value.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
+            }
+            catch { }
 
-                _ = _bot._databaseClient.SyncDatabase();
-            };
+        foreach (var b in _bot._guilds.Servers)
+        {
+            b.Value.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
+            b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);
+        }
 
         LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");
 
