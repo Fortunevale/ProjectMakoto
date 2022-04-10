@@ -242,6 +242,11 @@ internal class Bot
             discordClient.MessageCreated += afkEvents.MessageCreated;
 
 
+            LogDebug($"Registering Crosspost Events..");
+
+            CrosspostEvents crosspostEvents = new(this);
+            discordClient.MessageCreated += crosspostEvents.MessageCreated;
+
 
             LogDebug($"Registering Phishing Events..");
 
