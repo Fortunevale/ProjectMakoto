@@ -19,6 +19,60 @@ internal class Maintainers : BaseCommandModule
 
 
 
+    [Command("roleselectortest"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task RoleSelectorTest(CommandContext ctx, bool forMe)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"`Role selector test`"
+            }));
+
+            var role = await new InteractionSelectors.GenericSelectors(_bot).PromptRoleSelection(ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, forMe, "Testrole");
+
+            await msg.ModifyAsync($"Selected {role.Mention}");
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("channelselectortest"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task ChannelSelectorTest(CommandContext ctx, bool forMe)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
+                Color = ColorHelper.Info,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"`Channel selector test`"
+            }));
+
+            var channel = await new InteractionSelectors.GenericSelectors(_bot).PromptChannelSelection(ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, forMe);
+
+            await msg.ModifyAsync($"Selected {channel.Mention}");
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
     [Command("stop"),
     CommandModule("hidden"),
     Description(" ")]

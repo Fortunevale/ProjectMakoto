@@ -48,6 +48,7 @@ global using DisCatSharp.CommandsNext.Converters;
 
 // Own Utils
 
+global using Project_Ichigo.InteractionSelectors;
 global using Project_Ichigo.Events;
 global using Project_Ichigo.Helpers;
 global using Project_Ichigo.Extensions;
