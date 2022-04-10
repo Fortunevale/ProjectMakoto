@@ -485,24 +485,38 @@ internal class Bot
     {
         switch (e.LogEntry.LogLevel)
         {
-            case LoggerObjects.LogLevel.DEBUG:
-                _status.DebugRaised++;
-                break;
             case LoggerObjects.LogLevel.DEBUG2:
+            case LoggerObjects.LogLevel.DEBUG:
+            {
                 _status.DebugRaised++;
                 break;
+            }
             case LoggerObjects.LogLevel.INFO:
+            {
                 _status.InfoRaised++;
                 break;
+            }
             case LoggerObjects.LogLevel.WARN:
+            {
                 _status.WarnRaised++;
                 break;
+            }
             case LoggerObjects.LogLevel.ERROR:
+            {
                 _status.ErrorRaised++;
                 break;
+            }
             case LoggerObjects.LogLevel.FATAL:
+            {
+                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
+                {
+                    LogRaised -= LogHandler;
+                    _ = RunExitTasks(null, null);
+                }
+
                 _status.FatalRaised++;
                 break;
+            }
         }
     }
 
