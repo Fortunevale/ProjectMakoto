@@ -245,4 +245,100 @@ internal class GenericSelectors
 
         return Channel;
     }
+
+    internal async Task<string> PromptCustomSelection(List<DiscordSelectComponentOption> options, DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, string CustomPlaceHolder = "Select an option..")
+    {
+        int currentPage = 0;
+        string SelectionInteractionId = Guid.NewGuid().ToString();
+        string NextPageId = Guid.NewGuid().ToString();
+        string PrevPageId = Guid.NewGuid().ToString();
+
+        string Selection = null;
+
+        bool FinishedSelection = false;
+        bool ExceptionOccured = false;
+        Exception exception = null;
+
+        async Task Refresh()
+        {
+            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_left:")));
+            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_right:")));
+
+            var dropdown = new DiscordSelectComponent(SelectionInteractionId, CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);
+
+            if (options.Skip(currentPage * 25).Count() > 25)
+                builder.AddComponents(nextPageButton);
+
+            if (currentPage != 0)
+                builder.AddComponents(previousPageButton);
+
+            await message.ModifyAsync(builder);
+        }
+
+        _ = Refresh();
+
+        int TimeoutSeconds = 60;
+
+        async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    if (e.Message.Id == message.Id && e.User.Id == member.Id)
+                    {
+                        TimeoutSeconds = 60;
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        if (e.Interaction.Data.CustomId == SelectionInteractionId)
+                        {
+                            client.ComponentInteractionCreated -= RunDropdownInteraction;
+
+                            Selection = e.Values.First();
+
+                            FinishedSelection = true;
+                        }
+                        else if (e.Interaction.Data.CustomId == PrevPageId)
+                        {
+                            currentPage--;
+                            await Refresh();
+                        }
+                        else if (e.Interaction.Data.CustomId == NextPageId)
+                        {
+                            currentPage++;
+                            await Refresh();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    ExceptionOccured = true;
+                    FinishedSelection = true;
+                    throw;
+                }
+            }).Add(_bot._watcher);
+        }
+
+        client.ComponentInteractionCreated += RunDropdownInteraction;
+
+        while (!FinishedSelection && TimeoutSeconds >= 0)
+        {
+            await Task.Delay(1000);
+            TimeoutSeconds--;
+        }
+
+        client.ComponentInteractionCreated -= RunDropdownInteraction;
+
+        await message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(message.Embeds[0]).WithContent(message.Content));
+
+        if (ExceptionOccured)
+            throw exception;
+
+        if (TimeoutSeconds <= 0)
+            throw new ArgumentException("No selection made");
+
+        return Selection;
+    }
 }

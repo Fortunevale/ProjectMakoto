@@ -8,6 +8,8 @@ internal class Bot
     internal static DatabaseClient DatabaseClient { get; set; }
     internal DatabaseClient _databaseClient { get; set; }
 
+    internal CollectionUpdates _collectionUpdates { get; set; }
+
     internal Status _status = new();
     internal ServerInfo _guilds = new();
     internal Users _users = new();
@@ -40,6 +42,8 @@ internal class Bot
         _loggerProvider = new Xorog.Logger.LoggerProvider();
 
         LogRaised += LogHandler;
+
+        _collectionUpdates = new(this);
 
         LogInfo("Starting up..");
 

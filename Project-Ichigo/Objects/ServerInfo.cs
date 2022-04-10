@@ -14,6 +14,6 @@ internal class ServerInfo
         public Dictionary<ulong, Members> Members { get; set; } = new();
         public ActionLogSettings ActionLogSettings { get; set; } = new();
         public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
-        public List<ulong> CrosspostChannels { get; set; } = new();
+        public ObservableCollection<ulong> CrosspostChannels { get; set; } = new();
     }
 }
