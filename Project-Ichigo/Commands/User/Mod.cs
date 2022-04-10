@@ -823,6 +823,9 @@ internal class Mod : BaseCommandModule
             };
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
 
+            if (string.IsNullOrWhiteSpace(duration))
+                duration = "30m";
+
             try
             {
                 if (!DateTime.TryParse(duration, out DateTime until))
@@ -853,6 +856,11 @@ internal class Mod : BaseCommandModule
                     }
                 }
 
+                if (DateTime.UtcNow > until)
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
 
                 if (victim.IsProtected(_bot._status))
                 {
