@@ -22,7 +22,7 @@ internal class CrosspostEvents
 
             if (_bot._guilds.Servers[e.Guild.Id].CrosspostChannels.Contains(e.Channel.Id))
             {
-                if (e.Channel.Type != ChannelType.News)
+                if (e.Channel.Type == ChannelType.News)
                 {
                     bool ReactionAdded = false;
 
