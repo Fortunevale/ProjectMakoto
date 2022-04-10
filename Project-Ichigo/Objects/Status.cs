@@ -6,6 +6,8 @@ internal class Status
 
     internal List<Task> runningTasks { get; set; } = new();
 
+    internal string DevelopmentServerInvite = "";
+
     internal bool DiscordInitialized { get; set; } = false;
     internal bool LavalinkInitialized { get; set; } = false;
     internal bool DatabaseInitialized { get; set; } = false;

@@ -16,6 +16,26 @@ internal class PhishingUrlUpdater
             _ = UpdatePhishingUrlDatabase(phishingUrls);
         })).CreateScheduleTask(DateTime.UtcNow.AddMinutes(30), $"phishing-update");
 
+        _ = Task.Run(async () =>
+        {
+            // https://fortunevale.dd-dns.de/ProjectIchigoPermanentInvite.txt
+
+            try
+            {
+                HttpClient client = new();
+                var PermInvite = (await client.GetStringAsync("https://fortunevale.dd-dns.de/ProjectIchigoPermanentInvite.txt")).Split("\n").First();
+
+                if (_bot._status.DevelopmentServerInvite != PermInvite)
+                    LogInfo($"Updating DevelopmentServerInvite to '{PermInvite}'");
+
+                _bot._status.DevelopmentServerInvite = PermInvite;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to update DevelopmentServerInvite", ex);
+            }
+        });
+
         var urls = await GetUrls();
 
         bool DatabaseUpdated = false;
