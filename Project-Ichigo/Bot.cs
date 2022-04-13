@@ -217,6 +217,7 @@ internal class Bot
 
 
             LogDebug($"Registering Commands..");
+
             cNext.RegisterCommands<User>();
             cNext.RegisterCommands<Mod>();
             cNext.RegisterCommands<Admin>();
@@ -226,6 +227,7 @@ internal class Bot
 
 
             LogDebug($"Registering Command Converters..");
+
             cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
 
 
@@ -236,16 +238,20 @@ internal class Bot
             cNext.CommandExecuted += commandEvents.CommandExecuted;
             cNext.CommandErrored += commandEvents.CommandError;
 
+
+
             LogDebug($"Registering Afk Events..");
 
             AfkEvents afkEvents = new(this);
             discordClient.MessageCreated += afkEvents.MessageCreated;
 
 
+
             LogDebug($"Registering Crosspost Events..");
 
             CrosspostEvents crosspostEvents = new(this);
             discordClient.MessageCreated += crosspostEvents.MessageCreated;
+
 
 
             LogDebug($"Registering Phishing Events..");
@@ -263,6 +269,7 @@ internal class Bot
 
             DiscordEvents discordEvents = new(this);
             discordClient.GuildCreated += discordEvents.GuildCreated;
+
 
 
             LogDebug($"Registering Actionlog Events..");
@@ -287,6 +294,8 @@ internal class Bot
             discordClient.InviteCreated += actionlogEvents.InviteCreated;
             discordClient.InviteDeleted += actionlogEvents.InviteDeleted;
 
+
+
             LogDebug($"Registering Join Events..");
 
             JoinEvents joinEvents = new(this);
@@ -302,6 +311,8 @@ internal class Bot
             discordClient.MessageDeleted += bumpReminderEvents.MessageDeleted;
             discordClient.MessageReactionAdded += bumpReminderEvents.ReactionAdded;
             discordClient.MessageReactionRemoved += bumpReminderEvents.ReactionRemoved;
+
+
 
             LogDebug($"Registering Experience Events..");
 
@@ -319,6 +330,8 @@ internal class Bot
             LogDebug($"Registering Events..");
 
             discordClient.GuildDownloadCompleted += GuildDownloadCompleted;
+
+
 
             try
             {
