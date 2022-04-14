@@ -106,7 +106,7 @@ internal class Bot
             _ = _phishingUrlUpdater.UpdatePhishingUrlDatabase(_phishingUrls);
         });
 
-        await loadDatabase.WaitAsync(TimeSpan.FromSeconds(30));
+        await loadDatabase.WaitAsync(TimeSpan.FromSeconds(600));
 
         bool IsDev = false;
         bool DevOnline = false;
