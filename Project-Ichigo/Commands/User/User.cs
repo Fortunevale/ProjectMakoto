@@ -293,6 +293,12 @@ internal class User : BaseCommandModule
         {
             try
             {
+                if (!_bot._guilds.Servers.ContainsKey(ctx.Guild.Id))
+                    _bot._guilds.Servers.Add(ctx.Guild.Id, new ServerInfo.ServerSettings());
+
+                if (!_bot._guilds.Servers[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                    _bot._guilds.Servers[ctx.Guild.Id].Members.Add(victim.Id, new());
+
                 DiscordMember bMember = null;
 
                 try
@@ -316,22 +322,16 @@ internal class User : BaseCommandModule
                 if (bMember is not null)
                 {
                     if (bMember.Roles.Any())
-                    {
-                        foreach (var b in bMember.Roles)
-                        {
-                            GenerateRoles += $"{b.Mention}, ";
-                        }
-
-                        GenerateRoles = GenerateRoles.Remove(GenerateRoles.Length - 2, 2);
-                    }
+                        GenerateRoles = string.Join(", ", bMember.Roles.Select(x => x.Mention));
                     else
-                    {
                         GenerateRoles = "`User doesn't have any roles.`";
-                    }
                 }
                 else
                 {
-                    GenerateRoles = "`Not yet implemented.`";
+                    if (_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
+                        GenerateRoles = string.Join(", ", _bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
+                    else
+                        GenerateRoles = "`User doesn't have any stored roles.`";
                 }
 
                 var embed = new DiscordEmbedBuilder
@@ -342,7 +342,7 @@ internal class User : BaseCommandModule
                         IconUrl = victim.AvatarUrl,
                         Name = $"{victim.Username}#{victim.Discriminator} ({victim.Id})"
                     },
-                    Description = $"[Avatar]({victim.AvatarUrl})",
+                    Description = $"[Avatar Url]({victim.AvatarUrl})",
                     Footer = new DiscordEmbedBuilder.EmbedFooter
                     {
                         Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
@@ -351,32 +351,56 @@ internal class User : BaseCommandModule
                     Timestamp = DateTime.UtcNow
                 };
 
+                var banList = await ctx.Guild.GetBansAsync();
+                bool isBanned = banList.Any(x => x.User.Id == victim.Id);
+                DiscordBan banDetails = (isBanned ? banList.First(x => x.User.Id == victim.Id) : null);
+
                 if (bMember is null)
                 {
-                    embed.Description += "\n\n`Not yet implemented.`";
+                    if (_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch)
+                    {
+                        embed.Description += "\n\n`User never joined this server.`";
+                    }
+                    else
+                    {
+                        if (isBanned)
+                            embed.Description += "\n\n`User is currently banned from this server.`";
+                        else
+                            embed.Description += "\n\n`User is currently not in this server.`";
+                    }
                 }
+
+                if (isBanned)
+                    if (!string.IsNullOrWhiteSpace(banDetails.Reason))
+                        embed.AddField(new DiscordEmbedField("Ban Details", $"`{banDetails.Reason}`", false));
+                    else
+                        embed.AddField(new DiscordEmbedField("Ban Details", $"`No reason provided.`", false));
 
                 if (bMember is not null)
                     embed.AddField(new DiscordEmbedField("Roles", GenerateRoles.Truncate(1024), true));
                 else
                     embed.AddField(new DiscordEmbedField($"Roles (Backup)", GenerateRoles.Truncate(1024), true));
 
-                embed.AddField(new DiscordEmbedField("Created at", $"`{victim.CreationTimestamp.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(CreationAge.Ticks).TotalDays, 0)} days ago)", true));
+
+                embed.AddField(new DiscordEmbedField("Created at", $"{Formatter.Timestamp(victim.CreationTimestamp.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(victim.CreationTimestamp.ToUniversalTime())})", true));
+
 
                 if (bMember is not null)
-                {
-                    embed.AddField(new DiscordEmbedField("Joined at", $"`{bMember.JoinedAt.ToUniversalTime():dd.MM.yyyy HH:mm:ss zzz}` ({Math.Round(TimeSpan.FromTicks(JoinedAtAge.Ticks).TotalDays, 0)} days ago)", true));
-                }
+                    embed.AddField(new DiscordEmbedField("Joined at", $"{Formatter.Timestamp(bMember.JoinedAt.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(bMember.JoinedAt.ToUniversalTime())})", true));
                 else
-                {
-                    embed.AddField(new DiscordEmbedField("󠂪 󠂪", $"󠂪 󠂪", true));
-                }
+                    embed.AddField(new DiscordEmbedField("Left at", $"{Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})", true));
 
-                embed.AddField(new DiscordEmbedField("First joined at", $"`Not yet implemented.`", true));
+
+                embed.AddField(new DiscordEmbedField("First joined at", $"{Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})", true));
 
                 embed.AddField(new DiscordEmbedField("Invited by", $"`Not yet implemented.`", true));
 
                 embed.AddField(new DiscordEmbedField("Users invited", $"`Not yet implemented.`", true));
+
+                if (bMember is not null)
+                    if (bMember.CommunicationDisabledUntil.HasValue)
+                        if (((DateTime)bMember.CommunicationDisabledUntil).GetTotalSecondsUntil() > 0)
+                            embed.AddField(new DiscordEmbedField("Timed out until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value.ToUniversalTime())})", true));
 
                 await ctx.Channel.SendMessageAsync(embed: embed);
             }
