@@ -232,6 +232,15 @@ internal class Bot
 
 
 
+            LogDebug($"Registering Generic Guild Events..");
+
+            GenericGuildEvents genericGuildEvents = new(this);
+            discordClient.GuildMemberAdded += genericGuildEvents.GuildMemberAdded;
+            discordClient.GuildMemberRemoved += genericGuildEvents.GuildMemberRemoved;
+            discordClient.GuildMemberUpdated += genericGuildEvents.GuildMemberUpdated;
+
+
+
             LogDebug($"Registering Command Events..");
 
             CommandEvents commandEvents = new(this);
@@ -590,7 +599,7 @@ internal class Bot
         {
             LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
-            LogDebug($"{string.Join(", ", e.Guilds.Select(x => x.Value.Name))}");
+            LogDebug($"{string.Join(", ", e.Guilds.Select<KeyValuePair<ulong, DiscordGuild>, string>(x => x.Value.Name))}");
 
             for (int i = 0; i < 251; i++)
             {
@@ -618,8 +627,81 @@ internal class Bot
                 }
             }
 
-            await DatabaseClient.CheckGuildTables();
-            await DatabaseClient.SyncDatabase(true);
+            ObservableCollection<Task> runningTasks = new();
+
+            NotifyCollectionChangedEventHandler runningTasksUpdated()
+            {
+                return (s, e) =>
+                {
+                    foreach (Task b in e.NewItems)
+                    {
+                        LogDebug($"Adding startup task to watcher: {b.Id}");
+                        b.Add(_watcher);
+                    }
+                };
+            }
+
+            runningTasks.CollectionChanged += runningTasksUpdated();
+
+            int startupTasksSuccess = 0;
+
+            foreach (var guild in e.Guilds)
+            {
+                while (runningTasks.Count >= 4 && !runningTasks.Any(x => x.IsCompleted))
+                    await Task.Delay(100);
+
+                foreach (var task in runningTasks.ToList<Task>())
+                    if (task.IsCompleted)
+                        runningTasks.Remove(task);
+
+                runningTasks.Add(Task.Run(async () =>
+                {
+                    LogDebug($"Performing startup tasks for '{guild.Key}'..");
+                    var guildMembers = await guild.Value.GetAllMembersAsync();
+
+                    foreach (var member in guildMembers)
+                    {
+                        if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Id))
+                            _guilds.Servers[guild.Key].Members.Add(member.Id, new());
+
+                        if (_guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                            _guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
+
+                        if (_guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
+                            _guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
+
+                        _guilds.Servers[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MembersRole
+                        {
+                            Id = x.Id,
+                            Name = x.Name,
+                        }).ToList();
+
+                        _guilds.Servers[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+                    }
+
+                    foreach (var databaseMember in _guilds.Servers[guild.Key].Members.ToList())
+                    {
+                        if (!guildMembers.Any(x => x.Id == databaseMember.Key))
+                        {
+                            if (_guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                                _guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
+                        }
+                    }
+
+                    startupTasksSuccess++;
+                }));
+            }
+
+            while (runningTasks.Any(x => !x.IsCompleted))
+                await Task.Delay(100);
+
+            runningTasks.CollectionChanged -= runningTasksUpdated();
+            runningTasks.Clear();
+
+            LogInfo($"Startup successfully finished for {startupTasksSuccess}/{e.Guilds.Count} guilds.");
+
+            await _databaseClient.CheckGuildTables();
+            await _databaseClient.SyncDatabase(true);
 
         }).Add(_watcher);
     }

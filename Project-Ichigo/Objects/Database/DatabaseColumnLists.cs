@@ -64,6 +64,8 @@ internal class DatabaseColumnLists
         new Column("levelrewards", "text", "utf8mb4_0900_ai_ci"),
         new Column("auditlogcache", "text", "utf8mb4_0900_ai_ci"),
         new Column("crosspostchannels", "text", "utf8mb4_0900_ai_ci"),
+        new Column("reapplyroles", "tinyint(1)"),
+        new Column("reapplynickname", "tinyint(1)"),
         new Column("joinlog_channel_id", "bigint"),
         new Column("experience_use", "tinyint(1)"),
         new Column("experience_boost_bumpreminder", "tinyint(1)"),
@@ -97,6 +99,7 @@ internal class DatabaseColumnLists
     internal readonly static List<Column> guild_users = new()
     {
         new Column("userid", "bigint", primary: true),
+        new Column("saved_nickname", "text", "utf8mb4_0900_ai_ci", "", true),
         new Column("roles", "text", "utf8mb4_0900_ai_ci"),
         new Column("first_join", "bigint"),
         new Column("last_leave", "bigint"),

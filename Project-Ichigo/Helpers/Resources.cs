@@ -3,6 +3,27 @@ internal class Resources
 {
     public static readonly string Github = "https://cdn.discordapp.com/attachments/712761268393738301/893958382896173096/Github.png";
     public static readonly string QuestionMarkIcon = "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png";
+    public static readonly IEnumerable<Permissions> ProtectedPermissions = new List<Permissions>()
+    {
+        Permissions.Administrator,
+
+        Permissions.MuteMembers,
+        Permissions.DeafenMembers,
+        Permissions.ModerateMembers,
+        Permissions.KickMembers,
+        Permissions.BanMembers,
+
+        Permissions.ManageGuild,
+        Permissions.ManageChannels,
+        Permissions.ManageRoles,
+        Permissions.ManageMessages,
+        Permissions.ManageEvents,
+        Permissions.ManageThreads,
+        Permissions.ManageWebhooks,
+        Permissions.ManageNicknames,
+
+        Permissions.ViewAuditLog,
+    };
 
     public class LogIcons
     {

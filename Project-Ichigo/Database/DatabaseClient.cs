@@ -405,6 +405,7 @@ internal class DatabaseClient
                             joinlog_channel_id = x.Value.JoinSettings.JoinlogChannelId,
                             autoban_global_ban = x.Value.JoinSettings.AutoBanGlobalBans,
                             reapplyroles = x.Value.JoinSettings.ReApplyRoles,
+                            reapplynickname = x.Value.JoinSettings.ReApplyNickname,
 
                             phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
                             phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
@@ -463,6 +464,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);
 
                             cmd.Parameters.AddWithValue($"reapplyroles{i}", DatabaseInserts[i].reapplyroles);
+                            cmd.Parameters.AddWithValue($"reapplynickname{i}", DatabaseInserts[i].reapplynickname);
 
                             cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
                             cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);
@@ -527,6 +529,7 @@ internal class DatabaseClient
                                     first_join = Convert.ToUInt64(x.Value.FirstJoinDate.ToUniversalTime().Ticks),
                                     last_leave = Convert.ToUInt64(x.Value.LastLeaveDate.ToUniversalTime().Ticks),
                                     roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
+                                    saved_nickname = x.Value.SavedNickname
                                 }).ToList();
 
                                 if (mainDatabaseConnection == null)
@@ -549,6 +552,7 @@ internal class DatabaseClient
                                     cmd.Parameters.AddWithValue($"first_join{i}", DatabaseInserts[i].first_join);
                                     cmd.Parameters.AddWithValue($"last_leave{i}", DatabaseInserts[i].last_leave);
                                     cmd.Parameters.AddWithValue($"roles{i}", DatabaseInserts[i].roles);
+                                    cmd.Parameters.AddWithValue($"saved_nickname{i}", DatabaseInserts[i].saved_nickname);
                                 }
 
                                 cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

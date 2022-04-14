@@ -2,8 +2,14 @@
 
 internal class Members
 {
+    private string _SavedNickname { get; set; } = "";
+    public string SavedNickname { get => _SavedNickname; set { _SavedNickname = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+
+
+
     private DateTime _FirstJoinDate { get; set; } = DateTime.UnixEpoch;
     public DateTime FirstJoinDate { get => _FirstJoinDate; set { _FirstJoinDate = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+
 
 
     private DateTime _LastLeaveDate { get; set; } = DateTime.UnixEpoch;

@@ -787,6 +787,79 @@ internal class Mod : BaseCommandModule
 
 
 
+    [Command("clearbackup"), Aliases("clearroles", "clearrole", "clearbackuproles", "clearbackuprole"),
+    CommandModule("mod"),
+    Description($"Clears the stored roles of a user.")]
+    public async Task ClearBackup(CommandContext ctx, DiscordUser victim)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageRoles))
+            {
+                _ = ctx.SendPermissionError(Permissions.ManageRoles);
+                return;
+            }
+
+            if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))
+            {
+                _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Description = $"`{victim.Username}#{victim.Discriminator} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
+                    Color = ColorHelper.Error,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                    {
+                        Url = victim.AvatarUrl
+                    },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                    {
+                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                        IconUrl = ctx.Member.AvatarUrl
+                    },
+                    Timestamp = DateTime.UtcNow
+                });
+
+                return;
+            }
+
+            if (!_bot._guilds.Servers.ContainsKey(ctx.Guild.Id))
+                _bot._guilds.Servers.Add(ctx.Guild.Id, new ServerInfo.ServerSettings());
+
+            if (!_bot._guilds.Servers[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                _bot._guilds.Servers[ctx.Guild.Id].Members.Add(victim.Id, new());
+
+            _bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
+            _bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
+
+            _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+            {
+                Description = $"`Deleted stored nickname and roles for {victim.Username}#{victim.Discriminator} ({victim.Id}).`",
+                Color = ColorHelper.StrongPunishment,
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = victim.AvatarUrl
+                },
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.Guild.Name,
+                    IconUrl = ctx.Guild.IconUrl
+                },
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
     [Command("timeout"), Aliases("time-out", "mute"),
     CommandModule("mod"),
     Description("Times the user for the specified amount of time out")]

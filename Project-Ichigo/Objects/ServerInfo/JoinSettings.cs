@@ -17,4 +17,9 @@ public class JoinSettings
 
     private bool _ReApplyRoles { get; set; } = false;
     public bool ReApplyRoles { get => _ReApplyRoles; set { _ReApplyRoles = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+
+
+
+    private bool _ReApplyNickname { get; set; } = false;
+    public bool ReApplyNickname { get => _ReApplyNickname; set { _ReApplyNickname = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 }

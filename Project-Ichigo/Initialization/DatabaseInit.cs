@@ -58,6 +58,7 @@ internal class DatabaseInit
                     JoinlogChannelId = b.joinlog_channel_id,
                     AutoBanGlobalBans = b.autoban_global_ban,
                     ReApplyRoles = b.reapplyroles,
+                    ReApplyNickname = b.reapplynickname,
                 },
                 ExperienceSettings = new()
                 {
@@ -130,6 +131,7 @@ internal class DatabaseInit
                         FirstJoinDate = (b.first_join == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.first_join)),
                         LastLeaveDate = (b.last_leave == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.last_leave)),
                         MemberRoles = JsonConvert.DeserializeObject<List<MembersRole>>((b.roles is null or "null" or "" ? "[]" : b.roles)),
+                        SavedNickname = b.saved_nickname
                     });
 
                 LogInfo($"Loaded {_bot._guilds.Servers[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");

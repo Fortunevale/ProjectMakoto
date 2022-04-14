@@ -7,6 +7,7 @@ public class DatabaseServerSettings
     public string auditlogcache { get; set; }
     public string crosspostchannels { get; set; }
     public bool reapplyroles { get; set; }
+    public bool reapplynickname { get; set; }
     public ulong auto_assign_role_id { get; set; }
     public ulong joinlog_channel_id { get; set; }
     public bool autoban_global_ban { get; set; }

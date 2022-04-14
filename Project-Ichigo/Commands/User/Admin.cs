@@ -47,7 +47,9 @@ internal class Admin : BaseCommandModule
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Autoban Globally Banned Users` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
                                   $"`Joinlog Channel              ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                  $"`Role On Join                 ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
+                                  $"`Role On Join                 ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
+                                  $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
+                                  $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}"
                 });
                 return;
             }
@@ -61,7 +63,11 @@ internal class Admin : BaseCommandModule
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Autoban Globally Banned Users` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
                                   $"`Joinlog Channel              ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                  $"`Role On Join                 ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}"
+                                  $"`Role On Join                 ` : {(_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
+                                  $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
+                                  $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}\n\n" +
+                                  $"For security reasons, roles with any of the following permissions never get re-applied: {string.Join(", ", Resources.ProtectedPermissions.Select(x => $"`{x.ToPermissionString()}`"))}.\n\n" +
+                                  $"In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied."
                 };
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -71,8 +77,9 @@ internal class Admin : BaseCommandModule
                     { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), "toggle_global_ban", "Toggle Global Bans") },
                     { new DiscordButtonComponent(ButtonStyle.Primary, "change_joinlog_channel", "Change Joinlog Channel") },
                     { new DiscordButtonComponent(ButtonStyle.Primary, "change_role_on_join", "Change Role assigned on join") },
-                    { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
-                } as IEnumerable<DiscordComponent>));
+                    { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), "toggle_reapply_roles", "Toggle Role Re-Apply") },
+                    { new DiscordButtonComponent((_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), "toggle_reapply_nickname", "Toggle Nickname Re-Apply") }
+                } as IEnumerable<DiscordComponent>).AddComponents(new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel")));
 
                 CancellationTokenSource cancellationTokenSource = new();
 
@@ -89,6 +96,28 @@ internal class Admin : BaseCommandModule
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
+
+                                _ = msg.DeleteAsync();
+                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                cancellationTokenSource.Cancel();
+                                return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "toggle_reapply_roles")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                                _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyRoles = !_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyRoles;
+
+                                _ = msg.DeleteAsync();
+                                _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                cancellationTokenSource.Cancel();
+                                return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "toggle_reapply_nickname")
+                            {
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                                _bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyNickname = !_bot._guilds.Servers[ctx.Guild.Id].JoinSettings.ReApplyNickname;
 
                                 _ = msg.DeleteAsync();
                                 _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
