@@ -522,11 +522,101 @@ internal class Bot
         LogDebug($"Closed Discord Client.");
     }
 
+    private async Task SyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
+    {
+        ObservableCollection<Task> runningTasks = new();
+
+        NotifyCollectionChangedEventHandler runningTasksUpdated()
+        {
+            return (s, e) =>
+            {
+                foreach (Task b in e.NewItems)
+                {
+                    LogDebug($"Adding sync task to watcher: {b.Id}");
+                    b.Add(_watcher);
+                }
+            };
+        }
+
+        runningTasks.CollectionChanged += runningTasksUpdated();
+
+        int startupTasksSuccess = 0;
+
+        foreach (var guild in Guilds)
+        {
+            while (runningTasks.Count >= 4 && !runningTasks.Any(x => x.IsCompleted))
+                await Task.Delay(100);
+
+            foreach (var task in runningTasks.ToList<Task>())
+                if (task.IsCompleted)
+                    runningTasks.Remove(task);
+
+            runningTasks.Add(Task.Run(async () =>
+            {
+                LogDebug($"Performing sync tasks for '{guild.Key}'..");
+                var guildMembers = await guild.Value.GetAllMembersAsync();
+                var guildBans = await guild.Value.GetBansAsync();
+
+                foreach (var member in guildMembers)
+                {
+                    if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Id))
+                        _guilds.Servers[guild.Key].Members.Add(member.Id, new());
+
+                    if (_guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                        _guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
+
+                    if (_guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
+                        _guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
+
+                    _guilds.Servers[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MembersRole
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                    }).ToList();
+
+                    _guilds.Servers[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+                }
+
+                foreach (var databaseMember in _guilds.Servers[guild.Key].Members.ToList())
+                {
+                    if (!guildMembers.Any(x => x.Id == databaseMember.Key))
+                    {
+                        if (_guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                            _guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
+                    }
+                }
+
+                foreach (var banEntry in guildBans)
+                {
+                    if (!_guilds.Servers[guild.Key].Members.ContainsKey(banEntry.User.Id))
+                        continue;
+
+                    if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
+                        _guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+
+                    if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
+                        _guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
+                }
+
+                startupTasksSuccess++;
+            }));
+        }
+
+        while (runningTasks.Any(x => !x.IsCompleted))
+            await Task.Delay(100);
+
+        runningTasks.CollectionChanged -= runningTasksUpdated();
+        runningTasks.Clear();
+
+        LogInfo($"Sync Tasks successfully finished for {startupTasksSuccess}/{Guilds.Count} guilds.");
+    }
+
     private async Task RunExitTasks(object? sender, EventArgs e)
     {
         if (DatabaseClient.IsDisposed())
             return;
 
+        await SyncTasks(discordClient.Guilds);
         await LogOffDiscord();
         await FlushToDatabase();
 
@@ -568,91 +658,7 @@ internal class Bot
                 }
             }
 
-            ObservableCollection<Task> runningTasks = new();
-
-            NotifyCollectionChangedEventHandler runningTasksUpdated()
-            {
-                return (s, e) =>
-                {
-                    foreach (Task b in e.NewItems)
-                    {
-                        LogDebug($"Adding startup task to watcher: {b.Id}");
-                        b.Add(_watcher);
-                    }
-                };
-            }
-
-            runningTasks.CollectionChanged += runningTasksUpdated();
-
-            int startupTasksSuccess = 0;
-
-            foreach (var guild in e.Guilds)
-            {
-                while (runningTasks.Count >= 4 && !runningTasks.Any(x => x.IsCompleted))
-                    await Task.Delay(100);
-
-                foreach (var task in runningTasks.ToList<Task>())
-                    if (task.IsCompleted)
-                        runningTasks.Remove(task);
-
-                runningTasks.Add(Task.Run(async () =>
-                {
-                    LogDebug($"Performing startup tasks for '{guild.Key}'..");
-                    var guildMembers = await guild.Value.GetAllMembersAsync();
-                    var guildBans = await guild.Value.GetBansAsync();
-
-                    foreach (var member in guildMembers)
-                    {
-                        if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Id))
-                            _guilds.Servers[guild.Key].Members.Add(member.Id, new());
-
-                        if (_guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
-                            _guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
-
-                        if (_guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
-                            _guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
-
-                        _guilds.Servers[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MembersRole
-                        {
-                            Id = x.Id,
-                            Name = x.Name,
-                        }).ToList();
-
-                        _guilds.Servers[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
-                    }
-
-                    foreach (var databaseMember in _guilds.Servers[guild.Key].Members.ToList())
-                    {
-                        if (!guildMembers.Any(x => x.Id == databaseMember.Key))
-                        {
-                            if (_guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
-                                _guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
-                        }
-                    }
-
-                    foreach (var banEntry in guildBans)
-                    {
-                        if (!_guilds.Servers[guild.Key].Members.ContainsKey(banEntry.User.Id))
-                            continue;
-
-                        if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
-                            _guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
-
-                        if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
-                            _guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
-                    }
-
-                    startupTasksSuccess++;
-                }));
-            }
-
-            while (runningTasks.Any(x => !x.IsCompleted))
-                await Task.Delay(100);
-
-            runningTasks.CollectionChanged -= runningTasksUpdated();
-            runningTasks.Clear();
-
-            LogInfo($"Startup successfully finished for {startupTasksSuccess}/{e.Guilds.Count} guilds.");
+            await SyncTasks(e.Guilds);
 
             await _databaseClient.CheckGuildTables();
             await _databaseClient.SyncDatabase(true);
