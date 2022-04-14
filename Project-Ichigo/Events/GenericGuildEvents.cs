@@ -124,4 +124,19 @@ internal class GenericGuildEvents
             _bot._guilds.Servers[e.Guild.Id].Members[e.Member.Id].SavedNickname = e.Member.Nickname;
         }).Add(_bot._watcher);
     }
+
+    internal async Task GuildMemberBanned(DiscordClient sender, GuildBanAddEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (!_bot._guilds.Servers.ContainsKey(e.Guild.Id))
+                _bot._guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+
+            if (!_bot._guilds.Servers[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+                _bot._guilds.Servers[e.Guild.Id].Members.Add(e.Member.Id, new());
+
+            _bot._guilds.Servers[e.Guild.Id].Members[e.Member.Id].MemberRoles.Clear();
+            _bot._guilds.Servers[e.Guild.Id].Members[e.Member.Id].SavedNickname = "";
+        }).Add(_bot._watcher);
+    }
 }

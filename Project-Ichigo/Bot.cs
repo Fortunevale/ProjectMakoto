@@ -238,6 +238,7 @@ internal class Bot
             discordClient.GuildMemberAdded += genericGuildEvents.GuildMemberAdded;
             discordClient.GuildMemberRemoved += genericGuildEvents.GuildMemberRemoved;
             discordClient.GuildMemberUpdated += genericGuildEvents.GuildMemberUpdated;
+            discordClient.GuildBanAdded += genericGuildEvents.GuildMemberBanned;
 
 
 
@@ -658,6 +659,7 @@ internal class Bot
                 {
                     LogDebug($"Performing startup tasks for '{guild.Key}'..");
                     var guildMembers = await guild.Value.GetAllMembersAsync();
+                    var guildBans = await guild.Value.GetBansAsync();
 
                     foreach (var member in guildMembers)
                     {
@@ -686,6 +688,18 @@ internal class Bot
                             if (_guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
                                 _guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
                         }
+                    }
+
+                    foreach (var banEntry in guildBans)
+                    {
+                        if (!_guilds.Servers[guild.Key].Members.ContainsKey(banEntry.User.Id))
+                            return;
+
+                        if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
+                            _guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+
+                        if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
+                            _guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                     }
 
                     startupTasksSuccess++;
