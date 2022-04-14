@@ -693,7 +693,7 @@ internal class Bot
                     foreach (var banEntry in guildBans)
                     {
                         if (!_guilds.Servers[guild.Key].Members.ContainsKey(banEntry.User.Id))
-                            return;
+                            continue;
 
                         if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
                             _guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
