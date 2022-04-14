@@ -124,7 +124,10 @@ internal class DatabaseInit
                     {
                         Level = b.experience_level,
                         Experience = b.experience,
-                        Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message))
+                        Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message)),
+                        FirstJoinDate = (b.first_join == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.first_join)),
+                        LastLeaveDate = (b.last_leave == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.last_leave)),
+                        MemberRoles = JsonConvert.DeserializeObject<List<MembersRole>>((b.roles is null or "null" or "" ? "[]" : b.roles)),
                     });
 
                 LogInfo($"Loaded {_bot._guilds.Servers[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");

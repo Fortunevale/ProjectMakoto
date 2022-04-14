@@ -97,6 +97,9 @@ internal class DatabaseColumnLists
     internal readonly static List<Column> guild_users = new()
     {
         new Column("userid", "bigint", primary: true),
+        new Column("roles", "text", "utf8mb4_0900_ai_ci"),
+        new Column("first_join", "bigint"),
+        new Column("last_leave", "bigint"),
         new Column("experience_last_message", "bigint"),
         new Column("experience", "bigint"),
         new Column("experience_level", "bigint"),

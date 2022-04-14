@@ -520,7 +520,10 @@ internal class DatabaseClient
 
                                     experience = x.Value.Experience,
                                     experience_level = x.Value.Level,
-                                    experience_last_message = Convert.ToUInt64(x.Value.Last_Message.ToUniversalTime().Ticks)
+                                    experience_last_message = Convert.ToUInt64(x.Value.Last_Message.ToUniversalTime().Ticks),
+                                    first_join = Convert.ToUInt64(x.Value.FirstJoinDate.ToUniversalTime().Ticks),
+                                    last_leave = Convert.ToUInt64(x.Value.LastLeaveDate.ToUniversalTime().Ticks),
+                                    roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
                                 }).ToList();
 
                                 if (mainDatabaseConnection == null)
@@ -540,6 +543,9 @@ internal class DatabaseClient
                                     cmd.Parameters.AddWithValue($"experience{i}", DatabaseInserts[i].experience);
                                     cmd.Parameters.AddWithValue($"experience_level{i}", DatabaseInserts[i].experience_level);
                                     cmd.Parameters.AddWithValue($"experience_last_message{i}", DatabaseInserts[i].experience_last_message);
+                                    cmd.Parameters.AddWithValue($"first_join{i}", DatabaseInserts[i].first_join);
+                                    cmd.Parameters.AddWithValue($"last_leave{i}", DatabaseInserts[i].last_leave);
+                                    cmd.Parameters.AddWithValue($"roles{i}", DatabaseInserts[i].roles);
                                 }
 
                                 cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
