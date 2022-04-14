@@ -232,102 +232,42 @@ internal class Bot
 
 
 
-            LogDebug($"Registering Generic Guild Events..");
+            LogDebug($"Registering DisCatSharp EventHandler..");
 
-            GenericGuildEvents genericGuildEvents = new(this);
-            discordClient.GuildMemberAdded += genericGuildEvents.GuildMemberAdded;
-            discordClient.GuildMemberRemoved += genericGuildEvents.GuildMemberRemoved;
-            discordClient.GuildMemberUpdated += genericGuildEvents.GuildMemberUpdated;
-            discordClient.GuildBanAdded += genericGuildEvents.GuildMemberBanned;
+            DisCatSharpEventHandler disCatSharpEventHandler = new(this);
 
+            discordClient.GuildCreated += disCatSharpEventHandler.GuildCreated;
+            discordClient.GuildUpdated += disCatSharpEventHandler.GuildUpdated;
 
+            discordClient.ChannelCreated += disCatSharpEventHandler.ChannelCreated;
+            discordClient.ChannelDeleted += disCatSharpEventHandler.ChannelDeleted;
+            discordClient.ChannelUpdated += disCatSharpEventHandler.ChannelUpdated;
 
-            LogDebug($"Registering Command Events..");
+            discordClient.GuildMemberAdded += disCatSharpEventHandler.GuildMemberAdded;
+            discordClient.GuildMemberRemoved += disCatSharpEventHandler.GuildMemberRemoved;
+            discordClient.GuildMemberUpdated += disCatSharpEventHandler.GuildMemberUpdated;
+            discordClient.GuildBanAdded += disCatSharpEventHandler.GuildBanAdded;
+            discordClient.GuildBanRemoved += disCatSharpEventHandler.GuildBanRemoved;
 
-            CommandEvents commandEvents = new(this);
-            cNext.CommandExecuted += commandEvents.CommandExecuted;
-            cNext.CommandErrored += commandEvents.CommandError;
+            discordClient.InviteCreated += disCatSharpEventHandler.InviteCreated;
+            discordClient.InviteDeleted += disCatSharpEventHandler.InviteDeleted;
 
+            cNext.CommandExecuted += disCatSharpEventHandler.CommandExecuted;
+            cNext.CommandErrored += disCatSharpEventHandler.CommandError;
 
+            discordClient.MessageCreated += disCatSharpEventHandler.MessageCreated;
+            discordClient.MessageDeleted += disCatSharpEventHandler.MessageDeleted;
+            discordClient.MessagesBulkDeleted += disCatSharpEventHandler.MessagesBulkDeleted;
+            discordClient.MessageUpdated += disCatSharpEventHandler.MessageUpdated;
 
-            LogDebug($"Registering Afk Events..");
+            discordClient.MessageReactionAdded += disCatSharpEventHandler.MessageReactionAdded;
+            discordClient.MessageReactionRemoved += disCatSharpEventHandler.MessageReactionRemoved;
 
-            AfkEvents afkEvents = new(this);
-            discordClient.MessageCreated += afkEvents.MessageCreated;
+            discordClient.ComponentInteractionCreated += disCatSharpEventHandler.ComponentInteractionCreated;
 
-
-
-            LogDebug($"Registering Crosspost Events..");
-
-            CrosspostEvents crosspostEvents = new(this);
-            discordClient.MessageCreated += crosspostEvents.MessageCreated;
-
-
-
-            LogDebug($"Registering Phishing Events..");
-
-            PhishingProtectionEvents phishingProtectionEvents = new(this);
-            discordClient.MessageCreated += phishingProtectionEvents.MessageCreated;
-            discordClient.MessageUpdated += phishingProtectionEvents.MessageUpdated;
-
-            SubmissionEvents _submissionEvents = new(this);
-            discordClient.ComponentInteractionCreated += _submissionEvents.ComponentInteractionCreated;
-
-
-
-            LogDebug($"Registering Discord Events..");
-
-            DiscordEvents discordEvents = new(this);
-            discordClient.GuildCreated += discordEvents.GuildCreated;
-
-
-
-            LogDebug($"Registering Actionlog Events..");
-
-            ActionlogEvents actionlogEvents = new(this);
-
-            discordClient.GuildMemberAdded += actionlogEvents.UserJoined;
-            discordClient.GuildMemberRemoved += actionlogEvents.UserLeft;
-            discordClient.MessageDeleted += actionlogEvents.MessageDeleted;
-            discordClient.MessagesBulkDeleted += actionlogEvents.MessageBulkDeleted;
-            discordClient.MessageUpdated += actionlogEvents.MessageUpdated;
-            discordClient.GuildMemberUpdated += actionlogEvents.MemberUpdated;
-            discordClient.GuildRoleCreated += actionlogEvents.RoleCreated;
-            discordClient.GuildRoleDeleted += actionlogEvents.RoleDeleted;
-            discordClient.GuildRoleUpdated += actionlogEvents.RoleModified;
-            discordClient.GuildBanAdded += actionlogEvents.BanAdded;
-            discordClient.GuildBanRemoved += actionlogEvents.BanRemoved;
-            discordClient.GuildUpdated += actionlogEvents.GuildUpdated;
-            discordClient.ChannelCreated += actionlogEvents.ChannelCreated;
-            discordClient.ChannelDeleted += actionlogEvents.ChannelDeleted;
-            discordClient.ChannelUpdated += actionlogEvents.ChannelUpdated;
-            discordClient.InviteCreated += actionlogEvents.InviteCreated;
-            discordClient.InviteDeleted += actionlogEvents.InviteDeleted;
-
-
-
-            LogDebug($"Registering Join Events..");
-
-            JoinEvents joinEvents = new(this);
-            discordClient.GuildMemberAdded += joinEvents.GuildMemberAdded;
-            discordClient.GuildMemberRemoved += joinEvents.GuildMemberRemoved;
-
-
-
-            LogDebug($"Registering BumpReminder Events..");
-
-            BumpReminderEvents bumpReminderEvents = new(this);
-            discordClient.MessageCreated += bumpReminderEvents.MessageCreated;
-            discordClient.MessageDeleted += bumpReminderEvents.MessageDeleted;
-            discordClient.MessageReactionAdded += bumpReminderEvents.ReactionAdded;
-            discordClient.MessageReactionRemoved += bumpReminderEvents.ReactionRemoved;
-
-
-
-            LogDebug($"Registering Experience Events..");
-
-            ExperienceEvents experienceEvents = new(this);
-            discordClient.MessageCreated += experienceEvents.MessageCreated;
+            discordClient.GuildRoleCreated += disCatSharpEventHandler.GuildRoleCreated;
+            discordClient.GuildRoleDeleted += disCatSharpEventHandler.GuildRoleDeleted;
+            discordClient.GuildRoleUpdated += disCatSharpEventHandler.GuildRoleUpdated;
 
 
 
