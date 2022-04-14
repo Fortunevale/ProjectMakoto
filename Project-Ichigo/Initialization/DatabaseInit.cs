@@ -55,7 +55,9 @@ internal class DatabaseInit
                 JoinSettings = new()
                 {
                     AutoAssignRoleId = b.auto_assign_role_id,
-                    JoinlogChannelId = b.joinlog_channel_id
+                    JoinlogChannelId = b.joinlog_channel_id,
+                    AutoBanGlobalBans = b.autoban_global_ban,
+                    ReApplyRoles = b.reapplyroles,
                 },
                 ExperienceSettings = new()
                 {

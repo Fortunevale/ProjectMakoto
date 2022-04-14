@@ -404,6 +404,7 @@ internal class DatabaseClient
                             auto_assign_role_id = x.Value.JoinSettings.AutoAssignRoleId,
                             joinlog_channel_id = x.Value.JoinSettings.JoinlogChannelId,
                             autoban_global_ban = x.Value.JoinSettings.AutoBanGlobalBans,
+                            reapplyroles = x.Value.JoinSettings.ReApplyRoles,
 
                             phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
                             phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
@@ -460,6 +461,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"levelrewards{i}", DatabaseInserts[i].levelrewards);
                             cmd.Parameters.AddWithValue($"auditlogcache{i}", DatabaseInserts[i].auditlogcache);
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);
+
+                            cmd.Parameters.AddWithValue($"reapplyroles{i}", DatabaseInserts[i].reapplyroles);
 
                             cmd.Parameters.AddWithValue($"bump_enabled{i}", DatabaseInserts[i].bump_enabled);
                             cmd.Parameters.AddWithValue($"bump_role{i}", DatabaseInserts[i].bump_role);
