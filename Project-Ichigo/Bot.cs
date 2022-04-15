@@ -439,7 +439,14 @@ internal class Bot
                     if (_databaseClient.IsDisposed())
                         return;
 
-                    await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
+                    List<ulong> users = new();
+
+                    foreach (var b in _guilds.Servers)
+                        foreach (var c in b.Value.Members)
+                            if (!users.Contains(c.Key))
+                                users.Add(c.Key);
+
+                    await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
