@@ -446,6 +446,10 @@ internal class Bot
                             if (!users.Contains(c.Key))
                                 users.Add(c.Key);
 
+                    foreach (var b in _users.List)
+                        if (!users.Contains(b.Key))
+                            users.Add(b.Key);
+
                     await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
