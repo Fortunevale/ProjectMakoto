@@ -19,4 +19,6 @@ internal class Status
     internal long WarnRaised = 0;
     internal long ErrorRaised = 0;
     internal long FatalRaised = 0;
+
+    internal long DataReaderExceptions = 0;
 }
