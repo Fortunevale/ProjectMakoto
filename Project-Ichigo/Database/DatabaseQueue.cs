@@ -31,14 +31,29 @@ internal class DatabaseQueue
 
                 try
                 {
-                    b.Value.Command.ExecuteNonQuery();
+                    switch (b.Value.RequestType)
+                    {
+                        case RequestType.Command:
+                        {
+                            b.Value.Command.ExecuteNonQuery();
 
-                    Queue[b.Key].Executed = true;
+                            Queue[b.Key].Executed = true;
+                            break;
+                        }
+                        case RequestType.Ping:
+                        {
+                            b.Value.Connection.Ping();
+
+                            Queue[b.Key].Executed = true;
+                            break;
+                        }
+                    }
                 }
                 catch (MySqlException ex)
                 {
                     LogError($"An exception occured while trying to execute a mysql command", ex);
                 }
+
                 catch (Exception ex)
                 {
                     Queue[b.Key].Failed = true;
@@ -65,7 +80,7 @@ internal class DatabaseQueue
     {
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { Command = cmd });
+        Queue.Add(key, new RequestQueue { RequestType = RequestType.Command, Command = cmd });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(50);
@@ -82,6 +97,27 @@ internal class DatabaseQueue
         throw new Exception("This exception should be impossible to get.");
     }
 
+    internal async Task<bool> RunPing(MySqlConnection conn)
+    {
+        string key = Guid.NewGuid().ToString();
+
+        Queue.Add(key, new RequestQueue { RequestType = RequestType.Ping, Connection = conn });
+
+        while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
+            Thread.Sleep(50);
+
+        var response = Queue[key];
+        Queue.Remove(key);
+
+        if (response.Executed)
+            return true;
+
+        if (response.Failed)
+            return false;
+
+        throw new Exception("This exception should be impossible to get.");
+    }
+
     internal int QueueCount()
     {
         return this.Queue.Count;
@@ -91,9 +127,17 @@ internal class DatabaseQueue
 
     internal class RequestQueue
     {
+        public RequestType RequestType { get; set; }
+        public MySqlConnection Connection { get; set; }
         public MySqlCommand Command { get; set; }
         public bool Executed { get; set; }
         public bool Failed { get; set; }
         public Exception Exception { get; set; }
+    }
+
+    internal enum RequestType
+    {
+        Command,
+        Ping
     }
 }

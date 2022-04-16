@@ -333,7 +333,10 @@ internal class DatabaseClient
         if (Disposed)
             return;
 
-        if (!connection.Ping())
+        while (_queue.QueueCount() > 0)
+            await Task.Delay(100);
+
+        if (!await _queue.RunPing(connection))
         {
             try
             {
