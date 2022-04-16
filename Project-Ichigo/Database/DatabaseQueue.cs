@@ -2,10 +2,14 @@
 
 internal class DatabaseQueue
 {
-    internal DatabaseQueue()
+    internal DatabaseQueue(Bot _bot)
     {
+        this._bot = _bot;
+
         _ = QueueHandler();
     }
+
+    public Bot _bot { get; private set; }
 
     internal async Task QueueHandler()
     {
@@ -53,7 +57,6 @@ internal class DatabaseQueue
                 {
                     LogError($"An exception occured while trying to execute a mysql command", ex);
                 }
-
                 catch (Exception ex)
                 {
                     Queue[b.Key].Failed = true;

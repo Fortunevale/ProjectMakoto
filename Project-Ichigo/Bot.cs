@@ -496,6 +496,18 @@ internal class Bot
                     LogRaised -= LogHandler;
                     _ = RunExitTasks(null, null);
                 }
+                else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
+                {
+                    _status.DataReaderExceptions++;
+
+                    if (_status.DataReaderExceptions >= 4)
+                    {
+                        LogFatal("4 or more DataReader Exceptions triggered, exiting..");
+
+                        LogRaised -= LogHandler;
+                        _ = RunExitTasks(null, null);
+                    }
+                }
 
                 _status.FatalRaised++;
                 break;
