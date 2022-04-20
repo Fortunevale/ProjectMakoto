@@ -9,7 +9,7 @@ internal class CollectionUpdates
 
     public Bot _bot { private get; set; }
 
-    internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated(KeyValuePair<ulong, ServerInfo.ServerSettings> b)
+    internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated(KeyValuePair<ulong, Guilds.ServerSettings> b)
     {
         return (s, e) =>
         {
@@ -17,7 +17,7 @@ internal class CollectionUpdates
         };
     }
 
-    internal NotifyCollectionChangedEventHandler AuditLogCollectionUpdated(KeyValuePair<ulong, ServerInfo.ServerSettings> b)
+    internal NotifyCollectionChangedEventHandler AuditLogCollectionUpdated(KeyValuePair<ulong, Guilds.ServerSettings> b)
     {
         return (s, e) =>
         {

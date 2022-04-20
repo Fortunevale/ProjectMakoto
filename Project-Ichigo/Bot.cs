@@ -5,33 +5,41 @@ internal class Bot
     internal DiscordClient discordClient;
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
+
     internal static DatabaseClient DatabaseClient { get; set; }
     internal DatabaseClient _databaseClient { get; set; }
-
     internal CollectionUpdates _collectionUpdates { get; set; }
 
+
     internal Status _status = new();
-    internal ServerInfo _guilds = new();
+    internal Guilds _guilds = new();
     internal Users _users = new();
+
 
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
 
     internal PhishingUrls _phishingUrls = new();
-    internal SubmissionBans _submissionBans = new();
+    internal PhishingSubmissionBans _submissionBans = new();
     internal SubmittedUrls _submittedUrls = new();
 
+
     internal GlobalBans _globalBans = new();
+
 
     internal ScoreSaberClient _scoreSaberClient { get; set; }
     internal CountryCodes _countryCodes { get; set; }
 
+
     internal BumpReminder.BumpReminder _bumpReminder { get; set; }
     internal ExperienceHandler _experienceHandler { get; set; }
 
+
     internal TaskWatcher.TaskWatcher _watcher = new();
+
 
     internal ILogger _logger { get; set; }
     internal ILoggerProvider _loggerProvider { get; set; }
+
 
     internal async Task Init(string[] args)
     {
@@ -441,7 +449,7 @@ internal class Bot
 
                     List<ulong> users = new();
 
-                    foreach (var b in _guilds.Servers)
+                    foreach (var b in _guilds.List)
                         foreach (var c in b.Value.Members)
                             if (!users.Contains(c.Key))
                                 users.Add(c.Key);
@@ -450,7 +458,7 @@ internal class Bot
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
-                    await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.DebugRaised}D {_status.InfoRaised}I {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
@@ -468,17 +476,6 @@ internal class Bot
     {
         switch (e.LogEntry.LogLevel)
         {
-            case LoggerObjects.LogLevel.DEBUG2:
-            case LoggerObjects.LogLevel.DEBUG:
-            {
-                _status.DebugRaised++;
-                break;
-            }
-            case LoggerObjects.LogLevel.INFO:
-            {
-                _status.InfoRaised++;
-                break;
-            }
             case LoggerObjects.LogLevel.WARN:
             {
                 _status.WarnRaised++;
@@ -512,6 +509,8 @@ internal class Bot
                 _status.FatalRaised++;
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -582,43 +581,43 @@ internal class Bot
 
                 foreach (var member in guildMembers)
                 {
-                    if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Id))
-                        _guilds.Servers[guild.Key].Members.Add(member.Id, new());
+                    if (!_guilds.List[guild.Key].Members.ContainsKey(member.Id))
+                        _guilds.List[guild.Key].Members.Add(member.Id, new());
 
-                    if (_guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
-                        _guilds.Servers[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
+                    if (_guilds.List[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                        _guilds.List[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
 
-                    if (_guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
-                        _guilds.Servers[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
+                    if (_guilds.List[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
+                        _guilds.List[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
 
-                    _guilds.Servers[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MembersRole
+                    _guilds.List[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
                     {
                         Id = x.Id,
                         Name = x.Name,
                     }).ToList();
 
-                    _guilds.Servers[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+                    _guilds.List[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
                 }
 
-                foreach (var databaseMember in _guilds.Servers[guild.Key].Members.ToList())
+                foreach (var databaseMember in _guilds.List[guild.Key].Members.ToList())
                 {
                     if (!guildMembers.Any(x => x.Id == databaseMember.Key))
                     {
-                        if (_guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
-                            _guilds.Servers[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
+                        if (_guilds.List[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                            _guilds.List[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
                     }
                 }
 
                 foreach (var banEntry in guildBans)
                 {
-                    if (!_guilds.Servers[guild.Key].Members.ContainsKey(banEntry.User.Id))
+                    if (!_guilds.List[guild.Key].Members.ContainsKey(banEntry.User.Id))
                         continue;
 
-                    if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
-                        _guilds.Servers[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+                    if (_guilds.List[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
+                        _guilds.List[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
 
-                    if (_guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
-                        _guilds.Servers[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
+                    if (_guilds.List[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
+                        _guilds.List[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                 }
 
                 startupTasksSuccess++;
@@ -662,19 +661,19 @@ internal class Bot
 
             foreach (var guild in e.Guilds)
             {
-                if (!_guilds.Servers.ContainsKey(guild.Key))
-                    _guilds.Servers.Add(guild.Key, new ServerInfo.ServerSettings());
+                if (!_guilds.List.ContainsKey(guild.Key))
+                    _guilds.List.Add(guild.Key, new Guilds.ServerSettings());
 
-                if (_guilds.Servers[guild.Key].BumpReminderSettings.Enabled)
+                if (_guilds.List[guild.Key].BumpReminderSettings.Enabled)
                 {
                     _bumpReminder.ScheduleBump(sender, guild.Key);
                 }
 
                 foreach (var member in guild.Value.Members)
                 {
-                    if (!_guilds.Servers[guild.Key].Members.ContainsKey(member.Value.Id))
+                    if (!_guilds.List[guild.Key].Members.ContainsKey(member.Value.Id))
                     {
-                        _guilds.Servers[guild.Key].Members.Add(member.Value.Id, new());
+                        _guilds.List[guild.Key].Members.Add(member.Value.Id, new());
                     }
 
                     _experienceHandler.CheckExperience(member.Key, guild.Value);

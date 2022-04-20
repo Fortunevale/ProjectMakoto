@@ -2,7 +2,7 @@
 
 internal class GlobalBans
 {
-    public Dictionary<ulong, BanInfo> Users = new();
+    public Dictionary<ulong, BanInfo> List = new();
 
     public class BanInfo
     {

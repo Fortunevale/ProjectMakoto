@@ -15,8 +15,8 @@ internal class AfkStatus
 
 
 
-    private List<AfkStatusMessageCache> _Messages { get; set; } = new();
-    public List<AfkStatusMessageCache> Messages
+    private List<MessageDetails> _Messages { get; set; } = new();
+    public List<MessageDetails> Messages
     {
         get
         {

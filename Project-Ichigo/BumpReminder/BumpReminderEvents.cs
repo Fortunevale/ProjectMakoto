@@ -16,15 +16,15 @@ internal class BumpReminderEvents
             if (e.Guild is null)
                 return;
 
-            if (!_bot._guilds.Servers.ContainsKey(e.Guild.Id))
-                _bot._guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+            if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
+                _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
 
-            if (e.Channel.IsPrivate || !_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+            if (e.Channel.IsPrivate || !_bot._guilds.List[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.List[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
             DiscordUser bUser = null;
 
-            var getuser = sender.GetUserAsync(_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId, true).ContinueWith(x =>
+            var getuser = sender.GetUserAsync(_bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastUserId, true).ContinueWith(x =>
             {
                 if (x.IsCompletedSuccessfully)
                     bUser = x.Result;
@@ -40,8 +40,8 @@ internal class BumpReminderEvents
 
             if (e.Message.Embeds[0].Description.ToLower().Contains(":thumbsup:"))
             {
-                _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow;
-                _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow;
+                _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow;
+                _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow;
 
 
                 try
@@ -62,14 +62,14 @@ internal class BumpReminderEvents
                         _bumper = await e.Guild.GetMemberAsync(Convert.ToUInt64(Regex.Match(Mentions.First(), @"\d+").Value));
                     }
 
-                    _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId = _bumper.Id;
+                    _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastUserId = _bumper.Id;
 
                     e.Channel.SendMessageAsync($"**{_bumper.Mention} Thanks a lot for supporting the server!**\n\n" +
                                                $"_**You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message!**_").Add(_bot._watcher);
 
                     try
                     {
-                        if (_bot._guilds.Servers[e.Guild.Id].ExperienceSettings.UseExperience && _bot._guilds.Servers[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
+                        if (_bot._guilds.List[e.Guild.Id].ExperienceSettings.UseExperience && _bot._guilds.List[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
                             _bot._experienceHandler.ModifyExperience(_bumper, e.Guild, e.Channel, 50);
                     }
                     catch { }
@@ -78,13 +78,13 @@ internal class BumpReminderEvents
                 }
                 catch (Exception)
                 {
-                    _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
+                    _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
                     throw;
                 }
             }
             else
             {
-                if (_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump < DateTime.UtcNow.AddHours(-2))
+                if (_bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastBump < DateTime.UtcNow.AddHours(-2))
                 {
                     if (e.Message.Embeds[0].Description.ToLower().Contains("please wait another"))
                     {
@@ -95,12 +95,12 @@ internal class BumpReminderEvents
                             _embedDescription = _embedDescription.Remove(0, _embedDescription.IndexOf(">"));
                             int _minutes = Int32.Parse(Regex.Match(_embedDescription, @"\d+").Value);
 
-                            _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddMinutes(_minutes - 120);
-                            _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddMinutes(_minutes - 120);
-                            _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
+                            _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddMinutes(_minutes - 120);
+                            _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddMinutes(_minutes - 120);
+                            _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
                             e.Channel.SendMessageAsync($":warning: It seems the last bump was not registered properly.\n" +
-                                $"The last time the server was bumped was determined to be around {Formatter.Timestamp(_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}.").Add(_bot._watcher);
+                                $"The last time the server was bumped was determined to be around {Formatter.Timestamp(_bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}.").Add(_bot._watcher);
 
                             _bot._bumpReminder.ScheduleBump(sender, e.Guild.Id);
                         }
@@ -115,14 +115,14 @@ internal class BumpReminderEvents
     {
         Task.Run(async () =>
         {
-            if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+            if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.List[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.List[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.PersistentMessageId)
+            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.PersistentMessageId)
             {
                 DiscordUser bUser = null;
 
-                var getuser = sender.GetUserAsync(_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.LastUserId, true).ContinueWith(x =>
+                var getuser = sender.GetUserAsync(_bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastUserId, true).ContinueWith(x =>
                 {
                     if (x.IsCompletedSuccessfully)
                         bUser = x.Result;
@@ -139,14 +139,14 @@ internal class BumpReminderEvents
     {
         Task.Run(async () =>
         {
-            if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+            if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.List[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.List[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
+            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
             {
                 var member = await e.Guild.GetMemberAsync(e.User.Id);
 
-                await member.GrantRoleAsync(e.Guild.GetRole(_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId));
+                await member.GrantRoleAsync(e.Guild.GetRole(_bot._guilds.List[e.Guild.Id].BumpReminderSettings.RoleId));
             }
         }).Add(_bot._watcher);
     }
@@ -155,14 +155,14 @@ internal class BumpReminderEvents
     {
         Task.Run(async () =>
         {
-            if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.ChannelId)
+            if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.List[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.List[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
+            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
             {
                 var member = await e.Guild.GetMemberAsync(e.User.Id);
 
-                await member.RevokeRoleAsync(e.Guild.GetRole(_bot._guilds.Servers[e.Guild.Id].BumpReminderSettings.RoleId));
+                await member.RevokeRoleAsync(e.Guild.GetRole(_bot._guilds.List[e.Guild.Id].BumpReminderSettings.RoleId));
             }
         }).Add(_bot._watcher);
     }

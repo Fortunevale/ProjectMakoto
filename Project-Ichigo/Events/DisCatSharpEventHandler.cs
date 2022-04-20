@@ -27,7 +27,7 @@ internal class DisCatSharpEventHandler
     AfkEvents afkEvents { get; set; }
     CrosspostEvents crosspostEvents { get; set; }
     PhishingProtectionEvents phishingProtectionEvents { get; set; }
-    SubmissionEvents submissionEvents { get; set; }
+    PhishingSubmissionEvents submissionEvents { get; set; }
     DiscordEvents discordEvents { get; set; }
     ActionlogEvents actionlogEvents { get; set; }
     JoinEvents joinEvents { get; set; }

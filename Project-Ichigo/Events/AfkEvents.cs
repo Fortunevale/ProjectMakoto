@@ -79,7 +79,7 @@ internal class AfkEvents
 
                         if (_bot._users.List[b.Id].AfkStatus.Messages.Count < 5)
                         {
-                            _bot._users.List[b.Id].AfkStatus.Messages.Add(new AfkStatusMessageCache
+                            _bot._users.List[b.Id].AfkStatus.Messages.Add(new MessageDetails
                             {
                                 AuthorId = e.Author.Id,
                                 ChannelId = e.Channel.Id,

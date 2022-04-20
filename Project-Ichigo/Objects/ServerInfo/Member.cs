@@ -1,6 +1,6 @@
 ﻿namespace Project_Ichigo.Objects;
 
-internal class Members
+internal class Member
 {
     private string _SavedNickname { get; set; } = "";
     public string SavedNickname { get => _SavedNickname; set { _SavedNickname = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
@@ -37,5 +37,5 @@ internal class Members
 
 
 
-    public List<MembersRole> MemberRoles { get; set; } = new();
+    public List<MemberRole> MemberRoles { get; set; } = new();
 }

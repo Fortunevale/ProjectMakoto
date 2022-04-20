@@ -32,7 +32,7 @@ internal class DatabaseInit
         IEnumerable<DatabaseServerSettings> serverSettings = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseServerSettings>(_bot._databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
         foreach (var b in serverSettings)
-            _bot._guilds.Servers.Add(b.serverid, new ServerInfo.ServerSettings
+            _bot._guilds.List.Add(b.serverid, new Guilds.ServerSettings
             {
                 PhishingDetectionSettings = new()
                 {
@@ -65,7 +65,7 @@ internal class DatabaseInit
                     UseExperience = b.experience_use,
                     BoostXpForBumpReminder = b.experience_boost_bumpreminder
                 },
-                LevelRewards = JsonConvert.DeserializeObject<List<LevelRewards>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
+                LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
                 ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
                 CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
                 ActionLogSettings = new()
@@ -85,7 +85,7 @@ internal class DatabaseInit
                 }
             });
 
-        foreach (var b in _bot._guilds.Servers)
+        foreach (var b in _bot._guilds.List)
             try
             {
                 b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
@@ -93,13 +93,13 @@ internal class DatabaseInit
             }
             catch { }
 
-        foreach (var b in _bot._guilds.Servers)
+        foreach (var b in _bot._guilds.List)
         {
             b.Value.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
             b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);
         }
 
-        LogInfo($"Loaded {_bot._guilds.Servers.Count} guilds from table 'guilds'.");
+        LogInfo($"Loaded {_bot._guilds.List.Count} guilds from table 'guilds'.");
 
         foreach (var table in await _bot._databaseClient._helper.ListTables(_bot._databaseClient.guildDatabaseConnection))
         {
@@ -115,7 +115,7 @@ internal class DatabaseInit
                 LogDebug($"Loading members from table '{table}'..");
                 IEnumerable<DatabaseMembers> memberList = _bot._databaseClient.guildDatabaseConnection.Query<DatabaseMembers>(_bot._databaseClient._helper.GetLoadCommand(table, DatabaseColumnLists.guild_users));
 
-                if (!_bot._guilds.Servers.ContainsKey(Convert.ToUInt64(table)))
+                if (!_bot._guilds.List.ContainsKey(Convert.ToUInt64(table)))
                 {
                     LogWarn($"Table '{table}' has no server attached to it. Dropping table.");
                     await _bot._databaseClient._helper.DropTable(_bot._databaseClient.guildDatabaseConnection, table);
@@ -123,18 +123,18 @@ internal class DatabaseInit
                 }
 
                 foreach (var b in memberList)
-                    _bot._guilds.Servers[Convert.ToUInt64(table)].Members.Add(b.userid, new Members
+                    _bot._guilds.List[Convert.ToUInt64(table)].Members.Add(b.userid, new Member
                     {
                         Level = b.experience_level,
                         Experience = b.experience,
                         Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message)),
                         FirstJoinDate = (b.first_join == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.first_join)),
                         LastLeaveDate = (b.last_leave == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.last_leave)),
-                        MemberRoles = JsonConvert.DeserializeObject<List<MembersRole>>((b.roles is null or "null" or "" ? "[]" : b.roles)),
+                        MemberRoles = JsonConvert.DeserializeObject<List<MemberRole>>((b.roles is null or "null" or "" ? "[]" : b.roles)),
                         SavedNickname = b.saved_nickname
                     });
 
-                LogInfo($"Loaded {_bot._guilds.Servers[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
+                LogInfo($"Loaded {_bot._guilds.List[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
             }
         }
 
@@ -156,7 +156,7 @@ internal class DatabaseInit
                 {
                     Reason = b.afk_reason,
                     TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since)),
-                    Messages = JsonConvert.DeserializeObject<List<AfkStatusMessageCache>>(b.afk_pings),
+                    Messages = JsonConvert.DeserializeObject<List<MessageDetails>>(b.afk_pings),
                     MessagesAmount = b.afk_pingamount
                 },
                 ScoreSaber = new()
@@ -178,13 +178,13 @@ internal class DatabaseInit
         IEnumerable<DatabaseBanInfo> globalbans = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot._databaseClient._helper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
 
         foreach (var b in globalbans)
-            _bot._globalBans.Users.Add(b.id, new GlobalBans.BanInfo
+            _bot._globalBans.List.Add(b.id, new GlobalBans.BanInfo
             {
                 Reason = b.reason,
                 Moderator = b.moderator
             });
 
-        LogInfo($"Loaded {_bot._globalBans.Users.Count} submission bans from table 'globalbans'.");
+        LogInfo($"Loaded {_bot._globalBans.List.Count} submission bans from table 'globalbans'.");
 
 
 
@@ -193,13 +193,13 @@ internal class DatabaseInit
         IEnumerable<DatabaseBanInfo> userbans = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot._databaseClient._helper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
 
         foreach (var b in userbans)
-            _bot._submissionBans.BannedUsers.Add(b.id, new SubmissionBans.BanInfo
+            _bot._submissionBans.Users.Add(b.id, new PhishingSubmissionBans.BanInfo
             {
                 Reason = b.reason,
                 Moderator = b.moderator
             });
 
-        LogInfo($"Loaded {_bot._submissionBans.BannedUsers.Count} submission bans from table 'user_submission_bans'.");
+        LogInfo($"Loaded {_bot._submissionBans.Users.Count} submission bans from table 'user_submission_bans'.");
 
 
 
@@ -208,13 +208,13 @@ internal class DatabaseInit
         IEnumerable<DatabaseBanInfo> guildbans = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot._databaseClient._helper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
 
         foreach (var b in guildbans)
-            _bot._submissionBans.BannedGuilds.Add(b.id, new SubmissionBans.BanInfo
+            _bot._submissionBans.Guilds.Add(b.id, new PhishingSubmissionBans.BanInfo
             {
                 Reason = b.reason,
                 Moderator = b.moderator
             });
 
-        LogInfo($"Loaded {_bot._submissionBans.BannedGuilds.Count} submission bans from table 'guild_submission_bans'.");
+        LogInfo($"Loaded {_bot._submissionBans.Guilds.Count} submission bans from table 'guild_submission_bans'.");
 
 
 
@@ -223,14 +223,14 @@ internal class DatabaseInit
         IEnumerable<DatabaseSubmittedUrls> active_submissions = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseSubmittedUrls>(_bot._databaseClient._helper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
 
         foreach (var b in active_submissions)
-            _bot._submittedUrls.Urls.Add(b.messageid, new SubmittedUrls.UrlInfo
+            _bot._submittedUrls.List.Add(b.messageid, new SubmittedUrls.UrlInfo
             {
                 Url = b.url,
                 Submitter = b.submitter,
                 GuildOrigin = b.guild
             });
 
-        LogInfo($"Loaded {_bot._submittedUrls.Urls.Count} active submissions from table 'active_url_submissions'.");
+        LogInfo($"Loaded {_bot._submittedUrls.List.Count} active submissions from table 'active_url_submissions'.");
     }
 
     internal async Task UpdateCountryCodes()

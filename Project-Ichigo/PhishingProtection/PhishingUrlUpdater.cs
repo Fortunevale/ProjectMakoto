@@ -165,6 +165,7 @@ internal class PhishingUrlUpdater
         foreach (var url in new string[]
         {
             "https://raw.githubusercontent.com/nikolaischunk/discord-tokenlogger-link-list/main/domain-list.json",
+            "https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json",
             "https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt",
             "https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt",
             "https://fortunevale.dd-dns.de/discord-scam-urls.txt",

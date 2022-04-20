@@ -1,5 +1,6 @@
-﻿namespace Project_Ichigo.Objects;
-internal class AfkStatusMessageCache
+﻿namespace Project_Ichigo.Objects.Afk;
+
+internal class MessageDetails
 {
     private ulong _MessageId { get; set; } = 0;
     public ulong MessageId { get => _MessageId; set { _MessageId = value; _ = Bot.DatabaseClient.SyncDatabase(); } }

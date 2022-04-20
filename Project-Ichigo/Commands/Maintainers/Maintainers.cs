@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Commands.Admin;
+﻿namespace Project_Ichigo.Commands.Maintainers;
 internal class Maintainers : BaseCommandModule
 {
     public Bot _bot { private get; set; }
@@ -133,17 +133,17 @@ internal class Maintainers : BaseCommandModule
                 return;
             }
 
-            _bot._globalBans.Users.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
+            _bot._globalBans.List.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
 
             int Success = 0;
             int Failed = 0;
 
             foreach (var b in ctx.Client.Guilds)
             {
-                if (!_bot._guilds.Servers.ContainsKey(b.Key))
-                    _bot._guilds.Servers.Add(b.Key, new ServerInfo.ServerSettings());
+                if (!_bot._guilds.List.ContainsKey(b.Key))
+                    _bot._guilds.List.Add(b.Key, new Guilds.ServerSettings());
 
-                if (_bot._guilds.Servers[b.Key].JoinSettings.AutoBanGlobalBans)
+                if (_bot._guilds.List[b.Key].JoinSettings.AutoBanGlobalBans)
                 {
                     try
                     {
@@ -176,7 +176,7 @@ internal class Maintainers : BaseCommandModule
             if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
-            _bot._globalBans.Users.Remove(victim.Id);
+            _bot._globalBans.List.Remove(victim.Id);
             await _bot._databaseClient._helper.DeleteRow(_bot._databaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -225,10 +225,10 @@ internal class Maintainers : BaseCommandModule
                                 if ((long)user.Value.Experience <= 0)
                                     continue;
 
-                                if (!_bot._guilds.Servers[ctx.Guild.Id].Members.ContainsKey(user.Key))
-                                    _bot._guilds.Servers[ctx.Guild.Id].Members.Add(user.Key, new());
+                                if (!_bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(user.Key))
+                                    _bot._guilds.List[ctx.Guild.Id].Members.Add(user.Key, new());
 
-                                _bot._guilds.Servers[ctx.Guild.Id].Members[user.Key].Experience = (long)user.Value.Experience;
+                                _bot._guilds.List[ctx.Guild.Id].Members[user.Key].Experience = (long)user.Value.Experience;
                                 _bot._experienceHandler.CheckExperience(user.Key, ctx.Guild);
                             }
                         }

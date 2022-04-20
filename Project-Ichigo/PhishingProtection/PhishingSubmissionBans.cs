@@ -1,9 +1,9 @@
 ﻿namespace Project_Ichigo.PhishingProtection;
 
-internal class SubmissionBans
+internal class PhishingSubmissionBans
 {
-    public Dictionary<ulong, BanInfo> BannedUsers = new();
-    public Dictionary<ulong, BanInfo> BannedGuilds = new();
+    public Dictionary<ulong, BanInfo> Users = new();
+    public Dictionary<ulong, BanInfo> Guilds = new();
 
     public class BanInfo
     {

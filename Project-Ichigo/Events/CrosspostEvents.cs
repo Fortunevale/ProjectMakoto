@@ -13,14 +13,14 @@ internal class CrosspostEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot._guilds.Servers.ContainsKey(e.Guild.Id))
-                _bot._guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+            if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
+                _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
 
-            foreach (var b in _bot._guilds.Servers[e.Guild.Id].CrosspostChannels.ToList())
+            foreach (var b in _bot._guilds.List[e.Guild.Id].CrosspostChannels.ToList())
                 if (!e.Guild.Channels.ContainsKey(b))
-                    _bot._guilds.Servers[e.Guild.Id].CrosspostChannels.Remove(b);
+                    _bot._guilds.List[e.Guild.Id].CrosspostChannels.Remove(b);
 
-            if (_bot._guilds.Servers[e.Guild.Id].CrosspostChannels.Contains(e.Channel.Id))
+            if (_bot._guilds.List[e.Guild.Id].CrosspostChannels.Contains(e.Channel.Id))
             {
                 if (e.Channel.Type == ChannelType.News)
                 {

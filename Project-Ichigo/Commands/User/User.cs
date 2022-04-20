@@ -293,11 +293,11 @@ internal class User : BaseCommandModule
         {
             try
             {
-                if (!_bot._guilds.Servers.ContainsKey(ctx.Guild.Id))
-                    _bot._guilds.Servers.Add(ctx.Guild.Id, new ServerInfo.ServerSettings());
+                if (!_bot._guilds.List.ContainsKey(ctx.Guild.Id))
+                    _bot._guilds.List.Add(ctx.Guild.Id, new Guilds.ServerSettings());
 
-                if (!_bot._guilds.Servers[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                    _bot._guilds.Servers[ctx.Guild.Id].Members.Add(victim.Id, new());
+                if (!_bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                    _bot._guilds.List[ctx.Guild.Id].Members.Add(victim.Id, new());
 
                 DiscordMember bMember = null;
 
@@ -328,8 +328,8 @@ internal class User : BaseCommandModule
                 }
                 else
                 {
-                    if (_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
-                        GenerateRoles = string.Join(", ", _bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
+                    if (_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
+                        GenerateRoles = string.Join(", ", _bot._guilds.List[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
                     else
                         GenerateRoles = "`User doesn't have any stored roles.`";
                 }
@@ -357,7 +357,7 @@ internal class User : BaseCommandModule
 
                 if (bMember is null)
                 {
-                    if (_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch)
+                    if (_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch)
                     {
                         embed.Description += "\n\n`User never joined this server.`";
                     }
@@ -388,10 +388,10 @@ internal class User : BaseCommandModule
                 if (bMember is not null)
                     embed.AddField(new DiscordEmbedField("Joined at", $"{Formatter.Timestamp(bMember.JoinedAt.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(bMember.JoinedAt.ToUniversalTime())})", true));
                 else
-                    embed.AddField(new DiscordEmbedField("Left at", $"{Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})", true));
+                    embed.AddField(new DiscordEmbedField("Left at", $"{Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})", true));
 
 
-                embed.AddField(new DiscordEmbedField("First joined at", $"{Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})", true));
+                embed.AddField(new DiscordEmbedField("First joined at", $"{Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})", true));
 
                 embed.AddField(new DiscordEmbedField("Invited by", $"`Not yet implemented.`", true));
 
@@ -456,7 +456,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -474,8 +474,8 @@ internal class User : BaseCommandModule
                 victim = ctx.Member;
             }
 
-            long current = (long)Math.Floor((decimal)(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
-            long max = (long)Math.Floor((decimal)(_bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level) - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+            long current = (long)Math.Floor((decimal)(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+            long max = (long)Math.Floor((decimal)(_bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level) - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level - 1)));
 
             _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
             {
@@ -484,8 +484,8 @@ internal class User : BaseCommandModule
                     Name = $"Experience • {ctx.Guild.Name}",
                     IconUrl = ctx.Guild.IconUrl
                 },
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
-                              $"**Level {(_bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
+                              $"**Level {(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
@@ -509,7 +509,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (!_bot._guilds.Servers[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -551,7 +551,7 @@ internal class User : BaseCommandModule
 
             int currentuserplacement = 0;
 
-            foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
             {
                 currentuserplacement++;
                 if (b.Key == ctx.User.Id)
@@ -562,7 +562,7 @@ internal class User : BaseCommandModule
 
             List<KeyValuePair<string, string>> Board = new();
 
-            foreach (var b in _bot._guilds.Servers[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
             {
                 try
                 {
@@ -704,20 +704,20 @@ internal class User : BaseCommandModule
                 return;
             }
 
-            if (_bot._submissionBans.BannedUsers.ContainsKey(ctx.User.Id))
+            if (_bot._submissionBans.Users.ContainsKey(ctx.User.Id))
             {
                 embed.Description = $"`You are banned from submitting URLs.`\n" +
-                                    $"`Reason: {_bot._submissionBans.BannedUsers[ctx.User.Id].Reason}`";
+                                    $"`Reason: {_bot._submissionBans.Users[ctx.User.Id].Reason}`";
                 embed.Color = ColorHelper.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
                 return;
             }
 
-            if (_bot._submissionBans.BannedGuilds.ContainsKey(ctx.Guild.Id))
+            if (_bot._submissionBans.Guilds.ContainsKey(ctx.Guild.Id))
             {
                 embed.Description = $"`This guild is banned from submitting URLs.`\n" +
-                                    $"`Reason: {_bot._submissionBans.BannedGuilds[ctx.Guild.Id].Reason}`";
+                                    $"`Reason: {_bot._submissionBans.Guilds[ctx.Guild.Id].Reason}`";
                 embed.Color = ColorHelper.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
@@ -795,7 +795,7 @@ internal class User : BaseCommandModule
                                 embed.Description = $"`Checking if your domain has already been submitted before..`";
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                foreach (var b in _bot._submittedUrls.Urls)
+                                foreach (var b in _bot._submittedUrls.List)
                                 {
                                     if (b.Value.Url == domain)
                                     {
@@ -833,7 +833,7 @@ internal class User : BaseCommandModule
                                         { ban_guild_button },
                                     }));
 
-                                _bot._submittedUrls.Urls.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
+                                _bot._submittedUrls.List.Add(subbmited_msg.Id, new SubmittedUrls.UrlInfo
                                 {
                                     Url = domain,
                                     Submitter = ctx.User.Id,

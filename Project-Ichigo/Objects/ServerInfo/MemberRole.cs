@@ -1,6 +1,6 @@
 ﻿namespace Project_Ichigo.Objects;
 
-internal class MembersRole
+internal class MemberRole
 {
     public string Name { get; set; }
     public ulong Id { get; set; }

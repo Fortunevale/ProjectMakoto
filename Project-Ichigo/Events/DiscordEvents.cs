@@ -15,16 +15,16 @@ internal class DiscordEvents
     {
         Task.Run(() =>
         {
-            if (!_bot._guilds.Servers.ContainsKey(e.Guild.Id))
-                _bot._guilds.Servers.Add(e.Guild.Id, new ServerInfo.ServerSettings());
+            if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
+                _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
 
             foreach (var guild in sender.Guilds)
             {
-                if (!_bot._guilds.Servers.ContainsKey(guild.Key))
-                    _bot._guilds.Servers.Add(guild.Key, new ServerInfo.ServerSettings());
+                if (!_bot._guilds.List.ContainsKey(guild.Key))
+                    _bot._guilds.List.Add(guild.Key, new Guilds.ServerSettings());
             }
 
-            foreach (var b in _bot._guilds.Servers)
+            foreach (var b in _bot._guilds.List)
                 try
                 {
                     b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
@@ -32,7 +32,7 @@ internal class DiscordEvents
                 }
                 catch { }
 
-            foreach (var b in _bot._guilds.Servers)
+            foreach (var b in _bot._guilds.List)
             {
                 b.Value.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
                 b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);

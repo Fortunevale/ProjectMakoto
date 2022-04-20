@@ -1,6 +1,6 @@
 ﻿namespace Project_Ichigo.Objects;
 
-internal class LevelRewards
+internal class LevelReward
 {
     public long Level { get; set; }
     public ulong RoleId { get; set; }

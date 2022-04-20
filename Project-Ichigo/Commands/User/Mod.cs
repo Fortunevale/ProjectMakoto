@@ -826,14 +826,14 @@ internal class Mod : BaseCommandModule
                 return;
             }
 
-            if (!_bot._guilds.Servers.ContainsKey(ctx.Guild.Id))
-                _bot._guilds.Servers.Add(ctx.Guild.Id, new ServerInfo.ServerSettings());
+            if (!_bot._guilds.List.ContainsKey(ctx.Guild.Id))
+                _bot._guilds.List.Add(ctx.Guild.Id, new Guilds.ServerSettings());
 
-            if (!_bot._guilds.Servers[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                _bot._guilds.Servers[ctx.Guild.Id].Members.Add(victim.Id, new());
+            if (!_bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                _bot._guilds.List[ctx.Guild.Id].Members.Add(victim.Id, new());
 
-            _bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
-            _bot._guilds.Servers[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
+            _bot._guilds.List[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
+            _bot._guilds.List[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
 
             _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
