@@ -5,6 +5,7 @@ public class DatabaseServerSettings
     public ulong serverid { get; set; }
     public string levelrewards { get; set; }
     public string auditlogcache { get; set; }
+    public string reactionroles { get; set; }
     public string crosspostchannels { get; set; }
     public bool reapplyroles { get; set; }
     public bool reapplynickname { get; set; }

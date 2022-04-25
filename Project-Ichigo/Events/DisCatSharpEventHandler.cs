@@ -17,6 +17,7 @@ internal class DisCatSharpEventHandler
         joinEvents = new(_bot);
         bumpReminderEvents = new(_bot);
         experienceEvents = new(_bot);
+        reactionRoleEvents = new(_bot);
     }
 
 
@@ -33,6 +34,7 @@ internal class DisCatSharpEventHandler
     JoinEvents joinEvents { get; set; }
     BumpReminderEvents bumpReminderEvents { get; set; }
     ExperienceEvents experienceEvents { get; set; }
+    ReactionRoleEvents reactionRoleEvents { get; set; }
 
 
 
@@ -161,10 +163,12 @@ internal class DisCatSharpEventHandler
     internal async Task MessageReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)
     {
         _ = bumpReminderEvents.ReactionAdded(sender, e);
+        _ = reactionRoleEvents.MessageReactionAdded(sender, e);
     }
 
     internal async Task MessageReactionRemoved(DiscordClient sender, MessageReactionRemoveEventArgs e)
     {
         _ = bumpReminderEvents.ReactionRemoved(sender, e);
+        _ = reactionRoleEvents.MessageReactionRemoved(sender, e);
     }
 }

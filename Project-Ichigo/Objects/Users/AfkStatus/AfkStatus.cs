@@ -1,4 +1,5 @@
-﻿namespace Project_Ichigo.Objects;
+﻿namespace Project_Ichigo.Objects.Afk;
+
 internal class AfkStatus
 {
     private string _Reason { get; set; } = "";

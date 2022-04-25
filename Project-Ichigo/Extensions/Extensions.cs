@@ -182,6 +182,105 @@ internal static class Extensions
         return DiscordEmoji.FromName(client, colorArray[color]);
     }
 
+    internal static bool TryGetMessage(this DiscordChannel channel, ulong id, out DiscordMessage discordMessage)
+    {
+        try
+        {
+            var msg = channel.GetMessageAsync(id).Result;
+            discordMessage = msg;
+            return true;
+        }
+        catch (DisCatSharp.Exceptions.NotFoundException)
+        {
+            discordMessage = null;
+            return false;
+        }
+        catch (DisCatSharp.Exceptions.UnauthorizedException)
+        {
+            discordMessage = null;
+            return false;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    internal static bool TryParseMessageLink(this string link, out ulong GuildId, out ulong ChannelId, out ulong MessageId)
+    {
+        try
+        {
+            if (!Regex.IsMatch(link, Resources.Regex.DiscordChannelUrl))
+                throw new Exception("Not a discord channel url");
+
+            string processed = link.Remove(0, link.IndexOf("channels/") + 9);
+
+            GuildId = Convert.ToUInt64(processed.Remove(processed.IndexOf("/"), processed.Length - processed.IndexOf("/")));
+            processed = processed.Remove(0, processed.IndexOf("/") + 1);
+
+            ChannelId = Convert.ToUInt64(processed.Remove(processed.IndexOf("/"), processed.Length - processed.IndexOf("/")));
+            processed = processed.Remove(0, processed.IndexOf("/") + 1);
+
+            MessageId = Convert.ToUInt64(processed);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            LogError("Failed to process channel link", ex);
+
+            GuildId = 0;
+            ChannelId = 0;
+            MessageId = 0;
+            return false;
+        }
+    }
+
+    internal static bool TryParseRole(this string str, DiscordGuild guild, out DiscordRole Role)
+    {
+        try
+        {
+            if (!DisCatSharp.Common.RegularExpressions.DiscordRegEx.Role.IsMatch(str))
+            {
+                if (!str.IsDigitsOnly())
+                    throw new Exception("Not a role id");
+
+                ulong id = Convert.ToUInt64(str);
+
+                if (!guild.Roles.ContainsKey(id))
+                    throw new Exception("Guild doesn't have role");
+
+                Role = guild.GetRole(id);
+                return true;
+            }
+
+            var match_str = Regex.Match(str, @"\d*").Value;
+
+            if (!match_str.IsDigitsOnly())
+                throw new Exception("Not a role id");
+
+            ulong id0 = Convert.ToUInt64(match_str);
+
+            if (!guild.Roles.ContainsKey(id0))
+                throw new Exception("Guild doesn't have role");
+
+            Role = guild.GetRole(id0);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            LogError("Failed to process role", ex);
+
+            Role = null;
+            return false;
+        }
+    }
+
+    internal static string GetUniqueDiscordName(this DiscordEmoji emoji)
+    {
+        return $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
+    }
+
     //internal static bool IsProtected(this DiscordMember member)
     //{
     //    if (member.Roles.Any(x => x.Id == Objects.Settings.basicPermissionsRoleId) ||

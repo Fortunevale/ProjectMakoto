@@ -426,6 +426,7 @@ internal class DatabaseClient
                             levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
                             auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
                             crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostChannels),
+                            reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
 
                             actionlog_channel = x.Value.ActionLogSettings.Channel,
                             actionlog_attempt_further_detail = x.Value.ActionLogSettings.AttemptGettingMoreDetails,
@@ -462,6 +463,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"joinlog_channel_id{i}", DatabaseInserts[i].joinlog_channel_id);
                             cmd.Parameters.AddWithValue($"autoban_global_ban{i}", DatabaseInserts[i].autoban_global_ban);
 
+                            cmd.Parameters.AddWithValue($"reactionroles{i}", DatabaseInserts[i].reactionroles);
                             cmd.Parameters.AddWithValue($"levelrewards{i}", DatabaseInserts[i].levelrewards);
                             cmd.Parameters.AddWithValue($"auditlogcache{i}", DatabaseInserts[i].auditlogcache);
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);

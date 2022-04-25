@@ -1677,7 +1677,7 @@ internal class Admin : BaseCommandModule
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows all active autocrosspost channels._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
                 });
             }
@@ -1862,6 +1862,621 @@ internal class Admin : BaseCommandModule
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
                 }
                 catch { }
+            }
+            else
+            {
+                await SendHelp(ctx);
+                return;
+            }
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("reactionroles"),
+    CommandModule("admin"),
+    Description("Allows to review, change settings for reactionroles")]
+    public async Task ReactionRoles(CommandContext ctx, [Description("Action")] string action = "help", DiscordEmoji emoji_parameter = null, DiscordRole role_parameter = null)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.Member.IsAdmin(_bot._status))
+            {
+                _ = ctx.SendAdminError();
+                return;
+            }
+
+            static async Task SendHelp(CommandContext ctx)
+            {
+                DiscordEmbedBuilder embed = new()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows all currently active reaction roles._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to add, delete and modify reaction roles._\n\n\n" +
+                                                    $"**Harder, but faster commands**\n" +
+                                                    $"_These commands are less user-friendly but if used correctly, can be faster than using `{ctx.Prefix}{ctx.Command.Name} config`._\n\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} add <MessageReply> <Emoji> <@Role>` - _Adds a new reaction role to the mentioned message._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} remove <MessageReply> <Emoji>` - _Removes a reaction role from the mentioned message._\n" +
+                                                    $"`{ctx.Prefix}{ctx.Command.Name} removeall <MessageReply>` - _Removes all reaction roles from the mentioned message._\n\n" +
+                                                    $"_To fulfill the `<MessageReply>` requirement, simply reply to a message you want to perform the action on._",
+                    ImageUrl = "https://media.discordapp.net/attachments/906976602557145110/967751607418761257/unknown.png"
+                };
+                await ctx.Channel.SendMessageAsync(embed);
+            }
+
+            foreach (var b in _bot._guilds.List[ctx.Guild.Id].ReactionRoles.ToList())
+            {
+                if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
+                {
+                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
+                    continue;
+                }
+
+                if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
+                {
+                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
+                    continue;
+                }
+
+                var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
+
+                if (!channel.TryGetMessage(b.Key, out DiscordMessage msg))
+                {
+                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
+                    continue;
+                }
+
+                if (!msg.Reactions.Any(x => x.Emoji.Id == b.Value.EmojiId && x.Emoji.GetUniqueDiscordName() == b.Value.EmojiName && x.IsMe))
+                {
+                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
+                    continue;
+                }
+            }
+
+            if (action.ToLower() == "help")
+            {
+                await SendHelp(ctx);
+                return;
+            }
+            else if (action.ToLower() is "review" or "list")
+            {
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Loading,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = "`Loading Reaction Roles..`"
+                });
+
+                string Desc = "";
+
+                if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count == 0)
+                {
+                    await msg.ModifyAsync(new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = "`No reaction roles are set up.`"
+                    }.Build());
+                    return;
+                }
+
+                foreach (var b in _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles)
+                {
+                    var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
+                    var role = ctx.Guild.GetRole(b.Value.RoleId);
+                    var message = await channel.GetMessageAsync(b.Key);
+
+                    Desc += $"[`Message`]({message.JumpLink}) in {channel.Mention} `[#{channel.Name}]`\n" +
+                            $"{b.Value.GetEmoji(ctx.Client)} - {role.Mention} `{role.Name}`\n\n";
+                }
+
+                await msg.ModifyAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = Desc
+                }.Build());
+                return;
+            }
+            else if (action.ToLower() == "config")
+            {
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Loading,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = "`Loading Reaction Roles..`"
+                });
+
+                string Desc = "";
+
+                if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count == 0)
+                {
+                    Desc = "`No reaction roles are set up.`";
+                }
+
+                if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count != 0)
+                    foreach (var b in _bot._guilds.List[ctx.Guild.Id].ReactionRoles)
+                    {
+                        var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
+                        var role = ctx.Guild.GetRole(b.Value.RoleId);
+                        var message = await channel.GetMessageAsync(b.Key);
+
+                        Desc += $"[`Message`]({message.JumpLink}) in {channel.Mention} `[#{channel.Name}]`\n" +
+                                $"{b.Value.GetEmoji(ctx.Client)} - {role.Mention} `{role.Name}`\n\n";
+                    }
+
+                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "Add", "Add a new reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
+                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "Remove", "Remove a reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_multiplication_x:")));
+                var CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
+
+                var embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.Info,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = Desc
+                };
+
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { AddButton, RemoveButton, CancelButton }));
+
+                CancellationTokenSource cancellationTokenSource = new();
+                ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            cancellationTokenSource.Cancel();
+                            cancellationTokenSource = new();
+
+                            if (e.Interaction.Data.CustomId == "Add")
+                            {
+                                var action_embed = new DiscordEmbedBuilder
+                                {
+                                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                                    Color = ColorHelper.AwaitingInput,
+                                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                                    Timestamp = DateTime.UtcNow,
+                                    Description = "`Please copy and send the message link of the message you want the reaction role to be added to.`",
+                                    ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
+                                };
+
+                                if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100)
+                                {
+                                    action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+
+                                var link = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Channel.Id == ctx.Channel.Id && x.Author.Id == ctx.User.Id, TimeSpan.FromMinutes(2));
+
+                                if (link.TimedOut)
+                                {
+                                    action_embed.Footer.Text += " • Interaction timed out";
+                                    action_embed.ImageUrl = "";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                try { _ = link.Result.DeleteAsync(); } catch { }
+
+                                if (!Regex.IsMatch(link.Result.Content, Resources.Regex.DiscordChannelUrl))
+                                {
+                                    action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
+                                                               $"`http://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                               $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                               $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                               $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    action_embed.ImageUrl = "";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                if (!link.Result.Content.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
+                                {
+                                    action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
+                                                               $"`http://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                               $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                               $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                               $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    action_embed.ImageUrl = "";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                if (GuildId != ctx.Guild.Id)
+                                {
+                                    action_embed.Description = $"`The link you provided leads to another server.`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    action_embed.ImageUrl = "";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                if (!ctx.Guild.Channels.ContainsKey(ChannelId))
+                                {
+                                    action_embed.Description = $"`The link you provided leads to a channel that doesn't exist.`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    action_embed.ImageUrl = "";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                var channel = ctx.Guild.GetChannel(ChannelId);
+
+                                if (!channel.TryGetMessage(MessageId, out DiscordMessage reactionMessage))
+                                {
+                                    action_embed.Description = $"`The link you provided leads a message that doesn't exist or the bot has no access to.`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    action_embed.ImageUrl = "";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                action_embed.Description = "`Please react with the emoji you want to use for the reaction role.`";
+                                action_embed.ImageUrl = "";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+
+                                var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == msg.Id, TimeSpan.FromMinutes(2));
+
+                                if (emoji_wait.TimedOut)
+                                {
+                                    action_embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                try { _ = emoji_wait.Result.Message.DeleteAllReactionsAsync(); } catch { }
+
+                                var emoji = emoji_wait.Result.Emoji;
+
+                                if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
+                                {
+                                    action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
+                                    action_embed.Color = ColorHelper.Error;
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                action_embed.Description = "`Please select the role you want to use.`";
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                msg = await ctx.Channel.GetMessageAsync(msg.Id);
+
+                                try
+                                {
+                                    var role = await new GenericSelectors(_bot).PromptRoleSelection(ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+
+                                    if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100)
+                                    {
+                                        action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
+                                        action_embed.Color = ColorHelper.Error;
+                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                        await Task.Delay(5000);
+                                        _ = msg.DeleteAsync();
+                                        _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                        return;
+                                    }
+
+
+                                    if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Any(x => (x.Key == MessageId && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
+                                    {
+                                        action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
+                                        action_embed.Color = ColorHelper.Error;
+                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                        await Task.Delay(5000);
+                                        _ = msg.DeleteAsync();
+                                        _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                        return;
+                                    }
+
+                                    if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
+                                    {
+                                        action_embed.Description = $"`The specified role is already being used in another reaction role.`";
+                                        action_embed.Color = ColorHelper.Error;
+                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                        await Task.Delay(5000);
+                                        _ = msg.DeleteAsync();
+                                        _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                        return;
+                                    }
+
+                                    _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoles>(reactionMessage.Id, new Objects.ReactionRoles
+                                    {
+                                        ChannelId = ChannelId,
+                                        RoleId = role.Id,
+                                        EmojiId = emoji.Id,
+                                        EmojiName = emoji.GetUniqueDiscordName()
+                                    }));
+
+                                    await reactionMessage.CreateReactionAsync(emoji);
+
+                                    action_embed.Color = ColorHelper.Info;
+                                    action_embed.Description = $"`Added role` {role.Mention} `to message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {emoji} `.`";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+                                catch (ArgumentException)
+                                {
+                                    action_embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+                            }
+                            else if (e.Interaction.Data.CustomId == "Remove")
+                            {
+                                try
+                                {
+                                    msg = await ctx.Channel.GetMessageAsync(msg.Id);
+                                    var roleuuid = await new GenericSelectors(_bot).PromptCustomSelection(_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles
+                                                                    .Select(x => new DiscordSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList(),
+                                                                    ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+
+                                    var obj = _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.First(x => x.Value.UUID == roleuuid);
+
+                                    var role = ctx.Guild.GetRole(obj.Value.RoleId);
+                                    var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
+                                    var reactionMessage = await channel.GetMessageAsync(obj.Key);
+                                    _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
+
+                                    _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(obj);
+
+                                    embed.Color = ColorHelper.Info;
+                                    embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ ctx.Command.Name ].ExecuteAsync(ctx);
+                                    return;
+                                }
+                                catch (ArgumentException)
+                                {
+                                    embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+                            }
+                            else if (e.Interaction.Data.CustomId == "cancel")
+                            {
+                                _ = msg.DeleteAsync();
+                                return;
+                            }
+                        }
+                    }).Add(_bot._watcher, ctx);
+                }
+
+                try
+                {
+                    await Task.Delay(120000, cancellationTokenSource.Token);
+                    embed.Footer.Text += " • Interaction timed out";
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+
+                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                }
+                catch { }
+                return;
+            }
+            else if (action.ToLower() == "add")
+            {
+                if (ctx.Message.ReferencedMessage is null || role_parameter is null || emoji_parameter is null)
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
+
+                var action_embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.AwaitingInput,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = "`Adding reaction role..`"
+                };
+
+                var msg = await ctx.Channel.SendMessageAsync(action_embed);
+                action_embed.Author.IconUrl = ctx.Guild.IconUrl;
+
+                if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100)
+                {
+                    action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
+                    action_embed.Color = ColorHelper.Error;
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+                if (emoji_parameter.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji_parameter.Id))
+                {
+                    action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
+                    action_embed.Color = ColorHelper.Error;
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+                if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Any(x => (x.Key == ctx.Message.ReferencedMessage.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
+                {
+                    action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
+                    action_embed.Color = ColorHelper.Error;
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+                if (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
+                {
+                    action_embed.Description = $"`The specified role is already being used in another reaction role.`";
+                    action_embed.Color = ColorHelper.Error;
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+                await ctx.Message.ReferencedMessage.CreateReactionAsync(emoji_parameter);
+
+                _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoles>(ctx.Message.ReferencedMessage.Id, new Objects.ReactionRoles
+                {
+                    ChannelId = ctx.Message.ReferencedMessage.Channel.Id,
+                    RoleId = role_parameter.Id,
+                    EmojiId = emoji_parameter.Id,
+                    EmojiName = emoji_parameter.GetUniqueDiscordName()
+                }));
+
+                action_embed.Color = ColorHelper.Info;
+                action_embed.Description = $"`Added role` {role_parameter.Mention} `to message sent by` {ctx.Message.ReferencedMessage.Author.Mention} `in` {ctx.Message.ReferencedMessage.Channel.Mention} `with emoji` {emoji_parameter} `.`";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                await Task.Delay(5000);
+                _ = msg.DeleteAsync();
+                return;
+            }
+            else if (action.ToLower() == "remove")
+            {
+                if (ctx.Message.ReferencedMessage is null || emoji_parameter is null)
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
+
+                var action_embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.AwaitingInput,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = "`Removing reaction role..`"
+                };
+
+                var msg = await ctx.Channel.SendMessageAsync(action_embed);
+                action_embed.Author.IconUrl = ctx.Guild.IconUrl;
+
+                if (!_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Any(x => x.Key == ctx.Message.ReferencedMessage.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
+                {
+                    action_embed.Description = $"`The specified message doesn't contain specified reaction.`";
+                    action_embed.Color = ColorHelper.Error;
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+                var obj = _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.First(x => x.Key == ctx.Message.ReferencedMessage.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName());
+
+                var role = ctx.Guild.GetRole(obj.Value.RoleId);
+                var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
+                var reactionMessage = await channel.GetMessageAsync(obj.Key);
+                _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
+
+                _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(obj);
+
+                action_embed.Color = ColorHelper.Info;
+                action_embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                await Task.Delay(5000);
+                _ = msg.DeleteAsync();
+                return;
+            }
+            else if (action.ToLower() == "removeall")
+            {
+                if (ctx.Message.ReferencedMessage is null)
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
+
+                var action_embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
+                    Color = ColorHelper.AwaitingInput,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Timestamp = DateTime.UtcNow,
+                    Description = "`Removing all reaction roles..`"
+                };
+
+                var msg = await ctx.Channel.SendMessageAsync(action_embed);
+                action_embed.Author.IconUrl = ctx.Guild.IconUrl;
+
+                if (!_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Any(x => x.Key == ctx.Message.ReferencedMessage.Id))
+                {
+                    action_embed.Description = $"`The specified message doesn't contain any reaction roles.`";
+                    action_embed.Color = ColorHelper.Error;
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+                foreach (var b in _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Where(x => x.Key == ctx.Message.ReferencedMessage.Id).ToList())
+                    _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(b);
+
+                _ = ctx.Message.ReferencedMessage.DeleteAllReactionsAsync();
+
+                action_embed.Color = ColorHelper.Info;
+                action_embed.Description = $"`Removed all reaction roles from message sent by` {ctx.Message.ReferencedMessage.Author.Mention} `in` {ctx.Message.ReferencedMessage.Channel.Mention} `.`";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
+                await Task.Delay(5000);
+                _ = msg.DeleteAsync();
+                return;
             }
             else
             {
