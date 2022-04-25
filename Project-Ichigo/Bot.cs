@@ -552,11 +552,12 @@ internal class Bot
         {
             return (s, e) =>
             {
-                foreach (Task b in e.NewItems)
-                {
-                    LogDebug($"Adding sync task to watcher: {b.Id}");
-                    b.Add(_watcher);
-                }
+                if (e is not null && e.NewItems is not null)
+                    foreach (Task b in e.NewItems)
+                    {
+                        LogDebug($"Adding sync task to watcher: {b.Id}");
+                        b.Add(_watcher);
+                    }
             };
         }
 
@@ -569,7 +570,7 @@ internal class Bot
             while (runningTasks.Count >= 4 && !runningTasks.Any(x => x.IsCompleted))
                 await Task.Delay(100);
 
-            foreach (var task in runningTasks.ToList<Task>())
+            foreach (var task in runningTasks.ToList())
                 if (task.IsCompleted)
                     runningTasks.Remove(task);
 
@@ -638,7 +639,15 @@ internal class Bot
         if (DatabaseClient.IsDisposed())
             return;
 
-        await SyncTasks(discordClient.Guilds);
+        try
+        {
+            await SyncTasks(discordClient.Guilds);
+        }
+        catch (Exception ex)
+        {
+            LogError("Failed to run sync tasks", ex);
+        }
+
         await LogOffDiscord();
         await FlushToDatabase();
 
@@ -680,7 +689,14 @@ internal class Bot
                 }
             }
 
-            await SyncTasks(e.Guilds);
+            try
+            {
+                await SyncTasks(discordClient.Guilds);
+            }
+            catch (Exception ex)
+            {
+                LogError("Failed to run sync tasks", ex);
+            }
 
             await _databaseClient.CheckGuildTables();
             await _databaseClient.SyncDatabase(true);
