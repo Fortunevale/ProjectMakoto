@@ -724,6 +724,18 @@ internal class User : BaseCommandModule
                 return;
             }
 
+            if (_bot._submittedUrls.List.Any(x => x.Value.Submitter == ctx.User.Id) && !ctx.User.IsMaintenance(_bot._status))
+            {
+                if (_bot._submittedUrls.List.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 10)
+                {
+                    embed.Description = $"`You have 10 open url submissions. Please wait before trying to submit another url.`";
+                    embed.Color = ColorHelper.Error;
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    _ = msg.ModifyAsync(embed.Build());
+                    return; 
+                }
+            }
+
             if (_bot._submissionBans.Users.ContainsKey(ctx.User.Id))
             {
                 embed.Description = $"`You are banned from submitting URLs.`\n" +
