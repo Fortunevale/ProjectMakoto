@@ -2024,7 +2024,7 @@ internal class User : BaseCommandModule
                                 {
                                     using (var fileStream = File.OpenRead(SanitizedEmoteList.ElementAt(i).Value.Path))
                                     {
-                                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent($"`{i}/{SanitizedEmoteList.Count}` `{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}`").WithFile($"{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}", fileStream));
+                                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent($"`{i + 1}/{SanitizedEmoteList.Count}` `{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}`").WithFile($"{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}", fileStream));
                                     }
 
                                     await Task.Delay(1000);
@@ -2152,6 +2152,12 @@ internal class User : BaseCommandModule
                             }
                             else if (e.Interaction.Data.CustomId == SendHereButton.CustomId)
                             {
+                                if (!ctx.Member.Permissions.HasPermission(Permissions.AttachFiles))
+                                {
+                                    _ = ctx.SendPermissionError(Permissions.AttachFiles);
+                                    return;
+                                }
+
                                 embed.Description = $"`Sending your Zip File..`";
                                 await msg.ModifyAsync(embed: embed.Build());
 
