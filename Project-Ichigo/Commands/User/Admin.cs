@@ -2050,6 +2050,12 @@ internal class Admin : BaseCommandModule
                     build += curstr;
                 }
 
+                if (build.Length > 0)
+                {
+                    Sections.Add(build);
+                    build = "";
+                }
+
                 List<DiscordEmbedBuilder> embeds = Sections.Select(x => new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
