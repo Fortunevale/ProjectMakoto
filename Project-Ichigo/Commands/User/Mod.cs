@@ -235,6 +235,9 @@ internal class Mod : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.Permissions.HasPermission(Permissions.ManageMessages))
             {
                 _ = ctx.SendPermissionError(Permissions.ManageMessages);

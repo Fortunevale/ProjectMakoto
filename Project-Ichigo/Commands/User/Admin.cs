@@ -12,6 +12,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -241,6 +244,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -362,6 +368,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -792,6 +801,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -1084,6 +1096,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -1373,6 +1388,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -1662,6 +1680,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
@@ -1880,6 +1901,9 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
+
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();

@@ -12,6 +12,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             List<KeyValuePair<string, string>> Commands = new();
 
 
@@ -113,6 +116,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
             if (victim is not null)
             {
                 _ = ctx.Client.GetCommandsNext().RegisteredCommands["user-info"].ExecuteAsync(ctx);
@@ -291,6 +297,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
             try
             {
                 if (!_bot._guilds.List.ContainsKey(ctx.Guild.Id))
@@ -420,6 +429,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
             if (victim is null)
             {
                 victim = ctx.Member;
@@ -456,6 +468,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
             if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -509,6 +524,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -619,6 +637,8 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
                 _bot._users.List.Add(ctx.User.Id, new Users.Info());
@@ -885,6 +905,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
                 _bot._users.List.Add(ctx.User.Id, new Users.Info());
 
@@ -919,6 +942,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
+
             bool AddLinkButton = true;
 
             if ((string.IsNullOrWhiteSpace(id) || id.Contains('@')) && ctx.Message.MentionedUsers != null && ctx.Message.MentionedUsers.Count > 0)
@@ -1322,6 +1348,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
+
             DiscordSelectComponent GetContinents(string default_code)
             {
                 List<DiscordSelectComponentOption> continents = new();
@@ -1640,6 +1669,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
+
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
                 _bot._users.List.Add(ctx.User.Id, new Users.Info());
 
@@ -1689,6 +1721,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
             string[] urls = {
             "https://cdn.discordapp.com/attachments/906976602557145110/943950308369903636/1.gif",
             "https://cdn.discordapp.com/attachments/906976602557145110/943950308101472266/2.gif",
@@ -1744,6 +1779,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
             Task.Run(async () =>
             {
                 string[] urls = {
@@ -1810,6 +1848,9 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
             ulong messageid;
 
             if (ctx.Message.ReferencedMessage is not null)

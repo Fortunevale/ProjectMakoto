@@ -19,6 +19,63 @@ internal class Maintainers : BaseCommandModule
 
 
 
+    [Command("cooldowntest-light"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task CooldownTestLight(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
+            _ = ctx.RespondAsync("Cooldown finished.");
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("cooldowntest-moderate"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task CooldownTestModerate(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
+
+            _ = ctx.RespondAsync("Cooldown finished.");
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("cooldowntest-heavy"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task CooldownTestHeavy(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
+
+            _ = ctx.RespondAsync("Cooldown finished.");
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
     [Command("roleselectortest"),
     CommandModule("hidden"),
     Description(" ")]
