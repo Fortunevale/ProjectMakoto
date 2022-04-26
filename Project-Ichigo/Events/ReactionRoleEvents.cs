@@ -23,7 +23,7 @@ internal class ReactionRoleEvents
             {
                 var obj = _bot._guilds.List[ e.Guild.Id ].ReactionRoles.First(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
 
-                if (e.Guild.Roles.ContainsKey(obj.Value.RoleId))
+                if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != _bot.discordClient.CurrentUser.Id)
                     await (await e.User.ConvertToMember(e.Guild)).GrantRoleAsync(e.Guild.GetRole(obj.Value.RoleId));
             }
         }).Add(_bot._watcher);
@@ -43,7 +43,7 @@ internal class ReactionRoleEvents
             {
                 var obj = _bot._guilds.List[ e.Guild.Id ].ReactionRoles.First(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
 
-                if (e.Guild.Roles.ContainsKey(obj.Value.RoleId))
+                if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != _bot.discordClient.CurrentUser.Id)
                     await (await e.User.ConvertToMember(e.Guild)).RevokeRoleAsync(e.Guild.GetRole(obj.Value.RoleId));
             }
         }).Add(_bot._watcher);

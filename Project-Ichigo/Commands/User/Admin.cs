@@ -1901,7 +1901,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -1936,6 +1936,9 @@ internal class Admin : BaseCommandModule
 
             async Task CheckForInvalid()
             {
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                    return;
+
                 foreach (var b in _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.ToList())
                 {
                     if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
