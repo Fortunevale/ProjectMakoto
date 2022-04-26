@@ -1908,32 +1908,62 @@ internal class Admin : BaseCommandModule
                 await ctx.Channel.SendMessageAsync(embed);
             }
 
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].ReactionRoles.ToList())
+            Dictionary<ulong, DiscordMessage> messageCache = new();
+
+            async Task CheckForInvalid()
             {
-                if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
+                foreach (var b in _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.ToList())
                 {
-                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
-                    continue;
-                }
+                    if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
+                    {
+                        _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(b);
+                        continue;
+                    }
 
-                if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
-                {
-                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
-                    continue;
-                }
+                    if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
+                    {
+                        _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(b);
+                        continue;
+                    }
 
-                var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
+                    var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
 
-                if (!channel.TryGetMessage(b.Key, out DiscordMessage msg))
-                {
-                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
-                    continue;
-                }
+                    if (!messageCache.ContainsKey(b.Key))
+                    {
+                        try
+                        {
+                            var requested_msg = await channel.GetMessageAsync(b.Key);
+                            messageCache.Add(b.Key, requested_msg);
+                        }
+                        catch (DisCatSharp.Exceptions.NotFoundException)
+                        {
+                            messageCache.Add(b.Key, null);
 
-                if (!msg.Reactions.Any(x => x.Emoji.Id == b.Value.EmojiId && x.Emoji.GetUniqueDiscordName() == b.Value.EmojiName && x.IsMe))
-                {
-                    _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(b);
-                    continue;
+                            _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(b);
+                            continue;
+                        }
+                        catch (DisCatSharp.Exceptions.UnauthorizedException)
+                        {
+                            messageCache.Add(b.Key, null);
+
+                            _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(b);
+                            continue;
+                        }
+                    }
+
+                    if (messageCache[ b.Key ] == null)
+                    {
+                        _bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Remove(b);
+                        continue;
+                    }
+
+                    var msg = messageCache[ b.Key ];
+
+                    if (!msg.Reactions.Any(x => x.Emoji.Id == b.Value.EmojiId && x.Emoji.GetUniqueDiscordName() == b.Value.EmojiName && x.IsMe))
+                    {
+                        _ = msg.CreateReactionAsync(b.Value.GetEmoji(ctx.Client));
+                        continue;
+                    }
                 }
             }
 
@@ -1953,7 +1983,9 @@ internal class Admin : BaseCommandModule
                     Description = "`Loading Reaction Roles..`"
                 });
 
-                string Desc = "";
+                await CheckForInvalid();
+
+                List<string> Desc = new();
 
                 if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count == 0)
                 {
@@ -1972,20 +2004,41 @@ internal class Admin : BaseCommandModule
                 {
                     var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
                     var role = ctx.Guild.GetRole(b.Value.RoleId);
-                    var message = await channel.GetMessageAsync(b.Key);
+                    var message = messageCache[ b.Key ];
 
-                    Desc += $"[`Message`]({message.JumpLink}) in {channel.Mention} `[#{channel.Name}]`\n" +
-                            $"{b.Value.GetEmoji(ctx.Client)} - {role.Mention} `{role.Name}`\n\n";
+                    Desc.Add($"[`Message`]({message.JumpLink}) in {channel.Mention} `[#{channel.Name}]`\n" +
+                            $"{b.Value.GetEmoji(ctx.Client)} - {role.Mention} `{role.Name}`");
                 }
 
-                await msg.ModifyAsync(new DiscordEmbedBuilder
+                List<string> Sections = new();
+                string build = "";
+
+                foreach (var b in Desc)
+                {
+                    string curstr = $"{b}\n\n";
+
+                    if (build.Length + curstr.Length > 4096)
+                    {
+                        Sections.Add(build);
+                        build = "";
+                    }
+
+                    build += curstr;
+                }
+
+                List<DiscordEmbedBuilder> embeds = Sections.Select(x => new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = Desc
-                }.Build());
+                    Description = x
+                }).ToList();
+
+                foreach (var b in embeds)
+                    _ = ctx.Channel.SendMessageAsync(b);
+
+                _ = msg.DeleteAsync();
                 return;
             }
             else if (action.ToLower() == "config")
@@ -1999,23 +2052,7 @@ internal class Admin : BaseCommandModule
                     Description = "`Loading Reaction Roles..`"
                 });
 
-                string Desc = "";
-
-                if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count == 0)
-                {
-                    Desc = "`No reaction roles are set up.`";
-                }
-
-                if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count != 0)
-                    foreach (var b in _bot._guilds.List[ctx.Guild.Id].ReactionRoles)
-                    {
-                        var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
-                        var role = ctx.Guild.GetRole(b.Value.RoleId);
-                        var message = await channel.GetMessageAsync(b.Key);
-
-                        Desc += $"[`Message`]({message.JumpLink}) in {channel.Mention} `[#{channel.Name}]`\n" +
-                                $"{b.Value.GetEmoji(ctx.Client)} - {role.Mention} `{role.Name}`\n\n";
-                    }
+                await CheckForInvalid();
 
                 var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "Add", "Add a new reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
                 var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "Remove", "Remove a reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_multiplication_x:")));
@@ -2027,7 +2064,7 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = Desc
+                    Description = $"`{_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count} reaction roles are set up.`"
                 };
 
                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { AddButton, RemoveButton, CancelButton }));
