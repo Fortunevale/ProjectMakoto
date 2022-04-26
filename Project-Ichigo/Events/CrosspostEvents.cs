@@ -13,6 +13,9 @@ internal class CrosspostEvents
     {
         Task.Run(async () =>
         {
+            if (e.Guild is null || e.Channel.IsPrivate)
+                return;
+
             if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
                 _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
 
