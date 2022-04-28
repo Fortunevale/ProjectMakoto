@@ -302,7 +302,7 @@ internal class Bot
                 {
                     if (!_status.DiscordInitialized)
                     {
-                        LogError($"An exception occured while trying to log into discord: The log in took longer than 5 seconds");
+                        LogError($"An exception occured while trying to log into discord: The log in took longer than 10 seconds");
                         Environment.Exit(ExitCodes.FailedDiscordLogin);
                         return;
                     }

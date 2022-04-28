@@ -5,7 +5,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("join-settings"), Aliases("joinsettings"),
+    [Command("join"), Aliases("joinsettings", "join-settings"),
     CommandModule("admin"),
     Description("Allows to review and change settings in the event somebody joins")]
     public async Task JoinSettings(CommandContext ctx, [Description("Action")] string action = "help")
@@ -40,7 +40,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-            else if (action.ToLower() == "review")
+            else if (action.ToLower() is "review" or "list")
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -56,7 +56,7 @@ internal class Admin : BaseCommandModule
                 });
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 DiscordEmbedBuilder embed = new()
                 {
@@ -237,7 +237,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("experience-settings"), Aliases("experiencesettings"),
+    [Command("experience"), Aliases("experiencesettings", "experience-settings"),
     CommandModule("admin"),
     Description("Allows to review and change settings related to experience")]
     public async Task ExperienceSettings(CommandContext ctx, [Description("Action")] string action = "help")
@@ -272,7 +272,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-            else if (action.ToLower() == "review")
+            else if (action.ToLower() is "review" or "list")
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -285,7 +285,7 @@ internal class Admin : BaseCommandModule
                 });
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 DiscordEmbedBuilder embed = new()
                 {
@@ -361,7 +361,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("levelrewards"), Aliases("level-rewards"),
+    [Command("levelrewards"), Aliases("level-rewards", "rewards"),
     CommandModule("admin"),
     Description("Allows to review, add and remove levelreward roles")]
     public async Task LevelRewards(CommandContext ctx, [Description("Action")] string action = "help")
@@ -546,7 +546,7 @@ internal class Admin : BaseCommandModule
                 }
                 catch { }
             }
-            else if (action.ToLower() == "modify")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 int current_page = 0;
 
@@ -747,7 +747,7 @@ internal class Admin : BaseCommandModule
                 }
                 catch { }
             }
-            else if (action.ToLower() is "list" or "review")
+            else if (action.ToLower() is "review" or "list")
             {
                 string Build = "";
                 if (_bot._guilds.List[ctx.Guild.Id].LevelRewards.Count != 0)
@@ -794,7 +794,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("phishing-settings"), Aliases("phishingsettings", "phishing"),
+    [Command("phishing"), Aliases("phishingsettings", "phishing-settings"),
     CommandModule("admin"),
     Description("Allows to review and change settings for the phishing detection")]
     public async Task PhishingSettings(CommandContext ctx, [Description("Action")] string action = "help")
@@ -829,7 +829,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-            else if (action.ToLower() == "review")
+            else if (action.ToLower() is "review" or "list")
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -844,7 +844,7 @@ internal class Admin : BaseCommandModule
                 });
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 DiscordEmbedBuilder embed = new()
                 {
@@ -1125,7 +1125,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-            else if (action.ToLower() == "review")
+            else if (action.ToLower() is "review" or "list")
             {
                 if (!_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled)
                 {
@@ -1152,7 +1152,7 @@ internal class Admin : BaseCommandModule
                 });
                 return;
             }
-            else if (action.ToLower() == "setup")
+            else if (action.ToLower() is "setup" or "set-up")
             {
                 if (_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled)
                 {
@@ -1235,7 +1235,7 @@ internal class Admin : BaseCommandModule
                 _bot._bumpReminder.SendPersistentMessage(ctx.Client, ctx.Channel, null);
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 if (!_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled)
                 {
@@ -1381,7 +1381,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("actionlog"),
+    [Command("actionlog"), Aliases("action-log"),
     CommandModule("admin"),
     Description("Allows to review, change settings for the actionlog")]
     public async Task ActionLog(CommandContext ctx, [Description("Action")] string action = "help")
@@ -1416,7 +1416,7 @@ internal class Admin : BaseCommandModule
                 await SendHelp(ctx);
                 return;
             }
-            else if (action.ToLower() == "review")
+            else if (action.ToLower() is "review" or "list")
             {
                 if (_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel == 0)
                 {
@@ -1453,7 +1453,7 @@ internal class Admin : BaseCommandModule
                 });
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 var embed = new DiscordEmbedBuilder
                 {
@@ -1681,7 +1681,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("autocrosspost"),
+    [Command("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
     CommandModule("admin"),
     Description("Allows to review, change settings for the automatic crossposts")]
     public async Task AutoCrosspost(CommandContext ctx, [Description("Action")] string action = "help")
@@ -1732,7 +1732,7 @@ internal class Admin : BaseCommandModule
                 });
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 CancellationTokenSource cancellationTokenSource = new();
 
@@ -1902,7 +1902,7 @@ internal class Admin : BaseCommandModule
 
 
 
-    [Command("reactionroles"),
+    [Command("reactionroles"), Aliases("reactionrole","reaction-roles", "reaction-role"),
     CommandModule("admin"),
     Description("Allows to review, change settings for reactionroles")]
     public async Task ReactionRoles(CommandContext ctx, [Description("Action")] string action = "help", DiscordEmoji emoji_parameter = null, DiscordRole role_parameter = null)
@@ -2082,7 +2082,7 @@ internal class Admin : BaseCommandModule
                 _ = msg.DeleteAsync();
                 return;
             }
-            else if (action.ToLower() == "config")
+            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
             {
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
