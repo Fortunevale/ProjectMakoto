@@ -244,4 +244,11 @@ internal class DisCatSharpEventHandler
         _ = bumpReminderEvents.ReactionRemoved(sender, e);
         _ = reactionRoleEvents.MessageReactionRemoved(sender, e);
     }
+
+    internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
+    {
+        FillDatabase(e.Guild, user: e.User);
+
+        _ = actionlogEvents.VoiceStateUpdated(sender, e);
+    }
 }

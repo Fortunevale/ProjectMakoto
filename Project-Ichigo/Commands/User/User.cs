@@ -1199,57 +1199,57 @@ internal class User : BaseCommandModule
                     qc.Height = 500;
                     qc.Config = $@"{{
                         type: 'line',
-	                    data: 
-	                    {{
+                        data: 
+                        {{
                             labels: 
-		                    [
-			                    '',
-			                    '48 days ago','',
-			                    '46 days ago','',
-			                    '44 days ago','',
-			                    '42 days ago','',
-			                    '40 days ago','',
-			                    '38 days ago','',
-			                    '36 days ago','',
-			                    '34 days ago','',
-			                    '32 days ago','',
-			                    '30 days ago','',
-			                    '28 days ago','',
-			                    '26 days ago','',
-			                    '24 days ago','',
-			                    '22 days ago','',
-			                    '20 days ago','',
-			                    '18 days ago','',
-			                    '16 days ago','',
-			                    '14 days ago','',
-			                    '12 days ago','',
-			                    '10 days ago','',
-			                    '8 days ago','',
-			                    '6 days ago','',
-			                    '4 days ago','',
-			                    '2 days ago','',
-			                    'Today'
+                            [
+                                '',
+                                '48 days ago','',
+                                '46 days ago','',
+                                '44 days ago','',
+                                '42 days ago','',
+                                '40 days ago','',
+                                '38 days ago','',
+                                '36 days ago','',
+                                '34 days ago','',
+                                '32 days ago','',
+                                '30 days ago','',
+                                '28 days ago','',
+                                '26 days ago','',
+                                '24 days ago','',
+                                '22 days ago','',
+                                '20 days ago','',
+                                '18 days ago','',
+                                '16 days ago','',
+                                '14 days ago','',
+                                '12 days ago','',
+                                '10 days ago','',
+                                '8 days ago','',
+                                '6 days ago','',
+                                '4 days ago','',
+                                '2 days ago','',
+                                'Today'
                             ],
-		                    datasets: 
-		                    [
-			                    {{
-				                    label: 'Placements',
-				                    data: [{player.histories},{player.rank}],
-				                    fill: false,
-				                    borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
-				                    reverse: true,
-				                    id: ""yaxis2""
+                            datasets: 
+                            [
+                                {{
+                                    label: 'Placements',
+                                    data: [{player.histories},{player.rank}],
+                                    fill: false,
+                                    borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
+                                    reverse: true,
+                                    id: ""yaxis2""
 
                                 }}
-		                    ]
+                            ]
 
                         }},
-	                    options:
-	                    {{
-		                    legend:
-		                    {{
-			                    display: false,
-		                    }},
+                        options:
+                        {{
+                            legend:
+                            {{
+                                display: false,
+                            }},
                             elements:
                             {{
                                 point:
@@ -1257,20 +1257,20 @@ internal class User : BaseCommandModule
                                     radius: 0
                                 }}
                             }},
-		                    scales:
-		                    {{
-			                    yAxes:
-			                    [
+                            scales:
+                            {{
+                                yAxes:
+                                [
                                     {{
                                         reverse: true,
                                         ticks:
-  			                            {{
+                                        {{
                                             reverse: true
-  			                            }}
-			                        }}
+                                        }}
+                                    }}
                                 ]
-		                    }}
-	                    }}
+                            }}
+                        }}
                     }}";
 
                     qc.ToFile(file);

@@ -11,6 +11,9 @@ internal class ActionlogEvents
 
     internal async Task<bool> ValidateServer(DiscordGuild guild)
     {
+        if (guild is null)
+            return false;
+
         if (!_bot._guilds.List.ContainsKey(guild.Id))
             _bot._guilds.List.Add(guild.Id, new Guilds.ServerSettings());
 
@@ -30,6 +33,7 @@ internal class ActionlogEvents
             _bot._guilds.List[guild.Id].ActionLogSettings.BanlistModified = false;
             _bot._guilds.List[guild.Id].ActionLogSettings.GuildModified = false;
             _bot._guilds.List[guild.Id].ActionLogSettings.ChannelsModified = false;
+            _bot._guilds.List[guild.Id].ActionLogSettings.VoiceStateUpdated = false;
             _bot._guilds.List[guild.Id].ActionLogSettings.InvitesModified = false;
             return false;
         }
@@ -155,6 +159,65 @@ internal class ActionlogEvents
                 return;
 
             _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+        }).Add(_bot._watcher);
+    }
+
+    internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (!await ValidateServer(e.Guild) || !_bot._guilds.List[ e.Guild.Id ].ActionLogSettings.VoiceStateUpdated)
+                return;
+
+            DiscordChannel PreviousChannel = e.Before?.Channel;
+            DiscordChannel NewChannel = e.After?.Channel;
+
+            if (PreviousChannel != NewChannel)
+                if (PreviousChannel is null && NewChannel is not null)
+                {
+                    DiscordEmbedBuilder embed = new()
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.VoiceStateUserJoined, Name = $"User joined Voice Channel" },
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.User.AvatarUrl },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" + 
+                                      $"**Channel**: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
+                    };
+
+                    var msg = await e.Guild.GetChannel(_bot._guilds.List[ e.Guild.Id ].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                }
+                else if (PreviousChannel is not null && NewChannel is null)
+                {
+                    DiscordEmbedBuilder embed = new()
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.VoiceStateUserLeft, Name = $"User left Voice Channel" },
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.User.AvatarUrl },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" +
+                                      $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]`"
+                    };
+
+                    var msg = await e.Guild.GetChannel(_bot._guilds.List[ e.Guild.Id ].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                }
+                else if (PreviousChannel is not null && NewChannel is not null)
+                {
+                    DiscordEmbedBuilder embed = new()
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.VoiceStateUserUpdated, Name = $"User switched Voice Channel" },
+                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.User.AvatarUrl },
+                        Color = ColorHelper.Info,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" +
+                                      $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]` :arrow_right: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
+                    };
+
+                    var msg = await e.Guild.GetChannel(_bot._guilds.List[ e.Guild.Id ].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                }
         }).Add(_bot._watcher);
     }
 
@@ -979,6 +1042,9 @@ internal class ActionlogEvents
         Task.Run(async () =>
         {
             if (!await ValidateServer(e.Guild) || !_bot._guilds.List[e.Guild.Id].ActionLogSettings.ChannelsModified)
+                return;
+
+            if (e.ChannelBefore.Name == e.ChannelAfter.Name && e.ChannelBefore.IsNsfw == e.ChannelAfter.IsNsfw)
                 return;
 
             string Icon = $"{(e.ChannelAfter.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.ChannelAfter.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}";

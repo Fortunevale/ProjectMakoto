@@ -1,6 +1,6 @@
 ﻿namespace Project_Ichigo.Objects.Database;
 
-public class DatabaseServerSettings
+public class DatabaseGuildSettings
 {
     public ulong serverid { get; set; }
     public string levelrewards { get; set; }
@@ -38,5 +38,6 @@ public class DatabaseServerSettings
     public bool actionlog_log_banlist_modified { get; set; }
     public bool actionlog_log_guild_modified { get; set; }
     public bool actionlog_log_channels_modified { get; set; }
+    public bool actionlog_log_voice_state { get; set; }
     public bool actionlog_log_invites_modified { get; set; }
 }

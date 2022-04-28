@@ -61,6 +61,10 @@ internal class Resources
         public static readonly string ChannelRemoved = "https://cdn.discordapp.com/attachments/906976602557145110/961723848569544754/ChannelRemoved.png";
         public static readonly string ChannelModified = "https://cdn.discordapp.com/attachments/906976602557145110/961723848137539684/ChannelUpdated.png";
 
+        public static readonly string VoiceStateUserJoined = "https://media.discordapp.net/attachments/906976602557145110/969317928593928242/VoiceStateUserJoined.png";
+        public static readonly string VoiceStateUserLeft = "https://media.discordapp.net/attachments/906976602557145110/969317928635883570/VoiceStateUserLeft.png";
+        public static readonly string VoiceStateUserUpdated = "https://media.discordapp.net/attachments/906976602557145110/969317928690413578/VoiceStateUserUpdated.png";
+
         public static readonly string UserKicked = "https://cdn.discordapp.com/attachments/712761268393738301/839911329229176842/UserKicked.png";
         public static readonly string UserLeft = "https://cdn.discordapp.com/attachments/712761268393738301/839566703477260348/UserRemoved.png";
         public static readonly string UserUpdated = "https://cdn.discordapp.com/attachments/712761268393738301/839566706032640088/UserUpdated.png";

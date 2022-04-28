@@ -397,7 +397,7 @@ internal class DatabaseClient
                 if (_bot._guilds.List.Count > 0)
                     try
                     {
-                        List<DatabaseServerSettings> DatabaseInserts = _bot._guilds.List.Select(x => new DatabaseServerSettings
+                        List<DatabaseGuildSettings> DatabaseInserts = _bot._guilds.List.Select(x => new DatabaseGuildSettings
                         {
                             serverid = x.Key,
 
@@ -439,6 +439,7 @@ internal class DatabaseClient
                             actionlog_log_banlist_modified = x.Value.ActionLogSettings.BanlistModified,
                             actionlog_log_guild_modified = x.Value.ActionLogSettings.GuildModified,
                             actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified,
+                            actionlog_log_voice_state = x.Value.ActionLogSettings.VoiceStateUpdated,
                             actionlog_log_channels_modified = x.Value.ActionLogSettings.ChannelsModified
                         }).ToList();
 
@@ -496,6 +497,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"actionlog_log_banlist_modified{i}", DatabaseInserts[i].actionlog_log_banlist_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_guild_modified{i}", DatabaseInserts[i].actionlog_log_guild_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_channels_modified{i}", DatabaseInserts[i].actionlog_log_channels_modified);
+                            cmd.Parameters.AddWithValue($"actionlog_log_voice_state{i}", DatabaseInserts[i].actionlog_log_voice_state);
                             cmd.Parameters.AddWithValue($"actionlog_log_invites_modified{i}", DatabaseInserts[i].actionlog_log_invites_modified);
                         }
 

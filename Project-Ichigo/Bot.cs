@@ -277,6 +277,8 @@ internal class Bot
             discordClient.GuildRoleDeleted += disCatSharpEventHandler.GuildRoleDeleted;
             discordClient.GuildRoleUpdated += disCatSharpEventHandler.GuildRoleUpdated;
 
+            discordClient.VoiceStateUpdated += disCatSharpEventHandler.VoiceStateUpdated;
+
 
 
             LogDebug($"Registering Interactivity..");

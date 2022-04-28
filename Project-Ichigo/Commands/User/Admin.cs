@@ -1448,6 +1448,7 @@ internal class Admin : BaseCommandModule
                                   $"`Bans & Unbans                     ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
                                   $"`Server Modifications              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
                                   $"`Channel Modifications             ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified.BoolToEmote()}\n" +
+                                  $"`Voice Channel Updates             ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated.BoolToEmote()}\n" +
                                   $"`Invite Modifications              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
                 });
                 return;
@@ -1471,6 +1472,7 @@ internal class Admin : BaseCommandModule
                                   $"`Bans & Unbans                     ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote()}\n" +
                                   $"`Server Modifications              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote()}\n" +
                                   $"`Channel Modifications             ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified.BoolToEmote()}\n" +
+                                  $"`Voice Channel Updates             ` : {_bot._guilds.List[ ctx.Guild.Id ].ActionLogSettings.VoiceStateUpdated.BoolToEmote()}\n" +
                                   $"`Invite Modifications              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote()}"
                 };
 
@@ -1506,6 +1508,7 @@ internal class Admin : BaseCommandModule
                         new DiscordSelectComponentOption("Toggle 'Bans & Unbans'", "log_banlist_modified"),
                         new DiscordSelectComponentOption("Toggle 'Server Modifications'", "log_guild_modified"),
                         new DiscordSelectComponentOption("Toggle 'Channel Modifications'", "log_channels_modified"),
+                        new DiscordSelectComponentOption("Toggle 'Voice Channel Updates'", "log_voice_state"),
                         new DiscordSelectComponentOption("Toggle 'Invite Modifications'", "log_invites_modified"),
                     }));
 
@@ -1542,6 +1545,7 @@ internal class Admin : BaseCommandModule
                                 _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified = false;
                                 _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified = false;
                                 _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified = false;
+                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated = false;
                                 _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified = false;
 
                                 _ = msg.DeleteAsync();
@@ -1604,10 +1608,14 @@ internal class Admin : BaseCommandModule
                                         _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified;
                                         _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified;
                                         _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified;
+                                        _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated;
                                         _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified;
                                         break;
                                     case "log_members_modified":
                                         _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified;
+                                        break;
+                                    case "log_voice_state":
+                                        _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated;
                                         break;
                                     case "log_memberprofile_modified":
                                         _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified;

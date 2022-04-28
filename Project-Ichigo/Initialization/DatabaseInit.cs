@@ -29,7 +29,7 @@ internal class DatabaseInit
 
         LogDebug($"Loading guilds from table 'guilds'..");
 
-        IEnumerable<DatabaseServerSettings> serverSettings = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseServerSettings>(_bot._databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
+        IEnumerable<DatabaseGuildSettings> serverSettings = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseGuildSettings>(_bot._databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
         foreach (var b in serverSettings)
             _bot._guilds.List.Add(b.serverid, new Guilds.ServerSettings
@@ -83,6 +83,7 @@ internal class DatabaseInit
                     RolesModified = b.actionlog_log_roles_modified,
                     MemberProfileModified = b.actionlog_log_memberprofile_modified,
                     ChannelsModified = b.actionlog_log_channels_modified,
+                    VoiceStateUpdated = b.actionlog_log_voice_state,
                 }
             });
 
