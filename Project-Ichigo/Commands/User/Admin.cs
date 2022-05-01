@@ -12,7 +12,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -244,7 +244,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -368,7 +368,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -801,7 +801,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -1096,7 +1096,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -1388,7 +1388,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
@@ -1688,7 +1688,7 @@ internal class Admin : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
             if (!ctx.Member.IsAdmin(_bot._status))
