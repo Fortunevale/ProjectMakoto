@@ -990,6 +990,8 @@ internal class User : BaseCommandModule
         }).Add(_bot._watcher, ctx);
     }
 
+
+
     private async Task SendScoreSaberProfile(CommandContext ctx, string id = "", bool AddLinkButton = true)
     {
         if (!_bot._users.List.ContainsKey(ctx.User.Id))
@@ -1352,6 +1354,8 @@ internal class User : BaseCommandModule
             throw;
         }
     }
+
+
 
     [Command("scoresaber-search"), Aliases("sss", "scoresabersearch"),
     CommandModule("user"),
@@ -1853,7 +1857,7 @@ internal class User : BaseCommandModule
 
 
 
-    [Command("emoji"), Aliases("emote", "steal", "grab"),
+    [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
     CommandModule("user"),
     Description("Steals emojis of the message that this command was replied to")]
     public async Task EmojiStealer(CommandContext ctx)
@@ -1903,9 +1907,9 @@ internal class User : BaseCommandModule
             List<string> Emotes = bMessage.Content.GetEmotes();
             List<string> AnimatedEmotes = bMessage.Content.GetAnimatedEmotes();
 
-            if (Emotes is null && AnimatedEmotes is null)
+            if (Emotes is null && AnimatedEmotes is null && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
             {
-                embed.Description = $"`This message doesn't contain any emotes.`";
+                embed.Description = $"`This message doesn't contain any emojis or stickers.`";
                 embed.Color = ColorHelper.Error;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 await msg.ModifyAsync(embed: embed.Build());
@@ -1916,15 +1920,14 @@ internal class User : BaseCommandModule
             if (Emotes is not null)
                 foreach (var b in Emotes)
                     if (!SanitizedEmoteList.ContainsKey(Convert.ToUInt64(Regex.Match(b, @"(\d+(?=>))").Value)))
-                        SanitizedEmoteList.Add(Convert.ToUInt64(Regex.Match(b, @"(\d+(?=>))").Value), new EmojiStealer { Animated = false, Name = Regex.Match(b, @"((?<=:)[^ ]*(?=:))").Value });
+                        SanitizedEmoteList.Add(Convert.ToUInt64(Regex.Match(b, @"(\d+(?=>))").Value), new EmojiStealer { Animated = false, Name = Regex.Match(b, @"((?<=:)[^ ]*(?=:))").Value, Type = EmojiType.EMOJI });
 
             if (AnimatedEmotes is not null)
                 foreach (var b in AnimatedEmotes)
                     if (!SanitizedEmoteList.ContainsKey(Convert.ToUInt64(Regex.Match(b, @"(\d+(?=>))").Value)))
-                        SanitizedEmoteList.Add(Convert.ToUInt64(Regex.Match(b, @"(\d+(?=>))").Value), new EmojiStealer { Animated = true, Name = Regex.Match(b, @"((?<=:)[^ ]*(?=:))").Value });
+                        SanitizedEmoteList.Add(Convert.ToUInt64(Regex.Match(b, @"(\d+(?=>))").Value), new EmojiStealer { Animated = true, Name = Regex.Match(b, @"((?<=:)[^ ]*(?=:))").Value, Type = EmojiType.EMOJI });
 
-            embed.Description = $"`Downloading {SanitizedEmoteList.Count} emojis of this message..`";
-            await msg.ModifyAsync(embed: embed.Build());
+            bool ContainsStickers = bMessage.Stickers.Count > 0;
 
             string guid = Guid.NewGuid().ToString().MakeValidFileName();
 
@@ -1933,46 +1936,120 @@ internal class User : BaseCommandModule
 
             Directory.CreateDirectory($"emotes-{guid}");
 
-            foreach (var b in SanitizedEmoteList.ToList())
+            if (SanitizedEmoteList.Count > 0)
             {
-                try
+                embed.Description = $"`Downloading {SanitizedEmoteList.Count} emojis of this message..`";
+                await msg.ModifyAsync(embed: embed.Build());
+
+                foreach (var b in SanitizedEmoteList.ToList())
                 {
-                    var EmoteStream = await client.GetStreamAsync($"https://cdn.discordapp.com/emojis/{b.Key}.{(b.Value.Animated ? "gif" : "png")}");
+                    try
+                    {
+                        var EmoteStream = await client.GetStreamAsync($"https://cdn.discordapp.com/emojis/{b.Key}.{(b.Value.Animated ? "gif" : "png")}");
+
+                        string FileExists = "";
+                        int FileExistsInt = 1;
+
+                        string fileName = $"{b.Value.Name}{FileExists}.{(b.Value.Animated ? "gif" : "png")}".MakeValidFileName('_');
+
+                        while (File.Exists($"emotes-{guid}/{fileName}"))
+                        {
+                            FileExistsInt++;
+                            FileExists = $" ({FileExistsInt})";
+
+                            fileName = $"{b.Value.Name}{FileExists}.{(b.Value.Animated ? "gif" : "png")}".MakeValidFileName('_');
+                        }
+
+                        using (var fileStream = File.Create($"emotes-{guid}/{fileName}"))
+                        {
+                            EmoteStream.CopyTo(fileStream);
+                            await fileStream.FlushAsync();
+                        }
+
+                        SanitizedEmoteList[b.Key].Path = $"emotes-{guid}/{fileName}";
+                    }
+                    catch (Exception ex)
+                    {
+                        LogError($"Failed to download an emote", ex);
+                        SanitizedEmoteList.Remove(b.Key);
+                    }
+                } 
+            }
+
+            if (ContainsStickers)
+            {
+                embed.Description = $"`Downloading {bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()).Count()} stickers of this message..`";
+                await msg.ModifyAsync(embed: embed.Build());
+
+                foreach (var b in bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()))
+                {
+                    var StickerStream = await client.GetStreamAsync(b.Url);
 
                     string FileExists = "";
                     int FileExistsInt = 1;
 
-                    while (File.Exists($"emotes-{guid}/{b.Value.Name}{FileExists}.{(b.Value.Animated ? "gif" : "png")}"))
+                    string fileName = $"{b.Name}{FileExists}.png".MakeValidFileName('_');
+
+                    while (File.Exists($"emotes-{guid}/{fileName}"))
                     {
                         FileExistsInt++;
                         FileExists = $" ({FileExistsInt})";
+
+                        fileName = $"{b.Name}{FileExists}.png".MakeValidFileName('_');
                     }
 
-                    using (var fileStream = File.Create($"emotes-{guid}/{b.Value.Name}{FileExists}.{(b.Value.Animated ? "gif" : "png")}"))
+                    using (var fileStream = File.Create($"emotes-{guid}/{fileName}"))
                     {
-                        EmoteStream.CopyTo(fileStream);
+                        StickerStream.CopyTo(fileStream);
                         await fileStream.FlushAsync();
                     }
 
-                    SanitizedEmoteList[ b.Key ].Path = $"emotes-{guid}/{b.Value.Name}{FileExists}.{(b.Value.Animated ? "gif" : "png")}";
-                }
-                catch (Exception ex)
-                {
-                    LogError($"Failed to download an emote", ex);
-                    SanitizedEmoteList.Remove(b.Key);
+                    SanitizedEmoteList.Add(b.Id, new EmojiStealer { Animated = false, Name = b.Name, Path = $"emotes-{guid}/{fileName}", Type = EmojiType.STICKER });
                 }
             }
 
-            embed.Author.IconUrl = ctx.Guild.IconUrl;
-            embed.Description = $"`Select how you want to receive the downloaded emojis.`";
+            if (SanitizedEmoteList.Count == 0)
+            {
+                embed.Description = $"`Couldn't download any emojis or stickers from this message.`";
+                embed.Color = ColorHelper.Error;
+                embed.Author.IconUrl = ctx.Guild.IconUrl;
+                await msg.ModifyAsync(embed: embed.Build());
 
-            var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", !(ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers)), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
+                return;
+            }
+
+            string emojiText = "";
+
+            if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI))
+                emojiText += "emojis";
+
+            if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.STICKER))
+                emojiText += $"{(emojiText.Length > 0 ? " and stickers" : "stickers")}";
+
+            embed.Author.IconUrl = ctx.Guild.IconUrl;
+            embed.Description = $"`Select how you want to receive the downloaded {emojiText}.`";
+
+            bool IncludeStickers = false;
+
+            if (!SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI))
+                IncludeStickers = true;
+
+            var IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", "Include Stickers", !SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
+            
+            var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
             var ZipPrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "ZipPrivateMessage", "Direct Message as Zip File", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":desktop:")));
             var SinglePrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "SinglePrivateMessage", "Direct Message as Single Files", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":mobile_phone:")));
 
             var SendHereButton = new DiscordButtonComponent(ButtonStyle.Secondary, "SendHere", "In this chat as Zip File", !(ctx.Member.Permissions.HasPermission(Permissions.AttachFiles)), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":speech_balloon:")));
 
-            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { AddToServerButton, ZipPrivateMessageButton, SinglePrivateMessageButton, SendHereButton }));
+            var builder = new DiscordMessageBuilder().WithEmbed(embed);
+
+            if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.STICKER))
+                builder.AddComponents(IncludeStickersButton);
+
+            builder.AddComponents(new List<DiscordComponent> { AddToServerButton, ZipPrivateMessageButton, SinglePrivateMessageButton, SendHereButton });
+
+            await msg.ModifyAsync(builder);
 
             CancellationTokenSource cancellationTokenSource = new();
 
@@ -1995,12 +2072,22 @@ internal class User : BaseCommandModule
                                 _ = ctx.SendPermissionError(Permissions.ManageEmojisAndStickers);
                                 return;
                             }
+                            
+                            if (IncludeStickers)
+                            {
+                                embed.Description = $"`You cannot add any emoji(s) to the server while including stickers.`";
+                                embed.Color = ColorHelper.Error;
+                                embed.Author.IconUrl = ctx.Guild.IconUrl;
+                                await msg.ModifyAsync(embed: embed.Build());
+
+                                return;
+                            }
 
                             bool Pinned = false;
                             bool DiscordWarning = false;
 
                             embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
-                            embed.Description = $"`Added 0/{SanitizedEmoteList.Count} emojis to this server..`";
+                            embed.Description = $"`Added 0/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`";
                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                             for (int i = 0; i < SanitizedEmoteList.Count; i++)
@@ -2008,6 +2095,9 @@ internal class User : BaseCommandModule
                                 try
                                 {
                                     Task task;
+
+                                    if (SanitizedEmoteList.ElementAt(i).Value.Type != EmojiType.EMOJI)
+                                        continue;
 
                                     using (var fileStream = File.OpenRead(SanitizedEmoteList.ElementAt(i).Value.Path))
                                     {
@@ -2022,7 +2112,7 @@ internal class User : BaseCommandModule
 
                                         if (WaitSeconds > 10 && !DiscordWarning)
                                         {
-                                            embed.Description = $"`Added {i}/{SanitizedEmoteList.Count} emojis to this server..`\n\n" +
+                                            embed.Description = $"`Added {i}/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`\n\n" +
                                                                                 $"_The bot most likely hit a rate limit. This can take up to an hour to continue._\n" +
                                                                                 $"_If you want this to change, go scream at Discord. There's nothing i can do._";
                                             await msg.ModifyAsync(embed: embed.Build());
@@ -2048,7 +2138,7 @@ internal class User : BaseCommandModule
                                         }
                                         catch { }
 
-                                    embed.Description = $"`Added {i}/{SanitizedEmoteList.Count} emojis to this server..`";
+                                    embed.Description = $"`Added {i}/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`";
                                     await msg.ModifyAsync(embed: embed.Build());
                                 }
                                 catch (Exception ex)
@@ -2060,7 +2150,7 @@ internal class User : BaseCommandModule
                             embed.Thumbnail = null;
                             embed.Color = ColorHelper.Success;
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
-                            embed.Description = $":white_check_mark: `Downloaded and added {SanitizedEmoteList.Count} emojis to the server.`";
+                            embed.Description = $":white_check_mark: `Downloaded and added {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to the server.`";
                             await msg.ModifyAsync(embed: embed.Build());
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
@@ -2068,22 +2158,26 @@ internal class User : BaseCommandModule
                         else if (e.Interaction.Data.CustomId == SinglePrivateMessageButton.CustomId)
                         {
                             embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
-                            embed.Description = $"`Sending the emojis in your DMs..`";
+                            embed.Description = $"`Sending the {emojiText} in your DMs..`";
                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                             try
                             {
                                 for (int i = 0; i < SanitizedEmoteList.Count; i++)
                                 {
+                                    if (!IncludeStickers)
+                                        if (SanitizedEmoteList.ElementAt(i).Value.Type != EmojiType.EMOJI)
+                                            continue;
+
                                     using (var fileStream = File.OpenRead(SanitizedEmoteList.ElementAt(i).Value.Path))
                                     {
-                                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent($"`{i + 1}/{SanitizedEmoteList.Count}` `{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}`").WithFile($"{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}", fileStream));
+                                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent($"`{i + 1}/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())}` `{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}`").WithFile($"{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}", fileStream));
                                     }
 
                                     await Task.Delay(1000);
                                 }
 
-                                await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent($"Heyho! Here's the emojis you requested."));
+                                await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent($"Heyho! Here's the {emojiText} you requested."));
                             }
                             catch (DisCatSharp.Exceptions.UnauthorizedException)
                             {
@@ -2120,7 +2214,7 @@ internal class User : BaseCommandModule
                             embed.Thumbnail = null;
                             embed.Color = ColorHelper.Success;
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
-                            embed.Description = $":white_check_mark: `Downloaded and sent {SanitizedEmoteList.Count} emojis to your DMs.`";
+                            embed.Description = $":white_check_mark: `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                             await msg.ModifyAsync(embed: embed.Build());
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
@@ -2138,6 +2232,10 @@ internal class User : BaseCommandModule
 
                             for (int i = 0; i < SanitizedEmoteList.Count; i++)
                             {
+                                if (!IncludeStickers)
+                                    if (SanitizedEmoteList.ElementAt(i).Value.Type != EmojiType.EMOJI)
+                                        continue;
+
                                 string NewFilename = $"{SanitizedEmoteList.ElementAt(i).Value.Name}.{(SanitizedEmoteList.ElementAt(i).Value.Animated == true ? "gif" : "png")}";
 
                                 int FileExistsInt = 1;
@@ -2200,7 +2298,7 @@ internal class User : BaseCommandModule
                                 embed.Thumbnail = null;
                                 embed.Color = ColorHelper.Success;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                                embed.Description = $":white_check_mark: `Downloaded and sent {SanitizedEmoteList.Count} emojis to your DMs.`";
+                                embed.Description = $":white_check_mark: `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                                 await msg.ModifyAsync(embed: embed.Build());
                             }
                             else if (e.Interaction.Data.CustomId == SendHereButton.CustomId)
@@ -2217,7 +2315,7 @@ internal class User : BaseCommandModule
                                 embed.Thumbnail = null;
                                 embed.Color = ColorHelper.Success;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                                embed.Description = $":white_check_mark: `Downloaded {SanitizedEmoteList.Count} emojis. Attached is a Zip File containing them.`";
+                                embed.Description = $":white_check_mark: `Downloaded {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText}. Attached is a Zip File containing them.`";
 
                                 using (var fileStream = File.OpenRead($"Emotes-{guid}.zip"))
                                 {
@@ -2229,6 +2327,44 @@ internal class User : BaseCommandModule
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
                         }
+                        else if (e.Interaction.Data.CustomId == IncludeStickersButton.CustomId)
+                        {
+                            IncludeStickers = !IncludeStickers;
+
+                            if (!IncludeStickers)
+                            {
+                                if (!SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI))
+                                    IncludeStickers = true;
+                            }
+
+                            IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", "Include Stickers", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
+                            AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
+
+                            var builder = new DiscordMessageBuilder().WithEmbed(embed);
+
+                            if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.STICKER))
+                                builder.AddComponents(IncludeStickersButton);
+
+                            builder.AddComponents(new List<DiscordComponent> { AddToServerButton, ZipPrivateMessageButton, SinglePrivateMessageButton, SendHereButton });
+
+                            await msg.ModifyAsync(builder);
+                        }
+
+                        cancellationTokenSource = new();
+                        ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+                        try
+                        {
+                            await Task.Delay(60000, cancellationTokenSource.Token);
+                            _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
+                            embed.Footer.Text += " • Interaction timed out";
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        }
+                        catch { }
                     }
 
                 }).Add(_bot._watcher, ctx);

@@ -27,23 +27,21 @@
 
   <ItemGroup>
     <Compile Remove="%2a%2a\**" />
-    <Compile Remove="ApplicationCommands\**" />
     <Compile Remove="Project_Ichigo\**" />
     <EmbeddedResource Remove="%2a%2a\**" />
-    <EmbeddedResource Remove="ApplicationCommands\**" />
     <EmbeddedResource Remove="Project_Ichigo\**" />
     <None Remove="%2a%2a\**" />
-    <None Remove="ApplicationCommands\**" />
     <None Remove="Project_Ichigo\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00326" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00326" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.0.0-nightly-00326" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00326" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00326" />
+    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00331" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.0-nightly-00331" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00331" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.0.0-nightly-00331" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00331" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00331" />
     <PackageReference Include="MySql.Data" Version="8.0.29" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.115.5" />
