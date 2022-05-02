@@ -63,8 +63,6 @@ global using Project_Ichigo.Objects.Entities;
 global using Project_Ichigo.Objects.Database;
 global using Project_Ichigo.PhishingProtection;
 global using Project_Ichigo.Commands;
-global using Project_Ichigo.ApplicationCommands;
-global using Project_Ichigo.ApplicationCommands.Maintainers;
 global using Project_Ichigo.Commands.User;
 global using Project_Ichigo.Commands.Maintainers;
 global using Project_Ichigo.Experience;

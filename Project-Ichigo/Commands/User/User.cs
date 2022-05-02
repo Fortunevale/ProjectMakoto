@@ -116,14 +116,14 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
-
             if (victim is not null)
             {
                 _ = ctx.Client.GetCommandsNext().RegisteredCommands["user-info"].ExecuteAsync(ctx);
                 return;
             }
+
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                return;
 
             var embed = new DiscordEmbedBuilder
             {
