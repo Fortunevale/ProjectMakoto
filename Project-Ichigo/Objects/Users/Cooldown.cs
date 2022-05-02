@@ -2,6 +2,13 @@
 
 internal class Cooldown
 {
+    internal Cooldown(Bot _bot)
+    {
+        this._bot = _bot;
+    }
+
+    private Bot _bot { get; set; }
+
     private DateTime LightCommandLastUse = DateTime.MinValue;
     private DateTime ModerateCommandLastUse = DateTime.MinValue;
     private DateTime HeavyCommandLastUse = DateTime.MinValue;
@@ -12,6 +19,9 @@ internal class Cooldown
 
     public async Task<bool> WaitForLight(DiscordClient client, DiscordMessage message)
     {
+        if (_bot._status.TeamMembers.Contains(message.Author.Id))
+            return false;
+
         if (WaitingLight)
         {
             var stop_warn = await message.Channel.SendMessageAsync($"{message.Author.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`");
@@ -46,6 +56,9 @@ internal class Cooldown
 
     public async Task<bool> WaitForModerate(DiscordClient client, DiscordMessage message)
     {
+        if (_bot._status.TeamMembers.Contains(message.Author.Id))
+            return false;
+
         if (WaitingModerate)
         {
             var stop_warn = await message.Channel.SendMessageAsync($"{message.Author.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`");
@@ -80,6 +93,9 @@ internal class Cooldown
 
     public async Task<bool> WaitForHeavy(DiscordClient client, DiscordMessage message)
     {
+        if (_bot._status.TeamMembers.Contains(message.Author.Id))
+            return false;
+
         if (WaitingHeavy)
         {
             var stop_warn = await message.Channel.SendMessageAsync($"{message.Author.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`");

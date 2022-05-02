@@ -146,7 +146,7 @@ internal class DatabaseInit
         IEnumerable<DatabaseUsers> users = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseUsers>(_bot._databaseClient._helper.GetLoadCommand("users", DatabaseColumnLists.users));
 
         foreach (var b in users)
-            _bot._users.List.Add(b.userid, new Users.Info
+            _bot._users.List.Add(b.userid, new Users.Info(_bot)
             {
                 UrlSubmissions = new()
                 {

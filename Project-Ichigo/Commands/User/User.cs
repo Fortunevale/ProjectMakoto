@@ -641,7 +641,7 @@ internal class User : BaseCommandModule
                 return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
-                _bot._users.List.Add(ctx.User.Id, new Users.Info());
+                _bot._users.List.Add(ctx.User.Id, new Users.Info(_bot));
 
             if (!_bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
             {
@@ -921,7 +921,7 @@ internal class User : BaseCommandModule
                 return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
-                _bot._users.List.Add(ctx.User.Id, new Users.Info());
+                _bot._users.List.Add(ctx.User.Id, new Users.Info(_bot));
 
             if (reason.Length > 128)
             {
@@ -963,7 +963,7 @@ internal class User : BaseCommandModule
             {
                 if (id.Contains('@'))
                     if (!_bot._users.List.ContainsKey(ctx.Message.MentionedUsers[0].Id))
-                        _bot._users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info());
+                        _bot._users.List.Add(ctx.Message.MentionedUsers[0].Id, new Users.Info(_bot));
 
                 if (_bot._users.List[ctx.Message.MentionedUsers[0].Id].ScoreSaber.Id != 0)
                 {
@@ -995,7 +995,7 @@ internal class User : BaseCommandModule
     private async Task SendScoreSaberProfile(CommandContext ctx, string id = "", bool AddLinkButton = true)
     {
         if (!_bot._users.List.ContainsKey(ctx.User.Id))
-            _bot._users.List.Add(ctx.User.Id, new Users.Info());
+            _bot._users.List.Add(ctx.User.Id, new Users.Info(_bot));
 
         if (string.IsNullOrWhiteSpace(id))
         {
@@ -1689,7 +1689,7 @@ internal class User : BaseCommandModule
                 return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
-                _bot._users.List.Add(ctx.User.Id, new Users.Info());
+                _bot._users.List.Add(ctx.User.Id, new Users.Info(_bot));
 
             if (_bot._users.List[ctx.User.Id].ScoreSaber.Id != 0)
             {

@@ -57,11 +57,11 @@ internal class DisCatSharpEventHandler
 
         if (member is not null)
             if (!_bot._users.List.ContainsKey(member.Id))
-                _bot._users.List.Add(member.Id, new());
+                _bot._users.List.Add(member.Id, new(_bot));
 
         if (user is not null)
             if (!_bot._users.List.ContainsKey(user.Id))
-                _bot._users.List.Add(user.Id, new());
+                _bot._users.List.Add(user.Id, new(_bot));
     }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)

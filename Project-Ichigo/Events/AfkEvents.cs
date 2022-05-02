@@ -16,7 +16,7 @@ internal class AfkEvents
                 return;
 
             if (!_bot._users.List.ContainsKey(e.Author.Id))
-                _bot._users.List.Add(e.Author.Id, new Users.Info());
+                _bot._users.List.Add(e.Author.Id, new Users.Info(_bot));
 
             if (_bot._users.List[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot._users.List[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
             {
@@ -70,7 +70,7 @@ internal class AfkEvents
                         continue;
 
                     if (!_bot._users.List.ContainsKey(b.Id))
-                        _bot._users.List.Add(b.Id, new Users.Info());
+                        _bot._users.List.Add(b.Id, new Users.Info(_bot));
 
                     if (_bot._users.List[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
                     {
