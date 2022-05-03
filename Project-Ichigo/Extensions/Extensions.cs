@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Project_Ichigo.Extensions;
+﻿namespace Project_Ichigo.Extensions;
 
 internal static class Extensions
 {

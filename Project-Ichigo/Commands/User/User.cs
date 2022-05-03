@@ -1,4 +1,5 @@
 ﻿namespace Project_Ichigo.Commands.User;
+
 internal class User : BaseCommandModule
 {
     public Bot _bot { private get; set; }

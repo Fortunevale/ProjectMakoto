@@ -1,6 +1,7 @@
 ﻿// System
 
 global using System;
+global using System.Drawing;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Net.Http;
@@ -62,6 +63,8 @@ global using Project_Ichigo.Objects.Afk;
 global using Project_Ichigo.Objects.Entities;
 global using Project_Ichigo.Objects.Database;
 global using Project_Ichigo.PhishingProtection;
+global using Project_Ichigo.ApplicationCommands;
+global using Project_Ichigo.ApplicationCommands.Maintainers;
 global using Project_Ichigo.Commands;
 global using Project_Ichigo.Commands.User;
 global using Project_Ichigo.Commands.Maintainers;
@@ -87,3 +90,10 @@ global using static Xorog.Logger.LoggerObjects;
 
 global using Newtonsoft.Json;
 global using Dapper;
+global using Octokit;
+
+// Octokit Aliases
+
+global using FileMode = System.IO.FileMode;
+global using RequestParameters = Xorog.ScoreSaber.Objects.RequestParameters;
+global using PermissionLevel = DisCatSharp.PermissionLevel;
