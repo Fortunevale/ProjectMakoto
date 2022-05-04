@@ -1031,7 +1031,25 @@ internal class User : BaseCommandModule
             DiscordButtonComponent ShowProfileButton = new(ButtonStyle.Primary, "getmain", "Show Profile", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":bust_in_silhouette:")));
             DiscordButtonComponent TopScoresButton = new(ButtonStyle.Primary, "gettopscores", "Show Top Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":sparkler:")));
             DiscordButtonComponent RecentScoresButton = new(ButtonStyle.Primary, "getrecentscores", "Show Recent Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":clock3:")));
+
+            DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
+
             DiscordLinkButtonComponent OpenProfileInBrowser = new($"https://scoresaber.com/u/{id}", "Open in browser", false);
+
+            List<DiscordComponent> ProfileInteractionRow = new();
+            ProfileInteractionRow.Add(OpenProfileInBrowser);
+            ProfileInteractionRow.Add(TopScoresButton);
+            ProfileInteractionRow.Add(RecentScoresButton);
+
+            List<DiscordComponent> RecentScoreInteractionRow = new();
+            RecentScoreInteractionRow.Add(OpenProfileInBrowser);
+            RecentScoreInteractionRow.Add(ShowProfileButton);
+            RecentScoreInteractionRow.Add(TopScoresButton);
+
+            List<DiscordComponent> TopScoreInteractionRow = new();
+            TopScoreInteractionRow.Add(OpenProfileInBrowser);
+            TopScoreInteractionRow.Add(ShowProfileButton);
+            TopScoreInteractionRow.Add(RecentScoresButton);
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
@@ -1043,10 +1061,8 @@ internal class User : BaseCommandModule
 
                         if (e.Interaction.Data.CustomId == "thats_me")
                         {
-                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                            cancellationTokenSource.Cancel();
-
-                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(TopScoresButton).AddComponents(RecentScoresButton));
+                            AddLinkButton = false;
+                            ShowProfile().Add(_bot._watcher, ctx);
                             _bot._users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -1063,7 +1079,6 @@ internal class User : BaseCommandModule
                             {
                                 _ = new_msg.DeleteAsync();
                             });
-                            return;
                         }
                         else if (e.Interaction.Data.CustomId == "gettopscores")
                         {
@@ -1141,7 +1156,7 @@ internal class User : BaseCommandModule
                         {
                             await Task.Delay(120000, cancellationTokenSource.Token);
                             embed.Footer.Text += " • Interaction timed out";
-                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(OpenProfileInBrowser));
 
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                         }
@@ -1165,8 +1180,15 @@ internal class User : BaseCommandModule
                         $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.score.missedNotes + score.score.badCuts}`")}**"));
                 }
 
-                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(OpenProfileInBrowser).AddComponents(ShowProfileButton).AddComponents((scoreType == RequestParameters.ScoreType.TOP ? RecentScoresButton : TopScoresButton)));
+                DiscordMessageBuilder builder = new();
+
+                if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                    builder.AddComponents(LinkButton);
+
+                _ = msg.ModifyAsync(builder.WithEmbed(embed).AddComponents((scoreType == RequestParameters.ScoreType.TOP ? TopScoreInteractionRow : RecentScoreInteractionRow)));
             }
+
+            string LoadedGraph = "";
 
             async Task ShowProfile()
             {
@@ -1182,122 +1204,126 @@ internal class User : BaseCommandModule
                 embed.AddField(new DiscordEmbedField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
                 embed.AddField(new DiscordEmbedField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true));
 
-                DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
-
-                DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
-
-                builder.AddComponents(OpenProfileInBrowser);
+                DiscordMessageBuilder builder = new();
 
                 if (_bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
-                msg.ModifyAsync(builder).Add(_bot._watcher, ctx);
+                if (!string.IsNullOrWhiteSpace(LoadedGraph))
+                {
+                    embed.Author.IconUrl = ctx.Guild.IconUrl;
+                    embed.ImageUrl = LoadedGraph;
+                    builder.AddComponents(ProfileInteractionRow);
+                }
+
+                msg.ModifyAsync(builder.WithEmbed(embed)).Add(_bot._watcher, ctx);
 
                 var file = $"{Guid.NewGuid()}.png";
 
-                try
-                {
-                    Chart qc = new();
-                    qc.Width = 1000;
-                    qc.Height = 500;
-                    qc.Config = $@"{{
-                        type: 'line',
-                        data: 
-                        {{
-                            labels: 
-                            [
-                                '',
-                                '48 days ago','',
-                                '46 days ago','',
-                                '44 days ago','',
-                                '42 days ago','',
-                                '40 days ago','',
-                                '38 days ago','',
-                                '36 days ago','',
-                                '34 days ago','',
-                                '32 days ago','',
-                                '30 days ago','',
-                                '28 days ago','',
-                                '26 days ago','',
-                                '24 days ago','',
-                                '22 days ago','',
-                                '20 days ago','',
-                                '18 days ago','',
-                                '16 days ago','',
-                                '14 days ago','',
-                                '12 days ago','',
-                                '10 days ago','',
-                                '8 days ago','',
-                                '6 days ago','',
-                                '4 days ago','',
-                                '2 days ago','',
-                                'Today'
-                            ],
-                            datasets: 
-                            [
-                                {{
-                                    label: 'Placements',
-                                    data: [{player.histories},{player.rank}],
-                                    fill: false,
-                                    borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
-                                    reverse: true,
-                                    id: ""yaxis2""
-
-                                }}
-                            ]
-
-                        }},
-                        options:
-                        {{
-                            legend:
+                if (string.IsNullOrWhiteSpace(LoadedGraph))
+                    try
+                    {
+                        Chart qc = new();
+                        qc.Width = 1000;
+                        qc.Height = 500;
+                        qc.Config = $@"{{
+                            type: 'line',
+                            data: 
                             {{
-                                display: false,
-                            }},
-                            elements:
-                            {{
-                                point:
-                                {{
-                                    radius: 0
-                                }}
-                            }},
-                            scales:
-                            {{
-                                yAxes:
+                                labels: 
+                                [
+                                    '',
+                                    '48 days ago','',
+                                    '46 days ago','',
+                                    '44 days ago','',
+                                    '42 days ago','',
+                                    '40 days ago','',
+                                    '38 days ago','',
+                                    '36 days ago','',
+                                    '34 days ago','',
+                                    '32 days ago','',
+                                    '30 days ago','',
+                                    '28 days ago','',
+                                    '26 days ago','',
+                                    '24 days ago','',
+                                    '22 days ago','',
+                                    '20 days ago','',
+                                    '18 days ago','',
+                                    '16 days ago','',
+                                    '14 days ago','',
+                                    '12 days ago','',
+                                    '10 days ago','',
+                                    '8 days ago','',
+                                    '6 days ago','',
+                                    '4 days ago','',
+                                    '2 days ago','',
+                                    'Today'
+                                ],
+                                datasets: 
                                 [
                                     {{
+                                        label: 'Placements',
+                                        data: [{player.histories},{player.rank}],
+                                        fill: false,
+                                        borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
                                         reverse: true,
-                                        ticks:
-                                        {{
-                                            reverse: true
-                                        }}
+                                        id: ""yaxis2""
+
                                     }}
                                 ]
+
+                            }},
+                            options:
+                            {{
+                                legend:
+                                {{
+                                    display: false,
+                                }},
+                                elements:
+                                {{
+                                    point:
+                                    {{
+                                        radius: 0
+                                    }}
+                                }},
+                                scales:
+                                {{
+                                    yAxes:
+                                    [
+                                        {{
+                                            reverse: true,
+                                            ticks:
+                                            {{
+                                                reverse: true
+                                            }}
+                                        }}
+                                    ]
+                                }}
                             }}
-                        }}
-                    }}";
+                        }}";
 
-                    qc.ToFile(file);
+                        qc.ToFile(file);
 
-                    using (FileStream stream = File.Open(file, FileMode.Open))
-                    {
-                        var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+                        using (FileStream stream = File.Open(file, FileMode.Open))
+                        {
+                            var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
 
-                        embed.Author.IconUrl = ctx.Guild.IconUrl;
-                        embed.ImageUrl = asset.Attachments[0].Url;
-                        builder = builder.WithEmbed(embed);
-                        builder.AddComponents(TopScoresButton);
-                        builder.AddComponents(RecentScoresButton);
-                        _ = msg.ModifyAsync(builder);
+                            LoadedGraph = asset.Attachments[0].Url;
+
+                            embed.Author.IconUrl = ctx.Guild.IconUrl;
+                            embed.ImageUrl = asset.Attachments[0].Url;
+                            builder = builder.WithEmbed(embed);
+                            builder.AddComponents(ProfileInteractionRow);
+                            _ = msg.ModifyAsync(builder);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    builder.AddComponents(TopScoresButton);
-                    builder.AddComponents(RecentScoresButton);
-                    _ = msg.ModifyAsync(builder);
-                    LogError(ex.ToString());
-                }
+                    catch (Exception ex)
+                    {
+                        embed.Author.IconUrl = ctx.Guild.IconUrl;
+                        builder.AddComponents(ProfileInteractionRow);
+                        _ = msg.ModifyAsync(builder);
+                        LogError(ex.ToString());
+                    }
 
                 try
                 {
@@ -1315,7 +1341,7 @@ internal class User : BaseCommandModule
             {
                 await Task.Delay(120000, cancellationTokenSource.Token);
                 embed.Footer.Text += " • Interaction timed out";
-                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(OpenProfileInBrowser));
 
                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
             }
