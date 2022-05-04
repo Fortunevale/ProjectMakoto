@@ -15,4 +15,4 @@ jobs:
           # The url of the project
           project-url: "https://github.com/TheXorog/Project-Ichigo/projects/2"
           # The column that the card should end up
-          column-name: "To Do"
+          column-name: "To do"
