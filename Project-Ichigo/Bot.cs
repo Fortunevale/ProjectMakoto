@@ -333,24 +333,6 @@ internal class Bot
                         appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(929365338544545802);
                     else
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
-
-                    await Task.Delay(5000);
-
-                    var guild = await discordClient.GetGuildAsync(929365338544545802);
-                    var perms = await discordClient.GetGuildApplicationCommandPermissionsAsync(929365338544545802);
-
-                    foreach (var b in perms)
-                    {
-                        LogInfo($"{b.ApplicationId} > {String.Join("\n", b.Permissions.Select(x => $"({guild.EveryoneRole.Id == x.Id}) {x.Id} : {x.Permission}"))}");
-                    }
-
-                    foreach (var guilds in appCommands.RegisteredCommands)
-                    {
-                        foreach (var b in guilds.Value)
-                        {
-                            LogInfo($"{b.Name} > {b.DefaultMemberPermissions}");
-                        }
-                    }
                 }).Add(_watcher);
 
                 if (!IsDev)
