@@ -35,7 +35,7 @@ internal class Maintainers : ApplicationCommandsModule
 
                 var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                     .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
-                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description"));
+                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", required: false));
 
                 await ctx.CreateModalResponseAsync(modal);
 
