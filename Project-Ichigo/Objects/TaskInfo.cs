@@ -2,7 +2,14 @@
 
 internal class TaskInfo
 {
-    internal string uuid { get; set; }
-    internal CommandContext? ctx { get; set; } = null;
-    internal Task task { get; set; }
+    internal TaskInfo(Task task, CommandContext ctx = null)
+    {
+        this.ctx = ctx;
+        this.task = task;
+    }
+
+    internal string uuid { get; private set; } = Guid.NewGuid().ToString();
+    internal CommandContext? ctx { get; private set; } = null;
+    internal Task task { get; private set; }
+    internal DateTime CreationTimestamp { get; private set; } = DateTime.UtcNow;
 }
