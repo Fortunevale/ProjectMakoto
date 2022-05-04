@@ -17,7 +17,7 @@ internal class Maintainers : ApplicationCommandsModule
             if (ctx.User.IsMaintenance(_bot._status))
                 return true;
 
-            _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"{false.BoolToEmote()} `This command is restricted to Staff Members of Project Ichigo.`"));
             return false;
         }
@@ -29,13 +29,21 @@ internal class Maintainers : ApplicationCommandsModule
             {
                 if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                 {
-                    var followup = await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"{false.BoolToEmote()} `The GitHub Token expired, please update.`"));
+                    await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"{false.BoolToEmote()} `The GitHub Token expired, please update.`"));
                     return;
                 }
 
+                var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
+
+                var tokenAuth = new Credentials(Secrets.Secrets.GithubToken);
+                client.Credentials = tokenAuth;
+
+                var labels = await client.Issue.Labels.GetAllForRepository("TheXorog", "Project-Ichigo");
+                
                 var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                     .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
-                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", required: false));
+                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", required: false))
+                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "labels", "Labels", "", null, null, false, $"Put a # in front of every label you want to add.\n\n{string.Join("\n", labels.Select(x => x.Name))}"));
 
                 await ctx.CreateModalResponseAsync(modal);
 
@@ -54,8 +62,7 @@ internal class Maintainers : ApplicationCommandsModule
 
                             string title = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "title").First().Components.First().Value;
                             string description = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "description").First().Components.First().Value;
-
-                            var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
+                            string labelsraw = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "labels").First().Components.First().Value;
 
                             if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                             {
@@ -63,10 +70,14 @@ internal class Maintainers : ApplicationCommandsModule
                                 return;
                             }
 
-                            var tokenAuth = new Credentials(Secrets.Secrets.GithubToken);
-                            client.Credentials = tokenAuth;
+                            List<string> labels = labelsraw.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith("#")).Select(x => x.Replace("#", "")).ToList();
 
                             var issue = await client.Issue.Create("TheXorog", "Project-Ichigo", new NewIssue(title) { Body = description });
+
+                            if (labels.Count > 0)
+                                await client.Issue.Labels.ReplaceAllForIssue("TheXorog", "Project-Ichigo", issue.Number, labels.ToArray());
+
+                            await client.Issue.Assignee.AddAssignees("TheXorog", "Project-Ichigo", issue.Number, new AssigneesUpdate(new List<string> { "TheXorog" }));
 
                             _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"{true.BoolToEmote()} `Issue submitted:` {issue.HtmlUrl}"));
                         }
