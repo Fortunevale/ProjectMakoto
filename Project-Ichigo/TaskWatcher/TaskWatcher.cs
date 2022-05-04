@@ -13,13 +13,18 @@ internal class TaskWatcher
                 if (!b.task.IsCompleted)
                     continue;
 
+                var ctx = b.ctx;
+
                 if (b.task.IsCompletedSuccessfully)
                 {
+                    LogDebug2($"Successfully executed task:{b.task.Id} '{b.uuid}' in {b.CreationTimestamp.GetTimespanSince().TotalMilliseconds:N0}ms");
+
+                    if (ctx is not null)
+                        LogInfo($"Successfully executed Command in {b.CreationTimestamp.GetTimespanSince().TotalMilliseconds:N0}ms for '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id})");
+
                     tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
                     continue;
                 }
-
-                var ctx = b.ctx;
 
                 if (ctx != null)
                     LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name}  on '{ctx.Guild.Name}' ({ctx.Guild.Id})", b.task.Exception);
