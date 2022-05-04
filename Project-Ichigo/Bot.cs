@@ -42,6 +42,9 @@ internal class Bot
     internal ILogger _logger { get; set; }
     internal ILoggerProvider _loggerProvider { get; set; }
 
+    internal string Prefix { get; private set; } = ";;";
+    internal bool IsDev { get; private set; } = false;
+
 
     internal async Task Init(string[] args)
     {
@@ -118,9 +121,6 @@ internal class Bot
 
         await loadDatabase.WaitAsync(TimeSpan.FromSeconds(600));
 
-        bool IsDev = false;
-        bool DevOnline = false;
-
         var logInToDiscord = Task.Run(async () =>
         {
             string token = "";
@@ -172,26 +172,6 @@ internal class Bot
             _experienceHandler = new(this);
 
             LogDebug($"Registering CommandsNext..");
-
-            string Prefix = ";;";
-
-            Task<int> GetPrefix(DiscordMessage message)
-            {
-                return Task<int>.Run(() =>
-                {
-                    if (!IsDev)
-                        if (DevOnline)
-                            if (_status.TeamMembers.Any(x => x == message.Author.Id))
-                                if (message.Channel.GuildId is 929365338544545802 or 938490069839380510)
-                                    return -1;
-
-                    if (IsDev)
-                        if (!_status.TeamMembers.Any(x => x == message.Author.Id))
-                            return -1;
-
-                    return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
-                });
-            }
 
             var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
             {
@@ -335,37 +315,8 @@ internal class Bot
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
                 }).Add(_watcher);
 
-                if (!IsDev)
-                    Task.Run(async () =>
-                    {
-                        while (true)
-                        {
-                            try
-                            {
-                                var bot = await discordClient.GetUserAsync(929373806437470260, true);
-
-                                if (bot.Presence is null)
-                                {
-                                    DevOnline = false;
-                                    await Task.Delay(8000);
-                                    continue;
-                                }
-
-                                bool isOnline = (bot.Presence.ClientStatus.Web.Value == UserStatus.Online);
-
-                                if (isOnline != DevOnline)
-                                {
-                                    DevOnline = isOnline;
-                                    LogWarn($"Developer client status changed: {isOnline}");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                LogError($"An exception occured while trying to request the status of the developer client", ex);
-                            }
-                            await Task.Delay(8000);
-                        }
-                    }).Add(_watcher);
+                if (IsDev)
+                    Prefix = ">>";
 
                 _ = Task.Run(() =>
                 {
@@ -478,7 +429,7 @@ internal class Bot
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
-                    await discordClient.UpdateStatusAsync(userStatus: (DevOnline ? UserStatus.DoNotDisturb : UserStatus.Online), activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
@@ -492,76 +443,16 @@ internal class Bot
         await Task.Delay(-1);
     }
 
-    private void LogHandler(object? sender, LogMessageEventArgs e)
+    internal Task<int> GetPrefix(DiscordMessage message)
     {
-        switch (e.LogEntry.LogLevel)
+        return Task<int>.Run(() =>
         {
-            case LoggerObjects.LogLevel.WARN:
-            {
-                _status.WarnRaised++;
-                break;
-            }
-            case LoggerObjects.LogLevel.ERROR:
-            {
-                _status.ErrorRaised++;
-                break;
-            }
-            case LoggerObjects.LogLevel.FATAL:
-            {
-                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
-                {
-                    LogRaised -= LogHandler;
-                    _ = RunExitTasks(null, null);
-                }
-                else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
-                {
-                    _status.DataReaderExceptions++;
+            if (IsDev)
+                if (!_status.TeamMembers.Any(x => x == message.Author.Id))
+                    return -1;
 
-                    if (_status.DataReaderExceptions >= 4)
-                    {
-                        LogFatal("4 or more DataReader Exceptions triggered, exiting..");
-
-                        LogRaised -= LogHandler;
-                        _ = RunExitTasks(null, null);
-                    }
-                }
-
-                _status.FatalRaised++;
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    private async Task FlushToDatabase()
-    {
-        LogInfo($"Flushing to database..");
-        await DatabaseClient.SyncDatabase(true);
-        LogDebug($"Flushed to database.");
-
-        await Task.Delay(1000);
-
-        LogInfo($"Closing database..");
-        await DatabaseClient.Dispose();
-        LogDebug($"Closed database.");
-    }
-
-    private async Task LogOffDiscord()
-    {
-        // Apparently spamming status changes makes it more consistent. Dont ask me how.
-        // It's important that the status changes before the bot shuts down to work around a library issue.
-
-        LogInfo($"Closing Discord Client..");
-
-        for (int i = 0; i < 10; i++)
-            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await Task.Delay(1000);
-        for (int i = 0; i < 10; i++)
-            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await Task.Delay(5000);
-        await discordClient.DisconnectAsync();
-        LogDebug($"Closed Discord Client.");
+            return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
+        });
     }
 
     private async Task SyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
@@ -654,27 +545,6 @@ internal class Bot
         LogInfo($"Sync Tasks successfully finished for {startupTasksSuccess}/{Guilds.Count} guilds.");
     }
 
-    private async Task RunExitTasks(object? sender, EventArgs e)
-    {
-        if (DatabaseClient.IsDisposed())
-            return;
-
-        try
-        {
-            await SyncTasks(discordClient.Guilds);
-        }
-        catch (Exception ex)
-        {
-            LogError("Failed to run sync tasks", ex);
-        }
-
-        await LogOffDiscord();
-        await FlushToDatabase();
-
-        Thread.Sleep(1000);
-        LogInfo($"Goodbye!");
-    }
-
     private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {
         Task.Run(async () =>
@@ -722,5 +592,98 @@ internal class Bot
             await _databaseClient.SyncDatabase(true);
 
         }).Add(_watcher);
+    }
+
+    private async Task FlushToDatabase()
+    {
+        LogInfo($"Flushing to database..");
+        await DatabaseClient.SyncDatabase(true);
+        LogDebug($"Flushed to database.");
+
+        await Task.Delay(1000);
+
+        LogInfo($"Closing database..");
+        await DatabaseClient.Dispose();
+        LogDebug($"Closed database.");
+    }
+
+    private async Task LogOffDiscord()
+    {
+        // Apparently spamming status changes makes it more consistent. Dont ask me how.
+        // It's important that the status changes before the bot shuts down to work around a library issue.
+
+        LogInfo($"Closing Discord Client..");
+
+        for (int i = 0; i < 10; i++)
+            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
+        await Task.Delay(1000);
+        for (int i = 0; i < 10; i++)
+            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+        await Task.Delay(5000);
+        await discordClient.DisconnectAsync();
+        LogDebug($"Closed Discord Client.");
+    }
+
+    private async Task RunExitTasks(object? sender, EventArgs e)
+    {
+        if (DatabaseClient.IsDisposed())
+            return;
+
+        try
+        {
+            await SyncTasks(discordClient.Guilds);
+        }
+        catch (Exception ex)
+        {
+            LogError("Failed to run sync tasks", ex);
+        }
+
+        await LogOffDiscord();
+        await FlushToDatabase();
+
+        Thread.Sleep(1000);
+        LogInfo($"Goodbye!");
+    }
+
+    private void LogHandler(object? sender, LogMessageEventArgs e)
+    {
+        switch (e.LogEntry.LogLevel)
+        {
+            case LoggerObjects.LogLevel.WARN:
+            {
+                _status.WarnRaised++;
+                break;
+            }
+            case LoggerObjects.LogLevel.ERROR:
+            {
+                _status.ErrorRaised++;
+                break;
+            }
+            case LoggerObjects.LogLevel.FATAL:
+            {
+                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
+                {
+                    LogRaised -= LogHandler;
+                    _ = RunExitTasks(null, null);
+                }
+                else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
+                {
+                    _status.DataReaderExceptions++;
+
+                    if (_status.DataReaderExceptions >= 4)
+                    {
+                        LogFatal("4 or more DataReader Exceptions triggered, exiting..");
+
+                        LogRaised -= LogHandler;
+                        _ = RunExitTasks(null, null);
+                    }
+                }
+
+                _status.FatalRaised++;
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
