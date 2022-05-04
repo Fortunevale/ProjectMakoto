@@ -33,6 +33,9 @@ internal class DatabaseQueue
 
                 var b = Queue.First();
 
+                if (b.Value is null)
+                    continue;
+
                 try
                 {
                     switch (b.Value.RequestType)
@@ -65,16 +68,8 @@ internal class DatabaseQueue
                 finally
                 {
                     lastResolve = b.Key;
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
                 }
-
-                GC.KeepAlive(b);
-                GC.KeepAlive(b.Key);
-                GC.KeepAlive(b.Value);
-                GC.KeepAlive(b.Value.Failed);
-                GC.KeepAlive(b.Value.Command);
-                GC.KeepAlive(b.Value.Executed);
-                GC.KeepAlive(b.Value.Exception);
             }
         });
     }
@@ -86,7 +81,7 @@ internal class DatabaseQueue
         Queue.Add(key, new RequestQueue { RequestType = RequestType.Command, Command = cmd });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
-            Thread.Sleep(50);
+            Thread.Sleep(1);
 
         var response = Queue[key];
         Queue.Remove(key);
