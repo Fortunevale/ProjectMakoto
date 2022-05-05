@@ -43,7 +43,7 @@ internal class Maintainers : ApplicationCommandsModule
 
                 await ctx.CreateModalResponseAsync(modal);
 
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                CancellationTokenSource cancellationTokenSource = new();
 
                 ctx.Client.ComponentInteractionCreated += RunInteraction;
 
