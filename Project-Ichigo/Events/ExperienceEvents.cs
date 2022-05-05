@@ -36,7 +36,6 @@ internal class ExperienceEvents
 
                 if (exp > 0)
                 {
-                    LogDebug(exp.ToString());
                     _bot._guilds.List[e.Guild.Id].Members[e.Author.Id].Last_Message = DateTime.UtcNow;
                     _bot._experienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
                 }

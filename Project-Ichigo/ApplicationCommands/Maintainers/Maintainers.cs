@@ -7,26 +7,22 @@ internal class Maintainers : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("github", "Interact with Project-Ichigo's Github Repository", (long)Permissions.None, false)]
+    [SlashCommandGroup("github", "Interact with Project-Ichigo's Github Repository", (long)Permissions.UseApplicationCommands, false)]
     public class Github : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        public override async Task<bool> BeforeSlashExecutionAsync(InteractionContext ctx)
-        {
-            if (ctx.User.IsMaintenance(_bot._status))
-                return true;
-
-            await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-            await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"{false.BoolToEmote()} `This command is restricted to Staff Members of Project Ichigo.`"));
-            return false;
-        }
-
-        [SlashCommand("create-issue", "Create a new issue on Project-Ichigo's Github Repository", (long)Permissions.None, false)]
+        [SlashCommand("create-issue", "Create a new issue on Project-Ichigo's Github Repository", (long)Permissions.UseApplicationCommands, false)]
         public async Task CreateIssue(InteractionContext ctx)
         {
             Task.Run(async () =>
             {
+                if (!ctx.User.IsMaintenance(_bot._status))
+                {
+                    _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"{false.BoolToEmote()} `This command is restricted to Staff Members of Project Ichigo.`"));
+                    return;
+                }
+
                 if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                 {
                     await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"{false.BoolToEmote()} `The GitHub Token expired, please update.`"));
