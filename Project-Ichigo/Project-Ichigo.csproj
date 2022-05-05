@@ -52,6 +52,7 @@
     <ProjectReference Include="..\..\Xorog.ScoreSaber\Xorog.ScoreSaber.csproj" />
     <ProjectReference Include="..\..\Xorog.Logger\Xorog.Logger.csproj" />
     <ProjectReference Include="..\..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+    <ProjectReference Include="..\Project-Ichigo.Secrets\Project-Ichigo.Secrets.csproj" />
   </ItemGroup>
 
   <ItemGroup>

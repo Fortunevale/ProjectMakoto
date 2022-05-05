@@ -9,12 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.Logger", "..\..\Xorog
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{4D7C899C-434C-490E-901D-F75B923790EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xorog.ScoreSaber", "..\..\Xorog.ScoreSaber\Xorog.ScoreSaber.csproj", "{C538FF26-FCB3-4BCC-82D3-70B2F02CEE7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.ScoreSaber", "..\..\Xorog.ScoreSaber\Xorog.ScoreSaber.csproj", "{C538FF26-FCB3-4BCC-82D3-70B2F02CEE7B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9696CEB9-0A15-4B42-A54E-63DB7F44D560}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project-Ichigo.Secrets", "..\Project-Ichigo.Secrets\Project-Ichigo.Secrets.csproj", "{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,6 +76,18 @@ Global
 		{C538FF26-FCB3-4BCC-82D3-70B2F02CEE7B}.x64|Any CPU.Build.0 = Debug|Any CPU
 		{C538FF26-FCB3-4BCC-82D3-70B2F02CEE7B}.x64|x64.ActiveCfg = Debug|Any CPU
 		{C538FF26-FCB3-4BCC-82D3-70B2F02CEE7B}.x64|x64.Build.0 = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Debug|x64.Build.0 = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Release|x64.ActiveCfg = Release|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.Release|x64.Build.0 = Release|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.x64|Any CPU.ActiveCfg = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.x64|Any CPU.Build.0 = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.x64|x64.ActiveCfg = Debug|Any CPU
+		{7303D0AA-CDD4-47A4-BFC7-F5FBB0055A3A}.x64|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
