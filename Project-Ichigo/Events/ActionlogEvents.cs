@@ -51,7 +51,7 @@ internal class ActionlogEvents
             _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"User joined" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("00ff21"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -71,7 +71,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserLeft, Name = $"User left" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -138,7 +138,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.MessageDeleted, Name = $"Message deleted" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Message.Author.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
@@ -179,7 +179,7 @@ internal class ActionlogEvents
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.VoiceStateUserJoined, Name = $"User joined Voice Channel" },
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.User.AvatarUrl },
-                        Color = ColorHelper.Info,
+                        Color = new DiscordColor("00ff21"),
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" + 
@@ -194,7 +194,7 @@ internal class ActionlogEvents
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.VoiceStateUserLeft, Name = $"User left Voice Channel" },
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.User.AvatarUrl },
-                        Color = ColorHelper.Info,
+                        Color = new DiscordColor("ff0005"),
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" +
@@ -209,7 +209,7 @@ internal class ActionlogEvents
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.VoiceStateUserUpdated, Name = $"User switched Voice Channel" },
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.User.AvatarUrl },
-                        Color = ColorHelper.Info,
+                        Color = new DiscordColor("ff9d00"),
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" +
@@ -231,7 +231,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.MessageDeleted, Name = $"Multiple Messages deleted" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`\n" +
                                 $"`Check the attached file to view the deleted messages.`"
@@ -325,7 +325,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.MessageEdited, Name = $"Message updated" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff9d00"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Message.Author.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
@@ -364,7 +364,7 @@ internal class ActionlogEvents
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Nickname updated" },
-                    Color = ColorHelper.Info,
+                    Color = new DiscordColor("ff9d00"),
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -410,7 +410,7 @@ internal class ActionlogEvents
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Roles updated" },
-                    Color = ColorHelper.Info,
+                    Color = new DiscordColor("ff9d00"),
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -441,11 +441,23 @@ internal class ActionlogEvents
                 }
 
                 if (RolesAdded && !RolesRemoved)
+                {
                     embed.Author.Name = "Roles added";
+                    embed.Color = new DiscordColor("00ff21");
+                    embed.Author.IconUrl = Resources.AuditLogIcons.UserAdded;
+                }
                 else if (!RolesAdded && RolesRemoved)
+                {
                     embed.Author.Name = "Roles removed";
+                    embed.Color = new DiscordColor("ff0005");
+                    embed.Author.IconUrl = Resources.AuditLogIcons.UserLeft;
+                }
                 else
+                {
                     embed.Author.Name = "Roles updated";
+                    embed.Color = new DiscordColor("ff9d00");
+                    embed.Author.IconUrl = Resources.AuditLogIcons.UserUpdated;
+                }
 
                 embed.Description += $"\n\n{Roles}";
 
@@ -460,7 +472,7 @@ internal class ActionlogEvents
                     _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanned, Name = $"User timed out" },
-                        Color = ColorHelper.Info,
+                        Color = new DiscordColor("ff0005"),
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -472,7 +484,7 @@ internal class ActionlogEvents
                     _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanRemoved, Name = $"User timeout removed" },
-                        Color = ColorHelper.Info,
+                        Color = new DiscordColor("00ff21"),
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -488,7 +500,7 @@ internal class ActionlogEvents
                         _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         {
                             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"Membership approved" },
-                            Color = ColorHelper.Info,
+                            Color = new DiscordColor("00ff21"),
                             Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                             Timestamp = DateTime.UtcNow,
                             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -508,7 +520,7 @@ internal class ActionlogEvents
                 _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Member Profile Picture updated" },
-                    Color = ColorHelper.Info,
+                    Color = new DiscordColor("ff9d00"),
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -522,7 +534,7 @@ internal class ActionlogEvents
                 _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Member Guild Profile Picture updated" },
-                    Color = ColorHelper.Info,
+                    Color = new DiscordColor("ff9d00"),
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -560,7 +572,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"Role created" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("00ff21"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Role**: {e.Role.Mention} `{e.Role.Name}`\n" +
@@ -626,7 +638,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserLeft, Name = $"Role deleted" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Role**: `{e.Role.Name}`\n" +
@@ -746,7 +758,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserUpdated, Name = $"Role updated" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff9d00"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.RoleAfter.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = Description
@@ -790,7 +802,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanned, Name = $"User banned" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -837,7 +849,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserBanRemoved, Name = $"User unbanned" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("00ff21"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
@@ -911,7 +923,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.GuildUpdated, Name = $"Guild updated" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff9d00"),
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.GuildAfter.IconUrl },
                 Description = Description
@@ -959,7 +971,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.ChannelAdded, Name = $"Channel created" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("00ff21"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Channel-Id: {e.Channel.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Name**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`\n"
@@ -1003,7 +1015,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.ChannelRemoved, Name = $"Channel deleted" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Channel-Id: {e.Channel.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Name**: `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`\n"
@@ -1058,7 +1070,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.ChannelModified, Name = $"Channel updated" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff9d00"),
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Channel-Id: {e.ChannelAfter.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = Description
@@ -1102,7 +1114,7 @@ internal class ActionlogEvents
             _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.InviteAdded, Name = $"Invite created" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("00ff21"),
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
                                 $"**Created by**: {e.Invite.Inviter.Mention} `{e.Invite.Inviter.UsernameWithDiscriminator}`\n" +
@@ -1121,7 +1133,7 @@ internal class ActionlogEvents
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.InviteRemoved, Name = $"Invite deleted" },
-                Color = ColorHelper.Info,
+                Color = new DiscordColor("ff0005"),
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
                                 $"**Created by**: {e.Invite.Inviter.Mention} `{e.Invite.Inviter.UsernameWithDiscriminator}`\n" +
