@@ -551,8 +551,6 @@ internal class Bot
         {
             LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
-            LogDebug($"{string.Join(", ", e.Guilds.Select<KeyValuePair<ulong, DiscordGuild>, string>(x => x.Value.Name))}");
-
             for (int i = 0; i < 251; i++)
             {
                 _experienceHandler.CalculateLevelRequirement(i);
