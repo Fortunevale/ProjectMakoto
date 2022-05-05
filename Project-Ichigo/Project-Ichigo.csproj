@@ -50,8 +50,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Xorog.ScoreSaber\Xorog.ScoreSaber.csproj" />
-    <ProjectReference Include="D:\Dokumente\GitHub\Xorog.Logger\Xorog.Logger.csproj" />
-    <ProjectReference Include="D:\Dokumente\GitHub\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
+    <ProjectReference Include="..\..\Xorog.Logger\Xorog.Logger.csproj" />
+    <ProjectReference Include="..\..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
