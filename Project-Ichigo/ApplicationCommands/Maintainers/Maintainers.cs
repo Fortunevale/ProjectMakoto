@@ -43,6 +43,8 @@ internal class Maintainers : ApplicationCommandsModule
 
                 await ctx.CreateModalResponseAsync(modal);
 
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
                 ctx.Client.ComponentInteractionCreated += RunInteraction;
 
                 async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
@@ -51,6 +53,7 @@ internal class Maintainers : ApplicationCommandsModule
                     {
                         if (e.Interaction.Data.CustomId == modal.CustomId)
                         {
+                            cancellationTokenSource.Cancel();
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
@@ -77,17 +80,17 @@ internal class Maintainers : ApplicationCommandsModule
 
                             _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"{true.BoolToEmote()} `Issue submitted:` {issue.HtmlUrl}"));
                         }
-                    }).Add(_bot._watcher);
+                    }).Add(_bot._watcher, ctx);
                 }
 
                 try
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(15));
+                    await Task.Delay(TimeSpan.FromMinutes(15), cancellationTokenSource.Token);
 
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
                 }
                 catch { }
-            }).Add(_bot._watcher);
+            }).Add(_bot._watcher, ctx);
         }
     }
 }

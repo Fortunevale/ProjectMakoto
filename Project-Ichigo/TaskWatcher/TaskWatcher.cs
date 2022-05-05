@@ -13,21 +13,26 @@ internal class TaskWatcher
                 if (!b.task.IsCompleted)
                     continue;
 
-                var ctx = b.ctx;
+                var CommandContext = b.CommandContext;
+                var InteractionContext = b.InteractionContext;
 
                 if (b.task.IsCompletedSuccessfully)
                 {
                     LogTrace($"Successfully executed task:{b.task.Id} '{b.uuid}' in {b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}ms");
 
-                    if (ctx is not null)
-                        LogInfo($"Successfully executed '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name} on '{ctx.Guild.Name}' ({ctx.Guild.Id}) ({b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}ms)");
+                    if (CommandContext is not null)
+                        LogInfo($"Successfully executed '{CommandContext.Prefix}{CommandContext.Command.Name}{(string.IsNullOrWhiteSpace(CommandContext.RawArgumentString) ? "" : $" {CommandContext.RawArgumentString}")}' for {CommandContext.User.Username}#{CommandContext.User.Discriminator} ({CommandContext.User.Id}) in #{CommandContext.Channel.Name} on '{CommandContext.Guild.Name}' ({CommandContext.Guild.Id}) ({b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}ms)");
+                    else if (InteractionContext is not null)
+                        LogInfo($"Successfully executed '/{InteractionContext.CommandName}' for {InteractionContext.User.Username}#{InteractionContext.User.Discriminator} ({InteractionContext.User.Id}){(InteractionContext.Channel is not null ? $"in #{InteractionContext.Channel.Name}" : "")}{(InteractionContext.Guild is not null ? $" on '{InteractionContext.Guild.Name}' ({InteractionContext.Guild.Id})" : "")} ({b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}ms)", b.task.Exception);
 
                     tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
                     continue;
                 }
 
-                if (ctx != null)
-                    LogError($"Failed to execute '{ctx.Prefix}{ctx.Command.Name}{(string.IsNullOrWhiteSpace(ctx.RawArgumentString) ? "" : $" {ctx.RawArgumentString}")}' for {ctx.User.Username}#{ctx.User.Discriminator} ({ctx.User.Id}) in #{ctx.Channel.Name} on '{ctx.Guild.Name}' ({ctx.Guild.Id})", b.task.Exception);
+                if (CommandContext != null)
+                    LogError($"Failed to execute '{CommandContext.Prefix}{CommandContext.Command.Name}{(string.IsNullOrWhiteSpace(CommandContext.RawArgumentString) ? "" : $" {CommandContext.RawArgumentString}")}' for {CommandContext.User.Username}#{CommandContext.User.Discriminator} ({CommandContext.User.Id}) in #{CommandContext.Channel.Name} on '{CommandContext.Guild.Name}' ({CommandContext.Guild.Id})", b.task.Exception);
+                else if (InteractionContext != null)
+                    LogError($"Failed to execute '/{InteractionContext.CommandName}' for {InteractionContext.User.Username}#{InteractionContext.User.Discriminator} ({InteractionContext.User.Id}){(InteractionContext.Channel is not null ? $"in #{InteractionContext.Channel.Name}" : "")}{(InteractionContext.Guild is not null ? $" on '{InteractionContext.Guild.Name}' ({InteractionContext.Guild.Id})" : "")}", b.task.Exception);
                 else
                     LogError($"A non-command task failed to execute: {b.task.Exception}");
 
@@ -38,10 +43,10 @@ internal class TaskWatcher
                             $"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
                 }
 
-                if (ctx != null)
+                if (CommandContext != null)
                     try
                     {
-                        await ctx.Channel.SendMessageAsync($"{ctx.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`\n\n" +
+                        await CommandContext.Channel.SendMessageAsync($"{CommandContext.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`\n\n" +
                                                            $"```csharp\n" +
                                                            $"{b.task.Exception}" +
                                                            $"\n```");
