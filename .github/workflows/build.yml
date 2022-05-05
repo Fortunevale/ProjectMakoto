@@ -12,5 +12,6 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY_ED25519 }}
+        passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
         port: ${{ secrets.SSH_PORT }}
         script: ${{ secrets.SSH_CMDLINE }}
