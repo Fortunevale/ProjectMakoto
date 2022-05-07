@@ -1,8 +1,11 @@
 # Project-Ichigo - A discord bot written in C#
 
+# **[Skip everything, i want the bot!](#getting-the-bot)**
+
 ## Table of Contents
 
 * **[What is this?](#what-is-this)**
+* **[Getting the bot](#getting-the-bot)**
 * **[Contributing or forking](#building-debugging-and-deployment)**
 * **[Credits](#credits)**
 
@@ -24,6 +27,14 @@ Current noteable features are:
 ##### \* Roles with any significant Permissions like Administrator won't be re-applied. In addition, if the user hasn't been on the server for more than 60 days, neither the roles nor the nickname will be reapplied. Also the `clearbackup` command gives moderators ability to remove stored roles.
 <br></br>
 ##### \** A guild-purge is similar to a purge command. However, instead of scanning just one channel for messages by the specified user, it scans all channels.
+
+## Getting the bot
+
+## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=1642824461815&scope=bot%20applications.commands)
+
+- Phishing Protection is enabled by default, people will be banned if they send a link known to be malicous. To change this, run `;;phishing config`.
+- The bot is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server, however to change this behaviour you can use `;;join config`.
+- You can join a support server [here](https://discord.gg/SaHT4GPGyW).
 
 ## Building, Debugging and Deployment
 
