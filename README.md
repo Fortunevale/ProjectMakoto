@@ -33,7 +33,7 @@ Current noteable features are:
 ## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=1642824461815&scope=bot%20applications.commands)
 
 - Phishing Protection is enabled by default, people will be banned if they send a link known to be malicous. To change this, run `;;phishing config`.
-- The bot is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server, however to change this behaviour you can use `;;join config`.
+- Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server, however to change this behaviour you can use `;;join config`.
 - You can join a support server [here](https://discord.gg/SaHT4GPGyW).
 
 ## Building, Debugging and Deployment
