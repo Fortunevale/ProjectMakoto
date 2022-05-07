@@ -42,7 +42,7 @@ Current noteable features are:
 - [Xorog.UniversalExtensions](https://github.com/TheXorog/Xorog.UniversalExtensions)
 <br></br>
 - [Lavalink](https://github.com/freyacodes/Lavalink)
-- [A MySQL Server](https://github.com/freyacodes/Lavalink)
+- [A MySQL/MariaDB Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
 
 ## Credits
 
