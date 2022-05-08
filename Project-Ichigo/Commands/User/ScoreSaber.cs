@@ -761,16 +761,16 @@ internal class ScoreSaber : BaseCommandModule
 
 
 
-    [Command("scoresaber-map-leaderboard"), Aliases("ssml", "scoresabermapleaderboard"),
-    CommandModule("scoresaber"),
-    Description("Display a leaderboard off a specific map")]
-    public async Task ScoreSaberMapLeaderboard(CommandContext ctx, [Description("LeaderboardId")][RemainingText] string boardId)
-    {
-        Task.Run(async () =>
-        {
+    //[Command("scoresaber-map-leaderboard"), Aliases("ssml", "scoresabermapleaderboard"),
+    //CommandModule("scoresaber"),
+    //Description("Display a leaderboard off a specific map")]
+    //public async Task ScoreSaberMapLeaderboard(CommandContext ctx, [Description("LeaderboardId")][RemainingText] string boardId)
+    //{
+    //    Task.Run(async () =>
+    //    {
 
-        }).Add(_bot._watcher, ctx);
-    }
+    //    }).Add(_bot._watcher, ctx);
+    //}
 
 
 
