@@ -209,6 +209,8 @@ internal class Bot
             LogDebug($"Registering Commands..");
 
             cNext.RegisterCommands<User>();
+            cNext.RegisterCommands<Social>();
+            cNext.RegisterCommands<Commands.User.ScoreSaber>();
             cNext.RegisterCommands<Mod>();
             cNext.RegisterCommands<Admin>();
 
