@@ -1400,9 +1400,9 @@ internal class User : BaseCommandModule
                 continents.Add(new DiscordSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")));
                 foreach (var b in _bot._countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
                 {
-                    continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentCode}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
+                    continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
                 }
-                return new DiscordSelectComponent("continent_selection", "Select a country..", continents as IEnumerable<DiscordSelectComponentOption>);
+                return new DiscordSelectComponent("continent_selection", "Select a continent..", continents as IEnumerable<DiscordSelectComponentOption>);
             }
 
             DiscordSelectComponent GetCountries(string continent_code, string default_country, int page)
@@ -1577,11 +1577,7 @@ internal class User : BaseCommandModule
                                 tokenSource.Cancel();
                                 tokenSource = null;
 
-                                embed.Description = "`Getting profile..`";
-                                embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                                await SendScoreSaberProfile(ctx, e.Values.First());
+                                _ = SendScoreSaberProfile(ctx, e.Values.First());
                                 _ = msg.DeleteAsync();
 
                                 return;

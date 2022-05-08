@@ -244,8 +244,25 @@ internal class DatabaseInit
             List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>((await new HttpClient().GetStringAsync("https://fortunevale.dd-dns.de/Countries.json")));
             foreach (var b in cc)
             {
-                _bot._countryCodes.List.Add(b[2], new CountryCodes.CountryInfo { Name = b[0], ContinentCode = b[1] });
+                _bot._countryCodes.List.Add(b[2], new CountryCodes.CountryInfo
+                {
+                    Name = b[0],
+                    ContinentCode = b[1],
+                    ContinentName = b[1].ToLower() switch
+                    {
+                        "af" => "Africa",
+                        "an" => "Antarctica",
+                        "as" => "Asia",
+                        "eu" => "Europe",
+                        "na" => "North America",
+                        "oc" => "Oceania",
+                        "sa" => "South America",
+                        _ => "Invalid Continent"
+                    }
+                }
+            );
             }
+
             LogInfo($"Loaded {_bot._countryCodes.List.Count} countries.");
         }
         catch (Exception ex)

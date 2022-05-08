@@ -8,5 +8,6 @@ public class CountryCodes
     {
         public string Name { get; set; }
         public string ContinentCode { get; set; }
+        public string ContinentName { get; set; }
     }
 }
