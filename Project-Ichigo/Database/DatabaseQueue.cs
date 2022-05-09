@@ -15,23 +15,15 @@ internal class DatabaseQueue
     {
         _ = Task.Run(async () =>
         {
-            string lastResolve = "";
-
             while (true)
             {
-                if (Queue.Count == 0)
+                if (Queue.Count == 0 || !Queue.Any(x => !x.Value.Executed && !x.Value.Failed))
                 {
                     Thread.Sleep(100);
                     continue;
                 }
 
-                if (Queue.ContainsKey(lastResolve))
-                    Queue.Remove(lastResolve);
-
-                if (Queue.Count == 0)
-                    continue;
-
-                var b = Queue.First();
+                var b = Queue.First(x => !x.Value.Executed && !x.Value.Failed);
 
                 if (b.Value is null)
                     continue;
@@ -67,7 +59,6 @@ internal class DatabaseQueue
                 }
                 finally
                 {
-                    lastResolve = b.Key;
                     Thread.Sleep(500);
                 }
             }
