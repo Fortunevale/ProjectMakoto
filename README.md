@@ -23,9 +23,9 @@ Current noteable features are:
 - Important Moderation Features such as an Actionlog, A purge Command and a guild-purge Command**
 - Reaction Roles
 - No unfair premium features. (Currently no premium features at all.)
-<br></br><br></br>
-##### \* Roles with any significant Permissions like Administrator won't be re-applied. In addition, if the user hasn't been on the server for more than 60 days, neither the roles nor the nickname will be reapplied. Also the `clearbackup` command gives moderators ability to remove stored roles.
 <br></br>
+##### \* Roles with any significant Permissions like Administrator won't be re-applied. In addition, if the user hasn't been on the server for more than 60 days, neither the roles nor the nickname will be reapplied. Also the `clearbackup` command gives moderators ability to remove stored roles.
+
 ##### \** A guild-purge is similar to a purge command. However, instead of scanning just one channel for messages by the specified user, it scans all channels.
 
 ## Getting the bot
@@ -54,6 +54,19 @@ Current noteable features are:
 <br></br>
 - [Lavalink](https://github.com/freyacodes/Lavalink)
 - [A MySQL/MariaDB Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
+
+### Required APIs, Keys and Tokens
+
+- [Discord Team](https://discord.com/developers/teams)
+- [Discord Application](https://discord.com/developers/applications/)
+   - The Appliction must be in previously mentioned Discord Team. The staff-check requires this.
+- [Kawaii API Key](https://kawaii.red/)
+   - This is mainly for social commands like `hug`, `cuddle`, `pat` and so on.
+<br></br>
+- [Github Account](https://github.com/) with [this](#project-ichigo---a-discord-bot-written-in-c) Repository forked
+- [Personal Access Token](https://github.com/settings/tokens) for your Github Account
+   - The personal access token should have the `repo` permissions.
+   - This is required for the `/github create-issue` command.
 
 ## Credits
 
