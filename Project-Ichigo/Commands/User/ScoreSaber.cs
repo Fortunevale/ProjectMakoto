@@ -1,4 +1,6 @@
-﻿namespace Project_Ichigo.Commands.User;
+﻿using Microsoft.Win32.SafeHandles;
+
+namespace Project_Ichigo.Commands.User;
 
 internal class ScoreSaber : BaseCommandModule
 {
@@ -26,7 +28,7 @@ internal class ScoreSaber : BaseCommandModule
 
         var embed = new DiscordEmbedBuilder
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber • {ctx.Guild.Name}" },
             Color = ColorHelper.Processing,
             Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
             Timestamp = DateTime.UtcNow,
@@ -64,6 +66,9 @@ internal class ScoreSaber : BaseCommandModule
             TopScoreInteractionRow.Add(ShowProfileButton);
             TopScoreInteractionRow.Add(RecentScoresButton);
 
+            PlayerScores CachedTopScores = null;
+            PlayerScores CachedRecentScores = null;
+
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
                 Task.Run(async () =>
@@ -80,7 +85,7 @@ internal class ScoreSaber : BaseCommandModule
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
                                 Color = ColorHelper.Success,
                                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                                 Timestamp = DateTime.UtcNow,
@@ -97,8 +102,10 @@ internal class ScoreSaber : BaseCommandModule
                         {
                             try
                             {
-                                var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
-                                ShowScores(scores, RequestParameters.ScoreType.TOP).Add(_bot._watcher, ctx);
+                                if (CachedTopScores is null)
+                                    CachedTopScores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+
+                                ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(_bot._watcher, ctx);
                             }
                             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                             {
@@ -129,8 +136,10 @@ internal class ScoreSaber : BaseCommandModule
                         {
                             try
                             {
-                                var scores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
-                                ShowScores(scores, RequestParameters.ScoreType.RECENT).Add(_bot._watcher, ctx);
+                                if (CachedRecentScores is null)
+                                    CachedRecentScores = await _bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+
+                                ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(_bot._watcher, ctx);
                             }
                             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                             {
@@ -187,10 +196,16 @@ internal class ScoreSaber : BaseCommandModule
 
                 foreach (var score in scores.playerScores.Take(5))
                 {
+                    decimal page = Math.Ceiling((decimal)score.score.rank / (decimal)12);
+
+                    decimal rank = score.score.rank / 6;
+                    bool odd = (rank % 2 != 0);
+
                     embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $" {score.leaderboard.songSubName}" : "")} - {score.leaderboard.songAuthorName} [{score.leaderboard.levelAuthorName}]".TruncateWithIndication(256),
                         $":globe_with_meridians: **#{score.score.rank}**  󠂪 󠂪| 󠂪 󠂪 {Formatter.Timestamp(score.score.timeSet, TimestampFormat.RelativeTime)}\n" +
                         $"{(score.leaderboard.ranked ? $"**`{((decimal)((decimal)score.score.modifiedScore / (decimal)score.leaderboard.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp [{(score.score.pp * score.score.weight).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp]`**\n" : "\n")}" +
-                        $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.score.missedNotes + score.score.badCuts}`")}**"));
+                        $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.score.missedNotes + score.score.badCuts}`")}**\n" +
+                        $"Map Leaderboard: `{ctx.Prefix}ssml {score.leaderboard.difficulty.leaderboardId} {page}{(odd ? " 1" : "")}`"));
                 }
 
                 DiscordMessageBuilder builder = new();
@@ -424,7 +439,7 @@ internal class ScoreSaber : BaseCommandModule
                 {
                     var embed = new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                         Timestamp = DateTime.UtcNow,
@@ -761,16 +776,228 @@ internal class ScoreSaber : BaseCommandModule
 
 
 
-    //[Command("scoresaber-map-leaderboard"), Aliases("ssml", "scoresabermapleaderboard"),
-    //CommandModule("scoresaber"),
-    //Description("Display a leaderboard off a specific map")]
-    //public async Task ScoreSaberMapLeaderboard(CommandContext ctx, [Description("LeaderboardId")][RemainingText] string boardId)
-    //{
-    //    Task.Run(async () =>
-    //    {
+    [Command("scoresaber-map-leaderboard"), Aliases("ssml", "scoresabermapleaderboard"),
+    CommandModule("scoresaber"),
+    Description("Display a leaderboard off a specific map")]
+    public async Task ScoreSaberMapLeaderboard(CommandContext ctx, [Description("LeaderboardId")]int boardId, [Description("Page")] int Page = 1, [Description("Internal Page")] int Internal_Page = 0)
+    {
+        Task.Run(async () =>
+        {
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                return;
 
-    //    }).Add(_bot._watcher, ctx);
-    //}
+            if (Page <= 0 || !(Internal_Page is 0 or 1))
+            {
+                _ = ctx.SendSyntaxError();
+                return;
+            }
+
+            var embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber • {ctx.Guild.Name}" },
+                Color = ColorHelper.Processing,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Timestamp = DateTime.UtcNow,
+                Description = $"`Looking for scoreboard..`"
+            };
+
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+            string NextPageId = Guid.NewGuid().ToString();
+            string PrevPageId = Guid.NewGuid().ToString();
+
+            int InternalPage = Internal_Page;
+
+            int scoreSaberPage = Page;
+
+            Leaderboard leaderboard;
+
+            int TotalPages;
+
+            try
+            {
+                leaderboard = await _bot._scoreSaberClient.GetScoreboardById(boardId.ToString());
+                LeaderboardScores scores = await _bot._scoreSaberClient.GetScoreboardScoresById(boardId.ToString());
+
+                TotalPages = scores.metadata.total / scores.metadata.itemsPerPage;
+            }
+            catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+            {
+                embed.Author.IconUrl = Resources.LogIcons.Error;
+                embed.Color = ColorHelper.Error;
+                embed.Description = $"`An internal server exception occured. Please retry later.`";
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                return;
+            }
+            catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+            {
+                embed.Author.IconUrl = Resources.LogIcons.Error;
+                embed.Color = ColorHelper.Error;
+                embed.Description = $"`The requested scoreboard does not exist.`";
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                throw;
+            }
+            catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+            {
+                embed.Author.IconUrl = Resources.LogIcons.Error;
+                embed.Color = ColorHelper.Error;
+                embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                return;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            CancellationTokenSource cancellationTokenSource = new();
+            Dictionary<int, LeaderboardScores> cachedPages = new();
+
+            ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+            async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+            {
+                Task.Run(async () =>
+                {
+                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        cancellationTokenSource.Cancel();
+                        cancellationTokenSource = new();
+
+                        if (e.Interaction.Data.CustomId == NextPageId)
+                        {
+                            if (InternalPage == 1)
+                            {
+                                InternalPage = 0;
+
+                                scoreSaberPage++;
+                            }
+                            else if (InternalPage == 0)
+                            {
+                                InternalPage = 1;
+                            }
+
+                            _ = SendPage(InternalPage, scoreSaberPage);
+                        }
+                        else if (e.Interaction.Data.CustomId == PrevPageId)
+                        {
+                            if (InternalPage == 1)
+                            {
+                                InternalPage = 0;
+                            }
+                            else if (InternalPage == 0)
+                            {
+                                InternalPage = 1;
+
+                                scoreSaberPage--;
+                            }
+
+                            _ = SendPage(InternalPage, scoreSaberPage);
+                        }
+
+                        try
+                        {
+                            await Task.Delay(60000, cancellationTokenSource.Token);
+
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                            embed.Footer.Text += " • Interaction timed out";
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+                        }
+                        catch { }
+                    }
+                }).Add(_bot._watcher, ctx);
+            }
+
+            async Task SendPage(int internalPage, int scoreSaberPage)
+            {
+                if (scoreSaberPage > TotalPages)
+                {
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    embed.Color = ColorHelper.Error;
+                    embed.Description = $"`Page {scoreSaberPage} doesn't exist.`";
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    return;
+                }
+
+                LeaderboardScores scores;
+                try
+                {
+                    if (!cachedPages.ContainsKey(scoreSaberPage))
+                        cachedPages.Add(scoreSaberPage, await _bot._scoreSaberClient.GetScoreboardScoresById(boardId.ToString(), scoreSaberPage));
+
+                    scores = cachedPages[scoreSaberPage];
+                }
+                catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+                {
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    embed.Color = ColorHelper.Error;
+                    embed.Description = $"`An internal server exception occured. Please retry later.`";
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    return;
+                }
+                catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+                {
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    embed.Color = ColorHelper.Error;
+                    embed.Description = $"`The requested scoreboard does not exist.`";
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    throw;
+                }
+                catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+                {
+                    embed.Author.IconUrl = Resources.LogIcons.Error;
+                    embed.Color = ColorHelper.Error;
+                    embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    return;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+                embed.Title = $"{leaderboard.leaderboardInfo.songName}{(!string.IsNullOrWhiteSpace(leaderboard.leaderboardInfo.songSubName) ? $" {leaderboard.leaderboardInfo.songSubName}" : "")} - {leaderboard.leaderboardInfo.songAuthorName} [{leaderboard.leaderboardInfo.levelAuthorName}]".TruncateWithIndication(256);
+                embed.Description = "";
+                embed.Author.IconUrl = ctx.Guild.IconUrl;
+                embed.Color = ColorHelper.Info;
+                embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = leaderboard.leaderboardInfo.coverImage };
+                embed.Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • Page {scoreSaberPage}/{TotalPages}" };
+                embed.ClearFields();
+                foreach (var score in scores.scores.ToList().Skip(internalPage * 6).Take(6))
+                {
+                    embed.AddField(new DiscordEmbedField($"**#{score.rank}** {score.leaderboardPlayerInfo.country.IsoCountryCodeToFlagEmoji()} `{Formatter.Sanitize(score.leaderboardPlayerInfo.name)}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.timeSet, TimestampFormat.RelativeTime)}",
+                        $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.modifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
+                        $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.missedNotes + score.badCuts}`")}**"));
+                }
+
+                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
+                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", (scoreSaberPage + 1 > scores.metadata.total / scores.metadata.itemsPerPage), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+
+                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
+            };
+
+            _ = SendPage(InternalPage, scoreSaberPage);
+
+            try
+            {
+                await Task.Delay(60000, cancellationTokenSource.Token);
+
+                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                embed.Footer.Text += " • Interaction timed out";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                await Task.Delay(5000);
+                _ = msg.DeleteAsync();
+            }
+            catch { }
+
+        }).Add(_bot._watcher, ctx);
+    }
 
 
 
@@ -793,7 +1020,7 @@ internal class ScoreSaber : BaseCommandModule
 
                 var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
                     Color = ColorHelper.Error,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
@@ -809,7 +1036,7 @@ internal class ScoreSaber : BaseCommandModule
             {
                 var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Profile • {ctx.Guild.Name}" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
                     Color = ColorHelper.Error,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
