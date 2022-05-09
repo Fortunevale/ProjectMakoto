@@ -34,7 +34,7 @@ internal class Maintainers : ApplicationCommandsModule
                 var tokenAuth = new Credentials(Secrets.Secrets.GithubToken);
                 client.Credentials = tokenAuth;
 
-                var labels = await client.Issue.Labels.GetAllForRepository("TheXorog", "Project-Ichigo");
+                var labels = await client.Issue.Labels.GetAllForRepository(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository);
                 
                 var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                     .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
@@ -71,12 +71,12 @@ internal class Maintainers : ApplicationCommandsModule
 
                             List<string> labels = labelsraw.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith("#")).Select(x => x.Replace("#", "")).ToList();
 
-                            var issue = await client.Issue.Create("TheXorog", "Project-Ichigo", new NewIssue(title) { Body = description });
+                            var issue = await client.Issue.Create(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, new NewIssue(title) { Body = description });
 
                             if (labels.Count > 0)
-                                await client.Issue.Labels.ReplaceAllForIssue("TheXorog", "Project-Ichigo", issue.Number, labels.ToArray());
+                                await client.Issue.Labels.ReplaceAllForIssue(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, issue.Number, labels.ToArray());
 
-                            await client.Issue.Assignee.AddAssignees("TheXorog", "Project-Ichigo", issue.Number, new AssigneesUpdate(new List<string> { "TheXorog" }));
+                            await client.Issue.Assignee.AddAssignees(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, issue.Number, new AssigneesUpdate(new List<string> { Secrets.Secrets.GithubUsername }));
 
                             _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($":white_check_mark: `Issue submitted:` {issue.HtmlUrl}"));
                         }
