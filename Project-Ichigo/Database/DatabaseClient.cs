@@ -411,6 +411,7 @@ internal class DatabaseClient
                             reapplynickname = x.Value.JoinSettings.ReApplyNickname,
 
                             phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
+                            phishing_warnonredirect = x.Value.PhishingDetectionSettings.WarnOnRedirect,
                             phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
                             phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
                             phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
@@ -482,6 +483,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
 
                             cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
+                            cmd.Parameters.AddWithValue($"phishing_warnonredirect{i}", DatabaseInserts[i].phishing_warnonredirect);
                             cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
                             cmd.Parameters.AddWithValue($"phishing_reason{i}", DatabaseInserts[i].phishing_reason);
                             cmd.Parameters.AddWithValue($"phishing_time{i}", DatabaseInserts[i].phishing_time);

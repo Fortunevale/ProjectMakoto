@@ -89,22 +89,24 @@ internal class PhishingProtectionEvents
                 {
                     if (ex.Message.Contains("Cannot write more bytes"))
                     {
-                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
-                        {
-                            Title = $":no_entry: Couldn't check this link for malicous redirects. Please proceed with caution.",
-                            Color = ColorHelper.Error
-                        });
+                        if (_bot._guilds.List[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
+                            _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                            {
+                                Title = $":no_entry: Couldn't check this link for malicous redirects. Please proceed with caution.",
+                                Color = ColorHelper.Error
+                            });
                     }
                 }
                 catch (Exception ex)
                 {
                     LogError($"An exception occured while trying to unshorten url '{match.Value}'", ex);
 
-                    _ = e.RespondAsync(embed: new DiscordEmbedBuilder
-                    {
-                        Title = $":no_entry: An unknown error occured while trying to check for malicous redirects. Please proceed with caution.",
-                        Color = ColorHelper.Error
-                    });
+                    if (_bot._guilds.List[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
+                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                        {
+                            Title = $":no_entry: An unknown error occured while trying to check for malicous redirects. Please proceed with caution.",
+                            Color = ColorHelper.Error
+                        });
                 }
             }
 
@@ -116,12 +118,13 @@ internal class PhishingProtectionEvents
                     else
                         recentlyResolvedUrls[b.Value] = DateTime.UtcNow;
 
-                _ = e.RespondAsync(embed: new DiscordEmbedBuilder
-                {
-                    Title = $":warning: Found at least one (or more) redirected URLs in this message.",
-                    Description = $"`{string.Join("`\n`", redirectUrls.Select(x => x.Value))}`",
-                    Color = ColorHelper.Warning
-                });
+                if (_bot._guilds.List[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
+                    _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Title = $":warning: Found at least one (or more) redirected URLs in this message.",
+                        Description = $"`{string.Join("`\n`", redirectUrls.Select(x => x.Value))}`",
+                        Color = ColorHelper.Warning
+                    });
             }
         }
     }

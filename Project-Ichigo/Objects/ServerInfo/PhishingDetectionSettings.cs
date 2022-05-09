@@ -6,6 +6,10 @@ public class PhishingDetectionSettings
     public bool DetectPhishing { get => _DetectPhishing; set { _DetectPhishing = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 
 
+    private bool _WarnOnRedirect { get; set; } = true;
+    public bool WarnOnRedirect { get => _WarnOnRedirect; set { _WarnOnRedirect = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+
+
     private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.BAN;
     public PhishingPunishmentType PunishmentType { get => _PunishmentType; set { _PunishmentType = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 
