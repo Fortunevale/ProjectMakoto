@@ -426,7 +426,10 @@ internal class DatabaseClient
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
                             levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
                             auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
-                            crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostChannels),
+
+                            crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostChannels),
+                            crosspostdelay = x.Value.CrosspostSettings.DelayBeforePosting,
+
                             reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
 
                             actionlog_channel = x.Value.ActionLogSettings.Channel,
@@ -468,6 +471,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"reactionroles{i}", DatabaseInserts[i].reactionroles);
                             cmd.Parameters.AddWithValue($"levelrewards{i}", DatabaseInserts[i].levelrewards);
                             cmd.Parameters.AddWithValue($"auditlogcache{i}", DatabaseInserts[i].auditlogcache);
+
+                            cmd.Parameters.AddWithValue($"crosspostdelay{i}", DatabaseInserts[i].crosspostdelay);
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);
 
                             cmd.Parameters.AddWithValue($"reapplyroles{i}", DatabaseInserts[i].reapplyroles);

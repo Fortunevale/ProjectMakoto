@@ -66,10 +66,11 @@ internal class DatabaseInit
                     UseExperience = b.experience_use,
                     BoostXpForBumpReminder = b.experience_boost_bumpreminder
                 },
-                LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
-                ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
-                CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
-                ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles)),
+                CrosspostSettings = new()
+                {
+                    CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
+                    DelayBeforePosting = b.crosspostdelay
+                },
                 ActionLogSettings = new()
                 {
                     Channel = b.actionlog_channel,
@@ -85,20 +86,23 @@ internal class DatabaseInit
                     MemberProfileModified = b.actionlog_log_memberprofile_modified,
                     ChannelsModified = b.actionlog_log_channels_modified,
                     VoiceStateUpdated = b.actionlog_log_voice_state,
-                }
+                },
+                LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
+                ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
+                ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles)),
             });
 
         foreach (var b in _bot._guilds.List)
             try
             {
                 b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
-                b.Value.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
+                b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
             }
             catch { }
 
         foreach (var b in _bot._guilds.List)
         {
-            b.Value.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
+            b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
             b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);
         }
 

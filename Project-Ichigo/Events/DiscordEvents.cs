@@ -28,13 +28,13 @@ internal class DiscordEvents
                 try
                 {
                     b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
-                    b.Value.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
+                    b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
                 }
                 catch { }
 
             foreach (var b in _bot._guilds.List)
             {
-                b.Value.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
+                b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
                 b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);
             }
         }).Add(_bot._watcher);

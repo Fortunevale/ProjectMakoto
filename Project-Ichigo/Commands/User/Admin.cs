@@ -1733,9 +1733,9 @@ internal class Admin : BaseCommandModule
                 });
             }
 
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].CrosspostChannels.ToList())
+            foreach (var b in _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
                 if (!ctx.Guild.Channels.ContainsKey(b))
-                    _bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Remove(b);
+                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);
 
             if (action.ToLower() == "help")
             {
@@ -1750,7 +1750,8 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
+                    Description = $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" +
+                    $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
                 });
                 return;
             }
@@ -1764,14 +1765,16 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
+                    Description = $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" + 
+                    $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
                 };
 
+                var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, "SetDelay", "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":clock3:")));
                 var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "AddChannel", "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
                 var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "RemoveChannel", "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_multiplication_x:")));
                 var CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
 
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { AddButton, RemoveButton, CancelButton }));
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { SetDelayButton, AddButton, RemoveButton, CancelButton }));
 
                 ctx.Client.ComponentInteractionCreated += RunInteraction;
 
@@ -1788,7 +1791,7 @@ internal class Admin : BaseCommandModule
 
                             if (e.Interaction.Data.CustomId == "AddChannel")
                             {
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Count >= 5)
+                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
                                 {
                                     embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
                                     embed.Color = ColorHelper.Error;
@@ -1825,7 +1828,7 @@ internal class Admin : BaseCommandModule
                                     return;
                                 }
 
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Count >= 5)
+                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
                                 {
                                     embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
                                     embed.Color = ColorHelper.Error;
@@ -1836,14 +1839,14 @@ internal class Admin : BaseCommandModule
                                     return;
                                 }
 
-                                _bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Add(channel.Id);
+                                _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Add(channel.Id);
                                 _ = msg.DeleteAsync();
                                 _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                                 return;
                             }
                             else if (e.Interaction.Data.CustomId == "RemoveChannel")
                             {
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Count == 0)
+                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
                                 {
                                     embed.Description = $"`No Crosspost Channels are set up.`";
                                     embed.Color = ColorHelper.Error;
@@ -1858,7 +1861,7 @@ internal class Admin : BaseCommandModule
 
                                 try
                                 {
-                                    var channel = await new GenericSelectors(_bot).PromptCustomSelection(_bot._guilds.List[ctx.Guild.Id].CrosspostChannels
+                                    var channel = await new GenericSelectors(_bot).PromptCustomSelection(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels
                                         .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList(),
                                         ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
 
@@ -1873,12 +1876,95 @@ internal class Admin : BaseCommandModule
                                     return;
                                 }
 
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Contains(ChannelToRemove))
-                                    _bot._guilds.List[ctx.Guild.Id].CrosspostChannels.Remove(ChannelToRemove);
+                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelToRemove))
+                                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(ChannelToRemove);
 
                                 _ = msg.DeleteAsync();
                                 _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
                                 return;
+                            }
+                            else if (e.Interaction.Data.CustomId == "SetDelay")
+                            {
+                                embed.Description = "Please specify how long to delay the crossposting:\n" +
+                                                    "`m` - _Minutes_\n" +
+                                                    "`s` - _Seconds_\n\n" +
+                                                    "For example, `10s` would result to 10 seconds.";
+                                embed.Color = ColorHelper.AwaitingInput;
+
+                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                var interactivity = ctx.Client.GetInteractivity();
+                                var reason = await interactivity.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
+
+                                if (reason.TimedOut)
+                                {
+                                    embed.Footer.Text += " • Interaction timed out";
+                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                    await Task.Delay(5000);
+                                    _ = msg.DeleteAsync();
+                                    return;
+                                }
+
+                                _ = Task.Delay(2000).ContinueWith(x =>
+                                {
+                                    _ = reason.Result.DeleteAsync();
+                                });
+
+                                if (reason.Result.Content.ToLower() is "cancel" or ".")
+                                {
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                    return;
+                                }
+
+                                try
+                                {
+                                    if (!TimeSpan.TryParse(reason.Result.Content, out TimeSpan length))
+                                    {
+                                        switch (reason.Result.Content[^1..])
+                                        {
+                                            case "d":
+                                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content.Replace("d", "")));
+                                                break;
+                                            case "h":
+                                                length = TimeSpan.FromHours(Convert.ToInt32(reason.Result.Content.Replace("h", "")));
+                                                break;
+                                            case "m":
+                                                length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Result.Content.Replace("m", "")));
+                                                break;
+                                            case "s":
+                                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content.Replace("s", "")));
+                                                break;
+                                            default:
+                                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content));
+                                                return;
+                                        }
+                                    }
+
+                                    if (length > TimeSpan.FromMinutes(5) || length < TimeSpan.FromSeconds(1))
+                                    {
+                                        embed.Description = "`The duration has to be between 1 second and 5 minutes.`";
+                                        embed.Color = ColorHelper.Error;
+                                        embed.Author.IconUrl = Resources.LogIcons.Error;
+
+                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                        await Task.Delay(5000);
+                                        _ = msg.DeleteAsync();
+                                        _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                        return;
+                                    }
+
+                                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(length.TotalSeconds);
+
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                }
+                                catch (Exception)
+                                {
+                                    _ = msg.DeleteAsync();
+                                    _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                                    return;
+                                }
                             }
                             else if (e.Interaction.Data.CustomId == "cancel")
                             {

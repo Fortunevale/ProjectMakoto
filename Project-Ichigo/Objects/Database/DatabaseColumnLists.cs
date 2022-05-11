@@ -64,6 +64,7 @@ internal class DatabaseColumnLists
         new Column("levelrewards", "text", "utf8mb4_0900_ai_ci"),
         new Column("auditlogcache", "text", "utf8mb4_0900_ai_ci"),
         new Column("reactionroles", "text", "utf8mb4_0900_ai_ci"),
+        new Column("crosspostdelay", "int", Default: "10"),
         new Column("crosspostchannels", "text", "utf8mb4_0900_ai_ci"),
         new Column("reapplyroles", "tinyint(1)"),
         new Column("reapplynickname", "tinyint(1)"),

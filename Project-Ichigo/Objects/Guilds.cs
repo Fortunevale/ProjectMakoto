@@ -13,8 +13,8 @@ internal class Guilds
         public List<LevelReward> LevelRewards { get; set; } = new();
         public Dictionary<ulong, Member> Members { get; set; } = new();
         public List<KeyValuePair<ulong, ReactionRoles>> ReactionRoles { get; set; } = new();
+        public CrosspostSettings CrosspostSettings { get; set; } = new();
         public ActionLogSettings ActionLogSettings { get; set; } = new();
         public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
-        public ObservableCollection<ulong> CrosspostChannels { get; set; } = new();
     }
 }
