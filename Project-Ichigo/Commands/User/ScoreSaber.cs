@@ -879,7 +879,7 @@ internal class ScoreSaber : BaseCommandModule
                                 InternalPage = 1;
                             }
 
-                            _ = SendPage(InternalPage, scoreSaberPage);
+                            await SendPage(InternalPage, scoreSaberPage);
                         }
                         else if (e.Interaction.Data.CustomId == PrevPageId)
                         {
@@ -894,7 +894,7 @@ internal class ScoreSaber : BaseCommandModule
                                 scoreSaberPage--;
                             }
 
-                            _ = SendPage(InternalPage, scoreSaberPage);
+                            await SendPage(InternalPage, scoreSaberPage);
                         }
 
                         try
@@ -972,7 +972,8 @@ internal class ScoreSaber : BaseCommandModule
                 {
                     embed.AddField(new DiscordEmbedField($"**#{score.rank}** {score.leaderboardPlayerInfo.country.IsoCountryCodeToFlagEmoji()} `{Formatter.Sanitize(score.leaderboardPlayerInfo.name)}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.timeSet, TimestampFormat.RelativeTime)}",
                         $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.modifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
-                        $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.missedNotes + score.badCuts}`")}**"));
+                        $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote()} `{score.missedNotes + score.badCuts}`")}**\n" +
+                        $"Profile: `{ctx.Prefix}ss {score.leaderboardPlayerInfo.id}`"));
                 }
 
                 var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
@@ -981,7 +982,7 @@ internal class ScoreSaber : BaseCommandModule
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
             };
 
-            _ = SendPage(InternalPage, scoreSaberPage);
+            await SendPage(InternalPage, scoreSaberPage);
 
             try
             {
