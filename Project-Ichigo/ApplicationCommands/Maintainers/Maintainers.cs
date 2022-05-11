@@ -7,12 +7,12 @@ internal class Maintainers : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("github", "Interact with Project-Ichigo's Github Repository", (long)Permissions.UseApplicationCommands, true)]
+    [SlashCommandGroup("github", "Interact with Project-Ichigo's Github Repository")]
     public class Github : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("create-issue", "Create a new issue on Project-Ichigo's Github Repository", (long)Permissions.UseApplicationCommands, true)]
+        [SlashCommand("create-issue", "Create a new issue on Project-Ichigo's Github Repository")]
         public async Task CreateIssue(InteractionContext ctx)
         {
             Task.Run(async () =>
