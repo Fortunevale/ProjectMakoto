@@ -97,7 +97,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Kicked by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
-                        embed.Description += $"\n**Reason**: {Entry.Reason.Replace("`", "´")}";
+                        embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCodeBlock()}";
 
                     embed.Footer = new();
                     embed.Footer.Text += "\n(Please note that the 'Kicked by' and 'Reason' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -147,7 +147,7 @@ internal class ActionlogEvents
             };
 
             if (!string.IsNullOrWhiteSpace(e.Message.Content))
-                embed.AddField(new DiscordEmbedField("Content", $"`{e.Message.Content.Replace("`", "´").TruncateWithIndication(1022)}`"));
+                embed.AddField(new DiscordEmbedField("Content", $"`{e.Message.Content.SanitizeForCodeBlock().TruncateWithIndication(1022)}`"));
 
             if (e.Message.Attachments.Count != 0)
                 embed.AddField(new DiscordEmbedField("Attachments", $"{string.Join("\n", e.Message.Attachments.Select(x => $"`[{Math.Round(Convert.ToDecimal(x.FileSize / 1024), 2)} KB]` `{x.Url}`"))}"));
@@ -826,7 +826,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Banned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
-                        embed.Description += $"\n**Reason**: {Entry.Reason.Replace("`", "´")}";
+                        embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCodeBlock()}";
 
                     embed.Footer.Text += "\n(Please note that the 'Banned by' and 'Reason' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 

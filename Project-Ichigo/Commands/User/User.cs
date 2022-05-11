@@ -767,14 +767,14 @@ internal class User : BaseCommandModule
 
             if (!domain.Contains('.') || domain.Contains(' '))
             {
-                embed.Description = $"`The domain ('{domain.Replace("`", "")}') you're trying to submit is invalid.`";
+                embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') you're trying to submit is invalid.`";
                 embed.Color = ColorHelper.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
                 return;
             }
 
-            embed.Description = $"`You are about to submit the domain '{domain.Replace("`", "")}'. When submitting, your public user account and guild will be tracked and visible to verifiers. Do you want to proceed?`";
+            embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCodeBlock()}'. When submitting, your public user account and guild will be tracked and visible to verifiers. Do you want to proceed?`";
             embed.Color = ColorHelper.Success;
             embed.Author.IconUrl = Resources.LogIcons.Info;
 
@@ -817,7 +817,7 @@ internal class User : BaseCommandModule
                                 {
                                     if (domain.Contains(b.Key))
                                     {
-                                        embed.Description = $"`The domain ('{domain.Replace("`", "")}') is already present in the database. Thanks for trying to contribute regardless.`";
+                                        embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') is already present in the database. Thanks for trying to contribute regardless.`";
                                         embed.Color = ColorHelper.Error;
                                         embed.Author.IconUrl = Resources.LogIcons.Error;
                                         _ = msg.ModifyAsync(embed.Build());
@@ -832,7 +832,7 @@ internal class User : BaseCommandModule
                                 {
                                     if (b.Value.Url == domain)
                                     {
-                                        embed.Description = $"`The domain ('{domain.Replace("`", "")}') has already been submitted. Thanks for trying to contribute regardless.`";
+                                        embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') has already been submitted. Thanks for trying to contribute regardless.`";
                                         embed.Color = ColorHelper.Error;
                                         embed.Author.IconUrl = Resources.LogIcons.Error;
                                         _ = msg.ModifyAsync(embed.Build());
@@ -855,7 +855,7 @@ internal class User : BaseCommandModule
                                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Info, Name = $"Phishing Link Submission" },
                                     Color = ColorHelper.Success,
                                     Timestamp = DateTime.UtcNow,
-                                    Description = $"`Submitted Url`: `{domain.Replace("`", "")}`\n" +
+                                    Description = $"`Submitted Url`: `{domain.SanitizeForCodeBlock()}`\n" +
                                                     $"`Submission by`: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
                                                     $"`Submitted on `: `{ctx.Guild.Name} ({ctx.Guild.Id})`"
                                 }).AddComponents(new List<DiscordComponent>

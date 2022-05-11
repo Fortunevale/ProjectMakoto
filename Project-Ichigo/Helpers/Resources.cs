@@ -36,6 +36,12 @@ internal class Resources
 
     public class Regex
     {
+        public static readonly string UserMention = @"((<@\d+>)|(<@!\d+>))";
+        public static readonly string ChannelMention = @"(<#\d+>)";
+
+        public static readonly string Emoji = @"(<:[^ ]*:\d*>)";
+        public static readonly string AnimatedEmoji = @"(<a:[^ ]*:\d*>)";
+
         public static readonly string YouTubeUrl = @"^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$";
         public static readonly string DiscordChannelUrl = @"((https|http):\/\/(ptb\.|canary\.)?discord.com\/channels\/\d+\/\d+\/\d+)";
         public static readonly string Url = @"((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:\/~\+#]*[\w\-\@?^=%&amp;\/~\+#])?)";

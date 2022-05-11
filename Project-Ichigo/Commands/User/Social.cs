@@ -25,7 +25,7 @@ internal class Social : BaseCommandModule
                 return;
             }
 
-            _bot._users.List[ctx.User.Id].AfkStatus.Reason = Formatter.Sanitize(reason).Replace("@", "").Replace("&", "").Replace("#", "").Replace("<", "").Replace(">", "");
+            _bot._users.List[ctx.User.Id].AfkStatus.Reason = reason.Sanitize();
             _bot._users.List[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
 
             var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder

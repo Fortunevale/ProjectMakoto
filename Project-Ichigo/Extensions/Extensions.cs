@@ -180,6 +180,23 @@ internal static class Extensions
         return DiscordEmoji.FromName(client, colorArray[color]);
     }
 
+    internal static string Sanitize(this string str)
+    {
+        var proc = str;
+
+        proc = proc.Replace("`", "´");
+
+        try { proc = Regex.Replace(proc, Resources.Regex.UserMention, ""); } catch { }
+        try { proc = Regex.Replace(proc, Resources.Regex.ChannelMention, ""); } catch { }
+
+        return Formatter.Sanitize(proc);
+    }
+    
+    internal static string SanitizeForCodeBlock(this string str)
+    {
+        return str.Replace("`", "´");
+    }
+
     internal static bool TryGetMessage(this DiscordChannel channel, ulong id, out DiscordMessage discordMessage)
     {
         try
