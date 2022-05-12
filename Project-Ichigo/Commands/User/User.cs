@@ -489,18 +489,15 @@ internal class User : BaseCommandModule
                         else if (e.Interaction.Data.CustomId == ProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.AvatarUrl;
-                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));
                         }
 
                         try
                         {
                             await Task.Delay(60000, cancellationTokenSource.Token);
                             embed.Footer.Text += " • Interaction timed out";
-                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                            await Task.Delay(5000);
-                            _ = msg.DeleteAsync();
-
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         }
                         catch { }
                     }
@@ -511,11 +508,105 @@ internal class User : BaseCommandModule
             {
                 await Task.Delay(60000, cancellationTokenSource.Token);
                 embed.Footer.Text += " • Interaction timed out";
-                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                await Task.Delay(5000);
-                _ = msg.DeleteAsync();
-
                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            }
+            catch { }
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("banner"),
+    CommandModule("user"),
+    Description("Sends the user's banner as an embedded image")]
+    public async Task Banner(CommandContext ctx, DiscordUser victim = null)
+    {
+        Task.Run(async () =>
+        {
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
+            if (victim is null)
+            {
+                victim = ctx.Member;
+            }
+
+            var embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = $"{victim.Username}#{victim.Discriminator}'s Banner",
+                    Url = victim.AvatarUrl
+                },
+                ImageUrl = victim.BannerUrl,
+                Description = (string.IsNullOrWhiteSpace(victim.BannerUrl) ? "`This user has no banner.`" : ""),
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
+                    IconUrl = ctx.Member.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow,
+                Color = ColorHelper.Info
+            };
+
+            DiscordMember member = null;
+
+            try
+            { member = await victim.ConvertToMember(ctx.Guild); }
+            catch { }
+
+            var ServerBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Banner", (string.IsNullOrWhiteSpace(member?.GuildBannerHash)));
+            var ProfileBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Banner", false);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerBannerButton);
+
+            var msg = await ctx.Channel.SendMessageAsync(builder);
+
+            CancellationTokenSource cancellationTokenSource = new();
+
+            ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+            async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+            {
+                Task.Run(async () =>
+                {
+                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        cancellationTokenSource.Cancel();
+                        cancellationTokenSource = new();
+
+                        if (e.Interaction.Data.CustomId == ServerBannerButton.CustomId)
+                        {
+                            embed.ImageUrl = member.GuildBannerUrl;
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfileBannerButton));
+                        }
+                        else if (e.Interaction.Data.CustomId == ProfileBannerButton.CustomId)
+                        {
+                            embed.ImageUrl = member.BannerUrl;
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerBannerButton));
+                        }
+
+                        try
+                        {
+                            await Task.Delay(60000, cancellationTokenSource.Token);
+                            embed.Footer.Text += " • Interaction timed out";
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        }
+                        catch { }
+                    }
+                }).Add(_bot._watcher, ctx);
+            }
+
+            try
+            {
+                await Task.Delay(60000, cancellationTokenSource.Token);
+                embed.Footer.Text += " • Interaction timed out";
+                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
             }
             catch { }
         }).Add(_bot._watcher, ctx);
