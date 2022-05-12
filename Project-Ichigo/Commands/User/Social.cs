@@ -5,6 +5,13 @@ internal class Social : BaseCommandModule
     public Bot _bot { private get; set; }
 
 
+    private async Task<string> GetGif(string action)
+    {
+        KawaiiRequest request = JsonConvert.DeserializeObject<KawaiiRequest>(await new HttpClient().GetStringAsync($"https://kawaii.red/api/gif/{action}/token={Secrets.Secrets.KawaiiRedToken}/"));
+        return request.response;
+    }
+
+
 
     [Command("afk"),
     CommandModule("social"),
@@ -53,7 +60,7 @@ internal class Social : BaseCommandModule
             if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
-            KawaiiRequest request = JsonConvert.DeserializeObject<KawaiiRequest>(await new HttpClient().GetStringAsync($"https://kawaii.red/api/gif/cuddle/token={Secrets.Secrets.KawaiiRedToken}/"));
+            string gif = await GetGif("cuddle");
 
             string[] phrases =
             {
@@ -79,7 +86,7 @@ internal class Social : BaseCommandModule
             _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
-                ImageUrl = request.response,
+                ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
             }));
@@ -98,7 +105,7 @@ internal class Social : BaseCommandModule
             if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
-            KawaiiRequest request = JsonConvert.DeserializeObject<KawaiiRequest>(await new HttpClient().GetStringAsync($"https://kawaii.red/api/gif/kiss/token={Secrets.Secrets.KawaiiRedToken}/"));
+            string gif = await GetGif("kiss");
 
             string[] phrases =
             {
@@ -124,7 +131,7 @@ internal class Social : BaseCommandModule
             _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
-                ImageUrl = request.response,
+                ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
             }));
@@ -143,7 +150,7 @@ internal class Social : BaseCommandModule
             if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
-            KawaiiRequest request = JsonConvert.DeserializeObject<KawaiiRequest>(await new HttpClient().GetStringAsync($"https://kawaii.red/api/gif/slap/token={Secrets.Secrets.KawaiiRedToken}/"));
+            string gif = await GetGif("slap");
 
             string[] phrases =
             {
@@ -152,7 +159,7 @@ internal class Social : BaseCommandModule
 
             string[] self_phrases =
             {
-                "Come on, %1. There's no need to be so hard one yourself!",
+                "Come on, %1. There's no need to be so hard on yourself!",
                 "Bad %1! I don't know what you did but bad!"
             };
 
@@ -170,7 +177,145 @@ internal class Social : BaseCommandModule
             _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
-                ImageUrl = request.response,
+                ImageUrl = gif,
+                Color = ColorHelper.HiddenSidebar,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+            }));
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("kill"), Aliases("waste"),
+    CommandModule("social"),
+    Description("Kill another user..?")]
+    public async Task Kill(CommandContext ctx, DiscordUser user)
+    {
+        Task.Run(async () =>
+        {
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
+            string gif = await GetGif(new string[] { "kill", "wasted" }.OrderBy(x => Guid.NewGuid()).First());
+
+            string[] phrases =
+            {
+                "%1 kills %2! That looks like it hurt.. <:Scared:972880270069997598>",
+                "%1 kills %2! Ouch.. <:Scared:972880270069997598>",
+            };
+
+            string[] self_phrases =
+            {
+                "Come on, %1. There's no need to be so hard on yourself!",
+                "Come on, %1.. This isn't a solution is it?"
+            };
+
+            if (ctx.Member.Id == user.Id)
+            {
+                _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
+                    Color = ColorHelper.HiddenSidebar,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                }));
+                return;
+            }
+
+            _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                ImageUrl = gif,
+                Color = ColorHelper.HiddenSidebar,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+            }));
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("boop"),
+    CommandModule("social"),
+    Description("Give another user a boop!")]
+    public async Task Boop(CommandContext ctx, DiscordUser user)
+    {
+        Task.Run(async () =>
+        {
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
+            string gif = await GetGif("boop");
+
+            string[] phrases =
+            {
+                "%1 boops %2! Adorable..",
+                "%1 boops %2! So cute!",
+            };
+
+            string[] self_phrases =
+            {
+                "%1, i don't think that's how it works..",
+            };
+
+            if (ctx.Member.Id == user.Id)
+            {
+                _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
+                    Color = ColorHelper.HiddenSidebar,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                }));
+                return;
+            }
+
+            _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                ImageUrl = gif,
+                Color = ColorHelper.HiddenSidebar,
+                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+            }));
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("highfive"),
+    CommandModule("social"),
+    Description("Give a high five!")]
+    public async Task Highfive(CommandContext ctx, DiscordUser user)
+    {
+        Task.Run(async () =>
+        {
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
+
+            string gif = await GetGif("highfive");
+
+            string[] phrases =
+            {
+                "%1 highfives %2! That's the spirit. <:AlyProud:974100194062917632>",
+            };
+
+            string[] self_phrases =
+            {
+                "%1, are you trying to clap..?",
+            };
+
+            if (ctx.Member.Id == user.Id)
+            {
+                _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
+                    Color = ColorHelper.HiddenSidebar,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                }));
+                return;
+            }
+
+            _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
             }));
@@ -189,7 +334,7 @@ internal class Social : BaseCommandModule
             if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                 return;
 
-            KawaiiRequest request = JsonConvert.DeserializeObject<KawaiiRequest>(await new HttpClient().GetStringAsync($"https://kawaii.red/api/gif/hug/token={Secrets.Secrets.KawaiiRedToken}/"));
+            string gif = await GetGif("hug");
 
             string[] phrases =
             {
@@ -220,7 +365,7 @@ internal class Social : BaseCommandModule
             _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
-                ImageUrl = request.response,
+                ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
             }));
@@ -236,12 +381,12 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
-
             Task.Run(async () =>
             {
-                KawaiiRequest request = JsonConvert.DeserializeObject<KawaiiRequest>(await new HttpClient().GetStringAsync($"https://kawaii.red/api/gif/pat/token={Secrets.Secrets.KawaiiRedToken}/"));
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                string gif = await GetGif("pat");
 
                 string[] phrases =
                 {
@@ -269,7 +414,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
-                    ImageUrl = request.response,
+                    ImageUrl = gif,
                     Color = ColorHelper.HiddenSidebar,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
                 }));
