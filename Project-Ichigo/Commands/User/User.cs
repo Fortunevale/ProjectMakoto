@@ -438,14 +438,13 @@ internal class User : BaseCommandModule
                 victim = ctx.Member;
             }
 
-            var embed2 = new DiscordEmbedBuilder
+            var embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = $"{victim.Username}#{victim.Discriminator}'s Avatar",
                     Url = victim.AvatarUrl
                 },
-                Title = "",
                 ImageUrl = victim.AvatarUrl,
                 Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
@@ -456,7 +455,69 @@ internal class User : BaseCommandModule
                 Color = ColorHelper.Info
             };
 
-            await ctx.Channel.SendMessageAsync(embed: embed2);
+            DiscordMember member = null;
+
+            try { member = await victim.ConvertToMember(ctx.Guild); } catch { }
+
+            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Profile Picture", (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)));
+            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Picture", false);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
+
+            var msg = await ctx.Channel.SendMessageAsync(builder);
+
+            CancellationTokenSource cancellationTokenSource = new();
+
+            ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+            async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+            {
+                Task.Run(async () =>
+                {
+                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    {
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        cancellationTokenSource.Cancel();
+                        cancellationTokenSource = new();
+
+                        if (e.Interaction.Data.CustomId == ServerProfilePictureButton.CustomId)
+                        {
+                            embed.ImageUrl = member.GuildAvatarUrl;
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
+                        }
+                        else if (e.Interaction.Data.CustomId == ProfilePictureButton.CustomId)
+                        {
+                            embed.ImageUrl = member.AvatarUrl;
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
+                        }
+
+                        try
+                        {
+                            await Task.Delay(60000, cancellationTokenSource.Token);
+                            embed.Footer.Text += " • Interaction timed out";
+                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        }
+                        catch { }
+                    }
+                }).Add(_bot._watcher, ctx);
+            }
+
+            try
+            {
+                await Task.Delay(60000, cancellationTokenSource.Token);
+                embed.Footer.Text += " • Interaction timed out";
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                await Task.Delay(5000);
+                _ = msg.DeleteAsync();
+
+                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+            }
+            catch { }
         }).Add(_bot._watcher, ctx);
     }
 
