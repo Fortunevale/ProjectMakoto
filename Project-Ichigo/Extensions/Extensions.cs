@@ -32,11 +32,6 @@ internal static class Extensions
         return false;
     }
 
-    internal static async Task<DiscordMember> ConvertToMember(this DiscordUser user, DiscordGuild guild)
-    {
-        return await guild.GetMemberAsync(user.Id);
-    }
-
     internal static string BoolToEmote(this bool b)
     {
         return b ? ":white_check_mark:" : "<:white_x:939750475354472478>";

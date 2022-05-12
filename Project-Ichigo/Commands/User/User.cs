@@ -552,9 +552,7 @@ internal class User : BaseCommandModule
 
             DiscordMember member = null;
 
-            try
-            { member = await victim.ConvertToMember(ctx.Guild); }
-            catch { }
+            try { member = await victim.ConvertToMember(ctx.Guild); } catch { }
 
             var ServerBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Banner", (string.IsNullOrWhiteSpace(member?.GuildBannerHash)));
             var ProfileBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Banner", false);
