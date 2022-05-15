@@ -49,18 +49,36 @@ internal class PhishingProtectionEvents
             throw;
         }
 
+        var matches = Regex.Matches(e.Content, RegexHelper.UrlRegex);
+        var parsedMatches = matches.Select(x => new UriBuilder(x.Value));
+
+        var parsedWords = e.Content.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         foreach (var url in _bot._phishingUrls.List)
         {
-            if (e.Content.Contains(url.Key))
+            foreach (var word in parsedWords)
             {
-                _ = PunishMember(guild, member, e, url.Key);
-                return;
+                if (word.ToLower() == url.Key.ToLower())
+                {
+                    _ = PunishMember(guild, member, e, url.Key);
+                    return;
+                }
             }
         }
 
-        var matches = Regex.Matches(e.Content, RegexHelper.UrlRegex);
+        foreach (var url in _bot._phishingUrls.List)
+        {
+            foreach (var match in parsedMatches)
+            {
+                if (match.Host.ToLower() == url.Key.ToLower())
+                {
+                    _ = PunishMember(guild, member, e, url.Key);
+                    return;
+                }
+            }
+        }
 
-        if (matches.Count > 0)
+        if (matches.Count() > 0)
         {
             Dictionary<string, string> redirectUrls = new();
 
@@ -69,12 +87,13 @@ internal class PhishingProtectionEvents
                 try
                 {
                     var unshortened_url = await UnshortenUrl(match.Value);
+                    var parsedUri = new UriBuilder(unshortened_url);
 
                     if (unshortened_url != match.Value)
                     {
                         foreach (var url in _bot._phishingUrls.List)
                         {
-                            if (unshortened_url.Contains(url.Key))
+                            if (parsedUri.Host.ToLower() == url.Key.ToLower())
                             {
                                 _ = PunishMember(guild, member, e, url.Key);
                                 return;
@@ -99,7 +118,7 @@ internal class PhishingProtectionEvents
                 }
                 catch (Exception ex)
                 {
-                    LogError($"An exception occured while trying to unshorten url '{match.Value}'", ex);
+                    LogError($"An exception occured while trying to unshorten url '{match}'", ex);
 
                     if (_bot._guilds.List[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
