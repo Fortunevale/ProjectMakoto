@@ -39,7 +39,7 @@ internal class Maintainers : BaseCommandModule
             int Success = 0;
             int Failed = 0;
 
-            foreach (var b in ctx.Client.Guilds)
+            foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id).ThenBy(x => x))
             {
                 if (!_bot._guilds.List.ContainsKey(b.Key))
                     _bot._guilds.List.Add(b.Key, new Guilds.ServerSettings());
@@ -60,7 +60,7 @@ internal class Maintainers : BaseCommandModule
             }
 
             embed.Color = ColorHelper.Success;
-            embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' from {Success} guilds.`";
+            embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
             _ = msg.ModifyAsync(embed.Build());
         }).Add(_bot._watcher, ctx);
     }
@@ -171,6 +171,21 @@ internal class Maintainers : BaseCommandModule
 
             ChangeLogLevel((LoggerObjects.LogLevel)Level);
             _ = ctx.RespondAsync($"`Changed LogLevel to '{(LoggerObjects.LogLevel)Level}'`");
+        }).Add(_bot._watcher, ctx);
+    }
+    
+    
+    [Command("test"),
+    CommandModule("hidden"),
+    Description(" ")]
+    public async Task Log(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (ctx.User.Id != 411950662662881290)
+                return;
+
+            await ctx.RespondAsync(string.Join(", ", ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id).ThenBy(x => x).Select(x => $"{x.Key}{x.Value.Name}")));
         }).Add(_bot._watcher, ctx);
     }
 
