@@ -39,7 +39,7 @@ internal class Maintainers : BaseCommandModule
             int Success = 0;
             int Failed = 0;
 
-            foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id).ThenBy(x => x))
+            foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
                 if (!_bot._guilds.List.ContainsKey(b.Key))
                     _bot._guilds.List.Add(b.Key, new Guilds.ServerSettings());
@@ -185,7 +185,7 @@ internal class Maintainers : BaseCommandModule
             if (ctx.User.Id != 411950662662881290)
                 return;
 
-            await ctx.RespondAsync(string.Join(", ", ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id).ThenBy(x => x).Select(x => $"{x.Key}{x.Value.Name}")));
+            await ctx.RespondAsync(string.Join(", ", ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id).Select(x => $"{x.Key}{x.Value.Name}")));
         }).Add(_bot._watcher, ctx);
     }
 
