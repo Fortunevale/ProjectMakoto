@@ -890,6 +890,7 @@ internal class Admin : BaseCommandModule
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             cancellationTokenSource.Cancel();
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                             var interactivity = ctx.Client.GetInteractivity();
 
