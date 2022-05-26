@@ -368,13 +368,15 @@ internal class Bot
 
         if (!loadDatabase.IsCompletedSuccessfully)
         {
-            LogFatal($"An uncaught exception occured while initializing the database.");
+            LogFatal($"An uncaught exception occured while initializing the database.", loadDatabase.Exception);
+            await Task.Delay(1000);
             Environment.Exit(ExitCodes.FailedDatabaseLoad);
         }
 
         if (!logInToDiscord.IsCompletedSuccessfully)
         {
-            LogFatal($"An uncaught exception occured while initializing the discord client.");
+            LogFatal($"An uncaught exception occured while initializing the discord client.", logInToDiscord.Exception);
+            await Task.Delay(1000);
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
 
