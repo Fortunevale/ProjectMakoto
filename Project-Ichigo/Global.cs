@@ -55,6 +55,7 @@ global using Project_Ichigo.InteractionSelectors;
 global using Project_Ichigo.Events;
 global using Project_Ichigo.Helpers;
 global using Project_Ichigo.Extensions;
+global using Project_Ichigo.Exceptions;
 global using Project_Ichigo.TaskWatcher;
 global using Project_Ichigo.BumpReminder;
 global using Project_Ichigo.Secrets;

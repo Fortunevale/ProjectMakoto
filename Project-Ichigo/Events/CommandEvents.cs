@@ -48,6 +48,10 @@ internal class CommandEvents
                     catch { }
                 }).Add(_bot._watcher);
             }
+            else if (e.Exception.GetType().FullName == "Project_Ichigo.Exceptions.CancelCommandException")
+            {
+                return;
+            }
             else
             {
                 Task.Run(async () =>

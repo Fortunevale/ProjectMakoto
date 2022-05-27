@@ -18,7 +18,7 @@ internal class Admin : BaseCommandModule
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions");
+                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
             }
         }
 

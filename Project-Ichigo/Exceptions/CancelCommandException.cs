@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 namespace Project_Ichigo.Exceptions;
 internal class CancelCommandException : Exception
 {
-    public CancelCommandException(string message) : base(message)
+    public CancelCommandException(string message, CommandContext context) : base(message)
     {
+        this.context = context;
     }
+
+    public CommandContext context { get; set; }
 }
