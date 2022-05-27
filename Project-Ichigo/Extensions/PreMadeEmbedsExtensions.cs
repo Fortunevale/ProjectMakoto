@@ -109,7 +109,7 @@ internal static class PreMadeEmbedsExtensions
             Author = new DiscordEmbedBuilder.EmbedAuthor
             {
                 IconUrl = ctx.Guild.IconUrl,
-                Name = ctx.Guild.Name
+                Name = $"{cmds[0].Parent.Name.FirstLetterToUpper()} Command Help • {ctx.Guild.Name}"
             },
             Description = $"{string.Join("\n", cmds.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"))}\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
             Footer = new DiscordEmbedBuilder.EmbedFooter
