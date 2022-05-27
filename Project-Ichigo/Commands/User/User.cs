@@ -830,7 +830,7 @@ internal class User : BaseCommandModule
                             var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
                             await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
 
-                            _ = ctx.Client.GetCommandsNext().RegisteredCommands[ctx.Command.Name].ExecuteAsync(ctx);
+                            _ = ctx.Command.ExecuteAsync(ctx);
 
                             _ = Task.Delay(10000).ContinueWith(x =>
                             {

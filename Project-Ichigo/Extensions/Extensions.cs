@@ -57,6 +57,23 @@ internal static class Extensions
             .Replace("9", ":nine:");
     }
 
+    internal static void ModifyToTimedOut(this DiscordMessage msg, bool Delete = false)
+    {
+        msg.Channel.GetMessageAsync(msg.Id).ContinueWith(x =>
+        {
+            if (x.IsCompletedSuccessfully)
+            {
+                x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(x.Result.Embeds[0]).WithFooter(x.Result.Embeds[0].Footer.Text + " • Interaction timed out")));
+
+                if (Delete)
+                    Task.Delay(5000).ContinueWith(_ =>
+                    {
+                        msg.DeleteAsync();
+                    });
+            }
+        });
+    }
+
     internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> list, string title, string description = "")
     {
         List<DiscordEmbedBuilder> discordEmbeds = new();
