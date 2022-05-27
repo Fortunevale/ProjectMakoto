@@ -32,9 +32,9 @@ internal static class Extensions
         return false;
     }
 
-    internal static string BoolToEmote(this bool b)
+    internal static DiscordEmoji BoolToEmote(this bool b, DiscordClient client)
     {
-        return b ? ":white_check_mark:" : "<:white_x:939750475354472478>";
+        return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 939750475354472478);
     }
 
     internal static string DigitsToEmotes(this long i) =>
@@ -55,6 +55,23 @@ internal static class Extensions
             .Replace("7", ":seven:")
             .Replace("8", ":eight:")
             .Replace("9", ":nine:");
+    }
+
+    internal static void ModifyToTimedOut(this DiscordMessage msg, bool Delete = false)
+    {
+        msg.Channel.GetMessageAsync(msg.Id).ContinueWith(x =>
+        {
+            if (x.IsCompletedSuccessfully)
+            {
+                x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(x.Result.Embeds[0]).WithFooter(x.Result.Embeds[0].Footer.Text + " • Interaction timed out")));
+
+                if (Delete)
+                    Task.Delay(5000).ContinueWith(_ =>
+                    {
+                        msg.DeleteAsync();
+                    });
+            }
+        });
     }
 
     internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> list, string title, string description = "")

@@ -24,6 +24,7 @@ internal class Resources
 
         Permissions.ViewAuditLog,
     };
+    public static readonly DiscordButtonComponent CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
 
     public class LogIcons
     {

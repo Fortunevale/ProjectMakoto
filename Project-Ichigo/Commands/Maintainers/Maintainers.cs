@@ -283,7 +283,7 @@ internal class Maintainers : BaseCommandModule
                 Description = $"`Role selector test`"
             }));
 
-            var role = await new InteractionSelectors.GenericSelectors(_bot).PromptRoleSelection(ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, forMe, "Testrole");
+            var role = await GenericSelectors.PromptRoleSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, forMe, "Testrole");
 
             await msg.ModifyAsync($"Selected {role.Mention}");
         }).Add(_bot._watcher, ctx);
@@ -310,7 +310,7 @@ internal class Maintainers : BaseCommandModule
                 Description = $"`Channel selector test`"
             }));
 
-            var channel = await new InteractionSelectors.GenericSelectors(_bot).PromptChannelSelection(ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, forMe);
+            var channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, forMe);
 
             await msg.ModifyAsync($"Selected {channel.Mention}");
         }).Add(_bot._watcher, ctx);
