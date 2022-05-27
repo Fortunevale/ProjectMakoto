@@ -711,325 +711,288 @@ internal class Admin : BaseCommandModule
         }
     }
 
-
-
-    [Command("phishing"), Aliases("phishingsettings", "phishing-settings"),
+    [Group("phishing"), Aliases("phishingsettings", "phishing-settings"),
     CommandModule("admin"),
     Description("Allows to review and change settings for the phishing detection")]
-    public async Task PhishingSettings(CommandContext ctx, [Description("Action")] string action = "help")
+    public class PhishingSettings : BaseCommandModule
     {
-        Task.Run(async () =>
-        {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
+        public Bot _bot { private get; set; }
 
+        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        {
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
-                return;
+                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
             }
+        }
 
-            static async Task SendHelp(CommandContext ctx)
+        private string GetCurrentConfiguration(CommandContext ctx)
+        {
+            return $"`Detect Phishing Links   ` : {_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote(ctx.Client)}\n" +
+                    $"`Redirect Warning        ` : {_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect.BoolToEmote(ctx.Client)}\n" +
+                    $"`Punishment Type         ` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
+                    $"`Custom Punishment Reason` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
+                    $"`Custom Timeout Length   ` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`";
+        }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Shows a list of all currently defined Level Rewards")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                var ListEmbed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Phishing Protection Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
-                                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
-                });
-            }
+                    Description = GetCurrentConfiguration(ctx)
+                };
+                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+            }).Add(_bot._watcher, ctx);
+        }
 
-            if (action.ToLower() == "help")
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows modifying currently used phishing protection settings")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
-                await SendHelp(ctx);
-                return;
-            }
-            else if (action.ToLower() is "review" or "list")
-            {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"`Detect Phishing Links   ` : {_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote(ctx.Client)}\n" +
-                                  $"`Redirect Warning        ` : {_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect.BoolToEmote(ctx.Client)}\n" +
-                                  $"`Punishment Type         ` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
-                                  $"`Custom Punishment Reason` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
-                                  $"`Custom Timeout Length   ` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
-                });
-                return;
-            }
-            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
-            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Detect Phishing Links   ` : {_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing.BoolToEmote(ctx.Client)}\n" +
-                                  $"`Redirect Warning        ` : {_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect.BoolToEmote(ctx.Client)}\n" +
-                                  $"`Punishment Type         ` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType.ToString().ToLower().FirstLetterToUpper()}`\n" +
-                                  $"`Custom Punishment Reason` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason}`\n" +
-                                  $"`Custom Timeout Length   ` : `{_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength.GetHumanReadable()}`"
+                    Description = GetCurrentConfiguration(ctx)
                 };
 
-                var ToggleDetectionButton = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection");
-                var ToggleWarningButton = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning");
-                var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Punishment");
-                var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Reason");
-                var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Timeout Length");
-                var CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
+                var ToggleDetectionButton = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
+                var ToggleWarningButton = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+                var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Punishment", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
+                var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Reason", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+                var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Timeout Length", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
                 {
                     { ToggleDetectionButton },
                     { ToggleWarningButton },
+                })
+                .AddComponents(new List<DiscordComponent>
+                {
                     { ChangePunishmentButton },
                     { ChangeReasonButton },
                     { ChangeTimeoutLengthButton }
-                }).AddComponents(CancelButton));
+                }).AddComponents(Resources.CancelButton));
 
-                CancellationTokenSource cancellationTokenSource = new();
+                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
 
-                ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                if (e.TimedOut)
                 {
-                    Task.Run(async () =>
+                    msg.ModifyToTimedOut(true);
+                    return;
+                }
+
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (e.Result.Interaction.Data.CustomId == ToggleDetectionButton.CustomId)
+                {
+                    _ = msg.DeleteAsync();
+                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == ToggleWarningButton.CustomId)
+                {
+                    _ = msg.DeleteAsync();
+                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect = !_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect;
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
+                {
+                    var dropdown = new DiscordSelectComponent("selection", "Select an action..", new List<DiscordSelectComponentOption>
+                    {
+                        { new DiscordSelectComponentOption("Ban", "Ban", "Bans the user if a scam link has been detected") },
+                        { new DiscordSelectComponentOption("Kick", "Kick", "Kicks the user if a scam link has been detected") },
+                        { new DiscordSelectComponentOption("Timeout", "Timeout", "Times the user out if a scam link has been detected") },
+                        { new DiscordSelectComponentOption("Delete", "Delete", "Only deletes the message containing the detected scam link") },
+                    });
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
+
+                    async Task ChangePunishmentInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                     {
                         if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
-                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                            ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
 
-                            cancellationTokenSource.Cancel();
-                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
-
-                            var interactivity = ctx.Client.GetInteractivity();
-
-                            if (e.Interaction.Data.CustomId == ToggleDetectionButton.CustomId)
+                            switch (e.Values.First())
                             {
-                                _ = msg.DeleteAsync();
-                                _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
-                                _ = ctx.Command.ExecuteAsync(ctx);
+                                case "Ban":
+                                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
+                                    break;
+                                case "Kick":
+                                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
+                                    break;
+                                case "Timeout":
+                                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
+                                    break;
+                                case "Delete":
+                                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
+                                    break;
                             }
-                            else if (e.Interaction.Data.CustomId == ToggleWarningButton.CustomId)
-                            {
-                                _ = msg.DeleteAsync();
-                                _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect = !_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect;
-                                _ = ctx.Command.ExecuteAsync(ctx);
-                            }
-                            else if (e.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
-                            {
-                                var dropdown = new DiscordSelectComponent("selection", "Select an action..", new List<DiscordSelectComponentOption>
+
+                            _ = msg.DeleteAsync();
+                            _ = ctx.Command.ExecuteAsync(ctx);
+                        }
+                    };
+
+                    _ = Task.Delay(60000).ContinueWith(x =>
+                    {
+                        if (x.IsCompletedSuccessfully)
                         {
-                            { new DiscordSelectComponentOption("Ban", "Ban", "Bans the user if a scam link has been detected") },
-                            { new DiscordSelectComponentOption("Kick", "Kick", "Kicks the user if a scam link has been detected") },
-                            { new DiscordSelectComponentOption("Timeout", "Timeout", "Times the user out if a scam link has been detected") },
-                            { new DiscordSelectComponentOption("Delete", "Delete", "Only deletes the message containing the detected scam link") },
-                        } as IEnumerable<DiscordSelectComponentOption>);
+                            ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
+                            msg.ModifyToTimedOut(true);
+                        }
+                    });
 
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
+                    ctx.Client.ComponentInteractionCreated += ChangePunishmentInteraction;
+                }
+                else if (e.Result.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
+                {
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("Please specify a new Ban/Kick Reason.\n" +
+                                                                                                        "_Type `cancel` or `.` to cancel._\n\n" +
+                                                                                                        "**Placeholders**\n" +
+                                                                                                        "`%R` - _A placeholder for the reason_")));
 
-                                async Task ChangePunishmentInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-                                {
-                                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
-                                    {
-                                        switch (e.Values.First())
-                                        {
-                                            case "Ban":
-                                                _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
-                                                break;
-                                            case "Kick":
-                                                _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
-                                                break;
-                                            case "Timeout":
-                                                _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
-                                                break;
-                                            case "Delete":
-                                                _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
-                                                break;
-                                        }
+                    var reason = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
 
-                                        _ = msg.DeleteAsync();
-                                        _ = ctx.Command.ExecuteAsync(ctx);
-                                        ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
-                                    }
-                                };
+                    if (reason.TimedOut)
+                    {
+                        msg.ModifyToTimedOut(true);
+                        return;
+                    }
 
-                                ctx.Client.ComponentInteractionCreated += ChangePunishmentInteraction;
+                    _ = reason.Result.DeleteAsync();
 
-                                try
-                                {
-                                    await Task.Delay(60000);
-                                    embed.Footer.Text += " • Interaction timed out";
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
+                    if (reason.Result.Content.ToLower() is not "cancel" and not ".")
+                        _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
 
-                                    ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
-                                }
-                                catch { }
-                            }
-                            else if (e.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == ChangeTimeoutLengthButton.CustomId)
+                {
+                    if (_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != PhishingPunishmentType.TIMEOUT)
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`You aren't using 'Timeout' as your Punishment`")));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("Please specify how long the timeout should last with one of the following suffixes:\n" +
+                                                                                                        "`d` - _Days (default)_\n" +
+                                                                                                        "`h` - _Hours_\n" +
+                                                                                                        "`m` - _Minutes_\n" +
+                                                                                                        "`s` - _Seconds_\n\n" +
+                                                                                                        "e.g.: `31h = 31 Hours`")));
+
+                    var reason = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
+
+                    if (reason.TimedOut)
+                    {
+                        msg.ModifyToTimedOut(true);
+                        return;
+                    }
+
+                    _ = reason.Result.DeleteAsync();
+
+                    if (reason.Result.Content.ToLower() is "cancel" or ".")
+                    {
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    try
+                    {
+                        if (!TimeSpan.TryParse(reason.Result.Content, out TimeSpan length))
+                        {
+                            switch (reason.Result.Content[^1..])
                             {
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                var msg3 = await ctx.Channel.SendMessageAsync("Please specify a new Ban Reason.\n" +
-                                                                                "_Type `cancel` or `.` to cancel._\n\n" +
-                                                                                "**Placeholders**\n" +
-                                                                                "`%R` - _A placeholder for the reason_");
-
-                                var reason = await interactivity.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
-
-                                _ = Task.Delay(2000).ContinueWith(x =>
-                                {
-                                    _ = reason.Result.DeleteAsync();
-                                });
-
-                                if (reason.TimedOut)
-                                {
-                                    _ = msg3.DeleteAsync();
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
+                                case "d":
+                                    length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content.Replace("d", "")));
+                                    break;
+                                case "h":
+                                    length = TimeSpan.FromHours(Convert.ToInt32(reason.Result.Content.Replace("h", "")));
+                                    break;
+                                case "m":
+                                    length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Result.Content.Replace("m", "")));
+                                    break;
+                                case "s":
+                                    length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content.Replace("s", "")));
+                                    break;
+                                default:
+                                    length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content));
                                     return;
-                                }
-
-                                if (reason.Result.Content.ToLower() is not "cancel" or ".")
-                                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
-
-                                _ = msg3.DeleteAsync();
-                                _ = msg.DeleteAsync();
-                                _ = ctx.Command.ExecuteAsync(ctx);
-                            }
-                            else if (e.Interaction.Data.CustomId == ChangeTimeoutLengthButton.CustomId)
-                            {
-                                if (_bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != PhishingPunishmentType.TIMEOUT)
-                                {
-                                    var msg4 = await ctx.Channel.SendMessageAsync("You aren't using `Timeout` as your Punishment");
-                                    await Task.Delay(5000);
-                                    _ = msg4.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                var msg3 = await ctx.Channel.SendMessageAsync("Please specify how long the timeout should last with one of the following suffixes:\n" +
-                                                                                "`d` - _Days (default)_\n" +
-                                                                                "`h` - _Hours_\n" +
-                                                                                "`m` - _Minutes_\n" +
-                                                                                "`s` - _Seconds_");
-
-                                var reason = await interactivity.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
-
-                                if (reason.TimedOut)
-                                {
-                                    _ = msg3.DeleteAsync();
-                                    embed.Footer.Text += " • Interaction timed out";
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    return;
-                                }
-
-                                _ = Task.Delay(2000).ContinueWith(x =>
-                                {
-                                    _ = reason.Result.DeleteAsync();
-                                });
-
-                                if (reason.Result.Content.ToLower() is "cancel" or ".")
-                                {
-                                    _ = msg3.DeleteAsync();
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                try
-                                {
-                                    if (!TimeSpan.TryParse(reason.Result.Content, out TimeSpan length))
-                                    {
-                                        switch (reason.Result.Content[^1..])
-                                        {
-                                            case "d":
-                                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content.Replace("d", "")));
-                                                break;
-                                            case "h":
-                                                length = TimeSpan.FromHours(Convert.ToInt32(reason.Result.Content.Replace("h", "")));
-                                                break;
-                                            case "m":
-                                                length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Result.Content.Replace("m", "")));
-                                                break;
-                                            case "s":
-                                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content.Replace("s", "")));
-                                                break;
-                                            default:
-                                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content));
-                                                return;
-                                        }
-                                    }
-
-                                    if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(1))
-                                    {
-                                        _ = msg3.DeleteAsync();
-                                        _ = msg.DeleteAsync();
-                                        var msg4 = await ctx.Channel.SendMessageAsync("The duration has to be between 1 second and 28 days.");
-                                        await Task.Delay(5000);
-                                        _ = msg4.DeleteAsync();
-                                        _ = ctx.Command.ExecuteAsync(ctx);
-                                        return;
-                                    }
-
-                                    _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
-
-                                    _ = msg3.DeleteAsync();
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                }
-                                catch (Exception)
-                                {
-                                    _ = msg3.DeleteAsync();
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-                            }
-                            else if (e.Interaction.Data.CustomId == CancelButton.CustomId)
-                            {
-                                _ = msg.DeleteAsync();
                             }
                         }
-                    }).Add(_bot._watcher, ctx);
+
+                        if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(1))
+                        {
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("The duration has to be between 1 second and 28 days.")));
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+                            _ = ctx.Command.ExecuteAsync(ctx);
+                            return;
+                        }
+
+                        _bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
+
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                    }
+                    catch (Exception)
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("Invalid duration")));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
                 }
-
-                try
+                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
                 {
-                    await Task.Delay(60000, cancellationTokenSource.Token);
-
-                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
-
-                    embed.Footer.Text += " • Interaction timed out";
-                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                    await Task.Delay(5000);
                     _ = msg.DeleteAsync();
                 }
-                catch { }
-            }
-            else
-            {
-                await SendHelp(ctx);
-                return;
-            }
-        }).Add(_bot._watcher, ctx);
+            }).Add(_bot._watcher, ctx);
+        }
     }
-
-
 
     [Command("bumpreminder"), Aliases("bump-reminder"),
     CommandModule("admin"),
