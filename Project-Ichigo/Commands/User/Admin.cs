@@ -316,7 +316,7 @@ internal class Admin : BaseCommandModule
 
     [Group("levelrewards"), Aliases("level-rewards", "rewards"),
     CommandModule("admin"),
-    Description("Allows to review, add and remove levelreward roles")]
+    Description("Allows to review, add, remove and modify Level Rewards")]
     public class LevelRewards : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -374,7 +374,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined levelrewards")]
+        Description("Shows a list of all currently defined Level Rewards")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -395,7 +395,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows deletion and modification of currently defined levelrewards")]
+        Description("Allows adding, removing and modifying currently defined Level Rewards")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -710,6 +710,8 @@ internal class Admin : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
     }
+
+
 
     [Command("phishing"), Aliases("phishingsettings", "phishing-settings"),
     CommandModule("admin"),
