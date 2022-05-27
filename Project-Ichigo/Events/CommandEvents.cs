@@ -13,7 +13,7 @@ internal class CommandEvents
     {
         Task.Run(async () =>
         {
-            LogDebug($"Successfully started execution of '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}) ({e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds}ms)");
+            LogDebug($"Successfully started execution of '{e.Context.Prefix}{(e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "")}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id}) ({e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds}ms)");
 
             try
             {
