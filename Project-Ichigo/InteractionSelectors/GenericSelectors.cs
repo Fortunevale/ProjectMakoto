@@ -2,15 +2,10 @@
 
 internal class GenericSelectors
 {
-    internal Bot _bot { get; set; }
-
-    internal GenericSelectors(Bot _bot)
+    internal static async Task<DiscordRole> PromptRoleSelection(Bot _bot, DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, bool IncludeCreateForMe = false, string CreateForMeName = "Role", bool IncludeDisable = false, string DisableString = "Disable")
     {
-        this._bot = _bot;
-    }
+        message = await channel.GetMessageAsync(message.Id);
 
-    internal async Task<DiscordRole> PromptRoleSelection(DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, bool IncludeCreateForMe = false, string CreateForMeName = "Role", bool IncludeDisable = false, string DisableString = "Disable")
-    {
         List<DiscordSelectComponentOption> roles = new();
 
         if (IncludeCreateForMe)
@@ -128,8 +123,10 @@ internal class GenericSelectors
         return Role;
     }
 
-    internal async Task<DiscordChannel> PromptChannelSelection(DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
+    internal static async Task<DiscordChannel> PromptChannelSelection(Bot _bot, DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
     {
+        message = await channel.GetMessageAsync(message.Id);
+
         List<DiscordSelectComponentOption> channels = new();
 
         if (IncludeCreateForMe)
@@ -246,8 +243,10 @@ internal class GenericSelectors
         return Channel;
     }
 
-    internal async Task<string> PromptCustomSelection(List<DiscordSelectComponentOption> options, DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, string CustomPlaceHolder = "Select an option..")
+    internal static async Task<string> PromptCustomSelection(Bot _bot, List<DiscordSelectComponentOption> options, DiscordClient client, DiscordGuild guild, DiscordChannel channel, DiscordMember member, DiscordMessage message, string CustomPlaceHolder = "Select an option..")
     {
+        message = await channel.GetMessageAsync(message.Id);
+
         int currentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
         string NextPageId = Guid.NewGuid().ToString();

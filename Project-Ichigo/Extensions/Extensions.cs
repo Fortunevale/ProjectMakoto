@@ -32,9 +32,9 @@ internal static class Extensions
         return false;
     }
 
-    internal static string BoolToEmote(this bool b)
+    internal static DiscordEmoji BoolToEmote(this bool b, DiscordClient client)
     {
-        return b ? ":white_check_mark:" : "<:white_x:939750475354472478>";
+        return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 939750475354472478);
     }
 
     internal static string DigitsToEmotes(this long i) =>
