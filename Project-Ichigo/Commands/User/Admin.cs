@@ -24,13 +24,13 @@ internal class Admin : BaseCommandModule
 
         private string GetCurrentConfiguration(CommandContext ctx)
         {
-            return $"`Autoban Globally Banned Users` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
-                                      $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                      $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
-                                      $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
-                                      $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}\n\n" +
-                                      $"For security reasons, roles with any of the following permissions never get re-applied: {string.Join(", ", Resources.ProtectedPermissions.Select(x => $"`{x.ToPermissionString()}`"))}.\n\n" +
-                                      $"In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied.";
+            return  $"`Autoban Globally Banned Users` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
+                    $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                    $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
+                    $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
+                    $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}\n\n" +
+                    $"For security reasons, roles with any of the following permissions never get re-applied: {string.Join(", ", Resources.ProtectedPermissions.Select(x => $"`{x.ToPermissionString()}`"))}.\n\n" +
+                    $"In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied.";
         }
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
@@ -54,6 +54,9 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
@@ -62,7 +65,7 @@ internal class Admin : BaseCommandModule
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 });
-            }).Add(_bot._watcher);
+            }).Add(_bot._watcher, ctx);
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
@@ -186,61 +189,76 @@ internal class Admin : BaseCommandModule
                 {
                     _ = msg.DeleteAsync();
                 }
-            }).Add(_bot._watcher);
+            }).Add(_bot._watcher, ctx);
         }
     }
 
-
-    [Command("experience"), Aliases("experiencesettings", "experience-settings"),
+    [Group("experience"), Aliases("experiencesettings", "experience-settings"),
     CommandModule("admin"),
     Description("Allows to review and change settings related to experience")]
-    public async Task ExperienceSettings(CommandContext ctx, [Description("Action")] string action = "help")
+    public class ExperienceSettings : BaseCommandModule
     {
-        Task.Run(async () =>
-        {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
+        public Bot _bot { private get; set; }
 
+        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        {
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
-                return;
+                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
             }
+        }
 
-            static async Task SendHelp(CommandContext ctx)
+        private string GetCurrentConfiguration(CommandContext ctx)
+        {
+            return  $"`Experience Enabled          ` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
+                    $"`Experience Boost for Bumpers` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}";
+        }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Shows the currently used settings")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                 $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
-                                 $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
+                    Description = GetCurrentConfiguration(ctx)
                 });
-            }
+            }).Add(_bot._watcher, ctx);
+        }
 
-            if (action.ToLower() == "help")
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows modification of the currently used settings")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
-                await SendHelp(ctx);
-                return;
-            }
-            else if (action.ToLower() is "review" or "list")
-            {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"`Experience Enabled          ` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
-                                  $"`Experience Boost for Bumpers` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
-                });
-                return;
-            }
-            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
-            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
@@ -248,71 +266,53 @@ internal class Admin : BaseCommandModule
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience Enabled          ` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote()}\n" +
-                                  $"`Experience Boost for Bumpers` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
+                  $"`Experience Boost for Bumpers` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote()}"
                 };
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                var msg = await ctx.Channel.SendMessageAsync(builder.AddComponents(new List<DiscordComponent>
-                {
-                    { new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), "1", "Toggle Experience System") },
-                    { new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), "2", "Toggle Experience Boost for Bumpers") },
-                    { new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel") }
-                } as IEnumerable<DiscordComponent>));
+                var ToggleExperienceSystem = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience System", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
+                var ToggleBumperBoost = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience Boost for Bumpers", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
 
-                CancellationTokenSource cancellationTokenSource = new();
-
-                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-                {
-                    Task.Run(async () =>
+                var msg = await ctx.Channel.SendMessageAsync(builder
+                    .AddComponents(new List<DiscordComponent>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
-                        {
-                            if (e.Interaction.Data.CustomId == "1")
-                            {
-                                _bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience = !_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience;
-                            }
-                            else if (e.Interaction.Data.CustomId == "2")
-                            {
-                                _bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder = !_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder;
-                            }
-                            else if (e.Interaction.Data.CustomId == "cancel")
-                            {
-                                cancellationTokenSource.Cancel();
-                                _ = msg.DeleteAsync();
-                                return;
-                            }
+                        ToggleExperienceSystem,
+                        ToggleBumperBoost,
+                    })
+                    .AddComponents(Resources.CancelButton));
 
-                            cancellationTokenSource.Cancel();
-                            _ = msg.DeleteAsync();
-                            _ = ctx.Command.ExecuteAsync(ctx);
-                            return;
-                        }
-                    }).Add(_bot._watcher, ctx);
-                }
+                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
 
-                ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-                try
+                if (e.TimedOut)
                 {
-                    await Task.Delay(60000, cancellationTokenSource.Token);
-                    embed.Footer.Text += " • Interaction timed out";
-                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                    await Task.Delay(5000);
-                    _ = msg.DeleteAsync();
-
-                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                    msg.ModifyToTimedOut(true);
+                    return;
                 }
-                catch { }
-            }
-            else
-            {
-                await SendHelp(ctx);
-                return;
-            }
-        }).Add(_bot._watcher, ctx);
-    }
 
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (e.Result.Interaction.Data.CustomId == ToggleExperienceSystem.CustomId)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience = !_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience;
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == ToggleBumperBoost.CustomId)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder = !_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder;
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                {
+                    _ = msg.DeleteAsync();
+                }
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 
 
     [Command("levelrewards"), Aliases("level-rewards", "rewards"),
