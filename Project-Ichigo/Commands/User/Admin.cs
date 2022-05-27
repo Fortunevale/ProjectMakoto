@@ -1,46 +1,47 @@
-﻿namespace Project_Ichigo.Commands.User;
+﻿using Project_Ichigo.Exceptions;
+
+namespace Project_Ichigo.Commands.User;
 internal class Admin : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
 
-
-    [Command("join"), Aliases("joinsettings", "join-settings"),
-    CommandModule("admin"),
-    Description("Allows to review and change settings in the event somebody joins")]
-    public async Task JoinSettings(CommandContext ctx, [Description("Action")] string action = "help")
+    [Group("join"), Aliases("joinsettings", "join-settings"),
+    CommandModule("admin"), 
+    Description("Allows to review and change settings in the event somebody joins the server")]
+    public class JoinSettings : BaseCommandModule
     {
-        Task.Run(async () =>
-        {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
+        public Bot _bot { private get; set; }
 
+        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        {
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
-                return;
+                throw new CancelCommandException("User is missing apprioriate permissions");
             }
+        }
 
-            static async Task SendHelp(CommandContext ctx)
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                 $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
-                                 $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
-                });
-            }
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
 
-            if (action.ToLower() == "help")
-            {
-                await SendHelp(ctx);
-                return;
-            }
-            else if (action.ToLower() is "review" or "list")
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Shows the currently used settings")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
@@ -49,15 +50,23 @@ internal class Admin : BaseCommandModule
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Autoban Globally Banned Users` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
-                                  $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                  $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
-                                  $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
-                                  $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}"
+                                $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                                $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
+                                $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
+                                $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}"
                 });
-                return;
-            }
-            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
+            }).Add(_bot._watcher);
+        }
+
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows modification of the currently used settings")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
@@ -65,12 +74,12 @@ internal class Admin : BaseCommandModule
                     Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Autoban Globally Banned Users` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote()}\n" +
-                                  $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
-                                  $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
-                                  $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
-                                  $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}\n\n" +
-                                  $"For security reasons, roles with any of the following permissions never get re-applied: {string.Join(", ", Resources.ProtectedPermissions.Select(x => $"`{x.ToPermissionString()}`"))}.\n\n" +
-                                  $"In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied."
+                                      $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote())}\n" +
+                                      $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote())}\n" +
+                                      $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote()}\n" +
+                                      $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote()}\n\n" +
+                                      $"For security reasons, roles with any of the following permissions never get re-applied: {string.Join(", ", Resources.ProtectedPermissions.Select(x => $"`{x.ToPermissionString()}`"))}.\n\n" +
+                                      $"In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied."
                 };
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -226,15 +235,9 @@ internal class Admin : BaseCommandModule
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
                 }
                 catch { }
-            }
-            else
-            {
-                await SendHelp(ctx);
-                return;
-            }
-        }).Add(_bot._watcher, ctx);
+            }).Add(_bot._watcher);
+        }
     }
-
 
 
     [Command("experience"), Aliases("experiencesettings", "experience-settings"),

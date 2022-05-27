@@ -102,6 +102,30 @@ internal static class PreMadeEmbedsExtensions
         return msg;
     }
 
+    public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx)
+    {
+        var embed = new DiscordEmbedBuilder
+        {
+            Author = new DiscordEmbedBuilder.EmbedAuthor
+            {
+                IconUrl = ctx.Guild.IconUrl,
+                Name = ctx.Guild.Name
+            },
+            Description = $"{string.Join("\n", cmds.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"))}\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+            Footer = new DiscordEmbedBuilder.EmbedFooter
+            {
+                Text = $"Command used by {ctx.User.Username}#{ctx.User.Discriminator}",
+                IconUrl = ctx.User.AvatarUrl
+            },
+            Timestamp = DateTime.UtcNow,
+            Color = ColorHelper.Info
+        };
+
+        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
+
+        return msg;
+    }
+
     public static async Task<DiscordMessage> SendSyntaxError(this CommandContext ctx)
     {
         var embed = new DiscordEmbedBuilder

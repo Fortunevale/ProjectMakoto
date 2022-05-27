@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Project_Ichigo.Exceptions;
+internal class CancelCommandException : Exception
+{
+    public CancelCommandException(string message) : base(message)
+    {
+    }
+}
