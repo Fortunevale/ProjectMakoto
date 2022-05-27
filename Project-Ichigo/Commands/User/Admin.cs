@@ -1785,6 +1785,7 @@ internal class Admin : BaseCommandModule
                     {
                         if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             cancellationTokenSource.Cancel();
@@ -1977,12 +1978,12 @@ internal class Admin : BaseCommandModule
                             try
                             {
                                 await Task.Delay(120000, cancellationTokenSource.Token);
+                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
                                 embed.Footer.Text += " • Interaction timed out";
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 _ = msg.DeleteAsync();
-
-                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             }
                             catch { }
                         }
