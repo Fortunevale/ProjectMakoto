@@ -201,6 +201,8 @@ internal class Maintainers : BaseCommandModule
 
                             if (requestedMsgs.Where(x => x.Embeds is not null && x.Embeds.Count > 0).Any(x => JsonConvert.SerializeObject(x.Embeds).Contains($"{ctx.User.UsernameWithDiscriminator}")))
                                 collectedDiscordMessagesToDelete.AddRange(requestedMsgs.Where(x => x.Embeds is not null && x.Embeds.Count > 0).Where(x => JsonConvert.SerializeObject(x.Embeds).Contains($"{ctx.User.UsernameWithDiscriminator}")));
+
+                            await Task.Delay(1000);
                         }
                         catch (Exception ex) { LogError($"{ex}"); continue; }
                     }
