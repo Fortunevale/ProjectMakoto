@@ -93,6 +93,129 @@ internal class Maintainers : BaseCommandModule
 
 
 
+    [Command("getridofme"),
+    CommandModule("maintainence"),
+    Description("Allows getting rid of all messages of you in this server")]
+    public async Task GetRidOfMe(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+                return;
+
+            List<DiscordMessage> collectedDiscordMessagesToDelete = new();
+
+            bool Done = false;
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    while (collectedDiscordMessagesToDelete.Count <= 0 && !Done)
+                        Thread.Sleep(1000);
+
+                    if (Done && collectedDiscordMessagesToDelete.Count <= 0)
+                    {
+                        LogInfo("Exiting delete thread");
+                        return;
+                    }
+
+                    for (int i = 0; i < collectedDiscordMessagesToDelete.Count; i++)
+                    {
+                        var msg = collectedDiscordMessagesToDelete[0];
+
+                        try
+                        {
+                            await msg.DeleteAsync();
+                            LogInfo($"Deleted '{msg.Id}' in {msg.Channel.Name}");
+                        }
+                        catch (NotFoundException)
+                        {
+                            collectedDiscordMessagesToDelete.Remove(msg);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogError($"{ex}");
+                            continue;
+                        }
+
+                        collectedDiscordMessagesToDelete.Remove(msg);
+                        await Task.Delay(1000);
+                    }
+                }
+            }).Add(_bot._watcher, ctx);
+
+            foreach (var channel in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Text))
+            {
+                try
+                {
+                    LogInfo($"[Get Rid of Me] Processing channel {channel.Value.Name}");
+
+                    List<DiscordMessage> discordMessages = new();
+                    discordMessages.AddRange(await channel.Value.GetMessagesAsync(1));
+
+                    if (discordMessages.Any(x => x.Author.Id == 411950662662881290))
+                        collectedDiscordMessagesToDelete.AddRange(discordMessages.Where(x => x.Author.Id == 411950662662881290));
+
+                    if (discordMessages.Any(x => x.Content.Contains(411950662662881290.ToString())))
+                        collectedDiscordMessagesToDelete.AddRange(discordMessages.Where(x => x.Content.Contains(411950662662881290.ToString())));
+
+                    if (discordMessages.Any(x => x.Content.Contains(ctx.Client.CurrentUser.Id.ToString())))
+                        collectedDiscordMessagesToDelete.AddRange(discordMessages.Where(x => x.Content.Contains(ctx.Client.CurrentUser.Id.ToString())));
+
+                    if (discordMessages.Where(x => x.ReferencedMessage is not null).Any(x => x.ReferencedMessage.Author.Id == 411950662662881290))
+                        collectedDiscordMessagesToDelete.AddRange(discordMessages.Where(x => x.ReferencedMessage is not null).Where(x => x.ReferencedMessage.Author.Id == 411950662662881290));
+                    
+                    if (discordMessages.Where(x => x.Embeds is not null && x.Embeds.Count > 0).Any(x => JsonConvert.SerializeObject(x.Embeds).Contains($"{ctx.User.UsernameWithDiscriminator}")))
+                        collectedDiscordMessagesToDelete.AddRange(discordMessages.Where(x => x.Embeds is not null && x.Embeds.Count > 0).Where(x => JsonConvert.SerializeObject(x.Embeds).Contains($"{ctx.User.UsernameWithDiscriminator}")));
+
+                    if (discordMessages.Count <= 0)
+                        continue;
+
+                    while (true)
+                    {
+                        try
+                        {
+                            var requestedMsgs = await channel.Value.GetMessagesBeforeAsync(discordMessages.Last().Id, 100);
+                            LogInfo($"[Get Rid of Me] Received {requestedMsgs.Count} messages");
+
+                            if (!requestedMsgs.Any())
+                            {
+                                LogInfo($"No more messages in '{channel.Value.Name}'");
+                                break;
+                            }
+
+                            discordMessages.AddRange(requestedMsgs);
+
+                            if (requestedMsgs.Any(x => x.Author.Id == 411950662662881290))
+                                collectedDiscordMessagesToDelete.AddRange(requestedMsgs.Where(x => x.Author.Id == 411950662662881290));
+
+                            if (requestedMsgs.Any(x => x.Content.Contains(411950662662881290.ToString())))
+                                collectedDiscordMessagesToDelete.AddRange(requestedMsgs.Where(x => x.Content.Contains(411950662662881290.ToString())));
+
+                            if (requestedMsgs.Any(x => x.Content.Contains(ctx.Client.CurrentUser.Id.ToString())))
+                                collectedDiscordMessagesToDelete.AddRange(requestedMsgs.Where(x => x.Content.Contains(ctx.Client.CurrentUser.Id.ToString())));
+
+                            if (requestedMsgs.Where(x => x.ReferencedMessage is not null).Any(x => x.ReferencedMessage.Author.Id == 411950662662881290))
+                                collectedDiscordMessagesToDelete.AddRange(requestedMsgs.Where(x => x.ReferencedMessage is not null).Where(x => x.ReferencedMessage.Author.Id == 411950662662881290));
+
+                            if (requestedMsgs.Where(x => x.Embeds is not null && x.Embeds.Count > 0).Any(x => JsonConvert.SerializeObject(x.Embeds).Contains($"{ctx.User.UsernameWithDiscriminator}")))
+                                collectedDiscordMessagesToDelete.AddRange(requestedMsgs.Where(x => x.Embeds is not null && x.Embeds.Count > 0).Where(x => JsonConvert.SerializeObject(x.Embeds).Contains($"{ctx.User.UsernameWithDiscriminator}")));
+                        }
+                        catch (Exception ex) { LogError($"{ex}"); continue; }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogError($"{ex}");
+                }
+            }
+
+            Done = true;
+        }).Add(_bot._watcher, ctx);
+    }
+
+
     [Command("import"),
     CommandModule("maintainence"),
     Description("Allows import of Kaffeemaschine settings")]
