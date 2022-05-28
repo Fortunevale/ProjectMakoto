@@ -140,7 +140,7 @@ internal class Maintainers : BaseCommandModule
                         }
 
                         collectedDiscordMessagesToDelete.Remove(msg);
-                        await Task.Delay(1000);
+                        await Task.Delay(10000);
                     }
                 }
             }).Add(_bot._watcher, ctx);
