@@ -45,11 +45,7 @@ internal class Mod : BaseCommandModule
                             Name = ctx.Guild.Name,
                             IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                         },
-                        Footer = new DiscordEmbedBuilder.EmbedFooter
-                        {
-                            Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                            IconUrl = ctx.Member.AvatarUrl
-                        },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow
                     };
                     var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
@@ -101,7 +97,7 @@ internal class Mod : BaseCommandModule
                     }
                     else
                     {
-                        PerformingActionEmbed.Description = $":x: `No messages were found with the specified filter.`";
+                        PerformingActionEmbed.Description = $"❌ `No messages were found with the specified filter.`";
                         PerformingActionEmbed.Color = ColorHelper.Error;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                         await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -133,7 +129,7 @@ internal class Mod : BaseCommandModule
                     catch (Exception ex)
                     {
                         LogError($"Failed to delete messages", ex);
-                        PerformingActionEmbed.Description = $":x: `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
+                        PerformingActionEmbed.Description = $"❌ `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
                         PerformingActionEmbed.Color = ColorHelper.Error;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
                         await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -147,14 +143,14 @@ internal class Mod : BaseCommandModule
                         _ = msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
                     }
 
-                    PerformingActionEmbed.Description = $":white_check_mark: `Successfully deleted {total - failed_deleted} messages`";
+                    PerformingActionEmbed.Description = $"✅ `Successfully deleted {total - failed_deleted} messages`";
 
                     if (FailedToDeleteAmount > 0)
                         PerformingActionEmbed.Description += $"\n`Failed to delete {failed_deleted} messages because they we're more than 14 days old`";
 
                     PerformingActionEmbed.Color = ColorHelper.Success;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                    PerformingActionEmbed.Footer.Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • This message will auto-delete in 5 seconds";
+                    PerformingActionEmbed.Footer = ctx.GenerateUsedByFooter("This message will auto-delete in 5 seconds");
 
                     _ = msg1.ModifyAsync(embed: PerformingActionEmbed.Build()).ContinueWith(_ =>
                     {
@@ -196,18 +192,14 @@ internal class Mod : BaseCommandModule
                     var PerformingActionEmbed = new DiscordEmbedBuilder
                     {
                         Title = "",
-                        Description = $":x: `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`",
+                        Description = $"❌ `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`",
                         Color = ColorHelper.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
                             IconUrl = ctx.Guild.IconUrl
                         },
-                        Footer = new DiscordEmbedBuilder.EmbedFooter
-                        {
-                            Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • This message will auto-delete in 5 seconds",
-                            IconUrl = ctx.Member.AvatarUrl
-                        },
+                        Footer = ctx.GenerateUsedByFooter("This message will auto-delete in 5 seconds"),
                         Timestamp = DateTime.UtcNow
                     };
                     var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
@@ -254,7 +246,7 @@ internal class Mod : BaseCommandModule
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Server Purge • {ctx.Guild.Name}" },
                 Color = ColorHelper.Processing,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Scanning all channels for messages sent by '{user.UsernameWithDiscriminator}' ({user.Id})..`"
             };
@@ -393,11 +385,7 @@ internal class Mod : BaseCommandModule
                         Name = ctx.Guild.Name,
                         IconUrl = ctx.Guild.IconUrl
                     },
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                        IconUrl = ctx.Member.AvatarUrl
-                    },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow
                 });
 
@@ -426,11 +414,7 @@ internal class Mod : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = ctx.Guild.IconUrl
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             });
         }).Add(_bot._watcher, ctx);
@@ -465,11 +449,7 @@ internal class Mod : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
@@ -517,7 +497,7 @@ internal class Mod : BaseCommandModule
                 {
                     PerformingActionEmbed.Color = ColorHelper.Error;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                    PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
+                    PerformingActionEmbed.Description = $"❌ `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
                     await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
                     return;
                 }
@@ -527,13 +507,13 @@ internal class Mod : BaseCommandModule
                     await victim.TimeoutAsync(until);
                     PerformingActionEmbed.Color = ColorHelper.Success;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                    PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) was timed out for {until.GetTotalSecondsUntil().GetHumanReadable(TimeFormat.HOURS)}.`";
+                    PerformingActionEmbed.Description = $"✅ `{victim.Username}#{victim.Discriminator} ({victim.Id}) was timed out for {until.GetTotalSecondsUntil().GetHumanReadable(TimeFormat.HOURS)}.`";
                 }
                 catch (Exception)
                 {
                     PerformingActionEmbed.Color = ColorHelper.Error;
                     PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                    PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
+                    PerformingActionEmbed.Description = $"❌ `{victim.Username}#{victim.Discriminator} ({victim.Id}) couldn't be timed out.`";
                 }
 
                 await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -575,11 +555,7 @@ internal class Mod : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
@@ -589,13 +565,13 @@ internal class Mod : BaseCommandModule
                 await victim.RemoveTimeoutAsync();
                 PerformingActionEmbed.Color = ColorHelper.Success;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")} `Removed timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
+                PerformingActionEmbed.Description = $"✅ `Removed timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
             }
             catch (Exception)
             {
                 PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $"{DiscordEmoji.FromName(ctx.Client, ":x:")} `Couldn't remove timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
+                PerformingActionEmbed.Description = $"❌ `Couldn't remove timeout for {victim.Username}#{victim.Discriminator} ({victim.Id}).`";
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -634,11 +610,7 @@ internal class Mod : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
@@ -657,7 +629,7 @@ internal class Mod : BaseCommandModule
             {
                 PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $":x: Encountered an exception while trying to kick <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
+                PerformingActionEmbed.Description = $"❌ Encountered an exception while trying to kick <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -696,11 +668,7 @@ internal class Mod : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
@@ -719,7 +687,7 @@ internal class Mod : BaseCommandModule
             {
                 PerformingActionEmbed.Color = ColorHelper.Error;
                 PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $":x: Encountered an exception while trying to ban <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
+                PerformingActionEmbed.Description = $"❌ Encountered an exception while trying to ban <@{victim.Id}> `{victim.Username}#{victim.Discriminator}`";
             }
 
             await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
@@ -755,11 +723,7 @@ internal class Mod : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
             var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);

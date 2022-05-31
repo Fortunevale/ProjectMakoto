@@ -61,7 +61,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 });
@@ -81,7 +81,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 };
@@ -243,7 +243,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 });
@@ -263,7 +263,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience Enabled          ` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote(ctx.Client)}\n" +
                   $"`Experience Boost for Bumpers` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote(ctx.Client)}"
@@ -386,7 +386,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Level Rewards • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 };
@@ -409,7 +409,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Level Rewards • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Loading Level Rewards..`"
                 };
@@ -456,8 +456,8 @@ internal class Admin : BaseCommandModule
                         embed.Description = "`No Level Rewards are defined.`";
                     }
 
-                    var PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
-                    var NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+                    var PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                    var NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
                     var Add = new DiscordButtonComponent(ButtonStyle.Success, "Add", "Add new Level Reward", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
                     var Modify = new DiscordButtonComponent(ButtonStyle.Primary, "Modify", "Modify Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
@@ -764,7 +764,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Phishing Protection Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 };
@@ -785,7 +785,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
                 };
@@ -1016,7 +1016,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
@@ -1038,7 +1038,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"{false.BoolToEmote(ctx.Client)} `The Bump Reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
                     });
@@ -1049,7 +1049,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Bump Reminder Enabled` : {_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}\n" +
                                   $"`Bump Reminder Channel` : <#{_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
@@ -1065,7 +1065,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"`The Bump Reminder is already set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} config' to change it's settings instead.`"
                     });
@@ -1078,7 +1078,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
                     });
@@ -1089,7 +1089,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Setting up Bump Reminder..`"
                 };
@@ -1114,8 +1114,8 @@ internal class Admin : BaseCommandModule
                     return;
                 }
 
-                var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with :white_check_mark: to receive notifications as soon as the server can be bumped again.");
-                _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:"));
+                var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with ✅ to receive notifications as soon as the server can be bumped again.");
+                _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromUnicode("✅"));
                 _ = bump_reaction_msg.PinAsync();
 
                 _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
@@ -1148,7 +1148,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"{false.BoolToEmote(ctx.Client)} `The Bump Reminder is not set up on this server. Please run '{ctx.Prefix}{ctx.Command.Name} setup' in the channel used for bumping.`"
                     });
@@ -1159,7 +1159,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Bump Reminder Enabled` : {_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}\n" +
                                   $"`Bump Reminder Channel` : <#{_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
@@ -1308,7 +1308,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows the currently used settings._\n" +
@@ -1329,7 +1329,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"{false.BoolToEmote(ctx.Client)} `The actionlog is disabled.`"
                     });
@@ -1340,7 +1340,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Actionlog Channel                 ` : <#{_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
                                   $"`Attempt gathering more details    ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote(ctx.Client)}\n" +
@@ -1364,7 +1364,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Actionlog Channel                 ` : <#{_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
                                   $"`Attempt gathering more details    ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote(ctx.Client)}\n" +
@@ -1386,7 +1386,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"{false.BoolToEmote(ctx.Client)} `The actionlog is disabled.`"
                     };
@@ -1498,7 +1498,7 @@ internal class Admin : BaseCommandModule
 
                                         if (_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                                         {
-                                            embed.Description = $":warning: `This may result in inaccurate details being displayed. Please make sure to double check the audit log on serious concerns.`";
+                                            embed.Description = $"⚠ `This may result in inaccurate details being displayed. Please make sure to double check the audit log on serious concerns.`";
                                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                             await Task.Delay(10000);
                                         }
@@ -1608,7 +1608,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows all active autocrosspost channels._\n" +
@@ -1631,7 +1631,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" +
                     $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
@@ -1646,15 +1646,15 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" + 
                     $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
                 };
 
-                var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, "SetDelay", "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":clock3:")));
-                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "AddChannel", "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
-                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "RemoveChannel", "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_multiplication_x:")));
+                var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, "SetDelay", "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "AddChannel", "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "RemoveChannel", "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
                 var CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { SetDelayButton, AddButton, RemoveButton, CancelButton }));
@@ -1916,7 +1916,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
                                                     $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows all currently active reaction roles._\n" +
@@ -2005,7 +2005,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Loading Reaction Roles..`"
                 });
@@ -2020,7 +2020,7 @@ internal class Admin : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                         Color = ColorHelper.Info,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = "`No reaction roles are set up.`"
                     }.Build());
@@ -2063,7 +2063,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = x
                 }).ToList();
@@ -2080,22 +2080,22 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.Loading,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Loading Reaction Roles..`"
                 });
 
                 await CheckForInvalid();
 
-                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "Add", "Add a new reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
-                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "Remove", "Remove a reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_multiplication_x:")));
+                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "Add", "Add a new reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "Remove", "Remove a reaction role", (_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
                 var CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
 
                 var embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.Info,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{_bot._guilds.List[ ctx.Guild.Id ].ReactionRoles.Count} reaction roles are set up.`"
                 };
@@ -2124,7 +2124,7 @@ internal class Admin : BaseCommandModule
                                 {
                                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                                     Color = ColorHelper.AwaitingInput,
-                                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                                    Footer = ctx.GenerateUsedByFooter(),
                                     Timestamp = DateTime.UtcNow,
                                     Description = "`Please copy and send the message link of the message you want the reaction role to be added to.`",
                                     ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
@@ -2395,7 +2395,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.AwaitingInput,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Adding reaction role..`"
                 };
@@ -2472,7 +2472,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.AwaitingInput,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Removing reaction role..`"
                 };
@@ -2518,7 +2518,7 @@ internal class Admin : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
                     Color = ColorHelper.AwaitingInput,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Removing all reaction roles..`"
                 };

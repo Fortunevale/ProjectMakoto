@@ -28,12 +28,12 @@ internal class CrosspostEvents
                 if (e.Channel.Type == ChannelType.News)
                 {
                     if (_bot._guilds.List[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
-                        _ = e.Message.CreateReactionAsync(DiscordEmoji.FromName(sender, ":clock3:"));
+                        _ = e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 
                     await Task.Delay(TimeSpan.FromSeconds(_bot._guilds.List[e.Guild.Id].CrosspostSettings.DelayBeforePosting));
 
                     if (_bot._guilds.List[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
-                        _ = e.Message.DeleteOwnReactionAsync(DiscordEmoji.FromName(sender, ":clock3:"));
+                        _ = e.Message.DeleteOwnReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 
                     DiscordMessage msg;
 

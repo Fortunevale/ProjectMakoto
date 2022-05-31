@@ -19,13 +19,13 @@ internal class Maintainers : ApplicationCommandsModule
             {
                 if (!ctx.User.IsMaintenance(_bot._status))
                 {
-                    _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($":x: `This command is restricted to Staff Members of Project Ichigo.`"));
+                    _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
                     return;
                 }
 
                 if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                 {
-                    await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($":x: `The GitHub Token expired, please update.`"));
+                    await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"❌ `The GitHub Token expired, please update.`"));
                     return;
                 }
 
@@ -65,7 +65,7 @@ internal class Maintainers : ApplicationCommandsModule
 
                             if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                             {
-                                _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($":x: `The GitHub Token expired, please update.`"));
+                                _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"❌ `The GitHub Token expired, please update.`"));
                                 return;
                             }
 
@@ -78,7 +78,7 @@ internal class Maintainers : ApplicationCommandsModule
 
                             await client.Issue.Assignee.AddAssignees(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, issue.Number, new AssigneesUpdate(new List<string> { Secrets.Secrets.GithubUsername }));
 
-                            _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($":white_check_mark: `Issue submitted:` {issue.HtmlUrl}"));
+                            _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"✅ `Issue submitted:` {issue.HtmlUrl}"));
                         }
                     }).Add(_bot._watcher, ctx);
                 }

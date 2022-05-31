@@ -75,7 +75,7 @@ internal class JoinEvents
                             IconUrl = Resources.AuditLogIcons.UserLeft,
                             Name = $"{e.Member.Username}#{e.Member.Discriminator}"
                         },
-                        Description = $"left the server. Sad to see you go. {DiscordEmoji.FromName(sender, ":wave:")}\n\n" +
+                        Description = $"left the server. Sad to see you go. 👋\n\n" +
                                       $"**Time on the server**: {e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}",
                         Timestamp = DateTime.UtcNow,
                         Color = ColorHelper.Error,
