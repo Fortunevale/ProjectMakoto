@@ -21,6 +21,14 @@ internal static class Extensions
 
         return false;
     }
+    
+    internal static bool IsDJ(this DiscordMember member, Status _status)
+    {
+        if (member.IsAdmin(_status) || member.Roles.Any(x => x.Name.ToLower() == "dj"))
+            return true;
+
+        return false;
+    }
 
     internal static bool IsProtected(this DiscordMember member, Status _status)
     {

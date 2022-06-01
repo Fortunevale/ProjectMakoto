@@ -269,6 +269,90 @@ internal class Music : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
+        [Command("forcedisconnect"), Aliases("fdc", "forceleave", "fleave"), Description("Forces the bot to disconnect from the current channel")]
+        public async Task ForceDisconnect(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                    return;
+
+                var lava = ctx.Client.GetLavalink();
+                var node = lava.ConnectedNodes.Values.First();
+                var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                if (conn is null)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `The bot is not in a voice channel.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You aren't in the same channel as the bot.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (!ctx.Member.IsDJ(_bot._status))
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(_bot, ctx.Guild.Id);
+                _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
+
+                await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
+                await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();
+
+                _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                {
+                    Description = $"✅ `The bot was force disconnected.`",
+                    Color = ColorHelper.Success,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                });
+            }).Add(_bot._watcher, ctx);
+        }
+
         [Command("play"), Description("Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.")]
         public async Task Play(CommandContext ctx, [Description("Search Query/Url")][RemainingText]string search)
         {
@@ -866,6 +950,86 @@ internal class Music : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
+        [Command("forceskip"), Aliases("fs", "fskip"), Description("Forces skipping of the current song. You need to be an Administrator or have a role called `DJ`.")]
+        public async Task ForceSkip(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                    return;
+
+                var lava = ctx.Client.GetLavalink();
+                var node = lava.ConnectedNodes.Values.First();
+                var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                if (conn is null)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `The bot is not in a voice channel.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You aren't in the same channel as the bot.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (!ctx.Member.IsDJ(_bot._status))
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                await conn.StopAsync();
+
+                _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                {
+                    Description = $"✅ `The song was force skipped.`",
+                    Color = ColorHelper.Success,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                });
+            }).Add(_bot._watcher, ctx);
+        }
+
         [Command("clearqueue"), Aliases("cq"), Description("Starts a voting to clear the current queue")]
         public async Task ClearQueue(CommandContext ctx)
         {
@@ -1030,6 +1194,87 @@ internal class Music : BaseCommandModule
                         }
                     }).Add(_bot._watcher);
                 }
+            }).Add(_bot._watcher, ctx);
+        }
+        
+        [Command("forceclearqueue"), Aliases("fcq"), Description("Forces clearing the current queue. You need to be an Administrator or have a role called `DJ`.")]
+        public async Task ForceClearQueue(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                    return;
+
+                var lava = ctx.Client.GetLavalink();
+                var node = lava.ConnectedNodes.Values.First();
+                var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                if (conn is null)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `The bot is not in a voice channel.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You aren't in the same channel as the bot.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (!ctx.Member.IsDJ(_bot._status))
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Clear();
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+
+                _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                {
+                    Description = $"✅ `The queue was force cleared.`",
+                    Color = ColorHelper.Success,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                });
             }).Add(_bot._watcher, ctx);
         }
 
