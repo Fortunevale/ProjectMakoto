@@ -67,6 +67,7 @@ internal class Music : BaseCommandModule
                     }
 
                     conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.QueueHandler(_bot, ctx.Client, node, conn);
                     return;
                 }
 
@@ -162,6 +163,7 @@ internal class Music : BaseCommandModule
 
                 if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                 {
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose();
                     _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
 
                     await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
@@ -238,6 +240,7 @@ internal class Music : BaseCommandModule
 
                             if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                             {
+                                _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose();
                                 _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
 
                                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
@@ -274,6 +277,12 @@ internal class Music : BaseCommandModule
                 if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
                     return;
 
+                if (string.IsNullOrWhiteSpace(search))
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
+
                 if (Regex.IsMatch(search, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
                     throw new Exception();
 
@@ -303,6 +312,7 @@ internal class Music : BaseCommandModule
                     }
 
                     conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.QueueHandler(_bot, ctx.Client, node, conn);
                 }
 
                 if (conn.Channel.Users.Count >= 2 && !(ctx.Member.VoiceState.Channel.Id == conn.Channel.Id))
@@ -563,6 +573,12 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
+                if (string.IsNullOrWhiteSpace(selection))
+                {
+                    _ = ctx.SendSyntaxError();
+                    return;
+                }
+
                 if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                     return;
 
@@ -825,8 +841,6 @@ internal class Music : BaseCommandModule
 
                             if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                             {
-                                _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
-
                                 await conn.StopAsync();
 
                                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -1065,11 +1079,11 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                _bot._guilds.List[ctx.User.Id].Lavalink.Shuffle = !_bot._guilds.List[ctx.User.Id].Lavalink.Shuffle;
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle = !_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle;
 
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
-                    Description = (_bot._guilds.List[ctx.User.Id].Lavalink.Shuffle ? "✅ `The queue now shuffles.`" : "✅ `The queue no longer shuffles.`"),
+                    Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now shuffles.`" : "✅ `The queue no longer shuffles.`"),
                     Color = ColorHelper.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
@@ -1132,11 +1146,11 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                _bot._guilds.List[ctx.User.Id].Lavalink.Repeat = !_bot._guilds.List[ctx.User.Id].Lavalink.Repeat;
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat = !_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat;
 
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
-                    Description = (_bot._guilds.List[ctx.User.Id].Lavalink.Shuffle ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
+                    Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
                     Color = ColorHelper.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
