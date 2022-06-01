@@ -93,12 +93,17 @@ internal class Lavalink
 
                             var conn = nodeConnection.GetGuildConnection(e.Guild);
 
-                            var track = conn.CurrentState.CurrentTrack;
-                            var position = conn.CurrentState.PlaybackPosition;
+                            var track = conn.CurrentState?.CurrentTrack;
+                            var position = conn.CurrentState?.PlaybackPosition;
+
+                            if (track is null || position is null)
+                            {
+                                return;
+                            }
 
                             if (conn is null)
                             {
-                                await guildConnection.DisconnectAsync();
+                                _ = guildConnection.DisconnectAsync();
                                 this.Dispose(_bot, e.Guild.Id);
                                 return;
                             }
@@ -108,7 +113,7 @@ internal class Lavalink
                             await Task.Delay(1000);
 
                             await conn.PlayAsync(track);
-                            await conn.SeekAsync(position);
+                            await conn.SeekAsync((TimeSpan)position);
                             guildConnection = nodeConnection.GetGuildConnection(guildConnection.Guild);
                         }
                     }
@@ -143,7 +148,7 @@ internal class Lavalink
                     LogDebug($"Destroying Player for {guildConnection.Guild.Id}..");
                     sender.VoiceStateUpdated -= VoiceStateUpdated;
 
-                    await guildConnection.DisconnectAsync();
+                    _ = guildConnection.DisconnectAsync();
                     return;
                 }
 
