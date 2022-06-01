@@ -6,7 +6,7 @@ internal class Music : BaseCommandModule
 
 
     [Group("music"),
-    CommandModule("music"),
+    CommandModule("music"), Aliases("m"),
     Description("Allows to play music and change the current playback settings")]
     public class MusicCommands : BaseCommandModule
     {
@@ -938,6 +938,78 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Description = (_bot._guilds.List[ctx.User.Id].Lavalink.Shuffle ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
+                    Color = ColorHelper.Success,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter()
+                })
+                .ContinueWith(msg =>
+                {
+                    if (msg.IsCompletedSuccessfully)
+                        _ = Task.Delay(5000).ContinueWith(_ => { _ = msg.Result.DeleteAsync(); });
+                });
+            });
+        }
+        
+        [Command("pause"), Description("Pause or unpause the current song")]
+        public async Task Pause(CommandContext ctx)
+        {
+            _ = Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                    return;
+
+                var lava = ctx.Client.GetLavalink();
+                var node = lava.ConnectedNodes.Values.First();
+                var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                if (conn is null)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `The bot is not in a voice channel.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You aren't in the same channel as the bot.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                _bot._guilds.List[ctx.User.Id].Lavalink.IsPaused = !_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused;
+
+                if (_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused)
+                    _ = conn.PauseAsync();
+                else
+                    _ = conn.ResumeAsync();
+
+                _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Description = (_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
                     Color = ColorHelper.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
