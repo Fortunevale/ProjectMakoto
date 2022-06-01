@@ -87,6 +87,13 @@ internal class Lavalink
                 {
                     if (e.User.Id == sender.CurrentUser.Id)
                     {
+                        if (e.After is null || e.After.Channel is null)
+                        {
+                            _ = guildConnection.DisconnectAsync();
+                            this.Dispose(_bot, e.Guild.Id);
+                            return;
+                        }
+
                         if (e.Before?.Channel != e.After?.Channel)
                         {
                             LogTrace($"Switched Channel on {guildConnection.Guild.Id}");
