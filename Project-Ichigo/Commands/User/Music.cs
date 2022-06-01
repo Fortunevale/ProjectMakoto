@@ -621,34 +621,115 @@ internal class Music : BaseCommandModule
                     return LastInt;
                 }
 
-                var Description = $"**`There's currently {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued.`**\n\n";
-                Description += $"{string.Join("\n", _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Select(x => $"**{GetInt()}**. `{x.VideoTitle}` requested by {x.user.Mention}"))}\n\n";
-                Description += $"`Currently playing:` `{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`\n";
-                Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : "<:disabledrepeat:981594645165408286>")}";
-                Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : "<:disabledshuffle:981594650018209863>")}";
-                Description += $" `|` {(_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "<a:paused:981594656435490836>" : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : "<:disabledplay:981594639440154744>")} ")}";
+                int CurrentPage = 0;
 
-                if (conn.CurrentState.CurrentTrack is not null)
+                async Task<DiscordMessage> UpdateMessage(DiscordMessage msg)
                 {
-                    Description += $"`[{((long)Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}/{((long)Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}]` ";
-                    Description += $"`{GenerateASCIIProgressbar(Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0), Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0))}`"; 
-                }
-                
-                
-                var msg = await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
-                {
-                    Color = ColorHelper.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    DiscordButtonComponent Refresh = new DiscordButtonComponent(ButtonStyle.Primary, "Refresh", "Refresh", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+
+                    DiscordButtonComponent NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                    DiscordButtonComponent PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+
+                    if (msg is null)
                     {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = Description,
+                        msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Color = ColorHelper.Success,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow,
+                            Description = "`Loading..`"
+                        }));
+                    }
+
+                    LastInt = CurrentPage * 10;
+
+                    var Description = $"**`There's currently {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued.`**\n\n";
+                    Description += $"{string.Join("\n", _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.VideoTitle}` requested by {x.user.Mention}"))}\n\n";
+                    
+                    if (_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count > 0)
+                        Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count / 10.0)}`\n\n";
+                    
+                    Description += $"`Currently playing:` `{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`\n";
+                    Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : "<:disabledrepeat:981594645165408286>")}";
+                    Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : "<:disabledshuffle:981594650018209863>")}";
+                    Description += $" `|` {(_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "<a:paused:981594656435490836>" : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : "<:disabledplay:981594639440154744>")} ")}";
+
+                    if (conn.CurrentState.CurrentTrack is not null)
+                    {
+                        Description += $"`[{((long)Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}/{((long)Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}]` ";
+                        Description += $"`{GenerateASCIIProgressbar(Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0), Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0))}`";
+                    }
+
+                    if (CurrentPage <= 0)
+                        PreviousPage = PreviousPage.Disable();
+
+                    if ((CurrentPage * 10) + 10 >= _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count)
+                        NextPage = NextPage.Disable();
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Color = ColorHelper.Success,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow,
+                        Description = Description
+                    }).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
+
+                    return msg;
+                }
+
+                var msg = await UpdateMessage(null);
+
+                _ = Task.Delay(120000).ContinueWith(x =>
+                {
+                    if (x.IsCompletedSuccessfully)
+                    {
+                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        msg.ModifyToTimedOut();
+                    }
                 });
 
-                
+                ctx.Client.ComponentInteractionCreated += RunInteraction;
+                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            switch (e.Interaction.Data.CustomId)
+                            {
+                                case "Refresh":
+                                {
+                                    msg = await UpdateMessage(msg);
+                                    break;
+                                }                                
+                                case "NextPage":
+                                {
+                                    CurrentPage++;
+                                    msg = await UpdateMessage(msg);
+                                    break;
+                                }                                
+                                case "PreviousPage":
+                                {
+                                    CurrentPage--;
+                                    msg = await UpdateMessage(msg);
+                                    break;
+                                }
+                            }
+                        }
+                    }).Add(_bot._watcher, ctx);
+                }
             }).Add(_bot._watcher, ctx);
         }
         
