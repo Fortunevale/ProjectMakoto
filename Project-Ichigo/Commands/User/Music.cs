@@ -401,6 +401,90 @@ internal class Music : BaseCommandModule
 
             }).Add(_bot._watcher, ctx);
         }
+        
+        [Command("queue"), Description("Displays the current queue")]
+        public async Task Queue(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                    return;
+
+                var lava = ctx.Client.GetLavalink();
+                var node = lava.ConnectedNodes.Values.First();
+                var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                if (conn is null)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `The bot is not in a voice channel.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You aren't in the same channel as the bot.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                int LastInt = 0;
+                int GetInt()
+                {
+                    LastInt++;
+                    return LastInt;
+                }
+
+                var Description = $"**`There's currently {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued.`**\n\n";
+                Description += $"{string.Join("\n", _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Select(x => $"**{GetInt()}**. `{x.VideoTitle}` requested by {x.user.Mention}"))}\n\n";
+                Description += $"`Currently playing:` `{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`\n";
+                Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : "<:disabledrepeat:981594645165408286>")}";
+                Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : "<:disabledshuffle:981594650018209863>")}";
+                Description += $" `|` {(_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "<a:paused:981594656435490836>" : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : "<:disabledplay:981594639440154744>")} ")}";
+
+                if (conn.CurrentState.CurrentTrack is not null)
+                {
+                    Description += $"`[{((long)Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}/{((long)Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}]` ";
+                    Description += $"`{GenerateASCIIProgressbar(Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0), Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0))}`"; 
+                }
+                
+                
+                var msg = await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                {
+                    Color = DiscordColor.Aquamarine,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow,
+                    Description = Description,
+                });
+
+                
+            }).Add(_bot._watcher, ctx);
+        }
 
         [Command("skip"), Description("Starts a voting to skip the current song")]
         public async Task Skip(CommandContext ctx)
