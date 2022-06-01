@@ -942,7 +942,7 @@ internal class Music : BaseCommandModule
                                 return;
                             }
 
-                            embed.Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                            embed.Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                             _ = msg.ModifyAsync(embed.Build());
                         }
                     }).Add(_bot._watcher);
