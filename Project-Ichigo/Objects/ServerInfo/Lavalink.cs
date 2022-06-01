@@ -2,6 +2,8 @@
 
 internal class Lavalink
 {
+    DiscordGuild Guild { get; set; }
+
     public List<QueueInfo> SongQueue = new();
 
     public List<ulong> collectedSkips = new();
@@ -48,8 +50,10 @@ internal class Lavalink
 
             Initialized = true;
 
-            LogDebug($"Initializing Player for {guildConnection.Guild.Id}..");
+            this.Guild = guildConnection.Guild;
 
+            LogDebug($"Initializing Player for {Guild.Id}..");
+            
             int UserAmount = 0;
             CancellationTokenSource VoiceUpdateTokenSource = new();
             async Task VoiceStateUpdated(DiscordClient s, VoiceStateUpdateEventArgs e)
@@ -66,7 +70,7 @@ internal class Lavalink
                         else
                             UserAmount = e.Guild.Channels.First(x => x.Key == e.Before.Channel.Id).Value.Users.Count;
 
-                        LogTrace($"UserAmount updated to {UserAmount} for {guildConnection.Guild.Id}");
+                        LogTrace($"UserAmount updated to {UserAmount} for {Guild.Id}");
 
                         if (UserAmount <= 1)
                             _ = Task.Delay(30000, VoiceUpdateTokenSource.Token).ContinueWith(x =>
@@ -96,7 +100,7 @@ internal class Lavalink
 
                         if (e.Before?.Channel != e.After?.Channel)
                         {
-                            LogTrace($"Switched Channel on {guildConnection.Guild.Id}");
+                            LogTrace($"Switched Channel on {Guild.Id}");
 
                             var conn = nodeConnection.GetGuildConnection(e.Guild);
 
@@ -121,22 +125,22 @@ internal class Lavalink
 
                             await conn.PlayAsync(track);
                             await conn.SeekAsync((TimeSpan)position);
-                            guildConnection = nodeConnection.GetGuildConnection(guildConnection.Guild);
+                            guildConnection = nodeConnection.GetGuildConnection(Guild);
                         }
                     }
                 }).Add(_bot._watcher);
             }
 
-            LogDebug($"Initializing VoiceStateUpdated Event for {guildConnection.Guild.Id}..");
+            LogDebug($"Initializing VoiceStateUpdated Event for {Guild.Id}..");
             sender.VoiceStateUpdated += VoiceStateUpdated;
 
             while (true)
             {
                 int WaitSeconds = 30;
 
-                while ((guildConnection.CurrentState.CurrentTrack is not null || _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Count <= 0) && !Disposed)
+                while ((guildConnection.CurrentState.CurrentTrack is not null || _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count <= 0) && !Disposed)
                 {
-                    if (guildConnection.CurrentState.CurrentTrack is null && _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Count <= 0)
+                    if (guildConnection.CurrentState.CurrentTrack is null && _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count <= 0)
                     {
                         WaitSeconds--;
 
@@ -148,11 +152,11 @@ internal class Lavalink
                 }
 
                 if (WaitSeconds <= 0)
-                    this.Dispose(_bot, guildConnection.Guild.Id);
+                    this.Dispose(_bot, Guild.Id);
 
                 if (Disposed)
                 {
-                    LogDebug($"Destroying Player for {guildConnection.Guild.Id}..");
+                    LogDebug($"Destroying Player for {Guild.Id}..");
                     sender.VoiceStateUpdated -= VoiceStateUpdated;
 
                     _ = guildConnection.DisconnectAsync();
@@ -161,24 +165,24 @@ internal class Lavalink
 
                 Lavalink.QueueInfo Track;
 
-                if (_bot._guilds.List[guildConnection.Guild.Id].Lavalink.Shuffle)
-                    Track = _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.OrderBy(_ => Guid.NewGuid()).ToList().First();
+                if (_bot._guilds.List[Guild.Id].Lavalink.Shuffle)
+                    Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.OrderBy(_ => Guid.NewGuid()).ToList().First();
                 else
-                    Track = _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.ToList().First();
+                    Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.ToList().First();
 
-                _bot._guilds.List[guildConnection.Guild.Id].Lavalink.collectedSkips.Clear();
+                _bot._guilds.List[Guild.Id].Lavalink.collectedSkips.Clear();
 
                 var loadResult = await nodeConnection.Rest.GetTracksAsync(Track.Url, LavalinkSearchType.Plain);
 
                 if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                 {
-                    _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Remove(Track);
+                    _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
                     continue;
                 }
 
                 var loadedTrack = loadResult.Tracks.First();
 
-                guildConnection = nodeConnection.GetGuildConnection(guildConnection.Guild);
+                guildConnection = nodeConnection.GetGuildConnection(Guild);
 
                 if (guildConnection is not null)
                 {
@@ -186,11 +190,11 @@ internal class Lavalink
                 }
                 else
                 {
-                    this.Dispose(_bot, guildConnection.Guild.Id);
+                    this.Dispose(_bot, Guild.Id);
                     continue;
                 }
 
-                _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Remove(Track);
+                _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
             }
         }).Add(_bot._watcher);
     }
