@@ -163,7 +163,7 @@ internal class Music : BaseCommandModule
 
                 if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                 {
-                    _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose();
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(_bot, ctx.Guild.Id);
                     _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
 
                     await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
@@ -240,7 +240,7 @@ internal class Music : BaseCommandModule
 
                             if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                             {
-                                _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose();
+                                _bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(_bot, ctx.Guild.Id);
                                 _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
 
                                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();

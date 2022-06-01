@@ -32,9 +32,11 @@ internal class Lavalink
     public bool Disposed { private set; get; } = false;
     public bool Initialized { private set; get; } = false;
 
-    public void Dispose()
+    public void Dispose(Bot _bot, ulong Id)
     {
         this.Disposed = true;
+
+        _bot._guilds.List[Id].Lavalink = new();
     }
 
     public void QueueHandler(Bot _bot, DiscordClient sender, LavalinkNodeConnection nodeConnection, LavalinkGuildConnection guildConnection)
@@ -64,7 +66,7 @@ internal class Lavalink
                         else
                             UserAmount = e.Guild.Channels.First(x => x.Key == e.Before.Channel.Id).Value.Users.Count;
 
-
+                        LogTrace($"UserAmount updated to {UserAmount} for {guildConnection.Guild.Id}");
 
                         if (UserAmount <= 1)
                             _ = Task.Delay(30000, VoiceUpdateTokenSource.Token).ContinueWith(x =>
@@ -74,10 +76,41 @@ internal class Lavalink
 
                                 if (UserAmount <= 1)
                                 {
-                                    _bot._guilds.List[e.Guild.Id].Lavalink.Dispose();
+                                    _bot._guilds.List[e.Guild.Id].Lavalink.Dispose(_bot, e.Guild.Id);
                                     _bot._guilds.List[e.Guild.Id].Lavalink = new();
                                 }
                             });
+                    }
+                }).Add(_bot._watcher);
+
+                Task.Run(async () =>
+                {
+                    if (e.User.Id == sender.CurrentUser.Id)
+                    {
+                        if (e.Before.Channel != e.After.Channel)
+                        {
+                            LogTrace($"Switched Channel on {guildConnection.Guild.Id}");
+
+                            var conn = nodeConnection.GetGuildConnection(e.Guild);
+
+                            var track = conn.CurrentState.CurrentTrack;
+                            var position = conn.CurrentState.PlaybackPosition;
+
+                            if (conn is null)
+                            {
+                                await guildConnection.DisconnectAsync();
+                                this.Dispose(_bot, e.Guild.Id);
+                                return;
+                            }
+
+                            await conn.StopAsync();
+
+                            await Task.Delay(1000);
+
+                            await conn.PlayAsync(track);
+                            await conn.SeekAsync(position);
+                            guildConnection = nodeConnection.GetGuildConnection(guildConnection.Guild);
+                        }
                     }
                 }).Add(_bot._watcher);
             }
@@ -87,13 +120,30 @@ internal class Lavalink
 
             while (true)
             {
+                int WaitSeconds = 30;
+
                 while ((guildConnection.CurrentState.CurrentTrack is not null || _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Count <= 0) && !Disposed)
+                {
+                    if (guildConnection.CurrentState.CurrentTrack is null && _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Count <= 0)
+                    {
+                        WaitSeconds--;
+
+                        if (WaitSeconds <= 0)
+                            break;
+                    }
+
                     await Task.Delay(1000);
+                }
+
+                if (WaitSeconds <= 0)
+                    this.Dispose(_bot, guildConnection.Guild.Id);
 
                 if (Disposed)
                 {
                     LogDebug($"Destroying Player for {guildConnection.Guild.Id}..");
                     sender.VoiceStateUpdated -= VoiceStateUpdated;
+
+                    await guildConnection.DisconnectAsync();
                     return;
                 }
 
@@ -108,7 +158,7 @@ internal class Lavalink
 
                 var loadResult = await nodeConnection.Rest.GetTracksAsync(Track.Url, LavalinkSearchType.Plain);
 
-                if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed || loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
+                if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                 {
                     _bot._guilds.List[guildConnection.Guild.Id].Lavalink.SongQueue.Remove(Track);
                     continue;
@@ -124,7 +174,7 @@ internal class Lavalink
                 }
                 else
                 {
-                    this.Dispose();
+                    this.Dispose(_bot, guildConnection.Guild.Id);
                     continue;
                 }
 
