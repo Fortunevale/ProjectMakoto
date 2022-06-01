@@ -30,7 +30,7 @@ internal class ScoreSaber : BaseCommandModule
         {
             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber • {ctx.Guild.Name}" },
             Color = ColorHelper.Processing,
-            Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+            Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
             Description = $"`Looking for player..`"
         };
@@ -43,11 +43,11 @@ internal class ScoreSaber : BaseCommandModule
 
             CancellationTokenSource cancellationTokenSource = new();
 
-            DiscordButtonComponent ShowProfileButton = new(ButtonStyle.Primary, "getmain", "Show Profile", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":bust_in_silhouette:")));
-            DiscordButtonComponent TopScoresButton = new(ButtonStyle.Primary, "gettopscores", "Show Top Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":sparkler:")));
-            DiscordButtonComponent RecentScoresButton = new(ButtonStyle.Primary, "getrecentscores", "Show Recent Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":clock3:")));
+            DiscordButtonComponent ShowProfileButton = new(ButtonStyle.Primary, "getmain", "Show Profile", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            DiscordButtonComponent TopScoresButton = new(ButtonStyle.Primary, "gettopscores", "Show Top Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎇")));
+            DiscordButtonComponent RecentScoresButton = new(ButtonStyle.Primary, "getrecentscores", "Show Recent Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
 
-            DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_lower_right:")));
+            DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
 
             DiscordLinkButtonComponent OpenProfileInBrowser = new($"https://scoresaber.com/u/{id}", "Open in browser", false);
 
@@ -87,7 +87,7 @@ internal class ScoreSaber : BaseCommandModule
                             {
                                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
                                 Color = ColorHelper.Success,
-                                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                                Footer = ctx.GenerateUsedByFooter("This message automatically deletes in 10 seconds"),
                                 Timestamp = DateTime.UtcNow,
                                 Description = $"{ctx.User.Mention} `Linked '{player.name.SanitizeForCodeBlock()}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
                                               $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
@@ -204,7 +204,7 @@ internal class ScoreSaber : BaseCommandModule
                     embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName.Sanitize()}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $" {score.leaderboard.songSubName.Sanitize()}" : "")} - {score.leaderboard.songAuthorName.Sanitize()} [{score.leaderboard.levelAuthorName.Sanitize()}]".TruncateWithIndication(256),
                         $":globe_with_meridians: **#{score.score.rank}**  󠂪 󠂪| 󠂪 󠂪 {Formatter.Timestamp(score.score.timeSet, TimestampFormat.RelativeTime)}\n" +
                         $"{(score.leaderboard.ranked ? $"**`{((decimal)((decimal)score.score.modifiedScore / (decimal)score.leaderboard.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp [{(score.score.pp * score.score.weight).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp]`**\n" : "\n")}" +
-                        $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote(ctx.Client)} `{score.score.missedNotes + score.score.badCuts}`")}**\n" +
+                        $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? "✅ `FC`" : $"{false.BoolToEmote(ctx.Client)} `{score.score.missedNotes + score.score.badCuts}`")}**\n" +
                         $"Map Leaderboard: `{ctx.Prefix}ssml {score.leaderboard.difficulty.leaderboardId} {page}{(odd ? " 1" : "")}`"));
                 }
 
@@ -441,7 +441,7 @@ internal class ScoreSaber : BaseCommandModule
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber • {ctx.Guild.Name}" },
                         Color = ColorHelper.Error,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                        Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"`This user has no Score Saber Profile linked to their Discord Account.`"
                     };
@@ -488,23 +488,23 @@ internal class ScoreSaber : BaseCommandModule
                     DiscordEmoji flag_emote = null;
                     try
                     { flag_emote = DiscordEmoji.FromName(ctx.Client, $":flag_{b.Key.ToLower()}:"); }
-                    catch (Exception) { flag_emote = DiscordEmoji.FromName(ctx.Client, $":white_large_square:"); }
+                    catch (Exception) { flag_emote = DiscordEmoji.FromUnicode("⬜"); }
                     countries.Add(new DiscordSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country), new DiscordComponentEmoji(flag_emote)));
                 }
                 return new DiscordSelectComponent("country_selection", "Select a country..", countries as IEnumerable<DiscordSelectComponentOption>);
             }
 
-            var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", "Start Search", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":mag:")));
-            var next_step_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_step", "Next step", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+            var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", "Start Search", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔎")));
+            var next_step_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_step", "Next step", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-            var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
-            var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+            var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+            var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Search • {ctx.Guild.Name}" },
                 Color = ColorHelper.AwaitingInput,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Please select a continent filter below.`"
             };
@@ -796,7 +796,7 @@ internal class ScoreSaber : BaseCommandModule
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber • {ctx.Guild.Name}" },
                 Color = ColorHelper.Processing,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Looking for scoreboard..`"
             };
@@ -966,18 +966,18 @@ internal class ScoreSaber : BaseCommandModule
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Color = ColorHelper.Info;
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = leaderboard.leaderboardInfo.coverImage };
-                embed.Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • Page {scoreSaberPage}/{TotalPages}" };
+                embed.Footer = ctx.GenerateUsedByFooter($"Page {scoreSaberPage}/{TotalPages}");
                 embed.ClearFields();
                 foreach (var score in scores.scores.ToList().Skip(internalPage * 6).Take(6))
                 {
                     embed.AddField(new DiscordEmbedField($"**#{score.rank}** {score.leaderboardPlayerInfo.country.IsoCountryCodeToFlagEmoji()} `{score.leaderboardPlayerInfo.name.SanitizeForCodeBlock()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.timeSet, TimestampFormat.RelativeTime)}",
                         $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.modifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
-                        $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? ":white_check_mark: `FC`" : $"{false.BoolToEmote(ctx.Client)} `{score.missedNotes + score.badCuts}`")}**\n" +
+                        $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? "✅ `FC`" : $"{false.BoolToEmote(ctx.Client)} `{score.missedNotes + score.badCuts}`")}**\n" +
                         $"Profile: `{ctx.Prefix}ss {score.leaderboardPlayerInfo.id}`"));
                 }
 
-                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_left:")));
-                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", (scoreSaberPage + 1 > scores.metadata.total / scores.metadata.itemsPerPage), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":arrow_right:")));
+                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", (scoreSaberPage + 1 > scores.metadata.total / scores.metadata.itemsPerPage), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
             };
@@ -1023,7 +1023,7 @@ internal class ScoreSaber : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
                     Color = ColorHelper.Error,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter("This message automatically deletes in 10 seconds"),
                     Timestamp = DateTime.UtcNow,
                     Description = $"{ctx.User.Mention} `Unlinked your Score Saber Profile from your Discord Account`"
                 }));
@@ -1039,7 +1039,7 @@ internal class ScoreSaber : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
                     Color = ColorHelper.Error,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"This message automatically deletes in 10 seconds • Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter("This message automatically deletes in 10 seconds"),
                     Timestamp = DateTime.UtcNow,
                     Description = $"{ctx.User.Mention} `There is no Score Saber Profile linked to your Discord Account.`"
                 }));

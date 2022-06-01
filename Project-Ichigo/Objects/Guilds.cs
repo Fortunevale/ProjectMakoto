@@ -16,5 +16,6 @@ internal class Guilds
         public CrosspostSettings CrosspostSettings { get; set; } = new();
         public ActionLogSettings ActionLogSettings { get; set; } = new();
         public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
+        public Lavalink Lavalink { get; set; } = new();
     }
 }

@@ -213,6 +213,7 @@ internal class Bot
             cNext.RegisterCommands<Commands.User.ScoreSaber>();
             cNext.RegisterCommands<Mod>();
             cNext.RegisterCommands<Admin>();
+            cNext.RegisterCommands<Music>();
 
             cNext.RegisterCommands<Commands.Maintainers.Maintainers>();
 
@@ -451,9 +452,9 @@ internal class Bot
     {
         return Task<int>.Run(() =>
         {
-            if (IsDev)
-                if (!_status.TeamMembers.Any(x => x == message.Author.Id))
-                    return -1;
+            //if (IsDev)
+            //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
+            //        return -1;
 
             return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
         });

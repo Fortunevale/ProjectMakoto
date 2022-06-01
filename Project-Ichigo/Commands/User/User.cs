@@ -55,7 +55,7 @@ internal class User : BaseCommandModule
             try
             {
                 foreach (var b in Embeds)
-                    await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter($"Command used by {ctx.Member.UsernameWithDiscriminator}").WithTimestamp(DateTime.UtcNow).WithColor(ColorHelper.Info).Build());
+                    await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter(ctx.GenerateUsedByFooter().Text, ctx.GenerateUsedByFooter().IconUrl).WithTimestamp(DateTime.UtcNow).WithColor(ColorHelper.Info).Build());
 
                 var successembed = new DiscordEmbedBuilder
                 {
@@ -65,11 +65,7 @@ internal class User : BaseCommandModule
                         IconUrl = ctx.Guild.IconUrl
                     },
                     Description = ":mailbox_with_mail: `You got mail! Please check your dm's.`",
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                        IconUrl = ctx.Member.AvatarUrl
-                    },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Color = ColorHelper.Success
                 };
@@ -85,12 +81,8 @@ internal class User : BaseCommandModule
                         Name = ctx.Guild.Name,
                         IconUrl = ctx.Guild.IconUrl
                     },
-                    Description = ":x: `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                        IconUrl = ctx.Member.AvatarUrl
-                    },
+                    Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Color = ColorHelper.Error,
                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
@@ -135,11 +127,7 @@ internal class User : BaseCommandModule
                 },
                 Color = ColorHelper.Info,
                 Description = "",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
 
@@ -353,11 +341,7 @@ internal class User : BaseCommandModule
                         Name = $"{victim.Username}#{victim.Discriminator} ({victim.Id})"
                     },
                     Description = $"[Avatar Url]({victim.AvatarUrl})",
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                        IconUrl = ctx.Member.AvatarUrl
-                    },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow
                 };
 
@@ -446,11 +430,7 @@ internal class User : BaseCommandModule
                     Url = victim.AvatarUrl
                 },
                 ImageUrl = victim.AvatarUrl,
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Color = ColorHelper.Info
             };
@@ -541,11 +521,7 @@ internal class User : BaseCommandModule
                 },
                 ImageUrl = victim.BannerUrl,
                 Description = (string.IsNullOrWhiteSpace(victim.BannerUrl) ? "`This user has no banner.`" : ""),
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Color = ColorHelper.Info
             };
@@ -628,7 +604,7 @@ internal class User : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
                     Color = ColorHelper.Error,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
                 });
@@ -655,11 +631,7 @@ internal class User : BaseCommandModule
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Color = ColorHelper.HiddenSidebar
             });
@@ -684,7 +656,7 @@ internal class User : BaseCommandModule
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
                     Color = ColorHelper.Error,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
                 });
@@ -706,11 +678,7 @@ internal class User : BaseCommandModule
                     Name = $"Experience Leaderboard"
                 },
                 Description = $"`Loading Leaderboard, please wait..`",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
 
@@ -796,13 +764,13 @@ internal class User : BaseCommandModule
 
             if (!_bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
             {
-                var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
+                var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
                     Color = ColorHelper.Important,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                    Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
                                   $"{2.DigitsToEmotes()}. You may not spam submissions.\n" +
@@ -827,7 +795,7 @@ internal class User : BaseCommandModule
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             _bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
 
-                            var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":thumbsup:")));
+                            var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
                             await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
 
                             _ = ctx.Command.ExecuteAsync(ctx);
@@ -859,7 +827,7 @@ internal class User : BaseCommandModule
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
                 Color = ColorHelper.Processing,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Processing your request..`"
             };
@@ -928,7 +896,7 @@ internal class User : BaseCommandModule
             embed.Color = ColorHelper.Success;
             embed.Author.IconUrl = Resources.LogIcons.Info;
 
-            var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "continue", "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")));
+            var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "continue", "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
             var cancel_button = new DiscordButtonComponent(ButtonStyle.Danger, "cancel", "Cancel", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
 
 
@@ -995,7 +963,7 @@ internal class User : BaseCommandModule
 
                                 var channel = await ctx.Client.GetChannelAsync(940040486910066698);
 
-                                var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "accept_submission", "Accept submission", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":white_check_mark:")));
+                                var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "accept_submission", "Accept submission", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
                                 var cancel_button = new DiscordButtonComponent(ButtonStyle.Danger, "deny_submission", "Deny submission", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
                                 var ban_user_button = new DiscordButtonComponent(ButtonStyle.Danger, "ban_user", "Deny submission & ban submitter", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
                                 var ban_guild_button = new DiscordButtonComponent(ButtonStyle.Danger, "ban_guild", "Deny submission & ban guild", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
@@ -1092,11 +1060,7 @@ internal class User : BaseCommandModule
                     Name = ctx.Guild.Name,
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading
                 },
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                    IconUrl = ctx.Member.AvatarUrl
-                },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
             };
             var msg = await ctx.Message.ReferencedMessage.RespondAsync(embed: embed);
@@ -1240,11 +1204,11 @@ internal class User : BaseCommandModule
 
             var IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", "Include Stickers", !SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
             
-            var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
-            var ZipPrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "ZipPrivateMessage", "Direct Message as Zip File", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":desktop:")));
-            var SinglePrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "SinglePrivateMessage", "Direct Message as Single Files", false, new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":mobile_phone:")));
+            var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var ZipPrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "ZipPrivateMessage", "Direct Message as Zip File", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+            var SinglePrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "SinglePrivateMessage", "Direct Message as Single Files", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📱")));
 
-            var SendHereButton = new DiscordButtonComponent(ButtonStyle.Secondary, "SendHere", "In this chat as Zip File", !(ctx.Member.Permissions.HasPermission(Permissions.AttachFiles)), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":speech_balloon:")));
+            var SendHereButton = new DiscordButtonComponent(ButtonStyle.Secondary, "SendHere", "In this chat as Zip File", !(ctx.Member.Permissions.HasPermission(Permissions.AttachFiles)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -1354,7 +1318,7 @@ internal class User : BaseCommandModule
                             embed.Thumbnail = null;
                             embed.Color = ColorHelper.Success;
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
-                            embed.Description = $":white_check_mark: `Downloaded and added {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to the server.`";
+                            embed.Description = $"✅ `Downloaded and added {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to the server.`";
                             await msg.ModifyAsync(embed: embed.Build());
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
@@ -1392,12 +1356,8 @@ internal class User : BaseCommandModule
                                         Name = ctx.Guild.Name,
                                         IconUrl = ctx.Guild.IconUrl
                                     },
-                                    Description = ":x: `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
-                                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                                    {
-                                        Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                                        IconUrl = ctx.Member.AvatarUrl
-                                    },
+                                    Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
+                                    Footer = ctx.GenerateUsedByFooter(),
                                     Timestamp = DateTime.UtcNow,
                                     Color = ColorHelper.Error,
                                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
@@ -1418,7 +1378,7 @@ internal class User : BaseCommandModule
                             embed.Thumbnail = null;
                             embed.Color = ColorHelper.Success;
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
-                            embed.Description = $":white_check_mark: `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
+                            embed.Description = $"✅ `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                             await msg.ModifyAsync(embed: embed.Build());
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
@@ -1476,12 +1436,8 @@ internal class User : BaseCommandModule
                                             Name = ctx.Guild.Name,
                                             IconUrl = ctx.Guild.IconUrl
                                         },
-                                        Description = ":x: `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
-                                        Footer = new DiscordEmbedBuilder.EmbedFooter
-                                        {
-                                            Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}",
-                                            IconUrl = ctx.Member.AvatarUrl
-                                        },
+                                        Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
+                                        Footer = ctx.GenerateUsedByFooter(),
                                         Timestamp = DateTime.UtcNow,
                                         Color = ColorHelper.Error,
                                         ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
@@ -1502,7 +1458,7 @@ internal class User : BaseCommandModule
                                 embed.Thumbnail = null;
                                 embed.Color = ColorHelper.Success;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                                embed.Description = $":white_check_mark: `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
+                                embed.Description = $"✅ `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                                 await msg.ModifyAsync(embed: embed.Build());
                             }
                             else if (e.Interaction.Data.CustomId == SendHereButton.CustomId)
@@ -1519,7 +1475,7 @@ internal class User : BaseCommandModule
                                 embed.Thumbnail = null;
                                 embed.Color = ColorHelper.Success;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                                embed.Description = $":white_check_mark: `Downloaded {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText}. Attached is a Zip File containing them.`";
+                                embed.Description = $"✅ `Downloaded {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText}. Attached is a Zip File containing them.`";
 
                                 using (var fileStream = File.OpenRead($"Emotes-{guid}.zip"))
                                 {
@@ -1542,7 +1498,7 @@ internal class User : BaseCommandModule
                             }
 
                             IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", "Include Stickers", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
-                            AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromName(ctx.Client, ":heavy_plus_sign:")));
+                            AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", "Add Emoji(s) to Server", (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
 
                             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 

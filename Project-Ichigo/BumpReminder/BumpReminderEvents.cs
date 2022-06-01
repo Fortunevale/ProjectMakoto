@@ -99,7 +99,7 @@ internal class BumpReminderEvents
                             _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddMinutes(_minutes - 120);
                             _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastUserId = 0;
 
-                            e.Channel.SendMessageAsync($":warning: It seems the last bump was not registered properly.\n" +
+                            e.Channel.SendMessageAsync($"⚠ It seems the last bump was not registered properly.\n" +
                                 $"The last time the server was bumped was determined to be around {Formatter.Timestamp(_bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}.").Add(_bot._watcher);
 
                             _bot._bumpReminder.ScheduleBump(sender, e.Guild.Id);
@@ -142,7 +142,7 @@ internal class BumpReminderEvents
             if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.List[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.List[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
+            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == "✅")
             {
                 var member = await e.Guild.GetMemberAsync(e.User.Id);
 
@@ -158,7 +158,7 @@ internal class BumpReminderEvents
             if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds.List[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds.List[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == ":white_check_mark:")
+            if (e.Message.Id == _bot._guilds.List[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == "✅")
             {
                 var member = await e.Guild.GetMemberAsync(e.User.Id);
 

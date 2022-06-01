@@ -9,10 +9,10 @@ internal class GenericSelectors
         List<DiscordSelectComponentOption> roles = new();
 
         if (IncludeCreateForMe)
-            roles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":heavy_plus_sign:"))));
+            roles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
         if (IncludeDisable)
-            roles.Add(new DiscordSelectComponentOption(DisableString, "disable", "", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":x:"))));
+            roles.Add(new DiscordSelectComponentOption(DisableString, "disable", "", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
         var HighestRoleOnBot = (await guild.GetMemberAsync(client.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
         var HighestRoleOnUser = member.Roles.OrderByDescending(x => x.Position).First().Position;
@@ -36,8 +36,8 @@ internal class GenericSelectors
 
         async Task RefreshRoleList()
         {
-            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_left:")));
-            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_right:")));
+            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent(SelectionInteractionId, "Select a role..", roles.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);
@@ -130,10 +130,10 @@ internal class GenericSelectors
         List<DiscordSelectComponentOption> channels = new();
 
         if (IncludeCreateForMe)
-            channels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":heavy_plus_sign:"))));
+            channels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
         if (IncludeDisable)
-            channels.Add(new DiscordSelectComponentOption(DisableString, "disable", "", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":x:"))));
+            channels.Add(new DiscordSelectComponentOption(DisableString, "disable", "", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
         foreach (var category in await guild.GetOrderedChannelsAsync())
         {
@@ -157,8 +157,8 @@ internal class GenericSelectors
 
         async Task RefreshRoleList()
         {
-            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_left:")));
-            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_right:")));
+            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent(SelectionInteractionId, "Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);
@@ -260,8 +260,8 @@ internal class GenericSelectors
 
         async Task Refresh()
         {
-            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_left:")));
-            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromName(client, ":arrow_right:")));
+            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent(SelectionInteractionId, CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);

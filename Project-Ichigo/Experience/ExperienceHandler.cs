@@ -171,7 +171,7 @@ internal class ExperienceHandler
 
                     IEnumerable<DiscordComponent> discordComponents = new List<DiscordComponent>
                     {
-                        { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", "Disable Direct Message Experience Notifications", false, new DiscordComponentEmoji(DiscordEmoji.FromName(_bot.discordClient, ":no_entry:"))) },
+                        { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", "Disable Direct Message Experience Notifications", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔"))) },
                     };
 
                     msg = await (await user.CreateDmChannelAsync()).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(discordComponents));

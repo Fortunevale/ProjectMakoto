@@ -39,7 +39,7 @@ internal class Social : BaseCommandModule
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Afk Status • {ctx.Guild.Name}" },
                 Color = ColorHelper.Info,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator}" },
+                Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"{ctx.User.Mention} `You're now set to be afk. Next time you send a message, your afk status will be removed.`"
             });
@@ -78,7 +78,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -88,7 +88,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -123,7 +123,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -133,7 +133,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -169,7 +169,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -179,7 +179,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -216,7 +216,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -226,7 +226,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -262,7 +262,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -272,7 +272,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -307,7 +307,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -317,7 +317,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -357,7 +357,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
             }
@@ -367,7 +367,7 @@ internal class Social : BaseCommandModule
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = ColorHelper.HiddenSidebar,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
     }
@@ -406,7 +406,7 @@ internal class Social : BaseCommandModule
                     {
                         Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                         Color = ColorHelper.HiddenSidebar,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                        Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                     }));
                     return;
                 }
@@ -416,7 +416,7 @@ internal class Social : BaseCommandModule
                     Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                     ImageUrl = gif,
                     Color = ColorHelper.HiddenSidebar,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { IconUrl = ctx.Member.AvatarUrl, Text = $"Command used by {ctx.Member.Username}#{ctx.Member.Discriminator} • kawaii.red" },
+                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
             }).Add(_bot._watcher, ctx);
         }).Add(_bot._watcher, ctx);

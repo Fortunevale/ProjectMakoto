@@ -102,6 +102,15 @@ internal static class PreMadeEmbedsExtensions
         return msg;
     }
 
+    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "")
+    {
+        return new DiscordEmbedBuilder.EmbedFooter
+        {
+            IconUrl = ctx.User.AvatarUrl,
+            Text = $"Command used by {ctx.User.UsernameWithDiscriminator}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+        };
+    }
+
     public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx)
     {
         var embed = new DiscordEmbedBuilder
@@ -112,11 +121,7 @@ internal static class PreMadeEmbedsExtensions
                 Name = $"{cmds[0].Parent.Name.FirstLetterToUpper()} Command Help • {ctx.Guild.Name}"
             },
             Description = $"{string.Join("\n", cmds.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"))}\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"Command used by {ctx.User.Username}#{ctx.User.Discriminator}",
-                IconUrl = ctx.User.AvatarUrl
-            },
+            Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
             Color = ColorHelper.Info
         };
@@ -137,11 +142,7 @@ internal static class PreMadeEmbedsExtensions
             },
             Title = "",
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"Command used by {ctx.User.Username}#{ctx.User.Discriminator}",
-                IconUrl = ctx.User.AvatarUrl
-            },
+            Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
             Color = ColorHelper.Error
         };
