@@ -196,7 +196,7 @@ internal class Music : BaseCommandModule
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                DiscordButtonComponent DisconnectVote = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Vote to disconnect", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🚫")));
+                DiscordButtonComponent DisconnectVote = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to disconnect", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")));
                 builder.AddComponents(DisconnectVote);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder);
@@ -488,7 +488,7 @@ internal class Music : BaseCommandModule
 
                 DiscordEmbedBuilder embed = new DiscordEmbedBuilder
                 {
-                    Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                    Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
                     Color = ColorHelper.AwaitingInput,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
@@ -500,7 +500,175 @@ internal class Music : BaseCommandModule
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                DiscordButtonComponent DisconnectVote = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Vote to disconnect", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🚫")));
+                DiscordButtonComponent SkipSongVote = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to skip the current song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
+                builder.AddComponents(SkipSongVote);
+
+                var msg = await ctx.Channel.SendMessageAsync(builder);
+
+                _ = Task.Delay(TimeSpan.FromMinutes(10)).ContinueWith(x =>
+                {
+                    if (x.IsCompletedSuccessfully)
+                    {
+                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                        msg.ModifyToTimedOut();
+                    }
+                });
+
+                ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                {
+                    Task.Run(async () =>
+                    {
+                        if (e.Message.Id == msg.Id)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Contains(e.User.Id))
+                            {
+                                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to skip the current song.`").AsEphemeral());
+                                return;
+                            }
+
+                            var member = await e.User.ConvertToMember(ctx.Guild);
+
+                            if (member.VoiceState is null || member.VoiceState.Channel.Id != conn.Channel.Id)
+                            {
+                                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `You aren't in the same channel as the bot.`").AsEphemeral());
+                                return;
+                            }
+
+                            _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Add(e.User.Id);
+
+                            if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                            {
+                                _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
+
+                                await conn.StopAsync();
+
+                                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                                {
+                                    Description = $"✅ `The song was skipped.`",
+                                    Color = ColorHelper.Success,
+                                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                                    {
+                                        Name = ctx.Guild.Name,
+                                        IconUrl = ctx.Guild.IconUrl
+                                    },
+                                    Footer = ctx.GenerateUsedByFooter(),
+                                    Timestamp = DateTime.UtcNow
+                                }));
+                                return;
+                            }
+
+                            embed.Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                            _ = msg.ModifyAsync(embed.Build());
+                        }
+                    }).Add(_bot._watcher);
+                }
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("clearqueue"), Aliases("cq"), Description("Starts a voting to clear the current queue")]
+        public async Task ClearQueue(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                    return;
+
+                var lava = ctx.Client.GetLavalink();
+                var node = lava.ConnectedNodes.Values.First();
+                var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                if (conn is null)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `The bot is not in a voice channel.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You aren't in the same channel as the bot.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(ctx.User.Id))
+                {
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"❌ `You already voted to clear the current queue.`",
+                        Color = ColorHelper.Error,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(ctx.User.Id);
+
+                if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Clear();
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+
+                    _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    {
+                        Description = $"✅ `The queue was cleared.`",
+                        Color = ColorHelper.Success,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
+                    return;
+                }
+
+                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                {
+                    Description = $"❓ `You voted to clear the current queue. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                    Color = ColorHelper.AwaitingInput,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter()
+                };
+
+                var builder = new DiscordMessageBuilder().WithEmbed(embed);
+
+                DiscordButtonComponent DisconnectVote = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to clear the current queue", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
                 builder.AddComponents(DisconnectVote);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder);
@@ -524,9 +692,9 @@ internal class Music : BaseCommandModule
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Contains(e.User.Id))
+                            if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(e.User.Id))
                             {
-                                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to disconnect the bot.`").AsEphemeral());
+                                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to clear the current queue.`").AsEphemeral());
                                 return;
                             }
 
@@ -538,18 +706,16 @@ internal class Music : BaseCommandModule
                                 return;
                             }
 
-                            _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Add(e.User.Id);
+                            _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(e.User.Id);
 
-                            if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                            if (_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                             {
-                                _bot._guilds.List[ctx.Guild.Id].Lavalink = new();
-
-                                await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
-                                await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();
+                                _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Clear();
+                                _bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
 
                                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                 {
-                                    Description = $"✅ `The bot was disconnected.`",
+                                    Description = $"✅ `The queue was cleared.`",
                                     Color = ColorHelper.Success,
                                     Author = new DiscordEmbedBuilder.EmbedAuthor
                                     {
@@ -562,7 +728,7 @@ internal class Music : BaseCommandModule
                                 return;
                             }
 
-                            embed.Description = $"❓ `You voted to disconnect the bot. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                            embed.Description = $"❓ `You voted to clear the current queue. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                             _ = msg.ModifyAsync(embed.Build());
                         }
                     }).Add(_bot._watcher);
