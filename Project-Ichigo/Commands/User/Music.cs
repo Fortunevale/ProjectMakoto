@@ -182,7 +182,7 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                DiscordEmbedBuilder embed = new()
                 {
                     Description = $"❓ `You voted to disconnect the bot. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
                     Color = ColorHelper.AwaitingInput,
@@ -196,7 +196,7 @@ internal class Music : BaseCommandModule
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                DiscordButtonComponent DisconnectVote = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to disconnect", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")));
+                DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to disconnect", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")));
                 builder.AddComponents(DisconnectVote);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder);
@@ -570,7 +570,7 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                DiscordEmbedBuilder embed = new()
                 {
                     Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
                     Color = ColorHelper.AwaitingInput,
@@ -584,7 +584,7 @@ internal class Music : BaseCommandModule
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                DiscordButtonComponent SkipSongVote = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to skip the current song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
+                DiscordButtonComponent SkipSongVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to skip the current song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
                 builder.AddComponents(SkipSongVote);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder);
@@ -738,7 +738,7 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+                DiscordEmbedBuilder embed = new()
                 {
                     Description = $"❓ `You voted to clear the current queue. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
                     Color = ColorHelper.AwaitingInput,
@@ -752,7 +752,7 @@ internal class Music : BaseCommandModule
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                DiscordButtonComponent DisconnectVote = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to clear the current queue", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+                DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to clear the current queue", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
                 builder.AddComponents(DisconnectVote);
 
                 var msg = await ctx.Channel.SendMessageAsync(builder);
