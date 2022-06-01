@@ -87,7 +87,7 @@ internal class Lavalink
                 {
                     if (e.User.Id == sender.CurrentUser.Id)
                     {
-                        if (e.Before.Channel != e.After.Channel)
+                        if (e.Before?.Channel != e.After?.Channel)
                         {
                             LogTrace($"Switched Channel on {guildConnection.Guild.Id}");
 
