@@ -453,6 +453,14 @@ internal class Maintainers : BaseCommandModule
             if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
+            var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent("Confirm?").AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, "Shutdown", "Confirm shutdown", false , new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")))));
+
+            var x = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(1));
+            _ = msg.DeleteAsync();
+
+            if (x.TimedOut)
+                return;
+
             File.WriteAllText("updated", "");
         }).Add(_bot._watcher, ctx);
     }
