@@ -209,12 +209,12 @@ internal class Bot
             LogDebug($"Registering Commands..");
 
             cNext.RegisterCommands<User>();
+            cNext.RegisterCommands<Music>();
             cNext.RegisterCommands<Social>();
             cNext.RegisterCommands<Commands.User.ScoreSaber>();
             cNext.RegisterCommands<Mod>();
             cNext.RegisterCommands<Admin>();
-            cNext.RegisterCommands<Music>();
-
+            
             cNext.RegisterCommands<Commands.Maintainers.Maintainers>();
 
 
