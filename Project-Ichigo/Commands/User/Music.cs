@@ -1476,7 +1476,7 @@ internal class Music : BaseCommandModule
 
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
-                    Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
+                    Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
                     Color = ColorHelper.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
