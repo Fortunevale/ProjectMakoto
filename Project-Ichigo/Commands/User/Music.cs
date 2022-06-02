@@ -825,7 +825,7 @@ internal class Music : BaseCommandModule
                 {
                     int Index = Convert.ToInt32(selection) - 1;
 
-                    if (Index < 0 || Index > _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count)
+                    if (Index < 0 || Index >= _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count)
                     {
                         _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                         {
