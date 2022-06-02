@@ -488,9 +488,43 @@ internal class Music : BaseCommandModule
                     embed.Color = ColorHelper.Success;
                     _ = msg.ModifyAsync(embed.Build());
                 }
+                else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
+                {
+                    embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search results. Please select the song you want to add below.`";
+                    await msg.ModifyAsync(embed.Build());
+
+                    string SelectedUri;
+
+                    try
+                    {
+                        SelectedUri = await GenericSelectors.PromptCustomSelection(_bot, loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList(), ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                    }
+                    catch (ArgumentException)
+                    {
+                        msg.ModifyToTimedOut();
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    LavalinkTrack track = loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri);
+
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
+
+                    embed.Description = $"✅ `Queued '{track.Title}'.`";
+
+                    embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+                    embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
+                    embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
+
+                    embed.Color = ColorHelper.Success;
+                    _ = msg.ModifyAsync(embed.Build());
+                }
                 else
                 {
-                    throw new Exception("Unknown Load Result Type.");
+                    throw new Exception($"Unknown Load Result Type: {loadResult.LoadResultType.ToString()}");
                 }
 
             }).Add(_bot._watcher, ctx);
