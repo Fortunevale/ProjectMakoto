@@ -752,7 +752,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Level Rewards")]
+        Description("Shows a list of all currently defined Phishing Protection settings")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -773,7 +773,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently used phishing protection settings")]
+        Description("Allows modifying currently used Phishing Protection settings")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -1036,7 +1036,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Level Rewards")]
+        Description("Shows a list of all currently defined Bump Reminder settings")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -1280,7 +1280,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Level Rewards")]
+        Description("Shows a list of all currently defined Actionlog Settings")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -1478,61 +1478,76 @@ internal class Admin : BaseCommandModule
         }
     }
 
-    [Command("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
+    [Group("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
     CommandModule("admin"),
     Description("Allows to review, change settings for the automatic crossposts")]
-    public async Task AutoCrosspost(CommandContext ctx, [Description("Action")] string action = "help")
+    public class AutoCrosspost : BaseCommandModule
     {
-        Task.Run(async () =>
-        {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
+        public Bot _bot { private get; set; }
 
+        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        {
             if (!ctx.Member.IsAdmin(_bot._status))
             {
                 _ = ctx.SendAdminError();
-                return;
+                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
             }
+        }
 
-            static async Task SendHelp(CommandContext ctx)
+        private string GetCurrentConfiguration(CommandContext ctx)
+        {
+            return $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" +
+                    $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}";
+        }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
             {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Shows a list of all currently defined Auto Crosspost Channels")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                var ListEmbed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Auto Crosspost Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
                     Color = ColorHelper.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`{ctx.Prefix}{ctx.Command.Name} help` - _Shows help on how to use this command._\n" +
-                                                    $"`{ctx.Prefix}{ctx.Command.Name} review` - _Shows all active autocrosspost channels._\n" +
-                                                    $"`{ctx.Prefix}{ctx.Command.Name} config` - _Allows you to change the currently used settings._"
-                });
-            }
+                    Description = GetCurrentConfiguration(ctx)
+                };
+                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+            }).Add(_bot._watcher, ctx);
+        }
 
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
-                if (!ctx.Guild.Channels.ContainsKey(b))
-                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows modifying currently defined Auto Crosspost Channels and settings related to it")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
 
-            if (action.ToLower() == "help")
-            {
-                await SendHelp(ctx);
-                return;
-            }
-            else if (action.ToLower() is "review" or "list")
-            {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" +
-                    $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
-                });
-                return;
-            }
-            else if (action.ToLower() is "config" or "configure" or "settings" or "list" or "modify")
-            {
-                CancellationTokenSource cancellationTokenSource = new();
+                foreach (var b in _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
+                    if (!ctx.Guild.Channels.ContainsKey(b))
+                        _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);
 
                 DiscordEmbedBuilder embed = new()
                 {
@@ -1540,251 +1555,218 @@ internal class Admin : BaseCommandModule
                     Color = ColorHelper.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" + 
-                    $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}"
+                    Description = GetCurrentConfiguration(ctx)
                 };
 
-                var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, "SetDelay", "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, "AddChannel", "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, "RemoveChannel", "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-                var CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel");
+                var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { SetDelayButton, AddButton, RemoveButton, CancelButton }));
-
-                ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-                async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
+                .AddComponents(SetDelayButton)
+                .AddComponents(new List<DiscordComponent>
                 {
-                    Task.Run(async () =>
-                    {
-                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
-                        {
-                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                    AddButton,
+                    RemoveButton
+                }).AddComponents(Resources.CancelButton));
 
-                            cancellationTokenSource.Cancel();
-                            cancellationTokenSource = new();
+                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
 
-                            if (e.Interaction.Data.CustomId == "AddChannel")
-                            {
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
-                                {
-                                    embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
-                                    embed.Color = ColorHelper.Error;
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                DiscordChannel channel;
-
-                                try
-                                {
-                                    channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-                                }
-                                catch (ArgumentException)
-                                {
-                                    embed.Footer.Text += " • Interaction timed out";
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    return;
-                                }
-
-                                if (channel.Type != ChannelType.News)
-                                {
-                                    embed.Description = "`The channel you selected is not an announcement channel.`";
-                                    embed.Color = ColorHelper.Error;
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
-                                {
-                                    embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
-                                    embed.Color = ColorHelper.Error;
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Add(channel.Id);
-                                _ = msg.DeleteAsync();
-                                _ = ctx.Command.ExecuteAsync(ctx);
-                                return;
-                            }
-                            else if (e.Interaction.Data.CustomId == "RemoveChannel")
-                            {
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
-                                {
-                                    embed.Description = $"`No Crosspost Channels are set up.`";
-                                    embed.Color = ColorHelper.Error;
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                ulong ChannelToRemove;
-
-                                try
-                                {
-                                    var channel = await GenericSelectors.PromptCustomSelection(_bot, _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels
-                                        .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList(),
-                                        ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-
-                                    ChannelToRemove = Convert.ToUInt64(channel);
-                                }
-                                catch (ArgumentException)
-                                {
-                                    embed.Footer.Text += " • Interaction timed out";
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    return;
-                                }
-
-                                if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelToRemove))
-                                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(ChannelToRemove);
-
-                                _ = msg.DeleteAsync();
-                                _ = ctx.Command.ExecuteAsync(ctx);
-                                return;
-                            }
-                            else if (e.Interaction.Data.CustomId == "SetDelay")
-                            {
-                                embed.Description = "Please specify how long to delay the crossposting:\n" +
-                                                    "`m` - _Minutes_\n" +
-                                                    "`s` - _Seconds_\n\n" +
-                                                    "For example, `10s` would result to 10 seconds.";
-                                embed.Color = ColorHelper.AwaitingInput;
-
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                                var interactivity = ctx.Client.GetInteractivity();
-                                var reason = await interactivity.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
-
-                                if (reason.TimedOut)
-                                {
-                                    embed.Footer.Text += " • Interaction timed out";
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                    _ = msg.DeleteAsync();
-                                    return;
-                                }
-
-                                _ = Task.Delay(2000).ContinueWith(x =>
-                                {
-                                    _ = reason.Result.DeleteAsync();
-                                });
-
-                                if (reason.Result.Content.ToLower() is "cancel" or ".")
-                                {
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-
-                                try
-                                {
-                                    if (!TimeSpan.TryParse(reason.Result.Content, out TimeSpan length))
-                                    {
-                                        switch (reason.Result.Content[^1..])
-                                        {
-                                            case "d":
-                                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content.Replace("d", "")));
-                                                break;
-                                            case "h":
-                                                length = TimeSpan.FromHours(Convert.ToInt32(reason.Result.Content.Replace("h", "")));
-                                                break;
-                                            case "m":
-                                                length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Result.Content.Replace("m", "")));
-                                                break;
-                                            case "s":
-                                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content.Replace("s", "")));
-                                                break;
-                                            default:
-                                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content));
-                                                return;
-                                        }
-                                    }
-
-                                    if (length > TimeSpan.FromMinutes(5) || length < TimeSpan.FromSeconds(1))
-                                    {
-                                        embed.Description = "`The duration has to be between 1 second and 5 minutes.`";
-                                        embed.Color = ColorHelper.Error;
-                                        embed.Author.IconUrl = Resources.LogIcons.Error;
-
-                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                        await Task.Delay(5000);
-                                        _ = msg.DeleteAsync();
-                                        _ = ctx.Command.ExecuteAsync(ctx);
-                                        return;
-                                    }
-
-                                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(length.TotalSeconds);
-
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                }
-                                catch (Exception)
-                                {
-                                    _ = msg.DeleteAsync();
-                                    _ = ctx.Command.ExecuteAsync(ctx);
-                                    return;
-                                }
-                            }
-                            else if (e.Interaction.Data.CustomId == "cancel")
-                            {
-                                _ = msg.DeleteAsync();
-                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                                return;
-                            }
-
-                            try
-                            {
-                                await Task.Delay(120000, cancellationTokenSource.Token);
-                                ctx.Client.ComponentInteractionCreated -= RunInteraction;
-
-                                embed.Footer.Text += " • Interaction timed out";
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                await Task.Delay(5000);
-                                _ = msg.DeleteAsync();
-                            }
-                            catch { }
-                        }
-                    }).Add(_bot._watcher, ctx);
+                if (e.TimedOut)
+                {
+                    msg.ModifyToTimedOut(true);
+                    return;
                 }
 
-                try
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (e.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
                 {
-                    await Task.Delay(120000, cancellationTokenSource.Token);
-                    embed.Footer.Text += " • Interaction timed out";
+                    embed.Description = "Please specify how long to delay the crossposting:\n" +
+                    "`m` - _Minutes_\n" +
+                    "`s` - _Seconds_\n\n" +
+                    "For example, `10s` would result to 10 seconds.";
+                    embed.Color = ColorHelper.AwaitingInput;
+
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                    await Task.Delay(5000);
-                    _ = msg.DeleteAsync();
 
-                    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                    var interactivity = ctx.Client.GetInteractivity();
+                    var reason = await interactivity.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
+
+                    if (reason.TimedOut)
+                    {
+                        embed.Footer.Text += " • Interaction timed out";
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        return;
+                    }
+
+                    _ = Task.Delay(2000).ContinueWith(x =>
+                    {
+                        _ = reason.Result.DeleteAsync();
+                    });
+
+                    if (reason.Result.Content.ToLower() is "cancel" or ".")
+                    {
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    try
+                    {
+                        if (!TimeSpan.TryParse(reason.Result.Content, out TimeSpan length))
+                        {
+                            switch (reason.Result.Content[^1..])
+                            {
+                                case "d":
+                                    length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content.Replace("d", "")));
+                                    break;
+                                case "h":
+                                    length = TimeSpan.FromHours(Convert.ToInt32(reason.Result.Content.Replace("h", "")));
+                                    break;
+                                case "m":
+                                    length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Result.Content.Replace("m", "")));
+                                    break;
+                                case "s":
+                                    length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content.Replace("s", "")));
+                                    break;
+                                default:
+                                    length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content));
+                                    return;
+                            }
+                        }
+
+                        if (length > TimeSpan.FromMinutes(5) || length < TimeSpan.FromSeconds(1))
+                        {
+                            embed.Description = "`The duration has to be between 1 second and 5 minutes.`";
+                            embed.Color = ColorHelper.Error;
+                            embed.Author.IconUrl = Resources.LogIcons.Error;
+
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                            await Task.Delay(5000);
+                            _ = msg.DeleteAsync();
+                            _ = ctx.Command.ExecuteAsync(ctx);
+                            return;
+                        }
+
+                        _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(length.TotalSeconds);
+
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                    }
+                    catch (Exception)
+                    {
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
                 }
-                catch { }
-            }
-            else
-            {
-                await SendHelp(ctx);
-                return;
-            }
-        }).Add(_bot._watcher, ctx);
+                else if (e.Result.Interaction.Data.CustomId == AddButton.CustomId)
+                {
+                    if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
+                    {
+                        embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
+                        embed.Color = ColorHelper.Error;
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    DiscordChannel channel;
+
+                    try
+                    {
+                        channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                    }
+                    catch (ArgumentException)
+                    {
+                        embed.Footer.Text += " • Interaction timed out";
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        return;
+                    }
+
+                    if (channel.Type != ChannelType.News)
+                    {
+                        embed.Description = "`The channel you selected is not an announcement channel.`";
+                        embed.Color = ColorHelper.Error;
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
+                    {
+                        embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
+                        embed.Color = ColorHelper.Error;
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Add(channel.Id);
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                    return;
+
+                }
+                else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+                {
+                    if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
+                    {
+                        embed.Description = $"`No Crosspost Channels are set up.`";
+                        embed.Color = ColorHelper.Error;
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+
+                    ulong ChannelToRemove;
+
+                    try
+                    {
+                        var channel = await GenericSelectors.PromptCustomSelection(_bot, _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels
+                            .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList(),
+                            ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+
+                        ChannelToRemove = Convert.ToUInt64(channel);
+                    }
+                    catch (ArgumentException)
+                    {
+                        embed.Footer.Text += " • Interaction timed out";
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        return;
+                    }
+
+                    if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelToRemove))
+                        _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(ChannelToRemove);
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                    return;
+                }
+                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                {
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+            }).Add(_bot._watcher, ctx);
+        }
+
     }
-
-
 
     [Command("reactionroles"), Aliases("reactionrole","reaction-roles", "reaction-role"),
     CommandModule("admin"),
