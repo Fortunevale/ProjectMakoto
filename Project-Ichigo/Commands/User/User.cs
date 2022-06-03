@@ -454,7 +454,7 @@ internal class User : BaseCommandModule
             {
                 Task.Run(async () =>
                 {
-                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -545,7 +545,7 @@ internal class User : BaseCommandModule
             {
                 Task.Run(async () =>
                 {
-                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -916,7 +916,7 @@ internal class User : BaseCommandModule
                     {
                         await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             InteractionExecuted = true;
                             ctx.Client.ComponentInteractionCreated -= RunSubmissionInteraction;
@@ -1227,7 +1227,7 @@ internal class User : BaseCommandModule
             {
                 Task.Run(async () =>
                 {
-                    if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                    if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                     {
                         ctx.Client.ComponentInteractionCreated -= RunInteraction;
                         cancellationTokenSource.Cancel();

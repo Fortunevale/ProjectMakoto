@@ -737,7 +737,7 @@ internal class Music : BaseCommandModule
                 {
                     Task.Run(async () =>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 

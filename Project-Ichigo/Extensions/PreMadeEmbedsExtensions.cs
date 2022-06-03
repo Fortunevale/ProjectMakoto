@@ -111,7 +111,7 @@ internal static class PreMadeEmbedsExtensions
         };
     }
 
-    public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx)
+    public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "")
     {
         var embed = new DiscordEmbedBuilder
         {
@@ -126,12 +126,18 @@ internal static class PreMadeEmbedsExtensions
             Color = ColorHelper.Info
         };
 
+        if (!string.IsNullOrWhiteSpace(CustomText))
+            embed.Description += CustomText;
+        
+        if (!string.IsNullOrWhiteSpace(CustomImageUrl))
+            embed.ImageUrl += CustomImageUrl;
+
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
 
         return msg;
     }
 
-    public static async Task<DiscordMessage> SendSyntaxError(this CommandContext ctx)
+    public static async Task<DiscordMessage> SendSyntaxError(this CommandContext ctx, string CustomArguments = "")
     {
         var embed = new DiscordEmbedBuilder
         {
@@ -141,7 +147,7 @@ internal static class PreMadeEmbedsExtensions
                 Name = ctx.Guild.Name
             },
             Title = "",
-            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{CustomArguments}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
             Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
             Color = ColorHelper.Error
