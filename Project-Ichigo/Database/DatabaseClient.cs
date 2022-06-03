@@ -429,6 +429,7 @@ internal class DatabaseClient
 
                             crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostChannels),
                             crosspostdelay = x.Value.CrosspostSettings.DelayBeforePosting,
+                            crosspostexcludebots = x.Value.CrosspostSettings.ExcludeBots,
 
                             reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
 
@@ -474,6 +475,7 @@ internal class DatabaseClient
 
                             cmd.Parameters.AddWithValue($"crosspostdelay{i}", DatabaseInserts[i].crosspostdelay);
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);
+                            cmd.Parameters.AddWithValue($"crosspostexcludebots{i}", DatabaseInserts[i].crosspostexcludebots);
 
                             cmd.Parameters.AddWithValue($"reapplyroles{i}", DatabaseInserts[i].reapplyroles);
                             cmd.Parameters.AddWithValue($"reapplynickname{i}", DatabaseInserts[i].reapplynickname);

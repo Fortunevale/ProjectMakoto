@@ -6,6 +6,7 @@ public class DatabaseGuildSettings
     public string levelrewards { get; set; }
     public string auditlogcache { get; set; }
     public string reactionroles { get; set; }
+    public bool crosspostexcludebots { get; set; }
     public int crosspostdelay { get; set; }
     public string crosspostchannels { get; set; }
     public bool reapplyroles { get; set; }

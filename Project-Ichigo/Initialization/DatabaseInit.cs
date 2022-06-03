@@ -69,7 +69,8 @@ internal class DatabaseInit
                 CrosspostSettings = new()
                 {
                     CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
-                    DelayBeforePosting = b.crosspostdelay
+                    DelayBeforePosting = b.crosspostdelay,
+                    ExcludeBots = b.crosspostexcludebots
                 },
                 ActionLogSettings = new()
                 {
