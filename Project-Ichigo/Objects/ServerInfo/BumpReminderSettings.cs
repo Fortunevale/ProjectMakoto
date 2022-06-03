@@ -32,4 +32,7 @@ public class BumpReminderSettings
 
     private DateTime _LastReminder { get; set; } = DateTime.MinValue;
     public DateTime LastReminder { get => _LastReminder; set { _LastReminder = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
+    
+    private int _BumpsMissed { get; set; } = 0;
+    public int BumpsMissed { get => _BumpsMissed; set { _BumpsMissed = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 }

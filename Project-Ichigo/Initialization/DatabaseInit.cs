@@ -51,7 +51,8 @@ internal class DatabaseInit
                     LastReminder = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_reminder),
                     LastUserId = b.bump_last_user,
                     PersistentMessageId = b.bump_persistent_msg,
-                    RoleId = b.bump_role
+                    RoleId = b.bump_role,
+                    BumpsMissed = b.bump_missed
                 },
                 JoinSettings = new()
                 {
@@ -69,7 +70,8 @@ internal class DatabaseInit
                 CrosspostSettings = new()
                 {
                     CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
-                    DelayBeforePosting = b.crosspostdelay
+                    DelayBeforePosting = b.crosspostdelay,
+                    ExcludeBots = b.crosspostexcludebots
                 },
                 ActionLogSettings = new()
                 {

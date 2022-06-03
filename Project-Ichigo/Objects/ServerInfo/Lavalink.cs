@@ -176,7 +176,9 @@ internal class Lavalink
 
                 if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                 {
-                    _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
+                    if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
+                        _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
+
                     continue;
                 }
 
@@ -194,7 +196,8 @@ internal class Lavalink
                     continue;
                 }
 
-                _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
+                if (!_bot._guilds.List[Guild.Id].Lavalink.Repeat)
+                    _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
             }
         }).Add(_bot._watcher);
     }

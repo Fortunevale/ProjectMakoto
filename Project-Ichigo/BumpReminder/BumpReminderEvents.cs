@@ -42,7 +42,7 @@ internal class BumpReminderEvents
             {
                 _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow;
                 _bot._guilds.List[e.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow;
-
+                _bot._guilds.List[e.Guild.Id].BumpReminderSettings.BumpsMissed = 0;
 
                 try
                 {

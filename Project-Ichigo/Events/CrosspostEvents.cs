@@ -27,6 +27,10 @@ internal class CrosspostEvents
             {
                 if (e.Channel.Type == ChannelType.News)
                 {
+                    if (_bot._guilds.List[e.Guild.Id].CrosspostSettings.ExcludeBots)
+                        if (e.Message.WebhookMessage || e.Message.Author.IsBot)
+                            return;
+
                     if (_bot._guilds.List[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
                         _ = e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 

@@ -424,11 +424,14 @@ internal class DatabaseClient
                             bump_last_user = x.Value.BumpReminderSettings.LastUserId,
                             bump_message = x.Value.BumpReminderSettings.MessageId,
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
+                            bump_missed = x.Value.BumpReminderSettings.BumpsMissed,
+
                             levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
                             auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
 
                             crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostChannels),
                             crosspostdelay = x.Value.CrosspostSettings.DelayBeforePosting,
+                            crosspostexcludebots = x.Value.CrosspostSettings.ExcludeBots,
 
                             reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
 
@@ -474,6 +477,7 @@ internal class DatabaseClient
 
                             cmd.Parameters.AddWithValue($"crosspostdelay{i}", DatabaseInserts[i].crosspostdelay);
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);
+                            cmd.Parameters.AddWithValue($"crosspostexcludebots{i}", DatabaseInserts[i].crosspostexcludebots);
 
                             cmd.Parameters.AddWithValue($"reapplyroles{i}", DatabaseInserts[i].reapplyroles);
                             cmd.Parameters.AddWithValue($"reapplynickname{i}", DatabaseInserts[i].reapplynickname);
@@ -486,6 +490,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"bump_last_user{i}", DatabaseInserts[i].bump_last_user);
                             cmd.Parameters.AddWithValue($"bump_message{i}", DatabaseInserts[i].bump_message);
                             cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
+                            cmd.Parameters.AddWithValue($"bump_missed{i}", DatabaseInserts[i].bump_missed);
 
                             cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
                             cmd.Parameters.AddWithValue($"phishing_warnonredirect{i}", DatabaseInserts[i].phishing_warnonredirect);

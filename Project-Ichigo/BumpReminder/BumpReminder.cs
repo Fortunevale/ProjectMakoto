@@ -52,7 +52,7 @@ internal class BumpReminder
         {
             var Guild = await client.GetGuildAsync(ServerId);
 
-            if (!Guild.Channels.ContainsKey(_bot._guilds.List[ServerId].BumpReminderSettings.ChannelId))
+            if (!Guild.Channels.ContainsKey(_bot._guilds.List[ServerId].BumpReminderSettings.ChannelId) || _bot._guilds.List[ServerId].BumpReminderSettings.BumpsMissed > 168)
             {
                 _bot._guilds.List[ServerId].BumpReminderSettings = new();
                 return;
@@ -61,7 +61,10 @@ internal class BumpReminder
             var Channel = Guild.GetChannel(_bot._guilds.List[ServerId].BumpReminderSettings.ChannelId);
 
             if (_bot._guilds.List[ServerId].BumpReminderSettings.LastBump < DateTime.UtcNow.AddHours(-3))
+            {
                 _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: <@&{_bot._guilds.List[ServerId].BumpReminderSettings.RoleId}> The last bump was missed!"));
+                _bot._guilds.List[ServerId].BumpReminderSettings.BumpsMissed++;
+            }
             else
                 _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":bell: <@&{_bot._guilds.List[ServerId].BumpReminderSettings.RoleId}> The server can be bumped again!"));
 

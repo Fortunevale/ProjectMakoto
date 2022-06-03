@@ -1496,8 +1496,9 @@ internal class Admin : BaseCommandModule
 
         private string GetCurrentConfiguration(CommandContext ctx)
         {
-            return $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" +
-                    $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}";
+            return $"`Exclude Bots             `: {_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.ExcludeBots.BoolToEmote(ctx.Client)}\n" +
+                   $"`Delay before crossposting`: `{TimeSpan.FromSeconds(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting).GetHumanReadable()}`\n\n" +
+                   $"{(_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count != 0 ? string.Join("\n\n", _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}";
         }
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
@@ -1559,11 +1560,16 @@ internal class Admin : BaseCommandModule
                 };
 
                 var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+                var ExcludeBots = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Exclude Bots", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
                 var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
                 var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
-                .AddComponents(SetDelayButton)
+                .AddComponents(new List<DiscordComponent>
+                {
+                    ExcludeBots,
+                    SetDelayButton
+                })
                 .AddComponents(new List<DiscordComponent>
                 {
                     AddButton,
@@ -1580,7 +1586,14 @@ internal class Admin : BaseCommandModule
 
                 _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (e.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
+                if (e.Result.Interaction.Data.CustomId == ExcludeBots.CustomId)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.ExcludeBots = !_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.ExcludeBots;
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
                 {
                     embed.Description = "Please specify how long to delay the crossposting:\n" +
                     "`m` - _Minutes_\n" +
