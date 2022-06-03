@@ -24,6 +24,7 @@ public class DatabaseGuildSettings
     public ulong bump_last_user { get; set; }
     public ulong bump_last_time { get; set; }
     public ulong bump_last_reminder { get; set; }
+    public int bump_missed { get; set; }
     public bool phishing_detect { get; set; }
     public bool phishing_warnonredirect { get; set; }
     public int phishing_type { get; set; }

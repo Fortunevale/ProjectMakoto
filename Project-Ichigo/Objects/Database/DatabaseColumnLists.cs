@@ -81,6 +81,7 @@ internal class DatabaseColumnLists
         new Column("bump_last_user", "bigint"),
         new Column("bump_message", "bigint"),
         new Column("bump_persistent_msg", "bigint"),
+        new Column("bump_missed", "bigint"),
         new Column("phishing_detect", "tinyint(1)", Default: "1"),
         new Column("phishing_warnonredirect", "tinyint(1)", Default: "1"),
         new Column("phishing_type", "int"),

@@ -51,7 +51,8 @@ internal class DatabaseInit
                     LastReminder = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_reminder),
                     LastUserId = b.bump_last_user,
                     PersistentMessageId = b.bump_persistent_msg,
-                    RoleId = b.bump_role
+                    RoleId = b.bump_role,
+                    BumpsMissed = b.bump_missed
                 },
                 JoinSettings = new()
                 {
