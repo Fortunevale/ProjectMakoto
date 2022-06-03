@@ -502,7 +502,7 @@ internal class Admin : BaseCommandModule
                 {
                     Task.Run(async () =>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             cancellationTokenSource.Cancel();
                             cancellationTokenSource = new();
@@ -845,7 +845,7 @@ internal class Admin : BaseCommandModule
 
                     async Task ChangePunishmentInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
 
@@ -1179,7 +1179,7 @@ internal class Admin : BaseCommandModule
                 {
                     Task.Run(async () =>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
@@ -1431,7 +1431,7 @@ internal class Admin : BaseCommandModule
                 {
                     Task.Run(async () =>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
@@ -1665,7 +1665,7 @@ internal class Admin : BaseCommandModule
                 {
                     Task.Run(async () =>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
@@ -2109,7 +2109,7 @@ internal class Admin : BaseCommandModule
                 {
                     Task.Run(async () =>
                     {
-                        if (e.Message.Id == msg.Id && e.User.Id == ctx.User.Id)
+                        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
