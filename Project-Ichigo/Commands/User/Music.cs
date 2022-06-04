@@ -905,7 +905,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1070,7 +1070,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
                     return;
 
                 var lava = ctx.Client.GetLavalink();

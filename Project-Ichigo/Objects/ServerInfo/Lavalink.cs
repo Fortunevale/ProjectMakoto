@@ -134,6 +134,8 @@ internal class Lavalink
             LogDebug($"Initializing VoiceStateUpdated Event for {Guild.Id}..");
             sender.VoiceStateUpdated += VoiceStateUpdated;
 
+            QueueInfo LastPlayedTrack = null;
+
             while (true)
             {
                 int WaitSeconds = 30;
@@ -165,10 +167,22 @@ internal class Lavalink
 
                 Lavalink.QueueInfo Track;
 
+                int skipSongs = 0;
+
+                if (LastPlayedTrack is not null && _bot._guilds.List[Guild.Id].Lavalink.Repeat && _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Contains(LastPlayedTrack))
+                {
+                    skipSongs = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.IndexOf(LastPlayedTrack) + 1;
+
+                    if (skipSongs > _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count)
+                        skipSongs = 0;
+                }
+
                 if (_bot._guilds.List[Guild.Id].Lavalink.Shuffle)
                     Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.OrderBy(_ => Guid.NewGuid()).ToList().First();
                 else
-                    Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.ToList().First();
+                    Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.ToList().Skip(skipSongs).First();
+
+                LastPlayedTrack = Track;
 
                 _bot._guilds.List[Guild.Id].Lavalink.collectedSkips.Clear();
 
