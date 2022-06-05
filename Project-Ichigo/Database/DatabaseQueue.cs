@@ -34,7 +34,7 @@ internal class DatabaseQueue
                     {
                         case RequestType.Command:
                         {
-                            LogTrace($"Running command '{b.Value.Command}' on '{b.Value.Connection.Database}'..");
+                            try { LogTrace($"Running command '{b.Value.Command.CommandText}' on '{b.Value.Command.Connection.Database}'.."); } catch { }
                             b.Value.Command.ExecuteNonQuery();
 
                             Queue[b.Key].Executed = true;
@@ -42,7 +42,7 @@ internal class DatabaseQueue
                         }
                         case RequestType.Ping:
                         {
-                            LogTrace($"Pinging '{b.Value.Connection.Database}'..");
+                            try { LogTrace($"Pinging '{b.Value.Command.Connection.Database}'.."); } catch { }
                             b.Value.Connection.Ping();
 
                             Queue[b.Key].Executed = true;
@@ -83,7 +83,7 @@ internal class DatabaseQueue
             return;
 
         if (response.Failed)
-            throw response.Exception;
+            throw response.Exception ?? new Exception("The command execution failed but there no exception was stored");
 
         throw new Exception("This exception should be impossible to get.");
     }
