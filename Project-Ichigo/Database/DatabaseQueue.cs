@@ -42,7 +42,7 @@ internal class DatabaseQueue
                         }
                         case RequestType.Ping:
                         {
-                            try { LogTrace($"Pinging '{b.Value.Command.Connection.Database}'.."); } catch { }
+                            try { LogTrace($"Pinging '{b.Value.Connection.Database}'.."); } catch { }
                             b.Value.Connection.Ping();
 
                             Queue[b.Key].Executed = true;
