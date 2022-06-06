@@ -1136,8 +1136,8 @@ internal class ActionlogEvents
                 Color = new DiscordColor("ff0005"),
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
-                                $"**Created by**: {e.Invite.Inviter.Mention} `{e.Invite.Inviter.UsernameWithDiscriminator}`\n" +
-                                $"**Channel**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`"
+                                $"**Created by**: {e.Invite.Inviter?.Mention} `{e.Invite.Inviter?.UsernameWithDiscriminator}`\n" +
+                                $"**Channel**: {e.Channel?.Mention} `[{(e.Channel?.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel?.Name}]`"
             };
 
             var msg = await e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
