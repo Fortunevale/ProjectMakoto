@@ -152,6 +152,8 @@ internal class Bot
             AddBlacklist(Secrets.Secrets.DatabasePassword);
             AddBlacklist(Secrets.Secrets.LavalinkPassword);
 
+            AddLogLevelBlacklist(LoggerObjects.LogLevel.TRACE2);
+
 
             LogDebug($"Registering DiscordClient..");
 
