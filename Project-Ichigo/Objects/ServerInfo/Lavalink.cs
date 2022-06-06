@@ -173,7 +173,7 @@ internal class Lavalink
                 {
                     skipSongs = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.IndexOf(LastPlayedTrack) + 1;
 
-                    if (skipSongs > _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count)
+                    if (skipSongs >= _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count)
                         skipSongs = 0;
                 }
 
