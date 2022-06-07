@@ -9,6 +9,7 @@ public class DatabaseGuildSettings
     public bool crosspostexcludebots { get; set; }
     public int crosspostdelay { get; set; }
     public string crosspostchannels { get; set; }
+    public string crossposttasks { get; set; }
     public bool reapplyroles { get; set; }
     public bool reapplynickname { get; set; }
     public ulong auto_assign_role_id { get; set; }

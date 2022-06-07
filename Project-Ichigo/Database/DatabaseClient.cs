@@ -430,6 +430,7 @@ internal class DatabaseClient
                             auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
 
                             crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostChannels),
+                            crossposttasks = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostTasks),
                             crosspostdelay = x.Value.CrosspostSettings.DelayBeforePosting,
                             crosspostexcludebots = x.Value.CrosspostSettings.ExcludeBots,
 
@@ -478,6 +479,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"crosspostdelay{i}", DatabaseInserts[i].crosspostdelay);
                             cmd.Parameters.AddWithValue($"crosspostchannels{i}", DatabaseInserts[i].crosspostchannels);
                             cmd.Parameters.AddWithValue($"crosspostexcludebots{i}", DatabaseInserts[i].crosspostexcludebots);
+                            cmd.Parameters.AddWithValue($"crossposttasks{i}", DatabaseInserts[i].crossposttasks);
 
                             cmd.Parameters.AddWithValue($"reapplyroles{i}", DatabaseInserts[i].reapplyroles);
                             cmd.Parameters.AddWithValue($"reapplynickname{i}", DatabaseInserts[i].reapplynickname);

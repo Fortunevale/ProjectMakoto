@@ -9,4 +9,6 @@ internal class CrosspostSettings
     public bool ExcludeBots { get => _ExcludeBots; set { _ExcludeBots = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 
     public ObservableCollection<ulong> CrosspostChannels { get; set; } = new();
+    
+    public ObservableCollection<CrosspostMessage> CrosspostTasks { get; set; } = new();
 }
