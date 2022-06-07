@@ -34,7 +34,6 @@ internal class DatabaseQueue
                     {
                         case RequestType.Command:
                         {
-                            try { LogTrace($"Running command '{b.Value.Command.CommandText}' on '{b.Value.Command.Connection.Database}'.."); } catch { }
                             b.Value.Command.ExecuteNonQuery();
 
                             Queue[b.Key].Executed = true;
@@ -42,7 +41,6 @@ internal class DatabaseQueue
                         }
                         case RequestType.Ping:
                         {
-                            try { LogTrace($"Pinging '{b.Value.Connection.Database}'.."); } catch { }
                             b.Value.Connection.Ping();
 
                             Queue[b.Key].Executed = true;
