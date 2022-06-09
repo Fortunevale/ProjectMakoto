@@ -225,7 +225,15 @@ internal static class Extensions
             discordMessage = msg;
             return true;
         }
-        catch (DisCatSharp.Exceptions.NotFoundException)
+        catch (AggregateException ex)
+        {
+            discordMessage = null;
+
+            if (ex.InnerException is NotFoundException ex1)
+                return false;
+
+            throw;
+        }catch (DisCatSharp.Exceptions.NotFoundException)
         {
             discordMessage = null;
             return false;
