@@ -51,6 +51,7 @@ internal class Resources
     public class AuditLogIcons
     {
         public static readonly string QuestionMark = "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png";
+        public static readonly string QuestionMarkSmall = "https://media.discordapp.net/attachments/906976602557145110/985379525531676742/unknown.png";
 
         public static readonly string GuildUpdated = "https://cdn.discordapp.com/attachments/712761268393738301/846833791079415878/GuildUpdated.png";
         public static readonly string MessageDeleted = "https://cdn.discordapp.com/attachments/712761268393738301/839566709903720518/MessageRemoved.png";

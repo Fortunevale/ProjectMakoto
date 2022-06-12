@@ -33,23 +33,24 @@ internal class JoinEvents
                 }
             }
 
+            string[] emojis = { "🙋‍", "🙋‍", "<a:3HC_wave:985374001062879292>", "<:wave:985373989927010315>", "<a:wave:985374007144632381>", "<a:waves:985373995996176384>", "<:WaveHello:985373984474419270>" };
+
             if (_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
             {
                 if (e.Guild.Channels.ContainsKey(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId))
                 {
                     _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        Author = new()
                         {
                             IconUrl = Resources.AuditLogIcons.UserAdded,
-                            Name = $"{e.Member.Username}#{e.Member.Discriminator}"
+                            Name = e.Member.UsernameWithDiscriminator
                         },
-                        Description = $"joined the server.",
-                        Timestamp = DateTime.UtcNow,
+                        Description = $"has joined **{e.Guild.Name}**. Welcome! {emojis.SelectRandom()}",
                         Color = ColorHelper.Success,
-                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                        Thumbnail = new()
                         {
-                            Url = e.Member.AvatarUrl
+                            Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
                         }
                     });
                 }
@@ -70,18 +71,17 @@ internal class JoinEvents
                 {
                     _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        Author = new()
                         {
                             IconUrl = Resources.AuditLogIcons.UserLeft,
-                            Name = $"{e.Member.Username}#{e.Member.Discriminator}"
+                            Name = e.Member.UsernameWithDiscriminator
                         },
-                        Description = $"left the server. Sad to see you go. 👋\n\n" +
-                                      $"**Time on the server**: {e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}",
-                        Timestamp = DateTime.UtcNow,
+                        Description = $"has left **{e.Guild.Name}**.\n" +
+                                      $"They've been on the server for _{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}_.",
                         Color = ColorHelper.Error,
-                        Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                        Thumbnail = new()
                         {
-                            Url = e.Member.AvatarUrl
+                            Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
                         }
                     });
                 }

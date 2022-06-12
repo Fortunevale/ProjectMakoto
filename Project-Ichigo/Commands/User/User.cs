@@ -210,13 +210,14 @@ internal class User : BaseCommandModule
             {
                 try
                 {
-                    ProcessStartInfo info = new();
-
-                    info.FileName = "bash";
-                    info.Arguments = $"-c sensors";
-                    info.RedirectStandardError = true;
-                    info.RedirectStandardOutput = true;
-                    info.UseShellExecute = false;
+                    ProcessStartInfo info = new()
+                    {
+                        FileName = "bash",
+                        Arguments = $"-c sensors",
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
 
                     var b = Process.Start(info);
 
@@ -243,13 +244,14 @@ internal class User : BaseCommandModule
 
                 try
                 {
-                    ProcessStartInfo info = new();
-
-                    info.FileName = "bash";
-                    info.Arguments = $"-c uptime";
-                    info.RedirectStandardError = true;
-                    info.RedirectStandardOutput = true;
-                    info.UseShellExecute = false;
+                    ProcessStartInfo info = new()
+                    {
+                        FileName = "bash",
+                        Arguments = $"-c uptime",
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
 
                     var b = Process.Start(info);
 
