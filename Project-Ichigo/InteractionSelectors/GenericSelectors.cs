@@ -39,7 +39,7 @@ internal class GenericSelectors
             var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-            var dropdown = new DiscordSelectComponent(SelectionInteractionId, "Select a role..", roles.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+            var dropdown = new DiscordSelectComponent("Select a role..", roles.Skip(currentPage * 25).Take(25), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);
 
             if (roles.Skip(currentPage * 25).Count() > 25)
@@ -160,7 +160,7 @@ internal class GenericSelectors
             var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-            var dropdown = new DiscordSelectComponent(SelectionInteractionId, "Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+            var dropdown = new DiscordSelectComponent("Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);
 
             if (channels.Skip(currentPage * 25).Count() > 25)
@@ -263,7 +263,7 @@ internal class GenericSelectors
             var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-            var dropdown = new DiscordSelectComponent(SelectionInteractionId, CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>);
+            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(message.Embeds[0]).WithColor(ColorHelper.AwaitingInput)).AddComponents(dropdown).WithContent(message.Content);
 
             if (options.Skip(currentPage * 25).Count() > 25)

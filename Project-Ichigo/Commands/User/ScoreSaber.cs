@@ -475,7 +475,7 @@ internal class ScoreSaber : BaseCommandModule
                 {
                     continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
                 }
-                return new DiscordSelectComponent("continent_selection", "Select a continent..", continents as IEnumerable<DiscordSelectComponentOption>);
+                return new DiscordSelectComponent("Select a continent..", continents as IEnumerable<DiscordSelectComponentOption>, "continent_selection");
             }
 
             DiscordSelectComponent GetCountries(string continent_code, string default_country, int page)
@@ -491,7 +491,7 @@ internal class ScoreSaber : BaseCommandModule
                     catch (Exception) { flag_emote = DiscordEmoji.FromUnicode("⬜"); }
                     countries.Add(new DiscordSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country), new DiscordComponentEmoji(flag_emote)));
                 }
-                return new DiscordSelectComponent("country_selection", "Select a country..", countries as IEnumerable<DiscordSelectComponentOption>);
+                return new DiscordSelectComponent("Select a country..", countries as IEnumerable<DiscordSelectComponentOption>, "country_selection");
             }
 
             var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", "Start Search", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔎")));
@@ -607,7 +607,7 @@ internal class ScoreSaber : BaseCommandModule
                                 {
                                     playerDropDownOptions.Add(new DiscordSelectComponentOption($"{b.name.Sanitize()} | {b.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
                                 }
-                                var player_dropdown = new DiscordSelectComponent("player_selection", "Select a player..", playerDropDownOptions as IEnumerable<DiscordSelectComponentOption>);
+                                var player_dropdown = new DiscordSelectComponent("Select a player..", playerDropDownOptions as IEnumerable<DiscordSelectComponentOption>, "player_selection");
 
                                 var builder = new DiscordMessageBuilder().AddComponents(player_dropdown);
 

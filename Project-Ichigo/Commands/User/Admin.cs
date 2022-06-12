@@ -463,7 +463,7 @@ internal class Admin : BaseCommandModule
                     var Modify = new DiscordButtonComponent(ButtonStyle.Primary, "Modify", "Modify Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
                     var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "Delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));
 
-                    var Dropdown = new DiscordSelectComponent("RewardSelection", "Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList());
+                    var Dropdown = new DiscordSelectComponent("Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
                     var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                     if (DefinedRewards.Count > 0)
@@ -833,13 +833,13 @@ internal class Admin : BaseCommandModule
                 }
                 else if (e.Result.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
                 {
-                    var dropdown = new DiscordSelectComponent("selection", "Select an action..", new List<DiscordSelectComponentOption>
+                    var dropdown = new DiscordSelectComponent("Select an action..", new List<DiscordSelectComponentOption>
                     {
                         { new DiscordSelectComponentOption("Ban", "Ban", "Bans the user if a scam link has been detected") },
                         { new DiscordSelectComponentOption("Kick", "Kick", "Kicks the user if a scam link has been detected") },
                         { new DiscordSelectComponentOption("Timeout", "Timeout", "Times the user out if a scam link has been detected") },
                         { new DiscordSelectComponentOption("Delete", "Delete", "Only deletes the message containing the detected scam link") },
-                    });
+                    }, "selection");
 
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
 
