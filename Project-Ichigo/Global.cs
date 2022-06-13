@@ -59,6 +59,7 @@ global using Project_Ichigo.Exceptions;
 global using Project_Ichigo.TaskWatcher;
 global using Project_Ichigo.BumpReminder;
 global using Project_Ichigo.Secrets;
+global using Project_Ichigo.Enums;
 global using Project_Ichigo.Entities;
 global using Project_Ichigo.Entities.Afk;
 global using Project_Ichigo.Entities.Entities;

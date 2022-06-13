@@ -32,14 +32,14 @@ internal class DatabaseQueue
                 {
                     switch (b.Value.RequestType)
                     {
-                        case RequestType.Command:
+                        case DatabaseRequestType.Command:
                         {
                             b.Value.Command.ExecuteNonQuery();
 
                             Queue[b.Key].Executed = true;
                             break;
                         }
-                        case RequestType.Ping:
+                        case DatabaseRequestType.Ping:
                         {
                             b.Value.Connection.Ping();
 
@@ -69,7 +69,7 @@ internal class DatabaseQueue
     {
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { RequestType = RequestType.Command, Command = cmd });
+        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(1);
@@ -90,7 +90,7 @@ internal class DatabaseQueue
     {
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { RequestType = RequestType.Ping, Connection = conn });
+        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(50);
@@ -116,17 +116,11 @@ internal class DatabaseQueue
 
     internal class RequestQueue
     {
-        public RequestType RequestType { get; set; }
+        public DatabaseRequestType RequestType { get; set; }
         public MySqlConnection Connection { get; set; }
         public MySqlCommand Command { get; set; }
         public bool Executed { get; set; }
         public bool Failed { get; set; }
         public Exception Exception { get; set; }
-    }
-
-    internal enum RequestType
-    {
-        Command,
-        Ping
     }
 }
