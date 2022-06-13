@@ -13,10 +13,10 @@ internal class Maintainers : ApplicationCommandsModule
         public Bot _bot { private get; set; }
 
         [SlashCommand("create-issue", "Create a new issue on Project-Ichigo's Github Repository")]
-        public async Task CreateIssue(InteractionContext ctx)
+        public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")]bool UseOldTagsSelector = false)
         {
             Task.Run(async () =>
-            {
+            { 
                 if (!ctx.User.IsMaintenance(_bot._status))
                 {
                     _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
@@ -35,11 +35,15 @@ internal class Maintainers : ApplicationCommandsModule
                 client.Credentials = tokenAuth;
 
                 var labels = await client.Issue.Labels.GetAllForRepository(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository);
-                
+
                 var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                     .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
-                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", required: false))
-                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "labels", "Labels", "", null, null, false, $"Put a # in front of every label you want to add.\n\n{string.Join("\n", labels.Select(x => x.Name))}"));
+                    .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", required: false));
+
+                if (!UseOldTagsSelector)
+                    modal.AddModalComponents(new DiscordSelectComponent("Select tags", labels.Select(x => new DiscordSelectComponentOption(x.Name, x.Name.ToLower().MakeValidFileName(), "", false, new DiscordComponentEmoji(new DiscordColor(x.Color).GetClosestColorEmoji(ctx.Client)))), "labels", 1, labels.Count));
+                else
+                    modal.AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "labels", "Labels", "", null, null, false, $"Put a # in front of every label you want to add.\n\n{string.Join("\n", labels.Select(x => x.Name))}"));
 
                 await ctx.CreateModalResponseAsync(modal);
 
@@ -59,17 +63,26 @@ internal class Maintainers : ApplicationCommandsModule
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             var followup = await e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent(":arrows_counterclockwise: `Submitting your issue..`"));
 
+                            var labelComp = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "labels").First().Components.First();
+
                             string title = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "title").First().Components.First().Value;
                             string description = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "description").First().Components.First().Value;
-                            string labelsraw = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "labels").First().Components.First().Value;
+                            List<string> labels;
+
+                            if (labelComp.Type == ComponentType.Select)
+                            {
+                                labels = labelComp.Values.ToList();
+                            }
+                            else
+                            {
+                                labels = labelComp.Value.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith("#")).Select(x => x.Replace("#", "")).ToList();
+                            }
 
                             if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                             {
                                 _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"❌ `The GitHub Token expired, please update.`"));
                                 return;
                             }
-
-                            List<string> labels = labelsraw.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith("#")).Select(x => x.Replace("#", "")).ToList();
 
                             var issue = await client.Issue.Create(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, new NewIssue(title) { Body = description });
 
