@@ -17,38 +17,40 @@ internal class CommandEvents
 
             try
             {
-                await Task.Delay(2000);
-                await e.Context.Message.DeleteAsync();
+                if (e.Command.CustomAttributes.Any(x => x.GetType() == typeof(PreventCommandDeletionAttribute)))
+                {
+                    if (e.Command.CustomAttributes.OfType<PreventCommandDeletionAttribute>().FirstOrDefault().PreventDeleteCommandMessage)
+                        return;
+                }
             }
             catch { }
+
+            _ = Task.Delay(2000).ContinueWith(x =>
+            {
+                _ = e.Context.Message.DeleteAsync();
+            });
         }).Add(_bot._watcher);
     }
 
     internal async Task CommandError(CommandsNextExtension sender, CommandErrorEventArgs e)
     {
         if (e.Command is not null)
-            if (e.Exception.GetType().FullName == "System.ArgumentException")
+            if (e.Exception.GetType() == typeof(ArgumentException))
             {
                 Task.Run(async () =>
                 {
                     if (e.Command is not null)
                         LogWarn($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id})", e.Exception);
 
-                    try
-                    {
-                        await e.Context.SendSyntaxError();
-                    }
-                    catch { }
+                    _ = e.Context.SendSyntaxError();
 
-                    try
+                    _ = Task.Delay(2000).ContinueWith(x =>
                     {
-                        await Task.Delay(2000);
-                        await e.Context.Message.DeleteAsync();
-                    }
-                    catch { }
+                        _ = e.Context.Message.DeleteAsync();
+                    });
                 }).Add(_bot._watcher);
             }
-            else if (e.Exception.GetType().FullName == "Project_Ichigo.Exceptions.CancelCommandException")
+            else if (e.Exception.GetType() == typeof(CancelCommandException))
             {
                 return;
             }
@@ -60,19 +62,14 @@ internal class CommandEvents
 
                     try
                     {
-                        await e.Context.Channel.SendMessageAsync($"{e.Context.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`\n\n" +
-                                                                    $"```csharp\n" +
-                                                                    $"{e.Exception}" +
-                                                                    $"\n```");
+                        _ = e.Context.Channel.SendMessageAsync($"{e.Context.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`");
                     }
                     catch { }
 
-                    try
+                    _ = Task.Delay(2000).ContinueWith(x =>
                     {
-                        await Task.Delay(2000);
-                        await e.Context.Message.DeleteAsync();
-                    }
-                    catch { }
+                        _ = e.Context.Message.DeleteAsync();
+                    });
                 }).Add(_bot._watcher);
             }
     }

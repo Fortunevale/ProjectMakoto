@@ -50,7 +50,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("cuddle"),
+    [Command("cuddle"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Cuddle with another user")]
     public async Task Cuddle(CommandContext ctx, DiscordUser user)
@@ -95,7 +95,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("kiss"),
+    [Command("kiss"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Kiss another user")]
     public async Task Kiss(CommandContext ctx, DiscordUser user)
@@ -140,7 +140,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("slap"),
+    [Command("slap"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Slap another user")]
     public async Task Slap(CommandContext ctx, DiscordUser user)
@@ -186,7 +186,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("kill"), Aliases("waste"),
+    [Command("kill"), Aliases("waste"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Kill another user..?")]
     public async Task Kill(CommandContext ctx, DiscordUser user)
@@ -233,7 +233,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("boop"),
+    [Command("boop"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Give another user a boop!")]
     public async Task Boop(CommandContext ctx, DiscordUser user)
@@ -279,7 +279,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("highfive"),
+    [Command("highfive"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Give a high five!")]
     public async Task Highfive(CommandContext ctx, DiscordUser user)
@@ -324,7 +324,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("hug"),
+    [Command("hug"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Hug another user!")]
     public async Task Hug(CommandContext ctx, DiscordUser user)
@@ -374,7 +374,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("pat"), Aliases("pet", "headpat", "headpet"),
+    [Command("pat"), Aliases("pet", "headpat", "headpet"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Give someone some headpats!")]
     public async Task Pat(CommandContext ctx, DiscordUser user)
