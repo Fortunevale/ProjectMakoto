@@ -50,7 +50,7 @@ internal class DatabaseQueue
                 }
                 catch (MySqlException ex)
                 {
-                    LogError($"An exception occured while trying to execute a mysql command", ex);
+                    _logger.LogError($"An exception occured while trying to execute a mysql command", ex);
                 }
                 catch (Exception ex)
                 {

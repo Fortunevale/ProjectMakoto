@@ -263,7 +263,7 @@ internal static class Extensions
         }
         catch (Exception ex)
         {
-            LogError("Failed to process channel link", ex);
+            _logger.LogError("Failed to process channel link", ex);
 
             GuildId = 0;
             ChannelId = 0;
@@ -305,7 +305,7 @@ internal static class Extensions
         }
         catch (Exception ex)
         {
-            LogError("Failed to process role", ex);
+            _logger.LogError("Failed to process role", ex);
 
             Role = null;
             return false;

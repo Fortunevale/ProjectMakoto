@@ -52,7 +52,7 @@ internal class Lavalink
 
             this.Guild = guildConnection.Guild;
 
-            LogDebug($"Initializing Player for {Guild.Id}..");
+            _logger.LogDebug($"Initializing Player for {Guild.Id}..");
             
             int UserAmount = 0;
             CancellationTokenSource VoiceUpdateTokenSource = new();
@@ -70,7 +70,7 @@ internal class Lavalink
                         else
                             UserAmount = e.Guild.Channels.First(x => x.Key == e.Before.Channel.Id).Value.Users.Count;
 
-                        LogTrace($"UserAmount updated to {UserAmount} for {Guild.Id}");
+                        _logger.LogTrace($"UserAmount updated to {UserAmount} for {Guild.Id}");
 
                         if (UserAmount <= 1)
                             _ = Task.Delay(30000, VoiceUpdateTokenSource.Token).ContinueWith(x =>
@@ -100,7 +100,7 @@ internal class Lavalink
 
                         if (e.Before?.Channel != e.After?.Channel)
                         {
-                            LogTrace($"Switched Channel on {Guild.Id}");
+                            _logger.LogTrace($"Switched Channel on {Guild.Id}");
 
                             var conn = nodeConnection.GetGuildConnection(e.Guild);
 
@@ -131,7 +131,7 @@ internal class Lavalink
                 }).Add(_bot._watcher);
             }
 
-            LogDebug($"Initializing VoiceStateUpdated Event for {Guild.Id}..");
+            _logger.LogDebug($"Initializing VoiceStateUpdated Event for {Guild.Id}..");
             sender.VoiceStateUpdated += VoiceStateUpdated;
 
             QueueInfo LastPlayedTrack = null;
@@ -158,7 +158,7 @@ internal class Lavalink
 
                 if (Disposed)
                 {
-                    LogDebug($"Destroying Player for {Guild.Id}..");
+                    _logger.LogDebug($"Destroying Player for {Guild.Id}..");
                     sender.VoiceStateUpdated -= VoiceStateUpdated;
 
                     _ = guildConnection.DisconnectAsync();

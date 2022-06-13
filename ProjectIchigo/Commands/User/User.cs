@@ -190,7 +190,7 @@ internal class User : BaseCommandModule
             }
             catch (Exception ex)
             {
-                LogError($"Failed to get cpu load", ex);
+                _logger.LogError($"Failed to get cpu load", ex);
                 embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current CPU load**\n`Loading..`", $"**Current CPU load**\n`Error`");
             }
 
@@ -202,7 +202,7 @@ internal class User : BaseCommandModule
             }
             catch (Exception ex)
             {
-                LogError($"Failed to get cpu load", ex);
+                _logger.LogError($"Failed to get cpu load", ex);
                 embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current RAM usage**\n`Loading..`", "**Current RAM usage**\n`Error`");
             }
 
@@ -238,7 +238,7 @@ internal class User : BaseCommandModule
                 }
                 catch (Exception ex)
                 {
-                    LogError($"Failed to get temps", ex);
+                    _logger.LogError($"Failed to get temps", ex);
                     embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current temperature**\n`Loading..`", $"**Current temperature**\n`Error`");
                 }
 
@@ -264,7 +264,7 @@ internal class User : BaseCommandModule
                 }
                 catch (Exception ex)
                 {
-                    LogError($"Failed to get uptime", ex);
+                    _logger.LogError($"Failed to get uptime", ex);
                     embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Server uptime**\n`Loading..`", $"**Server uptime**\n`Error`");
                 }
             }
@@ -307,7 +307,7 @@ internal class User : BaseCommandModule
                 }
                 catch (Exception ex)
                 {
-                    LogDebug($"Failed to get user", ex);
+                    _logger.LogDebug($"Failed to get user", ex);
                 }
 
                 DateTime CreationAge = new DateTime().AddSeconds((DateTime.UtcNow - victim.CreationTimestamp.ToUniversalTime()).TotalSeconds);
@@ -402,7 +402,7 @@ internal class User : BaseCommandModule
             }
             catch (Exception ex)
             {
-                LogError($"Error occured while trying to generate info about a user", ex);
+                _logger.LogError($"Error occured while trying to generate info about a user", ex);
             }
         }).Add(_bot._watcher, ctx);
     }
@@ -1140,7 +1140,7 @@ internal class User : BaseCommandModule
                     }
                     catch (Exception ex)
                     {
-                        LogError($"Failed to download an emote", ex);
+                        _logger.LogError($"Failed to download an emote", ex);
                         SanitizedEmoteList.Remove(b.Key);
                     }
                 } 
@@ -1313,7 +1313,7 @@ internal class User : BaseCommandModule
                                 }
                                 catch (Exception ex)
                                 {
-                                    LogError($"Failed to add an emote to guild", ex);
+                                    _logger.LogError($"Failed to add an emote to guild", ex);
                                 }
                             }
 

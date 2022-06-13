@@ -350,7 +350,7 @@ internal class ScoreSaber : BaseCommandModule
                         embed.Author.IconUrl = ctx.Guild.IconUrl;
                         builder.AddComponents(ProfileInteractionRow);
                         _ = msg.ModifyAsync(builder);
-                        LogError(ex.ToString());
+                        _logger.LogError(ex.ToString());
                     }
 
                 try

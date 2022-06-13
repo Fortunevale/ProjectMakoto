@@ -28,7 +28,7 @@ internal class PhishingUrlUpdater
                     var PermInvite = (await client.GetStringAsync("https://fortunevale.dd-dns.de/ProjectIchigoPermanentInvite.txt")).Split("\n").First();
 
                     if (_bot._status.DevelopmentServerInvite != PermInvite)
-                        LogInfo($"Updating Development Server Invite to '{PermInvite}'");
+                        _logger.LogInfo($"Updating Development Server Invite to '{PermInvite}'");
 
                     _bot._status.DevelopmentServerInvite = PermInvite;
                     break;
@@ -37,16 +37,16 @@ internal class PhishingUrlUpdater
                 {
                     if (ex.StatusCode == HttpStatusCode.ServiceUnavailable)
                     {
-                        LogWarn($"'https://fortunevale.dd-dns.de/ProjectIchigoPermanentInvite.txt' is temporarily unavailable. Retrying in 5 seconds..");
+                        _logger.LogWarn($"'https://fortunevale.dd-dns.de/ProjectIchigoPermanentInvite.txt' is temporarily unavailable. Retrying in 5 seconds..");
                         await Task.Delay(5000);
                         continue;
                     }
 
-                    LogError($"Unhandled HttpRequestException thrown while trying to update Development Server Invite", ex);
+                    _logger.LogError($"Unhandled HttpRequestException thrown while trying to update Development Server Invite", ex);
                 }
                 catch (Exception ex)
                 {
-                    LogError($"Failed to update Development Server Invite", ex);
+                    _logger.LogError($"Failed to update Development Server Invite", ex);
                     break;
                 } 
             }
@@ -98,7 +98,7 @@ internal class PhishingUrlUpdater
         }
         catch (Exception ex)
         {
-            LogError($"Failed to update database", ex);
+            _logger.LogError($"Failed to update database", ex);
         }
     }
 
@@ -108,7 +108,7 @@ internal class PhishingUrlUpdater
     {
         if (UpdateRunning)
         {
-            LogWarn($"A database update is already running, cancelling");
+            _logger.LogWarn($"A database update is already running, cancelling");
             return;
         }
 
@@ -145,7 +145,7 @@ internal class PhishingUrlUpdater
             cmd.Connection = _bot._databaseClient.mainDatabaseConnection;
             await _bot._databaseClient._queue.RunCommand(cmd);
 
-            LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
+            _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
             UpdateRunning = false;
             DatabaseInserts.Clear();
             DatabaseInserts = null;
@@ -155,7 +155,7 @@ internal class PhishingUrlUpdater
                 {
                     await _bot._databaseClient._helper.DeleteRow(_bot._databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
 
-                    LogDebug($"Dropped '{b}' from table 'scam_urls'.");
+                    _logger.LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }
 
             cmd.Dispose();

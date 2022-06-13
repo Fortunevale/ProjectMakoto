@@ -53,7 +53,7 @@ internal class Maintainers : BaseCommandModule
                     }
                     catch (Exception ex)
                     {
-                        LogError($"Exception occured while trying to ban user from {b.Key}", ex);
+                        _logger.LogError($"Exception occured while trying to ban user from {b.Key}", ex);
                         Failed++;
                     }
                 }
@@ -116,7 +116,7 @@ internal class Maintainers : BaseCommandModule
 
                     if (Done && collectedDiscordMessagesToDelete.Count <= 0)
                     {
-                        LogInfo("Exiting delete thread");
+                        _logger.LogInfo("Exiting delete thread");
                         return;
                     }
 
@@ -127,7 +127,7 @@ internal class Maintainers : BaseCommandModule
                         try
                         {
                             await msg.DeleteAsync();
-                            LogInfo($"Deleted '{msg.Id}' in {msg.Channel.Name}");
+                            _logger.LogInfo($"Deleted '{msg.Id}' in {msg.Channel.Name}");
                         }
                         catch (NotFoundException)
                         {
@@ -135,7 +135,7 @@ internal class Maintainers : BaseCommandModule
                         }
                         catch (Exception ex)
                         {
-                            LogError($"{ex}");
+                            _logger.LogError($"{ex}");
                             continue;
                         }
 
@@ -149,7 +149,7 @@ internal class Maintainers : BaseCommandModule
             {
                 try
                 {
-                    LogInfo($"[Get Rid of Me] Processing channel {channel.Value.Name}");
+                    _logger.LogInfo($"[Get Rid of Me] Processing channel {channel.Value.Name}");
 
                     List<DiscordMessage> discordMessages = new();
                     discordMessages.AddRange(await channel.Value.GetMessagesAsync(1));
@@ -177,11 +177,11 @@ internal class Maintainers : BaseCommandModule
                         try
                         {
                             var requestedMsgs = await channel.Value.GetMessagesBeforeAsync(discordMessages.Last().Id, 100);
-                            LogInfo($"[Get Rid of Me] Received {requestedMsgs.Count} messages");
+                            _logger.LogInfo($"[Get Rid of Me] Received {requestedMsgs.Count} messages");
 
                             if (!requestedMsgs.Any())
                             {
-                                LogInfo($"No more messages in '{channel.Value.Name}'");
+                                _logger.LogInfo($"No more messages in '{channel.Value.Name}'");
                                 break;
                             }
 
@@ -204,12 +204,12 @@ internal class Maintainers : BaseCommandModule
 
                             await Task.Delay(1000);
                         }
-                        catch (Exception ex) { LogError($"{ex}"); continue; }
+                        catch (Exception ex) { _logger.LogError($"{ex}"); continue; }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogError($"{ex}");
+                    _logger.LogError($"{ex}");
                 }
             }
 
@@ -294,8 +294,8 @@ internal class Maintainers : BaseCommandModule
             if (Level > 7)
                 throw new Exception("Invalid Log Level");
 
-            ChangeLogLevel((LoggerObjects.LogLevel)Level);
-            _ = ctx.RespondAsync($"`Changed LogLevel to '{(LoggerObjects.LogLevel)Level}'`");
+            _logger.ChangeLogLevel((LogLevel)Level);
+            _ = ctx.RespondAsync($"`Changed LogLevel to '{(LogLevel)Level}'`");
         }).Add(_bot._watcher, ctx);
     }
     

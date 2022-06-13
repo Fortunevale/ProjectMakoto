@@ -102,7 +102,7 @@ internal class DatabaseClient
             {
                 if (!MainTables.Contains(b.Key))
                 {
-                    LogWarn($"Missing table '{b.Key}'. Creating..");
+                    _logger.LogWarn($"Missing table '{b.Key}'. Creating..");
                     string sql = $"CREATE TABLE `{Secrets.Secrets.MainDatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
 
                     var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -110,7 +110,7 @@ internal class DatabaseClient
                     cmd.Connection = databaseClient.mainDatabaseConnection;
 
                     await databaseClient._queue.RunCommand(cmd);
-                    LogInfo($"Created table '{b.Key}'.");
+                    _logger.LogInfo($"Created table '{b.Key}'.");
                 }
 
                 var Columns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, b.Key);
@@ -119,7 +119,7 @@ internal class DatabaseClient
                 {
                     if (!Columns.ContainsKey(col.Name))
                     {
-                        LogWarn($"Missing column '{col.Name}' in '{b.Key}'. Creating..");
+                        _logger.LogWarn($"Missing column '{col.Name}' in '{b.Key}'. Creating..");
                         string sql = $"ALTER TABLE `{b.Key}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -128,13 +128,13 @@ internal class DatabaseClient
 
                         await databaseClient._queue.RunCommand(cmd);
 
-                        LogInfo($"Created column '{col.Name}' in '{b.Key}'.");
+                        _logger.LogInfo($"Created column '{col.Name}' in '{b.Key}'.");
                         Columns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, b.Key);
                     }
 
                     if (Columns[col.Name].ToLower() != col.Type.ToLower())
                     {
-                        LogWarn($"Wrong data type for column '{col.Name}' in '{b.Key}'");
+                        _logger.LogWarn($"Wrong data type for column '{col.Name}' in '{b.Key}'");
                         string sql = $"ALTER TABLE `{b.Key}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -143,7 +143,7 @@ internal class DatabaseClient
 
                         await databaseClient._queue.RunCommand(cmd);
 
-                        LogInfo($"Changed column '{col.Name}' in '{b.Key}' to datatype '{col.Type.ToUpper()}'.");
+                        _logger.LogInfo($"Changed column '{col.Name}' in '{b.Key}' to datatype '{col.Type.ToUpper()}'.");
                         Columns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, b.Key);
                     }
                 }
@@ -152,7 +152,7 @@ internal class DatabaseClient
                 {
                     if (!b.Value.Any(x => x.Name == col.Key))
                     {
-                        LogWarn($"Invalid column '{col.Key}' in '{b}'");
+                        _logger.LogWarn($"Invalid column '{col.Key}' in '{b}'");
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
@@ -185,13 +185,35 @@ internal class DatabaseClient
         while (_queue.QueueCount() != 0)
             await Task.Delay(500);
 
-        var GuildTables = await _helper.ListTables(guildDatabaseConnection);
+        IEnumerable<string> GuildTables;
+
+        int retries = 1;
+
+        while (true)
+        {
+            try
+            {
+                GuildTables = await _helper.ListTables(guildDatabaseConnection);
+                break;
+            }
+            catch (Exception ex)
+            {
+                if (retries >= 3)
+                {
+                    throw;
+                }
+
+                _logger.LogWarn($"Failed to get a list of guild tables. Retrying in 1000ms.. ({retries}/3)", ex);
+                retries++;
+                await Task.Delay(1000);
+            }
+        }
 
         foreach (var b in _bot._guilds.List)
         {
             if (!GuildTables.Contains($"{b.Key}"))
             {
-                LogWarn($"Missing table '{b.Key}'. Creating..");
+                _logger.LogWarn($"Missing table '{b.Key}'. Creating..");
                 string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
 
                 var cmd = guildDatabaseConnection.CreateCommand();
@@ -199,7 +221,7 @@ internal class DatabaseClient
                 cmd.Connection = guildDatabaseConnection;
 
                 await _queue.RunCommand(cmd);
-                LogInfo($"Created table '{b.Key}'.");
+                _logger.LogInfo($"Created table '{b.Key}'.");
             }
         }
 
@@ -215,7 +237,7 @@ internal class DatabaseClient
                 {
                     if (!Columns.ContainsKey(col.Name))
                     {
-                        LogWarn($"Missing column '{col.Name}' in '{b}'. Creating..");
+                        _logger.LogWarn($"Missing column '{col.Name}' in '{b}'. Creating..");
                         string sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = guildDatabaseConnection.CreateCommand();
@@ -224,13 +246,13 @@ internal class DatabaseClient
 
                         await _queue.RunCommand(cmd);
 
-                        LogInfo($"Created column '{col.Name}' in '{b}'.");
+                        _logger.LogInfo($"Created column '{col.Name}' in '{b}'.");
                         Columns = await _helper.ListColumns(guildDatabaseConnection, b);
                     }
 
                     if (Columns[col.Name].ToLower() != col.Type.ToLower())
                     {
-                        LogWarn($"Wrong data type for column '{col.Name}' in '{b}'");
+                        _logger.LogWarn($"Wrong data type for column '{col.Name}' in '{b}'");
                         string sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = guildDatabaseConnection.CreateCommand();
@@ -239,7 +261,7 @@ internal class DatabaseClient
 
                         await _queue.RunCommand(cmd);
 
-                        LogInfo($"Changed column '{col.Name}' in '{b}' to datatype '{col.Type.ToUpper()}'.");
+                        _logger.LogInfo($"Changed column '{col.Name}' in '{b}' to datatype '{col.Type.ToUpper()}'.");
                         Columns = await _helper.ListColumns(guildDatabaseConnection, b);
                     }
                 }
@@ -248,7 +270,7 @@ internal class DatabaseClient
                 {
                     if (!DatabaseColumnLists.guild_users.Any(x => x.Name == col.Key))
                     {
-                        LogWarn($"Invalid column '{col.Key}' in '{b}'");
+                        _logger.LogWarn($"Invalid column '{col.Key}' in '{b}'");
 
                         var cmd = guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
@@ -262,7 +284,7 @@ internal class DatabaseClient
 
         if (!GuildTables.Contains("writetester"))
         {
-            LogWarn($"Missing table 'writetester'. Creating..");
+            _logger.LogWarn($"Missing table 'writetester'. Creating..");
             string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`writetester` ( {string.Join(", ", DatabaseColumnLists.Tables["writetester"].Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.Tables["writetester"].Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.Tables["writetester"].First(x => x.Primary).Name}`)" : "")})";
 
             var cmd = guildDatabaseConnection.CreateCommand();
@@ -270,7 +292,7 @@ internal class DatabaseClient
             cmd.Connection = guildDatabaseConnection;
 
             await _queue.RunCommand(cmd);
-            LogInfo($"Created table 'writetester'.");
+            _logger.LogInfo($"Created table 'writetester'.");
         }
 
         var GuildColumns = await _helper.ListColumns(guildDatabaseConnection, "writetester");
@@ -279,7 +301,7 @@ internal class DatabaseClient
         {
             if (!GuildColumns.ContainsKey(col.Name))
             {
-                LogWarn($"Missing column '{col.Name}' in 'writetester'. Creating..");
+                _logger.LogWarn($"Missing column '{col.Name}' in 'writetester'. Creating..");
                 string sql = $"ALTER TABLE `writetester` ADD `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                 var cmd = guildDatabaseConnection.CreateCommand();
@@ -288,13 +310,13 @@ internal class DatabaseClient
 
                 await _queue.RunCommand(cmd);
 
-                LogInfo($"Created column '{col.Name}' in 'writetester'.");
+                _logger.LogInfo($"Created column '{col.Name}' in 'writetester'.");
                 GuildColumns = await _helper.ListColumns(guildDatabaseConnection, "writetester");
             }
 
             if (GuildColumns[col.Name].ToLower() != col.Type.ToLower())
             {
-                LogWarn($"Wrong data type for column '{col.Name}' in 'writetester'");
+                _logger.LogWarn($"Wrong data type for column '{col.Name}' in 'writetester'");
                 string sql = $"ALTER TABLE `writetester` CHANGE `{col.Name}` `{col.Name}` {col.Type.ToUpper()}{(col.Collation != "" ? $" CHARACTER SET {col.Collation.Remove(col.Collation.IndexOf("_"), col.Collation.Length - col.Collation.IndexOf("_"))} COLLATE {col.Collation}" : "")}{(col.Nullable ? " NULL" : " NOT NULL")}{(!col.Nullable ? (col.Default.Length > 0 ? $" DEFAULT '{col.Default}'" : "") : "")}{(col.Primary ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                 var cmd = guildDatabaseConnection.CreateCommand();
@@ -303,7 +325,7 @@ internal class DatabaseClient
 
                 await _queue.RunCommand(cmd);
 
-                LogInfo($"Changed column '{col.Name}' in 'writetester' to datatype '{col.Type.ToUpper()}'.");
+                _logger.LogInfo($"Changed column '{col.Name}' in 'writetester' to datatype '{col.Type.ToUpper()}'.");
                 GuildColumns = await _helper.ListColumns(guildDatabaseConnection, "writetester");
             }
         }
@@ -312,7 +334,7 @@ internal class DatabaseClient
         {
             if (!DatabaseColumnLists.Tables["writetester"].Any(x => x.Name == col.Key))
             {
-                LogWarn($"Invalid column '{col.Key}' in 'writetester'");
+                _logger.LogWarn($"Invalid column '{col.Key}' in 'writetester'");
 
                 var cmd = guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = $"ALTER TABLE `writetester` DROP COLUMN `{col.Key}`";
@@ -340,13 +362,13 @@ internal class DatabaseClient
         {
             try
             {
-                LogWarn("Pinging the database failed, attempting reconnect.");
+                _logger.LogWarn("Pinging the database failed, attempting reconnect.");
                 connection.Open();
-                LogInfo($"Reconnected to database.");
+                _logger.LogInfo($"Reconnected to database.");
             }
             catch (Exception ex)
             {
-                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex);
+                _logger.LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex);
                 return;
             }
         }
@@ -372,14 +394,14 @@ internal class DatabaseClient
         {
             try
             {
-                LogWarn($"Creating a test value in database failed, reconnecting to database", ex);
+                _logger.LogWarn($"Creating a test value in database failed, reconnecting to database", ex);
                 connection.Close();
                 connection.Open();
-                LogInfo($"Reconnected to database.");
+                _logger.LogInfo($"Reconnected to database.");
             }
             catch (Exception ex1)
             {
-                LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex1);
+                _logger.LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex1);
                 return;
             }
         }
@@ -521,14 +543,14 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the guilds table", ex);
+                        _logger.LogError($"An exception occured while trying to update the guilds table", ex);
                     }
 
                 var check = CheckGuildTables();
@@ -582,14 +604,14 @@ internal class DatabaseClient
                                 cmd.Connection = guildDatabaseConnection;
                                 await _queue.RunCommand(cmd);
 
-                                LogDebug($"Inserted {DatabaseInserts.Count} rows into table '{guild.Key}'.");
+                                _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table '{guild.Key}'.");
                                 DatabaseInserts.Clear();
                                 DatabaseInserts = null;
                                 cmd.Dispose();
                             }
                             catch (Exception ex)
                             {
-                                LogError($"An exception occured while trying to update the {guild.Key} table", ex);
+                                _logger.LogError($"An exception occured while trying to update the {guild.Key} table", ex);
                             }
                         }
 
@@ -640,14 +662,14 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the users table", ex);
+                        _logger.LogError($"An exception occured while trying to update the users table", ex);
                     }
 
                 if (_bot._submissionBans.Users.Count > 0)
@@ -683,14 +705,14 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the user_submission_bans table", ex);
+                        _logger.LogError($"An exception occured while trying to update the user_submission_bans table", ex);
                     }
 
                 if (_bot._submissionBans.Guilds.Count > 0)
@@ -726,14 +748,14 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
+                        _logger.LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
                     }
 
                 if (_bot._globalBans.List.Count > 0)
@@ -769,14 +791,14 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
+                        _logger.LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
                     }
 
                 if (_bot._submittedUrls.List.Count > 0)
@@ -814,14 +836,14 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured while trying to update the active_url_submissions table", ex);
+                        _logger.LogError($"An exception occured while trying to update the active_url_submissions table", ex);
                     }
 
                 await Task.Delay(1000);
