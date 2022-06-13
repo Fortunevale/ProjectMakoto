@@ -52,7 +52,7 @@ internal class Bot
             Directory.CreateDirectory("logs");
 
         _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
-        _loggerProvider = new LoggerProvider();
+        _loggerProvider = _logger._provider;
 
         _logger.LogRaised += LogHandler;
 
@@ -164,7 +164,7 @@ internal class Bot
             {
                 Token = $"{token}",
                 TokenType = TokenType.Bot,
-                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Information,
+                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Trace,
                 Intents = DiscordIntents.All,
                 LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
                 AutoReconnect = true,
