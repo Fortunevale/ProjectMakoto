@@ -128,7 +128,7 @@ internal class Mod : BaseCommandModule
                     }
                     catch (Exception ex)
                     {
-                        LogError($"Failed to delete messages", ex);
+                        _logger.LogError($"Failed to delete messages", ex);
                         PerformingActionEmbed.Description = $"❌ `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
                         PerformingActionEmbed.Color = EmbedColors.Error;
                         PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
@@ -213,7 +213,7 @@ internal class Mod : BaseCommandModule
             }
             catch (Exception ex)
             {
-                LogError($"Exception occured while trying to deleted {number} messages", ex);
+                _logger.LogError($"Exception occured while trying to deleted {number} messages", ex);
             }
         }).Add(_bot._watcher, ctx);
     }

@@ -79,6 +79,7 @@ global using ProjectIchigo.Exceptions;
 global using Xorog.ScoreSaber;
 global using Xorog.ScoreSaber.Objects;
 
+global using static ProjectIchigo.Log;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;
@@ -86,8 +87,10 @@ global using static Xorog.UniversalExtensions.UniversalExtensionsEnums;
 
 
 global using Xorog.Logger;
+global using Xorog.Logger.Entities;
+global using Xorog.Logger.Enums;
 global using static Xorog.Logger.Logger;
-global using static Xorog.Logger.LoggerObjects;
+global using LogLevel = Xorog.Logger.Enums.LogLevel;
 
 // Misc
 

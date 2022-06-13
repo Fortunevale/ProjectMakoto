@@ -104,7 +104,7 @@ internal class BumpReminderEvents
 
                             _bot._bumpReminder.ScheduleBump(sender, e.Guild.Id);
                         }
-                        catch (Exception ex) { LogDebug(ex.ToString()); }
+                        catch (Exception ex) { _logger.LogDebug(ex.ToString()); }
                     }
                 }
             }

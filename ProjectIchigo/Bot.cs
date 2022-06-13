@@ -4,11 +4,12 @@ namespace ProjectIchigo;
 
 internal class Bot
 {
+    internal static DatabaseClient DatabaseClient { get; set; }
+
     internal DiscordClient discordClient;
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
 
-    internal static DatabaseClient DatabaseClient { get; set; }
     internal DatabaseClient _databaseClient { get; set; }
     internal CollectionUpdates _collectionUpdates { get; set; }
 
@@ -38,8 +39,7 @@ internal class Bot
 
     internal TaskWatcher _watcher = new();
 
-
-    internal ILogger _logger { get; set; }
+    internal ILogger _ilogger { get; set; }
     internal ILoggerProvider _loggerProvider { get; set; }
 
     internal string Prefix { get; private set; } = ";;";
@@ -51,31 +51,31 @@ internal class Bot
         if (!Directory.Exists("logs"))
             Directory.CreateDirectory("logs");
 
-        _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LoggerObjects.LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
-        _loggerProvider = new Xorog.Logger.LoggerProvider();
+        _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
+        _loggerProvider = new LoggerProvider();
 
-        LogRaised += LogHandler;
+        _logger.LogRaised += LogHandler;
 
         _collectionUpdates = new(this);
 
-        LogInfo("Starting up..");
+        _logger.LogInfo("Starting up..");
 
         try
         {
             if (args.Contains("--debug"))
             {
-                ChangeLogLevel(LoggerObjects.LogLevel.DEBUG);
-                LogInfo("Debug logs enabled");
+                _logger.ChangeLogLevel(LogLevel.DEBUG);
+                _logger.LogInfo("Debug logs enabled");
             }
         }
         catch (Exception ex)
         {
-            LogError($"An exception occured while to enable debug logs", ex);
+            _logger.LogError($"An exception occured while to enable debug logs", ex);
         }
 
         _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
 
-        LogDebug($"Enviroment Details\n\n" +
+        _logger.LogDebug($"Enviroment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
                 $"OS & Version: {Environment.OSVersion}\n\n" +
                 $"OS 64x: {Environment.Is64BitOperatingSystem}\n" +
@@ -94,13 +94,13 @@ internal class Bot
             {
                 Stopwatch databaseConnectionSc = new();
                 databaseConnectionSc.Start();
-                LogInfo($"Connecting to database..");
+                _logger.LogInfo($"Connecting to database..");
 
                 DatabaseClient = await DatabaseClient.InitializeDatabase(this);
                 _databaseClient = DatabaseClient;
 
                 databaseConnectionSc.Stop();
-                LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+                _logger.LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
                 _status.DatabaseInitialized = true;
 
                 DatabaseInit _databaseInit = new(this);
@@ -110,7 +110,7 @@ internal class Bot
             }
             catch (Exception ex)
             {
-                LogFatal($"An exception occured while initializing data", ex);
+                _logger.LogFatal($"An exception occured while initializing data", ex);
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDatabaseLogin);
             }
@@ -132,7 +132,7 @@ internal class Bot
             }
             catch (Exception ex)
             {
-                LogError($"An exception occured while trying to parse a token commandline argument", ex);
+                _logger.LogError($"An exception occured while trying to parse a token commandline argument", ex);
             }
 
             if (File.Exists("token.cfg") && !args.Contains("--token"))
@@ -140,7 +140,7 @@ internal class Bot
 
             if (!(token.Length > 0))
             {
-                LogFatal("No token provided");
+                _logger.LogFatal("No token provided");
                 File.WriteAllText("token.cfg", "");
                 await Task.Delay(1000);
                 Environment.Exit(ExitCodes.NoToken);
@@ -148,14 +148,14 @@ internal class Bot
             }
 
 
-            AddBlacklist(token);
-            AddBlacklist(Secrets.Secrets.DatabasePassword);
-            AddBlacklist(Secrets.Secrets.LavalinkPassword);
+            _logger.AddBlacklist(token);
+            _logger.AddBlacklist(Secrets.Secrets.DatabasePassword);
+            _logger.AddBlacklist(Secrets.Secrets.LavalinkPassword);
 
-            AddLogLevelBlacklist(LoggerObjects.LogLevel.TRACE2);
+            _logger.AddLogLevelBlacklist(LogLevel.TRACE2);
 
 
-            LogDebug($"Registering DiscordClient..");
+            _logger.LogDebug($"Registering DiscordClient..");
 
             var logger = new LoggerFactory();
             logger.AddProvider(_loggerProvider);
@@ -173,7 +173,7 @@ internal class Bot
 
             _experienceHandler = new(this);
 
-            LogDebug($"Registering CommandsNext..");
+            _logger.LogDebug($"Registering CommandsNext..");
 
             var cNext = discordClient.UseCommandsNext(new CommandsNextConfiguration
             {
@@ -189,7 +189,7 @@ internal class Bot
 
 
 
-            LogDebug($"Registering Lavalink..");
+            _logger.LogDebug($"Registering Lavalink..");
 
             var endpoint = new ConnectionEndpoint
             {
@@ -208,7 +208,7 @@ internal class Bot
 
 
 
-            LogDebug($"Registering Commands..");
+            _logger.LogDebug($"Registering Commands..");
 
             cNext.RegisterCommands<User>();
             cNext.RegisterCommands<Music>();
@@ -221,13 +221,13 @@ internal class Bot
 
 
 
-            LogDebug($"Registering Command Converters..");
+            _logger.LogDebug($"Registering Command Converters..");
 
             cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
 
 
 
-            LogDebug($"Registering DisCatSharp EventHandler..");
+            _logger.LogDebug($"Registering DisCatSharp EventHandler..");
 
             DiscordEventHandler disCatSharpEventHandler = new(this);
 
@@ -268,13 +268,13 @@ internal class Bot
 
 
 
-            LogDebug($"Registering Interactivity..");
+            _logger.LogDebug($"Registering Interactivity..");
 
             discordClient.UseInteractivity(new InteractivityConfiguration { });
 
 
 
-            LogDebug($"Registering Events..");
+            _logger.LogDebug($"Registering Events..");
 
             discordClient.GuildDownloadCompleted += GuildDownloadCompleted;
 
@@ -289,17 +289,17 @@ internal class Bot
                 {
                     if (!_status.DiscordInitialized)
                     {
-                        LogError($"An exception occured while trying to log into discord: The log in took longer than 10 seconds");
+                        _logger.LogError($"An exception occured while trying to log into discord: The log in took longer than 10 seconds");
                         Environment.Exit(ExitCodes.FailedDiscordLogin);
                         return;
                     }
                 });
 
-                LogInfo("Connecting and authenticating with Discord..");
+                _logger.LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
                 discordLoginSc.Stop();
-                LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
+                _logger.LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
                 _status.DiscordInitialized = true;
 
                 IsDev = (discordClient.CurrentApplication.Id == 929373806437470260);
@@ -328,17 +328,17 @@ internal class Bot
                     try
                     {
                         _status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
-                        LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
+                        _logger.LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
                     }
                     catch (Exception ex)
                     {
-                        LogError($"An exception occured trying to add team members to administrator list. Is the current bot registered in a team?", ex);
+                        _logger.LogError($"An exception occured trying to add team members to administrator list. Is the current bot registered in a team?", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                LogError($"An exception occured while trying to log into discord", ex);
+                _logger.LogError($"An exception occured while trying to log into discord", ex);
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDiscordLogin);
                 return;
@@ -350,17 +350,17 @@ internal class Bot
                 {
                     var lavalinkSc = new Stopwatch();
                     lavalinkSc.Start();
-                    LogInfo("Connecting and authenticating with Lavalink..");
+                    _logger.LogInfo("Connecting and authenticating with Lavalink..");
 
                     LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
                     lavalinkSc.Stop();
-                    LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
+                    _logger.LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
 
                     _status.LavalinkInitialized = true;
                 }
                 catch (Exception ex)
                 {
-                    LogError($"An exception occured while trying to log into Lavalink", ex);
+                    _logger.LogError($"An exception occured while trying to log into Lavalink", ex);
                     return;
                 }
             });
@@ -371,14 +371,14 @@ internal class Bot
 
         if (!loadDatabase.IsCompletedSuccessfully)
         {
-            LogFatal($"An uncaught exception occured while initializing the database.", loadDatabase.Exception);
+            _logger.LogFatal($"An uncaught exception occured while initializing the database.", loadDatabase.Exception);
             await Task.Delay(1000);
             Environment.Exit(ExitCodes.FailedDatabaseLoad);
         }
 
         if (!logInToDiscord.IsCompletedSuccessfully)
         {
-            LogFatal($"An uncaught exception occured while initializing the discord client.", logInToDiscord.Exception);
+            _logger.LogFatal($"An uncaught exception occured while initializing the discord client.", logInToDiscord.Exception);
             await Task.Delay(1000);
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
@@ -393,7 +393,7 @@ internal class Bot
 
         //Console.CancelKeyPress += async delegate
         //{
-        //    LogInfo("Exiting, please wait..");
+        //    _logger.LogInfo("Exiting, please wait..");
         //    await FlushToDatabase(null, null);
         //};
 
@@ -441,7 +441,7 @@ internal class Bot
                 }
                 catch (Exception ex)
                 {
-                    LogError($"Failed to update user status", ex);
+                    _logger.LogError($"Failed to update user status", ex);
                     await Task.Delay(30000);
                 }
             }
@@ -478,7 +478,7 @@ internal class Bot
                 if (e is not null && e.NewItems is not null)
                     foreach (Task b in e.NewItems)
                     {
-                        LogDebug($"Adding sync task to watcher: {b.Id}");
+                        _logger.LogDebug($"Adding sync task to watcher: {b.Id}");
                         b.Add(_watcher);
                     }
             };
@@ -499,7 +499,7 @@ internal class Bot
 
             runningTasks.Add(Task.Run(async () =>
             {
-                LogDebug($"Performing sync tasks for '{guild.Key}'..");
+                _logger.LogDebug($"Performing sync tasks for '{guild.Key}'..");
                 var guildMembers = await guild.Value.GetAllMembersAsync();
                 var guildBans = await guild.Value.GetBansAsync();
 
@@ -554,14 +554,14 @@ internal class Bot
         runningTasks.CollectionChanged -= runningTasksUpdated();
         runningTasks.Clear();
 
-        LogInfo($"Sync Tasks successfully finished for {startupTasksSuccess}/{Guilds.Count} guilds.");
+        _logger.LogInfo($"Sync Tasks successfully finished for {startupTasksSuccess}/{Guilds.Count} guilds.");
     }
 
     private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {
         Task.Run(async () =>
         {
-            LogInfo($"I'm on {e.Guilds.Count} guilds.");
+            _logger.LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
             for (int i = 0; i < 251; i++)
             {
@@ -611,7 +611,7 @@ internal class Bot
                                 continue;
                             }
 
-                            LogDebug($"Handling missing crosspost message '{b.MessageId}' in '{b.ChannelId}' for '{guild.Key}'..");
+                            _logger.LogDebug($"Handling missing crosspost message '{b.MessageId}' in '{b.ChannelId}' for '{guild.Key}'..");
 
                             var WaitTime = _guilds.List[guild.Value.Id].CrosspostSettings.DelayBeforePosting - b.MessageId.GetSnowflakeTime().GetTotalSecondsSince();
 
@@ -679,7 +679,7 @@ internal class Bot
             }
             catch (Exception ex)
             {
-                LogError("Failed to run sync tasks", ex);
+                _logger.LogError("Failed to run sync tasks", ex);
             }
 
             await _databaseClient.CheckGuildTables();
@@ -690,15 +690,15 @@ internal class Bot
 
     private async Task FlushToDatabase()
     {
-        LogInfo($"Flushing to database..");
+        _logger.LogInfo($"Flushing to database..");
         await DatabaseClient.SyncDatabase(true);
-        LogDebug($"Flushed to database.");
+        _logger.LogDebug($"Flushed to database.");
 
         await Task.Delay(1000);
 
-        LogInfo($"Closing database..");
+        _logger.LogInfo($"Closing database..");
         await DatabaseClient.Dispose();
-        LogDebug($"Closed database.");
+        _logger.LogDebug($"Closed database.");
     }
 
     private async Task LogOffDiscord()
@@ -706,7 +706,7 @@ internal class Bot
         // Apparently spamming status changes makes it more consistent. Dont ask me how.
         // It's important that the status changes before the bot shuts down to work around a library issue.
 
-        LogInfo($"Closing Discord Client..");
+        _logger.LogInfo($"Closing Discord Client..");
 
         for (int i = 0; i < 10; i++)
             await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
@@ -715,7 +715,7 @@ internal class Bot
             await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
         await Task.Delay(5000);
         await discordClient.DisconnectAsync();
-        LogDebug($"Closed Discord Client.");
+        _logger.LogDebug($"Closed Discord Client.");
     }
 
     private async Task RunExitTasks(object? sender, EventArgs e)
@@ -729,35 +729,35 @@ internal class Bot
         }
         catch (Exception ex)
         {
-            LogError("Failed to run sync tasks", ex);
+            _logger.LogError("Failed to run sync tasks", ex);
         }
 
         await LogOffDiscord();
         await FlushToDatabase();
 
         Thread.Sleep(1000);
-        LogInfo($"Goodbye!");
+        _logger.LogInfo($"Goodbye!");
     }
 
     private void LogHandler(object? sender, LogMessageEventArgs e)
     {
         switch (e.LogEntry.LogLevel)
         {
-            case LoggerObjects.LogLevel.WARN:
+            case LogLevel.WARN:
             {
                 _status.WarnRaised++;
                 break;
             }
-            case LoggerObjects.LogLevel.ERROR:
+            case LogLevel.ERROR:
             {
                 _status.ErrorRaised++;
                 break;
             }
-            case LoggerObjects.LogLevel.FATAL:
+            case LogLevel.FATAL:
             {
                 if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
                 {
-                    LogRaised -= LogHandler;
+                    _logger.LogRaised -= LogHandler;
                     _ = RunExitTasks(null, null);
                 }
                 else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
@@ -766,9 +766,9 @@ internal class Bot
 
                     if (_status.DataReaderExceptions >= 4)
                     {
-                        LogFatal("4 or more DataReader Exceptions triggered, exiting..");
+                        _logger.LogFatal("4 or more DataReader Exceptions triggered, exiting..");
 
-                        LogRaised -= LogHandler;
+                        _logger.LogRaised -= LogHandler;
                         _ = RunExitTasks(null, null);
                     }
                 }
