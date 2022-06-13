@@ -458,7 +458,12 @@ internal class Bot
             //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
             //        return -1;
 
-            return CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
+            var CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
+
+            if (CommandStart == -1 && (message.Content.StartsWith($"<@{discordClient.CurrentUser.Id}>") || message.Content.StartsWith($"<@!{discordClient.CurrentUser.Id}>")))
+                CommandStart = CommandsNextUtilities.GetMentionPrefixLength(message, discordClient.CurrentUser);
+
+            return CommandStart;
         });
     }
 
