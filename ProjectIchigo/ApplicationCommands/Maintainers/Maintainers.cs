@@ -106,4 +106,148 @@ internal class Maintainers : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+
+	[SlashCommand("detailed_userinfo", "View discord user information.")]
+	public async Task DiscordLookup(InteractionContext ctx, [Option("User", "The user or user id.")] DiscordUser victim)
+	{
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+            {
+                _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Fetching user information for {victim.Mention}.."));
+
+            DiscordMember? bMember = null;
+
+            try
+            {
+                bMember = await ctx.Guild.GetMemberAsync(victim.Id);
+            }
+            catch { }
+
+            string GetNitroText(PremiumType? type)
+            {
+                return type switch
+                {
+                    PremiumType.NitroClassic => $"💵 `Nitro Classic`\n",
+                    PremiumType.Nitro => "💵 `Nitro`\n",
+                    PremiumType.NitroLite => "💵 `Nitro Lite`\n",
+                    _ => "",
+                };
+            }
+
+            string GetStatusIcon(UserStatus? status)
+            {
+                return status switch
+                {
+                    UserStatus.Online => "🟢",
+                    UserStatus.DoNotDisturb => "🔴",
+                    UserStatus.Idle => "🟡",
+                    UserStatus.Streaming => "🟣",
+                    _ => "⚪",
+                };
+            }
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = $"{(victim.IsBot ? $"[{(victim.IsSystem ?? false ? "System" : $"Bot{(victim.IsVerifiedBot ? "✅" : "❎")}")}] " : "")}{victim.UsernameWithDiscriminator}",
+                    Url = victim.ProfileUrl
+                },
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = (string.IsNullOrWhiteSpace(victim.AvatarUrl) ? "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png" : victim.AvatarUrl)
+                },
+                Color = victim.BannerColor ?? new("2f3136"),
+                ImageUrl = victim.BannerUrl,
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"User-Id: {victim.Id}"
+                },
+                Description = $"{GetNitroText(victim.PremiumType)}" +
+                        $"{(bMember is not null && bMember.IsOwner ? "✨ `This user owns this guild`\n" : "")}" +
+                        $"{(victim.IsCurrent ? "⚙ `Currently running with this account`\n" : "")}" +
+                        $"{(victim.IsStaff ? "📘 `Discord Staff`\n" : "")}" +
+                        $"{(victim.IsMod ? "⚒ `Certified Content Moderator`\n" : "")}" +
+                        $"{(victim.IsBotDev ? "⌨ `Verified Bot Developer`\n" : "")}" +
+                        $"{(victim.IsPartner ? "👥 `Discord Partner`\n" : "")}" +
+                        $"{(victim.Verified ?? false ? "✅ `Verified E-Mail Address`\n" : "")}" +
+                        $"{(victim.MfaEnabled ?? false ? "🔐 `Multi Factor Authentication enabled`\n" : "")}" +
+                        $"{(bMember is not null && bMember.IsPending.HasValue && bMember.IsPending.Value ? "❗ `User's Membership pending`\n" : "")}" +
+                        $"{(victim.Flags.HasValue ? $"\n**User Flags**\n{string.Join(", ", victim.Flags.Value.ToString().Split(", ").Select(x => $"`{x}`"))}\n" : "")}" +
+                        $"{(bMember is not null && bMember.MemberFlags != MemberFlags.None ? $"\n**Member Flags**\n{string.Join(", ", bMember.MemberFlags.ToString().Split(", ").Select(x => $"`{x}`"))}\n" : "")}" +
+                        $"{(victim.OAuthFlags.HasValue && victim.OAuthFlags.Value != UserFlags.None ? $"\n**OAuth Flags**\n{string.Join(", ", victim.OAuthFlags.Value.ToString().Split(", ").Select(x => $"`{x}`"))}\n" : "")}" +
+                        $"\n**Roles**\n{(bMember?.Roles.Count() > 0 ? string.Join(", ", bMember.Roles.Select(x => x.Mention)) : $"`The user doesn't have any roles on this server.`")}"
+            };
+
+            var banList = await ctx.Guild.GetBansAsync();
+            bool isBanned = banList.Any(x => x.User.Id == victim.Id);
+            DiscordBan? banDetails = (isBanned ? banList.First(x => x.User.Id == victim.Id) : null);
+
+            if (isBanned)
+                embed.AddField(new DiscordEmbedField("Ban Details", $"`{(string.IsNullOrWhiteSpace(banDetails?.Reason) ? "No reason provided." : $"{banDetails.Reason}")}`", false));
+
+            if (bMember is not null && !string.IsNullOrWhiteSpace(bMember.Nickname))
+                embed.AddField(new DiscordEmbedField("Nickname", $"`{bMember.Nickname}`", true));
+
+            embed.AddField(new DiscordEmbedField("Creation Date", $"{Formatter.Timestamp(victim.CreationTimestamp, TimestampFormat.LongDateTime)}", true));
+
+            if (!string.IsNullOrWhiteSpace(victim.Email))
+                embed.AddField(new DiscordEmbedField("E-Mail", $"`{victim.Email}`", true));
+
+            if (bMember is not null && bMember.PremiumSince.HasValue)
+                embed.AddField(new DiscordEmbedField("Premium Since", $"{Formatter.Timestamp(bMember.PremiumSince.Value, TimestampFormat.LongDateTime)}", true));
+
+            if (bMember is not null)
+                embed.AddField(new DiscordEmbedField("Guild Join Date", $"{Formatter.Timestamp(bMember.JoinedAt, TimestampFormat.LongDateTime)}", true));
+
+            if (!string.IsNullOrWhiteSpace(victim.Pronouns))
+                embed.AddField(new DiscordEmbedField("Pronouns", $"`{victim.Pronouns}`", true));
+
+            if (!string.IsNullOrWhiteSpace(victim.AvatarHash))
+                embed.AddField(new DiscordEmbedField("Avatar Hash", $"`{victim.AvatarHash}`", true));
+
+            if (!string.IsNullOrWhiteSpace(victim.Locale))
+                embed.AddField(new DiscordEmbedField("Locale", $"`{victim.Locale}`", true));
+
+            if (victim.BannerColor is not null)
+                embed.AddField(new DiscordEmbedField("Banner Color", $"`{victim.BannerColor.Value}`", true));
+
+            if (!string.IsNullOrWhiteSpace(victim.BannerUrl))
+                embed.AddField(new DiscordEmbedField("Banner Url", $"{victim.BannerUrl}", true));
+
+            if (!string.IsNullOrWhiteSpace(victim.BannerHash))
+                embed.AddField(new DiscordEmbedField("Banner Hash", $"`{victim.BannerHash}`", true));
+
+            if (bMember is not null && !string.IsNullOrWhiteSpace(bMember.GuildAvatarHash))
+            {
+                embed.AddField(new DiscordEmbedField("Guild Avatar Url", $"[Open in browser]({bMember.GuildAvatarUrl})", true));
+                embed.AddField(new DiscordEmbedField("Guild Avatar Hash", $"`{bMember.GuildAvatarHash}`", true));
+            }
+
+            if (bMember is not null && !string.IsNullOrWhiteSpace(bMember.GuildBannerHash))
+            {
+                embed.AddField(new DiscordEmbedField("Guild Banner Url", $"[Open in browser]({bMember.GuildBannerUrl})", true));
+                embed.AddField(new DiscordEmbedField("Guild Banner Hash", $"`{bMember.GuildBannerHash}`", true));
+            }
+
+            if (victim.Presence is not null)
+                embed.AddField(new DiscordEmbedField("Presence", $"{GetStatusIcon(victim.Presence.Status)} `{victim.Presence.Status}`\n" +
+                                                                $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Desktop.HasValue ? victim.Presence.ClientStatus.Desktop.Value : UserStatus.Offline)} `Desktop`\n" +
+                                                                $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Mobile.HasValue ? victim.Presence.ClientStatus.Mobile.Value : UserStatus.Offline)} `Mobile`\n" +
+                                                                $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `Web`\n\n", true));
+
+            if (victim.Presence is not null && victim.Presence.Activities?.Count > 0)
+                embed.AddField(new DiscordEmbedField("Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"<:dot:984701737552187433> Status: {x.CustomStatus.Emoji}{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"<:dot:984701737552187433> {x.ActivityType} {x.Name}")}")), true));
+
+            if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue)
+                embed.AddField(new DiscordEmbedField("Communication disabled until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
+
+            await ctx.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
+        }).Add(_bot._watcher, ctx);
+	}
 }
