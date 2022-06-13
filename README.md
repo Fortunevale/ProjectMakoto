@@ -1,5 +1,7 @@
 # Project-Ichigo - A discord bot written in C#
 
+[![wakatime](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg)](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo)
+
 # **[Skip everything, i want the bot!](#getting-the-bot)**
 
 ## Table of Contents
