@@ -185,7 +185,29 @@ internal class DatabaseClient
         while (_queue.QueueCount() != 0)
             await Task.Delay(500);
 
-        var GuildTables = await _helper.ListTables(guildDatabaseConnection);
+        IEnumerable<string> GuildTables;
+
+        int retries = 1;
+
+        while (true)
+        {
+            try
+            {
+                GuildTables = await _helper.ListTables(guildDatabaseConnection);
+                break;
+            }
+            catch (Exception ex)
+            {
+                if (retries >= 3)
+                {
+                    throw;
+                }
+
+                LogWarn($"Failed to get a list of guild tables. Retrying in 1000ms.. ({retries}/3)", ex);
+                retries++;
+                await Task.Delay(1000);
+            }
+        }
 
         foreach (var b in _bot._guilds.List)
         {
