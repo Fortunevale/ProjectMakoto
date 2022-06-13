@@ -611,7 +611,7 @@ internal class Admin : BaseCommandModule
                                 if (CustomMessageResult.Result.Content is not "cancel" and not  "continue" and not ".")
                                     Message = CustomMessageResult.Result.Content;
 
-                                _bot._guilds.List[ctx.Guild.Id].LevelRewards.Add(new Objects.LevelReward
+                                _bot._guilds.List[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
                                 {
                                     Level = level,
                                     RoleId = role.Id,
@@ -2188,7 +2188,7 @@ internal class Admin : BaseCommandModule
                             return;
                         }
 
-                        _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Objects.ReactionRoles>(reactionMessage.Id, new Objects.ReactionRoles
+                        _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(reactionMessage.Id, new Entities.ReactionRoles
                         {
                             ChannelId = ChannelId,
                             RoleId = role.Id,
@@ -2324,7 +2324,7 @@ internal class Admin : BaseCommandModule
 
                 await ctx.Message.ReferencedMessage.CreateReactionAsync(emoji_parameter);
 
-                _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Objects.ReactionRoles>(ctx.Message.ReferencedMessage.Id, new Objects.ReactionRoles
+                _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(ctx.Message.ReferencedMessage.Id, new Entities.ReactionRoles
                 {
                     ChannelId = ctx.Message.ReferencedMessage.Channel.Id,
                     RoleId = role_parameter.Id,
