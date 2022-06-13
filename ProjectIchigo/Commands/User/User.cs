@@ -55,7 +55,7 @@ internal class User : BaseCommandModule
             try
             {
                 foreach (var b in Embeds)
-                    await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter(ctx.GenerateUsedByFooter().Text, ctx.GenerateUsedByFooter().IconUrl).WithTimestamp(DateTime.UtcNow).WithColor(ColorHelper.Info).Build());
+                    await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter(ctx.GenerateUsedByFooter().Text, ctx.GenerateUsedByFooter().IconUrl).WithTimestamp(DateTime.UtcNow).WithColor(EmbedColors.Info).Build());
 
                 var successembed = new DiscordEmbedBuilder
                 {
@@ -67,7 +67,7 @@ internal class User : BaseCommandModule
                     Description = ":mailbox_with_mail: `You got mail! Please check your dm's.`",
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
-                    Color = ColorHelper.Success
+                    Color = EmbedColors.Success
                 };
 
                 await ctx.Channel.SendMessageAsync(embed: successembed);
@@ -84,7 +84,7 @@ internal class User : BaseCommandModule
                     Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
-                    Color = ColorHelper.Error,
+                    Color = EmbedColors.Error,
                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                 };
 
@@ -125,7 +125,7 @@ internal class User : BaseCommandModule
                     IconUrl = Resources.StatusIndicators.LoadingBlue,
                     Name = "Informations about this server and bot"
                 },
-                Color = ColorHelper.Info,
+                Color = EmbedColors.Info,
                 Description = "",
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
@@ -336,7 +336,7 @@ internal class User : BaseCommandModule
 
                 var embed = new DiscordEmbedBuilder
                 {
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         IconUrl = victim.AvatarUrl,
@@ -434,7 +434,7 @@ internal class User : BaseCommandModule
                 ImageUrl = victim.AvatarUrl,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Color = ColorHelper.Info
+                Color = EmbedColors.Info
             };
 
             DiscordMember member = null;
@@ -525,7 +525,7 @@ internal class User : BaseCommandModule
                 Description = (string.IsNullOrWhiteSpace(victim.BannerUrl) ? "`This user has no banner.`" : ""),
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Color = ColorHelper.Info
+                Color = EmbedColors.Info
             };
 
             DiscordMember member = null;
@@ -605,7 +605,7 @@ internal class User : BaseCommandModule
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Error,
+                    Color = EmbedColors.Error,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
@@ -635,7 +635,7 @@ internal class User : BaseCommandModule
                               $"`{current}/{max} XP`",
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Color = ColorHelper.HiddenSidebar
+                Color = EmbedColors.HiddenSidebar
             });
         }).Add(_bot._watcher, ctx);
     }
@@ -657,7 +657,7 @@ internal class User : BaseCommandModule
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Error,
+                    Color = EmbedColors.Error,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
@@ -673,7 +673,7 @@ internal class User : BaseCommandModule
 
             var PerformingActionEmbed = new DiscordEmbedBuilder
             {
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
@@ -771,7 +771,7 @@ internal class User : BaseCommandModule
                 var tos_embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Important,
+                    Color = EmbedColors.Important,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
@@ -798,7 +798,7 @@ internal class User : BaseCommandModule
                             _bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
 
                             var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
-                            await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(ColorHelper.Success)).AddComponents(accepted_button));
+                            await tos_accept.ModifyAsync(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(EmbedColors.Success)).AddComponents(accepted_button));
 
                             _ = ctx.Command.ExecuteAsync(ctx);
 
@@ -828,7 +828,7 @@ internal class User : BaseCommandModule
             var embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
-                Color = ColorHelper.Processing,
+                Color = EmbedColors.Processing,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Processing your request..`"
@@ -839,7 +839,7 @@ internal class User : BaseCommandModule
             if (_bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(_bot._status))
             {
                 embed.Description = $"`You cannot submit a domain for the next {_bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
                 return;
@@ -850,7 +850,7 @@ internal class User : BaseCommandModule
                 if (_bot._submittedUrls.List.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 10)
                 {
                     embed.Description = $"`You have 10 open url submissions. Please wait before trying to submit another url.`";
-                    embed.Color = ColorHelper.Error;
+                    embed.Color = EmbedColors.Error;
                     embed.Author.IconUrl = Resources.LogIcons.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     return; 
@@ -861,7 +861,7 @@ internal class User : BaseCommandModule
             {
                 embed.Description = $"`You are banned from submitting URLs.`\n" +
                                     $"`Reason: {_bot._submissionBans.Users[ctx.User.Id].Reason}`";
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
                 return;
@@ -871,7 +871,7 @@ internal class User : BaseCommandModule
             {
                 embed.Description = $"`This guild is banned from submitting URLs.`\n" +
                                     $"`Reason: {_bot._submissionBans.Guilds[ctx.Guild.Id].Reason}`";
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
                 return;
@@ -888,14 +888,14 @@ internal class User : BaseCommandModule
             if (!domain.Contains('.') || domain.Contains(' '))
             {
                 embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') you're trying to submit is invalid.`";
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = msg.ModifyAsync(embed.Build());
                 return;
             }
 
             embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCodeBlock()}'. When submitting, your public user account and guild will be tracked and visible to verifiers. Do you want to proceed?`";
-            embed.Color = ColorHelper.Success;
+            embed.Color = EmbedColors.Success;
             embed.Author.IconUrl = Resources.LogIcons.Info;
 
             var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "continue", "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
@@ -926,7 +926,7 @@ internal class User : BaseCommandModule
                             if (e.Interaction.Data.CustomId == "continue")
                             {
                                 embed.Description = $"`Submitting your domain..`";
-                                embed.Color = ColorHelper.Loading;
+                                embed.Color = EmbedColors.Loading;
                                 embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -938,7 +938,7 @@ internal class User : BaseCommandModule
                                     if (domain.Contains(b.Key))
                                     {
                                         embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') is already present in the database. Thanks for trying to contribute regardless.`";
-                                        embed.Color = ColorHelper.Error;
+                                        embed.Color = EmbedColors.Error;
                                         embed.Author.IconUrl = Resources.LogIcons.Error;
                                         _ = msg.ModifyAsync(embed.Build());
                                         return;
@@ -953,7 +953,7 @@ internal class User : BaseCommandModule
                                     if (b.Value.Url == domain)
                                     {
                                         embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') has already been submitted. Thanks for trying to contribute regardless.`";
-                                        embed.Color = ColorHelper.Error;
+                                        embed.Color = EmbedColors.Error;
                                         embed.Author.IconUrl = Resources.LogIcons.Error;
                                         _ = msg.ModifyAsync(embed.Build());
                                         return;
@@ -973,7 +973,7 @@ internal class User : BaseCommandModule
                                 var subbmited_msg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                 {
                                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Info, Name = $"Phishing Link Submission" },
-                                    Color = ColorHelper.Success,
+                                    Color = EmbedColors.Success,
                                     Timestamp = DateTime.UtcNow,
                                     Description = $"`Submitted Url`: `{domain.SanitizeForCodeBlock()}`\n" +
                                                     $"`Submission by`: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
@@ -996,7 +996,7 @@ internal class User : BaseCommandModule
                                 _bot._users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                                 embed.Description = $"`Submission created. Thanks for your contribution.`";
-                                embed.Color = ColorHelper.Success;
+                                embed.Color = EmbedColors.Success;
                                 embed.Author.IconUrl = Resources.LogIcons.Info;
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                             }
@@ -1056,7 +1056,7 @@ internal class User : BaseCommandModule
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Downloading emojis of this message..`",
-                Color = ColorHelper.Processing,
+                Color = EmbedColors.Processing,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = ctx.Guild.Name,
@@ -1080,7 +1080,7 @@ internal class User : BaseCommandModule
             if (Emotes is null && AnimatedEmotes is null && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
             {
                 embed.Description = $"`This message doesn't contain any emojis or stickers.`";
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 await msg.ModifyAsync(embed: embed.Build());
 
@@ -1181,7 +1181,7 @@ internal class User : BaseCommandModule
             if (SanitizedEmoteList.Count == 0)
             {
                 embed.Description = $"`Couldn't download any emojis or stickers from this message.`";
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 await msg.ModifyAsync(embed: embed.Build());
 
@@ -1246,7 +1246,7 @@ internal class User : BaseCommandModule
                             if (IncludeStickers)
                             {
                                 embed.Description = $"`You cannot add any emoji(s) to the server while including stickers.`";
-                                embed.Color = ColorHelper.Error;
+                                embed.Color = EmbedColors.Error;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                                 await msg.ModifyAsync(embed: embed.Build());
 
@@ -1318,7 +1318,7 @@ internal class User : BaseCommandModule
                             }
 
                             embed.Thumbnail = null;
-                            embed.Color = ColorHelper.Success;
+                            embed.Color = EmbedColors.Success;
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
                             embed.Description = $"✅ `Downloaded and added {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to the server.`";
                             await msg.ModifyAsync(embed: embed.Build());
@@ -1361,7 +1361,7 @@ internal class User : BaseCommandModule
                                     Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
                                     Footer = ctx.GenerateUsedByFooter(),
                                     Timestamp = DateTime.UtcNow,
-                                    Color = ColorHelper.Error,
+                                    Color = EmbedColors.Error,
                                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                                 };
 
@@ -1378,7 +1378,7 @@ internal class User : BaseCommandModule
                             }
 
                             embed.Thumbnail = null;
-                            embed.Color = ColorHelper.Success;
+                            embed.Color = EmbedColors.Success;
                             embed.Author.IconUrl = ctx.Guild.IconUrl;
                             embed.Description = $"✅ `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                             await msg.ModifyAsync(embed: embed.Build());
@@ -1441,7 +1441,7 @@ internal class User : BaseCommandModule
                                         Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
                                         Footer = ctx.GenerateUsedByFooter(),
                                         Timestamp = DateTime.UtcNow,
-                                        Color = ColorHelper.Error,
+                                        Color = EmbedColors.Error,
                                         ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
                                     };
 
@@ -1458,7 +1458,7 @@ internal class User : BaseCommandModule
                                 }
 
                                 embed.Thumbnail = null;
-                                embed.Color = ColorHelper.Success;
+                                embed.Color = EmbedColors.Success;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                                 embed.Description = $"✅ `Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                                 await msg.ModifyAsync(embed: embed.Build());
@@ -1475,7 +1475,7 @@ internal class User : BaseCommandModule
                                 await msg.ModifyAsync(embed: embed.Build());
 
                                 embed.Thumbnail = null;
-                                embed.Color = ColorHelper.Success;
+                                embed.Color = EmbedColors.Success;
                                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                                 embed.Description = $"✅ `Downloaded {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText}. Attached is a Zip File containing them.`";
 

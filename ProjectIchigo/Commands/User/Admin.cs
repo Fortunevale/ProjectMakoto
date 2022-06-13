@@ -60,7 +60,7 @@ internal class Admin : BaseCommandModule
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -80,7 +80,7 @@ internal class Admin : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -242,7 +242,7 @@ internal class Admin : BaseCommandModule
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -262,7 +262,7 @@ internal class Admin : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Experience Enabled          ` : {_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote(ctx.Client)}\n" +
@@ -385,7 +385,7 @@ internal class Admin : BaseCommandModule
                 var ListEmbed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Level Rewards • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -408,7 +408,7 @@ internal class Admin : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Level Rewards • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Loading,
+                    Color = EmbedColors.Loading,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Loading Level Rewards..`"
@@ -416,7 +416,7 @@ internal class Admin : BaseCommandModule
 
                 var msg = await ctx.Channel.SendMessageAsync(embed);
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Color = ColorHelper.AwaitingInput;
+                embed.Color = EmbedColors.AwaitingInput;
 
                 string selected = "";
 
@@ -544,7 +544,7 @@ internal class Admin : BaseCommandModule
                                 if (_bot._guilds.List[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
                                 {
                                     embed.Description = "`The role you're trying to add has already been assigned to a level.`";
-                                    embed.Color = ColorHelper.Error;
+                                    embed.Color = EmbedColors.Error;
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                     await Task.Delay(5000);
                                     await RefreshMessage();
@@ -572,7 +572,7 @@ internal class Admin : BaseCommandModule
                                 catch (Exception)
                                 {
                                     embed.Description = "`You must specify a valid level.`";
-                                    embed.Color = ColorHelper.Error;
+                                    embed.Color = EmbedColors.Error;
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                     await Task.Delay(5000);
                                     await RefreshMessage();
@@ -600,7 +600,7 @@ internal class Admin : BaseCommandModule
                                 if (CustomMessageResult.Result.Content.Length > 256)
                                 {
                                     embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                    embed.Color = ColorHelper.Error;
+                                    embed.Color = EmbedColors.Error;
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                     await Task.Delay(5000);
                                     await RefreshMessage();
@@ -643,7 +643,7 @@ internal class Admin : BaseCommandModule
                                 if (result.Result.Content.Length > 256)
                                 {
                                     embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                    embed.Color = ColorHelper.Error;
+                                    embed.Color = EmbedColors.Error;
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                     await Task.Delay(5000);
                                     _ = msg.DeleteAsync();
@@ -664,7 +664,7 @@ internal class Admin : BaseCommandModule
                                 if (_bot._guilds.List[ctx.Guild.Id].LevelRewards.Count == 0)
                                 {
                                     embed.Description = $"`There are no more Level Rewards to display.`";
-                                    embed.Color = ColorHelper.Success;
+                                    embed.Color = EmbedColors.Success;
                                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                                     await Task.Delay(5000);
                                     _ = msg.DeleteAsync();
@@ -763,7 +763,7 @@ internal class Admin : BaseCommandModule
                 var ListEmbed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Phishing Protection Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -784,7 +784,7 @@ internal class Admin : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Loading,
+                    Color = EmbedColors.Loading,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1047,7 +1047,7 @@ internal class Admin : BaseCommandModule
                 var ListEmbed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Bump Reminder Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1068,7 +1068,7 @@ internal class Admin : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Loading,
+                    Color = EmbedColors.Loading,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1108,7 +1108,7 @@ internal class Admin : BaseCommandModule
                         await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                         {
                             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                            Color = ColorHelper.Error,
+                            Color = EmbedColors.Error,
                             Footer = ctx.GenerateUsedByFooter(),
                             Timestamp = DateTime.UtcNow,
                             Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
@@ -1119,7 +1119,7 @@ internal class Admin : BaseCommandModule
                     embed = new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                        Color = ColorHelper.Loading,
+                        Color = EmbedColors.Loading,
                         Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = $"`Setting up Bump Reminder..`"
@@ -1159,7 +1159,7 @@ internal class Admin : BaseCommandModule
 
                     embed.Author.IconUrl = ctx.Guild.IconUrl;
                     embed.Description = "`The Bump Reminder has been set up.`";
-                    embed.Color = ColorHelper.Success;
+                    embed.Color = EmbedColors.Success;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                     await Task.Delay(5000);
@@ -1178,7 +1178,7 @@ internal class Admin : BaseCommandModule
 
                     embed.Author.IconUrl = ctx.Guild.IconUrl;
                     embed.Description = "`The Bump Reminder has been disabled.`";
-                    embed.Color = ColorHelper.Success;
+                    embed.Color = EmbedColors.Success;
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                     await Task.Delay(5000);
@@ -1291,7 +1291,7 @@ internal class Admin : BaseCommandModule
                 var ListEmbed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Actionlog Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1313,7 +1313,7 @@ internal class Admin : BaseCommandModule
                 var embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1528,7 +1528,7 @@ internal class Admin : BaseCommandModule
                 var ListEmbed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Auto Crosspost Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1553,7 +1553,7 @@ internal class Admin : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = GetCurrentConfiguration(ctx)
@@ -1599,7 +1599,7 @@ internal class Admin : BaseCommandModule
                     "`m` - _Minutes_\n" +
                     "`s` - _Seconds_\n\n" +
                     "For example, `10s` would result to 10 seconds.";
-                    embed.Color = ColorHelper.AwaitingInput;
+                    embed.Color = EmbedColors.AwaitingInput;
 
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -1654,7 +1654,7 @@ internal class Admin : BaseCommandModule
                         if (length > TimeSpan.FromMinutes(5) || length < TimeSpan.FromSeconds(1))
                         {
                             embed.Description = "`The duration has to be between 1 second and 5 minutes.`";
-                            embed.Color = ColorHelper.Error;
+                            embed.Color = EmbedColors.Error;
                             embed.Author.IconUrl = Resources.LogIcons.Error;
 
                             _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
@@ -1681,7 +1681,7 @@ internal class Admin : BaseCommandModule
                     if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
                     {
                         embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
-                        embed.Color = ColorHelper.Error;
+                        embed.Color = EmbedColors.Error;
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
@@ -1707,7 +1707,7 @@ internal class Admin : BaseCommandModule
                     if (channel.Type != ChannelType.News)
                     {
                         embed.Description = "`The channel you selected is not an announcement channel.`";
-                        embed.Color = ColorHelper.Error;
+                        embed.Color = EmbedColors.Error;
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
@@ -1718,7 +1718,7 @@ internal class Admin : BaseCommandModule
                     if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
                     {
                         embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {_bot._status.DevelopmentServerInvite}";
-                        embed.Color = ColorHelper.Error;
+                        embed.Color = EmbedColors.Error;
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
@@ -1737,7 +1737,7 @@ internal class Admin : BaseCommandModule
                     if (_bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
                     {
                         embed.Description = $"`No Crosspost Channels are set up.`";
-                        embed.Color = ColorHelper.Error;
+                        embed.Color = EmbedColors.Error;
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
@@ -1888,7 +1888,7 @@ internal class Admin : BaseCommandModule
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Loading,
+                    Color = EmbedColors.Loading,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Loading Reaction Roles..`"
@@ -1903,7 +1903,7 @@ internal class Admin : BaseCommandModule
                     await msg.ModifyAsync(new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                        Color = ColorHelper.Info,
+                        Color = EmbedColors.Info,
                         Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = "`No reaction roles are set up.`"
@@ -1946,7 +1946,7 @@ internal class Admin : BaseCommandModule
                 List<DiscordEmbedBuilder> embeds = Sections.Select(x => new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = x
@@ -1972,7 +1972,7 @@ internal class Admin : BaseCommandModule
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Loading,
+                    Color = EmbedColors.Loading,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Loading Reaction Roles..`"
@@ -1986,7 +1986,7 @@ internal class Admin : BaseCommandModule
                 var embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = $"`{_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count} reaction roles are set up.`"
@@ -2015,7 +2015,7 @@ internal class Admin : BaseCommandModule
                     var action_embed = new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                        Color = ColorHelper.AwaitingInput,
+                        Color = EmbedColors.AwaitingInput,
                         Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow,
                         Description = "`Please copy and send the message link of the message you want the reaction role to be added to.`",
@@ -2025,7 +2025,7 @@ internal class Admin : BaseCommandModule
                     if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100)
                     {
                         action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
@@ -2054,7 +2054,7 @@ internal class Admin : BaseCommandModule
                                                    $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                    $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                    $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         action_embed.ImageUrl = "";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
@@ -2070,7 +2070,7 @@ internal class Admin : BaseCommandModule
                                                    $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                    $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                    $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         action_embed.ImageUrl = "";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
@@ -2082,7 +2082,7 @@ internal class Admin : BaseCommandModule
                     if (GuildId != ctx.Guild.Id)
                     {
                         action_embed.Description = $"`The link you provided leads to another server.`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         action_embed.ImageUrl = "";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
@@ -2094,7 +2094,7 @@ internal class Admin : BaseCommandModule
                     if (!ctx.Guild.Channels.ContainsKey(ChannelId))
                     {
                         action_embed.Description = $"`The link you provided leads to a channel that doesn't exist.`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         action_embed.ImageUrl = "";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
@@ -2108,7 +2108,7 @@ internal class Admin : BaseCommandModule
                     if (!channel.TryGetMessage(MessageId, out DiscordMessage reactionMessage))
                     {
                         action_embed.Description = $"`The link you provided leads a message that doesn't exist or the bot has no access to.`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         action_embed.ImageUrl = "";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
@@ -2138,7 +2138,7 @@ internal class Admin : BaseCommandModule
                     if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
                     {
                         action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                        action_embed.Color = ColorHelper.Error;
+                        action_embed.Color = EmbedColors.Error;
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
                         _ = msg.DeleteAsync();
@@ -2157,7 +2157,7 @@ internal class Admin : BaseCommandModule
                         if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100)
                         {
                             action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                            action_embed.Color = ColorHelper.Error;
+                            action_embed.Color = EmbedColors.Error;
                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                             await Task.Delay(5000);
                             _ = msg.DeleteAsync();
@@ -2169,7 +2169,7 @@ internal class Admin : BaseCommandModule
                         if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == MessageId && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
-                            action_embed.Color = ColorHelper.Error;
+                            action_embed.Color = EmbedColors.Error;
                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                             await Task.Delay(5000);
                             _ = msg.DeleteAsync();
@@ -2180,7 +2180,7 @@ internal class Admin : BaseCommandModule
                         if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
                         {
                             action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                            action_embed.Color = ColorHelper.Error;
+                            action_embed.Color = EmbedColors.Error;
                             await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                             await Task.Delay(5000);
                             _ = msg.DeleteAsync();
@@ -2198,7 +2198,7 @@ internal class Admin : BaseCommandModule
 
                         await reactionMessage.CreateReactionAsync(emoji);
 
-                        action_embed.Color = ColorHelper.Info;
+                        action_embed.Color = EmbedColors.Info;
                         action_embed.Description = $"`Added role` {role.Mention} `to message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {emoji} `.`";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                         await Task.Delay(5000);
@@ -2230,7 +2230,7 @@ internal class Admin : BaseCommandModule
 
                         _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
-                        embed.Color = ColorHelper.Info;
+                        embed.Color = EmbedColors.Info;
                         embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
                         await Task.Delay(5000);
@@ -2273,7 +2273,7 @@ internal class Admin : BaseCommandModule
                 var action_embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.AwaitingInput,
+                    Color = EmbedColors.AwaitingInput,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Adding reaction role..`"
@@ -2285,7 +2285,7 @@ internal class Admin : BaseCommandModule
                 if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100)
                 {
                     action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                    action_embed.Color = ColorHelper.Error;
+                    action_embed.Color = EmbedColors.Error;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
@@ -2295,7 +2295,7 @@ internal class Admin : BaseCommandModule
                 if (emoji_parameter.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji_parameter.Id))
                 {
                     action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                    action_embed.Color = ColorHelper.Error;
+                    action_embed.Color = EmbedColors.Error;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
@@ -2305,7 +2305,7 @@ internal class Admin : BaseCommandModule
                 if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == ctx.Message.ReferencedMessage.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
                 {
                     action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
-                    action_embed.Color = ColorHelper.Error;
+                    action_embed.Color = EmbedColors.Error;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
@@ -2315,7 +2315,7 @@ internal class Admin : BaseCommandModule
                 if (_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
                 {
                     action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                    action_embed.Color = ColorHelper.Error;
+                    action_embed.Color = EmbedColors.Error;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
@@ -2332,7 +2332,7 @@ internal class Admin : BaseCommandModule
                     EmojiName = emoji_parameter.GetUniqueDiscordName()
                 }));
 
-                action_embed.Color = ColorHelper.Info;
+                action_embed.Color = EmbedColors.Info;
                 action_embed.Description = $"`Added role` {role_parameter.Mention} `to message sent by` {ctx.Message.ReferencedMessage.Author.Mention} `in` {ctx.Message.ReferencedMessage.Channel.Mention} `with emoji` {emoji_parameter} `.`";
                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                 await Task.Delay(5000);
@@ -2360,7 +2360,7 @@ internal class Admin : BaseCommandModule
                 var action_embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.AwaitingInput,
+                    Color = EmbedColors.AwaitingInput,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Removing reaction role..`"
@@ -2372,7 +2372,7 @@ internal class Admin : BaseCommandModule
                 if (!_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == ctx.Message.ReferencedMessage.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
                 {
                     action_embed.Description = $"`The specified message doesn't contain specified reaction.`";
-                    action_embed.Color = ColorHelper.Error;
+                    action_embed.Color = EmbedColors.Error;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
@@ -2388,7 +2388,7 @@ internal class Admin : BaseCommandModule
 
                 _bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
-                action_embed.Color = ColorHelper.Info;
+                action_embed.Color = EmbedColors.Info;
                 action_embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                 await Task.Delay(5000);
@@ -2413,7 +2413,7 @@ internal class Admin : BaseCommandModule
                 var action_embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = ColorHelper.AwaitingInput,
+                    Color = EmbedColors.AwaitingInput,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Description = "`Removing all reaction roles..`"
@@ -2425,7 +2425,7 @@ internal class Admin : BaseCommandModule
                 if (!_bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == ctx.Message.ReferencedMessage.Id))
                 {
                     action_embed.Description = $"`The specified message doesn't contain any reaction roles.`";
-                    action_embed.Color = ColorHelper.Error;
+                    action_embed.Color = EmbedColors.Error;
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
@@ -2437,7 +2437,7 @@ internal class Admin : BaseCommandModule
 
                 _ = ctx.Message.ReferencedMessage.DeleteAllReactionsAsync();
 
-                action_embed.Color = ColorHelper.Info;
+                action_embed.Color = EmbedColors.Info;
                 action_embed.Description = $"`Removed all reaction roles from message sent by` {ctx.Message.ReferencedMessage.Author.Mention} `in` {ctx.Message.ReferencedMessage.Channel.Mention} `.`";
                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(action_embed));
                 await Task.Delay(5000);

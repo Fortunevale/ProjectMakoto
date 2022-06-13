@@ -19,7 +19,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                 {
                     Description = $"❌ `You aren't in a voice channel.`",
-                    Color = ColorHelper.Error,
+                    Color = EmbedColors.Error,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -76,7 +76,7 @@ internal class Music : BaseCommandModule
                     await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is already in use.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -113,7 +113,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -130,7 +130,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -147,7 +147,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You already voted to disconnect the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -172,7 +172,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"✅ `The bot was disconnected.`",
-                        Color = ColorHelper.Success,
+                        Color = EmbedColors.Success,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -187,7 +187,7 @@ internal class Music : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Description = $"❓ `You voted to disconnect the bot. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
-                    Color = ColorHelper.AwaitingInput,
+                    Color = EmbedColors.AwaitingInput,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -249,7 +249,7 @@ internal class Music : BaseCommandModule
                                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                 {
                                     Description = $"✅ `The bot was disconnected.`",
-                                    Color = ColorHelper.Success,
+                                    Color = EmbedColors.Success,
                                     Author = new DiscordEmbedBuilder.EmbedAuthor
                                     {
                                         Name = ctx.Guild.Name,
@@ -269,7 +269,7 @@ internal class Music : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("forcedisconnect"), Aliases("fdc", "forceleave", "fleave"), Description("Forces the bot to disconnect from the current channel")]
+        [Command("forcedisconnect"), Aliases("fdc", "forceleave", "fleave", "stop"), Description("Forces the bot to disconnect from the current channel")]
         public async Task ForceDisconnect(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -286,7 +286,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -303,7 +303,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -320,7 +320,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -341,7 +341,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                 {
                     Description = $"✅ `The bot was force disconnected.`",
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -373,7 +373,7 @@ internal class Music : BaseCommandModule
                 var embed = new DiscordEmbedBuilder
                 {
                     Description = $":arrows_counterclockwise: `Preparing connection..`",
-                    Color = ColorHelper.Processing,
+                    Color = EmbedColors.Processing,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -404,7 +404,7 @@ internal class Music : BaseCommandModule
                     await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is already in use.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -437,7 +437,7 @@ internal class Music : BaseCommandModule
                 if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
                 {
                     embed.Description = $"❌ `Failed to load '{search}'.`";
-                    embed.Color = ColorHelper.Error;
+                    embed.Color = EmbedColors.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     _ = Task.Delay(5000).ContinueWith(x =>
                     {
@@ -448,7 +448,7 @@ internal class Music : BaseCommandModule
                 else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
                 {
                     embed.Description = $"❌ `No matches found for '{search}'.`";
-                    embed.Color = ColorHelper.Error;
+                    embed.Color = EmbedColors.Error;
                     _ = msg.ModifyAsync(embed.Build());
                     _ = Task.Delay(5000).ContinueWith(x =>
                     {
@@ -470,7 +470,7 @@ internal class Music : BaseCommandModule
 
                     embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count - added + 1)} - {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
-                    embed.Color = ColorHelper.Success;
+                    embed.Color = EmbedColors.Success;
                     _ = msg.ModifyAsync(embed.Build());
                 }
                 else if (loadResult.LoadResultType == LavalinkLoadResultType.TrackLoaded)
@@ -485,7 +485,7 @@ internal class Music : BaseCommandModule
                     embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
                     embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 
-                    embed.Color = ColorHelper.Success;
+                    embed.Color = EmbedColors.Success;
                     _ = msg.ModifyAsync(embed.Build());
                 }
                 else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
@@ -519,12 +519,12 @@ internal class Music : BaseCommandModule
                     embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
                     embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 
-                    embed.Color = ColorHelper.Success;
+                    embed.Color = EmbedColors.Success;
                     _ = msg.ModifyAsync(embed.Build());
                 }
                 else
                 {
-                    throw new Exception($"Unknown Load Result Type: {loadResult.LoadResultType.ToString()}");
+                    throw new Exception($"Unknown Load Result Type: {loadResult.LoadResultType}");
                 }
 
             }).Add(_bot._watcher, ctx);
@@ -547,7 +547,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -564,7 +564,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -586,7 +586,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Description = (_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -619,7 +619,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -636,7 +636,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -659,16 +659,16 @@ internal class Music : BaseCommandModule
 
                 async Task<DiscordMessage> UpdateMessage(DiscordMessage msg)
                 {
-                    DiscordButtonComponent Refresh = new DiscordButtonComponent(ButtonStyle.Primary, "Refresh", "Refresh", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+                    DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", "Refresh", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
 
-                    DiscordButtonComponent NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-                    DiscordButtonComponent PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                    DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                    DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 
                     if (msg is null)
                     {
                         msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Color = ColorHelper.Success,
+                            Color = EmbedColors.Success,
                             Author = new DiscordEmbedBuilder.EmbedAuthor
                             {
                                 Name = ctx.Guild.Name,
@@ -707,7 +707,7 @@ internal class Music : BaseCommandModule
 
                     await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Color = ColorHelper.Success,
+                        Color = EmbedColors.Success,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -790,7 +790,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -807,7 +807,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -830,7 +830,7 @@ internal class Music : BaseCommandModule
                         _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                         {
                             Description = $"❌ `Your value is out of range. Currently, the range is 1-{_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}.`",
-                            Color = ColorHelper.Error,
+                            Color = EmbedColors.Error,
                             Author = new DiscordEmbedBuilder.EmbedAuthor
                             {
                                 Name = ctx.Guild.Name,
@@ -851,7 +851,7 @@ internal class Music : BaseCommandModule
                         _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                         {
                             Description = $"❌ `There is no such song queued.`",
-                            Color = ColorHelper.Error,
+                            Color = EmbedColors.Error,
                             Author = new DiscordEmbedBuilder.EmbedAuthor
                             {
                                 Name = ctx.Guild.Name,
@@ -871,7 +871,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `There is no such song queued.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -888,7 +888,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                 {
                     Description = $"✅ `Removed '{info.VideoTitle}' from the current queue.`",
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -917,7 +917,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -934,7 +934,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -951,7 +951,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You already voted to skip the current song.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -972,7 +972,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"✅ `The song was skipped.`",
-                        Color = ColorHelper.Success,
+                        Color = EmbedColors.Success,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -987,7 +987,7 @@ internal class Music : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Description = $"❓ `You voted to skip the current song. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
-                    Color = ColorHelper.AwaitingInput,
+                    Color = EmbedColors.AwaitingInput,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -1045,7 +1045,7 @@ internal class Music : BaseCommandModule
                                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                 {
                                     Description = $"✅ `The song was skipped.`",
-                                    Color = ColorHelper.Success,
+                                    Color = EmbedColors.Success,
                                     Author = new DiscordEmbedBuilder.EmbedAuthor
                                     {
                                         Name = ctx.Guild.Name,
@@ -1082,7 +1082,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1099,7 +1099,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1116,7 +1116,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1133,7 +1133,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                 {
                     Description = $"✅ `The song was force skipped.`",
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -1162,7 +1162,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1179,7 +1179,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1196,7 +1196,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You already voted to clear the current queue.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1218,7 +1218,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"✅ `The queue was cleared.`",
-                        Color = ColorHelper.Success,
+                        Color = EmbedColors.Success,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1233,7 +1233,7 @@ internal class Music : BaseCommandModule
                 DiscordEmbedBuilder embed = new()
                 {
                     Description = $"❓ `You voted to clear the current queue. ({_bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
-                    Color = ColorHelper.AwaitingInput,
+                    Color = EmbedColors.AwaitingInput,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -1292,7 +1292,7 @@ internal class Music : BaseCommandModule
                                 _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                 {
                                     Description = $"✅ `The queue was cleared.`",
-                                    Color = ColorHelper.Success,
+                                    Color = EmbedColors.Success,
                                     Author = new DiscordEmbedBuilder.EmbedAuthor
                                     {
                                         Name = ctx.Guild.Name,
@@ -1329,7 +1329,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1346,7 +1346,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1363,7 +1363,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1381,7 +1381,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                 {
                     Description = $"✅ `The queue was force cleared.`",
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -1410,7 +1410,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1427,7 +1427,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1444,7 +1444,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now shuffles.`" : "✅ `The queue no longer shuffles.`"),
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
@@ -1477,7 +1477,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is not in a voice channel.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1494,7 +1494,7 @@ internal class Music : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                     {
                         Description = $"❌ `You aren't in the same channel as the bot.`",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
                             Name = ctx.Guild.Name,
@@ -1511,7 +1511,7 @@ internal class Music : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
-                    Color = ColorHelper.Success,
+                    Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,

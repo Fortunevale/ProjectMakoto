@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.BumpReminder;
+﻿namespace ProjectIchigo;
 
 internal class BumpReminderEvents
 {

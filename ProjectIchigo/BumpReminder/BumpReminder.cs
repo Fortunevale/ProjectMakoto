@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.BumpReminder;
+﻿namespace ProjectIchigo;
 internal class BumpReminder
 {
     internal BumpReminder(Bot _bot)
@@ -17,7 +17,7 @@ internal class BumpReminder
                 IconUrl = channel.Guild.IconUrl,
                 Name = channel.Guild.Name
             },
-            Color = ColorHelper.Info,
+            Color = EmbedColors.Info,
             Description = $"**The server can be bumped {Formatter.Timestamp(_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastBump.AddHours(2), TimestampFormat.RelativeTime)}.**\n\n" +
                           $"The server was last bumped by <@{_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastUserId}> {Formatter.Timestamp(_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}",
             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = $"{(bUser is null ? Resources.QuestionMarkIcon : bUser.AvatarUrl)}" }
@@ -27,7 +27,7 @@ internal class BumpReminder
         {
             embed.Description = $"**The server can be bumped!**\n\n" +
                           $"The server was last bumped by <@{_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastUserId}> {Formatter.Timestamp(_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(_bot._guilds.List[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}";
-            embed.Color = ColorHelper.AwaitingInput;
+            embed.Color = EmbedColors.AwaitingInput;
         }
 
         _ = channel.SendMessageAsync(embed.Build()).ContinueWith(async x =>

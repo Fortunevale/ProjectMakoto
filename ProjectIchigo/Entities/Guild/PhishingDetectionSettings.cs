@@ -21,11 +21,3 @@ public class PhishingDetectionSettings
     private TimeSpan _CustomPunishmentLength { get; set; } = TimeSpan.FromDays(14);
     public TimeSpan CustomPunishmentLength { get => _CustomPunishmentLength; set { _CustomPunishmentLength = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 }
-
-public enum PhishingPunishmentType
-{
-    DELETE,
-    TIMEOUT,
-    KICK,
-    BAN
-}

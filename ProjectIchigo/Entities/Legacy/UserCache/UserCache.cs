@@ -65,12 +65,4 @@ internal class UserCache
         public string Reason { get; set; }
         public ulong Moderator { get; set; }
     }
-
-    internal enum PunishmentActions
-    {
-        BAN,
-        KICK,
-        MUTE,
-        WARN
-    }
 }

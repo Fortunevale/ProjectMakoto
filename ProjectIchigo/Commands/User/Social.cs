@@ -38,7 +38,7 @@ internal class Social : BaseCommandModule
             var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Afk Status • {ctx.Guild.Name}" },
-                Color = ColorHelper.Info,
+                Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"{ctx.User.Mention} `You're now set to be afk. Next time you send a message, your afk status will be removed.`"
@@ -77,7 +77,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -87,7 +87,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -122,7 +122,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -132,7 +132,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -168,7 +168,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -178,7 +178,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -215,7 +215,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -225,7 +225,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -261,7 +261,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -271,7 +271,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -306,7 +306,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -316,7 +316,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -356,7 +356,7 @@ internal class Social : BaseCommandModule
                 _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
                 return;
@@ -366,7 +366,7 @@ internal class Social : BaseCommandModule
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
-                Color = ColorHelper.HiddenSidebar,
+                Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
             }));
         }).Add(_bot._watcher, ctx);
@@ -405,7 +405,7 @@ internal class Social : BaseCommandModule
                     _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
-                        Color = ColorHelper.HiddenSidebar,
+                        Color = EmbedColors.HiddenSidebar,
                         Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                     }));
                     return;
@@ -415,7 +415,7 @@ internal class Social : BaseCommandModule
                 {
                     Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                     ImageUrl = gif,
-                    Color = ColorHelper.HiddenSidebar,
+                    Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
             }).Add(_bot._watcher, ctx);

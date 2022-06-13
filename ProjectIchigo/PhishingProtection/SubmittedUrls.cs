@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.PhishingProtection;
+﻿namespace ProjectIchigo;
 internal class SubmittedUrls
 {
     public Dictionary<ulong, UrlInfo> List = new();

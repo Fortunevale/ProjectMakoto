@@ -1,5 +1,6 @@
-﻿namespace ProjectIchigo.Helpers;
-internal class ColorHelper
+﻿namespace ProjectIchigo.Entities;
+
+internal class EmbedColors
 {
     public static DiscordColor Error => DiscordColor.DarkRed;
     public static DiscordColor StrongPunishment => DiscordColor.DarkRed;

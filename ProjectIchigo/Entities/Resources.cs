@@ -1,9 +1,9 @@
-﻿namespace ProjectIchigo.Helpers;
+﻿namespace ProjectIchigo.Entities;
 internal class Resources
 {
     public static readonly string Github = "https://cdn.discordapp.com/attachments/712761268393738301/893958382896173096/Github.png";
     public static readonly string QuestionMarkIcon = "https://cdn.discordapp.com/attachments/712761268393738301/899051918037504040/QuestionMark.png";
-    public static readonly IEnumerable<Permissions> ProtectedPermissions = new List<Permissions>()
+    public static readonly IReadOnlyList<Permissions> ProtectedPermissions = new List<Permissions>()
     {
         Permissions.Administrator,
 
@@ -24,7 +24,7 @@ internal class Resources
 
         Permissions.ViewAuditLog,
     };
-    public static readonly DiscordButtonComponent CancelButton = new DiscordButtonComponent(ButtonStyle.Secondary, "cancel", "Cancel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+    public static readonly DiscordButtonComponent CancelButton = new(ButtonStyle.Secondary, "cancel", "Cancel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
 
     public class LogIcons
     {

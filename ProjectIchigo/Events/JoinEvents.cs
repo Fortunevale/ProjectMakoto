@@ -47,7 +47,7 @@ internal class JoinEvents
                             Name = e.Member.UsernameWithDiscriminator
                         },
                         Description = $"has joined **{e.Guild.Name}**. Welcome! {emojis.SelectRandom()}",
-                        Color = ColorHelper.Success,
+                        Color = EmbedColors.Success,
                         Thumbnail = new()
                         {
                             Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
@@ -78,7 +78,7 @@ internal class JoinEvents
                         },
                         Description = $"has left **{e.Guild.Name}**.\n" +
                                       $"They've been on the server for _{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}_.",
-                        Color = ColorHelper.Error,
+                        Color = EmbedColors.Error,
                         Thumbnail = new()
                         {
                             Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : e.Member.AvatarUrl)

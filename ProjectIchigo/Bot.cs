@@ -32,11 +32,11 @@ internal class Bot
     internal CountryCodes _countryCodes { get; set; }
 
 
-    internal BumpReminder.BumpReminder _bumpReminder { get; set; }
+    internal BumpReminder _bumpReminder { get; set; }
     internal ExperienceHandler _experienceHandler { get; set; }
 
 
-    internal TaskWatcher.TaskWatcher _watcher = new();
+    internal TaskWatcher _watcher = new();
 
 
     internal ILogger _logger { get; set; }

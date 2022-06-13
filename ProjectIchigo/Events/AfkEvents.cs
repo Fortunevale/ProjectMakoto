@@ -28,7 +28,7 @@ internal class AfkEvents
                 var embed = new DiscordEmbedBuilder
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"Afk Status • {e.Guild.Name}" },
-                    Color = ColorHelper.Info,
+                    Color = EmbedColors.Info,
                     Timestamp = DateTime.UtcNow,
                     Description = $"{e.Author.Mention} `You're no longer afk. You've been afk for {cache.GetTotalSecondsSince().GetHumanReadable()}.`"
                 };
@@ -95,7 +95,7 @@ internal class AfkEvents
                         _ = e.Message.RespondAsync(new DiscordEmbedBuilder
                         {
                             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"Afk Status • {e.Guild.Name}" },
-                            Color = ColorHelper.Info,
+                            Color = EmbedColors.Info,
                             Timestamp = DateTime.UtcNow,
                             Description = $"{b.Mention} `is currently AFK and has been since` {Formatter.Timestamp(_bot._users.List[b.Id].AfkStatus.TimeStamp)}`, they most likely wont answer your message: '{_bot._users.List[b.Id].AfkStatus.Reason}'`"
                         }).ContinueWith(async x =>

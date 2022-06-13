@@ -49,7 +49,7 @@ internal class PhishingProtectionEvents
             throw;
         }
 
-        var matches = Regex.Matches(e.Content, RegexHelper.UrlRegex);
+        var matches = Regex.Matches(e.Content, Resources.Regex.Url);
         var parsedMatches = matches.Select(x => new UriBuilder(x.Value));
 
         var parsedWords = e.Content.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -78,7 +78,7 @@ internal class PhishingProtectionEvents
             }
         }
 
-        if (matches.Count() > 0)
+        if (matches.Count > 0)
         {
             Dictionary<string, string> redirectUrls = new();
 
@@ -112,7 +112,7 @@ internal class PhishingProtectionEvents
                             _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                             {
                                 Title = $":no_entry: Couldn't check this link for malicous redirects. Please proceed with caution.",
-                                Color = ColorHelper.Error
+                                Color = EmbedColors.Error
                             });
                     }
                 }
@@ -124,7 +124,7 @@ internal class PhishingProtectionEvents
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                         {
                             Title = $":no_entry: An unknown error occured while trying to check for malicous redirects. Please proceed with caution.",
-                            Color = ColorHelper.Error
+                            Color = EmbedColors.Error
                         });
                 }
             }
@@ -142,7 +142,7 @@ internal class PhishingProtectionEvents
                     {
                         Title = $":warning: Found at least one (or more) redirected URLs in this message.",
                         Description = $"`{string.Join("`\n`", redirectUrls.Select(x => x.Value))}`",
-                        Color = ColorHelper.Warning
+                        Color = EmbedColors.Warning
                     });
             }
         }

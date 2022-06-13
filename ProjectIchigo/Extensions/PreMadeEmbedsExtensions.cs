@@ -19,7 +19,7 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = ColorHelper.Error
+            Color = EmbedColors.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -44,7 +44,7 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = ColorHelper.Error
+            Color = EmbedColors.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -69,7 +69,7 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = ColorHelper.Error
+            Color = EmbedColors.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -94,7 +94,7 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.User.AvatarUrl
             },
             Timestamp = DateTime.UtcNow,
-            Color = ColorHelper.Error
+            Color = EmbedColors.Error
         };
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -123,7 +123,7 @@ internal static class PreMadeEmbedsExtensions
             Description = $"{string.Join("\n", cmds.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"))}\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
             Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
-            Color = ColorHelper.Info
+            Color = EmbedColors.Info
         };
 
         if (!string.IsNullOrWhiteSpace(CustomText))
@@ -150,7 +150,7 @@ internal static class PreMadeEmbedsExtensions
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{CustomArguments}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
             Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
-            Color = ColorHelper.Error
+            Color = EmbedColors.Error
         };
 
         if (ctx.Client.GetCommandsNext()

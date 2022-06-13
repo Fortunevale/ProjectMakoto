@@ -18,7 +18,7 @@ internal class Maintainers : BaseCommandModule
             DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                Color = ColorHelper.Processing,
+                Color = EmbedColors.Processing,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
@@ -28,7 +28,7 @@ internal class Maintainers : BaseCommandModule
 
             if (_bot._status.TeamMembers.Contains(victim.Id))
             {
-                embed.Color = ColorHelper.Error;
+                embed.Color = EmbedColors.Error;
                 embed.Description = $"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`";
                 _ = msg.ModifyAsync(embed.Build());
                 return;
@@ -59,7 +59,7 @@ internal class Maintainers : BaseCommandModule
                 }
             }
 
-            embed.Color = ColorHelper.Success;
+            embed.Color = EmbedColors.Success;
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
             _ = msg.ModifyAsync(embed.Build());
         }).Add(_bot._watcher, ctx);
@@ -83,7 +83,7 @@ internal class Maintainers : BaseCommandModule
             await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                Color = ColorHelper.Info,
+                Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
@@ -402,7 +402,7 @@ internal class Maintainers : BaseCommandModule
             var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                Color = ColorHelper.Info,
+                Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Role selector test`"
@@ -429,7 +429,7 @@ internal class Maintainers : BaseCommandModule
             var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                Color = ColorHelper.Info,
+                Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
                 Description = $"`Channel selector test`"
