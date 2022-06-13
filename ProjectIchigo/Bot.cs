@@ -229,7 +229,7 @@ internal class Bot
 
             LogDebug($"Registering DisCatSharp EventHandler..");
 
-            DisCatSharpEventHandler disCatSharpEventHandler = new(this);
+            DiscordEventHandler disCatSharpEventHandler = new(this);
 
             discordClient.GuildCreated += disCatSharpEventHandler.GuildCreated;
             discordClient.GuildUpdated += disCatSharpEventHandler.GuildUpdated;

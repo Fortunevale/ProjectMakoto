@@ -1,8 +1,8 @@
 ﻿namespace ProjectIchigo.Events;
 
-internal class DisCatSharpEventHandler
+internal class DiscordEventHandler
 {
-    internal DisCatSharpEventHandler(Bot _bot)
+    internal DiscordEventHandler(Bot _bot)
     {
         this._bot = _bot;
 
