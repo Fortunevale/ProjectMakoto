@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Entities.Entities;
+﻿namespace ProjectIchigo.Entities.Entities;
 internal class EmojiStealer
 {
     public string Name { get; set; }

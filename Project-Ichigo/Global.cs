@@ -51,31 +51,31 @@ global using DisCatSharp.CommandsNext.Converters;
 
 // Own Utils
 
-global using Project_Ichigo.InteractionSelectors;
-global using Project_Ichigo.Events;
-global using Project_Ichigo.Helpers;
-global using Project_Ichigo.Extensions;
-global using Project_Ichigo.Exceptions;
-global using Project_Ichigo.TaskWatcher;
-global using Project_Ichigo.BumpReminder;
-global using Project_Ichigo.Secrets;
-global using Project_Ichigo.Enums;
-global using Project_Ichigo.Entities;
-global using Project_Ichigo.Entities.Afk;
-global using Project_Ichigo.Entities.Entities;
-global using Project_Ichigo.Entities.Database;
-global using Project_Ichigo.PhishingProtection;
-global using Project_Ichigo.ApplicationCommands;
-global using Project_Ichigo.ApplicationCommands.Maintainers;
-global using Project_Ichigo.Commands;
-global using Project_Ichigo.Commands.User;
-global using Project_Ichigo.Commands.Maintainers;
-global using Project_Ichigo.Experience;
-global using Project_Ichigo.Database;
-global using Project_Ichigo.Entities.Legacy;
-global using Project_Ichigo.Initialization;
+global using ProjectIchigo.InteractionSelectors;
+global using ProjectIchigo.Events;
+global using ProjectIchigo.Helpers;
+global using ProjectIchigo.Extensions;
+global using ProjectIchigo.Exceptions;
+global using ProjectIchigo.TaskWatcher;
+global using ProjectIchigo.BumpReminder;
+global using ProjectIchigo.Secrets;
+global using ProjectIchigo.Enums;
+global using ProjectIchigo.Entities;
+global using ProjectIchigo.Entities.Afk;
+global using ProjectIchigo.Entities.Entities;
+global using ProjectIchigo.Entities.Database;
+global using ProjectIchigo.PhishingProtection;
+global using ProjectIchigo.ApplicationCommands;
+global using ProjectIchigo.ApplicationCommands.Maintainers;
+global using ProjectIchigo.Commands;
+global using ProjectIchigo.Commands.User;
+global using ProjectIchigo.Commands.Maintainers;
+global using ProjectIchigo.Experience;
+global using ProjectIchigo.Database;
+global using ProjectIchigo.Entities.Legacy;
+global using ProjectIchigo.Initialization;
 
-global using static Project_Ichigo.Attributes.CustomAttributes;
+global using static ProjectIchigo.Attributes.CustomAttributes;
 
 global using Xorog.ScoreSaber;
 global using Xorog.ScoreSaber.Objects;

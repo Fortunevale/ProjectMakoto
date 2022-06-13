@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Experience;
+﻿namespace ProjectIchigo.Experience;
 
 internal class ExperienceHandler
 {

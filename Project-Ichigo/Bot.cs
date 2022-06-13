@@ -1,6 +1,6 @@
-﻿using User = Project_Ichigo.Commands.User.User;
+﻿using User = ProjectIchigo.Commands.User.User;
 
-namespace Project_Ichigo;
+namespace ProjectIchigo;
 
 internal class Bot
 {

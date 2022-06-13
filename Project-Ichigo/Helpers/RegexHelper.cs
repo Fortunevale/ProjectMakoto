@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Helpers;
+﻿namespace ProjectIchigo.Helpers;
 
 internal class RegexHelper
 {

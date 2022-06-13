@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_Ichigo.Enums;
+namespace ProjectIchigo.Enums;
 
 internal enum DatabaseRequestType
 {

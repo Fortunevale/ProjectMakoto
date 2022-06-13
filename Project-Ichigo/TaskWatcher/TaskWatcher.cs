@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.TaskWatcher;
+﻿namespace ProjectIchigo.TaskWatcher;
 
 internal class TaskWatcher
 {

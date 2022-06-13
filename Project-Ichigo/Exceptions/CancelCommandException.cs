@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_Ichigo.Exceptions;
+namespace ProjectIchigo.Exceptions;
 internal class CancelCommandException : Exception
 {
     public CancelCommandException(string message, CommandContext context) : base(message)

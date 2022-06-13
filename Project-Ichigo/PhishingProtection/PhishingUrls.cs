@@ -1,4 +1,4 @@
-namespace Project_Ichigo.PhishingProtection;
+namespace ProjectIchigo.PhishingProtection;
 
 public class PhishingUrls
 {

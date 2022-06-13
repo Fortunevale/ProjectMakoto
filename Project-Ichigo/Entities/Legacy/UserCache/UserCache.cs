@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Entities.Legacy;
+﻿namespace ProjectIchigo.Entities.Legacy;
 
 internal class UserCache
 {

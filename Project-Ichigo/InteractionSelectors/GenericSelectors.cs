@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.InteractionSelectors;
+﻿namespace ProjectIchigo.InteractionSelectors;
 
 internal class GenericSelectors
 {

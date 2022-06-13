@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Entities;
+﻿namespace ProjectIchigo.Entities;
 
 public class KawaiiRequest
 {

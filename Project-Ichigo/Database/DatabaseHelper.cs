@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project_Ichigo.Database;
+namespace ProjectIchigo.Database;
 internal class DatabaseHelper
 {
     DatabaseClient _databaseClient { get; set; }

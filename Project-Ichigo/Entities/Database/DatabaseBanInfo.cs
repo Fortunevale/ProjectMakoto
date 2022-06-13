@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Entities.Database;
+﻿namespace ProjectIchigo.Entities.Database;
 
 internal class DatabaseBanInfo
 {

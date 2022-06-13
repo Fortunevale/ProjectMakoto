@@ -337,3 +337,4 @@ Secrets/
 .vscode/
 .gitignore
 Project-Ichigo.Secrets/Secrets.cs
+Project-Ichigo/Properties/launchSettings.json

@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Entities.Afk;
+﻿namespace ProjectIchigo.Entities.Afk;
 
 internal class MessageDetails
 {

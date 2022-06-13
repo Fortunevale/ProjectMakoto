@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo;
+﻿namespace ProjectIchigo;
 
 internal class Program
 {

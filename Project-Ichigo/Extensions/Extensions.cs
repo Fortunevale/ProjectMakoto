@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Extensions;
+﻿namespace ProjectIchigo.Extensions;
 
 internal static class Extensions
 {

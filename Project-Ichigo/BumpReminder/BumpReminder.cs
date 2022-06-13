@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.BumpReminder;
+﻿namespace ProjectIchigo.BumpReminder;
 internal class BumpReminder
 {
     internal BumpReminder(Bot _bot)

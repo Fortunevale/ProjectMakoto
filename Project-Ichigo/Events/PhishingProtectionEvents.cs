@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Events;
+﻿namespace ProjectIchigo.Events;
 
 internal class PhishingProtectionEvents
 {

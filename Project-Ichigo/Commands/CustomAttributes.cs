@@ -1,4 +1,4 @@
-﻿namespace Project_Ichigo.Attributes;
+﻿namespace ProjectIchigo.Attributes;
 
 internal class CustomAttributes
 {
