@@ -16,7 +16,7 @@ internal class Maintainers : ApplicationCommandsModule
         public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")]bool UseOldTagsSelector = false)
         {
             Task.Run(async () =>
-            {
+            { 
                 if (!ctx.User.IsMaintenance(_bot._status))
                 {
                     _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
