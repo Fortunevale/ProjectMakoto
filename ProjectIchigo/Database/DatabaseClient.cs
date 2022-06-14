@@ -350,7 +350,7 @@ internal class DatabaseClient
         new Task(new Action(async () =>
         {
             _ = CheckDatabaseConnection(connection);
-        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(20), "database-connection-watcher");
+        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
 
         if (Disposed)
             return;
