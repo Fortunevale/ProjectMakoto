@@ -34,6 +34,12 @@ internal class DatabaseQueue
                     {
                         case DatabaseRequestType.Command:
                         {
+                            try
+                            {
+                                _logger.LogTrace($"Executing command on Database '{b.Value.Command.Connection.Database}': '{b.Value.Command.CommandText.TruncateWithIndication(30)}'");
+                            }
+                            catch { }
+
                             b.Value.Command.ExecuteNonQuery();
 
                             Queue[b.Key].Executed = true;

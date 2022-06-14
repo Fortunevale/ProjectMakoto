@@ -107,9 +107,32 @@ internal class Maintainers : ApplicationCommandsModule
         }
     }
 
-	[SlashCommand("detailed_userinfo", "View discord user information.")]
-	public async Task DiscordLookup(InteractionContext ctx, [Option("User", "The user or user id.")] DiscordUser victim)
-	{
+#if DEBUG
+    [SlashCommandGroup("debug", "Debug commands")]
+    public class Debug : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("throw", "Throw.")]
+        public async Task Throw(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (!ctx.User.IsMaintenance(_bot._status))
+                {
+                    _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
+                    return;
+                }
+
+                throw new InvalidCastException();
+            }).Add(_bot._watcher, ctx);
+        }
+    }
+#endif
+
+    [SlashCommand("detailed_userinfo", "View discord user information.")]
+    public async Task DiscordLookup(InteractionContext ctx, [Option("User", "The user or user id.")] DiscordUser victim)
+    {
         Task.Run(async () =>
         {
             if (!ctx.User.IsMaintenance(_bot._status))
@@ -249,5 +272,5 @@ internal class Maintainers : ApplicationCommandsModule
 
             await ctx.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
         }).Add(_bot._watcher, ctx);
-	}
+    }
 }
