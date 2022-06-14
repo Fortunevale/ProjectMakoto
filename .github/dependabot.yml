@@ -9,3 +9,5 @@ updates:
     directory: "/ProjectIchigo/" # Location of package manifests
     schedule:
       interval: "daily"
+   ignore:
+      - dependency-name: "DisCatSharp*"
