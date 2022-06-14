@@ -107,6 +107,7 @@ internal class Maintainers : ApplicationCommandsModule
         }
     }
 
+#if DEBUG
     [SlashCommandGroup("debug", "Debug commands")]
     public class Debug : ApplicationCommandsModule
     {
@@ -127,6 +128,7 @@ internal class Maintainers : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+#endif
 
     [SlashCommand("detailed_userinfo", "View discord user information.")]
     public async Task DiscordLookup(InteractionContext ctx, [Option("User", "The user or user id.")] DiscordUser victim)
