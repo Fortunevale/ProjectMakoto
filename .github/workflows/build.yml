@@ -1,11 +1,16 @@
-name: Start Build on Server
-on:
+name: Push to production
+on: 
   push:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+        version:
+          description: yes
+          default: idk
+          required: false
 jobs:
-
-  build:
-    name: Build
+  push:
+    name: Push to Server
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands
