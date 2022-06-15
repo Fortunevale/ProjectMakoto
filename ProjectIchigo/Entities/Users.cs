@@ -10,11 +10,12 @@ internal class Users
         {
             Cooldown = new(_bot);
         }
-                
+
         public UrlSubmissions UrlSubmissions { get; set; } = new();
         public AfkStatus AfkStatus { get; set; } = new();
         public ScoreSaber ScoreSaber { get; set; } = new();
         public ExperienceUserSettings ExperienceUserSettings { get; set; } = new();
+        public List<UserPlaylist> UserPlaylists { get; set; } = new();
 
         public Cooldown Cooldown { get; set; }
     }
