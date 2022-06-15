@@ -113,10 +113,7 @@ internal class DatabaseQueue
         throw new Exception("This exception should be impossible to get.");
     }
 
-    internal int QueueCount()
-    {
-        return this.Queue.Count;
-    }
+    internal int QueueCount => this.Queue.Count;
 
     readonly Dictionary<string, RequestQueue> Queue = new();
 
