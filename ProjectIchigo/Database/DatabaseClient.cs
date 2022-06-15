@@ -182,7 +182,7 @@ internal class DatabaseClient
 
     public async Task CheckGuildTables()
     {
-        while (_queue.QueueCount() != 0)
+        while (_queue.QueueCount!= 0)
             await Task.Delay(500);
 
         IEnumerable<string> GuildTables;
@@ -355,7 +355,7 @@ internal class DatabaseClient
         if (Disposed)
             return;
 
-        while (_queue.QueueCount() > 0)
+        while (_queue.QueueCount > 0)
             await Task.Delay(100);
 
         if (!await _queue.RunPing(connection))
@@ -871,7 +871,7 @@ internal class DatabaseClient
 
         int timeout = 0;
 
-        while (timeout < 30 && _queue.QueueCount() != 0)
+        while (timeout < 30 && _queue.QueueCount!= 0)
         {
             timeout++;
             await Task.Delay(1000);
