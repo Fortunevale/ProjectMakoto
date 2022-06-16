@@ -1801,7 +1801,7 @@ internal class Music : BaseCommandModule
                     }
                     else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded || loadResult.LoadResultType == LavalinkLoadResultType.TrackLoaded)
                     {
-                        Tracks.AddRange(loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
+                        Tracks.AddRange(loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).Take(250));
                     }
                     else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
                     {
@@ -1936,7 +1936,7 @@ internal class Music : BaseCommandModule
                         return;
                     }
 
-                    var Tracks = _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistItem { Title = x.VideoTitle, Url = x.Url }).ToList();
+                    var Tracks = _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistItem { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -2088,7 +2088,7 @@ internal class Music : BaseCommandModule
                     }
                     else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
                     {
-                        var Tracks = loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).ToList();
+                        var Tracks = loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).Take(250).ToList();
 
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -2228,6 +2228,7 @@ internal class Music : BaseCommandModule
                             NextPage = NextPage.Disable();
 
                         embed.Author.IconUrl = ctx.Guild.IconUrl;
+                        embed.Color = EmbedColors.Info;
                         embed.Title = $"Modifying your playlist: `{SelectedPlaylist.PlaylistName}`";
                         embed.Description = Description;
                         msg = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }).AddComponents(new List<DiscordComponent> { AddSong, RemoveSong, RemoveDuplicates }).AddComponents(Resources.CancelButton));
@@ -2273,6 +2274,18 @@ internal class Music : BaseCommandModule
                                 {
                                     case "AddSong":
                                     {
+                                        if (SelectedPlaylist.List.Count >= 250)
+                                        {
+                                            embed.Description = $"❌ `You already have 250 Tracks stored in this playlist. Please delete one to add a new one.`";
+                                            embed.Color = EmbedColors.Error;
+                                            _ = msg.ModifyAsync(embed.Build());
+                                            _ = Task.Delay(5000).ContinueWith(async x =>
+                                            {
+                                                msg = await UpdateMessage(msg);
+                                            });
+                                            return;
+                                        }
+
                                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`Please send a link to the track or playlist you want to add to this playlist.`")));
 
                                         var FirstTrack = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
@@ -2370,7 +2383,19 @@ internal class Music : BaseCommandModule
                                             }
                                         }
 
-                                        SelectedPlaylist.List.AddRange(Tracks);
+                                        if (SelectedPlaylist.List.Count >= 250)
+                                        {
+                                            embed.Description = $"❌ `You already have 250 Tracks stored in this playlist. Please delete one to add a new one.`";
+                                            embed.Color = EmbedColors.Error;
+                                            _ = msg.ModifyAsync(embed.Build());
+                                            _ = Task.Delay(5000).ContinueWith(async x =>
+                                            {
+                                                msg = await UpdateMessage(msg);
+                                            });
+                                            return;
+                                        }
+
+                                        SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count));
 
                                         msg = await UpdateMessage(msg);
                                         break;
