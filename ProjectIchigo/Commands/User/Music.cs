@@ -401,7 +401,7 @@ internal class Music : BaseCommandModule
 
                 if (conn.Channel.Users.Count >= 2 && !(ctx.Member.VoiceState.Channel.Id == conn.Channel.Id))
                 {
-                    await ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Description = $"❌ `The bot is already in use.`",
                         Color = EmbedColors.Error,
@@ -412,7 +412,7 @@ internal class Music : BaseCommandModule
                         },
                         Footer = ctx.GenerateUsedByFooter(),
                         Timestamp = DateTime.UtcNow
-                    }.Build());
+                    }));
                     return;
                 }
 
@@ -1535,22 +1535,22 @@ internal class Music : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
-        public async Task Help(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                    return;
+        //[GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        //public async Task Help(CommandContext ctx)
+        //{
+        //    Task.Run(async () =>
+        //    {
+        //        if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+        //            return;
 
-                if (ctx.Command.Parent is not null)
-                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
-                else
-                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-            }).Add(_bot._watcher, ctx);
-        }
+        //        if (ctx.Command.Parent is not null)
+        //            await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+        //        else
+        //            await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+        //    }).Add(_bot._watcher, ctx);
+        //}
 
-        [Command("manage"), Description("Allows to review and manage your playlists")]
+        [GroupCommand, Command("manage"), Description("Allows to review and manage your playlists")]
         public async Task Manage(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -1567,31 +1567,31 @@ internal class Music : BaseCommandModule
                     Color = EmbedColors.Info,
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
-                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a augue eget ante commodo pellentesque ut ac felis. Nunc interdum est ut neque vehicula, consequat dapibus sapien lacinia. Vivamus eu consequat erat. Praesent ac quam tincidunt, ultricies erat ac, congue mi. Pellentesque pellentesque, erat eget sagittis commodo, massa neque maximus tortor, vulputate egestas nibh felis vel erat. Nulla ut dui dignissim, fermentum neque a, rhoncus massa. Proin orci purus, vulputate quis libero non, hendrerit bibendum ex. Aliquam pharetra tellus nibh, eu varius leo aliquam ac. Cras ante lacus, sagittis eu finibus posuere, pharetra at arcu."
+                    Description = $"{(_bot._users.List[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", _bot._users.List[ctx.Member.Id].UserPlaylists.Select(x => $"`{x.PlaylistName.SanitizeForCodeBlock()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
                 };
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success , Guid.NewGuid().ToString(), "Add a playlist to the current queue", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
+                var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success , Guid.NewGuid().ToString(), "Add a playlist to the current queue", (_bot._users.List[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
 
                 var ImportPlaylist = new DiscordButtonComponent(ButtonStyle.Success , Guid.NewGuid().ToString(), "Import a playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
                 var SaveCurrent = new DiscordButtonComponent(ButtonStyle.Success , Guid.NewGuid().ToString(), "Save current queue as playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💾")));
                 var NewPlaylist = new DiscordButtonComponent(ButtonStyle.Success , Guid.NewGuid().ToString(), "Create new playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                var ModifyPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Select a playlist to modify", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚙")));
-                var DeletePlaylist = new DiscordButtonComponent(ButtonStyle.Danger , Guid.NewGuid().ToString(), "Select a playlist to delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+                var ModifyPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Select a playlist to modify", (_bot._users.List[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚙")));
+                var DeletePlaylist = new DiscordButtonComponent(ButtonStyle.Danger , Guid.NewGuid().ToString(), "Select a playlist to delete", (_bot._users.List[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
                 var msg = await ctx.Channel.SendMessageAsync(builder
-                .AddComponents(AddToQueue.Disable())
+                .AddComponents(AddToQueue)
                 .AddComponents(new List<DiscordComponent>
                 {
-                    ImportPlaylist.Disable(),
+                    ImportPlaylist,
                     SaveCurrent,
-                    NewPlaylist.Disable()
+                    NewPlaylist
                 })
                 .AddComponents(new List<DiscordComponent>
                 {
-                    ModifyPlaylist.Disable(),
-                    DeletePlaylist.Disable()
+                    ModifyPlaylist,
+                    DeletePlaylist
                 })
                 .AddComponents(Resources.CancelButton));
 
@@ -1605,7 +1605,285 @@ internal class Music : BaseCommandModule
 
                 _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (e.Result.Interaction.Data.CustomId == SaveCurrent.CustomId)
+                if (e.Result.Interaction.Data.CustomId == AddToQueue.CustomId)
+                {
+                    List<DiscordSelectComponentOption> Playlists = _bot._users.List[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+
+                    string SelectedPlaylistId;
+                    UserPlaylist SelectedPlaylist;
+
+                    try
+                    {
+                        SelectedPlaylistId = await GenericSelectors.PromptCustomSelection(_bot, Playlists, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                        SelectedPlaylist = _bot._users.List[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    }
+                    catch (ArgumentException)
+                    {
+                        msg.ModifyToTimedOut();
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    embed = new DiscordEmbedBuilder
+                    {
+                        Description = $":arrows_counterclockwise: `Preparing connection..`",
+                        Color = EmbedColors.Processing,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    };
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                    var lava = ctx.Client.GetLavalink();
+                    var node = lava.ConnectedNodes.Values.First();
+                    var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+
+                    if (conn is null)
+                    {
+                        if (!lava.ConnectedNodes.Any())
+                        {
+                            throw new Exception("Lavalink connection isn't established.");
+                        }
+
+                        conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
+                        _bot._guilds.List[ctx.Guild.Id].Lavalink.QueueHandler(_bot, ctx.Client, node, conn);
+                    }
+
+                    if (conn.Channel.Users.Count >= 2 && !(ctx.Member.VoiceState.Channel.Id == conn.Channel.Id))
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"❌ `The bot is already in use.`",
+                            Color = EmbedColors.Error,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        return;
+                    }
+
+                    if (ctx.Member.VoiceState.Channel.Id != conn.Channel.Id)
+                    {
+                        await conn.DisconnectAsync();
+                        conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
+                    }
+
+                    embed.Description = $":arrows_counterclockwise: `Adding '{SelectedPlaylist.PlaylistName}' with {SelectedPlaylist.List.Count} track(s) to the queue..`";
+                    await msg.ModifyAsync(embed.Build());
+
+                    _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, ctx.Guild, ctx.User)));
+
+                    embed.Description = $"✅ `Queued {SelectedPlaylist.List.Count} songs from your personal playlist '{SelectedPlaylist.PlaylistName}'.`";
+
+                    embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+
+                    embed.Color = EmbedColors.Success;
+                    embed.Author.IconUrl = ctx.Guild.IconUrl;
+                    _ = msg.ModifyAsync(embed.Build());
+                    return;
+                }
+                else if (e.Result.Interaction.Data.CustomId == NewPlaylist.CustomId)
+                {
+                    if (_bot._users.List[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"❌ `You already have 10 Playlists stored. Please delete one to create a new one.`",
+                            Color = EmbedColors.Error,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        return;
+                    }
+
+                    embed = new DiscordEmbedBuilder
+                    {
+                        Description = $"`What to you want to name this playlist?`",
+                        Color = EmbedColors.AwaitingInput,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    };
+
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                    var PlaylistName = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+
+                    if (PlaylistName.TimedOut)
+                    {
+                        msg.ModifyToTimedOut(true);
+                        return;
+                    }
+
+                    _ = Task.Delay(2000).ContinueWith(_ =>
+                    {
+                        _ = PlaylistName.Result.DeleteAsync();
+                    });
+
+                    await Task.Delay(1000);
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`What track(s) do you want to add first to your playlist?`")));
+
+                    var FirstTrack = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+
+                    if (FirstTrack.TimedOut)
+                    {
+                        msg.ModifyToTimedOut(true);
+                        return;
+                    }
+
+                    _ = Task.Delay(2000).ContinueWith(_ =>
+                    {
+                        _ = FirstTrack.Result.DeleteAsync();
+                    });
+
+                    var lava = ctx.Client.GetLavalink();
+                    var node = lava.ConnectedNodes.Values.First();
+
+                    if (Regex.IsMatch(FirstTrack.Result.Content, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
+                        throw new Exception();
+
+                    LavalinkLoadResult loadResult;
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder()
+                        .WithEmbed(embed
+                            .WithDescription($":arrows_counterclockwise: `Looking for '{FirstTrack.Result.Content}'..`")
+                            .WithAuthor(ctx.Guild.Name, null, Resources.StatusIndicators.DiscordCircleLoading)));
+
+                    if (Regex.IsMatch(FirstTrack.Result.Content, Resources.Regex.YouTubeUrl))
+                        loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content, LavalinkSearchType.Plain);
+                    else
+                        loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content);
+
+                    List<PlaylistItem> Tracks = new();
+
+                    if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
+                    {
+                        embed.Description = $"❌ `Failed to load '{FirstTrack.Result.Content}'.`";
+                        embed.Color = EmbedColors.Error;
+                        _ = msg.ModifyAsync(embed.Build());
+                        _ = Task.Delay(5000).ContinueWith(x =>
+                        {
+                            _ = msg.DeleteAsync();
+                        });
+                        return;
+                    }
+                    else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
+                    {
+                        embed.Description = $"❌ `No matches found for '{FirstTrack.Result.Content}'.`";
+                        embed.Color = EmbedColors.Error;
+                        _ = msg.ModifyAsync(embed.Build());
+                        _ = Task.Delay(5000).ContinueWith(x =>
+                        {
+                            _ = msg.DeleteAsync();
+                        });
+                        return;
+                    }
+                    else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded || loadResult.LoadResultType == LavalinkLoadResultType.TrackLoaded)
+                    {
+                        Tracks.AddRange(loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
+                    }
+                    else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
+                    {
+                        embed.Author.IconUrl = ctx.Guild.IconUrl;
+                        embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search results. Please select the song you want to add below.`";
+                        await msg.ModifyAsync(embed.Build());
+
+                        string SelectedUri;
+
+                        try
+                        {
+                            SelectedUri = await GenericSelectors.PromptCustomSelection(_bot, loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList(), ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                        }
+                        catch (ArgumentException)
+                        {
+                            msg.ModifyToTimedOut();
+                            return;
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
+
+                        LavalinkTrack track = loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri);
+
+                        Tracks.Add(new PlaylistItem { Title = track.Title, Url = track.Uri.ToString() });
+                    }
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Creating your playlist..`",
+                        Color = EmbedColors.Loading,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    }));
+
+                    if (_bot._users.List[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"❌ `You already have 10 Playlists stored. Please delete one to create a new one.`",
+                            Color = EmbedColors.Error,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        return;
+                    }
+
+                    _bot._users.List[ctx.Member.Id].UserPlaylists.Add(new UserPlaylist
+                    {
+                        PlaylistName = PlaylistName.Result.Content,
+                        List = Tracks
+                    });
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Your playlist '{PlaylistName.Result.Content}' has been created with {Tracks.Count} entries.`",
+                        Color = EmbedColors.Success,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    }));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                    return;
+                }
+                else if (e.Result.Interaction.Data.CustomId == SaveCurrent.CustomId)
                 {
                     if (ctx.Member.VoiceState is null || ctx.Member.VoiceState.Channel.Id != (await ctx.Client.CurrentUser.ConvertToMember(ctx.Guild)).VoiceState?.Channel?.Id)
                     {
@@ -1737,6 +2015,503 @@ internal class Music : BaseCommandModule
                     await Task.Delay(5000);
                     _ = msg.DeleteAsync();
                     _ = ctx.Command.ExecuteAsync(ctx);
+                    return;
+                }
+                else if (e.Result.Interaction.Data.CustomId == ImportPlaylist.CustomId)
+                {
+                    if (_bot._users.List[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"❌ `You already have 10 Playlists stored. Please delete one to create a new one.`",
+                            Color = EmbedColors.Error,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        return;
+                    }
+
+                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Description = $"`What is the URL from the playlist you want to import?`",
+                        Color = EmbedColors.AwaitingInput,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    }));
+
+                    var lava = ctx.Client.GetLavalink();
+                    var node = lava.ConnectedNodes.Values.First();
+
+                    var search = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+
+                    if (search.TimedOut)
+                    {
+                        msg.ModifyToTimedOut(true);
+                        return;
+                    }
+
+                    _ = Task.Delay(2000).ContinueWith(_ =>
+                    {
+                        _ = search.Result.DeleteAsync();
+                    });
+
+                    if (Regex.IsMatch(search.Result.Content, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
+                        throw new Exception();
+
+                    LavalinkLoadResult loadResult = await node.Rest.GetTracksAsync(search.Result.Content, LavalinkSearchType.Plain);
+
+                    if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"❌ `Couldn't load a playlist from this url.`",
+                            Color = EmbedColors.Error,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        return;
+                    }
+                    else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
+                    {
+                        var Tracks = loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).ToList();
+
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"`Creating your playlist..`",
+                            Color = EmbedColors.Loading,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+
+                        if (_bot._users.List[ctx.Member.Id].UserPlaylists.Count >= 10)
+                        {
+                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                            {
+                                Description = $"❌ `You already have 10 Playlists stored. Please delete one to create a new one.`",
+                                Color = EmbedColors.Error,
+                                Author = new DiscordEmbedBuilder.EmbedAuthor
+                                {
+                                    Name = ctx.Guild.Name,
+                                    IconUrl = ctx.Guild.IconUrl
+                                },
+                                Footer = ctx.GenerateUsedByFooter(),
+                                Timestamp = DateTime.UtcNow
+                            }));
+                            return;
+                        }
+
+                        _bot._users.List[ctx.Member.Id].UserPlaylists.Add(new UserPlaylist
+                        {
+                            PlaylistName = loadResult.PlaylistInfo.Name,
+                            List = Tracks
+                        });
+
+                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"`Your playlist '{loadResult.PlaylistInfo.Name}' has been created with {Tracks.Count} entries.`",
+                            Color = EmbedColors.Success,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        await Task.Delay(5000);
+                        _ = msg.DeleteAsync();
+                        _ = ctx.Command.ExecuteAsync(ctx);
+                        return;
+                    }
+                    else
+                    {
+                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"❌ `The specified url doesn't lead to a playlist.`",
+                            Color = EmbedColors.Error,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = ctx.Guild.IconUrl
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                        return;
+                    }
+                }
+                else if (e.Result.Interaction.Data.CustomId == ModifyPlaylist.CustomId)
+                {
+                    embed = new()
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Playlists • {ctx.Guild.Name}" },
+                        Color = EmbedColors.Info,
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow,
+                        Description = $"`What playlist do you want to modify?`"
+                    };
+
+                    msg = await msg.ModifyAsync(embed.Build());
+
+                    List<DiscordSelectComponentOption> Playlists = _bot._users.List[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+
+                    string SelectedPlaylistId;
+                    UserPlaylist SelectedPlaylist;
+
+                    try
+                    {
+                        SelectedPlaylistId = await GenericSelectors.PromptCustomSelection(_bot, Playlists, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                        SelectedPlaylist = _bot._users.List[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    }
+                    catch (ArgumentException)
+                    {
+                        msg.ModifyToTimedOut();
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    int LastInt = 0;
+                    int GetInt()
+                    {
+                        LastInt++;
+                        return LastInt;
+                    }
+
+                    int CurrentPage = 0;
+
+                    async Task<DiscordMessage> UpdateMessage(DiscordMessage msg)
+                    {
+                        LastInt = CurrentPage * 10;
+
+                        var CurrentTracks = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10);
+
+                        DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                        DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+
+                        DiscordButtonComponent AddSong = new(ButtonStyle.Success, "AddSong", "Add a song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                        DiscordButtonComponent RemoveSong = new(ButtonStyle.Danger, "DeleteSong", "Remove a song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+                        DiscordButtonComponent RemoveDuplicates = new(ButtonStyle.Secondary, "RemoveDuplicates", "Remove all duplicates", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("♻")));
+
+                        var Description = $"**`There's currently {SelectedPlaylist.List.Count} tracks(s) in this playlist.`**\n\n";
+                        Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. **[`{x.Title}`]({x.Url})** added {Formatter.Timestamp(x.AddedTime)}"))}";
+
+                        if (SelectedPlaylist.List.Count > 0)
+                            Description += $"\n\n`Page {CurrentPage + 1}/{Math.Ceiling(SelectedPlaylist.List.Count / 10.0)}`";
+
+                        if (CurrentPage <= 0)
+                            PreviousPage = PreviousPage.Disable();
+
+                        if ((CurrentPage * 10) + 10 >= SelectedPlaylist.List.Count)
+                            NextPage = NextPage.Disable();
+
+                        embed.Author.IconUrl = ctx.Guild.IconUrl;
+                        embed.Title = $"Modifying your playlist: `{SelectedPlaylist.PlaylistName}`";
+                        embed.Description = Description;
+                        msg = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }).AddComponents(new List<DiscordComponent> { AddSong, RemoveSong, RemoveDuplicates }).AddComponents(Resources.CancelButton));
+
+                        return msg;
+                    }
+
+                    await UpdateMessage(msg);
+
+                    CancellationTokenSource tokenSource = new();
+
+                    _ = Task.Delay(120000, tokenSource.Token).ContinueWith(x =>
+                    {
+                        if (x.IsCompletedSuccessfully)
+                        {
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                            msg.ModifyToTimedOut();
+                        }
+                    });
+
+                    ctx.Client.ComponentInteractionCreated += RunInteraction;
+                    async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+                    {
+                        Task.Run(async () =>
+                        {
+                            if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
+                            {
+                                tokenSource.Cancel();
+                                tokenSource = new();
+
+                                _ = Task.Delay(120000, tokenSource.Token).ContinueWith(x =>
+                                {
+                                    if (x.IsCompletedSuccessfully)
+                                    {
+                                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                        msg.ModifyToTimedOut();
+                                    }
+                                });
+
+                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                                switch (e.Interaction.Data.CustomId)
+                                {
+                                    case "AddSong":
+                                    {
+                                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`Please send a link to the track or playlist you want to add to this playlist.`")));
+
+                                        var FirstTrack = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+
+                                        if (FirstTrack.TimedOut)
+                                        {
+                                            msg.ModifyToTimedOut(true);
+                                            return;
+                                        }
+
+                                        _ = Task.Delay(2000).ContinueWith(_ =>
+                                        {
+                                            _ = FirstTrack.Result.DeleteAsync();
+                                        });
+
+                                        var lava = ctx.Client.GetLavalink();
+                                        var node = lava.ConnectedNodes.Values.First();
+
+                                        if (Regex.IsMatch(FirstTrack.Result.Content, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
+                                            throw new Exception();
+
+                                        LavalinkLoadResult loadResult;
+
+                                        await msg.ModifyAsync(new DiscordMessageBuilder()
+                                            .WithEmbed(embed
+                                                .WithDescription($":arrows_counterclockwise: `Looking for '{FirstTrack.Result.Content}'..`")
+                                                .WithAuthor(ctx.Guild.Name, null, Resources.StatusIndicators.DiscordCircleLoading)));
+
+                                        if (Regex.IsMatch(FirstTrack.Result.Content, Resources.Regex.YouTubeUrl))
+                                            loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content, LavalinkSearchType.Plain);
+                                        else
+                                            loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content);
+
+                                        List<PlaylistItem> Tracks = new();
+
+                                        switch (loadResult.LoadResultType)
+                                        {
+                                            case LavalinkLoadResultType.LoadFailed:
+                                            {
+                                                embed.Description = $"❌ `Failed to load '{FirstTrack.Result.Content}'.`";
+                                                embed.Color = EmbedColors.Error;
+                                                _ = msg.ModifyAsync(embed.Build());
+                                                _ = Task.Delay(5000).ContinueWith(async x =>
+                                                {
+                                                    msg = await UpdateMessage(msg);
+                                                });
+                                                return;
+                                            }
+
+                                            case LavalinkLoadResultType.NoMatches:
+                                            {
+                                                embed.Description = $"❌ `No matches found for '{FirstTrack.Result.Content}'.`";
+                                                embed.Color = EmbedColors.Error;
+                                                _ = msg.ModifyAsync(embed.Build());
+                                                _ = Task.Delay(5000).ContinueWith(async x =>
+                                                {
+                                                    msg = await UpdateMessage(msg);
+                                                });
+                                                return;
+                                            }
+
+                                            case LavalinkLoadResultType.PlaylistLoaded:
+                                            case LavalinkLoadResultType.TrackLoaded:
+                                            {
+                                                Tracks.AddRange(loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
+                                                break;
+                                            }
+
+                                            case LavalinkLoadResultType.SearchResult:
+                                            {
+                                                embed.Author.IconUrl = ctx.Guild.IconUrl;
+                                                embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search results. Please select the song you want to add below.`";
+                                                await msg.ModifyAsync(embed.Build());
+
+                                                string SelectedUri;
+
+                                                try
+                                                {
+                                                    SelectedUri = await GenericSelectors.PromptCustomSelection(_bot, loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList(), ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                                                }
+                                                catch (ArgumentException)
+                                                {
+                                                    msg.ModifyToTimedOut();
+                                                    return;
+                                                }
+                                                catch (Exception)
+                                                {
+                                                    throw;
+                                                }
+
+                                                LavalinkTrack track = loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri);
+
+                                                Tracks.Add(new PlaylistItem { Title = track.Title, Url = track.Uri.ToString() });
+                                                break;
+                                            }
+                                        }
+
+                                        SelectedPlaylist.List.AddRange(Tracks);
+
+                                        msg = await UpdateMessage(msg);
+                                        break;
+                                    }
+                                    
+                                    case "RemoveDuplicates":
+                                    {
+                                        CurrentPage = 0;
+                                        SelectedPlaylist.List = SelectedPlaylist.List.GroupBy(x => x.Url).Select(y => y.FirstOrDefault()).ToList();
+                                        msg = await UpdateMessage(msg);
+                                        break;
+                                    }
+                                    case "DeleteSong":
+                                    {
+                                        List<DiscordSelectComponentOption> TrackList = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Select(x => new DiscordSelectComponentOption($"{x.Title}", x.Url.MakeValidFileName(), $"Added {x.AddedTime.GetTimespanSince().GetHumanReadable()} ago")).ToList();
+
+                                        string SelectedTrackId;
+                                        PlaylistItem SelectedTrack;
+
+                                        try
+                                        {
+                                            SelectedTrackId = await GenericSelectors.PromptCustomSelection(_bot, TrackList, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                                            SelectedTrack = SelectedPlaylist.List.First(x => x.Url.MakeValidFileName() == SelectedTrackId);
+                                        }
+                                        catch (ArgumentException)
+                                        {
+                                            msg.ModifyToTimedOut();
+                                            return;
+                                        }
+                                        catch (Exception)
+                                        {
+                                            throw;
+                                        }
+                                        SelectedPlaylist.List.Remove(SelectedTrack);
+
+                                        if (SelectedPlaylist.List.Count <= 0)
+                                        {
+                                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                                            {
+                                                Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`",
+                                                Color = EmbedColors.Success,
+                                                Author = new DiscordEmbedBuilder.EmbedAuthor
+                                                {
+                                                    Name = ctx.Guild.Name,
+                                                    IconUrl = ctx.Guild.IconUrl
+                                                },
+                                                Footer = ctx.GenerateUsedByFooter(),
+                                                Timestamp = DateTime.UtcNow
+                                            }));
+
+                                            _bot._users.List[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+
+                                            await Task.Delay(5000);
+                                            _ = msg.DeleteAsync();
+                                            _ = ctx.Command.ExecuteAsync(ctx);
+                                            return;
+                                        }
+
+                                        if (SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Count() <= 0)
+                                            CurrentPage--;
+
+                                        msg = await UpdateMessage(msg);
+                                        break;
+                                    }
+                                    case "NextPage":
+                                    {
+                                        CurrentPage++;
+                                        msg = await UpdateMessage(msg);
+                                        break;
+                                    }
+                                    case "PreviousPage":
+                                    {
+                                        CurrentPage--;
+                                        msg = await UpdateMessage(msg);
+                                        break;
+                                    }
+                                    case "cancel":
+                                    {
+                                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                                        _ = msg.DeleteAsync();
+                                        _ = ctx.Command.ExecuteAsync(ctx);
+                                        return;
+                                    }
+                                }
+                            }
+                        }).Add(_bot._watcher, ctx);
+                    }
+                }
+                else if (e.Result.Interaction.Data.CustomId == DeletePlaylist.CustomId)
+                {
+                    List<DiscordSelectComponentOption> Playlists = _bot._users.List[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+
+                    string SelectedPlaylistId;
+                    UserPlaylist SelectedPlaylist;
+
+                    try
+                    {
+                        SelectedPlaylistId = await GenericSelectors.PromptCustomSelection(_bot, Playlists, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
+                        SelectedPlaylist = _bot._users.List[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    }
+                    catch (ArgumentException)
+                    {
+                        msg.ModifyToTimedOut();
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                        throw;
+                    }
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Deleting your playlist '{SelectedPlaylist.PlaylistName}'..`",
+                        Color = EmbedColors.Loading,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    }));
+
+                    _bot._users.List[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`",
+                        Color = EmbedColors.Success,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    }));
+                    await Task.Delay(5000);
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                    return;
                 }
                 else
                 {
