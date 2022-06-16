@@ -1714,7 +1714,7 @@ internal class Music : BaseCommandModule
 
                     embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`What to you want to name this playlist?`",
+                        Description = $"`What do you want to name this playlist?`",
                         Color = EmbedColors.AwaitingInput,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
@@ -1940,7 +1940,7 @@ internal class Music : BaseCommandModule
 
                     _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`What to you want to name this playlist?`",
+                        Description = $"`What do you want to name this playlist?`",
                         Color = EmbedColors.AwaitingInput,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
@@ -2211,6 +2211,8 @@ internal class Music : BaseCommandModule
                         DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
                         DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 
+                        DiscordButtonComponent PlaylistName = new(ButtonStyle.Success, "ChangePlaylistName", "Change the name of this playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+
                         DiscordButtonComponent AddSong = new(ButtonStyle.Success, "AddSong", "Add a song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
                         DiscordButtonComponent RemoveSong = new(ButtonStyle.Danger, "DeleteSong", "Remove a song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
                         DiscordButtonComponent RemoveDuplicates = new(ButtonStyle.Secondary, "RemoveDuplicates", "Remove all duplicates", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("♻")));
@@ -2231,7 +2233,7 @@ internal class Music : BaseCommandModule
                         embed.Color = EmbedColors.Info;
                         embed.Title = $"Modifying your playlist: `{SelectedPlaylist.PlaylistName}`";
                         embed.Description = Description;
-                        msg = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }).AddComponents(new List<DiscordComponent> { AddSong, RemoveSong, RemoveDuplicates }).AddComponents(Resources.CancelButton));
+                        msg = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }).AddComponents(new List<DiscordComponent> { PlaylistName, AddSong, RemoveSong, RemoveDuplicates }).AddComponents(Resources.CancelButton));
 
                         return msg;
                     }
@@ -2400,7 +2402,41 @@ internal class Music : BaseCommandModule
                                         msg = await UpdateMessage(msg);
                                         break;
                                     }
-                                    
+                                    case "ChangePlaylistName":
+                                    {
+                                        embed = new DiscordEmbedBuilder
+                                        {
+                                            Description = $"`What do you want to name this playlist?`",
+                                            Color = EmbedColors.AwaitingInput,
+                                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                                            {
+                                                Name = ctx.Guild.Name,
+                                                IconUrl = ctx.Guild.IconUrl
+                                            },
+                                            Footer = ctx.GenerateUsedByFooter(),
+                                            Timestamp = DateTime.UtcNow
+                                        };
+
+                                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+
+                                        var PlaylistName = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+
+                                        if (PlaylistName.TimedOut)
+                                        {
+                                            msg.ModifyToTimedOut(true);
+                                            return;
+                                        }
+
+                                        _ = Task.Delay(2000).ContinueWith(_ =>
+                                        {
+                                            _ = PlaylistName.Result.DeleteAsync();
+                                        });
+
+                                        SelectedPlaylist.PlaylistName = PlaylistName.Result.Content;
+
+                                        msg = await UpdateMessage(msg);
+                                        break;
+                                    }
                                     case "RemoveDuplicates":
                                     {
                                         CurrentPage = 0;
