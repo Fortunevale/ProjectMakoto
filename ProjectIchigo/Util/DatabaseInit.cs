@@ -176,7 +176,8 @@ internal class DatabaseInit
                 ExperienceUserSettings = new()
                 {
                     DirectMessageOptOut = b.experience_directmessageoptout
-                }
+                },
+                UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>((b.playlists is null or "null" or "" ? "[]" : b.playlists)),
             });
 
         _logger.LogInfo($"Loaded {_bot._users.List.Count} users from table 'users'.");

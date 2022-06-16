@@ -628,6 +628,7 @@ internal class DatabaseClient
                             experience_directmessageoptout = x.Value.ExperienceUserSettings.DirectMessageOptOut,
                             submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
                             submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
+                            playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
                             submission_last_datetime = x.Value.UrlSubmissions.LastTime,
                             scoresaber_id = x.Value.ScoreSaber.Id
                         }).ToList();
@@ -654,6 +655,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"submission_accepted_tos{i}", DatabaseInserts[i].submission_accepted_tos);
                             cmd.Parameters.AddWithValue($"submission_accepted_submissions{i}", DatabaseInserts[i].submission_accepted_submissions);
                             cmd.Parameters.AddWithValue($"submission_last_datetime{i}", DatabaseInserts[i].submission_last_datetime);
+                            cmd.Parameters.AddWithValue($"playlists{i}", DatabaseInserts[i].playlists);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
