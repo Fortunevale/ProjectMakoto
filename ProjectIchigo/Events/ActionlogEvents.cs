@@ -22,19 +22,7 @@ internal class ActionlogEvents
 
         if (!guild.Channels.ContainsKey(_bot._guilds.List[guild.Id].ActionLogSettings.Channel))
         {
-            _bot._guilds.List[guild.Id].ActionLogSettings.Channel = 0;
-            _bot._guilds.List[guild.Id].ActionLogSettings.AttemptGettingMoreDetails = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.MembersModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.MemberModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.MemberProfileModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.MessageDeleted = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.MessageModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.RolesModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.BanlistModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.GuildModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.ChannelsModified = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.VoiceStateUpdated = false;
-            _bot._guilds.List[guild.Id].ActionLogSettings.InvitesModified = false;
+            _bot._guilds.List[guild.Id].ActionLogSettings = new();
             return false;
         }
 
