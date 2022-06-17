@@ -127,6 +127,37 @@ internal class Maintainers : ApplicationCommandsModule
                 throw new InvalidCastException();
             }).Add(_bot._watcher, ctx);
         }
+
+        [SlashCommand("test-component-modify", "Debug")]
+        public async Task TestComponentModify(InteractionContext ctx, [Option("Refetch", "Whether to refetch the message")] bool Refetch)
+        {
+            try
+            {
+                _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                var msg = await ctx.Channel.SendMessageAsync("Test Message: This could be showing the user that something is loading");
+
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("Loading could be done").AddComponents(new DiscordButtonComponent(ButtonStyle.Primary, "a", "button")));
+
+                // Refetch the message to hopefully update it's components object
+                // This doesn't make a difference right now
+
+                if (Refetch)
+                    msg = await msg.Channel.GetMessageAsync(msg.Id);
+
+                var x = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(1)); // This will throw because there's no components in the message object
+
+                if (x.TimedOut)
+                    return;
+
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("button worked 😎"));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+        }
     }
 #endif
 
