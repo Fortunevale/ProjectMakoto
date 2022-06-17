@@ -5,7 +5,16 @@ internal class UserPlaylist
     public string PlaylistId { get; set; } = Guid.NewGuid().ToString();
 
     private string _PlaylistName { get; set; } = "";
-    public string PlaylistName { get => _PlaylistName; set { _PlaylistName = value; _ = Bot.DatabaseClient.SyncDatabase(); } }
 
+    [JsonProperty(Required = Required.Always)]
+    public string PlaylistName { get => _PlaylistName; set { _PlaylistName = value.TruncateWithIndication(256); _ = Bot.DatabaseClient.SyncDatabase(); } }
+
+    private string _PlaylistColor { get; set; } = "#FFFFFF";
+    public string PlaylistColor { get => _PlaylistColor; set { _PlaylistColor = value.Truncate(7).IsValidHexColor(); _ = Bot.DatabaseClient.SyncDatabase(); } }
+
+    private string _PlaylistThumbnail { get; set; } = "";
+    public string PlaylistThumbnail { get => _PlaylistThumbnail; set { _PlaylistThumbnail = value.Truncate(2048); _ = Bot.DatabaseClient.SyncDatabase(); } }
+
+    [JsonProperty(Required = Required.Always)]
     public List<PlaylistItem> List { get; set; } = new();
 }

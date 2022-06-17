@@ -40,6 +40,14 @@ internal static class Extensions
         return false;
     }
 
+    internal static string IsValidHexColor(this string str, string Default = "#FFFFFF")
+    {
+        if (!str.IsNullOrWhiteSpace() && Regex.IsMatch(str, @"^(#([a-fA-f0-9]{6}))$"))
+            return str;
+        else
+            return Default;
+    }
+
     internal static DiscordEmoji BoolToEmote(this bool b, DiscordClient client)
     {
         return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 939750475354472478);
