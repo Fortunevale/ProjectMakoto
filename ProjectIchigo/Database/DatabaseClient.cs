@@ -470,7 +470,10 @@ internal class DatabaseClient
                             actionlog_log_guild_modified = x.Value.ActionLogSettings.GuildModified,
                             actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified,
                             actionlog_log_voice_state = x.Value.ActionLogSettings.VoiceStateUpdated,
-                            actionlog_log_channels_modified = x.Value.ActionLogSettings.ChannelsModified
+                            actionlog_log_channels_modified = x.Value.ActionLogSettings.ChannelsModified,
+
+                            vc_privacy_clear = x.Value.InVoiceTextPrivacySettings.ClearTextEnabled,
+                            vc_privacy_perms = x.Value.InVoiceTextPrivacySettings.SetPermissionsEnabled,
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -535,6 +538,9 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"actionlog_log_channels_modified{i}", DatabaseInserts[i].actionlog_log_channels_modified);
                             cmd.Parameters.AddWithValue($"actionlog_log_voice_state{i}", DatabaseInserts[i].actionlog_log_voice_state);
                             cmd.Parameters.AddWithValue($"actionlog_log_invites_modified{i}", DatabaseInserts[i].actionlog_log_invites_modified);
+
+                            cmd.Parameters.AddWithValue($"vc_privacy_clear{i}", DatabaseInserts[i].vc_privacy_clear);
+                            cmd.Parameters.AddWithValue($"vc_privacy_perms{i}", DatabaseInserts[i].vc_privacy_perms);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

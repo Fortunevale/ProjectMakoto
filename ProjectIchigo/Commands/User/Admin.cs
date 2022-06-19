@@ -2445,4 +2445,147 @@ internal class Admin : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
     }
+
+
+    [Group("invoiceprivacy"), Aliases("in-voice-privacy", "vc-privacy", "vcprivacy"),
+    CommandModule("admin"),
+    Description("Allows to review, change In-Voice Text Channel Privacy Settings")]
+    public class InVoiceTextPrivacy : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        {
+            if (!ctx.Member.IsAdmin(_bot._status))
+            {
+                _ = ctx.SendAdminError();
+                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
+            }
+        }
+
+        private string GetCurrentConfiguration(CommandContext ctx)
+        {
+            return $"`Clear Messages on empty Voice Channel`: {_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled.BoolToEmote(ctx.Client)}\n" +
+                   $"`Set Permissions on User Join         `: {_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled.BoolToEmote(ctx.Client)}";
+        }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "", "", "In-Voice Text Channel Privacy");
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "", "", "In-Voice Text Channel Privacy");
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Shows currently defined settings for In-Voice Text Channel Privacy")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                var ListEmbed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"In-Voice Text Channel Privacy • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                    Color = EmbedColors.Info,
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow,
+                    Description = GetCurrentConfiguration(ctx)
+                };
+                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows modifying currently defined Auto Crosspost Channels and settings related to it")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                var embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"In-Voice Text Channel Privacy • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                    Color = EmbedColors.Info,
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow,
+                    Description = GetCurrentConfiguration(ctx)
+                };
+
+                var ToggleDeletion = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Deletion", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+                var TogglePermission = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Permission Protection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
+
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
+                .AddComponents(new List<DiscordComponent>
+                {
+                    ToggleDeletion,
+                    TogglePermission
+                })
+                .AddComponents(Resources.CancelButton));
+
+                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
+
+                if (e.TimedOut)
+                {
+                    msg.ModifyToTimedOut(true);
+                    return;
+                }
+
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (e.Result.Interaction.Data.CustomId == ToggleDeletion.CustomId)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled = !_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled;
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == TogglePermission.CustomId)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled = !_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled;
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+
+                    if (_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
+                    {
+                        if (!ctx.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
+                            return;
+
+                        foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
+                        {
+                            _ = b.Value.AddOverwriteAsync(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages , "Enabled In-Voice Privacy");
+                        }
+                    }
+                    else
+                    {
+                        if (!ctx.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
+                            return;
+
+                        foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
+                        {
+                            _ = b.Value.DeleteOverwriteAsync(ctx.Guild.EveryoneRole, "Disabled In-Voice Privacy");
+                        }
+                    }
+                }
+                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                {
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }
