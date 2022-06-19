@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Entities.Database;
+namespace ProjectIchigo.Entities.Database;
 
 public class DatabasePhishingUrlInfo
 {

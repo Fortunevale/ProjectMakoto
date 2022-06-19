@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Database;
+namespace ProjectIchigo.Database;
 internal class DatabaseClient
 {
     internal MySqlConnection mainDatabaseConnection { get; set; }

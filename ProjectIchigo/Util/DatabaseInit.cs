@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Util;
+namespace ProjectIchigo.Util;
 
 internal class DatabaseInit
 {

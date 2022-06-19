@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Events;
+namespace ProjectIchigo.Events;
 
 internal class ReactionRoleEvents
 {

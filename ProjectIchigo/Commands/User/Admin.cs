@@ -1,4 +1,4 @@
-﻿using ProjectIchigo.Exceptions;
+using ProjectIchigo.Exceptions;
 
 namespace ProjectIchigo.Commands.User;
 internal class Admin : BaseCommandModule

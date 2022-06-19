@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Entities.Legacy;
+namespace ProjectIchigo.Entities.Legacy;
 
 internal class Warnings
 {

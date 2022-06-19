@@ -1,4 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.Entities;
 
 namespace ProjectIchigo.ApplicationCommands.Maintainers;

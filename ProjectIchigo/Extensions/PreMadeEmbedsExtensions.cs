@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Extensions;
+namespace ProjectIchigo.Extensions;
 
 internal static class PreMadeEmbedsExtensions
 {

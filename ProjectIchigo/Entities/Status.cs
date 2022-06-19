@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Entities;
+namespace ProjectIchigo.Entities;
 
 internal class Status
 {

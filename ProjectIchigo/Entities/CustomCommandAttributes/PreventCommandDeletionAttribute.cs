@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Entities;
+namespace ProjectIchigo.Entities;
 
 [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
 public class PreventCommandDeletionAttribute : Attribute
