@@ -125,4 +125,21 @@ internal class VoicePrivacyEvents
             }).Add(_bot._watcher);
         }
     }
+
+    internal async Task ChannelCreated(DiscordClient sender, ChannelCreateEventArgs e)
+    {
+        Task.Run(async () =>
+        {
+            if (_bot._guilds.List[e.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
+            {
+                if (!e.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
+                    return;
+
+                foreach (var b in e.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
+                {
+                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages, "In-Voice Privacy is enabled");
+                }
+            }
+        }).Add(_bot._watcher);
+    }
 }

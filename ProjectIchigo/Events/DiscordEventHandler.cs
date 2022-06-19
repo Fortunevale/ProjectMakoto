@@ -208,6 +208,7 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild);
 
         _ = actionlogEvents.ChannelCreated(sender, e);
+        _ = voicePrivacyEvents.ChannelCreated(sender, e);
     }
 
     internal async Task ChannelDeleted(DiscordClient sender, ChannelDeleteEventArgs e)
