@@ -585,6 +585,7 @@ internal class Music : BaseCommandModule
 
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
+                
                     Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
                     Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
