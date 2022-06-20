@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Exceptions;
+namespace ProjectIchigo.Exceptions;
 
 internal class AlreadyAppliedException : Exception
 {

@@ -1,4 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.Entities;
 
 namespace ProjectIchigo.ApplicationCommands.Maintainers;
@@ -126,6 +126,37 @@ internal class Maintainers : ApplicationCommandsModule
 
                 throw new InvalidCastException();
             }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("test-component-modify", "Debug")]
+        public async Task TestComponentModify(InteractionContext ctx, [Option("Refetch", "Whether to refetch the message")] bool Refetch)
+        {
+            try
+            {
+                _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                var msg = await ctx.Channel.SendMessageAsync("Test Message: This could be showing the user that something is loading");
+
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("Loading could be done").AddComponents(new DiscordButtonComponent(ButtonStyle.Primary, "a", "button")));
+
+                // Refetch the message to hopefully update it's components object
+                // This doesn't make a difference right now
+
+                if (Refetch)
+                    msg = await msg.Channel.GetMessageAsync(msg.Id);
+
+                var x = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(1)); // This will throw because there's no components in the message object
+
+                if (x.TimedOut)
+                    return;
+
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("button worked 😎"));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
     }
 #endif
@@ -271,6 +302,33 @@ internal class Maintainers : ApplicationCommandsModule
                 embed.AddField(new DiscordEmbedField("Communication disabled until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
 
             await ctx.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
+        }).Add(_bot._watcher, ctx);
+    }
+
+    [SlashCommand("botnick", "Changes the bot's nickname on the current server.")]
+    public async Task BotNick(InteractionContext ctx, [Option("nickname", "The new nickname")] string newNickname)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+            {
+                _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
+                return;
+            }
+
+            try
+            {
+                await ctx.Guild.CurrentMember.ModifyAsync(x => x.Nickname = newNickname);
+
+                if (newNickname.IsNullOrWhiteSpace())
+                    await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"My nickname on this server has been reset."));
+                else
+                    await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"My nickname on this server has been changed to **{newNickname}**."));
+            }
+            catch (Exception)
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"My nickname could not be changed."));
+            }
         }).Add(_bot._watcher, ctx);
     }
 }

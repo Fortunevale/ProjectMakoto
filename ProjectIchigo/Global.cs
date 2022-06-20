@@ -1,4 +1,4 @@
-﻿// System
+// System
 
 global using System;
 global using System.Drawing;

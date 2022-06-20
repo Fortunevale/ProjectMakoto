@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Entities;
+namespace ProjectIchigo.Entities;
 internal class Resources
 {
     public static readonly string Github = "https://cdn.discordapp.com/attachments/712761268393738301/893958382896173096/Github.png";

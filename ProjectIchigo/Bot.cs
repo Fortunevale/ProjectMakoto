@@ -1,4 +1,4 @@
-﻿using User = ProjectIchigo.Commands.User.User;
+using User = ProjectIchigo.Commands.User.User;
 
 namespace ProjectIchigo;
 

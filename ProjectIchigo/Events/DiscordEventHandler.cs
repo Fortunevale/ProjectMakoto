@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Events;
+namespace ProjectIchigo.Events;
 
 internal class DiscordEventHandler
 {
@@ -18,6 +18,7 @@ internal class DiscordEventHandler
         bumpReminderEvents = new(_bot);
         experienceEvents = new(_bot);
         reactionRoleEvents = new(_bot);
+        voicePrivacyEvents = new(_bot);
     }
 
 
@@ -35,6 +36,7 @@ internal class DiscordEventHandler
     BumpReminderEvents bumpReminderEvents { get; set; }
     ExperienceEvents experienceEvents { get; set; }
     ReactionRoleEvents reactionRoleEvents { get; set; }
+    VoicePrivacyEvents voicePrivacyEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -206,6 +208,7 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild);
 
         _ = actionlogEvents.ChannelCreated(sender, e);
+        _ = voicePrivacyEvents.ChannelCreated(sender, e);
     }
 
     internal async Task ChannelDeleted(DiscordClient sender, ChannelDeleteEventArgs e)
@@ -257,5 +260,6 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild, user: e.User);
 
         _ = actionlogEvents.VoiceStateUpdated(sender, e);
+        _ = voicePrivacyEvents.VoiceStateUpdated(sender, e);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Extensions;
+namespace ProjectIchigo.Extensions;
 
 internal static class PreMadeEmbedsExtensions
 {
@@ -111,14 +111,14 @@ internal static class PreMadeEmbedsExtensions
         };
     }
 
-    public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "")
+    public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
     {
         var embed = new DiscordEmbedBuilder
         {
             Author = new DiscordEmbedBuilder.EmbedAuthor
             {
                 IconUrl = ctx.Guild.IconUrl,
-                Name = $"{cmds[0].Parent.Name.FirstLetterToUpper()} Command Help • {ctx.Guild.Name}"
+                Name = $"{(CustomParentName.IsNullOrWhiteSpace() ? cmds[0].Parent.Name.FirstLetterToUpper() : CustomParentName)} Command Help • {ctx.Guild.Name}"
             },
             Description = $"{string.Join("\n", cmds.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"))}\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
             Footer = ctx.GenerateUsedByFooter(),

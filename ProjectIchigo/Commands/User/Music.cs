@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Commands.User;
+namespace ProjectIchigo.Commands.User;
 
 internal class Music : BaseCommandModule
 {
@@ -530,10 +530,10 @@ internal class Music : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("pause"), Description("Pause or unpause the current song")]
+        [Command("pause"), Aliases("resume"), Description("Pause or unpause the current song")]
         public async Task Pause(CommandContext ctx)
         {
-            _ = Task.Run(async () =>
+            Task.Run(async () =>
             {
                 if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
                     return;
@@ -576,16 +576,17 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                _bot._guilds.List[ctx.User.Id].Lavalink.IsPaused = !_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused;
+                _bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused = !_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused;
 
-                if (_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused)
+                if (_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused)
                     _ = conn.PauseAsync();
                 else
                     _ = conn.ResumeAsync();
 
                 _ = ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
-                    Description = (_bot._guilds.List[ctx.User.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
+                
+                    Description = (_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
                     Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
@@ -599,7 +600,7 @@ internal class Music : BaseCommandModule
                     if (msg.IsCompletedSuccessfully)
                         _ = Task.Delay(5000).ContinueWith(_ => { _ = msg.Result.DeleteAsync(); });
                 });
-            });
+            }).Add(_bot._watcher, ctx);
         }
 
         [Command("queue"), Description("Displays the current queue")]

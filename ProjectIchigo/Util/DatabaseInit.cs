@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Util;
+namespace ProjectIchigo.Util;
 
 internal class DatabaseInit
 {
@@ -93,6 +93,11 @@ internal class DatabaseInit
                 LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
                 ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
                 ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles)),
+                InVoiceTextPrivacySettings = new()
+                {
+                    ClearTextEnabled = b.vc_privacy_clear,
+                    SetPermissionsEnabled = b.vc_privacy_perms
+                }
             });
 
         foreach (var b in _bot._guilds.List)

@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Enums;
+namespace ProjectIchigo.Enums;
 
 internal enum PunishmentActions
 {
