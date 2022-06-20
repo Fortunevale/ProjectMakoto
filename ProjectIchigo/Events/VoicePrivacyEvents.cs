@@ -5,9 +5,37 @@ internal class VoicePrivacyEvents
     internal VoicePrivacyEvents(Bot _bot)
     {
         this._bot = _bot;
+        QueueHandler();
     }
 
     public Bot _bot { private get; set; }
+
+    private List<Task> JobsQueue = new();
+
+    internal async void QueueHandler()
+    {
+        Task.Run(async () =>
+        {
+            while (true)
+            {
+                try
+                {
+                    while (JobsQueue.Count <= 0)
+                        Thread.Sleep(1000);
+
+                    var task = JobsQueue[0];
+                    JobsQueue.Remove(task);
+
+                    task.Start();
+                    task.Add(_bot._watcher);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarn("Failed to run queue item", ex);
+                }
+            }
+        }).Add(_bot._watcher);
+    }
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
@@ -28,101 +56,124 @@ internal class VoicePrivacyEvents
 
         if (_bot._guilds.List[e.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled)
         {
-            Task.Run(async () =>
+            JobsQueue.Add(new Task(async () =>
             {
-                if (e.After?.Channel?.Id != e.Before?.Channel?.Id)
+                try
                 {
-                    if (e.Before is not null && e.Before.Channel is not null)
+                    if (e.After?.Channel?.Id != e.Before?.Channel?.Id)
                     {
-                        List<DiscordMessage> discordMessages = new();
-                        discordMessages.AddRange(await e.Before.Channel.GetMessagesAsync(1));
-
-                        int failcount = 0;
-
-                        while (true)
+                        if (e.Before is not null && e.Before.Channel is not null)
                         {
-                            try
+                            _logger.LogTrace($"{e.User.Id}: Started In-Voice Text Privacy Cleaner");
+
+                            List<DiscordMessage> discordMessages = new();
+                            discordMessages.AddRange(await e.Before.Channel.GetMessagesAsync(1));
+
+                            if (!discordMessages.Any())
                             {
-                                var requestedMsgs = await e.Before.Channel.GetMessagesBeforeAsync(discordMessages.Last().Id, 100);
-
-                                if (!requestedMsgs.Any())
-                                    break;
-
-                                discordMessages.AddRange(requestedMsgs);
-                                await Task.Delay(10000);
+                                _logger.LogTrace($"{e.User.Id}: Finished In-Voice Text Privacy Cleaner, no messages are present in this Channel");
+                                return;
                             }
-                            catch (Exception ex) 
-                            { 
-                                _logger.LogWarn($"Failed to get messages for in voice text clearer", ex);
 
-                                await Task.Delay(30000);
-                                failcount++;
+                            int failcount = 0;
 
-                                if (failcount >= 3)
-                                    break;
-                            }
-                        }
-
-                        discordMessages = discordMessages.Where(x => x.Author.Id == e.User.Id).ToList();
-
-                        if (discordMessages.Any())
-                        {
-                            failcount = 0;
-                            var BulkDeletions = discordMessages.Where(x => x.Timestamp.GetTimespanSince() < TimeSpan.FromDays(14)).ToList();
-
-                            while (BulkDeletions.Count > 0)
+                            while (true)
                             {
                                 try
                                 {
-                                    var MessagesToDelete = BulkDeletions.Take(100).ToList();
-                                    await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete);
-    
-                                    for (int i = 0; i < MessagesToDelete.Count; i++)
+                                    var requestedMsgs = await e.Before.Channel.GetMessagesBeforeAsync(discordMessages.Last().Id, 100);
+
+                                    if (!requestedMsgs.Any())
+                                        break;
+
+                                    discordMessages.AddRange(requestedMsgs);
+
+                                    if (requestedMsgs.Any())
+                                        await Task.Delay(10000);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogWarn($"An exception occured while trying to get messages from a channel ({failcount}/3)", ex);
+
+                                    await Task.Delay(10000);
+                                    failcount++;
+
+                                    if (failcount >= 3)
+                                        throw;
+                                }
+                            }
+
+                            discordMessages = discordMessages.Where(x => x.Author.Id == e.User.Id).ToList();
+
+                            if (discordMessages.Any())
+                            {
+                                failcount = 0;
+                                var BulkDeletions = discordMessages.Where(x => x.Timestamp.GetTimespanSince() < TimeSpan.FromDays(14)).ToList();
+
+                                while (BulkDeletions.Count > 0)
+                                {
+                                    try
                                     {
-                                        BulkDeletions.Remove(MessagesToDelete[i]);
+                                        var MessagesToDelete = BulkDeletions.Take(100).ToList();
+                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete);
+
+                                        for (int i = 0; i < MessagesToDelete.Count; i++)
+                                        {
+                                            BulkDeletions.Remove(MessagesToDelete[i]);
+                                        }
+
+                                        if (BulkDeletions.Any())
+                                            await Task.Delay(30000);
                                     }
-                                    await Task.Delay(30000);
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogWarn($"An exception occured while trying to bulk delete messages from a channel ({failcount}/3)", ex);
+
+                                        await Task.Delay(30000);
+                                        failcount++;
+
+                                        if (failcount >= 3)
+                                            throw;
+                                    }
                                 }
-                                catch (Exception ex)
+
+                                failcount = 0;
+                                var SingleDeletions = discordMessages.Where(x => x.Timestamp.GetTimespanSince() > TimeSpan.FromDays(14)).ToList();
+
+                                while (BulkDeletions.Count > 0)
                                 {
-                                    _logger.LogWarn($"Failed to bulk delete messages for in voice text clearer", ex);
+                                    try
+                                    {
+                                        var msg = SingleDeletions[0];
 
-                                    await Task.Delay(30000);
-                                    failcount++;
+                                        await e.Before.Channel.DeleteMessageAsync(msg);
+                                        SingleDeletions.Remove(msg);
 
-                                    if (failcount >= 3)
-                                        break;
+                                        if (SingleDeletions.Any())
+                                            await Task.Delay(30000);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogWarn($"An exception occured while trying to delete a message from a channel ({failcount}/3)", ex);
+
+                                        await Task.Delay(30000);
+                                        failcount++;
+
+                                        if (failcount >= 3)
+                                            throw;
+                                    }
                                 }
                             }
 
-                            failcount = 0;
-                            var SingleDeletions = discordMessages.Where(x => x.Timestamp.GetTimespanSince() > TimeSpan.FromDays(14)).ToList();
-
-                            while (BulkDeletions.Count > 0)
-                            {
-                                try
-                                {
-                                    var msg = SingleDeletions[0];
-
-                                    await e.Before.Channel.DeleteMessageAsync(msg);
-                                    SingleDeletions.Remove(msg);
-                                    await Task.Delay(30000);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogWarn($"Failed to single delete messages for in voice text clearer", ex);
-
-                                    await Task.Delay(30000);
-                                    failcount++;
-
-                                    if (failcount >= 3)
-                                        break;
-                                }
-                            }
+                            _logger.LogTrace($"{e.User.Id}: Finished In-Voice Text Privacy Cleaner");
                         }
                     }
                 }
-            }).Add(_bot._watcher);
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to execute a In-Voice Text Privacy Cleaner", ex);
+                }
+            }));
         }
     }
 
