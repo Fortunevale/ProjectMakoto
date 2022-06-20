@@ -140,7 +140,7 @@ internal class VoicePrivacyEvents
                                 failcount = 0;
                                 var SingleDeletions = discordMessages.Where(x => x.Timestamp.GetTimespanSince() > TimeSpan.FromDays(14)).ToList();
 
-                                while (BulkDeletions.Count > 0)
+                                while (SingleDeletions.Count > 0)
                                 {
                                     try
                                     {
