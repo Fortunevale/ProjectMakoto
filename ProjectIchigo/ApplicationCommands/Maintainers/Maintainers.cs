@@ -304,4 +304,31 @@ internal class Maintainers : ApplicationCommandsModule
             await ctx.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
         }).Add(_bot._watcher, ctx);
     }
+
+    [SlashCommand("botnick", "Changes the bot's nickname on the current server.")]
+    public async Task BotNick(InteractionContext ctx, [Option("nickname", "The new nickname")] string newNickname)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.User.IsMaintenance(_bot._status))
+            {
+                _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
+                return;
+            }
+
+            try
+            {
+                await ctx.Guild.CurrentMember.ModifyAsync(x => x.Nickname = newNickname);
+
+                if (newNickname.IsNullOrWhiteSpace())
+                    await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"My nickname on this server has been reset."));
+                else
+                    await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"My nickname on this server has been changed to **{newNickname}**."));
+            }
+            catch (Exception)
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"My nickname could not be changed."));
+            }
+        }).Add(_bot._watcher, ctx);
+    }
 }
