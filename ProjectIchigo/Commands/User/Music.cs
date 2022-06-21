@@ -684,12 +684,12 @@ internal class Music : BaseCommandModule
                     LastInt = CurrentPage * 10;
 
                     var Description = $"**`There's currently {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued.`**\n\n";
-                    Description += $"{string.Join("\n", _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.VideoTitle}` requested by {x.user.Mention}"))}\n\n";
+                    Description += $"{string.Join("\n", _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. [`{x.VideoTitle}`]({x.Url}) requested by {x.user.Mention}"))}\n\n";
                     
                     if (_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count > 0)
                         Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count / 10.0)}`\n\n";
                     
-                    Description += $"`Currently playing:` `{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`\n";
+                    Description += $"`Currently playing:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : msg.JumpLink)})\n";
                     Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : "<:disabledrepeat:981594645165408286>")}";
                     Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : "<:disabledshuffle:981594650018209863>")}";
                     Description += $" `|` {(_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "<a:paused:981594656435490836>" : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : "<:disabledplay:981594639440154744>")} ")}";
