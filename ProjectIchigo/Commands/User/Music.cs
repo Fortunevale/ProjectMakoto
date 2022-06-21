@@ -466,7 +466,7 @@ internal class Music : BaseCommandModule
                         _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), ctx.Guild, ctx.User));
                     }
 
-                    embed.Description = $"✅ `Queued {added} songs from '{loadResult.PlaylistInfo.Name}'.`";
+                    embed.Description = $"✅ `Queued {added} songs from `[`{loadResult.PlaylistInfo.Name}`]({search})`.`";
 
                     embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count - added + 1)} - {_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
@@ -479,7 +479,7 @@ internal class Music : BaseCommandModule
 
                     _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
 
-                    embed.Description = $"✅ `Queued '{track.Title}'.`";
+                    embed.Description = $"✅ `Queued `[`{track.Title}`]({track.Uri})`.`";
 
                     embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
                     embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
@@ -490,7 +490,7 @@ internal class Music : BaseCommandModule
                 }
                 else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
                 {
-                    embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search results. Please select the song you want to add below.`";
+                    embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search result(s). Please select the song you want to add below.`";
                     await msg.ModifyAsync(embed.Build());
 
                     string SelectedUri;
@@ -513,7 +513,7 @@ internal class Music : BaseCommandModule
 
                     _bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
 
-                    embed.Description = $"✅ `Queued '{track.Title}'.`";
+                    embed.Description = $"✅ `Queued `[`{track.Title}`]({track.Uri})`.`";
 
                     embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
                     embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
@@ -888,7 +888,7 @@ internal class Music : BaseCommandModule
 
                 _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"✅ `Removed '{info.VideoTitle}' from the current queue.`",
+                    Description = $"✅ `Removed` [`{info.VideoTitle}`]({info.Url}) `from the current queue.`",
                     Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
