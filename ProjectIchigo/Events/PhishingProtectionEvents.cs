@@ -18,7 +18,7 @@ internal class PhishingProtectionEvents
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
-        if (e.MessageBefore.Content != e.Message.Content)
+        if (e.MessageBefore?.Content != e.Message?.Content)
             CheckMessage(sender, e.Guild, e.Message).Add(_bot._watcher);
     }
 
