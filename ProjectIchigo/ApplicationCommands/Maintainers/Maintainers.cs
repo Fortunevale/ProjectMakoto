@@ -306,7 +306,7 @@ internal class Maintainers : ApplicationCommandsModule
     }
 
     [SlashCommand("botnick", "Changes the bot's nickname on the current server.")]
-    public async Task BotNick(InteractionContext ctx, [Option("nickname", "The new nickname")] string newNickname)
+    public async Task BotNick(InteractionContext ctx, [Option("nickname", "The new nickname")] string newNickname = "")
     {
         Task.Run(async () =>
         {

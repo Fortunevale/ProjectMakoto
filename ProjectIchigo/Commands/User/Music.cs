@@ -361,7 +361,7 @@ internal class Music : BaseCommandModule
                 if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
                     return;
 
-                if (string.IsNullOrWhiteSpace(search))
+                if (search.IsNullOrWhiteSpace())
                 {
                     _ = ctx.SendSyntaxError();
                     return;
