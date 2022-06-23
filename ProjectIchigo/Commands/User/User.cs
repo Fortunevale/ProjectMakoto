@@ -499,94 +499,98 @@ internal class User : BaseCommandModule
 
 
 
-    //[Command("banner"),
-    //CommandModule("user"),
-    //Description("Sends the user's banner as an embedded image")]
-    //public async Task Banner(CommandContext ctx, DiscordUser victim = null)
-    //{
-    //    Task.Run(async () =>
-    //    {
-    //        if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-    //            return;
+    [Command("banner"),
+    CommandModule("user"),
+    Description("Sends the user's banner as an embedded image")]
+    public async Task Banner(CommandContext ctx, DiscordUser victim = null)
+    {
+        Task.Run(async () =>
+        {
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                return;
 
-    //        if (victim is null)
-    //        {
-    //            victim = ctx.Member;
-    //        }
+            if (victim is null)
+            {
+                victim = ctx.User;
+            }
 
-    //        var embed = new DiscordEmbedBuilder
-    //        {
-    //            Author = new DiscordEmbedBuilder.EmbedAuthor
-    //            {
-    //                Name = $"{victim.Username}#{victim.Discriminator}'s Banner",
-    //                Url = victim.AvatarUrl
-    //            },
-    //            ImageUrl = victim.BannerUrl,
-    //            Description = (string.IsNullOrWhiteSpace(victim.BannerUrl) ? "`This user has no banner.`" : ""),
-    //            Footer = ctx.GenerateUsedByFooter(),
-    //            Timestamp = DateTime.UtcNow,
-    //            Color = EmbedColors.Info
-    //        };
+            victim = await victim.GetFromApiAsync();
 
-    //        DiscordMember member = null;
+            var embed = new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = $"{victim.UsernameWithDiscriminator}'s Banner",
+                    Url = victim.AvatarUrl
+                },
+                ImageUrl = victim.BannerUrl,
+                Description = (victim.BannerUrl.IsNullOrWhiteSpace() ? "`This user has no banner.`" : ""),
+                Footer = ctx.GenerateUsedByFooter(),
+                Timestamp = DateTime.UtcNow,
+                Color = EmbedColors.Info
+            };
 
-    //        try { member = await victim.ConvertToMember(ctx.Guild); } catch { }
+            //DiscordMember member = null;
 
-    //        var ServerBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Banner", (string.IsNullOrWhiteSpace(member?.GuildBannerHash)));
-    //        var ProfileBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Banner", false);
+            //try
+            //{ member = await victim.ConvertToMember(ctx.Guild); }
+            //catch { }
 
-    //        DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerBannerButton);
+            //var ServerBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Banner", (string.IsNullOrWhiteSpace(member?.GuildBannerHash)));
+            //var ProfileBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Banner", false);
 
-    //        var msg = await ctx.Channel.SendMessageAsync(builder);
+            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed)/*.AddComponents(ServerBannerButton)*/;
 
-    //        CancellationTokenSource cancellationTokenSource = new();
+            var msg = await ctx.Channel.SendMessageAsync(builder);
 
-    //        ctx.Client.ComponentInteractionCreated += RunInteraction;
+            //CancellationTokenSource cancellationTokenSource = new();
 
-    //        async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-    //        {
-    //            Task.Run(async () =>
-    //            {
-    //                if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
-    //                {
-    //                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+            //ctx.Client.ComponentInteractionCreated += RunInteraction;
 
-    //                    cancellationTokenSource.Cancel();
-    //                    cancellationTokenSource = new();
+            //async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+            //{
+            //    Task.Run(async () =>
+            //    {
+            //        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
+            //        {
+            //            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-    //                    if (e.Interaction.Data.CustomId == ServerBannerButton.CustomId)
-    //                    {
-    //                        embed.ImageUrl = member.GuildBannerUrl;
-    //                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfileBannerButton));
-    //                    }
-    //                    else if (e.Interaction.Data.CustomId == ProfileBannerButton.CustomId)
-    //                    {
-    //                        embed.ImageUrl = member.BannerUrl;
-    //                        _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerBannerButton));
-    //                    }
+            //            cancellationTokenSource.Cancel();
+            //            cancellationTokenSource = new();
 
-    //                    try
-    //                    {
-    //                        await Task.Delay(60000, cancellationTokenSource.Token);
-    //                        embed.Footer.Text += " • Interaction timed out";
-    //                        ctx.Client.ComponentInteractionCreated -= RunInteraction;
-    //                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-    //                    }
-    //                    catch { }
-    //                }
-    //            }).Add(_bot._watcher, ctx);
-    //        }
+            //            if (e.Interaction.Data.CustomId == ServerBannerButton.CustomId)
+            //            {
+            //                embed.ImageUrl = member.GuildBannerUrl;
+            //                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfileBannerButton));
+            //            }
+            //            else if (e.Interaction.Data.CustomId == ProfileBannerButton.CustomId)
+            //            {
+            //                embed.ImageUrl = member.BannerUrl;
+            //                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerBannerButton));
+            //            }
 
-    //        try
-    //        {
-    //            await Task.Delay(60000, cancellationTokenSource.Token);
-    //            embed.Footer.Text += " • Interaction timed out";
-    //            ctx.Client.ComponentInteractionCreated -= RunInteraction;
-    //            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-    //        }
-    //        catch { }
-    //    }).Add(_bot._watcher, ctx);
-    //}
+            //            try
+            //            {
+            //                await Task.Delay(60000, cancellationTokenSource.Token);
+            //                embed.Footer.Text += " • Interaction timed out";
+            //                ctx.Client.ComponentInteractionCreated -= RunInteraction;
+            //                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            //            }
+            //            catch { }
+            //        }
+            //    }).Add(_bot._watcher, ctx);
+            //}
+
+            //try
+            //{
+            //    await Task.Delay(60000, cancellationTokenSource.Token);
+            //    embed.Footer.Text += " • Interaction timed out";
+            //    ctx.Client.ComponentInteractionCreated -= RunInteraction;
+            //    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            //}
+            //catch { }
+        }).Add(_bot._watcher, ctx);
+    }
 
 
 

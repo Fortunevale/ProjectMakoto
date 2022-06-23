@@ -158,6 +158,12 @@ internal class Maintainers : ApplicationCommandsModule
                 throw;
             }
         }
+        
+        [SlashCommand("rawuserinfo", "Debug")]
+        public async Task RawUserInfo(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
+        {
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"```json\n{JsonConvert.SerializeObject(await user.GetFromApiAsync(), Formatting.Indented)}\n```"));
+        }
     }
 #endif
 
