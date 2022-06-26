@@ -44,12 +44,22 @@ internal class BumpReminder
 
     internal void ScheduleBump(DiscordClient client, ulong ServerId)
     {
-        if (GetScheduleTasks() != null)
-            if (GetScheduleTasks().Any(x => x.Value.customId == $"bumpmsg-{ServerId}"))
-                DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ServerId}").Key);
+        _logger.LogDebug($"Queuing Bump Message for '{ServerId}'");
+
+        try
+        {
+            if (GetScheduleTasks() is not null)
+                if (GetScheduleTasks()?.Any(x => x.Value.customId == $"bumpmsg-{ServerId}") ?? false)
+                    DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ServerId}").Key);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occured while trying to un-queue previous bump messages for '{ServerId}'", ex);
+        }
 
         var task = new Task(new Action(async () =>
         {
+            _logger.LogDebug($"Executing Bump Message for '{ServerId}'");
             var Guild = await client.GetGuildAsync(ServerId);
 
             if (!Guild.Channels.ContainsKey(_bot._guilds.List[ServerId].BumpReminderSettings.ChannelId) || _bot._guilds.List[ServerId].BumpReminderSettings.BumpsMissed > 168)
