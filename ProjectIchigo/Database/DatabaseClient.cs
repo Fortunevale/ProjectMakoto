@@ -572,13 +572,15 @@ internal class DatabaseClient
                                 {
                                     userid = x.Key,
 
-                                    experience = x.Value.Experience,
-                                    experience_level = x.Value.Level,
-                                    experience_last_message = Convert.ToUInt64(x.Value.Last_Message.ToUniversalTime().Ticks),
+                                    experience = x.Value.Experience.Points,
+                                    experience_level = x.Value.Experience.Level,
+                                    experience_last_message = Convert.ToUInt64(x.Value.Experience.Last_Message.ToUniversalTime().Ticks),
                                     first_join = Convert.ToUInt64(x.Value.FirstJoinDate.ToUniversalTime().Ticks),
                                     last_leave = Convert.ToUInt64(x.Value.LastLeaveDate.ToUniversalTime().Ticks),
                                     roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
-                                    saved_nickname = x.Value.SavedNickname
+                                    saved_nickname = x.Value.SavedNickname,
+                                    invite_code = x.Value.InviteTracker.Code,
+                                    invite_user = x.Value.InviteTracker.UserId,
                                 }).ToList();
 
                                 if (mainDatabaseConnection == null)
@@ -602,6 +604,8 @@ internal class DatabaseClient
                                     cmd.Parameters.AddWithValue($"last_leave{i}", DatabaseInserts[i].last_leave);
                                     cmd.Parameters.AddWithValue($"roles{i}", DatabaseInserts[i].roles);
                                     cmd.Parameters.AddWithValue($"saved_nickname{i}", DatabaseInserts[i].saved_nickname);
+                                    cmd.Parameters.AddWithValue($"invite_code{i}", DatabaseInserts[i].invite_code);
+                                    cmd.Parameters.AddWithValue($"invite_user{i}", DatabaseInserts[i].invite_user);
                                 }
 
                                 cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

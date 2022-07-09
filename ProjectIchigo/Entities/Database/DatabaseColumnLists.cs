@@ -104,6 +104,8 @@ internal class DatabaseColumnLists
         new Column("actionlog_log_invites_modified", "tinyint(1)"),
         new Column("vc_privacy_perms", "tinyint(1)"),
         new Column("vc_privacy_clear", "tinyint(1)"),
+        new Column("invitetracker_enabled", "tinyint(1)"),
+        new Column("invitetracker_cache", "text", "utf8mb4_0900_ai_ci"),
     };
 
     internal readonly static List<Column> guild_users = new()
@@ -111,6 +113,8 @@ internal class DatabaseColumnLists
         new Column("userid", "bigint", primary: true),
         new Column("saved_nickname", "text", "utf8mb4_0900_ai_ci", "", true),
         new Column("roles", "text", "utf8mb4_0900_ai_ci"),
+        new Column("invite_user", "bigint"),
+        new Column("invite_code", "text", "utf8mb4_0900_ai_ci"),
         new Column("first_join", "bigint"),
         new Column("last_leave", "bigint"),
         new Column("experience_last_message", "bigint"),

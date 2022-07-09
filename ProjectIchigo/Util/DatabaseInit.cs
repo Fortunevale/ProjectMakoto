@@ -140,9 +140,17 @@ internal class DatabaseInit
                 foreach (var b in memberList)
                     _bot._guilds.List[Convert.ToUInt64(table)].Members.Add(b.userid, new Member
                     {
-                        Level = b.experience_level,
-                        Experience = b.experience,
-                        Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message)),
+                        Experience = new()
+                        {
+                            Level = b.experience_level,
+                            Points = b.experience,
+                            Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message)),
+                        },
+                        InviteTracker = new()
+                        {
+                            Code = b.invite_code,
+                            UserId = b.invite_user
+                        },
                         FirstJoinDate = (b.first_join == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.first_join)),
                         LastLeaveDate = (b.last_leave == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.last_leave)),
                         MemberRoles = JsonConvert.DeserializeObject<List<MemberRole>>((b.roles is null or "null" or "" ? "[]" : b.roles)),
