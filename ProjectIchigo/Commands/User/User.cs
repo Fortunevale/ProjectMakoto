@@ -389,9 +389,21 @@ internal class User : BaseCommandModule
 
                 embed.AddField(new DiscordEmbedField("First joined at", $"{Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})", true));
 
-                embed.AddField(new DiscordEmbedField("Invited by", $"`Not yet implemented.`", true));
+                if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+                    embed.AddField(new DiscordEmbedField("Invited by", $"{(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
 
-                embed.AddField(new DiscordEmbedField("Users invited", $"`Not yet implemented.`", true));
+                if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+                {
+                    long Count = 0;
+
+                    foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members)
+                    {
+                        if (b.Value.InviteTracker.UserId == victim.Id)
+                            Count++;
+                    }
+
+                    embed.AddField(new DiscordEmbedField("Users invited", $"`{Count}`", true));
+                }
 
                 if (bMember is not null)
                     if (bMember.CommunicationDisabledUntil.HasValue)
