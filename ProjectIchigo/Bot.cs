@@ -544,6 +544,11 @@ internal class Bot
                         _guilds.List[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                 }
 
+                if (_guilds.List[guild.Key].InviteTrackerSettings.Enabled)
+                {
+                    await InviteTrackerEvents.UpdateCachedInvites(this, guild.Value);
+                }
+
                 startupTasksSuccess++;
             }));
         }

@@ -25,7 +25,7 @@ internal class ExperienceEvents
             if (!_bot._guilds.List[e.Guild.Id].Members.ContainsKey(e.Author.Id))
                 _bot._guilds.List[e.Guild.Id].Members.Add(e.Author.Id, new());
 
-            if (_bot._guilds.List[e.Guild.Id].Members[e.Author.Id].Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
+            if (_bot._guilds.List[e.Guild.Id].Members[e.Author.Id].Experience.Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
             {
                 var exp = _bot._experienceHandler.CalculateMessageExperience(e.Message);
 
@@ -36,7 +36,7 @@ internal class ExperienceEvents
 
                 if (exp > 0)
                 {
-                    _bot._guilds.List[e.Guild.Id].Members[e.Author.Id].Last_Message = DateTime.UtcNow;
+                    _bot._guilds.List[e.Guild.Id].Members[e.Author.Id].Experience.Last_Message = DateTime.UtcNow;
                     _bot._experienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
                 }
             }

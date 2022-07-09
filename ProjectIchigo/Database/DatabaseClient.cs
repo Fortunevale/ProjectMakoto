@@ -474,6 +474,9 @@ internal class DatabaseClient
 
                             vc_privacy_clear = x.Value.InVoiceTextPrivacySettings.ClearTextEnabled,
                             vc_privacy_perms = x.Value.InVoiceTextPrivacySettings.SetPermissionsEnabled,
+
+                            invitetracker_enabled = x.Value.InviteTrackerSettings.Enabled,
+                            invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache)
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -541,6 +544,9 @@ internal class DatabaseClient
 
                             cmd.Parameters.AddWithValue($"vc_privacy_clear{i}", DatabaseInserts[i].vc_privacy_clear);
                             cmd.Parameters.AddWithValue($"vc_privacy_perms{i}", DatabaseInserts[i].vc_privacy_perms);
+
+                            cmd.Parameters.AddWithValue($"invitetracker_enabled{i}", DatabaseInserts[i].invitetracker_enabled);
+                            cmd.Parameters.AddWithValue($"invitetracker_cache{i}", DatabaseInserts[i].invitetracker_cache);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
@@ -572,13 +578,15 @@ internal class DatabaseClient
                                 {
                                     userid = x.Key,
 
-                                    experience = x.Value.Experience,
-                                    experience_level = x.Value.Level,
-                                    experience_last_message = Convert.ToUInt64(x.Value.Last_Message.ToUniversalTime().Ticks),
+                                    experience = x.Value.Experience.Points,
+                                    experience_level = x.Value.Experience.Level,
+                                    experience_last_message = Convert.ToUInt64(x.Value.Experience.Last_Message.ToUniversalTime().Ticks),
                                     first_join = Convert.ToUInt64(x.Value.FirstJoinDate.ToUniversalTime().Ticks),
                                     last_leave = Convert.ToUInt64(x.Value.LastLeaveDate.ToUniversalTime().Ticks),
                                     roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
-                                    saved_nickname = x.Value.SavedNickname
+                                    saved_nickname = x.Value.SavedNickname,
+                                    invite_code = x.Value.InviteTracker.Code,
+                                    invite_user = x.Value.InviteTracker.UserId,
                                 }).ToList();
 
                                 if (mainDatabaseConnection == null)
@@ -602,6 +610,8 @@ internal class DatabaseClient
                                     cmd.Parameters.AddWithValue($"last_leave{i}", DatabaseInserts[i].last_leave);
                                     cmd.Parameters.AddWithValue($"roles{i}", DatabaseInserts[i].roles);
                                     cmd.Parameters.AddWithValue($"saved_nickname{i}", DatabaseInserts[i].saved_nickname);
+                                    cmd.Parameters.AddWithValue($"invite_code{i}", DatabaseInserts[i].invite_code);
+                                    cmd.Parameters.AddWithValue($"invite_user{i}", DatabaseInserts[i].invite_user);
                                 }
 
                                 cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

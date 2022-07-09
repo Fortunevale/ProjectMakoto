@@ -36,7 +36,7 @@ internal class ActionlogEvents
             if (!await ValidateServer(e.Guild) || !_bot._guilds.List[e.Guild.Id].ActionLogSettings.MembersModified)
                 return;
 
-            _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"User joined" },
                 Color = new DiscordColor("00ff21"),
@@ -44,8 +44,32 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
                 Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
-                                $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
-            }));
+                                          $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
+            };
+
+            _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith<Task>(async x =>
+            {
+                if (!x.IsCompletedSuccessfully || !_bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Enabled)
+                    return;
+
+                await Task.Delay(5000);
+
+                int Wait = 0;
+
+                while (Wait < 10 && _bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
+                {
+                    Wait++;
+                    await Task.Delay(1000);
+                }
+
+                if (_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
+                    return;
+
+                embed.Description += $"\n\n**Invited by**: <@{_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
+                embed.Description += $"**Invited Code**: `{_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
+
+                _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            });
         }).Add(_bot._watcher);
     }
 

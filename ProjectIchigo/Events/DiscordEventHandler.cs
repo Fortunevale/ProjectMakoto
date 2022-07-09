@@ -19,6 +19,7 @@ internal class DiscordEventHandler
         experienceEvents = new(_bot);
         reactionRoleEvents = new(_bot);
         voicePrivacyEvents = new(_bot);
+        inviteTrackerEvents = new(_bot);
     }
 
 
@@ -37,6 +38,7 @@ internal class DiscordEventHandler
     ExperienceEvents experienceEvents { get; set; }
     ReactionRoleEvents reactionRoleEvents { get; set; }
     VoicePrivacyEvents voicePrivacyEvents { get; set; }
+    InviteTrackerEvents inviteTrackerEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -73,6 +75,7 @@ internal class DiscordEventHandler
         _ = genericGuildEvents.GuildMemberAdded(sender, e);
         _ = actionlogEvents.UserJoined(sender, e);
         _ = joinEvents.GuildMemberAdded(sender, e);
+        _ = inviteTrackerEvents.GuildMemberAdded(sender, e);
     }
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
@@ -151,6 +154,7 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild);
 
         _ = discordEvents.GuildCreated(sender, e);
+        _ = inviteTrackerEvents.GuildCreated(sender, e);
     }
 
     internal async Task MessageDeleted(DiscordClient sender, MessageDeleteEventArgs e)
@@ -230,6 +234,7 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild);
 
         _ = actionlogEvents.InviteCreated(sender, e);
+        _ = inviteTrackerEvents.InviteCreated(sender, e);
     }
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
@@ -237,6 +242,7 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild);
 
         _ = actionlogEvents.InviteDeleted(sender, e);
+        _ = inviteTrackerEvents.InviteDeleted(sender, e);
     }
 
     internal async Task MessageReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)

@@ -389,9 +389,21 @@ internal class User : BaseCommandModule
 
                 embed.AddField(new DiscordEmbedField("First joined at", $"{Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})", true));
 
-                embed.AddField(new DiscordEmbedField("Invited by", $"`Not yet implemented.`", true));
+                if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+                    embed.AddField(new DiscordEmbedField("Invited by", $"{(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
 
-                embed.AddField(new DiscordEmbedField("Users invited", $"`Not yet implemented.`", true));
+                if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+                {
+                    long Count = 0;
+
+                    foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members)
+                    {
+                        if (b.Value.InviteTracker.UserId == victim.Id)
+                            Count++;
+                    }
+
+                    embed.AddField(new DiscordEmbedField("Users invited", $"`{Count}`", true));
+                }
 
                 if (bMember is not null)
                     if (bMember.CommunicationDisabledUntil.HasValue)
@@ -622,8 +634,8 @@ internal class User : BaseCommandModule
                 victim = ctx.Member;
             }
 
-            long current = (long)Math.Floor((decimal)(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level - 1)));
-            long max = (long)Math.Floor((decimal)(_bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level) - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level - 1)));
+            long current = (long)Math.Floor((decimal)(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Points - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level - 1)));
+            long max = (long)Math.Floor((decimal)(_bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level) - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level - 1)));
 
             _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
             {
@@ -632,8 +644,8 @@ internal class User : BaseCommandModule
                     Name = $"Experience • {ctx.Guild.Name}",
                     IconUrl = ctx.Guild.IconUrl
                 },
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level.DigitsToEmotes()} with `{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
-                              $"**Level {(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Level + 1).DigitsToEmotes()} Progress**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level.DigitsToEmotes()} with `{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
+                              $"**Level {(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
@@ -694,7 +706,7 @@ internal class User : BaseCommandModule
 
             int currentuserplacement = 0;
 
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
             {
                 currentuserplacement++;
                 if (b.Key == ctx.User.Id)
@@ -705,7 +717,7 @@ internal class User : BaseCommandModule
 
             List<KeyValuePair<string, string>> Board = new();
 
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience))
+            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
             {
                 try
                 {
@@ -720,12 +732,12 @@ internal class User : BaseCommandModule
                     if (bMember.IsBot)
                         continue;
 
-                    if (b.Value.Experience <= 1)
+                    if (b.Value.Experience.Points <= 1)
                         break;
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.Username}#{bMember.Discriminator}` (`Level {b.Value.Level} with {b.Value.Experience} XP`)"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`Level {b.Value.Experience.Level} with {b.Value.Experience.Points} XP`)"));
 
                     if (count >= ShowAmount)
                         break;

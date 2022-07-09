@@ -47,4 +47,6 @@ public class DatabaseGuildSettings
     public bool actionlog_log_invites_modified { get; set; }
     public bool vc_privacy_perms { get; set; }
     public bool vc_privacy_clear { get; set; }
+    public bool invitetracker_enabled { get; set; }
+    public string invitetracker_cache { get; set; }
 }

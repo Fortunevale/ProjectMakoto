@@ -254,7 +254,7 @@ internal class Maintainers : BaseCommandModule
                                 if (!_bot._guilds.List[ ctx.Guild.Id ].Members.ContainsKey(user.Key))
                                     _bot._guilds.List[ ctx.Guild.Id ].Members.Add(user.Key, new());
 
-                                _bot._guilds.List[ ctx.Guild.Id ].Members[ user.Key ].Experience = (long)user.Value.Experience;
+                                _bot._guilds.List[ ctx.Guild.Id ].Members[ user.Key ].Experience.Points = (long)user.Value.Experience;
                                 _bot._experienceHandler.CheckExperience(user.Key, ctx.Guild);
                             }
                         }
