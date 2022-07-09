@@ -90,6 +90,11 @@ internal class DatabaseInit
                     ChannelsModified = b.actionlog_log_channels_modified,
                     VoiceStateUpdated = b.actionlog_log_voice_state,
                 },
+                InviteTrackerSettings = new() 
+                {
+                    Enabled = b.invitetracker_enabled,
+                    Cache = JsonConvert.DeserializeObject<ObservableCollection<InviteTrackerCacheItem>>((b.invitetracker_cache is null or "null" or "" ? "[]" : b.invitetracker_cache))
+                },
                 LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
                 ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
                 ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles)),

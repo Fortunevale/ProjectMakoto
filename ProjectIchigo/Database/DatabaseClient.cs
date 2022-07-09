@@ -474,6 +474,9 @@ internal class DatabaseClient
 
                             vc_privacy_clear = x.Value.InVoiceTextPrivacySettings.ClearTextEnabled,
                             vc_privacy_perms = x.Value.InVoiceTextPrivacySettings.SetPermissionsEnabled,
+
+                            invitetracker_enabled = x.Value.InviteTrackerSettings.Enabled,
+                            invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache)
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -541,6 +544,9 @@ internal class DatabaseClient
 
                             cmd.Parameters.AddWithValue($"vc_privacy_clear{i}", DatabaseInserts[i].vc_privacy_clear);
                             cmd.Parameters.AddWithValue($"vc_privacy_perms{i}", DatabaseInserts[i].vc_privacy_perms);
+
+                            cmd.Parameters.AddWithValue($"invitetracker_enabled{i}", DatabaseInserts[i].invitetracker_enabled);
+                            cmd.Parameters.AddWithValue($"invitetracker_cache{i}", DatabaseInserts[i].invitetracker_cache);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
