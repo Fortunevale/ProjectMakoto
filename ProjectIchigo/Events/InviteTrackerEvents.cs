@@ -9,7 +9,7 @@ internal class InviteTrackerEvents
 
     public Bot _bot { private get; set; }
 
-    private async Task UpdateCachedInvites(DiscordGuild guild)
+    public static async Task UpdateCachedInvites(Bot _bot, DiscordGuild guild)
     {
         _logger.LogDebug($"Fetching invites for {guild.Id}");
 
@@ -32,7 +32,7 @@ internal class InviteTrackerEvents
             if (!_bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Enabled)
                 return;
 
-            await UpdateCachedInvites(e.Guild);
+            await UpdateCachedInvites(_bot, e.Guild);
         }).Add(_bot._watcher);
     }
 
@@ -43,7 +43,7 @@ internal class InviteTrackerEvents
             if (!_bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Enabled)
                 return;
 
-            await UpdateCachedInvites(e.Guild);
+            await UpdateCachedInvites(_bot, e.Guild);
         }).Add(_bot._watcher);
     }
 
@@ -54,7 +54,7 @@ internal class InviteTrackerEvents
             if (!_bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Enabled)
                 return;
 
-            await UpdateCachedInvites(e.Guild);
+            await UpdateCachedInvites(_bot, e.Guild);
         }).Add(_bot._watcher);
     }
 
@@ -73,7 +73,7 @@ internal class InviteTrackerEvents
             foreach (var b in _bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Cache)
                 InvitesBefore.Add(b);
 
-            await UpdateCachedInvites(e.Guild);
+            await UpdateCachedInvites(_bot, e.Guild);
 
             foreach (var b in _bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Cache)
                 InvitesAfter.Add(b);
