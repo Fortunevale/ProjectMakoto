@@ -2688,6 +2688,9 @@ internal class Admin : BaseCommandModule
                 {
                     _bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled = !_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled;
 
+                    if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+                        _ = InviteTrackerEvents.UpdateCachedInvites(_bot, ctx.Guild);
+
                     _ = msg.DeleteAsync();
                     _ = ctx.Command.ExecuteAsync(ctx);
                 }
