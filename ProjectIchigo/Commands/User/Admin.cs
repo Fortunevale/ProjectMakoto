@@ -2588,4 +2588,116 @@ internal class Admin : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
     }
+
+
+    [Group("invitetracker"), Aliases("invite-tracker"),
+    CommandModule("admin"),
+    Description("Allows to review, change Invite Tracker Settings")]
+    public class InviteTracker : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        public async override Task BeforeExecutionAsync(CommandContext ctx)
+        {
+            if (!ctx.Member.IsAdmin(_bot._status))
+            {
+                _ = ctx.SendAdminError();
+                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
+            }
+        }
+
+        private string GetCurrentConfiguration(CommandContext ctx)
+        {
+            return $"`Invite Tracker Enabled`: {_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled.BoolToEmote(ctx.Client)}";
+        }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "", "", "In-Voice Text Channel Privacy");
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "", "", "In-Voice Text Channel Privacy");
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Shows currently defined settings for In-Voice Text Channel Privacy")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                var ListEmbed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Invite Tracker • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                    Color = EmbedColors.Info,
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow,
+                    Description = GetCurrentConfiguration(ctx)
+                };
+                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows modifying currently defined Auto Crosspost Channels and settings related to it")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                    return;
+
+                var embed = new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Invite Tracker • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                    Color = EmbedColors.Info,
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow,
+                    Description = GetCurrentConfiguration(ctx)
+                };
+
+                var Toggle = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Invite Tracking", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
+
+                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
+                .AddComponents(new List<DiscordComponent>
+                {
+                    Toggle
+                })
+                .AddComponents(Resources.CancelButton));
+
+                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
+
+                if (e.TimedOut)
+                {
+                    msg.ModifyToTimedOut(true);
+                    return;
+                }
+
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (e.Result.Interaction.Data.CustomId == Toggle.CustomId)
+                {
+                    _bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled = !_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled;
+
+                    _ = msg.DeleteAsync();
+                    _ = ctx.Command.ExecuteAsync(ctx);
+                }
+                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                {
+                    _ = msg.DeleteAsync();
+                    return;
+                }
+
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }
