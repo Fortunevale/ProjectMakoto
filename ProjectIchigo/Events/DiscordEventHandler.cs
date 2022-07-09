@@ -48,10 +48,11 @@ internal class DiscordEventHandler
             if (!_bot._guilds.List.ContainsKey(guild.Id))
                 _bot._guilds.List.Add(guild.Id, new Guilds.ServerSettings());
 
-        if (guild.Members is not null && guild.Members.Count > 0)
-            foreach(var b in guild.Members)
-                if (!_bot._guilds.List[ guild.Id ].Members.ContainsKey(b.Key))
-                    _bot._guilds.List[ guild.Id ].Members.Add(b.Key, new());
+        if (guild is not null)
+            if (guild.Members is not null && guild.Members.Count > 0)
+                foreach(var b in guild.Members)
+                    if (!_bot._guilds.List[ guild.Id ].Members.ContainsKey(b.Key))
+                        _bot._guilds.List[ guild.Id ].Members.Add(b.Key, new());
 
         if (member is not null && guild is not null)
             if (!_bot._guilds.List[ guild.Id ].Members.ContainsKey(member.Id))
@@ -285,7 +286,8 @@ internal class DiscordEventHandler
 
     internal async Task ThreadMemberUpdated(DiscordClient sender, ThreadMemberUpdateEventArgs e)
     {
-        FillDatabase(e.Thread.Guild);
+        if (e.Thread.Guild is not null)
+            FillDatabase(e.Thread.Guild);
 
         _ = e.Thread.JoinAsync();
     }
