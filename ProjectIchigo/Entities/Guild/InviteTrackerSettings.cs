@@ -7,6 +7,11 @@ internal class InviteTrackerSettings
         Cache.CollectionChanged += Cache_CollectionChanged;
     }
 
+    ~InviteTrackerSettings()
+    {
+        Cache.CollectionChanged -= Cache_CollectionChanged;
+    }
+
     private void Cache_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         _ = Bot.DatabaseClient.SyncDatabase();

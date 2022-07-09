@@ -105,20 +105,6 @@ internal class DatabaseInit
                 }
             });
 
-        foreach (var b in _bot._guilds.List)
-            try
-            {
-                b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
-                b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
-            }
-            catch { }
-
-        foreach (var b in _bot._guilds.List)
-        {
-            b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
-            b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);
-        }
-
         _logger.LogInfo($"Loaded {_bot._guilds.List.Count} guilds from table 'guilds'.");
 
         foreach (var table in await _bot._databaseClient._helper.ListTables(_bot._databaseClient.guildDatabaseConnection))

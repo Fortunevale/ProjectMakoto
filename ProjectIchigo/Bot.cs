@@ -11,7 +11,6 @@ internal class Bot
 
 
     internal DatabaseClient _databaseClient { get; set; }
-    internal CollectionUpdates _collectionUpdates { get; set; }
 
 
     internal Status _status = new();
@@ -55,8 +54,6 @@ internal class Bot
         _loggerProvider = _logger._provider;
 
         _logger.LogRaised += LogHandler;
-
-        _collectionUpdates = new(this);
 
         _logger.LogInfo("Starting up..");
 

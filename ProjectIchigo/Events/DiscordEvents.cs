@@ -23,20 +23,6 @@ internal class DiscordEvents
                 if (!_bot._guilds.List.ContainsKey(guild.Key))
                     _bot._guilds.List.Add(guild.Key, new Guilds.ServerSettings());
             }
-
-            foreach (var b in _bot._guilds.List)
-                try
-                {
-                    b.Value.ProcessedAuditLogs.CollectionChanged -= _bot._collectionUpdates.AuditLogCollectionUpdated(b);
-                    b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged -= _bot._collectionUpdates.CrosspostCollectionUpdated(b);
-                }
-                catch { }
-
-            foreach (var b in _bot._guilds.List)
-            {
-                b.Value.CrosspostSettings.CrosspostChannels.CollectionChanged += _bot._collectionUpdates.CrosspostCollectionUpdated(b);
-                b.Value.ProcessedAuditLogs.CollectionChanged += _bot._collectionUpdates.AuditLogCollectionUpdated(b);
-            }
         }).Add(_bot._watcher);
     }
 }
