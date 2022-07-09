@@ -106,6 +106,7 @@ internal class DatabaseColumnLists
         new Column("vc_privacy_clear", "tinyint(1)"),
         new Column("invitetracker_enabled", "tinyint(1)"),
         new Column("invitetracker_cache", "text", "utf8mb4_0900_ai_ci"),
+        new Column("autounarchivelist", "text", "utf8mb4_0900_ai_ci"),
     };
 
     internal readonly static List<Column> guild_users = new()

@@ -9,6 +9,7 @@ internal class Guilds
         internal ServerSettings()
         {
             CrosspostSettings.CrosspostChannels.CollectionChanged += CrosspostSettings.CrosspostCollectionUpdated();
+            AutoUnarchiveThreads.CollectionChanged += UnarchiveThreadsUpdated();
             ProcessedAuditLogs.CollectionChanged += AuditLogCollectionUpdated();
         }
 
@@ -16,6 +17,7 @@ internal class Guilds
         {
             CrosspostSettings.CrosspostChannels.CollectionChanged -= CrosspostSettings.CrosspostCollectionUpdated();
             ProcessedAuditLogs.CollectionChanged -= AuditLogCollectionUpdated();
+            AutoUnarchiveThreads.CollectionChanged -= UnarchiveThreadsUpdated();
         }
 
         public PhishingDetectionSettings PhishingDetectionSettings { get; set; } = new();
@@ -30,6 +32,7 @@ internal class Guilds
         public InVoiceTextPrivacySettings InVoiceTextPrivacySettings { get; set; } = new();
         public InviteTrackerSettings InviteTrackerSettings { get; set; } = new();
         public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
+        public ObservableCollection<ulong> AutoUnarchiveThreads { get; set; } = new();
         public Lavalink Lavalink { get; set; } = new();
 
         internal NotifyCollectionChangedEventHandler AuditLogCollectionUpdated()
@@ -39,6 +42,14 @@ internal class Guilds
                 if (ProcessedAuditLogs.Count > 50)
                     ProcessedAuditLogs.Remove(ProcessedAuditLogs[0]);
 
+                _ = Bot.DatabaseClient.SyncDatabase();
+            };
+        }
+
+        internal NotifyCollectionChangedEventHandler UnarchiveThreadsUpdated()
+        {
+            return (s, e) =>
+            {
                 _ = Bot.DatabaseClient.SyncDatabase();
             };
         }
