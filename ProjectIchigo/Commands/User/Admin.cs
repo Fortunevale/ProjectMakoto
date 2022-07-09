@@ -2506,7 +2506,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined Auto Crosspost Channels and settings related to it")]
+        Description("Allows modifying currently defined In-Voice Text Channel Privacy Settings")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -2648,7 +2648,7 @@ internal class Admin : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined Auto Crosspost Channels and settings related to it")]
+        Description("Allows modifying currently defined invite tracking Settings")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
