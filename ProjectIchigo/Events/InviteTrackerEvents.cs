@@ -81,7 +81,12 @@ internal class InviteTrackerEvents
             foreach (var b in InvitesBefore)
             {
                 if (!InvitesAfter.Any(x => x.Code == b.Code))
-                    continue;
+                {
+                    _bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
+                    _bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
+                    _logger.LogDebug($"User {e.Member.Id} joined {e.Guild.Id} with now deleted {b.Code} created by {b.CreatorId}");
+                    return;
+                }
 
                 if (InvitesAfter.First(x => x.Code == b.Code).Uses > b.Uses)
                 {
