@@ -2590,7 +2590,7 @@ internal class Admin : BaseCommandModule
     }
 
 
-    [Group("invitetracker"), Aliases("invite-tracker"),
+    [Group("invitetracker"), Aliases("invite-tracker", "invitetracking", "invite-tracking"),
     CommandModule("admin"),
     Description("Allows to review, change Invite Tracker Settings")]
     public class InviteTracker : BaseCommandModule

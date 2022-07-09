@@ -52,6 +52,8 @@ internal class ActionlogEvents
                 if (!x.IsCompletedSuccessfully || !_bot._guilds.List[e.Guild.Id].InviteTrackerSettings.Enabled)
                     return;
 
+                await Task.Delay(5000);
+
                 int Wait = 0;
 
                 while (Wait < 10 && _bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
@@ -63,8 +65,8 @@ internal class ActionlogEvents
                 if (_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
                     return;
 
-                embed.Description += $"\n**Invited by**: <@{_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
-                embed.Description += $"\n**Invited Code**: <@{_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}>\n";
+                embed.Description += $"\n\n**Invited by**: <@{_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
+                embed.Description += $"**Invited Code**: `{_bot._guilds.List[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
 
                 _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
             });
