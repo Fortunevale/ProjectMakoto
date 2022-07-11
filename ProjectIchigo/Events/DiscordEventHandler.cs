@@ -20,6 +20,7 @@ internal class DiscordEventHandler
         reactionRoleEvents = new(_bot);
         voicePrivacyEvents = new(_bot);
         inviteTrackerEvents = new(_bot);
+        autoUnarchiveEvents = new(_bot);
     }
 
 
@@ -39,6 +40,7 @@ internal class DiscordEventHandler
     ReactionRoleEvents reactionRoleEvents { get; set; }
     VoicePrivacyEvents voicePrivacyEvents { get; set; }
     InviteTrackerEvents inviteTrackerEvents { get; set; }
+    AutoUnarchiveEvents autoUnarchiveEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -46,10 +48,11 @@ internal class DiscordEventHandler
             if (!_bot._guilds.List.ContainsKey(guild.Id))
                 _bot._guilds.List.Add(guild.Id, new Guilds.ServerSettings());
 
-        if (guild.Members is not null && guild.Members.Count > 0)
-            foreach(var b in guild.Members)
-                if (!_bot._guilds.List[ guild.Id ].Members.ContainsKey(b.Key))
-                    _bot._guilds.List[ guild.Id ].Members.Add(b.Key, new());
+        if (guild is not null)
+            if (guild.Members is not null && guild.Members.Count > 0)
+                foreach(var b in guild.Members)
+                    if (!_bot._guilds.List[ guild.Id ].Members.ContainsKey(b.Key))
+                        _bot._guilds.List[ guild.Id ].Members.Add(b.Key, new());
 
         if (member is not null && guild is not null)
             if (!_bot._guilds.List[ guild.Id ].Members.ContainsKey(member.Id))
@@ -267,5 +270,47 @@ internal class DiscordEventHandler
 
         _ = actionlogEvents.VoiceStateUpdated(sender, e);
         _ = voicePrivacyEvents.VoiceStateUpdated(sender, e);
+    }
+
+    internal async Task ThreadCreated(DiscordClient sender, ThreadCreateEventArgs e)
+    {
+        FillDatabase(e.Guild);
+
+        _ = e.Thread.JoinAsync();
+    }
+
+    internal async Task ThreadDeleted(DiscordClient sender, ThreadDeleteEventArgs e)
+    {
+        FillDatabase(e.Guild);
+    }
+
+    internal async Task ThreadMemberUpdated(DiscordClient sender, ThreadMemberUpdateEventArgs e)
+    {
+        if (e.Thread.Guild is not null)
+            FillDatabase(e.Thread.Guild);
+
+        _ = e.Thread.JoinAsync();
+    }
+
+    internal async Task ThreadMembersUpdated(DiscordClient sender, ThreadMembersUpdateEventArgs e)
+    {
+        FillDatabase(e.Guild);
+
+        _ = e.Thread.JoinAsync();
+    }
+
+    internal async Task ThreadListSynced(DiscordClient sender, ThreadListSyncEventArgs e)
+    {
+        FillDatabase(e.Guild);
+
+        foreach (var b in e.Threads)
+            _ = b.JoinAsync();
+    }
+
+    internal async Task ThreadUpdated(DiscordClient sender, ThreadUpdateEventArgs e)
+    {
+        FillDatabase(e.Guild);
+
+        _ = autoUnarchiveEvents.ThreadUpdated(sender, e);
     }
 }

@@ -11,7 +11,6 @@ internal class Bot
 
 
     internal DatabaseClient _databaseClient { get; set; }
-    internal CollectionUpdates _collectionUpdates { get; set; }
 
 
     internal Status _status = new();
@@ -55,8 +54,6 @@ internal class Bot
         _loggerProvider = _logger._provider;
 
         _logger.LogRaised += LogHandler;
-
-        _collectionUpdates = new(this);
 
         _logger.LogInfo("Starting up..");
 
@@ -229,42 +226,49 @@ internal class Bot
 
             _logger.LogDebug($"Registering DisCatSharp EventHandler..");
 
-            DiscordEventHandler disCatSharpEventHandler = new(this);
+            DiscordEventHandler discordEventHandler = new(this);
 
-            discordClient.GuildCreated += disCatSharpEventHandler.GuildCreated;
-            discordClient.GuildUpdated += disCatSharpEventHandler.GuildUpdated;
+            discordClient.GuildCreated += discordEventHandler.GuildCreated;
+            discordClient.GuildUpdated += discordEventHandler.GuildUpdated;
 
-            discordClient.ChannelCreated += disCatSharpEventHandler.ChannelCreated;
-            discordClient.ChannelDeleted += disCatSharpEventHandler.ChannelDeleted;
-            discordClient.ChannelUpdated += disCatSharpEventHandler.ChannelUpdated;
+            discordClient.ChannelCreated += discordEventHandler.ChannelCreated;
+            discordClient.ChannelDeleted += discordEventHandler.ChannelDeleted;
+            discordClient.ChannelUpdated += discordEventHandler.ChannelUpdated;
 
-            discordClient.GuildMemberAdded += disCatSharpEventHandler.GuildMemberAdded;
-            discordClient.GuildMemberRemoved += disCatSharpEventHandler.GuildMemberRemoved;
-            discordClient.GuildMemberUpdated += disCatSharpEventHandler.GuildMemberUpdated;
-            discordClient.GuildBanAdded += disCatSharpEventHandler.GuildBanAdded;
-            discordClient.GuildBanRemoved += disCatSharpEventHandler.GuildBanRemoved;
+            discordClient.GuildMemberAdded += discordEventHandler.GuildMemberAdded;
+            discordClient.GuildMemberRemoved += discordEventHandler.GuildMemberRemoved;
+            discordClient.GuildMemberUpdated += discordEventHandler.GuildMemberUpdated;
+            discordClient.GuildBanAdded += discordEventHandler.GuildBanAdded;
+            discordClient.GuildBanRemoved += discordEventHandler.GuildBanRemoved;
 
-            discordClient.InviteCreated += disCatSharpEventHandler.InviteCreated;
-            discordClient.InviteDeleted += disCatSharpEventHandler.InviteDeleted;
+            discordClient.InviteCreated += discordEventHandler.InviteCreated;
+            discordClient.InviteDeleted += discordEventHandler.InviteDeleted;
 
-            cNext.CommandExecuted += disCatSharpEventHandler.CommandExecuted;
-            cNext.CommandErrored += disCatSharpEventHandler.CommandError;
+            cNext.CommandExecuted += discordEventHandler.CommandExecuted;
+            cNext.CommandErrored += discordEventHandler.CommandError;
 
-            discordClient.MessageCreated += disCatSharpEventHandler.MessageCreated;
-            discordClient.MessageDeleted += disCatSharpEventHandler.MessageDeleted;
-            discordClient.MessagesBulkDeleted += disCatSharpEventHandler.MessagesBulkDeleted;
-            discordClient.MessageUpdated += disCatSharpEventHandler.MessageUpdated;
+            discordClient.MessageCreated += discordEventHandler.MessageCreated;
+            discordClient.MessageDeleted += discordEventHandler.MessageDeleted;
+            discordClient.MessagesBulkDeleted += discordEventHandler.MessagesBulkDeleted;
+            discordClient.MessageUpdated += discordEventHandler.MessageUpdated;
 
-            discordClient.MessageReactionAdded += disCatSharpEventHandler.MessageReactionAdded;
-            discordClient.MessageReactionRemoved += disCatSharpEventHandler.MessageReactionRemoved;
+            discordClient.MessageReactionAdded += discordEventHandler.MessageReactionAdded;
+            discordClient.MessageReactionRemoved += discordEventHandler.MessageReactionRemoved;
 
-            discordClient.ComponentInteractionCreated += disCatSharpEventHandler.ComponentInteractionCreated;
+            discordClient.ComponentInteractionCreated += discordEventHandler.ComponentInteractionCreated;
 
-            discordClient.GuildRoleCreated += disCatSharpEventHandler.GuildRoleCreated;
-            discordClient.GuildRoleDeleted += disCatSharpEventHandler.GuildRoleDeleted;
-            discordClient.GuildRoleUpdated += disCatSharpEventHandler.GuildRoleUpdated;
+            discordClient.GuildRoleCreated += discordEventHandler.GuildRoleCreated;
+            discordClient.GuildRoleDeleted += discordEventHandler.GuildRoleDeleted;
+            discordClient.GuildRoleUpdated += discordEventHandler.GuildRoleUpdated;
 
-            discordClient.VoiceStateUpdated += disCatSharpEventHandler.VoiceStateUpdated;
+            discordClient.VoiceStateUpdated += discordEventHandler.VoiceStateUpdated;
+
+            discordClient.ThreadCreated += discordEventHandler.ThreadCreated;
+            discordClient.ThreadDeleted += discordEventHandler.ThreadDeleted;
+            discordClient.ThreadMemberUpdated += discordEventHandler.ThreadMemberUpdated;
+            discordClient.ThreadMembersUpdated += discordEventHandler.ThreadMembersUpdated;
+            discordClient.ThreadUpdated += discordEventHandler.ThreadUpdated;
+            discordClient.ThreadListSynced += discordEventHandler.ThreadListSynced;
 
 
 
@@ -547,6 +551,28 @@ internal class Bot
                 if (_guilds.List[guild.Key].InviteTrackerSettings.Enabled)
                 {
                     await InviteTrackerEvents.UpdateCachedInvites(this, guild.Value);
+                }
+
+                List<DiscordThreadChannel> Threads = new();
+
+                while (true)
+                {
+                    var t = await guild.Value.GetActiveThreadsAsync();
+
+                    foreach (var b in t.ReturnedThreads.Values)
+                    {
+                        if (!Threads.Contains(b) && b is not null)
+                            Threads.Add(b);
+                    }
+
+                    if (!t.HasMore)
+                        break;
+                }
+
+                foreach (var b in Threads)
+                {
+                    _ = b.JoinAsync();
+                    await Task.Delay(2000);
                 }
 
                 startupTasksSuccess++;

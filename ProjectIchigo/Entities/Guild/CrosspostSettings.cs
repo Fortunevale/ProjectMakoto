@@ -11,4 +11,12 @@ internal class CrosspostSettings
     public ObservableCollection<ulong> CrosspostChannels { get; set; } = new();
     
     public ObservableCollection<CrosspostMessage> CrosspostTasks { get; set; } = new();
+
+    internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated()
+    {
+        return (s, e) =>
+        {
+            _ = Bot.DatabaseClient.SyncDatabase();
+        };
+    }
 }

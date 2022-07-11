@@ -476,7 +476,9 @@ internal class DatabaseClient
                             vc_privacy_perms = x.Value.InVoiceTextPrivacySettings.SetPermissionsEnabled,
 
                             invitetracker_enabled = x.Value.InviteTrackerSettings.Enabled,
-                            invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache)
+                            invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache),
+
+                            autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads)
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -547,6 +549,8 @@ internal class DatabaseClient
 
                             cmd.Parameters.AddWithValue($"invitetracker_enabled{i}", DatabaseInserts[i].invitetracker_enabled);
                             cmd.Parameters.AddWithValue($"invitetracker_cache{i}", DatabaseInserts[i].invitetracker_cache);
+
+                            cmd.Parameters.AddWithValue($"autounarchivelist{i}", DatabaseInserts[i].autounarchivelist);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

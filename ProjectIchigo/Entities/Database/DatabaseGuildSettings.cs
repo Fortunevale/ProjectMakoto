@@ -49,4 +49,5 @@ public class DatabaseGuildSettings
     public bool vc_privacy_clear { get; set; }
     public bool invitetracker_enabled { get; set; }
     public string invitetracker_cache { get; set; }
+    public string autounarchivelist { get; set; }
 }
