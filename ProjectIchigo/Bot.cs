@@ -571,8 +571,8 @@ internal class Bot
 
                 foreach (var b in Threads)
                 {
-                    _logger.LogDebug(JsonConvert.SerializeObject(b));
                     _ = b.JoinAsync();
+                    await Task.Delay(2000);
                 }
 
                 startupTasksSuccess++;

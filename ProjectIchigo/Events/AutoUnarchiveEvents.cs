@@ -13,7 +13,12 @@ internal class AutoUnarchiveEvents
     {
         Task.Run(async () =>
         {
-            _logger.LogDebug(e.ThreadAfter.Flags.ToString());
+            await Task.Delay(5000);
+            if (_bot._guilds.List[e.Guild.Id].AutoUnarchiveThreads.Contains(e.ThreadAfter.Parent.Id))
+            {
+                if (e.ThreadAfter.ThreadMetadata.Archived && (!e.ThreadAfter.ThreadMetadata.Locked ?? false))
+                    _ = e.ThreadAfter.UnarchiveAsync();
+            }
         }).Add(_bot._watcher);
     }
 }
