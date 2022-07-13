@@ -314,6 +314,7 @@ internal class Bot
             discordClient.ThreadMembersUpdated += discordEventHandler.ThreadMembersUpdated;
             discordClient.ThreadUpdated += discordEventHandler.ThreadUpdated;
             discordClient.ThreadListSynced += discordEventHandler.ThreadListSynced;
+            discordClient.UserUpdated += discordEventHandler.UserUpdated;
 
 
 

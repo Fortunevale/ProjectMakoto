@@ -21,6 +21,7 @@ internal class DiscordEventHandler
         voicePrivacyEvents = new(_bot);
         inviteTrackerEvents = new(_bot);
         autoUnarchiveEvents = new(_bot);
+        nameNormalizerEvents = new(_bot);
     }
 
 
@@ -41,6 +42,7 @@ internal class DiscordEventHandler
     VoicePrivacyEvents voicePrivacyEvents { get; set; }
     InviteTrackerEvents inviteTrackerEvents { get; set; }
     AutoUnarchiveEvents autoUnarchiveEvents { get; set; }
+    NameNormalizerEvents nameNormalizerEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -79,6 +81,7 @@ internal class DiscordEventHandler
         _ = actionlogEvents.UserJoined(sender, e);
         _ = joinEvents.GuildMemberAdded(sender, e);
         _ = inviteTrackerEvents.GuildMemberAdded(sender, e);
+        _ = nameNormalizerEvents.GuildMemberAdded(sender, e);
     }
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
@@ -96,6 +99,7 @@ internal class DiscordEventHandler
 
         _ = genericGuildEvents.GuildMemberUpdated(sender, e);
         _ = actionlogEvents.MemberUpdated(sender, e);
+        _ = nameNormalizerEvents.GuildMemberUpdated(sender, e);
     }
 
     internal async Task GuildBanAdded(DiscordClient sender, GuildBanAddEventArgs e)
@@ -312,5 +316,12 @@ internal class DiscordEventHandler
         FillDatabase(e.Guild);
 
         _ = autoUnarchiveEvents.ThreadUpdated(sender, e);
+    }
+
+    internal async Task UserUpdated(DiscordClient sender, UserUpdateEventArgs e)
+    {
+        FillDatabase(user: e.UserAfter);
+
+        _ = nameNormalizerEvents.UserUpdated(sender, e);
     }
 }

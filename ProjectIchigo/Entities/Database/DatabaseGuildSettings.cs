@@ -50,4 +50,5 @@ public class DatabaseGuildSettings
     public bool invitetracker_enabled { get; set; }
     public string invitetracker_cache { get; set; }
     public string autounarchivelist { get; set; }
+    public bool normalizenames { get; set; }
 }
