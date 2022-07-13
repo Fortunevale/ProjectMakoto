@@ -84,12 +84,10 @@ internal class Maintainers : ApplicationCommandsModule
                                 return;
                             }
 
-                            var issue = await client.Issue.Create(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, new NewIssue(title) { Body = description });
+                            var issue = await client.Issue.Create(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.UsernameWithDiscriminator}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
 
                             if (labels.Count > 0)
                                 await client.Issue.Labels.ReplaceAllForIssue(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, issue.Number, labels.ToArray());
-
-                            await client.Issue.Assignee.AddAssignees(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, issue.Number, new AssigneesUpdate(new List<string> { Secrets.Secrets.GithubUsername }));
 
                             _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"✅ `Issue submitted:` {issue.HtmlUrl}"));
                         }
