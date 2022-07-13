@@ -140,7 +140,7 @@ internal class Social : BaseCommandModule
 
 
 
-    [Command("slap"), PreventCommandDeletion,
+    [Command("slap"), Aliases("bonk", "punch"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Slap another user")]
     public async Task Slap(CommandContext ctx, DiscordUser user)
