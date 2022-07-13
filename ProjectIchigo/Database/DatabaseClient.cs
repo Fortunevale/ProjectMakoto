@@ -478,7 +478,9 @@ internal class DatabaseClient
                             invitetracker_enabled = x.Value.InviteTrackerSettings.Enabled,
                             invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache),
 
-                            autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads)
+                            autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
+                            
+                            normalizenames = x.Value.NameNormalizer.NameNormalizerEnabled
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -551,6 +553,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"invitetracker_cache{i}", DatabaseInserts[i].invitetracker_cache);
 
                             cmd.Parameters.AddWithValue($"autounarchivelist{i}", DatabaseInserts[i].autounarchivelist);
+
+                            cmd.Parameters.AddWithValue($"normalizenames{i}", DatabaseInserts[i].normalizenames);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);

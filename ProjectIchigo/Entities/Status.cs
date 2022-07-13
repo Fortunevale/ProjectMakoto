@@ -17,4 +17,6 @@ internal class Status
     internal long FatalRaised = 0;
 
     internal long DataReaderExceptions = 0;
+
+    internal Config LoadedConfig { get; set; }
 }

@@ -103,6 +103,10 @@ internal class DatabaseInit
                 {
                     ClearTextEnabled = b.vc_privacy_clear,
                     SetPermissionsEnabled = b.vc_privacy_perms
+                },
+                NameNormalizer = new() 
+                { 
+                    NameNormalizerEnabled = b.normalizenames
                 }
             });
 

@@ -122,7 +122,7 @@ internal class User : BaseCommandModule
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    IconUrl = Resources.StatusIndicators.LoadingBlue,
+                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
                     Name = "Informations about this server and bot"
                 },
                 Color = EmbedColors.Info,
@@ -979,7 +979,7 @@ internal class User : BaseCommandModule
                                 embed.Description = $"`Creating submission..`";
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                var channel = await ctx.Client.GetChannelAsync(940040486910066698);
+                                var channel = await ctx.Client.GetChannelAsync(_bot._status.LoadedConfig.UrlSubmissionsChannelId);
 
                                 var continue_button = new DiscordButtonComponent(ButtonStyle.Success, "accept_submission", "Accept submission", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
                                 var cancel_button = new DiscordButtonComponent(ButtonStyle.Danger, "deny_submission", "Deny submission", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 939750475354472478)));

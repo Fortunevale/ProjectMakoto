@@ -34,6 +34,7 @@ internal class Guilds
         public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
         public ObservableCollection<ulong> AutoUnarchiveThreads { get; set; } = new();
         public Lavalink Lavalink { get; set; } = new();
+        public NameNormalizerSettings NameNormalizer { get; set; } = new();
 
         internal NotifyCollectionChangedEventHandler AuditLogCollectionUpdated()
         {

@@ -42,7 +42,6 @@ internal class Bot
     internal ILoggerProvider _loggerProvider { get; set; }
 
     internal string Prefix { get; private set; } = ";;";
-    internal bool IsDev { get; private set; } = false;
 
 
     internal async Task Init(string[] args)
@@ -89,6 +88,51 @@ internal class Bot
         {
             try
             {
+                _logger.LogDebug($"Loading config..");
+
+                if (!File.Exists("config.json"))
+                    File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+
+                _status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(_status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                _logger.LogInfo($"Config loaded.");
+
+                Task.Run(async () =>
+                {
+                    DateTime lastModify = new();
+
+                    while (true)
+                    {
+                        try
+                        {
+                            FileInfo fileInfo = new("config.json");
+
+                            if (lastModify != fileInfo.LastWriteTimeUtc)
+                            {
+                                try
+                                {
+                                    _logger.LogDebug($"Reloading config..");
+                                    _status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                                    _logger.LogInfo($"Config reloaded.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError($"Failed to reload config", ex);
+                                }
+                            }
+
+                            lastModify = fileInfo.LastWriteTimeUtc;
+
+                            await Task.Delay(1000);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("An exception occured while trying to reload the config.json", ex);
+                            await Task.Delay(10000);
+                        }
+                    }
+                }).Add(_watcher);
+
                 Stopwatch databaseConnectionSc = new();
                 databaseConnectionSc.Start();
                 _logger.LogInfo($"Connecting to database..");
@@ -165,7 +209,8 @@ internal class Bot
                 Intents = DiscordIntents.All,
                 LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
                 AutoReconnect = true,
-                LoggerFactory = logger
+                LoggerFactory = logger,
+                HttpTimeout = TimeSpan.FromSeconds(60),
             });
 
             _experienceHandler = new(this);
@@ -269,6 +314,7 @@ internal class Bot
             discordClient.ThreadMembersUpdated += discordEventHandler.ThreadMembersUpdated;
             discordClient.ThreadUpdated += discordEventHandler.ThreadUpdated;
             discordClient.ThreadListSynced += discordEventHandler.ThreadListSynced;
+            discordClient.UserUpdated += discordEventHandler.UserUpdated;
 
 
 
@@ -306,8 +352,6 @@ internal class Bot
                 _logger.LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
                 _status.DiscordInitialized = true;
 
-                IsDev = (discordClient.CurrentApplication.Id == 929373806437470260);
-
                 Task.Run(async () =>
                 {
                     var appCommands = discordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
@@ -318,13 +362,13 @@ internal class Bot
                         EnableDefaultHelp = false
                     });
 
-                    if (IsDev)
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(929365338544545802);
+                    if (_status.LoadedConfig.IsDev)
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(_status.LoadedConfig.AssetsGuildId);
                     else
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
                 }).Add(_watcher);
 
-                if (IsDev)
+                if (_status.LoadedConfig.IsDev)
                     Prefix = ">>";
 
                 _ = Task.Run(() =>
