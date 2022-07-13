@@ -89,6 +89,51 @@ internal class Bot
         {
             try
             {
+                _logger.LogDebug($"Loading config..");
+
+                if (!File.Exists("config.json"))
+                    File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+
+                _status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(_status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                _logger.LogInfo($"Config loaded.");
+
+                Task.Run(async () =>
+                {
+                    DateTime lastModify = new();
+
+                    while (true)
+                    {
+                        try
+                        {
+                            FileInfo fileInfo = new("config.json");
+
+                            if (lastModify != fileInfo.LastWriteTimeUtc)
+                            {
+                                try
+                                {
+                                    _logger.LogDebug($"Reloading config..");
+                                    _status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                                    _logger.LogInfo($"Config reloaded.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError($"Failed to reload config", ex);
+                                }
+                            }
+
+                            lastModify = fileInfo.LastWriteTimeUtc;
+
+                            await Task.Delay(1000);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("An exception occured while trying to reload the config.json", ex);
+                            await Task.Delay(10000);
+                        }
+                    }
+                }).Add(_watcher);
+
                 Stopwatch databaseConnectionSc = new();
                 databaseConnectionSc.Start();
                 _logger.LogInfo($"Connecting to database..");
@@ -319,7 +364,7 @@ internal class Bot
                     });
 
                     if (IsDev)
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(929365338544545802);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(_status.LoadedConfig.AssetsGuildId);
                     else
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
                 }).Add(_watcher);

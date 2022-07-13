@@ -33,8 +33,6 @@ internal class JoinEvents
                 }
             }
 
-            string[] emojis = { "🙋‍", "🙋‍", "<a:3HC_wave:985374001062879292>", "<:wave:985373989927010315>", "<a:wave:985374007144632381>", "<a:waves:985373995996176384>", "<:WaveHello:985373984474419270>" };
-
             if (_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
             {
                 if (e.Guild.Channels.ContainsKey(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId))
@@ -46,7 +44,7 @@ internal class JoinEvents
                             IconUrl = Resources.AuditLogIcons.UserAdded,
                             Name = e.Member.UsernameWithDiscriminator
                         },
-                        Description = $"has joined **{e.Guild.Name}**. Welcome! {emojis.SelectRandom()}",
+                        Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot._status.LoadedConfig.JoinEventsEmojis.SelectRandom()}",
                         Color = EmbedColors.Success,
                         Thumbnail = new()
                         {

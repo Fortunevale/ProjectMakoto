@@ -302,7 +302,7 @@ internal class Maintainers : ApplicationCommandsModule
                                                                 $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `Web`\n\n", true));
 
             if (victim.Presence is not null && victim.Presence.Activities?.Count > 0)
-                embed.AddField(new DiscordEmbedField("Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"<:dot:984701737552187433> Status: {x.CustomStatus.Emoji}{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"<:dot:984701737552187433> {x.ActivityType} {x.Name}")}")), true));
+                embed.AddField(new DiscordEmbedField("Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"{_bot._status.LoadedConfig.DotEmoji} Status: {x.CustomStatus.Emoji}{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"<:dot:984701737552187433> {x.ActivityType} {x.Name}")}")), true));
 
             if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue)
                 embed.AddField(new DiscordEmbedField("Communication disabled until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));

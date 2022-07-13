@@ -334,7 +334,7 @@ internal class ScoreSaber : BaseCommandModule
 
                         using (FileStream stream = File.Open(file, FileMode.Open))
                         {
-                            var asset = await (await ctx.Client.GetChannelAsync(945747744302174258)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(_bot._status.LoadedConfig.GraphAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
 
                             LoadedGraph = asset.Attachments[0].Url;
 

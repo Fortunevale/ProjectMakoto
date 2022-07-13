@@ -64,7 +64,7 @@ internal class Social : BaseCommandModule
 
             string[] phrases =
             {
-                "%1 cuddles with %2! <:Dog_Blush:972881712663130222>",
+                $"%1 cuddles with %2! {_bot._status.LoadedConfig.CuddleEmoji}",
             };
 
             string[] self_phrases =
@@ -109,7 +109,7 @@ internal class Social : BaseCommandModule
 
             string[] phrases =
             {
-                "%1 kisses %2! <:Dog_Blush:972881712663130222>",
+                $"%1 kisses %2! {_bot._status.LoadedConfig.CuddleEmoji}",
             };
 
             string[] self_phrases =
@@ -154,7 +154,7 @@ internal class Social : BaseCommandModule
 
             string[] phrases =
             {
-                "%1 slaps %2! That looks like it hurt.. <:Scared:972880270069997598>",
+                $"%1 slaps %2! That looks like it hurt.. {_bot._status.LoadedConfig.SlapEmoji}",
             };
 
             string[] self_phrases =
@@ -200,8 +200,8 @@ internal class Social : BaseCommandModule
 
             string[] phrases =
             {
-                "%1 kills %2! That looks like it hurt.. <:Scared:972880270069997598>",
-                "%1 kills %2! Ouch.. <:Scared:972880270069997598>",
+                $"%1 kills %2! That looks like it hurt.. {_bot._status.LoadedConfig.SlapEmoji}",
+                $"%1 kills %2! Ouch.. {_bot._status.LoadedConfig.SlapEmoji}",
             };
 
             string[] self_phrases =
@@ -293,7 +293,7 @@ internal class Social : BaseCommandModule
 
             string[] phrases =
             {
-                "%1 highfives %2! That's the spirit. <:AlyProud:974100194062917632>",
+                $"%1 highfives %2! That's the spirit. {_bot._status.LoadedConfig.ProudEmoji}",
             };
 
             string[] self_phrases =
@@ -339,8 +339,8 @@ internal class Social : BaseCommandModule
             string[] phrases =
             {
                 "%1 hugs %2! How sweet! ♥",
-                "%1 gives %2 a big fat hug! <:fv_woah:961993656129175592>",
-                "%2, watch out! %1 is coming to squeeze you tight! <:fv_woah:961993656129175592>",
+                $"%1 gives %2 a big fat hug! {_bot._status.LoadedConfig.HugEmoji}",
+                $"%2, watch out! %1 is coming to squeeze you tight! {_bot._status.LoadedConfig.HugEmoji}",
             };
 
             string[] self_phrases =

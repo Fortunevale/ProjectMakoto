@@ -690,9 +690,9 @@ internal class Music : BaseCommandModule
                         Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(_bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count / 10.0)}`\n\n";
                     
                     Description += $"`Currently playing:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : msg.JumpLink)})\n";
-                    Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : "<:disabledrepeat:981594645165408286>")}";
-                    Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : "<:disabledshuffle:981594650018209863>")}";
-                    Description += $" `|` {(_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "<a:paused:981594656435490836>" : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : "<:disabledplay:981594639440154744>")} ")}";
+                    Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : _bot._status.LoadedConfig.DisabledRepeatEmoji)}";
+                    Description += $"{(_bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : _bot._status.LoadedConfig.DisabledShuffleEmoji)}";
+                    Description += $" `|` {(_bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? _bot._status.LoadedConfig.PausedEmoji : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : _bot._status.LoadedConfig.DisabledPlayEmoji)} ")}";
 
                     if (conn.CurrentState.CurrentTrack is not null)
                     {
@@ -2668,7 +2668,7 @@ internal class Music : BaseCommandModule
 
                                             var rawFile = await new HttpClient().GetStreamAsync(attachment.Url);
 
-                                            var asset = await (await ctx.Client.GetChannelAsync(987339536784834570)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n`{SelectedPlaylist.PlaylistName}`").WithFile($"{Guid.NewGuid()}{attachment.Url.Remove(0, attachment.Url.LastIndexOf("."))}", rawFile));
+                                            var asset = await (await ctx.Client.GetChannelAsync(_bot._status.LoadedConfig.PlaylistAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n`{SelectedPlaylist.PlaylistName}`").WithFile($"{Guid.NewGuid()}{attachment.Url.Remove(0, attachment.Url.LastIndexOf("."))}", rawFile));
                                             string url = asset.Attachments[0].Url;
 
                                             SelectedPlaylist.PlaylistThumbnail = url;
