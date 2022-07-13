@@ -42,7 +42,6 @@ internal class Bot
     internal ILoggerProvider _loggerProvider { get; set; }
 
     internal string Prefix { get; private set; } = ";;";
-    internal bool IsDev { get; private set; } = false;
 
 
     internal async Task Init(string[] args)
@@ -210,7 +209,8 @@ internal class Bot
                 Intents = DiscordIntents.All,
                 LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
                 AutoReconnect = true,
-                LoggerFactory = logger
+                LoggerFactory = logger,
+                HttpTimeout = TimeSpan.FromSeconds(60),
             });
 
             _experienceHandler = new(this);
@@ -351,8 +351,6 @@ internal class Bot
                 _logger.LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
                 _status.DiscordInitialized = true;
 
-                IsDev = (discordClient.CurrentApplication.Id == 929373806437470260);
-
                 Task.Run(async () =>
                 {
                     var appCommands = discordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
@@ -363,13 +361,13 @@ internal class Bot
                         EnableDefaultHelp = false
                     });
 
-                    if (IsDev)
+                    if (_status.LoadedConfig.IsDev)
                         appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(_status.LoadedConfig.AssetsGuildId);
                     else
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
                 }).Add(_watcher);
 
-                if (IsDev)
+                if (_status.LoadedConfig.IsDev)
                     Prefix = ">>";
 
                 _ = Task.Run(() =>
