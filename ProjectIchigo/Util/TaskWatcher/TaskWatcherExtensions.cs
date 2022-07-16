@@ -1,4 +1,4 @@
-namespace ProjectIchigo;
+namespace ProjectIchigo.Util;
 
 internal static class TaskWatcherExtensions
 {

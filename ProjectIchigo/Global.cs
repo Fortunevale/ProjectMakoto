@@ -79,7 +79,7 @@ global using ProjectIchigo.Exceptions;
 global using Xorog.ScoreSaber;
 global using Xorog.ScoreSaber.Objects;
 
-global using static ProjectIchigo.Log;
+global using static ProjectIchigo.Util.Log;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;

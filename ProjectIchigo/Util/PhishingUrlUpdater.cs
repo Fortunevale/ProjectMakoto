@@ -1,4 +1,4 @@
-namespace ProjectIchigo;
+namespace ProjectIchigo.Util;
 
 internal class PhishingUrlUpdater
 {
