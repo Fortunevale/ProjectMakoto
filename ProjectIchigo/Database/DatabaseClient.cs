@@ -20,7 +20,7 @@ internal class DatabaseClient
         {
             while (true)
             {
-                await Task.Delay(1800000);
+                await Task.Delay(TimeSpan.FromMinutes(30));
 
                 if (Disposed)
                     return;
@@ -63,7 +63,7 @@ internal class DatabaseClient
                 foreach (var task in queuedUpdates.Where(x => x.Key.Status == TaskStatus.Created).ToList())
                 {
                     task.Key.Start();
-                    await Task.Delay(60000, tokenSource.Token);
+                    await Task.Delay(20000, tokenSource.Token);
                 }
 
                 await Task.Delay(1000);
@@ -72,8 +72,9 @@ internal class DatabaseClient
             {
                 continue;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError("An exception occured in the database queue handler", ex);
                 throw;
             }
         }
