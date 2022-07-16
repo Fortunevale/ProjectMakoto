@@ -18,6 +18,9 @@ internal class SharedCommandContext
 
         Bot = _bot;
 
+        Prefix = ctx.Prefix;
+        CommandName = ctx.Command.Name;
+
         BaseCommand = cmd;
     }
     
@@ -49,6 +52,9 @@ internal class SharedCommandContext
 
         OriginalInteractionContext = ctx;
 
+        Prefix = "/";
+        CommandName = ctx.CommandName;
+
         Bot = _bot;
 
         BaseCommand = cmd;
@@ -57,6 +63,9 @@ internal class SharedCommandContext
     public CommandType CommandType { get; set; }
 
     public Bot Bot { get; set; }
+
+    public string Prefix { get; set; }
+    public string CommandName { get; set; }
 
     public DiscordMember Member { get; set; }
     public DiscordUser User { get; set; }

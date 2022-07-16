@@ -10,7 +10,7 @@ internal class User : ApplicationCommandsModule
         {
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 
-            await new UserInfo().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            await new UserInfoCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "victim", await victim.GetFromApiAsync() }
             });

@@ -11,7 +11,6 @@ internal static class PreMadeEmbedsExtensions
                 IconUrl = ctx.Guild.IconUrl,
                 Name = ctx.Guild.Name
             },
-            Title = "",
             Description = "You dont have permissions to use this command. You need to be <@411950662662881290> to use this command.",
             Footer = new DiscordEmbedBuilder.EmbedFooter
             {
@@ -102,6 +101,15 @@ internal static class PreMadeEmbedsExtensions
         return msg;
     }
 
+    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this SharedCommandContext ctx, string addText = "")
+    {
+        return new DiscordEmbedBuilder.EmbedFooter
+        {
+            IconUrl = ctx.User.AvatarUrl,
+            Text = $"Command used by {ctx.User.UsernameWithDiscriminator}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+        };
+    }
+    
     public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "")
     {
         return new DiscordEmbedBuilder.EmbedFooter

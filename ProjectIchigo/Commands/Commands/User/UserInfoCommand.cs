@@ -1,5 +1,6 @@
 ﻿namespace ProjectIchigo.Commands;
-internal class UserInfo : BaseCommand
+
+internal class UserInfoCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -87,40 +88,26 @@ internal class UserInfo : BaseCommand
             if (ctx.Bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
             {
                 embed.AddField(new DiscordEmbedField("Invited by", $"{(ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
-
-                long Count = 0;
-
-                foreach (var b in ctx.Bot._guilds.List[ctx.Guild.Id].Members)
-                {
-                    if (b.Value.InviteTracker.UserId == victim.Id)
-                        Count++;
-                }
-
-                embed.AddField(new DiscordEmbedField("Users invited", $"`{Count}`", true));
+                embed.AddField(new DiscordEmbedField("Users invited", $"`{(ctx.Bot._guilds.List[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
             }
 
-            embed.AddField(new DiscordEmbedField("Creation Date", $"{Formatter.Timestamp(victim.CreationTimestamp, TimestampFormat.LongDateTime)}", true));
+            if (bMember is not null)
+                embed.AddField(new DiscordEmbedField("Server Join Date", $"{Formatter.Timestamp(bMember.JoinedAt, TimestampFormat.LongDateTime)}", true));
+            else
+                embed.AddField(new DiscordEmbedField("Server Leave Date", (ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})" : "`User never joined this server.`"), true));
+
+            embed.AddField(new DiscordEmbedField("First Join Date", (ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})" : "`User never joined this server.`"), true));
+
+            embed.AddField(new DiscordEmbedField("Account Creation Date", $"{Formatter.Timestamp(victim.CreationTimestamp, TimestampFormat.LongDateTime)}", true));
 
             if (bMember is not null && bMember.PremiumSince.HasValue)
                 embed.AddField(new DiscordEmbedField("Server Booster Since", $"{Formatter.Timestamp(bMember.PremiumSince.Value, TimestampFormat.LongDateTime)}", true));
-
-            if (bMember is not null)
-                embed.AddField(new DiscordEmbedField("Guild Join Date", $"{Formatter.Timestamp(bMember.JoinedAt, TimestampFormat.LongDateTime)}", true));
 
             if (!string.IsNullOrWhiteSpace(victim.Pronouns))
                 embed.AddField(new DiscordEmbedField("Pronouns", $"`{victim.Pronouns}`", true));
 
             if (victim.BannerColor is not null)
                 embed.AddField(new DiscordEmbedField("Banner Color", $"`{victim.BannerColor.Value}`", true));
-
-            if (!string.IsNullOrWhiteSpace(victim.BannerUrl))
-                embed.AddField(new DiscordEmbedField("Banner Url", $"{victim.BannerUrl}", true));
-
-            if (bMember is not null && !string.IsNullOrWhiteSpace(bMember.GuildAvatarHash))
-                embed.AddField(new DiscordEmbedField("Guild Avatar Url", $"[Open in browser]({bMember.GuildAvatarUrl})", true));
-
-            if (bMember is not null && !string.IsNullOrWhiteSpace(bMember.GuildBannerHash))
-                embed.AddField(new DiscordEmbedField("Guild Banner Url", $"[Open in browser]({bMember.GuildBannerUrl})", true));
 
             if (victim.Presence is not null)
                 embed.AddField(new DiscordEmbedField("Current Presence", $"{GetStatusIcon(victim.Presence.Status)} `{victim.Presence.Status}`\n" +
@@ -129,7 +116,7 @@ internal class UserInfo : BaseCommand
                                                                 $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `Web`\n\n", true));
 
             if (victim.Presence is not null && victim.Presence.Activities?.Count > 0)
-                embed.AddField(new DiscordEmbedField("Current Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"{ctx.Bot._status.LoadedConfig.DotEmoji} Status: {x.CustomStatus.Emoji}{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"<:dot:984701737552187433> {x.ActivityType} {x.Name}")}")), true));
+                embed.AddField(new DiscordEmbedField("Current Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"• Status: `{x.CustomStatus.Emoji.Name}`{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"• {x.ActivityType} {x.Name}")}")), true));
 
             if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue)
                 embed.AddField(new DiscordEmbedField("Timed out until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
