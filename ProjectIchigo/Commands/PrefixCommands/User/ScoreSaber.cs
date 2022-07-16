@@ -417,7 +417,7 @@ internal class ScoreSaber : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             bool AddLinkButton = true;
@@ -462,7 +462,7 @@ internal class ScoreSaber : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             DiscordSelectComponent GetContinents(string default_code)
@@ -781,7 +781,7 @@ internal class ScoreSaber : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (Page <= 0 || !(Internal_Page is 0 or 1))
@@ -1007,7 +1007,7 @@ internal class ScoreSaber : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))

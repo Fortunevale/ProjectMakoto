@@ -1,19 +1,19 @@
 ﻿namespace ProjectIchigo.Commands;
 internal abstract class BaseCommand
 {
-    private SharedCommandContext Context { get; set; }
+    internal SharedCommandContext Context { private get; set; }
 
     public abstract Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments);
 
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments)
     {
-        Context = new SharedCommandContext(ctx, _bot);
+        Context = new SharedCommandContext(this, ctx, _bot);
         await ExecuteCommand(Context, arguments);
     }
     
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments)
     {
-        Context = new SharedCommandContext(ctx, _bot);
+        Context = new SharedCommandContext(this, ctx, _bot);
         await ExecuteCommand(Context, arguments);
     }
 
@@ -33,6 +33,23 @@ internal abstract class BaseCommand
             }
 
             case Enums.CommandType.PrefixCommand:
+            {
+                if (Context.ResponseMessage is not null)
+                {
+                    await Context.ResponseMessage.ModifyAsync(discordMessageBuilder);
+                    Context.ResponseMessage = await Context.ResponseMessage.Refresh();
+
+                    return Context.ResponseMessage;
+                }
+
+                var msg = await Context.Channel.SendMessageAsync(discordMessageBuilder);
+
+                Context.ResponseMessage = msg;
+
+                return msg;
+            }
+            
+            case Enums.CommandType.Custom:
             {
                 if (Context.ResponseMessage is not null)
                 {

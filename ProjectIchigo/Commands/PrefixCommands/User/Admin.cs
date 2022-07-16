@@ -36,7 +36,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -52,7 +52,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -72,7 +72,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 DiscordEmbedBuilder embed = new()
@@ -218,7 +218,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -234,7 +234,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -254,7 +254,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 DiscordEmbedBuilder embed = new()
@@ -361,7 +361,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -377,7 +377,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -398,7 +398,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 int CurrentPage = 0;
@@ -739,7 +739,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -755,7 +755,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -776,7 +776,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 DiscordEmbedBuilder embed = new()
@@ -1023,7 +1023,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -1039,7 +1039,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -1060,7 +1060,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 DiscordEmbedBuilder embed = new()
@@ -1267,7 +1267,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -1283,7 +1283,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -1305,7 +1305,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var embed = new DiscordEmbedBuilder
@@ -1504,7 +1504,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -1520,7 +1520,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -1541,7 +1541,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 foreach (var b in _bot._guilds.List[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
@@ -1803,7 +1803,7 @@ internal class Admin : BaseCommandModule
 
         async Task CheckForInvalid(CommandContext ctx)
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             foreach (var b in _bot._guilds.List[ctx.Guild.Id].ReactionRoles.ToList())
@@ -1866,7 +1866,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -1882,7 +1882,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -1966,7 +1966,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var msg = await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -2261,7 +2261,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Message.ReferencedMessage is null)
@@ -2348,7 +2348,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Message.ReferencedMessage is null)
@@ -2401,7 +2401,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Message.ReferencedMessage is null)
@@ -2474,7 +2474,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -2490,7 +2490,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -2511,7 +2511,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var embed = new DiscordEmbedBuilder
@@ -2616,7 +2616,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -2632,7 +2632,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -2653,7 +2653,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var embed = new DiscordEmbedBuilder
@@ -2730,7 +2730,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -2746,7 +2746,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -2767,7 +2767,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var embed = new DiscordEmbedBuilder
@@ -2821,7 +2821,7 @@ internal class Admin : BaseCommandModule
                         return;
                     }
 
-                    if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                    if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                         return;
 
                     _bot._guilds.List[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning = true;
@@ -2928,7 +2928,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -2944,7 +2944,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var ListEmbed = new DiscordEmbedBuilder
@@ -2965,7 +2965,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var embed = new DiscordEmbedBuilder

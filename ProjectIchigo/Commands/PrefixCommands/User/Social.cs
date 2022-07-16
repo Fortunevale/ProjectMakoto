@@ -20,7 +20,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
@@ -57,7 +57,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif("cuddle");
@@ -102,7 +102,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif("kiss");
@@ -147,7 +147,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif("slap");
@@ -193,7 +193,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif(new string[] { "kill", "wasted" }.OrderBy(x => Guid.NewGuid()).First());
@@ -240,7 +240,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif("boop");
@@ -286,7 +286,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif("highfive");
@@ -331,7 +331,7 @@ internal class Social : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             string gif = await GetGif("hug");
@@ -383,7 +383,7 @@ internal class Social : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 string gif = await GetGif("pat");

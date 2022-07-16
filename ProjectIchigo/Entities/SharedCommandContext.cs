@@ -4,7 +4,7 @@ namespace ProjectIchigo.Entities;
 
 internal class SharedCommandContext
 {
-    internal SharedCommandContext(CommandContext ctx, Bot _bot)
+    internal SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
     {
         CommandType = CommandType.PrefixCommand;
 
@@ -17,9 +17,27 @@ internal class SharedCommandContext
         OriginalCommandContext = ctx;
 
         Bot = _bot;
+
+        BaseCommand = cmd;
     }
     
-    internal SharedCommandContext(InteractionContext ctx, Bot _bot)
+    internal SharedCommandContext(DiscordMessage message, Bot _bot)
+    {
+        CommandType = CommandType.Custom;
+
+        User = message.Author;
+        Guild = message.Channel.Guild;
+        Channel = message.Channel;
+
+        Bot = _bot;
+
+        BaseCommand = new DummyCommand()
+        {
+            Context = this
+        };
+    }
+    
+    internal SharedCommandContext(BaseCommand cmd, InteractionContext ctx, Bot _bot)
     {
         CommandType = CommandType.ApplicationCommand;
 
@@ -32,6 +50,8 @@ internal class SharedCommandContext
         OriginalInteractionContext = ctx;
 
         Bot = _bot;
+
+        BaseCommand = cmd;
     }
 
     public CommandType CommandType { get; set; }
@@ -45,6 +65,8 @@ internal class SharedCommandContext
     public DiscordClient Client { get; set; }
 
     public DiscordMessage ResponseMessage { get; set; }
+
+    public BaseCommand BaseCommand { get; set; }
 
     public CommandContext OriginalCommandContext { get; set; }
     public InteractionContext OriginalInteractionContext { get; set; }

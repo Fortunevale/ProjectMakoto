@@ -7,7 +7,7 @@ internal class UserInfo : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (ctx.OriginalCommandContext is not null && await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.OriginalCommandContext.Message))
+            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             if (!ctx.Bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(victim.Id))

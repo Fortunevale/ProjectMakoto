@@ -13,7 +13,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             List<KeyValuePair<string, string>> Commands = new();
@@ -115,7 +115,7 @@ internal class User : BaseCommandModule
                 return;
             }
 
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             var embed = new DiscordEmbedBuilder
@@ -304,7 +304,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (victim is null)
@@ -394,7 +394,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (victim is null)
@@ -489,7 +489,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
@@ -541,7 +541,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
@@ -650,7 +650,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             if (!_bot._users.List.ContainsKey(ctx.User.Id))
@@ -930,7 +930,7 @@ internal class User : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             ulong messageid;

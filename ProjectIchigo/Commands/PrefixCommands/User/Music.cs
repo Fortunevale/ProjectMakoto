@@ -37,7 +37,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -52,7 +52,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -101,7 +101,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -274,7 +274,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -358,7 +358,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (search.IsNullOrWhiteSpace())
@@ -535,7 +535,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -608,7 +608,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -779,7 +779,7 @@ internal class Music : BaseCommandModule
                     return;
                 }
 
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -906,7 +906,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1071,7 +1071,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1151,7 +1151,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1318,7 +1318,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1399,7 +1399,7 @@ internal class Music : BaseCommandModule
         {
             _ = Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1466,7 +1466,7 @@ internal class Music : BaseCommandModule
         {
             _ = Task.Run(async () =>
             {
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var lava = ctx.Client.GetLavalink();
@@ -1541,7 +1541,7 @@ internal class Music : BaseCommandModule
         //{
         //    Task.Run(async () =>
         //    {
-        //        if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+        //        if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
         //            return;
 
         //        if (ctx.Command.Parent is not null)
@@ -1559,7 +1559,7 @@ internal class Music : BaseCommandModule
                 if (!_bot._users.List.ContainsKey(ctx.User.Id))
                     _bot._users.List.Add(ctx.User.Id, new Users.Info(_bot));
 
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 var countInt = 0;
@@ -2913,7 +2913,7 @@ internal class Music : BaseCommandModule
                 if (!_bot._users.List.ContainsKey(ctx.User.Id))
                     _bot._users.List.Add(ctx.User.Id, new Users.Info(_bot));
 
-                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+                if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 DiscordEmbedBuilder embed = new()

@@ -342,7 +342,7 @@ internal class Maintainers : BaseCommandModule
             if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot), true))
                 return;
 
             _ = ctx.RespondAsync("Cooldown finished.");
@@ -361,7 +361,7 @@ internal class Maintainers : BaseCommandModule
             if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForModerate(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot), true))
                 return;
 
             _ = ctx.RespondAsync("Cooldown finished.");
@@ -380,7 +380,7 @@ internal class Maintainers : BaseCommandModule
             if (!ctx.User.IsMaintenance(_bot._status))
                 return;
 
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForHeavy(ctx.Client, ctx.Message))
+            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, new SharedCommandContext(ctx.Message, _bot), true))
                 return;
 
             _ = ctx.RespondAsync("Cooldown finished.");
