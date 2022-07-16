@@ -1,4 +1,4 @@
-namespace ProjectIchigo.Commands.User;
+namespace ProjectIchigo.PrefixCommands;
 
 internal class Music : BaseCommandModule
 {

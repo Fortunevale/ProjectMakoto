@@ -1,7 +1,4 @@
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.Entities;
-
-namespace ProjectIchigo.ApplicationCommands.Maintainers;
+namespace ProjectIchigo.ApplicationCommands;
 
 internal class Maintainers : ApplicationCommandsModule
 {

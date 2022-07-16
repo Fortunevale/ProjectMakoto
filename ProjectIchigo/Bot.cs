@@ -1,5 +1,3 @@
-using User = ProjectIchigo.Commands.User.User;
-
 namespace ProjectIchigo;
 
 internal class Bot
@@ -252,14 +250,14 @@ internal class Bot
 
             _logger.LogDebug($"Registering Commands..");
 
-            cNext.RegisterCommands<User>();
-            cNext.RegisterCommands<Music>();
-            cNext.RegisterCommands<Social>();
-            cNext.RegisterCommands<Commands.User.ScoreSaber>();
-            cNext.RegisterCommands<Mod>();
-            cNext.RegisterCommands<Admin>();
+            cNext.RegisterCommands<PrefixCommands.User>();
+            cNext.RegisterCommands<PrefixCommands.Music>();
+            cNext.RegisterCommands<PrefixCommands.Social>();
+            cNext.RegisterCommands<PrefixCommands.ScoreSaber>();
+            cNext.RegisterCommands<PrefixCommands.Mod>();
+            cNext.RegisterCommands<PrefixCommands.Admin>();
             
-            cNext.RegisterCommands<Commands.Maintainers.Maintainers>();
+            cNext.RegisterCommands<PrefixCommands.Maintainers>();
 
 
 
@@ -363,9 +361,9 @@ internal class Bot
                     });
 
                     if (_status.LoadedConfig.IsDev)
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers>(_status.LoadedConfig.AssetsGuildId);
                     else
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers>();
                 }).Add(_watcher);
 
                 if (_status.LoadedConfig.IsDev)

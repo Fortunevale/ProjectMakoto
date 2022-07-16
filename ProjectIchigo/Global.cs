@@ -51,12 +51,10 @@ global using DisCatSharp.CommandsNext.Converters;
 
 // Own Utils
 
-global using ProjectIchigo.ApplicationCommands;
-global using ProjectIchigo.ApplicationCommands.Maintainers;
-
 global using ProjectIchigo.Commands;
-global using ProjectIchigo.Commands.User;
-global using ProjectIchigo.Commands.Maintainers;
+
+global using ProjectIchigo.ApplicationCommands;
+global using ProjectIchigo.PrefixCommands;
 
 global using ProjectIchigo.Enums;
 global using ProjectIchigo.Secrets;

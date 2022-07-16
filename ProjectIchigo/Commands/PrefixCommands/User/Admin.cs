@@ -1,6 +1,4 @@
-using ProjectIchigo.Exceptions;
-
-namespace ProjectIchigo.Commands.User;
+namespace ProjectIchigo.PrefixCommands;
 internal class Admin : BaseCommandModule
 {
     public Bot _bot { private get; set; }

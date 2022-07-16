@@ -86,7 +86,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\Commands\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

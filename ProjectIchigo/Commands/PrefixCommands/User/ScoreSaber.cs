@@ -1,6 +1,4 @@
-using Microsoft.Win32.SafeHandles;
-
-namespace ProjectIchigo.Commands.User;
+namespace ProjectIchigo.PrefixCommands;
 
 internal class ScoreSaber : BaseCommandModule
 {
