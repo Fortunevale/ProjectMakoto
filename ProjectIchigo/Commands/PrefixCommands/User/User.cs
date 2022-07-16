@@ -284,138 +284,14 @@ internal class User : BaseCommandModule
     [Command("user-info"), Aliases("userinfo"),
     CommandModule("user"),
     Description("Shows information about the mentioned user")]
-    public async Task UserInfo(CommandContext ctx, DiscordUser victim)
+    public async Task UserInfoCommand(CommandContext ctx, DiscordUser victim)
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, ctx.Message))
-                return;
-
-            try
+            await new UserInfo().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
-                if (!_bot._guilds.List.ContainsKey(ctx.Guild.Id))
-                    _bot._guilds.List.Add(ctx.Guild.Id, new Guilds.ServerSettings());
-
-                if (!_bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                    _bot._guilds.List[ctx.Guild.Id].Members.Add(victim.Id, new());
-
-                DiscordMember bMember = null;
-
-                try
-                {
-                    bMember = await ctx.Guild.GetMemberAsync(victim.Id);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogDebug($"Failed to get user", ex);
-                }
-
-                DateTime CreationAge = new DateTime().AddSeconds((DateTime.UtcNow - victim.CreationTimestamp.ToUniversalTime()).TotalSeconds);
-
-                DateTime JoinedAtAge = new();
-
-                if (bMember is not null)
-                    JoinedAtAge = new DateTime().AddSeconds((DateTime.UtcNow - bMember.JoinedAt.ToUniversalTime()).TotalSeconds);
-
-                string GenerateRoles = "";
-
-                if (bMember is not null)
-                {
-                    if (bMember.Roles.Any())
-                        GenerateRoles = string.Join(", ", bMember.Roles.Select(x => x.Mention));
-                    else
-                        GenerateRoles = "`User doesn't have any roles.`";
-                }
-                else
-                {
-                    if (_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
-                        GenerateRoles = string.Join(", ", _bot._guilds.List[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
-                    else
-                        GenerateRoles = "`User doesn't have any stored roles.`";
-                }
-
-                var embed = new DiscordEmbedBuilder
-                {
-                    Color = EmbedColors.Info,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        IconUrl = victim.AvatarUrl,
-                        Name = $"{victim.Username}#{victim.Discriminator} ({victim.Id})"
-                    },
-                    Description = $"[Avatar Url]({victim.AvatarUrl})",
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                };
-
-                var banList = await ctx.Guild.GetBansAsync();
-                bool isBanned = banList.Any(x => x.User.Id == victim.Id);
-                DiscordBan banDetails = (isBanned ? banList.First(x => x.User.Id == victim.Id) : null);
-
-                if (bMember is null)
-                {
-                    if (_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch)
-                    {
-                        embed.Description += "\n\n`User never joined this server.`";
-                    }
-                    else
-                    {
-                        if (isBanned)
-                            embed.Description += "\n\n`User is currently banned from this server.`";
-                        else
-                            embed.Description += "\n\n`User is currently not in this server.`";
-                    }
-                }
-
-                if (isBanned)
-                    if (!string.IsNullOrWhiteSpace(banDetails.Reason))
-                        embed.AddField(new DiscordEmbedField("Ban Details", $"`{banDetails.Reason}`", false));
-                    else
-                        embed.AddField(new DiscordEmbedField("Ban Details", $"`No reason provided.`", false));
-
-                if (bMember is not null)
-                    embed.AddField(new DiscordEmbedField("Roles", GenerateRoles.Truncate(1024), true));
-                else
-                    embed.AddField(new DiscordEmbedField($"Roles (Backup)", GenerateRoles.Truncate(1024), true));
-
-
-                embed.AddField(new DiscordEmbedField("Created at", $"{Formatter.Timestamp(victim.CreationTimestamp.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(victim.CreationTimestamp.ToUniversalTime())})", true));
-
-
-                if (bMember is not null)
-                    embed.AddField(new DiscordEmbedField("Joined at", $"{Formatter.Timestamp(bMember.JoinedAt.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(bMember.JoinedAt.ToUniversalTime())})", true));
-                else
-                    embed.AddField(new DiscordEmbedField("Left at", $"{Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})", true));
-
-
-                embed.AddField(new DiscordEmbedField("First joined at", $"{Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})", true));
-
-                if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
-                    embed.AddField(new DiscordEmbedField("Invited by", $"{(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
-
-                if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
-                {
-                    long Count = 0;
-
-                    foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members)
-                    {
-                        if (b.Value.InviteTracker.UserId == victim.Id)
-                            Count++;
-                    }
-
-                    embed.AddField(new DiscordEmbedField("Users invited", $"`{Count}`", true));
-                }
-
-                if (bMember is not null)
-                    if (bMember.CommunicationDisabledUntil.HasValue)
-                        if (((DateTime)bMember.CommunicationDisabledUntil).GetTotalSecondsUntil() > 0)
-                            embed.AddField(new DiscordEmbedField("Timed out until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value.ToUniversalTime(), TimestampFormat.LongDateTime)} ({Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value.ToUniversalTime())})", true));
-
-                await ctx.Channel.SendMessageAsync(embed: embed);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occured while trying to generate info about a user", ex);
-            }
+                { "victim", victim }
+            });
         }).Add(_bot._watcher, ctx);
     }
 

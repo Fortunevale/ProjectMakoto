@@ -361,9 +361,15 @@ internal class Bot
                     });
 
                     if (_status.LoadedConfig.IsDev)
+                    {
                         appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.User>(_status.LoadedConfig.AssetsGuildId);
+                    }
                     else
+                    {
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.User>();
+                    }
                 }).Add(_watcher);
 
                 if (_status.LoadedConfig.IsDev)
