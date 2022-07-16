@@ -104,6 +104,17 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
+                if (!ctx.User.IsMaintenance(_bot._status))
+                {
+                    await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
+
+                    new DummyCommand()
+                    {
+                        Context = new SharedCommandContext(null, ctx, _bot)
+                    }.SendMaintenanceError();
+                    return;
+                }
+
                 if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
                 {
                     await ctx.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent($"❌ `The GitHub Token expired, please update.`"));
