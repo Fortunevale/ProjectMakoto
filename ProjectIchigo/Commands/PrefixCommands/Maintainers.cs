@@ -100,5 +100,17 @@ internal class Maintainers : BaseCommandModule
                 await new SaveCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
+
+        [Command("create-issue"), Description("Create a new issue on Project-Ichigo's Github Repository")]
+        public async Task CreateIssue(CommandContext ctx, bool UseOldTagsSelector = false)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "UseOldTagsSelector", UseOldTagsSelector },
+                });
+            }).Add(_bot._watcher, ctx);
+        }
     }
 }
