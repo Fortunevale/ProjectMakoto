@@ -24,4 +24,13 @@ internal static class TaskWatcherExtensions
     /// <param name="watcher">The current Watcher Instance</param>
     /// <param name="ctx">The InteractionContext</param>
     internal static void Add(this Task task, TaskWatcher watcher, InteractionContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
+
+
+    /// <summary>
+    /// Add Task to Watcher with SharedCommandContext
+    /// </summary>
+    /// <param name="task">The task</param>
+    /// <param name="watcher">The current Watcher Instance</param>
+    /// <param name="ctx">The InteractionContext</param>
+    internal static void Add(this Task task, TaskWatcher watcher, SharedCommandContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
 }
