@@ -48,7 +48,9 @@ internal abstract class BaseCommand
                 discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
-                return await Context.OriginalInteractionContext.EditResponseAsync(discordWebhookBuilder);
+                var msg = await Context.OriginalInteractionContext.EditResponseAsync(discordWebhookBuilder);
+                Context.ResponseMessage = msg;
+                return msg;
             }
 
             case Enums.CommandType.PrefixCommand:
@@ -129,26 +131,6 @@ internal abstract class BaseCommand
         });
     }
     
-    public void SendModError()
-    {
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
-        {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
-            Description = $"You dont have permissions to use this command. You need to be `Mod` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                IconUrl = Context.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        });
-    }
-    
     public void SendPermissionError(Permissions perms)
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
@@ -167,5 +149,94 @@ internal abstract class BaseCommand
             Timestamp = DateTime.UtcNow,
             Color = EmbedColors.Error
         });
+    }
+    
+    public void SendSourceError(Enums.CommandType commandType)
+    {
+        switch (commandType)
+        {
+            case Enums.CommandType.ApplicationCommand:
+                _ = RespondOrEdit(new DiscordEmbedBuilder()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        IconUrl = Context.Guild.IconUrl,
+                        Name = Context.Guild.Name
+                    },
+                    Description = $"This command is exclusive to application commands.",
+                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                    {
+                        Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
+                        IconUrl = Context.User.AvatarUrl
+                    },
+                    Timestamp = DateTime.UtcNow,
+                    Color = EmbedColors.Error
+                });
+                break;
+            case Enums.CommandType.PrefixCommand:
+                _ = RespondOrEdit(new DiscordEmbedBuilder()
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        IconUrl = Context.Guild.IconUrl,
+                        Name = Context.Guild.Name
+                    },
+                    Description = $"This command is exclusive to prefixed commands.",
+                    Footer = new DiscordEmbedBuilder.EmbedFooter
+                    {
+                        Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
+                        IconUrl = Context.User.AvatarUrl
+                    },
+                    Timestamp = DateTime.UtcNow,
+                    Color = EmbedColors.Error
+                });
+                break;
+            default:
+                throw new ArgumentException("Invalid Source defined.");
+        }
+    }
+
+    public async Task<bool> CheckMaintenance()
+    {
+        if (!Context.User.IsMaintenance(Context.Bot._status))
+        {
+            SendMaintenanceError();
+            return false;
+        }
+
+        return true;
+    }
+    
+    public async Task<bool> CheckAdmin()
+    {
+        if (!Context.Member.IsAdmin(Context.Bot._status))
+        {
+            SendMaintenanceError();
+            return false;
+        }
+
+        return true;
+    }
+    
+    public async Task<bool> CheckPerm(Permissions perms)
+    {
+        if (!Context.Member.Permissions.HasPermission(Permissions.ManageMessages))
+        {
+            SendPermissionError(perms);
+            return false;
+        }
+
+        return true;
+    }
+    
+    public async Task<bool> CheckSource(Enums.CommandType commandType)
+    {
+        if (Context.CommandType != commandType)
+        {
+            SendSourceError(commandType);
+            return false;
+        }
+
+        return true;
     }
 }

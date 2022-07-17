@@ -1,16 +1,7 @@
 ﻿namespace ProjectIchigo.Commands;
 internal class GlobalBanCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx)
-    {
-        if (!ctx.User.IsMaintenance(ctx.Bot._status))
-        {
-            SendMaintenanceError();
-            return false;
-        }
-
-        return true;
-    }
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
