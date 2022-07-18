@@ -62,4 +62,16 @@ internal class User : ApplicationCommandsModule
             });
         }).Add(_bot._watcher, ctx);
     }
+    
+    [SlashCommand("submit-url", "Allows submission of new malicous urls to our database")]
+    public async Task UrlSubmit(InteractionContext ctx, [Option("url", "The url")] string url)
+    {
+        Task.Run(async () =>
+        {
+            await new UrlSubmitCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "url", url }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
 }
