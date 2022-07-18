@@ -185,7 +185,11 @@ internal abstract class BaseCommand
         {
             case Enums.CommandType.ApplicationCommand:
                 _ = RespondOrEdit("✅ `Finished command`");
-                _ = Context.ResponseMessage.DeleteAsync();
+                _ = Context.OriginalInteractionContext.DeleteResponseAsync();
+                break;
+            case Enums.CommandType.ContextMenu:
+                _ = RespondOrEdit("✅ `Finished command`");
+                _ = Context.OriginalInteractionContext.DeleteResponseAsync();
                 break;
             default:
                 _ = Context.ResponseMessage.DeleteAsync();
