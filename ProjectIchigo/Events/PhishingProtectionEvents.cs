@@ -26,7 +26,7 @@ internal class PhishingProtectionEvents
     {
         if (e.Content.StartsWith($";;"))
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                if (e.Content.StartsWith($";;{command.Key}") || e.Content.StartsWith($">>{command.Key}"))
+                if (e.Content.StartsWith($";;{command.Key}"))
                     return;
 
         if (e.WebhookMessage || guild is null)
@@ -62,6 +62,19 @@ internal class PhishingProtectionEvents
                 {
                     _ = PunishMember(guild, member, e, url.Key);
                     return;
+                }
+
+                var reg = Regex.Match(word.ToLower(), @"([\S]*\.)?([\S]*)\.([\S]*)");
+
+                if (reg.Success && reg.Groups[0].Success)
+                {
+                    var regex = new Regex(Regex.Escape(reg.Groups[0].Value));
+
+                    if (regex.Replace(word.ToLower(), "", 1) == url.Key.ToLower())
+                    {
+                        _ = PunishMember(guild, member, e, url.Key);
+                        return;
+                    }
                 }
             }
         }
