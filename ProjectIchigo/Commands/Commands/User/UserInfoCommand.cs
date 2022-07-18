@@ -14,6 +14,11 @@ internal class UserInfoCommand : BaseCommand
             if (!ctx.Bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(victim.Id))
                 ctx.Bot._guilds.List[ctx.Guild.Id].Members.Add(victim.Id, new());
 
+            if (victim is null)
+                victim = ctx.User;
+
+            victim = await victim.GetFromApiAsync();
+
             DiscordMember? bMember = null;
 
             try

@@ -104,8 +104,8 @@ internal class User : BaseCommandModule
 
     [Command("user-info"), Aliases("userinfo"),
     CommandModule("user"),
-    Description("Shows information about the mentioned user")]
-    public async Task UserInfoCommand(CommandContext ctx, DiscordUser victim)
+    Description("Shows information about you or the mentioned user")]
+    public async Task UserInfo(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
         {
@@ -120,89 +120,15 @@ internal class User : BaseCommandModule
 
     [Command("avatar"), Aliases("pfp"),
     CommandModule("user"),
-    Description("Sends the user's avatar as an embedded image")]
+    Description("Sends your or the mentioned user's avatar as an embedded image")]
     public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                return;
-
-            if (victim is null)
+            await new AvatarCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
-                victim = ctx.Member;
-            }
-
-            var embed = new DiscordEmbedBuilder
-            {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"{victim.Username}#{victim.Discriminator}'s Avatar",
-                    Url = victim.AvatarUrl
-                },
-                ImageUrl = victim.AvatarUrl,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.Info
-            };
-
-            DiscordMember member = null;
-
-            try { member = await victim.ConvertToMember(ctx.Guild); } catch { }
-
-            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Profile Picture", (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)));
-            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Picture", false);
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
-
-            var msg = await ctx.Channel.SendMessageAsync(builder);
-
-            CancellationTokenSource cancellationTokenSource = new();
-
-            ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-            async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-            {
-                Task.Run(async () =>
-                {
-                    if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
-                    {
-                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                        cancellationTokenSource.Cancel();
-                        cancellationTokenSource = new();
-
-                        if (e.Interaction.Data.CustomId == ServerProfilePictureButton.CustomId)
-                        {
-                            embed.ImageUrl = member.GuildAvatarUrl;
-                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
-                        }
-                        else if (e.Interaction.Data.CustomId == ProfilePictureButton.CustomId)
-                        {
-                            embed.ImageUrl = member.AvatarUrl;
-                            _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));
-                        }
-
-                        try
-                        {
-                            await Task.Delay(60000, cancellationTokenSource.Token);
-                            embed.Footer.Text += " • Interaction timed out";
-                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                            await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                        }
-                        catch { }
-                    }
-                }).Add(_bot._watcher, ctx);
-            }
-
-            try
-            {
-                await Task.Delay(60000, cancellationTokenSource.Token);
-                embed.Footer.Text += " • Interaction timed out";
-                ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-            }
-            catch { }
+                { "victim", victim }
+            });
         }).Add(_bot._watcher, ctx);
     }
 
@@ -210,94 +136,15 @@ internal class User : BaseCommandModule
 
     [Command("banner"),
     CommandModule("user"),
-    Description("Sends the user's banner as an embedded image")]
+    Description("Sends your or the mentioned user's banner as an embedded image")]
     public async Task Banner(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                return;
-
-            if (victim is null)
+            await new BannerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
-                victim = ctx.User;
-            }
-
-            victim = await victim.GetFromApiAsync();
-
-            var embed = new DiscordEmbedBuilder
-            {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"{victim.UsernameWithDiscriminator}'s Banner",
-                    Url = victim.AvatarUrl
-                },
-                ImageUrl = victim.BannerUrl,
-                Description = (victim.BannerUrl.IsNullOrWhiteSpace() ? "`This user has no banner.`" : ""),
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.Info
-            };
-
-            //DiscordMember member = null;
-
-            //try
-            //{ member = await victim.ConvertToMember(ctx.Guild); }
-            //catch { }
-
-            //var ServerBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowServer", "Show Server Banner", (string.IsNullOrWhiteSpace(member?.GuildBannerHash)));
-            //var ProfileBannerButton = new DiscordButtonComponent(ButtonStyle.Primary, "ShowProfile", "Show Profile Banner", false);
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed)/*.AddComponents(ServerBannerButton)*/;
-
-            var msg = await ctx.Channel.SendMessageAsync(builder);
-
-            //CancellationTokenSource cancellationTokenSource = new();
-
-            //ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-            //async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-            //{
-            //    Task.Run(async () =>
-            //    {
-            //        if (e.Message?.Id == msg.Id && e.User.Id == ctx.User.Id)
-            //        {
-            //            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-            //            cancellationTokenSource.Cancel();
-            //            cancellationTokenSource = new();
-
-            //            if (e.Interaction.Data.CustomId == ServerBannerButton.CustomId)
-            //            {
-            //                embed.ImageUrl = member.GuildBannerUrl;
-            //                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfileBannerButton));
-            //            }
-            //            else if (e.Interaction.Data.CustomId == ProfileBannerButton.CustomId)
-            //            {
-            //                embed.ImageUrl = member.BannerUrl;
-            //                _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerBannerButton));
-            //            }
-
-            //            try
-            //            {
-            //                await Task.Delay(60000, cancellationTokenSource.Token);
-            //                embed.Footer.Text += " • Interaction timed out";
-            //                ctx.Client.ComponentInteractionCreated -= RunInteraction;
-            //                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-            //            }
-            //            catch { }
-            //        }
-            //    }).Add(_bot._watcher, ctx);
-            //}
-
-            //try
-            //{
-            //    await Task.Delay(60000, cancellationTokenSource.Token);
-            //    embed.Footer.Text += " • Interaction timed out";
-            //    ctx.Client.ComponentInteractionCreated -= RunInteraction;
-            //    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-            //}
-            //catch { }
+                { "victim", victim }
+            });
         }).Add(_bot._watcher, ctx);
     }
 
@@ -305,50 +152,14 @@ internal class User : BaseCommandModule
 
     [Command("rank"), Aliases("level", "lvl"),
     CommandModule("user"),
-    Description("Shows you your current level and progress")]
-    public async Task RankCommand(CommandContext ctx, DiscordUser victim = null)
+    Description("Shows your or the mentioned user's rank and rank progress")]
+    public async Task Rank(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                return;
-
-            if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            await new RankCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                });
-                return;
-            }
-
-            if (victim is null)
-            {
-                victim = ctx.Member;
-            }
-
-            long current = (long)Math.Floor((decimal)(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Points - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level - 1)));
-            long max = (long)Math.Floor((decimal)(_bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level) - _bot._experienceHandler.CalculateLevelRequirement(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level - 1)));
-
-            _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
-            {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"Experience • {ctx.Guild.Name}",
-                    IconUrl = ctx.Guild.IconUrl
-                },
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level.DigitsToEmotes()} with `{_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
-                              $"**Level {(_bot._guilds.List[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).DigitsToEmotes()} Progress**\n" +
-                              $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
-                              $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
-                              $"`{current}/{max} XP`",
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.HiddenSidebar
+                { "victim", victim }
             });
         }).Add(_bot._watcher, ctx);
     }
@@ -358,107 +169,14 @@ internal class User : BaseCommandModule
     [Command("leaderboard"),
     CommandModule("user"),
     Description("Shows the current experience leaderboard")]
-    public async Task LeaderboardCommand(CommandContext ctx, [Description("3-50")]int ShowAmount = 10)
+    public async Task Leaderboard(CommandContext ctx, [Description("3-50")]int ShowAmount = 10)
     {
         Task.Run(async () =>
         {
-            if (await _bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                return;
-
-            if (!_bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            await new LeaderboardCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                });
-                return;
-            }
-
-            if (ShowAmount is > 50 or < 3)
-            {
-                _ = ctx.SendSyntaxError();
-                return;
-            }
-
-            var PerformingActionEmbed = new DiscordEmbedBuilder
-            {
-                Color = EmbedColors.HiddenSidebar,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
-                    Name = $"Experience Leaderboard"
-                },
-                Description = $"`Loading Leaderboard, please wait..`",
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
-
-            var msg1 = await ctx.Channel.SendMessageAsync(embed: PerformingActionEmbed);
-
-            int count = 0;
-
-            int currentuserplacement = 0;
-
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
-            {
-                currentuserplacement++;
-                if (b.Key == ctx.User.Id)
-                    break;
-            }
-
-            var members = await ctx.Guild.GetAllMembersAsync();
-
-            List<KeyValuePair<string, string>> Board = new();
-
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
-            {
-                try
-                {
-                    if (!members.Any(x => x.Id == b.Key))
-                        continue;
-
-                    DiscordMember bMember = members.First(x => x.Id == b.Key);
-
-                    if (bMember is null)
-                        continue;
-
-                    if (bMember.IsBot)
-                        continue;
-
-                    if (b.Value.Experience.Points <= 1)
-                        break;
-
-                    count++;
-
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`Level {b.Value.Experience.Level} with {b.Value.Experience.Points} XP`)"));
-
-                    if (count >= ShowAmount)
-                        break;
-                }
-                catch { }
-            }
-
-            var fields = Board.PrepareEmbedFields();
-
-            foreach (var field in fields)
-                PerformingActionEmbed.AddField(new DiscordEmbedField(field.Key, field.Value));
-
-            if (count != 0)
-            {
-                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.";
-                await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-            }
-            else
-            {
-                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
-                await msg1.ModifyAsync(embed: PerformingActionEmbed.Build());
-            }
+                { "ShowAmount", ShowAmount }
+            });
         }).Add(_bot._watcher, ctx);
     }
 

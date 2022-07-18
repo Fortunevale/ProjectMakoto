@@ -97,6 +97,17 @@ internal abstract class BaseCommand
         throw new NotImplementedException();
     }
 
+    public void ModifyToTimedOut(bool Delete = false)
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out")));
+
+        if (Delete)
+            Task.Delay(5000).ContinueWith(_ =>
+            {
+                Context.ResponseMessage.DeleteAsync();
+            });
+    }
+
     public void SendMaintenanceError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
@@ -195,6 +206,33 @@ internal abstract class BaseCommand
             }),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
+    }
+
+    public void SendSyntaxError()
+    {
+        if (Context.CommandType != Enums.CommandType.PrefixCommand)
+            throw new ArgumentException("Syntax Error cannot be generated for Application Commands.");
+
+        var ctx = Context.OriginalCommandContext;
+
+        var embed = new DiscordEmbedBuilder
+        {
+            Author = new DiscordEmbedBuilder.EmbedAuthor
+            {
+                IconUrl = Context.Guild.IconUrl,
+                Name = Context.Guild.Name
+            },
+            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+            Footer = ctx.GenerateUsedByFooter(),
+            Timestamp = DateTime.UtcNow,
+            Color = EmbedColors.Error
+        };
+
+        if (ctx.Client.GetCommandsNext()
+            .RegisteredCommands[ctx.Command.Name].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
+            embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
+
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(Context.User.Mention));
     }
 
     public async Task<bool> CheckMaintenance()

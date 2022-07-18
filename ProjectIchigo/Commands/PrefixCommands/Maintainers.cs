@@ -76,7 +76,7 @@ internal class Maintainers : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                await new Commands.LogCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                await new LogCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "Level", Level },
                 });
@@ -106,7 +106,7 @@ internal class Maintainers : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                await new Commands.CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                await new CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "UseOldTagsSelector", UseOldTagsSelector },
                 });
