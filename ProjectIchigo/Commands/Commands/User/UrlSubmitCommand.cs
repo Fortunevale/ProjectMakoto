@@ -227,7 +227,7 @@ internal class UrlSubmitCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
             {
-                ModifyToTimedOut();
+                DeleteOrInvalidate();
             }
         });
     }

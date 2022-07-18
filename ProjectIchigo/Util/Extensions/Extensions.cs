@@ -2,7 +2,7 @@ namespace ProjectIchigo.Extensions;
 
 internal static class Extensions
 {
-    internal static async Task<DiscordMessage> Refresh(this DiscordMessage msg) => await msg.Channel.GetMessageAsync(msg.Id);
+    internal static async Task<DiscordMessage> Refresh(this DiscordMessage msg) => await msg.Channel.GetMessageAsync(msg.Id, true);
 
     internal static bool IsMaintenance(this DiscordMember member, Status _status) => (member as DiscordUser).IsMaintenance(_status);
 

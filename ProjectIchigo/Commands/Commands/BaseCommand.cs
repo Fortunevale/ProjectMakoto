@@ -108,6 +108,20 @@ internal abstract class BaseCommand
             });
     }
 
+    public void DeleteOrInvalidate()
+    {
+        switch (Context.CommandType)
+        {
+            case Enums.CommandType.ApplicationCommand:
+                _ = RespondOrEdit("❌ `Cancelled`");
+                _ = Context.ResponseMessage.DeleteAsync();
+                break;
+            default:
+                _ = Context.ResponseMessage.DeleteAsync();
+                break;
+        }
+    }
+
     public void SendMaintenanceError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
