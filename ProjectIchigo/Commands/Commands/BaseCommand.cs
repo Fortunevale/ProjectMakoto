@@ -35,6 +35,22 @@ internal abstract class BaseCommand
 
         await ExecuteCommand(Context, arguments);
     }
+    
+    public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
+    {
+        if (InitiateInteraction)
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            {
+                IsEphemeral = Ephemeral
+            });
+
+        Context = new SharedCommandContext(this, ctx, _bot);
+
+        if (!(await BeforeExecution(Context)))
+            return;
+
+        await ExecuteCommand(Context, arguments);
+    }
 
     internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed) => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -55,6 +71,19 @@ internal abstract class BaseCommand
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
                 var msg = await Context.OriginalInteractionContext.EditResponseAsync(discordWebhookBuilder);
+                Context.ResponseMessage = msg;
+                return msg;
+            }
+            
+            case Enums.CommandType.ContextMenu:
+            {
+                DiscordWebhookBuilder discordWebhookBuilder = new();
+
+                discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
+                discordWebhookBuilder.Content = discordMessageBuilder.Content;
+
+                var msg = await Context.OriginalContextMenuContext.EditResponseAsync(discordWebhookBuilder);
                 Context.ResponseMessage = msg;
                 return msg;
             }
@@ -114,6 +143,20 @@ internal abstract class BaseCommand
         {
             case Enums.CommandType.ApplicationCommand:
                 _ = RespondOrEdit("❌ `Cancelled`");
+                _ = Context.ResponseMessage.DeleteAsync();
+                break;
+            default:
+                _ = Context.ResponseMessage.DeleteAsync();
+                break;
+        }
+    }
+    
+    public void DeleteOrFinish()
+    {
+        switch (Context.CommandType)
+        {
+            case Enums.CommandType.ApplicationCommand:
+                _ = RespondOrEdit("✅ `Finished command`");
                 _ = Context.ResponseMessage.DeleteAsync();
                 break;
             default:

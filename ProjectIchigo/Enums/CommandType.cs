@@ -3,6 +3,7 @@
 internal enum CommandType
 {
     ApplicationCommand,
+    ContextMenu,
     PrefixCommand,
     Custom
 }

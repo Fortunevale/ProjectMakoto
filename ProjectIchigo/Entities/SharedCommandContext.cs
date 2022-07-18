@@ -59,6 +59,26 @@ internal class SharedCommandContext
 
         BaseCommand = cmd;
     }
+    
+    internal SharedCommandContext(BaseCommand cmd, ContextMenuContext ctx, Bot _bot)
+    {
+        CommandType = CommandType.ContextMenu;
+
+        Member = ctx.Member;
+        User = ctx.User;
+        Guild = ctx.Guild;
+        Channel = ctx.Channel;
+        Client = ctx.Client;
+
+        OriginalContextMenuContext = ctx;
+
+        Prefix = "";
+        CommandName = ctx.CommandName;
+
+        Bot = _bot;
+
+        BaseCommand = cmd;
+    }
 
     public CommandType CommandType { get; set; }
 
@@ -77,6 +97,7 @@ internal class SharedCommandContext
 
     public BaseCommand BaseCommand { get; set; }
 
+    public ContextMenuContext OriginalContextMenuContext { get; set; }
     public CommandContext OriginalCommandContext { get; set; }
     public InteractionContext OriginalInteractionContext { get; set; }
 }

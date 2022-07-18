@@ -16,6 +16,7 @@ internal class TaskWatcher
                 var CommandContext = b.CommandContext;
                 var InteractionContext = b.InteractionContext;
                 var SharedCommandContext = b.SharedCommandContext;
+                var ContextMenuContext = b.ContextMenuContext;
 
                 if (b.task.IsCompletedSuccessfully)
                 {
@@ -34,6 +35,8 @@ internal class TaskWatcher
                     _logger.LogError($"Failed to execute '{CommandContext.Prefix}{(CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "")}{CommandContext.Command.Name}{(string.IsNullOrWhiteSpace(CommandContext.RawArgumentString) ? "" : $" {CommandContext.RawArgumentString}")}' for {CommandContext.User.Username}#{CommandContext.User.Discriminator} ({CommandContext.User.Id}) in #{CommandContext.Channel.Name} on '{CommandContext.Guild.Name}' ({CommandContext.Guild.Id})", b.task.Exception);
                 else if (InteractionContext != null)
                     _logger.LogError($"Failed to execute '/{InteractionContext.CommandName}' for {InteractionContext.User.Username}#{InteractionContext.User.Discriminator} ({InteractionContext.User.Id}){(InteractionContext.Channel is not null ? $"in #{InteractionContext.Channel.Name}" : "")}{(InteractionContext.Guild is not null ? $" on '{InteractionContext.Guild.Name}' ({InteractionContext.Guild.Id})" : "")}", b.task.Exception);
+                else if (ContextMenuContext != null)
+                    _logger.LogError($"Failed to execute '{ContextMenuContext.CommandName}' for {ContextMenuContext.User.UsernameWithDiscriminator} ({ContextMenuContext.User.Id}){(ContextMenuContext.Channel is not null ? $"in #{ContextMenuContext.Channel.Name}" : "")}{(ContextMenuContext.Guild is not null ? $" on '{ContextMenuContext.Guild.Name}' ({ContextMenuContext.Guild.Id})" : "")}", b.task.Exception);
                 else if (SharedCommandContext != null)
                     _logger.LogError($"Failed to execute '{SharedCommandContext.Prefix}{SharedCommandContext.CommandName}' for {SharedCommandContext.User.UsernameWithDiscriminator} ({SharedCommandContext.User.Id}){(SharedCommandContext.Channel is not null ? $"in #{SharedCommandContext.Channel.Name}" : "")}{(SharedCommandContext.Guild is not null ? $" on '{SharedCommandContext.Guild.Name}' ({SharedCommandContext.Guild.Id})" : "")}", b.task.Exception);
                 else
