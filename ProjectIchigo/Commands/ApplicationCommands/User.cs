@@ -74,4 +74,16 @@ internal class User : ApplicationCommandsModule
             });
         }).Add(_bot._watcher, ctx);
     }
+
+    [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
+    public async Task EmojiStealer(ContextMenuContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new EmojiStealerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "message", ctx.TargetMessage }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
 }
