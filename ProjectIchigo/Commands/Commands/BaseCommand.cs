@@ -129,6 +129,14 @@ internal abstract class BaseCommand
             {
                 if (Context.ResponseMessage is not null)
                 {
+                    if (discordMessageBuilder.Files?.Any() ?? false)
+                    {
+                        await Context.ResponseMessage.DeleteAsync();
+                        var msg1 = await Context.Channel.SendMessageAsync(discordMessageBuilder);
+                        Context.ResponseMessage = msg1;
+                        return Context.ResponseMessage;
+                    }
+
                     await Context.ResponseMessage.ModifyAsync(discordMessageBuilder);
                     Context.ResponseMessage = await Context.ResponseMessage.Refresh();
 
