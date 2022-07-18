@@ -66,9 +66,9 @@ internal class PhishingProtectionEvents
 
                 var reg = Regex.Match(word.ToLower(), @"([\S]*\.)?([\S]*)\.([\S]*)");
 
-                if (reg.Success && reg.Groups[0].Success)
+                if (reg.Success && reg.Groups[1].Success)
                 {
-                    var regex = new Regex(Regex.Escape(reg.Groups[0].Value));
+                    var regex = new Regex(Regex.Escape(reg.Groups[1].Value));
 
                     if (regex.Replace(word.ToLower(), "", 1) == url.Key.ToLower())
                     {
