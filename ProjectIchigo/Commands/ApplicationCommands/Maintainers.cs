@@ -14,8 +14,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new InfoCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
@@ -25,8 +23,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new BotnickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "newNickname", newNickname }
@@ -39,8 +35,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new GlobalBanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "victim", victim },
@@ -54,8 +48,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new GlobalUnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "victim", victim },
@@ -68,8 +60,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new Commands.LogCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "Level", Level },
@@ -82,8 +72,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new StopCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
@@ -93,8 +81,6 @@ internal class Maintainers : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
                 await new SaveCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
@@ -107,7 +93,7 @@ internal class Maintainers : ApplicationCommandsModule
                 await new Commands.CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "UseOldTagsSelector", UseOldTagsSelector },
-                });
+                }, InitiateInteraction: false);
             }).Add(_bot._watcher, ctx);
         }
     }

@@ -20,8 +20,14 @@ internal abstract class BaseCommand
         await ExecuteCommand(Context, arguments);
     }
     
-    public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
+    public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
     {
+        if (InitiateInteraction)
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            {
+                IsEphemeral = Ephemeral
+            });
+
         Context = new SharedCommandContext(this, ctx, _bot);
 
         if (!(await BeforeExecution(Context)))
@@ -153,47 +159,42 @@ internal abstract class BaseCommand
     
     public void SendSourceError(Enums.CommandType commandType)
     {
-        switch (commandType)
+        _ = commandType switch
         {
-            case Enums.CommandType.ApplicationCommand:
-                _ = RespondOrEdit(new DiscordEmbedBuilder()
+            Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        IconUrl = Context.Guild.IconUrl,
-                        Name = Context.Guild.Name
-                    },
-                    Description = $"This command is exclusive to application commands.",
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                        IconUrl = Context.User.AvatarUrl
-                    },
-                    Timestamp = DateTime.UtcNow,
-                    Color = EmbedColors.Error
-                });
-                break;
-            case Enums.CommandType.PrefixCommand:
-                _ = RespondOrEdit(new DiscordEmbedBuilder()
+                    IconUrl = Context.Guild.IconUrl,
+                    Name = Context.Guild.Name
+                },
+                Description = $"This command is exclusive to application commands.",
+                Footer = new DiscordEmbedBuilder.EmbedFooter
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        IconUrl = Context.Guild.IconUrl,
-                        Name = Context.Guild.Name
-                    },
-                    Description = $"This command is exclusive to prefixed commands.",
-                    Footer = new DiscordEmbedBuilder.EmbedFooter
-                    {
-                        Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                        IconUrl = Context.User.AvatarUrl
-                    },
-                    Timestamp = DateTime.UtcNow,
-                    Color = EmbedColors.Error
-                });
-                break;
-            default:
-                throw new ArgumentException("Invalid Source defined.");
-        }
+                    Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
+                    IconUrl = Context.User.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow,
+                Color = EmbedColors.Error
+            }),
+            Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    IconUrl = Context.Guild.IconUrl,
+                    Name = Context.Guild.Name
+                },
+                Description = $"This command is exclusive to prefixed commands.",
+                Footer = new DiscordEmbedBuilder.EmbedFooter
+                {
+                    Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
+                    IconUrl = Context.User.AvatarUrl
+                },
+                Timestamp = DateTime.UtcNow,
+                Color = EmbedColors.Error
+            }),
+            _ => throw new ArgumentException("Invalid Source defined."),
+        };
     }
 
     public async Task<bool> CheckMaintenance()

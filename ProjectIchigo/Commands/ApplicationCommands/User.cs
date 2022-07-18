@@ -8,8 +8,6 @@ internal class User : ApplicationCommandsModule
     {
         Task.Run(async () =>
         {
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
             await new UserInfoCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "victim", await victim.GetFromApiAsync() }
