@@ -8,7 +8,7 @@ internal class EmojiStealerCommand : BaseCommand
         {
             DiscordMessage bMessage;
 
-            if (arguments.ContainsKey("message"))
+            if (arguments?.ContainsKey("message") ?? false)
             {
                 bMessage = (DiscordMessage)arguments["message"];
             }
@@ -474,10 +474,8 @@ internal class EmojiStealerCommand : BaseCommand
 
                                 using (var fileStream = File.OpenRead($"Emotes-{guid}.zip"))
                                 {
-                                    await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed));
+                                    await RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed));
                                 }
-
-                                DeleteOrFinish();
                             }
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
