@@ -146,4 +146,28 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+    
+    [SlashCommandGroup("autocrosspost", "Allows to review and change settings for the automatic crossposts")]
+    public class AutoCrosspost : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Shows a list of all currently defined Auto Crosspost Channels", (long)Permissions.Administrator)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.AutoCrosspostCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows modifying currently defined Auto Crosspost Channels and settings related to it", (long)Permissions.Administrator)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.AutoCrosspostCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }
