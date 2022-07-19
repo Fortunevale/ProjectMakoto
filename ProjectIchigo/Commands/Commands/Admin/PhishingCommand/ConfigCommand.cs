@@ -39,30 +39,34 @@ internal class ConfigCommand : BaseCommand
                 { ChangeTimeoutLengthButton }
             }).AddComponents(Resources.CancelButton));
 
-            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var Button = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
 
-            if (e.TimedOut)
+            if (Button.TimedOut)
             {
                 ModifyToTimedOut(true);
                 return;
             }
 
-            _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-            if (e.Result.Interaction.Data.CustomId == ToggleDetectionButton.CustomId)
+            if (Button.Result.Interaction.Data.CustomId == ToggleDetectionButton.CustomId)
             {
+                _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                 ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing = !ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ToggleWarningButton.CustomId)
+            else if (Button.Result.Interaction.Data.CustomId == ToggleWarningButton.CustomId)
             {
+                _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                 ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect = !ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
+            else if (Button.Result.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
             {
+                _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                 var dropdown = new DiscordSelectComponent("Select an action..", new List<DiscordSelectComponentOption>
                     {
                         { new DiscordSelectComponentOption("Ban", "Ban", "Bans the user if a scam link has been detected") },
@@ -73,68 +77,54 @@ internal class ConfigCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
 
-                async Task ChangePunishmentInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-                {
-                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
-                    {
-                        ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
+                var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, TimeSpan.FromMinutes(2));
 
-                        switch (e.Values.First())
-                        {
-                            case "Ban":
-                                ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
-                                break;
-                            case "Kick":
-                                ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
-                                break;
-                            case "Timeout":
-                                ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
-                                break;
-                            case "Delete":
-                                ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
-                                break;
-                        }
-
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-                };
-
-                _ = Task.Delay(60000).ContinueWith(x =>
-                {
-                    if (x.IsCompletedSuccessfully)
-                    {
-                        ctx.Client.ComponentInteractionCreated -= ChangePunishmentInteraction;
-                        ModifyToTimedOut(true);
-                    }
-                });
-
-                ctx.Client.ComponentInteractionCreated += ChangePunishmentInteraction;
-            }
-            else if (e.Result.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
-            {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("Please specify a new Ban/Kick Reason.\n" +
-                                                                                                    "_Type `cancel` or `.` to cancel._\n\n" +
-                                                                                                    "**Placeholders**\n" +
-                                                                                                    "`%R` - _A placeholder for the reason_")));
-
-                var reason = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
-
-                if (reason.TimedOut)
+                if (e.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
 
-                _ = reason.Result.DeleteAsync();
-
-                if (reason.Result.Content.ToLower() is not "cancel" and not ".")
-                    ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = reason.Result.Content;
+                switch (e.Result.Values.First())
+                {
+                    case "Ban":
+                        ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.BAN;
+                        break;
+                    case "Kick":
+                        ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.KICK;
+                        break;
+                    case "Timeout":
+                        ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.TIMEOUT;
+                        break;
+                    case "Delete":
+                        ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType = PhishingPunishmentType.DELETE;
+                        break;
+                }
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ChangeTimeoutLengthButton.CustomId)
+            else if (Button.Result.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
+            {
+                var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert the default reason", "", 1, 50, true, ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason));
+
+                await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
+
+                var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
+
+                if (e.TimedOut)
+                {
+                    ModifyToTimedOut(true);
+                    return;
+                }
+
+                ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "new_reason").First().Components.First().Value;
+
+                await ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (Button.Result.Interaction.Data.CustomId == ChangeTimeoutLengthButton.CustomId)
             {
                 if (ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.PunishmentType != PhishingPunishmentType.TIMEOUT)
                 {
@@ -144,49 +134,47 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("Please specify how long the timeout should last with one of the following suffixes:\n" +
+                var modal = new DiscordInteractionModalBuilder("Define a new timeout length", Guid.NewGuid().ToString())
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "explain", "Suffixes", "", 2, 50, true, "Please specify how long the timeout should last with one of the following suffixes:\n" +
                                                                                                     "`d` - _Days (default)_\n" +
                                                                                                     "`h` - _Hours_\n" +
                                                                                                     "`m` - _Minutes_\n" +
                                                                                                     "`s` - _Seconds_\n\n" +
-                                                                                                    "e.g.: `31h = 31 Hours`")));
+                                                                                                    "e.g.: `31h = 31 Hours`"))
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_timeoutlength", "New time out length", "", 1, 50, true, "14d"));
 
-                var reason = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(60));
+                await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
 
-                if (reason.TimedOut)
+                var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
+
+                if (e.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
 
-                _ = reason.Result.DeleteAsync();
-
-                if (reason.Result.Content.ToLower() is "cancel" or ".")
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
+                var reason = e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "new_timeoutlength").First().Components.First().Value;
 
                 try
                 {
-                    if (!TimeSpan.TryParse(reason.Result.Content, out TimeSpan length))
+                    if (!TimeSpan.TryParse(reason, out TimeSpan length))
                     {
-                        switch (reason.Result.Content[^1..])
+                        switch (reason[^1..])
                         {
                             case "d":
-                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content.Replace("d", "")));
+                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Replace("d", "")));
                                 break;
                             case "h":
-                                length = TimeSpan.FromHours(Convert.ToInt32(reason.Result.Content.Replace("h", "")));
+                                length = TimeSpan.FromHours(Convert.ToInt32(reason.Replace("h", "")));
                                 break;
                             case "m":
-                                length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Result.Content.Replace("m", "")));
+                                length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Replace("m", "")));
                                 break;
                             case "s":
-                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Result.Content.Replace("s", "")));
+                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Replace("s", "")));
                                 break;
                             default:
-                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Result.Content));
+                                length = TimeSpan.FromDays(Convert.ToInt32(reason));
                                 return;
                         }
                     }
@@ -212,7 +200,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+            else if (Button.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
             }
