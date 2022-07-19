@@ -449,20 +449,6 @@ internal class Admin : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
-        private string GetCurrentConfiguration(CommandContext ctx)
-        {
-            return $"`Invite Tracker Enabled`: {_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled.BoolToEmote(ctx.Client)}";
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -484,18 +470,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var ListEmbed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Invite Tracker • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                await new Commands.InviteTrackerCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
 
@@ -505,53 +480,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var embed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Invite Tracker • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-
-                var Toggle = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Invite Tracking", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
-
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
-                .AddComponents(new List<DiscordComponent>
-                {
-                    Toggle
-                })
-                .AddComponents(Resources.CancelButton));
-
-                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
-                {
-                    msg.ModifyToTimedOut(true);
-                    return;
-                }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == Toggle.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled = !_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled;
-
-                    if (_bot._guilds.List[ctx.Guild.Id].InviteTrackerSettings.Enabled)
-                        _ = InviteTrackerEvents.UpdateCachedInvites(_bot, ctx.Guild);
-
-                    _ = msg.DeleteAsync();
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                }
-                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
-                {
-                    _ = msg.DeleteAsync();
-                    return;
-                }
-
+                await new Commands.InviteTrackerCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }
