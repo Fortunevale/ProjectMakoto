@@ -40,7 +40,7 @@ internal class CuddleCommand : BaseCommand
                 ImageUrl = gif,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
-            }).WithContent(ctx.CommandType == Enums.CommandType.ApplicationCommand ? user.Mention : ""));
+            }).WithContent(ctx.CommandType == Enums.CommandType.ApplicationCommand ? user.Mention : "").WithAllowedMention(UserMention.All));
         });
     }
 }
