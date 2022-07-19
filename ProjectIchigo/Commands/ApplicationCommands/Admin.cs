@@ -194,7 +194,7 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
-
+    
     [ContextMenu(ApplicationCommandType.Message, "Add a Reaction Role", (long)Permissions.Administrator)]
     public async Task Add(ContextMenuContext ctx)
     {
@@ -229,5 +229,29 @@ internal class Admin : ApplicationCommandsModule
                     { "message", ctx.TargetMessage },
                 });
         }).Add(_bot._watcher, ctx);
+    }
+
+    [SlashCommandGroup("invoiceprivacy", "Allows to review and change In-Voice Text Channel Privacy Settings")]
+    public class InVoiceTextPrivacy : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Shows currently defined settings for In-Voice Text Channel Privacy", (long)Permissions.Administrator)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.InVoicePrivacyCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows modifying currently defined In-Voice Text Channel Privacy Settings", (long)Permissions.Administrator)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.InVoicePrivacyCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
     }
 }

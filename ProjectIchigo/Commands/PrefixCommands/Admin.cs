@@ -405,21 +405,6 @@ internal class Admin : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
-        private string GetCurrentConfiguration(CommandContext ctx)
-        {
-            return $"`Clear Messages on empty Voice Channel`: {_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled.BoolToEmote(ctx.Client)}\n" +
-                   $"`Set Permissions on User Join         `: {_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled.BoolToEmote(ctx.Client)}";
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -441,18 +426,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var ListEmbed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"In-Voice Text Channel Privacy • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                await new Commands.InVoicePrivacyCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
 
@@ -462,80 +436,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var embed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"In-Voice Text Channel Privacy • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-
-                var ToggleDeletion = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Deletion", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
-                var TogglePermission = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Permission Protection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
-
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
-                .AddComponents(new List<DiscordComponent>
-                {
-                    ToggleDeletion,
-                    TogglePermission
-                })
-                .AddComponents(Resources.CancelButton));
-
-                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
-                {
-                    msg.ModifyToTimedOut(true);
-                    return;
-                }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == ToggleDeletion.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled = !_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled;
-
-                    _ = msg.DeleteAsync();
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                }
-                else if (e.Result.Interaction.Data.CustomId == TogglePermission.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled = !_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled;
-
-                    _ = msg.DeleteAsync();
-                    _ = ctx.Command.ExecuteAsync(ctx);
-
-                    if (_bot._guilds.List[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
-                    {
-                        if (!ctx.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
-                            return;
-
-                        foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
-                        {
-                            _ = b.Value.AddOverwriteAsync(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages , "Enabled In-Voice Privacy");
-                        }
-                    }
-                    else
-                    {
-                        if (!ctx.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
-                            return;
-
-                        foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
-                        {
-                            _ = b.Value.DeleteOverwriteAsync(ctx.Guild.EveryoneRole, "Disabled In-Voice Privacy");
-                        }
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
-                {
-                    _ = msg.DeleteAsync();
-                    return;
-                }
-
+                await new Commands.InVoicePrivacyCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }
@@ -826,21 +727,6 @@ internal class Admin : BaseCommandModule
                     return;
                 }
 
-            }).Add(_bot._watcher, ctx);
-        }
-
-        [Command("test"),
-        Description(" ")]
-        public async Task Test(CommandContext ctx, [RemainingText]string test)
-        {
-            Task.Run(async () =>
-            {
-                string PingableName = Regex.Replace(test.Normalize(NormalizationForm.FormKC), @"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", "");
-
-                if (PingableName.IsNullOrWhiteSpace())
-                    PingableName = "Pingable Name";
-
-                await ctx.RespondAsync(PingableName);
             }).Add(_bot._watcher, ctx);
         }
     }
