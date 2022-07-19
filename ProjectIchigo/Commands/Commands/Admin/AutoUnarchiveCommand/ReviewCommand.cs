@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Commands.NameNormalizerCommand;
+﻿namespace ProjectIchigo.Commands.AutoUnarchiveCommand;
 
 internal class ReviewCommand : BaseCommand
 {
@@ -13,11 +13,11 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Name Normalizer • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
+                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Auto Thread Unarchiver • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
                 Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Description = NameNormalizerCommandAbstractions.GetCurrentConfiguration(ctx)
+                Description = AutoUnarchiveCommandAbstractions.GetCurrentConfiguration(ctx)
             });
         });
     }

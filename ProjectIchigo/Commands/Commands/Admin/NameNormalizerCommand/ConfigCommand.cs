@@ -2,6 +2,8 @@
 
 internal class ConfigCommand : BaseCommand
 {
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>

@@ -542,8 +542,6 @@ internal class Admin : BaseCommandModule
     Description("Allows to review and change Auto Thread Unarchiver Settings")]
     public class AutoUnarchive : BaseCommandModule
     {
-        string ReadableModuleName = "Auto Thread Unarchiver";
-
         public Bot _bot { private get; set; }
 
         public async override Task BeforeExecutionAsync(CommandContext ctx)
@@ -555,17 +553,6 @@ internal class Admin : BaseCommandModule
             }
         }
 
-        private string GetCurrentConfiguration(CommandContext ctx)
-        {
-            foreach (var b in _bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.ToList())
-            {
-                if (!ctx.Guild.Channels.ContainsKey(b))
-                    _bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Remove(b);
-            }
-
-            return $"{(_bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Any() ? string.Join("\n", _bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : "`No channels defined.`")}";
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -575,9 +562,9 @@ internal class Admin : BaseCommandModule
                     return;
 
                 if (ctx.Command.Parent is not null)
-                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", ReadableModuleName);
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
                 else
-                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", ReadableModuleName);
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
             }).Add(_bot._watcher, ctx);
         }
 
@@ -587,18 +574,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var ListEmbed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"{ReadableModuleName} • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                await new Commands.AutoUnarchiveCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
 
@@ -608,91 +584,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var embed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"{ReadableModuleName} • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = $"{GetCurrentConfiguration(ctx)}\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**"
-                };
-
-                var Add = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Add new channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                var Remove = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove a channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
-                .AddComponents(new List<DiscordComponent>
-                {
-                    Add,
-                    Remove
-                })
-                .AddComponents(Resources.CancelButton));
-
-                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
-                {
-                    msg.ModifyToTimedOut(true);
-                    return;
-                }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == Add.CustomId)
-                {
-                    DiscordChannel channel;
-
-                    try
-                    {
-                        channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-
-                    if (!_bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Contains(channel.Id))
-                        _bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Add(channel.Id);
-
-                    _ = msg.DeleteAsync();
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                    return;
-                }
-                else if (e.Result.Interaction.Data.CustomId == Remove.CustomId)
-                {
-                    ulong ChannelToRemove;
-
-                    try
-                    {
-                        var channel = await GenericSelectors.PromptCustomSelection(_bot, _bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads
-                            .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList(),
-                            ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-
-                        ChannelToRemove = Convert.ToUInt64(channel);
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-
-                    if (_bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelToRemove))
-                        _bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Remove(ChannelToRemove);
-
-                    _ = msg.DeleteAsync();
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                    return;
-                }
-                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
-                {
-                    _ = msg.DeleteAsync();
-                    return;
-                }
-
+                await new Commands.AutoUnarchiveCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }

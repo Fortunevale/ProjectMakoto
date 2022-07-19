@@ -302,4 +302,28 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+    
+    [SlashCommandGroup("autounarchive", "Allows to review and change Auto Thread Unarchiver Settings")]
+    public class AutoUnarchive : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Shows currently defined settings for Auto Thread Unarchiver", (long)Permissions.Administrator)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.AutoUnarchiveCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows modifying currently defined Auto Thread Unarchiver Settings", (long)Permissions.Administrator)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.AutoUnarchiveCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }
