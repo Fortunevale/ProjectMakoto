@@ -1,4 +1,4 @@
-namespace ProjectIchigo.PrefixCommands;
+namespace ProjectIchigo.Commands.PrefixCommands;
 internal class Mod : BaseCommandModule
 {
     public Bot _bot { private get; set; }

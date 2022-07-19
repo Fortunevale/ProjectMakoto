@@ -1,4 +1,4 @@
-namespace ProjectIchigo.PrefixCommands;
+namespace ProjectIchigo.Commands.PrefixCommands;
 
 internal class User : BaseCommandModule
 {
@@ -24,7 +24,7 @@ internal class User : BaseCommandModule
                 if (command.Value.CustomAttributes.OfType<CommandModuleAttribute>() is null)
                     continue;
 
-                string module = command.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString;
+                var module = command.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString;
 
                 switch (module)
                 {
@@ -169,7 +169,7 @@ internal class User : BaseCommandModule
     [Command("leaderboard"),
     CommandModule("user"),
     Description("Shows the current experience leaderboard")]
-    public async Task Leaderboard(CommandContext ctx, [Description("3-50")]int ShowAmount = 10)
+    public async Task Leaderboard(CommandContext ctx, [Description("3-50")] int ShowAmount = 10)
     {
         Task.Run(async () =>
         {
@@ -185,7 +185,7 @@ internal class User : BaseCommandModule
     [Command("submit-url"),
     CommandModule("user"),
     Description("Allows submission of new malicous urls to our database")]
-    public async Task UrlSubmit(CommandContext ctx, [Description("URL")]string url)
+    public async Task UrlSubmit(CommandContext ctx, [Description("URL")] string url)
     {
         Task.Run(async () =>
         {

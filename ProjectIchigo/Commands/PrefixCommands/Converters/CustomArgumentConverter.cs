@@ -1,4 +1,4 @@
-namespace ProjectIchigo;
+namespace ProjectIchigo.Commands.PrefixCommands.Converters;
 
 internal class CustomArgumentConverter
 {
