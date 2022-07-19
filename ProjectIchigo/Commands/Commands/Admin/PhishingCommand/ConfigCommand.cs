@@ -107,9 +107,10 @@ internal class ConfigCommand : BaseCommand
             else if (Button.Result.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
             {
                 var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert the default reason", "", 1, 50, true, ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason));
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason));
 
                 await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`")));
 
                 var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
 
@@ -118,6 +119,8 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut(true);
                     return;
                 }
+
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 ctx.Bot._guilds.List[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "new_reason").First().Components.First().Value;
 
@@ -135,17 +138,17 @@ internal class ConfigCommand : BaseCommand
                 }
 
                 var modal = new DiscordInteractionModalBuilder("Define a new timeout length", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "explain", "Suffixes", "", 2, 50, true, "Please specify how long the timeout should last with one of the following suffixes:\n" +
-                                                                                                    "`d` - _Days (default)_\n" +
-                                                                                                    "`h` - _Hours_\n" +
-                                                                                                    "`m` - _Minutes_\n" +
-                                                                                                    "`s` - _Seconds_\n\n" +
-                                                                                                    "e.g.: `31h = 31 Hours`"))
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_timeoutlength", "New time out length", "", 1, 50, true, "14d"));
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", "Days (28 max)", "", 1, 2, true, "14"))
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", "Hours (23 max)", "", 1, 2, true, "0"))
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", "Minutes (59 max)", "", 1, 2, true, "0"))
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (59 max)", "", 1, 2, true, "0"));
 
                 await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`")));
 
                 var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
+
+                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 if (e.TimedOut)
                 {
@@ -153,35 +156,28 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                var reason = e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "new_timeoutlength").First().Components.First().Value;
-
                 try
                 {
-                    if (!TimeSpan.TryParse(reason, out TimeSpan length))
+                    TimeSpan length = TimeSpan.FromSeconds(0);
+
+                    double seconds = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "seconds").First().Components.First().Value));
+                    double minutes = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "minutes").First().Components.First().Value));
+                    double hours = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "hours").First().Components.First().Value));
+                    double days = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "days").First().Components.First().Value));
+
+                    if (seconds > 59 || seconds < 0 || minutes > 59 || minutes < 0 || hours > 23 || hours < 0 || days > 28 || days < 0 )
                     {
-                        switch (reason[^1..])
-                        {
-                            case "d":
-                                length = TimeSpan.FromDays(Convert.ToInt32(reason.Replace("d", "")));
-                                break;
-                            case "h":
-                                length = TimeSpan.FromHours(Convert.ToInt32(reason.Replace("h", "")));
-                                break;
-                            case "m":
-                                length = TimeSpan.FromMinutes(Convert.ToInt32(reason.Replace("m", "")));
-                                break;
-                            case "s":
-                                length = TimeSpan.FromSeconds(Convert.ToInt32(reason.Replace("s", "")));
-                                break;
-                            default:
-                                length = TimeSpan.FromDays(Convert.ToInt32(reason));
-                                return;
-                        }
+                        throw new Exception();
                     }
 
-                    if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(1))
+                    length = length.Add(TimeSpan.FromSeconds(seconds));
+                    length = length.Add(TimeSpan.FromMinutes(minutes));
+                    length = length.Add(TimeSpan.FromHours(hours));
+                    length = length.Add(TimeSpan.FromDays(days));
+
+                    if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(10))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("The duration has to be between 1 second and 28 days.")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("The duration has to be between 10 seconds and 28 days.")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -194,7 +190,7 @@ internal class ConfigCommand : BaseCommand
                 }
                 catch (Exception)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("Invalid duration")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `Invalid duration`")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
