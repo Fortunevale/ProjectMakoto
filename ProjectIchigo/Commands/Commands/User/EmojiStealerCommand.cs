@@ -33,7 +33,7 @@ internal class EmojiStealerCommand : BaseCommand
                     default:
                         throw new ArgumentException("Message expected");
                 }
-            }    
+            }
 
             if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;

@@ -170,4 +170,64 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+
+    [SlashCommandGroup("reactionroles", "Allows to review and change settings for Reaction Roles")]
+    public class ReactionRoles : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Shows a list of all currently defined Auto Crosspost Channels", (long)Permissions.Administrator)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.ReactionRolesCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to add, delete and modify reaction roles", (long)Permissions.Administrator)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.ReactionRolesCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
+
+    [ContextMenu(ApplicationCommandType.Message, "Add a Reaction Role", (long)Permissions.Administrator)]
+    public async Task Add(ContextMenuContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "message", ctx.TargetMessage },
+                });
+        }).Add(_bot._watcher, ctx);
+    }
+
+    [ContextMenu(ApplicationCommandType.Message, "Remove a Reaction Role", (long)Permissions.Administrator)]
+    public async Task Remove(ContextMenuContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new Commands.ReactionRolesCommand.RemoveCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "message", ctx.TargetMessage },
+                });
+        }).Add(_bot._watcher, ctx);
+    }
+
+    [ContextMenu(ApplicationCommandType.Message, "Remove all Reaction Roles", (long)Permissions.Administrator)]
+    public async Task RemoveAll(ContextMenuContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "message", ctx.TargetMessage },
+                });
+        }).Add(_bot._watcher, ctx);
+    }
 }
