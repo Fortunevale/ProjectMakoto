@@ -184,25 +184,6 @@ internal class Admin : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
-        private string GetCurrentConfiguration(CommandContext ctx)
-        {
-            if (!_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled)
-                return $"`Bump Reminder Enabled` : {_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}";
-
-            return $"`Bump Reminder Enabled` : {_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}\n" +
-                $"`Bump Reminder Channel` : <#{_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
-                $"`Bump Reminder Role   ` : <@&{_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.RoleId})`";
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -224,18 +205,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var ListEmbed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Bump Reminder Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                await new Commands.BumpReminderCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
 
@@ -245,168 +215,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                DiscordEmbedBuilder embed = new()
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Loading,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-
-                var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Set up Bump Reminder", _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Disable Bump Reminder", !_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-                var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Channel", !_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-                var ChangeRole = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Role", !_bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
-                .AddComponents(new List<DiscordComponent>
-                {
-                    { Setup },
-                    { Disable }
-                })
-                .AddComponents(new List<DiscordComponent>
-                {
-                    { ChangeChannel },
-                    { ChangeRole }
-                }).AddComponents(Resources.CancelButton));
-
-                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
-                {
-                    msg.ModifyToTimedOut(true);
-                    return;
-                }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == Setup.CustomId)
-                {
-                    if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == Resources.AccountIds.Disboard))
-                    {
-                        await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                        {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                            Color = EmbedColors.Error,
-                            Footer = ctx.GenerateUsedByFooter(),
-                            Timestamp = DateTime.UtcNow,
-                            Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
-                        });
-                        return;
-                    }
-
-                    embed = new DiscordEmbedBuilder
-                    {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                        Color = EmbedColors.Loading,
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow,
-                        Description = $"`Setting up Bump Reminder..`"
-                    };
-                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.Description = "`Please select a role to ping when the server can be bumped.`";
-                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                    DiscordRole role;
-
-                    try
-                    {
-                        role = await GenericSelectors.PromptRoleSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, true, "BumpReminder");
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-
-                    var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with ✅ to receive notifications as soon as the server can be bumped again.");
-                    _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromUnicode("✅"));
-                    _ = bump_reaction_msg.PinAsync();
-
-                    _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
-
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.RoleId = role.Id;
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId = ctx.Channel.Id;
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.MessageId = bump_reaction_msg.Id;
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddHours(-2);
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.LastReminder = DateTime.UtcNow.AddHours(-2);
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.LastUserId = 0;
-
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.Enabled = true;
-
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.Description = "`The Bump Reminder has been set up.`";
-                    embed.Color = EmbedColors.Success;
-                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                    await Task.Delay(5000);
-                    _ = msg.DeleteAsync();
-
-                    _bot._bumpReminder.SendPersistentMessage(ctx.Client, ctx.Channel, null);
-                    return;
-                }
-                else if (e.Result.Interaction.Data.CustomId == Disable.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings = new();
-
-                    if (GetScheduleTasks() != null)
-                        if (GetScheduleTasks().Any(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}"))
-                            DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}").Key);
-
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.Description = "`The Bump Reminder has been disabled.`";
-                    embed.Color = EmbedColors.Success;
-                    _ = msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-
-                    await Task.Delay(5000);
-                    _ = msg.DeleteAsync();
-                    return;
-                }
-                else if (e.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
-                {
-                    try
-                    {
-                        var channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-
-                        _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.ChannelId = channel.Id;
-                        _ = msg.DeleteAsync();
-                        _ = ctx.Command.ExecuteAsync(ctx);
-                        return;
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == ChangeRole.CustomId)
-                {
-                    try
-                    {
-                        var role = await GenericSelectors.PromptRoleSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-
-                        _bot._guilds.List[ctx.Guild.Id].BumpReminderSettings.RoleId = role.Id;
-                        _ = msg.DeleteAsync();
-                        _ = ctx.Command.ExecuteAsync(ctx);
-                        return;
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
-                {
-                    _ = msg.DeleteAsync();
-                    return;
-                }
+                await new Commands.BumpReminderCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }

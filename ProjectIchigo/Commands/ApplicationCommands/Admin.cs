@@ -98,4 +98,28 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+    
+    [SlashCommandGroup("bumpreminder", "Allows to review, set up and change settings for the Bump Reminder")]
+    public class BumpReminder : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Shows a list of all currently defined Bump Reminder settings", (long)Permissions.Administrator)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.BumpReminderCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows modifying currently used Bump Reminder settings", (long)Permissions.Administrator)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.BumpReminderCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }
