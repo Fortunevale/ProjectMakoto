@@ -1,4 +1,4 @@
-namespace ProjectIchigo.Commands.PrefixCommands;
+namespace ProjectIchigo.PrefixCommands;
 
 internal class User : BaseCommandModule
 {
