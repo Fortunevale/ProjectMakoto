@@ -8,7 +8,7 @@ internal class Admin : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Shows the currently used settings")]
+        [SlashCommand("review", "Shows the currently used settings", (long)Permissions.Administrator)]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -17,7 +17,7 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows modification of the currently used settings")]
+        [SlashCommand("config", "Allows modification of the currently used settings", (long)Permissions.Administrator)]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -32,7 +32,7 @@ internal class Admin : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Shows the currently used settings")]
+        [SlashCommand("review", "Shows the currently used settings", (long)Permissions.Administrator)]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -41,7 +41,7 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows modification of the currently used settings")]
+        [SlashCommand("config", "Allows modification of the currently used settings", (long)Permissions.Administrator)]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -56,7 +56,7 @@ internal class Admin : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Shows a list of all currently defined Level Rewards")]
+        [SlashCommand("review", "Shows a list of all currently defined Level Rewards", (long)Permissions.Administrator)]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -65,7 +65,7 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows adding, removing and modifying currently defined Level Rewards")]
+        [SlashCommand("config", "Allows adding, removing and modifying currently defined Level Rewards", (long)Permissions.Administrator)]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -80,7 +80,7 @@ internal class Admin : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Shows a list of all currently defined Phishing Protection settings")]
+        [SlashCommand("review", "Shows a list of all currently defined Phishing Protection settings", (long)Permissions.Administrator)]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -89,7 +89,7 @@ internal class Admin : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows modifying currently used Phishing Protection settings")]
+        [SlashCommand("config", "Allows modifying currently used Phishing Protection settings", (long)Permissions.Administrator)]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>

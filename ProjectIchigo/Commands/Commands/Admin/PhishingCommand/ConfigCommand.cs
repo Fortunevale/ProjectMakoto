@@ -177,7 +177,7 @@ internal class ConfigCommand : BaseCommand
 
                     if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(10))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("The duration has to be between 10 seconds and 28 days.")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `The duration has to be between 10 seconds and 28 days.`").WithColor(EmbedColors.Error)));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -190,7 +190,7 @@ internal class ConfigCommand : BaseCommand
                 }
                 catch (Exception)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `Invalid duration`")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `Invalid duration`").WithColor(EmbedColors.Error)));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
