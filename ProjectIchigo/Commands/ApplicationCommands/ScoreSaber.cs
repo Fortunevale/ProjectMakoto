@@ -8,7 +8,7 @@ internal class ScoreSaber : ApplicationCommandsModule
         public Bot _bot { private get; set; }
 
         [SlashCommand("profile", "Get show a users Score Saber profile by id")]
-        public async Task ScoreSaberC(InteractionContext ctx, [Description("Id|@User")] string id = "")
+        public async Task ScoreSaberC(InteractionContext ctx, [Option("profile", "Id|@User")] string id = "")
         {
             Task.Run(async () =>
             {
@@ -20,7 +20,7 @@ internal class ScoreSaber : ApplicationCommandsModule
         }
 
         [SlashCommand("search", "Search a user on Score Saber by name")]
-        public async Task ScoreSaberSearch(InteractionContext ctx, [Description("Name")][RemainingText] string name)
+        public async Task ScoreSaberSearch(InteractionContext ctx, [Option("name", "The name to search for")] string name)
         {
             Task.Run(async () =>
             {
@@ -32,7 +32,7 @@ internal class ScoreSaber : ApplicationCommandsModule
         }
 
         [SlashCommand("map-leaderboard", "Display a leaderboard off a specific map")]
-        public async Task ScoreSaberMapLeaderboard(InteractionContext ctx, [Description("LeaderboardId")] int boardId, [Description("Page")] int Page = 1, [Description("Internal Page")] int Internal_Page = 0)
+        public async Task ScoreSaberMapLeaderboard(InteractionContext ctx, [Option("LeaderboardId", "The LeaderboardId")] int boardId, [Option("Page", "The page")] int Page = 1, [Option("Internal Page", "The internal page")] int Internal_Page = 0)
         {
             Task.Run(async () =>
             {

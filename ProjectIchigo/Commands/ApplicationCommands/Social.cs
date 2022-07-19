@@ -4,7 +4,7 @@ internal class Social : ApplicationCommandsModule
     public Bot _bot { private get; set; }
 
     [SlashCommand("afk", "Set yourself afk: Notify users pinging you that you're currently not around")]
-    public async Task UserInfo(InteractionContext ctx, string reason = "-")
+    public async Task UserInfo(InteractionContext ctx, [Option("reason", "The reason")]string reason = "-")
     {
         Task.Run(async () =>
         {
@@ -16,7 +16,7 @@ internal class Social : ApplicationCommandsModule
     }
 
     [SlashCommand("cuddle", "Cuddle with another user")]
-    public async Task Cuddle(InteractionContext ctx, DiscordUser user)
+    public async Task Cuddle(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -30,7 +30,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("kiss", "Kiss another user")]
-    public async Task Kiss(InteractionContext ctx, DiscordUser user)
+    public async Task Kiss(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -44,7 +44,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("slap", "Slap another user")]
-    public async Task Slap(InteractionContext ctx, DiscordUser user)
+    public async Task Slap(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -58,7 +58,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("kill", "Kill another user..?")]
-    public async Task Kill(InteractionContext ctx, DiscordUser user)
+    public async Task Kill(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -72,7 +72,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("boop", "Give another user a boop!")]
-    public async Task Boop(InteractionContext ctx, DiscordUser user)
+    public async Task Boop(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -86,7 +86,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("highfive", "Give a high five!")]
-    public async Task Highfive(InteractionContext ctx, DiscordUser user)
+    public async Task Highfive(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -100,7 +100,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("hug", "Hug another user!")]
-    public async Task Hug(InteractionContext ctx, DiscordUser user)
+    public async Task Hug(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
@@ -114,7 +114,7 @@ internal class Social : ApplicationCommandsModule
 
 
     [SlashCommand("pat", "Give someone some headpats!")]
-    public async Task Pat(InteractionContext ctx, DiscordUser user)
+    public async Task Pat(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
         {
