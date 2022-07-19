@@ -7,7 +7,7 @@ internal class ScoreSaber : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("profile", "Get show a users Score Saber profile by id")]
+        [SlashCommand("profile", "Show a users Score Saber profile by id")]
         public async Task ScoreSaberC(InteractionContext ctx, [Option("profile", "Id|@User")] string id = "")
         {
             Task.Run(async () =>

@@ -24,7 +24,7 @@ internal class ScoreSaber : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("profile"), Description("Get show a users Score Saber profile by id")]
+        [Command("profile"), Description("Show a users Score Saber profile by id")]
         public async Task ScoreSaberC(CommandContext ctx, [Description("Id|@User")] string id = "")
         {
             Task.Run(async () =>
