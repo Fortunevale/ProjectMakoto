@@ -17,7 +17,7 @@ internal class ConfigCommand : BaseCommand
                 Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Description = JoinCommandAbstractions.GetCurrentConfiguration(ctx, ctx.Bot)
+                Description = JoinCommandAbstractions.GetCurrentConfiguration(ctx)
             };
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);

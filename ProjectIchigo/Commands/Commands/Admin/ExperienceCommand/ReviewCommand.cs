@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Commands.JoinCommand;
+﻿namespace ProjectIchigo.Commands.ExperienceCommand;
 
 internal class ReviewCommand : BaseCommand
 {
@@ -13,11 +13,11 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
                 Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Description = JoinCommandAbstractions.GetCurrentConfiguration(ctx)
+                Description = ExperienceCommandAbstractions.GetCurrentConfiguration(ctx)
             });
         });
     }
