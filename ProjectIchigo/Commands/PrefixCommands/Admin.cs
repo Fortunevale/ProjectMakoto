@@ -236,26 +236,6 @@ internal class Admin : BaseCommandModule
             }
         }
 
-        private string GetCurrentConfiguration(CommandContext ctx)
-        {
-            if (_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel == 0)
-                return $"❌ `The actionlog is disabled.`";
-
-            return $"`Actionlog Channel                 ` : <#{_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
-                    $"`Attempt gathering more details    ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote(ctx.Client)}\n" +
-                    $"`Join, Leaves & Kicks              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Nickname, Role, Membership Updates` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`User Profile Updates              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Message Deletions                 ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageDeleted.BoolToEmote(ctx.Client)}\n" +
-                    $"`Message Modifications             ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Role Updates                      ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.RolesModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Bans & Unbans                     ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Server Modifications              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Channel Modifications             ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified.BoolToEmote(ctx.Client)}\n" +
-                    $"`Voice Channel Updates             ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated.BoolToEmote(ctx.Client)}\n" +
-                    $"`Invite Modifications              ` : {_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified.BoolToEmote(ctx.Client)}";
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -277,18 +257,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var ListEmbed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Actionlog Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-                await ctx.Channel.SendMessageAsync(embed: ListEmbed);
+                await new Commands.ActionLogCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
 
@@ -299,173 +268,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                var embed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-
-                var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), $"Disable Actionlog", (_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-                var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel == 0 ? "Set Channel" : "Change Channel")}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-                var ChangeFilter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"Change Filter", (_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📣")));
-
-                var msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)
-                .AddComponents(new List<DiscordComponent>
-                {
-                    { Disable }
-                })
-                .AddComponents(new List<DiscordComponent>
-                {
-                    { ChangeChannel },
-                    { ChangeFilter }
-                }).AddComponents(Resources.CancelButton));
-
-                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
-                {
-                    msg.ModifyToTimedOut(true);
-                    return;
-                }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == Disable.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].ActionLogSettings = new();
-
-                    _ = msg.DeleteAsync();
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                    return;
-                }
-                else if (e.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
-                {
-                    try
-                    {
-                        var channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, true, "actionlog", ChannelType.Text);
-
-                        await channel.ModifyAsync(x => x.PermissionOverwrites = new List<DiscordOverwriteBuilder>
-                        {
-                            new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) { Denied = Permissions.All },
-                            new DiscordOverwriteBuilder(ctx.Member) { Allowed = Permissions.All },
-                        });
-
-                        _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.Channel = channel.Id;
-
-                        _ = msg.DeleteAsync();
-                        _ = ctx.Command.ExecuteAsync(ctx);
-                        return;
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == ChangeFilter.CustomId)
-                {
-                    try
-                    {
-                        var FilterSelection = await GenericSelectors.PromptCustomSelection(_bot, new List<DiscordSelectComponentOption>
-                        {
-                            new DiscordSelectComponentOption("Toggle 'Attempt gathering more details'", "attempt_further_detail"),
-                            new DiscordSelectComponentOption("Toggle all options below", "toggle_all"),
-                            new DiscordSelectComponentOption("Toggle 'Join, Leaves & Kicks'", "log_members_modified"),
-                            new DiscordSelectComponentOption("Toggle 'Nickname, Role Updates'", "log_member_modified"),
-                            new DiscordSelectComponentOption("Toggle 'User Profile Updates'", "log_memberprofile_modified"),
-                            new DiscordSelectComponentOption("Toggle 'Message Deletions'", "log_message_deleted"),
-                            new DiscordSelectComponentOption("Toggle 'Message Modifications'", "log_message_updated"),
-                            new DiscordSelectComponentOption("Toggle 'Role Updates'", "log_roles_modified"),
-                            new DiscordSelectComponentOption("Toggle 'Bans & Unbans'", "log_banlist_modified"),
-                            new DiscordSelectComponentOption("Toggle 'Server Modifications'", "log_guild_modified"),
-                            new DiscordSelectComponentOption("Toggle 'Channel Modifications'", "log_channels_modified"),
-                            new DiscordSelectComponentOption("Toggle 'Voice Channel Updates'", "log_voice_state"),
-                            new DiscordSelectComponentOption("Toggle 'Invite Modifications'", "log_invites_modified"),
-                        }, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg);
-
-                        switch (FilterSelection)
-                        {
-                            case "attempt_further_detail":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails;
-
-                                if (_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
-                                {
-                                    embed.Description = $"⚠ `This may result in inaccurate details being displayed. Please make sure to double check the audit log on serious concerns.`";
-                                    await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-                                    await Task.Delay(5000);
-                                }
-                                break;
-                            case "toggle_all":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageDeleted = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageDeleted;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.RolesModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.RolesModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated;
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified;
-                                break;
-                            case "log_members_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MembersModified;
-                                break;
-                            case "log_voice_state":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated;
-                                break;
-                            case "log_memberprofile_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberProfileModified;
-                                break;
-                            case "log_member_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MemberModified;
-                                break;
-                            case "log_message_deleted":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageDeleted = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageDeleted;
-                                break;
-                            case "log_message_updated":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.MessageModified;
-                                break;
-                            case "log_roles_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.RolesModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.RolesModified;
-                                break;
-                            case "log_banlist_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.BanlistModified;
-                                break;
-                            case "log_guild_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.GuildModified;
-                                break;
-                            case "log_channels_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.ChannelsModified;
-                                break;
-                            case "log_invites_modified":
-                                _bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified = !_bot._guilds.List[ctx.Guild.Id].ActionLogSettings.InvitesModified;
-                                break;
-                            default:
-                                throw new Exception("Unknown option selected.");
-                        }
-
-                        _ = msg.DeleteAsync();
-                        _ = ctx.Command.ExecuteAsync(ctx);
-                        return;
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
-                {
-                    _ = msg.DeleteAsync();
-                    return;
-                }
+                await new Commands.ActionLogCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }
