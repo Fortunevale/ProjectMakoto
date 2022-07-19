@@ -8,9 +8,6 @@ internal class HighFiveCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (ctx.CommandType == Enums.CommandType.ApplicationCommand)
-                _ = ctx.OriginalInteractionContext.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
             if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
@@ -37,13 +34,13 @@ internal class HighFiveCommand : BaseCommand
                 return;
             }
 
-            _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
                 ImageUrl = gif,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
-            }));
+            }).WithContent(ctx.CommandType == Enums.CommandType.ApplicationCommand ? user.Mention : ""));
         });
     }
 }

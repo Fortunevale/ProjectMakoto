@@ -23,7 +23,7 @@ internal class Social : ApplicationCommandsModule
             await new CuddleCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -37,7 +37,7 @@ internal class Social : ApplicationCommandsModule
             await new KissCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -51,7 +51,7 @@ internal class Social : ApplicationCommandsModule
             await new SlapCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -65,7 +65,7 @@ internal class Social : ApplicationCommandsModule
             await new KillCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -79,7 +79,7 @@ internal class Social : ApplicationCommandsModule
             await new BoopCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -93,7 +93,7 @@ internal class Social : ApplicationCommandsModule
             await new HighFiveCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -107,7 +107,7 @@ internal class Social : ApplicationCommandsModule
             await new HugCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 
@@ -121,7 +121,7 @@ internal class Social : ApplicationCommandsModule
             await new PatCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "user", user }
-            }, false, false);
+            }, false, true);
         }).Add(_bot._watcher, ctx);
     }
 }
