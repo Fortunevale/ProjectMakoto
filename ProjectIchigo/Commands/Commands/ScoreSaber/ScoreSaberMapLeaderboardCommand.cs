@@ -197,7 +197,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                     embed.AddField(new DiscordEmbedField($"**#{score.rank}** {score.leaderboardPlayerInfo.country.IsoCountryCodeToFlagEmoji()} `{score.leaderboardPlayerInfo.name.SanitizeForCodeBlock()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.timeSet, TimestampFormat.RelativeTime)}",
                         $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.modifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
                         $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? "✅ `FC`" : $"{false.BoolToEmote(ctx.Client)} `{score.missedNotes + score.badCuts}`")}**\n" +
-                        $"Profile: `{ctx.Prefix}ss {score.leaderboardPlayerInfo.id}`"));
+                        $"Profile: `{ctx.Prefix}scoresaber profile {score.leaderboardPlayerInfo.id}`"));
                 }
 
                 var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));

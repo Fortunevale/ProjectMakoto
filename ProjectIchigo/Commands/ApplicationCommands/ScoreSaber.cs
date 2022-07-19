@@ -32,7 +32,7 @@ internal class ScoreSaber : ApplicationCommandsModule
         }
 
         [SlashCommand("map-leaderboard", "Display a leaderboard off a specific map")]
-        public async Task ScoreSaberMapLeaderboard(InteractionContext ctx, [Option("LeaderboardId", "The LeaderboardId")] int boardId, [Option("Page", "The page")] int Page = 1, [Option("Internal Page", "The internal page")] int Internal_Page = 0)
+        public async Task ScoreSaberMapLeaderboard(InteractionContext ctx, [Option("LeaderboardId", "The LeaderboardId")] int boardId, [Option("Page", "The page")] int Page = 1, [Option("internal_page", "The internal page")] int Internal_Page = 0)
         {
             Task.Run(async () =>
             {

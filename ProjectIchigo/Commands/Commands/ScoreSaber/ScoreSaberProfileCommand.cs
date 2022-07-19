@@ -19,7 +19,10 @@ internal class ScoreSaberProfileCommand : BaseCommand
 
                 try
                 {
-                    user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@(\d*)>").Groups[1]));
+                    if (!string.IsNullOrWhiteSpace(id))
+                        user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@(\d*)>").Groups[1].Value));
+                    else
+                        user = ctx.User;
                 }
                 catch (DisCatSharp.Exceptions.NotFoundException)
                 {
