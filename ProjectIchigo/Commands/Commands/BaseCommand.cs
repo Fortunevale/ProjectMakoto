@@ -14,6 +14,24 @@ internal abstract class BaseCommand
     {
         Context = new SharedCommandContext(this, ctx, _bot);
 
+        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
+            return;
+
         if (!(await BeforeExecution(Context)))
             return;
 
@@ -30,6 +48,24 @@ internal abstract class BaseCommand
 
         Context = new SharedCommandContext(this, ctx, _bot);
 
+        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
+            return;
+        
+        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
+            return;
+        
+        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
+            return;
+        
+        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
+            return;
+        
+        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
+            return;
+        
+        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
+            return;
+        
         if (!(await BeforeExecution(Context)))
             return;
 
@@ -45,6 +81,24 @@ internal abstract class BaseCommand
             });
 
         Context = new SharedCommandContext(this, ctx, _bot);
+
+        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
+            return;
+
+        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
+            return;
 
         if (!(await BeforeExecution(Context)))
             return;
@@ -197,6 +251,26 @@ internal abstract class BaseCommand
         }
     }
 
+    public void SendNoMemberError()
+    {
+        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        {
+            Author = new DiscordEmbedBuilder.EmbedAuthor
+            {
+                IconUrl = Context.Guild.IconUrl,
+                Name = Context.Guild.Name
+            },
+            Description = "The user you tagged is required to be on this server for this command to run.",
+            Footer = new DiscordEmbedBuilder.EmbedFooter
+            {
+                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
+                IconUrl = Context.User.AvatarUrl
+            },
+            Timestamp = DateTime.UtcNow,
+            Color = EmbedColors.Error
+        });
+    }
+    
     public void SendMaintenanceError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
@@ -247,6 +321,29 @@ internal abstract class BaseCommand
                 Name = Context.Guild.Name
             },
             Description = $"You dont have permissions to use this command. You need to be `{perms.ToPermissionString()}` to use this command.",
+            Footer = new DiscordEmbedBuilder.EmbedFooter
+            {
+                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
+                IconUrl = Context.User.AvatarUrl
+            },
+            Timestamp = DateTime.UtcNow,
+            Color = EmbedColors.Error
+        });
+    }
+    
+    public void SendOwnPermissionError(Permissions perms)
+    {
+        if (perms == Permissions.AccessChannels || perms == Permissions.SendMessages || perms == Permissions.EmbedLinks)
+            return;
+
+        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        {
+            Author = new DiscordEmbedBuilder.EmbedAuthor
+            {
+                IconUrl = Context.Guild.IconUrl,
+                Name = Context.Guild.Name
+            },
+            Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command.",
             Footer = new DiscordEmbedBuilder.EmbedFooter
             {
                 Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
@@ -346,11 +443,22 @@ internal abstract class BaseCommand
         return true;
     }
     
-    public async Task<bool> CheckPerm(Permissions perms)
+    public async Task<bool> CheckPermissions(Permissions perms)
     {
-        if (!Context.Member.Permissions.HasPermission(Permissions.ManageMessages))
+        if (!Context.Member.Permissions.HasPermission(perms))
         {
             SendPermissionError(perms);
+            return false;
+        }
+
+        return true;
+    }
+    
+    public async Task<bool> CheckOwnPermissions(Permissions perms)
+    {
+        if (!Context.CurrentMember.Permissions.HasPermission(perms))
+        {
+            SendOwnPermissionError(perms);
             return false;
         }
 

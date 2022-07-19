@@ -14,6 +14,9 @@ internal class SharedCommandContext
         Channel = ctx.Channel;
         Client = ctx.Client;
 
+        CurrentMember = ctx.Guild?.CurrentMember;
+        CurrentUser = ctx.Client.CurrentUser;
+
         OriginalCommandContext = ctx;
 
         Bot = _bot;
@@ -32,6 +35,9 @@ internal class SharedCommandContext
         Guild = message.Channel.Guild;
         Channel = message.Channel;
 
+        CurrentMember = message.Channel?.Guild?.CurrentMember;
+        CurrentUser = _bot.discordClient.CurrentUser;
+
         Bot = _bot;
 
         BaseCommand = new DummyCommand()
@@ -49,6 +55,9 @@ internal class SharedCommandContext
         Guild = ctx.Guild;
         Channel = ctx.Channel;
         Client = ctx.Client;
+
+        CurrentMember = ctx.Guild?.CurrentMember;
+        CurrentUser = ctx.Client.CurrentUser;
 
         OriginalInteractionContext = ctx;
 
@@ -70,6 +79,9 @@ internal class SharedCommandContext
         Channel = ctx.Channel;
         Client = ctx.Client;
 
+        CurrentMember = ctx.Guild?.CurrentMember;
+        CurrentUser = ctx.Client.CurrentUser;
+
         OriginalContextMenuContext = ctx;
 
         Prefix = "";
@@ -80,24 +92,85 @@ internal class SharedCommandContext
         BaseCommand = cmd;
     }
 
+    /// <summary>
+    /// From what kind of source this command originated from.
+    /// </summary>
     public CommandType CommandType { get; set; }
 
-    public Bot Bot { get; set; }
-
-    public string Prefix { get; set; }
-    public string CommandName { get; set; }
-
-    public DiscordMember Member { get; set; }
-    public DiscordUser User { get; set; }
-    public DiscordGuild Guild { get; set; }
-    public DiscordChannel Channel { get; set; }
-    public DiscordClient Client { get; set; }
-
-    public DiscordMessage ResponseMessage { get; set; }
-
+    /// <summary>
+    /// The Command's Environment.
+    /// </summary>
     public BaseCommand BaseCommand { get; set; }
 
+    /// <summary>
+    /// What prefix was used to execute this command.
+    /// </summary>
+    public string Prefix { get; set; }
+
+    /// <summary>
+    /// The name of the command used.
+    /// </summary>
+    public string CommandName { get; set; }
+
+    /// <summary>
+    /// What Bot Instance was used to execute this command.
+    /// </summary>
+    public Bot Bot { get; set; }
+
+    /// <summary>
+    /// What DiscordClient was used to execute this command.
+    /// </summary>
+    public DiscordClient Client { get; set; }
+    
+
+    /// <summary>
+    /// The member that executed this command.
+    /// </summary>
+    public DiscordMember Member { get; set; }
+
+    /// <summary>
+    /// This user that executed this command.
+    /// </summary>
+    public DiscordUser User { get; set; }
+
+    /// <summary>
+    /// The current member the bot uses.
+    /// </summary>
+    public DiscordMember CurrentMember { get; set; }
+
+    /// <summary>
+    /// The current user the bot uses.
+    /// </summary>
+    public DiscordUser CurrentUser { get; set; }
+
+    /// <summary>
+    /// The guild this command was executed on.
+    /// </summary>
+    public DiscordGuild Guild { get; set; }
+
+    /// <summary>
+    /// The channel this command was exectued in.
+    /// </summary>
+    public DiscordChannel Channel { get; set; }
+    
+
+    /// <summary>
+    /// The message that's being used to interact with the user.
+    /// </summary>
+    public DiscordMessage ResponseMessage { get; set; }
+
+    /// <summary>
+    /// The original context.
+    /// </summary>
     public ContextMenuContext OriginalContextMenuContext { get; set; }
+
+    /// <summary>
+    /// The original context.
+    /// </summary>
     public CommandContext OriginalCommandContext { get; set; }
+
+    /// <summary>
+    /// The original context.
+    /// </summary>
     public InteractionContext OriginalInteractionContext { get; set; }
 }
