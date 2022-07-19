@@ -1,4 +1,5 @@
 namespace ProjectIchigo.PrefixCommands;
+
 internal class Admin : BaseCommandModule
 {
     public Bot _bot { private get; set; }
@@ -10,26 +11,6 @@ internal class Admin : BaseCommandModule
     public class JoinSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
-
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
-        private string GetCurrentConfiguration(CommandContext ctx)
-        {
-            return  $"`Autoban Globally Banned Users` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans.BoolToEmote(ctx.Client)}\n" +
-                    $"`Joinlog Channel              ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId != 0 ? $"<#{_bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId}>" : false.BoolToEmote(ctx.Client))}\n" +
-                    $"`Role On Join                 ` : {(_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId != 0 ? $"<@&{_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId}>" : false.BoolToEmote(ctx.Client))}\n" +
-                    $"`Re-Apply Roles on Rejoin     ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles.BoolToEmote(ctx.Client)}\n" +
-                    $"`Re-Apply Nickname on Rejoin  ` : {_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname.BoolToEmote(ctx.Client)}\n\n" +
-                    $"For security reasons, roles with any of the following permissions never get re-applied: {string.Join(", ", Resources.ProtectedPermissions.Select(x => $"`{x.ToPermissionString()}`"))}.\n\n" +
-                    $"In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied.";
-        }
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
@@ -52,17 +33,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                await ctx.Channel.SendMessageAsync(new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                });
+                await new Commands.JoinCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
 
@@ -72,121 +43,7 @@ internal class Admin : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                DiscordEmbedBuilder embed = new()
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Description = GetCurrentConfiguration(ctx)
-                };
-
-                var builder = new DiscordMessageBuilder().WithEmbed(embed);
-
-                var ToggleGlobalban = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Global Bans", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
-                var ChangeJoinlogChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Joinlog Channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👋")));
-                var ChangeRoleOnJoin = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Role assigned on join", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                var ToggleReApplyRoles = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Role Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
-                var ToggleReApplyName = new DiscordButtonComponent((_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Nickname Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-
-                var msg = await ctx.Channel.SendMessageAsync(builder
-                    .AddComponents(new List<DiscordComponent>
-                    {
-                        ToggleGlobalban,
-                        ToggleReApplyRoles,
-                        ToggleReApplyName,
-                    })
-                    .AddComponents(new List<DiscordComponent>
-                    {
-                        ChangeJoinlogChannel,
-                        ChangeRoleOnJoin,
-                    })
-                    .AddComponents(Resources.CancelButton));
-
-                var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(msg, ctx.User, TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
-                {
-                    msg.ModifyToTimedOut(true);
-                    return;
-                }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == ToggleGlobalban.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !_bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
-
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                    _ = msg.DeleteAsync();
-                }
-                else if (e.Result.Interaction.Data.CustomId == ToggleReApplyRoles.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles = !_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles;
-
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                    _ = msg.DeleteAsync();
-                }
-                else if (e.Result.Interaction.Data.CustomId == ToggleReApplyName.CustomId)
-                {
-                    _bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname = !_bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname;
-
-                    _ = ctx.Command.ExecuteAsync(ctx);
-                    _ = msg.DeleteAsync();
-                }
-                else if (e.Result.Interaction.Data.CustomId == ChangeJoinlogChannel.CustomId)
-                {
-                    try
-                    {
-                        var channel = await GenericSelectors.PromptChannelSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, true, "joinlog", ChannelType.Text, true, "Disable Joinlog");
-
-                        if (channel is null)
-                            _bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
-                        else
-                            _bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId = channel.Id;
-
-                        _ = ctx.Command.ExecuteAsync(ctx);
-                        _ = msg.DeleteAsync();
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == ChangeRoleOnJoin.CustomId)
-                {
-                    try
-                    {
-                        var role = await GenericSelectors.PromptRoleSelection(_bot, ctx.Client, ctx.Guild, ctx.Channel, ctx.Member, msg, true, "AutoAssignedRole", true, "Disable Role on join");
-
-                        if (role is null)
-                            _bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
-                        else
-                            _bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = role.Id;
-
-                        _ = msg.DeleteAsync();
-                        _ = ctx.Command.ExecuteAsync(ctx);
-                    }
-                    catch (ArgumentException)
-                    {
-                        msg.ModifyToTimedOut(true);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-                }
-                else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
-                {
-                    _ = msg.DeleteAsync();
-                }
+                await new Commands.JoinCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }
