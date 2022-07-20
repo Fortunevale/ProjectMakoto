@@ -302,12 +302,28 @@ internal class EmojiStealerCommand : BaseCommand
                                         await Task.Delay(1000);
                                     }
 
+                                    if (task.IsFaulted)
+                                        throw task.Exception.InnerException;
+
                                     embed.Description = $"`Added {i}/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`";
                                     await RespondOrEdit(embed);
                                 }
-                                catch (Exception ex)
+                                catch (DisCatSharp.Exceptions.BadRequestException ex)
                                 {
-                                    _logger.LogError($"Failed to add an emote to guild", ex);
+                                    var regex = Regex.Match(ex.WebResponse.Response.Replace("\\", ""), "((\"code\": )(\\d*))");
+
+                                    if (regex.Groups[3].Value == "30008")
+                                    {
+                                        embed.Thumbnail = null;
+                                        embed.Color = EmbedColors.Error;
+                                        embed.Author.IconUrl = ctx.Guild.IconUrl;
+                                        embed.Description = $"❌ `Downloaded and added {i} emojis to the server. There is no more room for additional emojis.`";
+                                        await RespondOrEdit(embed);
+                                        _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
+                                        return;
+                                    }
+                                    else
+                                        throw;
                                 }
                             }
 
