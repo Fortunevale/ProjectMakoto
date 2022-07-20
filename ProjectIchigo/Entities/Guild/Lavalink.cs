@@ -34,9 +34,11 @@ internal class Lavalink
     public bool Disposed { private set; get; } = false;
     public bool Initialized { private set; get; } = false;
 
-    public void Dispose(Bot _bot, ulong Id)
+    public void Dispose(Bot _bot, ulong Id, string reason)
     {
         this.Disposed = true;
+
+        _logger.LogDebug($"Disposed Player for {Id}. ({reason})");
 
         _bot._guilds.List[Id].Lavalink = new();
     }
@@ -82,7 +84,7 @@ internal class Lavalink
 
                                     if (UserAmount <= 1)
                                     {
-                                        _bot._guilds.List[e.Guild.Id].Lavalink.Dispose(_bot, e.Guild.Id);
+                                        _bot._guilds.List[e.Guild.Id].Lavalink.Dispose(_bot, e.Guild.Id, "No users");
                                         _bot._guilds.List[e.Guild.Id].Lavalink = new();
                                     }
                                 });
@@ -96,7 +98,7 @@ internal class Lavalink
                             if (e.After is null || e.After.Channel is null)
                             {
                                 _ = guildConnection.DisconnectAsync();
-                                this.Dispose(_bot, e.Guild.Id);
+                                this.Dispose(_bot, e.Guild.Id, "Disconnected");
                                 return;
                             }
 
@@ -112,14 +114,14 @@ internal class Lavalink
                                 if (track is null || position is null)
                                 {
                                     _ = guildConnection.DisconnectAsync();
-                                    this.Dispose(_bot, e.Guild.Id);
+                                    this.Dispose(_bot, e.Guild.Id, "Error occured carrying on with playback after channel switch");
                                     return;
                                 }
 
                                 if (conn is null)
                                 {
                                     _ = guildConnection.DisconnectAsync();
-                                    this.Dispose(_bot, e.Guild.Id);
+                                    this.Dispose(_bot, e.Guild.Id, "Conn is null");
                                     return;
                                 }
 
@@ -158,7 +160,7 @@ internal class Lavalink
                     }
 
                     if (WaitSeconds <= 0)
-                        this.Dispose(_bot, Guild.Id);
+                        this.Dispose(_bot, Guild.Id, "Time out, nothing playing");
 
                     if (Disposed)
                     {
@@ -210,7 +212,7 @@ internal class Lavalink
                     }
                     else
                     {
-                        this.Dispose(_bot, Guild.Id);
+                        this.Dispose(_bot, Guild.Id, "guildConnection is null");
                         continue;
                     }
 
@@ -218,10 +220,12 @@ internal class Lavalink
                         _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError("An exception occured while trying to handle music queue", ex);
+
                 _ = guildConnection.DisconnectAsync();
-                this.Dispose(_bot, Guild.Id);
+                this.Dispose(_bot, Guild.Id, "Exception");
                 throw;
             }
         }).Add(_bot._watcher);

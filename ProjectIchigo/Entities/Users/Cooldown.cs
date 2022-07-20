@@ -17,14 +17,14 @@ internal class Cooldown
     private bool WaitingModerate = false;
     private bool WaitingHeavy = false;
 
-    public async Task<bool> WaitForLight(DiscordClient client, DiscordMessage message)
+    public async Task<bool> WaitForLight(DiscordClient client, SharedCommandContext ctx, bool IgnoreStaff = false)
     {
-        if (_bot._status.TeamMembers.Contains(message.Author.Id))
+        if (_bot._status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (WaitingLight)
         {
-            var stop_warn = await message.Channel.SendMessageAsync($"{message.Author.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`");
+            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`"));
             await Task.Delay(3000);
             _ = stop_warn.DeleteAsync();
             return true;
@@ -38,7 +38,7 @@ internal class Cooldown
             return false;
         }
 
-        var msg = await message.Channel.SendMessageAsync($"{message.Author.Mention} :hourglass: `You're on cooldown for {Math.Round(LightCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalSeconds, 2)} second(s). As soon as your cool down is over, your command will be executed.`");
+        var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} :hourglass: `You're on cooldown for {Math.Round(LightCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalSeconds, 2)} second(s). As soon as your cool down is over, your command will be executed.`"));
 
         double milliseconds = LightCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalMilliseconds;
 
@@ -49,19 +49,21 @@ internal class Cooldown
         await Task.Delay(Convert.ToInt32(Math.Round(milliseconds, 0)));
         WaitingLight = false;
 
-        _ = msg.DeleteAsync();
+        if (ctx.CommandType == Enums.CommandType.Custom)
+            _ = msg.DeleteAsync();
+
         LightCommandLastUse = DateTime.UtcNow.ToUniversalTime();
         return false;
     }
 
-    public async Task<bool> WaitForModerate(DiscordClient client, DiscordMessage message)
+    public async Task<bool> WaitForModerate(DiscordClient client, SharedCommandContext ctx, bool IgnoreStaff = false)
     {
-        if (_bot._status.TeamMembers.Contains(message.Author.Id))
+        if (_bot._status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (WaitingModerate)
         {
-            var stop_warn = await message.Channel.SendMessageAsync($"{message.Author.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`");
+            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`"));
             await Task.Delay(3000);
             _ = stop_warn.DeleteAsync();
             return true;
@@ -75,7 +77,7 @@ internal class Cooldown
             return false;
         }
 
-        var msg = await message.Channel.SendMessageAsync($"{message.Author.Mention} :hourglass: `You're on cooldown for {Math.Round(ModerateCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalSeconds, 2)} second(s). As soon as your cool down is over, your command will be executed.`");
+        var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} :hourglass: `You're on cooldown for {Math.Round(ModerateCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalSeconds, 2)} second(s). As soon as your cool down is over, your command will be executed.`"));
 
         double milliseconds = ModerateCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalMilliseconds;
 
@@ -86,19 +88,21 @@ internal class Cooldown
         await Task.Delay(Convert.ToInt32(Math.Round(milliseconds, 0)));
         WaitingModerate = false;
 
-        _ = msg.DeleteAsync();
+        if (ctx.CommandType == Enums.CommandType.Custom)
+            _ = msg.DeleteAsync();
+
         ModerateCommandLastUse = DateTime.UtcNow.ToUniversalTime();
         return false;
     }
 
-    public async Task<bool> WaitForHeavy(DiscordClient client, DiscordMessage message)
+    public async Task<bool> WaitForHeavy(DiscordClient client, SharedCommandContext ctx, bool IgnoreStaff = false)
     {
-        if (_bot._status.TeamMembers.Contains(message.Author.Id))
+        if (_bot._status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (WaitingHeavy)
         {
-            var stop_warn = await message.Channel.SendMessageAsync($"{message.Author.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`");
+            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} :octagonal_sign: `Please slow down. Your previous command is still queued.`"));
             await Task.Delay(3000);
             _ = stop_warn.DeleteAsync();
             return true;
@@ -112,7 +116,7 @@ internal class Cooldown
             return false;
         }
 
-        var msg = await message.Channel.SendMessageAsync($"{message.Author.Mention} :hourglass: `You're on cooldown for {Math.Round(HeavyCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalSeconds, 2)} second(s). As soon as your cool down is over, your command will be executed.`");
+        var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} :hourglass: `You're on cooldown for {Math.Round(HeavyCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalSeconds, 2)} second(s). As soon as your cool down is over, your command will be executed.`"));
 
         double milliseconds = HeavyCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTimespanUntil().TotalMilliseconds;
 
@@ -123,7 +127,9 @@ internal class Cooldown
         await Task.Delay(Convert.ToInt32(Math.Round(milliseconds, 0)));
         WaitingHeavy = false;
 
-        _ = msg.DeleteAsync();
+        if (ctx.CommandType == Enums.CommandType.Custom)
+            _ = msg.DeleteAsync();
+
         HeavyCommandLastUse = DateTime.UtcNow.ToUniversalTime();
         return false;
     }

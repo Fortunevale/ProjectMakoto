@@ -1,4 +1,4 @@
-using User = ProjectIchigo.Commands.User.User;
+using ProjectIchigo.Commands.PrefixCommands.Converters;
 
 namespace ProjectIchigo;
 
@@ -252,14 +252,14 @@ internal class Bot
 
             _logger.LogDebug($"Registering Commands..");
 
-            cNext.RegisterCommands<User>();
-            cNext.RegisterCommands<Music>();
-            cNext.RegisterCommands<Social>();
-            cNext.RegisterCommands<Commands.User.ScoreSaber>();
-            cNext.RegisterCommands<Mod>();
-            cNext.RegisterCommands<Admin>();
+            cNext.RegisterCommands<PrefixCommands.User>();
+            cNext.RegisterCommands<PrefixCommands.Music>();
+            cNext.RegisterCommands<PrefixCommands.Social>();
+            cNext.RegisterCommands<PrefixCommands.ScoreSaber>();
+            cNext.RegisterCommands<PrefixCommands.Mod>();
+            cNext.RegisterCommands<PrefixCommands.Admin>();
             
-            cNext.RegisterCommands<Commands.Maintainers.Maintainers>();
+            cNext.RegisterCommands<PrefixCommands.Maintainers>();
 
 
 
@@ -363,9 +363,25 @@ internal class Bot
                     });
 
                     if (_status.LoadedConfig.IsDev)
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers.Maintainers>(_status.LoadedConfig.AssetsGuildId);
+                    {
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Admin>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Mod>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Social>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaber>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Music>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.User>(_status.LoadedConfig.AssetsGuildId);
+                    }
                     else
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers.Maintainers>();
+                    {
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Admin>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Mod>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Social>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaber>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Music>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.User>();
+                    }
                 }).Add(_watcher);
 
                 if (_status.LoadedConfig.IsDev)

@@ -41,6 +41,7 @@ global using DisCatSharp.Entities;
 global using DisCatSharp.Enums;
 global using DisCatSharp.EventArgs;
 global using DisCatSharp.ApplicationCommands;
+global using DisCatSharp.ApplicationCommands.Attributes;
 global using DisCatSharp.CommandsNext.Attributes;
 global using DisCatSharp.Interactivity.Extensions;
 global using DisCatSharp.Interactivity;
@@ -51,12 +52,10 @@ global using DisCatSharp.CommandsNext.Converters;
 
 // Own Utils
 
-global using ProjectIchigo.ApplicationCommands;
-global using ProjectIchigo.ApplicationCommands.Maintainers;
-
 global using ProjectIchigo.Commands;
-global using ProjectIchigo.Commands.User;
-global using ProjectIchigo.Commands.Maintainers;
+
+global using ProjectIchigo.ApplicationCommands;
+global using ProjectIchigo.PrefixCommands;
 
 global using ProjectIchigo.Enums;
 global using ProjectIchigo.Secrets;
@@ -79,7 +78,7 @@ global using ProjectIchigo.Exceptions;
 global using Xorog.ScoreSaber;
 global using Xorog.ScoreSaber.Objects;
 
-global using static ProjectIchigo.Log;
+global using static ProjectIchigo.Util.Log;
 
 global using Xorog.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensions;
