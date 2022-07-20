@@ -53,7 +53,7 @@ internal class TaskWatcher
                             $"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
                 }
 
-                if (CommandContext != null)
+                if (CommandContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
                         _ = CommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{CommandContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
@@ -72,7 +72,7 @@ internal class TaskWatcher
                     }
                     catch { }
 
-                if (InteractionContext != null)
+                if (InteractionContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
                         _ = InteractionContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
@@ -91,7 +91,7 @@ internal class TaskWatcher
                     }
                     catch (Exception ex) { _logger.LogError("a", ex); }
                 
-                if (SharedCommandContext != null)
+                if (SharedCommandContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
                         _ = SharedCommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
@@ -110,7 +110,7 @@ internal class TaskWatcher
                     }
                     catch (Exception ex) { _logger.LogError("a", ex); }
                 
-                if (ContextMenuContext != null)
+                if (ContextMenuContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
                         _ = ContextMenuContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
