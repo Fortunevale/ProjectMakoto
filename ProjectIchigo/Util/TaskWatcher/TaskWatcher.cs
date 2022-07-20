@@ -86,6 +86,44 @@ internal class TaskWatcher
                         });
                     }
                     catch (Exception ex) { _logger.LogError("a", ex); }
+                
+                if (SharedCommandContext != null)
+                    try
+                    {
+                        _ = SharedCommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
+                        $"```csharp\n" +
+                        $"{b.task.Exception}" +
+                        $"\n```\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        {
+                            if (!x.IsCompletedSuccessfully)
+                                return;
+
+                            _ = Task.Delay(10000).ContinueWith(_ =>
+                            {
+                                _ = x.Result.DeleteAsync();
+                            });
+                        });
+                    }
+                    catch (Exception ex) { _logger.LogError("a", ex); }
+                
+                if (ContextMenuContext != null)
+                    try
+                    {
+                        _ = ContextMenuContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
+                        $"```csharp\n" +
+                        $"{b.task.Exception}" +
+                        $"\n```\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        {
+                            if (!x.IsCompletedSuccessfully)
+                                return;
+
+                            _ = Task.Delay(10000).ContinueWith(_ =>
+                            {
+                                _ = x.Result.DeleteAsync();
+                            });
+                        });
+                    }
+                    catch (Exception ex) { _logger.LogError("a", ex); }
 
                 tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
             }
