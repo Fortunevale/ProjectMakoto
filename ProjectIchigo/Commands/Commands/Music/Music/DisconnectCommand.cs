@@ -68,7 +68,7 @@ internal class DisconnectCommand : BaseCommand
 
             if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id);
+                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
                 ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink = new();
 
                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
@@ -145,7 +145,7 @@ internal class DisconnectCommand : BaseCommand
 
                         if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id);
+                            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
                             ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink = new();
 
                             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
