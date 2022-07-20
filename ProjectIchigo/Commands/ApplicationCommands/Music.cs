@@ -148,13 +148,13 @@ internal class Music : ApplicationCommandsModule
         }
 
         [SlashCommand("load-share", "Loads a playlist share")]
-        public async Task LoadShare(InteractionContext ctx, [Option("user", "The user")] ulong userid, [Option("Id", "The id")] string id)
+        public async Task LoadShare(InteractionContext ctx, [Option("user", "The user")] DiscordUser userid, [Option("Id", "The id")] string id)
         {
             Task.Run(async () =>
             {
                 await new Commands.Playlists.LoadShareCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "userid", userid },
+                    { "userid", userid.Id },
                     { "id", id },
                 });
             }).Add(_bot._watcher, ctx);
