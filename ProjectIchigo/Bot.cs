@@ -369,6 +369,7 @@ internal class Bot
                         appCommands.RegisterGuildCommands<ApplicationCommands.Mod>(_status.LoadedConfig.AssetsGuildId);
                         appCommands.RegisterGuildCommands<ApplicationCommands.Social>(_status.LoadedConfig.AssetsGuildId);
                         appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaber>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.Music>(_status.LoadedConfig.AssetsGuildId);
                         appCommands.RegisterGuildCommands<ApplicationCommands.User>(_status.LoadedConfig.AssetsGuildId);
                     }
                     else
@@ -378,6 +379,7 @@ internal class Bot
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Mod>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.Social>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaber>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.Music>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.User>();
                     }
                 }).Add(_watcher);
