@@ -663,7 +663,7 @@ internal abstract class BaseCommand
     
     public void SendOwnPermissionError(Permissions perms)
     {
-        if (perms == Permissions.AccessChannels || perms == Permissions.SendMessages || perms == Permissions.EmbedLinks)
+        if (perms is Permissions.AccessChannels or Permissions.SendMessages or Permissions.EmbedLinks)
             return;
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()

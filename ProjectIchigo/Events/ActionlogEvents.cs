@@ -36,7 +36,7 @@ internal class ActionlogEvents
             if (!await ValidateServer(e.Guild) || !_bot._guilds.List[e.Guild.Id].ActionLogSettings.MembersModified)
                 return;
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder
+            DiscordEmbedBuilder embed = new()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.AuditLogIcons.UserAdded, Name = $"User joined" },
                 Color = new DiscordColor("00ff21"),
@@ -44,7 +44,7 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
                 Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
-                                          $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
+                              $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
             };
 
             _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith<Task>(async x =>

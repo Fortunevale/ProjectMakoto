@@ -245,10 +245,11 @@ internal class ScoreSaberCommandAbstractions
                 if (string.IsNullOrWhiteSpace(LoadedGraph))
                     try
                     {
-                        Chart qc = new();
-                        qc.Width = 1000;
-                        qc.Height = 500;
-                        qc.Config = $@"{{
+                        Chart qc = new()
+                        {
+                            Width = 1000,
+                            Height = 500,
+                            Config = $@"{{
                             type: 'line',
                             data: 
                             {{
@@ -322,7 +323,8 @@ internal class ScoreSaberCommandAbstractions
                                     ]
                                 }}
                             }}
-                        }}";
+                        }}"
+                        };
 
                         qc.ToFile(file);
 
