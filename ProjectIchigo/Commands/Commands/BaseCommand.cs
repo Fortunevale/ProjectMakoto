@@ -750,7 +750,34 @@ internal abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(Context.User.Mention));
     }
+    
+    public void SendVoiceStateError()
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"❌ `You aren't in a voice channel.`",
+            Color = EmbedColors.Error,
+            Author = new DiscordEmbedBuilder.EmbedAuthor
+            {
+                Name = Context.Guild.Name,
+                IconUrl = Context.Guild.IconUrl
+            },
+            Footer = Context.GenerateUsedByFooter(),
+            Timestamp = DateTime.UtcNow
+        }).WithContent(Context.User.Mention));
+    }
 
+    public async Task<bool> CheckVoiceState()
+    {
+        if (Context.Member.VoiceState is null)
+        {
+            SendVoiceStateError();
+            return false;
+        }
+
+        return true;
+    }
+    
     public async Task<bool> CheckMaintenance()
     {
         if (!Context.User.IsMaintenance(Context.Bot._status))

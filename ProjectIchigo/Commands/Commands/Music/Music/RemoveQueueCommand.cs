@@ -2,6 +2,8 @@
 
 internal class RemoveQueueCommand : BaseCommand
 {
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
