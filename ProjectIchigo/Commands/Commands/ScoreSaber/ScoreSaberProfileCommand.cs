@@ -20,7 +20,22 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(id))
-                        user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@(\d*)>").Groups[1].Value));
+                    {
+                        if (Regex.IsMatch(id, @"<@((!?)(\d*))>", RegexOptions.ExplicitCapture))
+                            user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@((!?)(\d*))>", RegexOptions.ExplicitCapture).Groups[3].Value));
+                        else
+                        {
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                            {
+                                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber • {ctx.Guild.Name}" },
+                                Color = EmbedColors.Error,
+                                Footer = ctx.GenerateUsedByFooter(),
+                                Timestamp = DateTime.UtcNow,
+                                Description = $"`Invalid input.`"
+                            }));
+                            return;
+                        }
+                    }
                     else
                         user = ctx.User;
                 }
