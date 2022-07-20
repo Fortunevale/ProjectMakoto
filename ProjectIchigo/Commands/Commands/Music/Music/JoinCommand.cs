@@ -6,7 +6,7 @@ internal class JoinCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            bool Announce = arguments.ContainsKey("announce");
+            bool Announce = arguments?.ContainsKey("announce") ?? false;
 
             if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
@@ -24,6 +24,20 @@ internal class JoinCommand : BaseCommand
 
                 conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
                 ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.QueueHandler(ctx.Bot, ctx.Client, node, conn);
+
+                if (Announce)
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"✅ `The bot joined your channel.`",
+                        Color = EmbedColors.Success,
+                        Author = new DiscordEmbedBuilder.EmbedAuthor
+                        {
+                            Name = ctx.Guild.Name,
+                            IconUrl = ctx.Guild.IconUrl
+                        },
+                        Footer = ctx.GenerateUsedByFooter(),
+                        Timestamp = DateTime.UtcNow
+                    });
                 return;
             }
 
