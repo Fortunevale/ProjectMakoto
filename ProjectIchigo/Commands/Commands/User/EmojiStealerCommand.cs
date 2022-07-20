@@ -62,7 +62,8 @@ internal class EmojiStealerCommand : BaseCommand
                 SanitizedEmoteList.Add(b.Item1, new EmojiStealer
                 {
                     Name = b.Item2,
-                    Animated = b.Item3
+                    Animated = b.Item3,
+                    Type = EmojiType.EMOJI
                 });
 
             if (!Emotes.Any() && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
