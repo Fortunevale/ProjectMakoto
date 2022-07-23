@@ -23,7 +23,13 @@ internal class DatabaseQueue
                     continue;
                 }
 
-                var b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
+                KeyValuePair<string, RequestQueue> b;
+
+                try
+                {
+                    b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
+                }
+                catch (Exception){ continue; }
 
                 if (b.Value is null)
                     continue;

@@ -145,24 +145,26 @@ internal class DatabaseInit
                 }
 
                 foreach (var b in memberList)
-                    _bot._guilds[Convert.ToUInt64(table)].Members.Add(b.userid, new Member(_bot._guilds[Convert.ToUInt64(table)], b.userid)
+                {
+                    Member DbUser = new Member(_bot._guilds[Convert.ToUInt64(table)], b.userid);
+                    _bot._guilds[Convert.ToUInt64(table)].Members.Add(b.userid, DbUser);
+
+                    DbUser.Experience = new(DbUser)
                     {
-                        Experience = new()
-                        {
-                            Level = b.experience_level,
-                            Points = b.experience,
-                            Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message)),
-                        },
-                        InviteTracker = new()
-                        {
-                            Code = b.invite_code,
-                            UserId = b.invite_user
-                        },
-                        FirstJoinDate = (b.first_join == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.first_join)),
-                        LastLeaveDate = (b.last_leave == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.last_leave)),
-                        MemberRoles = JsonConvert.DeserializeObject<List<MemberRole>>((b.roles is null or "null" or "" ? "[]" : b.roles)),
-                        SavedNickname = b.saved_nickname
-                    });
+                        Level = b.experience_level,
+                        Points = b.experience,
+                        Last_Message = (b.experience_last_message == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.experience_last_message)),
+                    };
+                    DbUser.InviteTracker = new(DbUser)
+                    {
+                        Code = b.invite_code,
+                        UserId = b.invite_user
+                    };
+                    DbUser.FirstJoinDate = (b.first_join == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.first_join));
+                    DbUser.LastLeaveDate = (b.last_leave == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.last_leave));
+                    DbUser.MemberRoles = JsonConvert.DeserializeObject<List<MemberRole>>((b.roles is null or "null" or "" ? "[]" : b.roles));
+                    DbUser.SavedNickname = b.saved_nickname;
+                }
 
                 _logger.LogInfo($"Loaded {_bot._guilds[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
             }

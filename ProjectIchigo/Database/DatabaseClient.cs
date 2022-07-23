@@ -892,6 +892,9 @@ internal class DatabaseClient
 
     public async Task UpdateValue(string table, string columnKey, object rowKey, string columnToEdit, object newValue, MySqlConnection connection)
     {
+        if (!_bot._status.DatabaseInitialLoadCompleted)
+            return;
+
         _queue.RunCommand(new MySqlCommand(_helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(_bot._watcher);
         return;
     }
