@@ -10,7 +10,7 @@ internal class LeaderboardCommand : BaseCommand
             if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            if (!ctx.Bot._guilds.List[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            if (!ctx.Bot._guilds[ctx.Guild.Id].ExperienceSettings.UseExperience)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -48,7 +48,7 @@ internal class LeaderboardCommand : BaseCommand
 
             int currentuserplacement = 0;
 
-            foreach (var b in ctx.Bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
+            foreach (var b in ctx.Bot._guilds[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
             {
                 currentuserplacement++;
                 if (b.Key == ctx.User.Id)
@@ -59,7 +59,7 @@ internal class LeaderboardCommand : BaseCommand
 
             List<KeyValuePair<string, string>> Board = new();
 
-            foreach (var b in ctx.Bot._guilds.List[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
+            foreach (var b in ctx.Bot._guilds[ctx.Guild.Id].Members.OrderByDescending(x => x.Value.Experience.Points))
             {
                 try
                 {

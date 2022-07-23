@@ -49,11 +49,11 @@ internal class RepeatCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat = !ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat;
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Repeat = !ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Repeat;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Repeat ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
+                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Repeat ? "✅ `The queue now repeats itself.`" : "✅ `The queue no longer repeats itself.`"),
                 Color = EmbedColors.Success,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

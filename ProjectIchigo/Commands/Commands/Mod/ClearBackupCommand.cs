@@ -35,14 +35,14 @@ internal class ClearBackupCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Bot._guilds.List.ContainsKey(ctx.Guild.Id))
-                ctx.Bot._guilds.List.Add(ctx.Guild.Id, new Guilds.ServerSettings());
+            if (!ctx.Bot._guilds.ContainsKey(ctx.Guild.Id))
+                ctx.Bot._guilds.Add(ctx.Guild.Id, new Guild(ctx.Guild.Id));
 
-            if (!ctx.Bot._guilds.List[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                ctx.Bot._guilds.List[ctx.Guild.Id].Members.Add(victim.Id, new());
+            if (!ctx.Bot._guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                ctx.Bot._guilds[ctx.Guild.Id].Members.Add(victim.Id, new());
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
-            ctx.Bot._guilds.List[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
+            ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
+            ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {

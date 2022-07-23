@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Entities;
 
-internal class InviteTrackerMember
+public class InviteTrackerMember
 {
     private ulong _UserId { get; set; } = 0;
     public ulong UserId { get => _UserId; set { _UserId = value; _ = Bot.DatabaseClient.SyncDatabase(); } }

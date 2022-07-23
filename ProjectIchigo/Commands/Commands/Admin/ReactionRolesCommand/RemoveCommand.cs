@@ -91,7 +91,7 @@ internal class RemoveCommand : BaseCommand
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            if (!ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
+            if (!ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
                 embed.Description = $"`The specified message doesn't contain specified reaction.`";
                 embed.Color = EmbedColors.Error;
@@ -99,14 +99,14 @@ internal class RemoveCommand : BaseCommand
                 return;
             }
 
-            var obj = ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.First(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName());
+            var obj = ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.First(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName());
 
             var role = ctx.Guild.GetRole(obj.Value.RoleId);
             var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
             var reactionMessage = await channel.GetMessageAsync(obj.Key);
             _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(obj);
+            ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
             embed.Color = EmbedColors.Info;
             embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";

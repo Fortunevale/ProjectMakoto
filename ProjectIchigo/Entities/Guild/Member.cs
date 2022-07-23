@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-internal class Member
+public class Member
 {
     private string _SavedNickname { get; set; } = "";
     public string SavedNickname { get => _SavedNickname; set { _SavedNickname = value; _ = Bot.DatabaseClient.SyncDatabase(); } }

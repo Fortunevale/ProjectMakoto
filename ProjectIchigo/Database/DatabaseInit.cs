@@ -32,85 +32,96 @@ internal class DatabaseInit
         IEnumerable<DatabaseGuildSettings> serverSettings = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseGuildSettings>(_bot._databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
         foreach (var b in serverSettings)
-            _bot._guilds.List.Add(b.serverid, new Guilds.ServerSettings
-            {
-                PhishingDetectionSettings = new()
-                {
-                    DetectPhishing = b.phishing_detect,
-                    WarnOnRedirect = b.phishing_warnonredirect,
-                    PunishmentType = (PhishingPunishmentType)b.phishing_type,
-                    CustomPunishmentReason = b.phishing_reason,
-                    CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
-                },
-                BumpReminderSettings = new()
-                {
-                    Enabled = b.bump_enabled,
-                    MessageId = b.bump_message,
-                    ChannelId = b.bump_channel,
-                    LastBump = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_time),
-                    LastReminder = new DateTime().ToUniversalTime().AddTicks((long)b.bump_last_reminder),
-                    LastUserId = b.bump_last_user,
-                    PersistentMessageId = b.bump_persistent_msg,
-                    RoleId = b.bump_role,
-                    BumpsMissed = b.bump_missed
-                },
-                JoinSettings = new()
-                {
-                    AutoAssignRoleId = b.auto_assign_role_id,
-                    JoinlogChannelId = b.joinlog_channel_id,
-                    AutoBanGlobalBans = b.autoban_global_ban,
-                    ReApplyRoles = b.reapplyroles,
-                    ReApplyNickname = b.reapplynickname,
-                },
-                ExperienceSettings = new()
-                {
-                    UseExperience = b.experience_use,
-                    BoostXpForBumpReminder = b.experience_boost_bumpreminder
-                },
-                CrosspostSettings = new()
-                {
-                    CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
-                    DelayBeforePosting = b.crosspostdelay,
-                    ExcludeBots = b.crosspostexcludebots,
-                    CrosspostTasks = JsonConvert.DeserializeObject<ObservableCollection<CrosspostMessage>>((b.crossposttasks is null or "null" or "" ? "[]" : b.crossposttasks)),
-                },
-                ActionLogSettings = new()
-                {
-                    Channel = b.actionlog_channel,
-                    AttemptGettingMoreDetails = b.actionlog_attempt_further_detail,
-                    MemberModified = b.actionlog_log_member_modified,
-                    MembersModified = b.actionlog_log_members_modified,
-                    BanlistModified = b.actionlog_log_banlist_modified,
-                    GuildModified = b.actionlog_log_guild_modified,
-                    InvitesModified = b.actionlog_log_invites_modified,
-                    MessageDeleted = b.actionlog_log_message_deleted,
-                    MessageModified = b.actionlog_log_message_updated,
-                    RolesModified = b.actionlog_log_roles_modified,
-                    MemberProfileModified = b.actionlog_log_memberprofile_modified,
-                    ChannelsModified = b.actionlog_log_channels_modified,
-                    VoiceStateUpdated = b.actionlog_log_voice_state,
-                },
-                InviteTrackerSettings = new() 
-                {
-                    Enabled = b.invitetracker_enabled,
-                    Cache = JsonConvert.DeserializeObject<ObservableCollection<InviteTrackerCacheItem>>((b.invitetracker_cache is null or "null" or "" ? "[]" : b.invitetracker_cache))
-                },
-                LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards)),
-                ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache)),
-                ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles)),
-                AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.autounarchivelist is null or "null" or "" ? "[]" : b.autounarchivelist)),
-                InVoiceTextPrivacySettings = new()
-                {
-                    ClearTextEnabled = b.vc_privacy_clear,
-                    SetPermissionsEnabled = b.vc_privacy_perms
-                },
-                NameNormalizer = new() 
-                { 
-                    NameNormalizerEnabled = b.normalizenames
-                }
-            });
+        {
+            var DbGuild = new Guild(b.serverid);
+            _bot._guilds.Add(b.serverid, DbGuild);
 
-        _logger.LogInfo($"Loaded {_bot._guilds.List.Count} guilds from table 'guilds'.");
+            DbGuild.PhishingDetectionSettings = new(DbGuild)
+            {
+                DetectPhishing = b.phishing_detect,
+                WarnOnRedirect = b.phishing_warnonredirect,
+                PunishmentType = (PhishingPunishmentType)b.phishing_type,
+                CustomPunishmentReason = b.phishing_reason,
+                CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
+            };
+
+            DbGuild.BumpReminderSettings = new(DbGuild)
+            {
+                Enabled = b.bump_enabled,
+                MessageId = b.bump_message,
+                ChannelId = b.bump_channel,
+                LastBump = new DateTime().ToUniversalTime().AddTicks(b.bump_last_time),
+                LastReminder = new DateTime().ToUniversalTime().AddTicks(b.bump_last_reminder),
+                LastUserId = b.bump_last_user,
+                PersistentMessageId = b.bump_persistent_msg,
+                RoleId = b.bump_role,
+                BumpsMissed = b.bump_missed
+            };
+
+            DbGuild.JoinSettings = new(DbGuild)
+            {
+                AutoAssignRoleId = b.auto_assign_role_id,
+                JoinlogChannelId = b.joinlog_channel_id,
+                AutoBanGlobalBans = b.autoban_global_ban,
+                ReApplyRoles = b.reapplyroles,
+                ReApplyNickname = b.reapplynickname,
+            };
+
+            DbGuild.ExperienceSettings = new(DbGuild)
+            {
+                UseExperience = b.experience_use,
+                BoostXpForBumpReminder = b.experience_boost_bumpreminder
+            };
+
+            DbGuild.CrosspostSettings = new(DbGuild)
+            {
+                CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
+                DelayBeforePosting = b.crosspostdelay,
+                ExcludeBots = b.crosspostexcludebots,
+                CrosspostTasks = JsonConvert.DeserializeObject<ObservableCollection<CrosspostMessage>>((b.crossposttasks is null or "null" or "" ? "[]" : b.crossposttasks)),
+            };
+
+            DbGuild.ActionLogSettings = new(DbGuild)
+            {
+                Channel = b.actionlog_channel,
+                AttemptGettingMoreDetails = b.actionlog_attempt_further_detail,
+                MemberModified = b.actionlog_log_member_modified,
+                MembersModified = b.actionlog_log_members_modified,
+                BanlistModified = b.actionlog_log_banlist_modified,
+                GuildModified = b.actionlog_log_guild_modified,
+                InvitesModified = b.actionlog_log_invites_modified,
+                MessageDeleted = b.actionlog_log_message_deleted,
+                MessageModified = b.actionlog_log_message_updated,
+                RolesModified = b.actionlog_log_roles_modified,
+                MemberProfileModified = b.actionlog_log_memberprofile_modified,
+                ChannelsModified = b.actionlog_log_channels_modified,
+                VoiceStateUpdated = b.actionlog_log_voice_state,
+            };
+
+            DbGuild.InviteTrackerSettings = new(DbGuild)
+            {
+                Enabled = b.invitetracker_enabled,
+                Cache = JsonConvert.DeserializeObject<ObservableCollection<InviteTrackerCacheItem>>((b.invitetracker_cache is null or "null" or "" ? "[]" : b.invitetracker_cache))
+            };
+
+            DbGuild.InVoiceTextPrivacySettings = new(DbGuild)
+            {
+                ClearTextEnabled = b.vc_privacy_clear,
+                SetPermissionsEnabled = b.vc_privacy_perms
+            };
+
+            DbGuild.NameNormalizerSettings = new(DbGuild)
+            {
+                NameNormalizerEnabled = b.normalizenames
+            };
+
+            DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards));
+            DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache));
+            DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles));
+            DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.autounarchivelist is null or "null" or "" ? "[]" : b.autounarchivelist));
+        }
+
+        _logger.LogInfo($"Loaded {_bot._guilds.Count} guilds from table 'guilds'.");
 
         foreach (var table in await _bot._databaseClient._helper.ListTables(_bot._databaseClient.guildDatabaseConnection))
         {
@@ -126,7 +137,7 @@ internal class DatabaseInit
                 _logger.LogDebug($"Loading members from table '{table}'..");
                 IEnumerable<DatabaseMembers> memberList = _bot._databaseClient.guildDatabaseConnection.Query<DatabaseMembers>(_bot._databaseClient._helper.GetLoadCommand(table, DatabaseColumnLists.guild_users));
 
-                if (!_bot._guilds.List.ContainsKey(Convert.ToUInt64(table)))
+                if (!_bot._guilds.ContainsKey(Convert.ToUInt64(table)))
                 {
                     _logger.LogWarn($"Table '{table}' has no server attached to it. Dropping table.");
                     await _bot._databaseClient._helper.DropTable(_bot._databaseClient.guildDatabaseConnection, table);
@@ -134,7 +145,7 @@ internal class DatabaseInit
                 }
 
                 foreach (var b in memberList)
-                    _bot._guilds.List[Convert.ToUInt64(table)].Members.Add(b.userid, new Member
+                    _bot._guilds[Convert.ToUInt64(table)].Members.Add(b.userid, new Member
                     {
                         Experience = new()
                         {
@@ -153,7 +164,7 @@ internal class DatabaseInit
                         SavedNickname = b.saved_nickname
                     });
 
-                _logger.LogInfo($"Loaded {_bot._guilds.List[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
+                _logger.LogInfo($"Loaded {_bot._guilds[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
             }
         }
 

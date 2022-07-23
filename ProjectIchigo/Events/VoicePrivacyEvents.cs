@@ -39,7 +39,7 @@ internal class VoicePrivacyEvents
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
-        if (_bot._guilds.List[e.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
+        if (_bot._guilds[e.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
         {
             Task.Run(async () =>
             {
@@ -54,7 +54,7 @@ internal class VoicePrivacyEvents
             }).Add(_bot._watcher);
         }
 
-        if (_bot._guilds.List[e.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled)
+        if (_bot._guilds[e.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled)
         {
             JobsQueue.Add(new Task(async () =>
             {
@@ -181,7 +181,7 @@ internal class VoicePrivacyEvents
     {
         Task.Run(async () =>
         {
-            if (_bot._guilds.List[e.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
+            if (_bot._guilds[e.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled)
             {
                 if (!e.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
                     return;

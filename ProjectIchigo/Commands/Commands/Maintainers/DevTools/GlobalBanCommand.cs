@@ -36,10 +36,10 @@ internal class GlobalBanCommand : BaseCommand
 
             foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
-                if (!ctx.Bot._guilds.List.ContainsKey(b.Key))
-                    ctx.Bot._guilds.List.Add(b.Key, new Guilds.ServerSettings());
+                if (!ctx.Bot._guilds.ContainsKey(b.Key))
+                    ctx.Bot._guilds.Add(b.Key, new Guild(b.Key));
 
-                if (ctx.Bot._guilds.List[b.Key].JoinSettings.AutoBanGlobalBans)
+                if (ctx.Bot._guilds[b.Key].JoinSettings.AutoBanGlobalBans)
                 {
                     try
                     {

@@ -34,11 +34,11 @@ internal class ConfigCommand : BaseCommand
 
                 embed.Description = "";
 
-                foreach (var reward in ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.ToList().OrderBy(x => x.Level))
+                foreach (var reward in ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.ToList().OrderBy(x => x.Level))
                 {
                     if (!ctx.Guild.Roles.ContainsKey(reward.RoleId))
                     {
-                        ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Remove(reward);
+                        ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Remove(reward);
                         continue;
                     }
 
@@ -149,7 +149,7 @@ internal class ConfigCommand : BaseCommand
                                 return;
                             }
 
-                            if (ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
+                            if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
                             {
                                 embed.Description = "`The role you're trying to add has already been assigned to a level.`";
                                 embed.Color = EmbedColors.Error;
@@ -219,7 +219,7 @@ internal class ConfigCommand : BaseCommand
                             if (CustomMessageResult.Result.Content is not "cancel" and not "continue" and not ".")
                                 Message = CustomMessageResult.Result.Content;
 
-                            ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
+                            ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
                             {
                                 Level = level,
                                 RoleId = role.Id,
@@ -260,16 +260,16 @@ internal class ConfigCommand : BaseCommand
 
                             if (result.Result.Content.ToLower() != "cancel")
                             {
-                                ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result.Result.Content;
+                                ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result.Result.Content;
                             }
 
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == "Delete")
                         {
-                            ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Remove(ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
+                            ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Remove(ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
 
-                            if (ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Count == 0)
+                            if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Count == 0)
                             {
                                 embed.Description = $"`There are no more Level Rewards to display.`";
                                 embed.Color = EmbedColors.Success;

@@ -49,11 +49,11 @@ internal class ShuffleCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle = !ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle;
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Shuffle = !ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Shuffle;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now shuffles.`" : "✅ `The queue no longer shuffles.`"),
+                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now shuffles.`" : "✅ `The queue no longer shuffles.`"),
                 Color = EmbedColors.Success,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

@@ -122,11 +122,11 @@ internal class ManageCommand : BaseCommand
                 embed.Description = $":arrows_counterclockwise: `Adding '{SelectedPlaylist.PlaylistName}' with {SelectedPlaylist.List.Count} track(s) to the queue..`";
                 await RespondOrEdit(embed.Build());
 
-                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, ctx.Guild, ctx.User)));
+                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, ctx.Guild, ctx.User)));
 
                 embed.Description = $"✅ `Queued {SelectedPlaylist.List.Count} songs from your personal playlist '{SelectedPlaylist.PlaylistName}'.`";
 
-                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
                 embed.Color = EmbedColors.Success;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
@@ -444,7 +444,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
 
-                if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count <= 0)
+                if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count <= 0)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -461,7 +461,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
 
-                var Tracks = ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistItem { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
+                var Tracks = ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistItem { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

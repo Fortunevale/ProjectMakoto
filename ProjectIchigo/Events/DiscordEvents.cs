@@ -15,13 +15,13 @@ internal class DiscordEvents
     {
         Task.Run(() =>
         {
-            if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
-                _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
+            if (!_bot._guilds.ContainsKey(e.Guild.Id))
+                _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             foreach (var guild in sender.Guilds)
             {
-                if (!_bot._guilds.List.ContainsKey(guild.Key))
-                    _bot._guilds.List.Add(guild.Key, new Guilds.ServerSettings());
+                if (!_bot._guilds.ContainsKey(guild.Key))
+                    _bot._guilds.Add(guild.Key, new Guild(guild.Key));
             }
         }).Add(_bot._watcher);
     }

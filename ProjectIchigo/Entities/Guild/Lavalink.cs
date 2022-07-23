@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-internal class Lavalink
+public class Lavalink
 {
     DiscordGuild Guild { get; set; }
 
@@ -40,7 +40,7 @@ internal class Lavalink
 
         _logger.LogDebug($"Disposed Player for {Id}. ({reason})");
 
-        _bot._guilds.List[Id].Lavalink = new();
+        _bot._guilds[Id].Lavalink = new();
     }
 
     public void QueueHandler(Bot _bot, DiscordClient sender, LavalinkNodeConnection nodeConnection, LavalinkGuildConnection guildConnection)
@@ -84,8 +84,8 @@ internal class Lavalink
 
                                     if (UserAmount <= 1)
                                     {
-                                        _bot._guilds.List[e.Guild.Id].Lavalink.Dispose(_bot, e.Guild.Id, "No users");
-                                        _bot._guilds.List[e.Guild.Id].Lavalink = new();
+                                        _bot._guilds[e.Guild.Id].Lavalink.Dispose(_bot, e.Guild.Id, "No users");
+                                        _bot._guilds[e.Guild.Id].Lavalink = new();
                                     }
                                 });
                         }
@@ -146,9 +146,9 @@ internal class Lavalink
                 {
                     int WaitSeconds = 30;
 
-                    while ((guildConnection.CurrentState.CurrentTrack is not null || _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count <= 0) && !Disposed)
+                    while ((guildConnection.CurrentState.CurrentTrack is not null || _bot._guilds[Guild.Id].Lavalink.SongQueue.Count <= 0) && !Disposed)
                     {
-                        if (guildConnection.CurrentState.CurrentTrack is null && _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count <= 0)
+                        if (guildConnection.CurrentState.CurrentTrack is null && _bot._guilds[Guild.Id].Lavalink.SongQueue.Count <= 0)
                         {
                             WaitSeconds--;
 
@@ -175,29 +175,29 @@ internal class Lavalink
 
                     int skipSongs = 0;
 
-                    if (LastPlayedTrack is not null && _bot._guilds.List[Guild.Id].Lavalink.Repeat && _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Contains(LastPlayedTrack))
+                    if (LastPlayedTrack is not null && _bot._guilds[Guild.Id].Lavalink.Repeat && _bot._guilds[Guild.Id].Lavalink.SongQueue.Contains(LastPlayedTrack))
                     {
-                        skipSongs = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.IndexOf(LastPlayedTrack) + 1;
+                        skipSongs = _bot._guilds[Guild.Id].Lavalink.SongQueue.IndexOf(LastPlayedTrack) + 1;
 
-                        if (skipSongs >= _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Count)
+                        if (skipSongs >= _bot._guilds[Guild.Id].Lavalink.SongQueue.Count)
                             skipSongs = 0;
                     }
 
-                    if (_bot._guilds.List[Guild.Id].Lavalink.Shuffle)
-                        Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.OrderBy(_ => Guid.NewGuid()).ToList().First();
+                    if (_bot._guilds[Guild.Id].Lavalink.Shuffle)
+                        Track = _bot._guilds[Guild.Id].Lavalink.SongQueue.OrderBy(_ => Guid.NewGuid()).ToList().First();
                     else
-                        Track = _bot._guilds.List[Guild.Id].Lavalink.SongQueue.ToList().Skip(skipSongs).First();
+                        Track = _bot._guilds[Guild.Id].Lavalink.SongQueue.ToList().Skip(skipSongs).First();
 
                     LastPlayedTrack = Track;
 
-                    _bot._guilds.List[Guild.Id].Lavalink.collectedSkips.Clear();
+                    _bot._guilds[Guild.Id].Lavalink.collectedSkips.Clear();
 
                     var loadResult = await nodeConnection.Rest.GetTracksAsync(Track.Url, LavalinkSearchType.Plain);
 
                     if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                     {
                         if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
-                            _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
+                            _bot._guilds[Guild.Id].Lavalink.SongQueue.Remove(Track);
 
                         continue;
                     }
@@ -216,8 +216,8 @@ internal class Lavalink
                         continue;
                     }
 
-                    if (!_bot._guilds.List[Guild.Id].Lavalink.Repeat)
-                        _bot._guilds.List[Guild.Id].Lavalink.SongQueue.Remove(Track);
+                    if (!_bot._guilds[Guild.Id].Lavalink.Repeat)
+                        _bot._guilds[Guild.Id].Lavalink.SongQueue.Remove(Track);
                 }
             }
             catch (Exception ex)

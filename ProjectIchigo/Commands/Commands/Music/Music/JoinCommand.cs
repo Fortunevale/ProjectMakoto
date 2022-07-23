@@ -25,7 +25,7 @@ internal class JoinCommand : BaseCommand
                 }
 
                 conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
-                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.QueueHandler(ctx.Bot, ctx.Client, node, conn);
+                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.QueueHandler(ctx.Bot, ctx.Client, node, conn);
 
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder

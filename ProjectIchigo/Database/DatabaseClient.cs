@@ -210,7 +210,7 @@ internal class DatabaseClient
             }
         }
 
-        foreach (var b in _bot._guilds.List)
+        foreach (var b in _bot._guilds)
         {
             if (!GuildTables.Contains($"{b.Key}"))
             {
@@ -417,10 +417,10 @@ internal class DatabaseClient
         {
             Task key = new(async () =>
             {
-                if (_bot._guilds.List.Count > 0)
+                if (_bot._guilds.Count > 0)
                     try
                     {
-                        List<DatabaseGuildSettings> DatabaseInserts = _bot._guilds.List.Select(x => new DatabaseGuildSettings
+                        List<DatabaseGuildSettings> DatabaseInserts = _bot._guilds.Select(x => new DatabaseGuildSettings
                         {
                             serverid = x.Key,
 
@@ -442,8 +442,8 @@ internal class DatabaseClient
                             bump_enabled = x.Value.BumpReminderSettings.Enabled,
                             bump_role = x.Value.BumpReminderSettings.RoleId,
                             bump_channel = x.Value.BumpReminderSettings.ChannelId,
-                            bump_last_reminder = Convert.ToUInt64(x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks),
-                            bump_last_time = Convert.ToUInt64(x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks),
+                            bump_last_reminder = x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks,
+                            bump_last_time = x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks,
                             bump_last_user = x.Value.BumpReminderSettings.LastUserId,
                             bump_message = x.Value.BumpReminderSettings.MessageId,
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
@@ -481,7 +481,7 @@ internal class DatabaseClient
 
                             autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
                             
-                            normalizenames = x.Value.NameNormalizer.NameNormalizerEnabled
+                            normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -577,8 +577,8 @@ internal class DatabaseClient
                 var check = CheckGuildTables();
                 check.Add(_bot._watcher);
 
-                if (_bot._guilds.List.Count > 0)
-                    foreach (var guild in _bot._guilds.List)
+                if (_bot._guilds.Count > 0)
+                    foreach (var guild in _bot._guilds)
                         if (guild.Value.Members.Count > 0)
                         {
                             try
@@ -888,6 +888,12 @@ internal class DatabaseClient
                 return;
             }
         }
+    }
+
+    public async Task UpdateValue(string table, string columnKey, object rowKey, string columnToEdit, object newValue, MySqlConnection connection)
+    {
+        _queue.RunCommand(new MySqlCommand(_helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(_bot._watcher);
+        return;
     }
 
     public async Task Dispose()

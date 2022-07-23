@@ -135,7 +135,7 @@ internal class AddCommand : BaseCommand
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100)
+            if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
             {
                 embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
                 embed.Color = EmbedColors.Error;
@@ -151,7 +151,7 @@ internal class AddCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
+            if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
             {
                 embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
                 embed.Color = EmbedColors.Error;
@@ -159,7 +159,7 @@ internal class AddCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
+            if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
             {
                 embed.Description = $"`The specified role is already being used in another reaction role.`";
                 embed.Color = EmbedColors.Error;
@@ -169,7 +169,7 @@ internal class AddCommand : BaseCommand
 
             await message.CreateReactionAsync(emoji_parameter);
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(message.Id, new Entities.ReactionRoles
+            ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(message.Id, new Entities.ReactionRoles
             {
                 ChannelId = message.Channel.Id,
                 RoleId = role_parameter.Id,
