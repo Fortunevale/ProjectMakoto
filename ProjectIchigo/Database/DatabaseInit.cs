@@ -145,7 +145,7 @@ internal class DatabaseInit
                 }
 
                 foreach (var b in memberList)
-                    _bot._guilds[Convert.ToUInt64(table)].Members.Add(b.userid, new Member
+                    _bot._guilds[Convert.ToUInt64(table)].Members.Add(b.userid, new Member(_bot._guilds[Convert.ToUInt64(table)], b.userid)
                     {
                         Experience = new()
                         {

@@ -23,7 +23,7 @@ internal class ExperienceEvents
                 return;
 
             if (!_bot._guilds[e.Guild.Id].Members.ContainsKey(e.Author.Id))
-                _bot._guilds[e.Guild.Id].Members.Add(e.Author.Id, new());
+                _bot._guilds[e.Guild.Id].Members.Add(e.Author.Id, new(_bot._guilds[e.Guild.Id], e.Author.Id));
 
             if (_bot._guilds[e.Guild.Id].Members[e.Author.Id].Experience.Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
             {

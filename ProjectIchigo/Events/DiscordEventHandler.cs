@@ -47,22 +47,23 @@ internal class DiscordEventHandler
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
         if (guild is not null)
+        {
             if (!_bot._guilds.ContainsKey(guild.Id))
                 _bot._guilds.Add(guild.Id, new Guild(guild.Id));
 
-        if (guild is not null)
             if (guild.Members is not null && guild.Members.Count > 0)
-                foreach(var b in guild.Members)
-                    if (!_bot._guilds[ guild.Id ].Members.ContainsKey(b.Key))
-                        _bot._guilds[ guild.Id ].Members.Add(b.Key, new());
+                foreach (var b in guild.Members)
+                    if (!_bot._guilds[guild.Id].Members.ContainsKey(b.Key))
+                        _bot._guilds[guild.Id].Members.Add(b.Key, new(_bot._guilds[guild.Id], b.Key));
 
-        if (member is not null && guild is not null)
-            if (!_bot._guilds[ guild.Id ].Members.ContainsKey(member.Id))
-                _bot._guilds[ guild.Id ].Members.Add(member.Id, new());
+            if (member is not null)
+                if (!_bot._guilds[guild.Id].Members.ContainsKey(member.Id))
+                    _bot._guilds[guild.Id].Members.Add(member.Id, new(_bot._guilds[guild.Id], member.Id));
 
-        if (user is not null && guild is not null)
-            if (!_bot._guilds[ guild.Id ].Members.ContainsKey(user.Id))
-                _bot._guilds[ guild.Id ].Members.Add(user.Id, new());
+            if (user is not null)
+                if (!_bot._guilds[guild.Id].Members.ContainsKey(user.Id))
+                    _bot._guilds[guild.Id].Members.Add(user.Id, new(_bot._guilds[guild.Id], user.Id));
+        }
 
         if (member is not null)
             if (!_bot._users.List.ContainsKey(member.Id))

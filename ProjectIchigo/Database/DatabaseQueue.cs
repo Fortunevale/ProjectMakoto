@@ -23,8 +23,7 @@ internal class DatabaseQueue
                     continue;
                 }
 
-                IOrderedEnumerable<KeyValuePair<string, RequestQueue>> orderedEnumerable = Queue.OrderBy(x => (int)x.Value.Priority);
-                var b = orderedEnumerable.First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
+                var b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
 
                 if (b.Value is null)
                     continue;

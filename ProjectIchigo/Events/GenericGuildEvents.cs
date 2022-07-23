@@ -17,7 +17,7 @@ internal class GenericGuildEvents
                 _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             if (!_bot._guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new());
+                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot._guilds[e.Guild.Id], e.Member.Id));
 
 
             if (_bot._guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate == DateTime.UnixEpoch)
@@ -97,7 +97,7 @@ internal class GenericGuildEvents
                 _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             if (!_bot._guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new());
+                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot._guilds[e.Guild.Id], e.Member.Id));
 
             _bot._guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UtcNow;
         }).Add(_bot._watcher);
@@ -113,7 +113,7 @@ internal class GenericGuildEvents
                 _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             if (!_bot._guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new());
+                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot._guilds[e.Guild.Id], e.Member.Id));
 
             _bot._guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles = e.Member.Roles.Select(x => new MemberRole
             {
@@ -133,7 +133,7 @@ internal class GenericGuildEvents
                 _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             if (!_bot._guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new());
+                _bot._guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot._guilds[e.Guild.Id], e.Member.Id));
 
             _bot._guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles.Clear();
             _bot._guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname = "";

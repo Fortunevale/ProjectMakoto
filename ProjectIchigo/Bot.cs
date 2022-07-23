@@ -572,7 +572,7 @@ public class Bot
                 foreach (var member in guildMembers)
                 {
                     if (!_guilds[guild.Key].Members.ContainsKey(member.Id))
-                        _guilds[guild.Key].Members.Add(member.Id, new());
+                        _guilds[guild.Key].Members.Add(member.Id, new(_guilds[guild.Key], member.Id));
 
                     if (_guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
                         _guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
@@ -675,7 +675,7 @@ public class Bot
                 {
                     if (!_guilds[guild.Key].Members.ContainsKey(member.Value.Id))
                     {
-                        _guilds[guild.Key].Members.Add(member.Value.Id, new());
+                        _guilds[guild.Key].Members.Add(member.Value.Id, new(_guilds[guild.Key], member.Value.Id));
                     }
 
                     _experienceHandler.CheckExperience(member.Key, guild.Value);

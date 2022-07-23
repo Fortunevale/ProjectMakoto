@@ -12,7 +12,7 @@ internal class UserInfoCommand : BaseCommand
                 return;
 
             if (!ctx.Bot._guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                ctx.Bot._guilds[ctx.Guild.Id].Members.Add(victim.Id, new());
+                ctx.Bot._guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot._guilds[ctx.Guild.Id], victim.Id));
 
             if (victim is null)
                 victim = ctx.User;
