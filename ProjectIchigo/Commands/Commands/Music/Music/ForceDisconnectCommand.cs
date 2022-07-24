@@ -8,7 +8,7 @@ internal class ForceDisconnectCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -66,8 +66,8 @@ internal class ForceDisconnectCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink = new();
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink = new();
 
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();

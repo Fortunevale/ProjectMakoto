@@ -13,10 +13,10 @@ internal class JoinEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
-                _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
+            if (!_bot._guilds.ContainsKey(e.Guild.Id))
+                _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
-            if (_bot._guilds.List[e.Guild.Id].JoinSettings.AutoBanGlobalBans)
+            if (_bot._guilds[e.Guild.Id].JoinSettings.AutoBanGlobalBans)
             {
                 if (_bot._globalBans.List.ContainsKey(e.Member.Id))
                 {
@@ -25,19 +25,19 @@ internal class JoinEvents
                 }
             }
 
-            if (_bot._guilds.List[e.Guild.Id].JoinSettings.AutoAssignRoleId != 0)
+            if (_bot._guilds[e.Guild.Id].JoinSettings.AutoAssignRoleId != 0)
             {
-                if (e.Guild.Roles.ContainsKey(_bot._guilds.List[e.Guild.Id].JoinSettings.AutoAssignRoleId))
+                if (e.Guild.Roles.ContainsKey(_bot._guilds[e.Guild.Id].JoinSettings.AutoAssignRoleId))
                 {
-                    _ = e.Member.GrantRoleAsync(e.Guild.GetRole(_bot._guilds.List[e.Guild.Id].JoinSettings.AutoAssignRoleId));
+                    _ = e.Member.GrantRoleAsync(e.Guild.GetRole(_bot._guilds[e.Guild.Id].JoinSettings.AutoAssignRoleId));
                 }
             }
 
-            if (_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
+            if (_bot._guilds[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
             {
-                if (e.Guild.Channels.ContainsKey(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId))
+                if (e.Guild.Channels.ContainsKey(_bot._guilds[e.Guild.Id].JoinSettings.JoinlogChannelId))
                 {
-                    _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
+                    _ = e.Guild.GetChannel(_bot._guilds[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
                     {
                         Author = new()
                         {
@@ -60,14 +60,14 @@ internal class JoinEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot._guilds.List.ContainsKey(e.Guild.Id))
-                _bot._guilds.List.Add(e.Guild.Id, new Guilds.ServerSettings());
+            if (!_bot._guilds.ContainsKey(e.Guild.Id))
+                _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
-            if (_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
+            if (_bot._guilds[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
             {
-                if (e.Guild.Channels.ContainsKey(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId))
+                if (e.Guild.Channels.ContainsKey(_bot._guilds[e.Guild.Id].JoinSettings.JoinlogChannelId))
                 {
-                    _ = e.Guild.GetChannel(_bot._guilds.List[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
+                    _ = e.Guild.GetChannel(_bot._guilds[e.Guild.Id].JoinSettings.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
                     {
                         Author = new()
                         {

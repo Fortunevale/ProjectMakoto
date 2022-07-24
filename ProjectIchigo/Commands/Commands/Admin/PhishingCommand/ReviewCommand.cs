@@ -8,7 +8,7 @@ internal class ReviewCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var ListEmbed = new DiscordEmbedBuilder

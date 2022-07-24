@@ -23,8 +23,8 @@ public class DatabaseGuildSettings
     public ulong bump_message { get; set; }
     public ulong bump_persistent_msg { get; set; }
     public ulong bump_last_user { get; set; }
-    public ulong bump_last_time { get; set; }
-    public ulong bump_last_reminder { get; set; }
+    public long bump_last_time { get; set; }
+    public long bump_last_reminder { get; set; }
     public int bump_missed { get; set; }
     public bool phishing_detect { get; set; }
     public bool phishing_warnonredirect { get; set; }

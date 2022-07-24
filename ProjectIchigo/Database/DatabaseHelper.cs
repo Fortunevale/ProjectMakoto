@@ -46,6 +46,25 @@ internal class DatabaseHelper
         return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
+    public string GetUpdateValueCommand(string table, string columnKey, object rowKey, string columnToEdit, object newValue)
+    {
+        if (_databaseClient.IsDisposed())
+            throw new Exception("DatabaseHelper is disposed");
+
+        if (newValue.GetType() == typeof(bool))
+            newValue = ((bool)newValue ? "1" : "0");
+
+        if (newValue.GetType() == typeof(DateTime))
+            newValue = ((DateTime)newValue).ToUniversalTime().Ticks;
+
+        var v = MySqlHelper.EscapeString(newValue.ToString());
+
+        if (Regex.IsMatch(v, @"^(?=.*SELECT.*FROM)(?!.*(?:CREATE|DROP|UPDATE|INSERT|ALTER|DELETE|ATTACH|DETACH)).*$", RegexOptions.IgnoreCase))
+            throw new Exception("Sql detected.");
+
+        return $"UPDATE `{table}` SET `{columnToEdit}`='{v}' WHERE `{columnKey}`='{rowKey}'";
+    }
+
     public async Task<IEnumerable<string>> ListTables(MySqlConnection connection)
     {
         if (_databaseClient.IsDisposed())

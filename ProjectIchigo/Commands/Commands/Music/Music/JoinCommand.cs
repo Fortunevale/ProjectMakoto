@@ -10,7 +10,7 @@ internal class JoinCommand : BaseCommand
         {
             bool Announce = arguments?.ContainsKey("announce") ?? false;
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -25,7 +25,7 @@ internal class JoinCommand : BaseCommand
                 }
 
                 conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
-                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.QueueHandler(ctx.Bot, ctx.Client, node, conn);
+                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.QueueHandler(ctx.Bot, ctx.Client, node, conn);
 
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder

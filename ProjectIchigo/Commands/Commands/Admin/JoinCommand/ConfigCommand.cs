@@ -8,7 +8,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -22,11 +22,11 @@ internal class ConfigCommand : BaseCommand
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            var ToggleGlobalban = new DiscordButtonComponent((ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Global Bans", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
+            var ToggleGlobalban = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Global Bans", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
             var ChangeJoinlogChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Joinlog Channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👋")));
             var ChangeRoleOnJoin = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Role assigned on join", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-            var ToggleReApplyRoles = new DiscordButtonComponent((ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Role Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
-            var ToggleReApplyName = new DiscordButtonComponent((ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Nickname Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ToggleReApplyRoles = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Role Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
+            var ToggleReApplyName = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Nickname Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
             await RespondOrEdit(builder
                 .AddComponents(new List<DiscordComponent>
@@ -54,21 +54,21 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == ToggleGlobalban.CustomId)
             {
-                ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
+                ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans = !ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.AutoBanGlobalBans;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.Result.Interaction.Data.CustomId == ToggleReApplyRoles.CustomId)
             {
-                ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles = !ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyRoles;
+                ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyRoles = !ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyRoles;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.Result.Interaction.Data.CustomId == ToggleReApplyName.CustomId)
             {
-                ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname = !ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.ReApplyNickname;
+                ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyNickname = !ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyNickname;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -80,9 +80,9 @@ internal class ConfigCommand : BaseCommand
                     var channel = await PromptChannelSelection(true, "joinlog", ChannelType.Text, true, "Disable Joinlog");
 
                     if (channel is null)
-                        ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
+                        ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
                     else
-                        ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.JoinlogChannelId = channel.Id;
+                        ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = channel.Id;
 
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -103,9 +103,9 @@ internal class ConfigCommand : BaseCommand
                     var role = await PromptRoleSelection(true, "AutoAssignedRole", true, "Disable Role on join");
 
                     if (role is null)
-                        ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
+                        ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
                     else
-                        ctx.Bot._guilds.List[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = role.Id;
+                        ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = role.Id;
 
                     await ExecuteCommand(ctx, arguments);
                     return;

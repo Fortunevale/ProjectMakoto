@@ -1,8 +1,6 @@
-using ProjectIchigo.Commands.PrefixCommands.Converters;
-
 namespace ProjectIchigo;
 
-internal class Bot
+public class Bot
 {
     internal static DatabaseClient DatabaseClient { get; set; }
 
@@ -14,8 +12,8 @@ internal class Bot
 
 
     internal Status _status = new();
-    internal Guilds _guilds = new();
-    internal Users _users = new();
+    internal Dictionary<ulong, Guild> _guilds = new();
+    internal Dictionary<ulong, User> _users = new();
 
 
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
@@ -60,7 +58,7 @@ internal class Bot
         {
             if (args.Contains("--debug"))
             {
-                _logger.ChangeLogLevel(LogLevel.DEBUG);
+                _logger.ChangeLogLevel(LogLevel.TRACE);
                 _logger.LogInfo("Debug logs enabled");
             }
         }
@@ -148,6 +146,8 @@ internal class Bot
 
                 await _databaseInit.UpdateCountryCodes();
                 await _databaseInit.LoadValuesFromDatabase();
+
+                _status.DatabaseInitialLoadCompleted = true;
             }
             catch (Exception ex)
             {
@@ -252,14 +252,14 @@ internal class Bot
 
             _logger.LogDebug($"Registering Commands..");
 
-            cNext.RegisterCommands<PrefixCommands.User>();
-            cNext.RegisterCommands<PrefixCommands.Music>();
-            cNext.RegisterCommands<PrefixCommands.Social>();
-            cNext.RegisterCommands<PrefixCommands.ScoreSaber>();
-            cNext.RegisterCommands<PrefixCommands.Mod>();
-            cNext.RegisterCommands<PrefixCommands.Admin>();
+            cNext.RegisterCommands<PrefixCommands.UserPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.ModPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.AdminPrefixCommands>();
             
-            cNext.RegisterCommands<PrefixCommands.Maintainers>();
+            cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
 
 
 
@@ -364,23 +364,23 @@ internal class Bot
 
                     if (_status.LoadedConfig.IsDev)
                     {
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Admin>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Mod>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Social>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaber>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Music>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.User>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.AdminAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ModAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.UserAppCommands>(_status.LoadedConfig.AssetsGuildId);
                     }
                     else
                     {
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Admin>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Mod>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Social>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaber>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Music>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.User>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.AdminAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ModAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.UserAppCommands>();
                     }
                 }).Add(_watcher);
 
@@ -491,12 +491,12 @@ internal class Bot
 
                     List<ulong> users = new();
 
-                    foreach (var b in _guilds.List)
+                    foreach (var b in _guilds)
                         foreach (var c in b.Value.Members)
                             if (!users.Contains(c.Key))
                                 users.Add(c.Key);
 
-                    foreach (var b in _users.List)
+                    foreach (var b in _users)
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
@@ -569,46 +569,46 @@ internal class Bot
 
                 foreach (var member in guildMembers)
                 {
-                    if (!_guilds.List[guild.Key].Members.ContainsKey(member.Id))
-                        _guilds.List[guild.Key].Members.Add(member.Id, new());
+                    if (!_guilds[guild.Key].Members.ContainsKey(member.Id))
+                        _guilds[guild.Key].Members.Add(member.Id, new(_guilds[guild.Key], member.Id));
 
-                    if (_guilds.List[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
-                        _guilds.List[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
+                    if (_guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                        _guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
 
-                    if (_guilds.List[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
-                        _guilds.List[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
+                    if (_guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
+                        _guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
 
-                    _guilds.List[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
+                    _guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
                     {
                         Id = x.Id,
                         Name = x.Name,
                     }).ToList();
 
-                    _guilds.List[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+                    _guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
                 }
 
-                foreach (var databaseMember in _guilds.List[guild.Key].Members.ToList())
+                foreach (var databaseMember in _guilds[guild.Key].Members.ToList())
                 {
                     if (!guildMembers.Any(x => x.Id == databaseMember.Key))
                     {
-                        if (_guilds.List[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
-                            _guilds.List[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
+                        if (_guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                            _guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
                     }
                 }
 
                 foreach (var banEntry in guildBans)
                 {
-                    if (!_guilds.List[guild.Key].Members.ContainsKey(banEntry.User.Id))
+                    if (!_guilds[guild.Key].Members.ContainsKey(banEntry.User.Id))
                         continue;
 
-                    if (_guilds.List[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
-                        _guilds.List[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+                    if (_guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
+                        _guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
 
-                    if (_guilds.List[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
-                        _guilds.List[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
+                    if (_guilds[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
+                        _guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                 }
 
-                if (_guilds.List[guild.Key].InviteTrackerSettings.Enabled)
+                if (_guilds[guild.Key].InviteTrackerSettings.Enabled)
                 {
                     await InviteTrackerEvents.UpdateCachedInvites(this, guild.Value);
                 }
@@ -661,31 +661,31 @@ internal class Bot
 
             foreach (var guild in e.Guilds)
             {
-                if (!_guilds.List.ContainsKey(guild.Key))
-                    _guilds.List.Add(guild.Key, new Guilds.ServerSettings());
+                if (!_guilds.ContainsKey(guild.Key))
+                    _guilds.Add(guild.Key, new Guild(guild.Key));
 
-                if (_guilds.List[guild.Key].BumpReminderSettings.Enabled)
+                if (_guilds[guild.Key].BumpReminderSettings.Enabled)
                 {
                     _bumpReminder.ScheduleBump(sender, guild.Key);
                 }
 
                 foreach (var member in guild.Value.Members)
                 {
-                    if (!_guilds.List[guild.Key].Members.ContainsKey(member.Value.Id))
+                    if (!_guilds[guild.Key].Members.ContainsKey(member.Value.Id))
                     {
-                        _guilds.List[guild.Key].Members.Add(member.Value.Id, new());
+                        _guilds[guild.Key].Members.Add(member.Value.Id, new(_guilds[guild.Key], member.Value.Id));
                     }
 
                     _experienceHandler.CheckExperience(member.Key, guild.Value);
                 }
 
-                if (_guilds.List[guild.Key].CrosspostSettings.CrosspostTasks.Any())
+                if (_guilds[guild.Key].CrosspostSettings.CrosspostTasks.Any())
                 {
                     Task.Run(async () =>
                     {
-                        for (var i = 0; i < _guilds.List[guild.Key].CrosspostSettings.CrosspostTasks.Count; i++)
+                        for (var i = 0; i < _guilds[guild.Key].CrosspostSettings.CrosspostTasks.Count; i++)
                         {
-                            CrosspostMessage b = _guilds.List[guild.Key].CrosspostSettings.CrosspostTasks[0];
+                            CrosspostMessage b = _guilds[guild.Key].CrosspostSettings.CrosspostTasks[0];
 
                             if (!guild.Value?.Channels.ContainsKey(b.ChannelId) ?? true)
                                 return;
@@ -694,22 +694,22 @@ internal class Bot
 
                             if (!channel.TryGetMessage(b.MessageId, out var msg))
                             {
-                                if (_guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                 {
-                                    var obj = _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                    _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                    var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                    _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                 }
                                 continue;
                             }
 
                             _logger.LogDebug($"Handling missing crosspost message '{b.MessageId}' in '{b.ChannelId}' for '{guild.Key}'..");
 
-                            var WaitTime = _guilds.List[guild.Value.Id].CrosspostSettings.DelayBeforePosting - b.MessageId.GetSnowflakeTime().GetTotalSecondsSince();
+                            var WaitTime = _guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting - b.MessageId.GetSnowflakeTime().GetTotalSecondsSince();
 
                             if (WaitTime > 0)
                                 await Task.Delay(TimeSpan.FromSeconds(WaitTime));
 
-                            if (_guilds.List[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
+                            if (_guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
                                 _ = msg.DeleteOwnReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 
                             bool ReactionAdded = false;
@@ -718,10 +718,10 @@ internal class Bot
                             {
                                 var task = channel.CrosspostMessageAsync(msg).ContinueWith(s =>
                                 {
-                                    if (_guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                    if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                     {
-                                        var obj = _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                        _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                        var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                        _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                     }
 
                                     if (ReactionAdded)
@@ -738,10 +738,10 @@ internal class Bot
                             }
                             catch (ArgumentException)
                             {
-                                if (_guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                 {
-                                    var obj = _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                    _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                    var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                    _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                 }
                                 return;
                             }
@@ -749,10 +749,10 @@ internal class Bot
                             {
                                 if (ex.InnerException is ArgumentException aex)
                                 {
-                                    if (_guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                    if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                     {
-                                        var obj = _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                        _guilds.List[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                        var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                        _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                     }
                                     return;
                                 }
@@ -774,7 +774,7 @@ internal class Bot
             }
 
             await _databaseClient.CheckGuildTables();
-            await _databaseClient.SyncDatabase(true);
+            await _databaseClient.FullSyncDatabase(true);
 
         }).Add(_watcher);
     }
@@ -782,7 +782,7 @@ internal class Bot
     private async Task FlushToDatabase()
     {
         _logger.LogInfo($"Flushing to database..");
-        await DatabaseClient.SyncDatabase(true);
+        await DatabaseClient.FullSyncDatabase(true);
         _logger.LogDebug($"Flushed to database.");
 
         await Task.Delay(1000);

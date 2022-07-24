@@ -8,7 +8,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             await RespondOrEdit(new DiscordEmbedBuilder
@@ -22,8 +22,8 @@ internal class ConfigCommand : BaseCommand
 
             await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add a new reaction role", (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove a reaction role", (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add a new reaction role", (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove a reaction role", (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
             var embed = new DiscordEmbedBuilder
             {
@@ -31,7 +31,7 @@ internal class ConfigCommand : BaseCommand
                 Color = EmbedColors.Info,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
-                Description = $"`{ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count} reaction roles are set up.`"
+                Description = $"`{ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count} reaction roles are set up.`"
             };
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -63,7 +63,7 @@ internal class ConfigCommand : BaseCommand
                     ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
                 };
 
-                if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100)
+                if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
                 {
                     action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
                     action_embed.Color = EmbedColors.Error;
@@ -187,7 +187,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     var role = await PromptRoleSelection();
 
-                    if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count > 100)
+                    if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
                     {
                         action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
                         action_embed.Color = EmbedColors.Error;
@@ -198,7 +198,7 @@ internal class ConfigCommand : BaseCommand
                     }
 
 
-                    if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == MessageId && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
+                    if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == MessageId && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
                     {
                         action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
                         action_embed.Color = EmbedColors.Error;
@@ -208,7 +208,7 @@ internal class ConfigCommand : BaseCommand
                         return;
                     }
 
-                    if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
+                    if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
                     {
                         action_embed.Description = $"`The specified role is already being used in another reaction role.`";
                         action_embed.Color = EmbedColors.Error;
@@ -218,7 +218,7 @@ internal class ConfigCommand : BaseCommand
                         return;
                     }
 
-                    ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(reactionMessage.Id, new Entities.ReactionRoles
+                    ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(reactionMessage.Id, new Entities.ReactionRoles
                     {
                         ChannelId = ChannelId,
                         RoleId = role.Id,
@@ -245,17 +245,17 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var roleuuid = await PromptCustomSelection(ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles
+                    var roleuuid = await PromptCustomSelection(ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles
                                                     .Select(x => new DiscordSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
 
-                    var obj = ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.First(x => x.Value.UUID == roleuuid);
+                    var obj = ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.First(x => x.Value.UUID == roleuuid);
 
                     var role = ctx.Guild.GetRole(obj.Value.RoleId);
                     var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
                     var reactionMessage = await channel.GetMessageAsync(obj.Key);
                     _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-                    ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Remove(obj);
+                    ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
                     embed.Color = EmbedColors.Info;
                     embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";

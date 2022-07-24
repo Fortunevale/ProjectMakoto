@@ -56,6 +56,7 @@ global using ProjectIchigo.Commands;
 
 global using ProjectIchigo.ApplicationCommands;
 global using ProjectIchigo.PrefixCommands;
+global using ProjectIchigo.Commands.PrefixCommands.Converters;
 
 global using ProjectIchigo.Enums;
 global using ProjectIchigo.Secrets;
@@ -74,6 +75,7 @@ global using ProjectIchigo.Extensions;
 
 global using ProjectIchigo.Exceptions;
 
+global using User = ProjectIchigo.Entities.User;
 
 global using Xorog.ScoreSaber;
 global using Xorog.ScoreSaber.Objects;

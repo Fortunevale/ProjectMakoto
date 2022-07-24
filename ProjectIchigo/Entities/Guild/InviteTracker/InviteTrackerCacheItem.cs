@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Entities;
 
-internal class InviteTrackerCacheItem
+public class InviteTrackerCacheItem
 {
     public ulong CreatorId { get; set; }
     public string Code { get; set; }

@@ -16,7 +16,7 @@ internal class RemoveQueueCommand : BaseCommand
                 return;
             }
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -63,11 +63,11 @@ internal class RemoveQueueCommand : BaseCommand
             {
                 int Index = Convert.ToInt32(selection) - 1;
 
-                if (Index < 0 || Index >= ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count)
+                if (Index < 0 || Index >= ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count)
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = $"❌ `Your value is out of range. Currently, the range is 1-{ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Count}.`",
+                        Description = $"❌ `Your value is out of range. Currently, the range is 1-{ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}.`",
                         Color = EmbedColors.Error,
                         Author = new DiscordEmbedBuilder.EmbedAuthor
                         {
@@ -80,11 +80,11 @@ internal class RemoveQueueCommand : BaseCommand
                     return;
                 }
 
-                info = ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue[Index];
+                info = ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue[Index];
             }
             else
             {
-                if (!ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
+                if (!ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
@@ -101,7 +101,7 @@ internal class RemoveQueueCommand : BaseCommand
                     return;
                 }
 
-                info = ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.First(x => x.VideoTitle.ToLower() == selection.ToLower());
+                info = ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.First(x => x.VideoTitle.ToLower() == selection.ToLower());
             }
 
             if (info is null)
@@ -121,7 +121,7 @@ internal class RemoveQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Remove(info);
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Remove(info);
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {

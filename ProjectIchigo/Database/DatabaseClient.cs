@@ -25,7 +25,7 @@ internal class DatabaseClient
                 if (Disposed)
                     return;
 
-                _ = SyncDatabase();
+                _ = FullSyncDatabase();
             }
         });
 
@@ -210,7 +210,7 @@ internal class DatabaseClient
             }
         }
 
-        foreach (var b in _bot._guilds.List)
+        foreach (var b in _bot._guilds)
         {
             if (!GuildTables.Contains($"{b.Key}"))
             {
@@ -408,7 +408,7 @@ internal class DatabaseClient
         }
     }
 
-    public async Task SyncDatabase(bool Important = false)
+    public async Task FullSyncDatabase(bool Important = false)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
@@ -417,10 +417,10 @@ internal class DatabaseClient
         {
             Task key = new(async () =>
             {
-                if (_bot._guilds.List.Count > 0)
+                if (_bot._guilds.Count > 0)
                     try
                     {
-                        List<DatabaseGuildSettings> DatabaseInserts = _bot._guilds.List.Select(x => new DatabaseGuildSettings
+                        List<DatabaseGuildSettings> DatabaseInserts = _bot._guilds.Select(x => new DatabaseGuildSettings
                         {
                             serverid = x.Key,
 
@@ -442,8 +442,8 @@ internal class DatabaseClient
                             bump_enabled = x.Value.BumpReminderSettings.Enabled,
                             bump_role = x.Value.BumpReminderSettings.RoleId,
                             bump_channel = x.Value.BumpReminderSettings.ChannelId,
-                            bump_last_reminder = Convert.ToUInt64(x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks),
-                            bump_last_time = Convert.ToUInt64(x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks),
+                            bump_last_reminder = x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks,
+                            bump_last_time = x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks,
                             bump_last_user = x.Value.BumpReminderSettings.LastUserId,
                             bump_message = x.Value.BumpReminderSettings.MessageId,
                             bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
@@ -481,7 +481,7 @@ internal class DatabaseClient
 
                             autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
                             
-                            normalizenames = x.Value.NameNormalizer.NameNormalizerEnabled
+                            normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -577,8 +577,8 @@ internal class DatabaseClient
                 var check = CheckGuildTables();
                 check.Add(_bot._watcher);
 
-                if (_bot._guilds.List.Count > 0)
-                    foreach (var guild in _bot._guilds.List)
+                if (_bot._guilds.Count > 0)
+                    foreach (var guild in _bot._guilds)
                         if (guild.Value.Members.Count > 0)
                         {
                             try
@@ -589,9 +589,9 @@ internal class DatabaseClient
 
                                     experience = x.Value.Experience.Points,
                                     experience_level = x.Value.Experience.Level,
-                                    experience_last_message = Convert.ToUInt64(x.Value.Experience.Last_Message.ToUniversalTime().Ticks),
-                                    first_join = Convert.ToUInt64(x.Value.FirstJoinDate.ToUniversalTime().Ticks),
-                                    last_leave = Convert.ToUInt64(x.Value.LastLeaveDate.ToUniversalTime().Ticks),
+                                    experience_last_message = x.Value.Experience.Last_Message.ToUniversalTime().Ticks,
+                                    first_join = x.Value.FirstJoinDate.ToUniversalTime().Ticks,
+                                    last_leave = x.Value.LastLeaveDate.ToUniversalTime().Ticks,
                                     roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
                                     saved_nickname = x.Value.SavedNickname,
                                     invite_code = x.Value.InviteTracker.Code,
@@ -640,13 +640,13 @@ internal class DatabaseClient
                             }
                         }
 
-                if (_bot._users.List.Count > 0)
+                if (_bot._users.Count > 0)
                     try
                     {
-                        List<DatabaseUsers> DatabaseInserts = _bot._users.List.Select(x => new DatabaseUsers
+                        List<DatabaseUsers> DatabaseInserts = _bot._users.Select(x => new DatabaseUsers
                         {
                             userid = x.Key,
-                            afk_since = Convert.ToUInt64(x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks),
+                            afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
                             afk_reason = x.Value.AfkStatus.Reason,
                             afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
                             afk_pingamount = x.Value.AfkStatus.MessagesAmount,
@@ -654,7 +654,7 @@ internal class DatabaseClient
                             submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
                             submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
                             playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
-                            submission_last_datetime = x.Value.UrlSubmissions.LastTime,
+                            submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
                             scoresaber_id = x.Value.ScoreSaber.Id
                         }).ToList();
 
@@ -888,6 +888,15 @@ internal class DatabaseClient
                 return;
             }
         }
+    }
+
+    public async Task UpdateValue(string table, string columnKey, object rowKey, string columnToEdit, object newValue, MySqlConnection connection)
+    {
+        if (!_bot._status.DatabaseInitialLoadCompleted)
+            return;
+
+        _queue.RunCommand(new MySqlCommand(_helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(_bot._watcher);
+        return;
     }
 
     public async Task Dispose()

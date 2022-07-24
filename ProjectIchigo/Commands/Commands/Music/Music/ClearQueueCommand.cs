@@ -8,7 +8,7 @@ internal class ClearQueueCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -49,7 +49,7 @@ internal class ClearQueueCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(ctx.User.Id))
+            if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -66,12 +66,12 @@ internal class ClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(ctx.User.Id);
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(ctx.User.Id);
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Clear();
-                ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
+                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -90,7 +90,7 @@ internal class ClearQueueCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new()
             {
-                Description = $"❓ `You voted to clear the current queue. ({ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"❓ `You voted to clear the current queue. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
                 Color = EmbedColors.AwaitingInput,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
@@ -126,7 +126,7 @@ internal class ClearQueueCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(e.User.Id))
+                        if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to clear the current queue.`").AsEphemeral());
                             return;
@@ -140,12 +140,12 @@ internal class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(e.User.Id);
+                        ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(e.User.Id);
 
-                        if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.SongQueue.Clear();
-                            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+                            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
+                            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -162,7 +162,7 @@ internal class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"❓ `You voted to clear the current queue. ({ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"❓ `You voted to clear the current queue. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot._watcher);

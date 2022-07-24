@@ -2,9 +2,9 @@
 
 namespace ProjectIchigo.Entities;
 
-internal class SharedCommandContext
+public class SharedCommandContext
 {
-    internal SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
+    public SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
     {
         CommandType = CommandType.PrefixCommand;
 
@@ -26,8 +26,8 @@ internal class SharedCommandContext
 
         BaseCommand = cmd;
     }
-    
-    internal SharedCommandContext(DiscordMessage message, Bot _bot)
+
+    public SharedCommandContext(DiscordMessage message, Bot _bot)
     {
         CommandType = CommandType.Custom;
 
@@ -45,8 +45,8 @@ internal class SharedCommandContext
             Context = this
         };
     }
-    
-    internal SharedCommandContext(BaseCommand cmd, InteractionContext ctx, Bot _bot)
+
+    public SharedCommandContext(BaseCommand cmd, InteractionContext ctx, Bot _bot)
     {
         CommandType = CommandType.ApplicationCommand;
 
@@ -68,8 +68,8 @@ internal class SharedCommandContext
 
         BaseCommand = cmd;
     }
-    
-    internal SharedCommandContext(BaseCommand cmd, ContextMenuContext ctx, Bot _bot)
+
+    public SharedCommandContext(BaseCommand cmd, ContextMenuContext ctx, Bot _bot)
     {
         CommandType = CommandType.ContextMenu;
 

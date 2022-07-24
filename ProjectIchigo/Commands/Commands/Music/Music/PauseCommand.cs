@@ -8,7 +8,7 @@ internal class PauseCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -49,9 +49,9 @@ internal class PauseCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused = !ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused;
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused = !ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused;
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused)
+            if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused)
                 _ = conn.PauseAsync();
             else
                 _ = conn.ResumeAsync();
@@ -59,7 +59,7 @@ internal class PauseCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
 
-                Description = (ctx.Bot._guilds.List[ctx.Guild.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
+                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused ? "✅ `Paused playback.`" : "✅ `Resumed playback.`"),
                 Color = EmbedColors.Success,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

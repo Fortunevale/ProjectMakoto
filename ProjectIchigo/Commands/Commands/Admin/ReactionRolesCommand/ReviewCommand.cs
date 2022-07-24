@@ -8,7 +8,7 @@ internal class ReviewCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             await RespondOrEdit(new DiscordEmbedBuilder
@@ -24,7 +24,7 @@ internal class ReviewCommand : BaseCommand
 
             List<string> Desc = new();
 
-            if (ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles.Count == 0)
+            if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count == 0)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -37,7 +37,7 @@ internal class ReviewCommand : BaseCommand
                 return;
             }
 
-            foreach (var b in ctx.Bot._guilds.List[ctx.Guild.Id].ReactionRoles)
+            foreach (var b in ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles)
             {
                 var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
                 var role = ctx.Guild.GetRole(b.Value.RoleId);

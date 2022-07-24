@@ -8,7 +8,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
         {
             string id = (string)arguments["id"];
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             bool AddLinkButton = true;
@@ -52,12 +52,12 @@ internal class ScoreSaberProfileCommand : BaseCommand
                     return;
                 }
 
-                if (!ctx.Bot._users.List.ContainsKey(user.Id))
-                    ctx.Bot._users.List.Add(user.Id, new Users.Info(ctx.Bot));
+                if (!ctx.Bot._users.ContainsKey(user.Id))
+                    ctx.Bot._users.Add(user.Id, new User(ctx.Bot, user.Id));
 
-                if (ctx.Bot._users.List[user.Id].ScoreSaber.Id != 0)
+                if (ctx.Bot._users[user.Id].ScoreSaber.Id != 0)
                 {
-                    id = ctx.Bot._users.List[user.Id].ScoreSaber.Id.ToString();
+                    id = ctx.Bot._users[user.Id].ScoreSaber.Id.ToString();
                     AddLinkButton = false;
                 }
                 else

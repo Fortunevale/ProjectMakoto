@@ -8,7 +8,7 @@ internal class HugCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             string gif = await SocialCommandAbstractions.GetGif("hug");

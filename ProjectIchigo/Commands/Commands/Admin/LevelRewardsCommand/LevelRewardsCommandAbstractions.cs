@@ -5,13 +5,13 @@ internal class LevelRewardsCommandAbstractions
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
         string str = "";
-        if (ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Count != 0)
+        if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Count != 0)
         {
-            foreach (var b in ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.OrderBy(x => x.Level))
+            foreach (var b in ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.OrderBy(x => x.Level))
             {
                 if (!ctx.Guild.Roles.ContainsKey(b.RoleId))
                 {
-                    ctx.Bot._guilds.List[ctx.Guild.Id].LevelRewards.Remove(b);
+                    ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Remove(b);
                     continue;
                 }
 

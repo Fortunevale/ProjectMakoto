@@ -8,7 +8,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var embed = new DiscordEmbedBuilder
@@ -55,8 +55,8 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                if (!ctx.Bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Contains(channel.Id))
-                    ctx.Bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Add(channel.Id);
+                if (!ctx.Bot._guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(channel.Id))
+                    ctx.Bot._guilds[ctx.Guild.Id].AutoUnarchiveThreads.Add(channel.Id);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -67,7 +67,7 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    var channel = await PromptCustomSelection(ctx.Bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads
+                    var channel = await PromptCustomSelection(ctx.Bot._guilds[ctx.Guild.Id].AutoUnarchiveThreads
                         .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                     ChannelToRemove = Convert.ToUInt64(channel);
@@ -78,8 +78,8 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                if (ctx.Bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelToRemove))
-                    ctx.Bot._guilds.List[ctx.Guild.Id].AutoUnarchiveThreads.Remove(ChannelToRemove);
+                if (ctx.Bot._guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelToRemove))
+                    ctx.Bot._guilds[ctx.Guild.Id].AutoUnarchiveThreads.Remove(ChannelToRemove);
 
                 await ExecuteCommand(ctx, arguments);
                 return;

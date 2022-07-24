@@ -13,17 +13,23 @@ internal class DatabaseQueue
 
     internal async Task QueueHandler()
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             while (true)
             {
-                if (Queue.Count == 0 || !Queue.Any(x => !x.Value.Executed && !x.Value.Failed))
+                if (Queue.Count == 0 || !Queue.Any<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed))
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                     continue;
                 }
 
-                var b = Queue.First(x => !x.Value.Executed && !x.Value.Failed);
+                KeyValuePair<string, RequestQueue> b;
+
+                try
+                {
+                    b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
+                }
+                catch (Exception) { continue; }
 
                 if (b.Value is null)
                     continue;
@@ -36,7 +42,7 @@ internal class DatabaseQueue
                         {
                             try
                             {
-                                _logger.LogTrace($"Executing command on Database '{b.Value.Command.Connection.Database}': '{b.Value.Command.CommandText.TruncateWithIndication(30)}'");
+                                _logger.LogTrace($"Executing command on Database '{b.Value.Command.Connection.Database}': '{b.Value.Command.CommandText.TruncateWithIndication(100)}'");
                             }
                             catch { }
 
@@ -65,17 +71,17 @@ internal class DatabaseQueue
                 }
                 finally
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(10);
                 }
             }
-        });
+        }).Add(_bot._watcher);
     }
 
-    internal async Task RunCommand(MySqlCommand cmd)
+    internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal)
     {
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd });
+        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(1);
@@ -96,7 +102,7 @@ internal class DatabaseQueue
     {
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn });
+        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low });
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(50);
@@ -120,6 +126,7 @@ internal class DatabaseQueue
     internal class RequestQueue
     {
         public DatabaseRequestType RequestType { get; set; }
+        public QueuePriority Priority { get; set; } = QueuePriority.Normal;
         public MySqlConnection Connection { get; set; }
         public MySqlCommand Command { get; set; }
         public bool Executed { get; set; }

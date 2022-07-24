@@ -4,6 +4,6 @@ internal class NameNormalizerCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"`Name Normalizer Enabled`: {ctx.Bot._guilds.List[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled.BoolToEmote(ctx.Client)}";
+        return $"`Name Normalizer Enabled`: {ctx.Bot._guilds[ctx.Guild.Id].NameNormalizerSettings.NameNormalizerEnabled.BoolToEmote(ctx.Client)}";
     }
 }
