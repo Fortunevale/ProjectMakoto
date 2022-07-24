@@ -66,12 +66,12 @@ internal class DiscordEventHandler
         }
 
         if (member is not null)
-            if (!_bot._users.List.ContainsKey(member.Id))
-                _bot._users.List.Add(member.Id, new(_bot));
+            if (!_bot._users.ContainsKey(member.Id))
+                _bot._users.Add(member.Id, new(_bot, member.Id));
 
         if (user is not null)
-            if (!_bot._users.List.ContainsKey(user.Id))
-                _bot._users.List.Add(user.Id, new(_bot));
+            if (!_bot._users.ContainsKey(user.Id))
+                _bot._users.Add(user.Id, new(_bot, user.Id));
     }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)

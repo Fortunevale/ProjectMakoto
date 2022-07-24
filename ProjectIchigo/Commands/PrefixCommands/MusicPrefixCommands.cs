@@ -1,6 +1,6 @@
 namespace ProjectIchigo.PrefixCommands;
 
-internal class Music : BaseCommandModule
+internal class MusicPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
@@ -37,7 +37,7 @@ internal class Music : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot._users[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -186,7 +186,7 @@ internal class Music : BaseCommandModule
         //{
         //    Task.Run(async () =>
         //    {
-        //        if (await _bot._users.List[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+        //        if (await _bot._users[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
         //            return;
 
         //        if (ctx.Command.Parent is not null)

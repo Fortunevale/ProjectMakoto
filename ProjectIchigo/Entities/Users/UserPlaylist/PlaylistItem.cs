@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-internal class PlaylistItem
+public class PlaylistItem
 {
     private string _Title { get; set; }
     [JsonProperty(Required = Required.Always)]

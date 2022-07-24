@@ -10,7 +10,7 @@ internal class ClearBackupCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))

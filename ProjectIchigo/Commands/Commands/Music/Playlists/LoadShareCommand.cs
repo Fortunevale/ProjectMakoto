@@ -9,10 +9,10 @@ internal class LoadShareCommand : BaseCommand
             ulong userid = (ulong)arguments["userid"];
             string id = (string)arguments["id"];
 
-            if (!ctx.Bot._users.List.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.List.Add(ctx.User.Id, new Users.Info(ctx.Bot));
+            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
+                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -81,7 +81,7 @@ internal class LoadShareCommand : BaseCommand
                     Timestamp = DateTime.UtcNow
                 }));
 
-                if (ctx.Bot._users.List[ctx.Member.Id].UserPlaylists.Count >= 10)
+                if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -98,7 +98,7 @@ internal class LoadShareCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot._users.List[ctx.Member.Id].UserPlaylists.Add(ImportJson);
+                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(ImportJson);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

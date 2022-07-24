@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Enums;
 
-internal enum CommandType
+public enum CommandType
 {
     ApplicationCommand,
     ContextMenu,

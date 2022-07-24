@@ -4,7 +4,7 @@ internal class ReactionRolesCommandAbstractions
 {
     internal static async Task<Dictionary<ulong, DiscordMessage>> CheckForInvalid(SharedCommandContext ctx)
     {
-        if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+        if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
             return new();
 
         Dictionary<ulong, DiscordMessage> messageCache = new();

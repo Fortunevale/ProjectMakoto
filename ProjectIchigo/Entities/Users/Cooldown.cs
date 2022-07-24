@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-internal class Cooldown
+public class Cooldown
 {
     internal Cooldown(Bot _bot)
     {

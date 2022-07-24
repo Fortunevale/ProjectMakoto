@@ -160,7 +160,7 @@ internal class ExperienceHandler
                             {
                                 _bot.discordClient.ComponentInteractionCreated -= RunInteraction;
 
-                                _bot._users.List[user.Id].ExperienceUserSettings.DirectMessageOptOut = true;
+                                _bot._users[user.Id].ExperienceUserSettings.DirectMessageOptOut = true;
 
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 

@@ -55,7 +55,7 @@ public class Guild
             if (ProcessedAuditLogs.Count > 50)
                 ProcessedAuditLogs.Remove(ProcessedAuditLogs[0]);
 
-            _ = Bot.DatabaseClient.SyncDatabase();
+            _ = Bot.DatabaseClient.FullSyncDatabase();
         };
     }
 
@@ -63,7 +63,7 @@ public class Guild
     {
         return (s, e) =>
         {
-            _ = Bot.DatabaseClient.SyncDatabase();
+            _ = Bot.DatabaseClient.FullSyncDatabase();
         };
     }
 }

@@ -1,5 +1,5 @@
 ﻿namespace ProjectIchigo.ApplicationCommands;
-internal class Music : ApplicationCommandsModule
+internal class MusicAppCommands : ApplicationCommandsModule
 {
     [SlashCommandGroup("music", "Allows to play music and change the current playback settings")]
     public class MusicCommands : ApplicationCommandsModule

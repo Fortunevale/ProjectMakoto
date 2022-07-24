@@ -41,7 +41,7 @@ public class CrosspostSettings
     {
         return (s, e) =>
         {
-            _ = Bot.DatabaseClient.SyncDatabase();
+            _ = Bot.DatabaseClient.FullSyncDatabase();
         };
     }
 }

@@ -1,5 +1,3 @@
-using ProjectIchigo.Commands.PrefixCommands.Converters;
-
 namespace ProjectIchigo;
 
 public class Bot
@@ -15,7 +13,7 @@ public class Bot
 
     internal Status _status = new();
     internal Dictionary<ulong, Guild> _guilds = new();
-    internal Users _users = new();
+    internal Dictionary<ulong, User> _users = new();
 
 
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
@@ -254,14 +252,14 @@ public class Bot
 
             _logger.LogDebug($"Registering Commands..");
 
-            cNext.RegisterCommands<PrefixCommands.User>();
-            cNext.RegisterCommands<PrefixCommands.Music>();
-            cNext.RegisterCommands<PrefixCommands.Social>();
-            cNext.RegisterCommands<PrefixCommands.ScoreSaber>();
-            cNext.RegisterCommands<PrefixCommands.Mod>();
-            cNext.RegisterCommands<PrefixCommands.Admin>();
+            cNext.RegisterCommands<PrefixCommands.UserPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.ModPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.AdminPrefixCommands>();
             
-            cNext.RegisterCommands<PrefixCommands.Maintainers>();
+            cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
 
 
 
@@ -366,23 +364,23 @@ public class Bot
 
                     if (_status.LoadedConfig.IsDev)
                     {
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Maintainers>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Admin>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Mod>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Social>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaber>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.Music>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.User>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.AdminAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ModAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.UserAppCommands>(_status.LoadedConfig.AssetsGuildId);
                     }
                     else
                     {
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Maintainers>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Admin>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Mod>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Social>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaber>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.Music>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.User>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.AdminAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ModAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.UserAppCommands>();
                     }
                 }).Add(_watcher);
 
@@ -498,7 +496,7 @@ public class Bot
                             if (!users.Contains(c.Key))
                                 users.Add(c.Key);
 
-                    foreach (var b in _users.List)
+                    foreach (var b in _users)
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
@@ -776,7 +774,7 @@ public class Bot
             }
 
             await _databaseClient.CheckGuildTables();
-            await _databaseClient.SyncDatabase(true);
+            await _databaseClient.FullSyncDatabase(true);
 
         }).Add(_watcher);
     }
@@ -784,7 +782,7 @@ public class Bot
     private async Task FlushToDatabase()
     {
         _logger.LogInfo($"Flushing to database..");
-        await DatabaseClient.SyncDatabase(true);
+        await DatabaseClient.FullSyncDatabase(true);
         _logger.LogDebug($"Flushed to database.");
 
         await Task.Delay(1000);

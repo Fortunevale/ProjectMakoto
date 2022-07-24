@@ -1,4 +1,4 @@
-namespace ProjectIchigo.Util;
+namespace ProjectIchigo.Database;
 
 internal class DatabaseInit
 {
@@ -146,7 +146,7 @@ internal class DatabaseInit
 
                 foreach (var b in memberList)
                 {
-                    Member DbUser = new Member(_bot._guilds[Convert.ToUInt64(table)], b.userid);
+                    Member DbUser = new(_bot._guilds[Convert.ToUInt64(table)], b.userid);
                     _bot._guilds[Convert.ToUInt64(table)].Members.Add(b.userid, DbUser);
 
                     DbUser.Experience = new(DbUser)
@@ -176,33 +176,36 @@ internal class DatabaseInit
         IEnumerable<DatabaseUsers> users = _bot._databaseClient.mainDatabaseConnection.Query<DatabaseUsers>(_bot._databaseClient._helper.GetLoadCommand("users", DatabaseColumnLists.users));
 
         foreach (var b in users)
-            _bot._users.List.Add(b.userid, new Users.Info(_bot)
-            {
-                UrlSubmissions = new()
-                {
-                    AcceptedSubmissions = JsonConvert.DeserializeObject<List<string>>(b.submission_accepted_submissions),
-                    LastTime = b.submission_last_datetime,
-                    AcceptedTOS = b.submission_accepted_tos
-                },
-                AfkStatus = new()
-                {
-                    Reason = b.afk_reason,
-                    TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since)),
-                    Messages = JsonConvert.DeserializeObject<List<MessageDetails>>(b.afk_pings),
-                    MessagesAmount = b.afk_pingamount
-                },
-                ScoreSaber = new()
-                {
-                    Id = b.scoresaber_id
-                },
-                ExperienceUserSettings = new()
-                {
-                    DirectMessageOptOut = b.experience_directmessageoptout
-                },
-                UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>((b.playlists is null or "null" or "" ? "[]" : b.playlists)),
-            });
+        {
+            _bot._users.Add(b.userid, new User(_bot, b.userid));
 
-        _logger.LogInfo($"Loaded {_bot._users.List.Count} users from table 'users'.");
+            var DbUser = _bot._users[b.userid];
+
+            DbUser.UrlSubmissions = new(DbUser)
+            {
+                AcceptedSubmissions = JsonConvert.DeserializeObject<List<string>>(b.submission_accepted_submissions),
+                LastTime = new DateTime().ToUniversalTime().AddTicks(b.submission_last_datetime),
+                AcceptedTOS = b.submission_accepted_tos
+            };
+            DbUser.AfkStatus = new(DbUser)
+            {
+                Reason = b.afk_reason,
+                TimeStamp = (b.afk_since == 0 ? DateTime.UnixEpoch : new DateTime().ToUniversalTime().AddTicks((long)b.afk_since)),
+                Messages = JsonConvert.DeserializeObject<List<MessageDetails>>(b.afk_pings),
+                MessagesAmount = b.afk_pingamount
+            };
+            DbUser.ScoreSaber = new(DbUser)
+            {
+                Id = b.scoresaber_id
+            };
+            DbUser.ExperienceUserSettings = new(DbUser)
+            {
+                DirectMessageOptOut = b.experience_directmessageoptout
+            };
+            DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>((b.playlists is null or "null" or "" ? "[]" : b.playlists));
+        }
+
+        _logger.LogInfo($"Loaded {_bot._users.Count} users from table 'users'.");
 
 
 

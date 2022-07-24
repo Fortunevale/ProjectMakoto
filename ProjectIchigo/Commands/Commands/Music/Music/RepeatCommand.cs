@@ -8,7 +8,7 @@ internal class RepeatCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();

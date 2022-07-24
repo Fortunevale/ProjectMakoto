@@ -8,15 +8,15 @@ internal class UrlSubmitCommand : BaseCommand
         {
             string url = (string)arguments["url"];
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            if (!ctx.Bot._users.List.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.List.Add(ctx.User.Id, new Users.Info(ctx.Bot));
+            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
+                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
 
             var interactivity = ctx.Client.GetInteractivity();
 
-            if (!ctx.Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS)
+            if (!ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS)
             {
                 var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
 
@@ -48,7 +48,7 @@ internal class UrlSubmitCommand : BaseCommand
 
                 await TosAccept.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot._users.List[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
+                ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
 
                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(EmbedColors.Success).WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
@@ -67,9 +67,9 @@ internal class UrlSubmitCommand : BaseCommand
 
             await RespondOrEdit(embed);
 
-            if (ctx.Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot._status))
+            if (ctx.Bot._users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot._status))
             {
-                embed.Description = $"`You cannot submit a domain for the next {ctx.Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
+                embed.Description = $"`You cannot submit a domain for the next {ctx.Bot._users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
                 embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = Resources.LogIcons.Error;
                 _ = RespondOrEdit(embed.Build());
@@ -218,7 +218,7 @@ internal class UrlSubmitCommand : BaseCommand
                     GuildOrigin = ctx.Guild.Id
                 });
 
-                ctx.Bot._users.List[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
+                ctx.Bot._users[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                 embed.Description = $"`Submission created. Thanks for your contribution.`";
                 embed.Color = EmbedColors.Success;

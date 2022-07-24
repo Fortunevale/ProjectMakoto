@@ -29,7 +29,7 @@ internal class DatabaseQueue
                 {
                     b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
                 }
-                catch (Exception){ continue; }
+                catch (Exception) { continue; }
 
                 if (b.Value is null)
                     continue;
@@ -126,7 +126,7 @@ internal class DatabaseQueue
     internal class RequestQueue
     {
         public DatabaseRequestType RequestType { get; set; }
-        public QueuePriority Priority { get; set; }
+        public QueuePriority Priority { get; set; } = QueuePriority.Normal;
         public MySqlConnection Connection { get; set; }
         public MySqlCommand Command { get; set; }
         public bool Executed { get; set; }

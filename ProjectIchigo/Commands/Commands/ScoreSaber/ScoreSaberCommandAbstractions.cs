@@ -4,14 +4,14 @@ internal class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
-        if (!ctx.Bot._users.List.ContainsKey(ctx.User.Id))
-            ctx.Bot._users.List.Add(ctx.User.Id, new Users.Info(ctx.Bot));
+        if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
+            ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
 
         if (string.IsNullOrWhiteSpace(id))
         {
-            if (ctx.Bot._users.List[ctx.User.Id].ScoreSaber.Id != 0)
+            if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id != 0)
             {
-                id = ctx.Bot._users.List[ctx.User.Id].ScoreSaber.Id.ToString();
+                id = ctx.Bot._users[ctx.User.Id].ScoreSaber.Id.ToString();
             }
             else
             {
@@ -75,7 +75,7 @@ internal class ScoreSaberCommandAbstractions
                         {
                             AddLinkButton = false;
                             ShowProfile().Add(ctx.Bot._watcher, ctx);
-                            ctx.Bot._users.List[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
+                            ctx.Bot._users[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -204,7 +204,7 @@ internal class ScoreSaberCommandAbstractions
 
                 DiscordMessageBuilder builder = new();
 
-                if (ctx.Bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
                 await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed).AddComponents((scoreType == RequestParameters.ScoreType.TOP ? TopScoreInteractionRow : RecentScoreInteractionRow)));
@@ -228,7 +228,7 @@ internal class ScoreSaberCommandAbstractions
 
                 DiscordMessageBuilder builder = new();
 
-                if (ctx.Bot._users.List[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
                 if (!string.IsNullOrWhiteSpace(LoadedGraph))

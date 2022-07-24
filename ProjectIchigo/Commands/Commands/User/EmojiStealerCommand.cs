@@ -35,7 +35,7 @@ internal class EmojiStealerCommand : BaseCommand
                 }
             }
 
-            if (await ctx.Bot._users.List[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             HttpClient client = new();

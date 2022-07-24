@@ -1,5 +1,5 @@
 ﻿namespace ProjectIchigo.Commands;
-internal abstract class BaseCommand
+public abstract class BaseCommand
 {
     internal SharedCommandContext Context { private get; set; }
 

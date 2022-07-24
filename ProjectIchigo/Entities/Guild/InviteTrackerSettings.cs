@@ -16,7 +16,7 @@ public class InviteTrackerSettings
 
     private void Cache_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        _ = Bot.DatabaseClient.SyncDatabase();
+        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
     private Guild Parent { get; set; }
