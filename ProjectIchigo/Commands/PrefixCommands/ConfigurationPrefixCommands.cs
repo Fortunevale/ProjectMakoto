@@ -1,12 +1,12 @@
 namespace ProjectIchigo.PrefixCommands;
 
-internal class AdminPrefixCommands : BaseCommandModule
+internal class ConfigurationPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
 
     [Group("join"), Aliases("joinsettings", "join-settings"),
-    CommandModule("admin"), 
+    CommandModule("configuration"), 
     Description("Allows to review and change settings in the event somebody joins the server")]
     public class JoinSettings : BaseCommandModule
     {
@@ -49,7 +49,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("experience"), Aliases("experiencesettings", "experience-settings"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change settings related to experience")]
     public class ExperienceSettings : BaseCommandModule
     {
@@ -92,7 +92,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("levelrewards"), Aliases("level-rewards", "rewards"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review, add, remove and modify Level Rewards")]
     public class LevelRewards : BaseCommandModule
     {
@@ -135,7 +135,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("phishing"), Aliases("phishingsettings", "phishing-settings"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change settings for the phishing detection")]
     public class PhishingSettings : BaseCommandModule
     {
@@ -178,7 +178,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("bumpreminder"), Aliases("bump-reminder"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review, set up and change settings for the Bump Reminder")]
     public class BumpReminder : BaseCommandModule
     {
@@ -221,7 +221,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("actionlog"), Aliases("action-log"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change settings for the actionlog")]
     public class ActionLog : BaseCommandModule
     {
@@ -274,7 +274,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change settings for the automatic crossposts")]
     public class AutoCrosspost : BaseCommandModule
     {
@@ -318,7 +318,7 @@ internal class AdminPrefixCommands : BaseCommandModule
 
 
     [Group("reactionroles"), Aliases("reactionrole", "reaction-roles", "reaction-role"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change settings for Reaction Roles")]
     public class ReactionRoles : BaseCommandModule
     {
@@ -399,7 +399,7 @@ internal class AdminPrefixCommands : BaseCommandModule
 
 
     [Group("invoiceprivacy"), Aliases("in-voice-privacy", "vc-privacy", "vcprivacy"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change In-Voice Text Channel Privacy Settings")]
     public class InVoiceTextPrivacy : BaseCommandModule
     {
@@ -443,7 +443,7 @@ internal class AdminPrefixCommands : BaseCommandModule
 
 
     [Group("invitetracker"), Aliases("invite-tracker", "invitetracking", "invite-tracking"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change Invite Tracker Settings")]
     public class InviteTracker : BaseCommandModule
     {
@@ -486,7 +486,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("namenormalizer"), Aliases("name-normalizer"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change Name Normalizer Settings")]
     public class NameNormalizer : BaseCommandModule
     {
@@ -538,7 +538,7 @@ internal class AdminPrefixCommands : BaseCommandModule
     }
 
     [Group("autounarchive"), Aliases("auto-unarchive"),
-    CommandModule("admin"),
+    CommandModule("configuration"),
     Description("Allows to review and change Auto Thread Unarchiver Settings")]
     public class AutoUnarchive : BaseCommandModule
     {

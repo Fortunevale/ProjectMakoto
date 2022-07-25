@@ -27,7 +27,9 @@ public class Bot
 
 
     internal ScoreSaberClient _scoreSaberClient { get; set; }
+    internal TranslationClient _translationClient { get; set; }
     internal CountryCodes _countryCodes { get; set; }
+    internal LanguageCodes _languageCodes { get; set; }
 
 
     internal BumpReminder _bumpReminder { get; set; }
@@ -68,6 +70,7 @@ public class Bot
         }
 
         _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
+        _translationClient = TranslationClient.Initialize();
 
         _logger.LogDebug($"Enviroment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
@@ -252,12 +255,12 @@ public class Bot
 
             _logger.LogDebug($"Registering Commands..");
 
-            cNext.RegisterCommands<PrefixCommands.UserPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
             cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
             cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
             cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ModPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.AdminPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
+            cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
             
             cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
 
@@ -365,22 +368,22 @@ public class Bot
                     if (_status.LoadedConfig.IsDev)
                     {
                         appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.AdminAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ModAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(_status.LoadedConfig.AssetsGuildId);
                         appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(_status.LoadedConfig.AssetsGuildId);
                         appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(_status.LoadedConfig.AssetsGuildId);
                         appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.UserAppCommands>(_status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(_status.LoadedConfig.AssetsGuildId);
                     }
                     else
                     {
                         appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.AdminAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ModAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.UserAppCommands>();
+                        appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
                     }
                 }).Add(_watcher);
 

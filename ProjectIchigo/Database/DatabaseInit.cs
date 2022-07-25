@@ -293,11 +293,23 @@ internal class DatabaseInit
                         "sa" => "South America",
                         _ => "Invalid Continent"
                     }
-                }
-            );
+                });
             }
 
             _logger.LogInfo($"Loaded {_bot._countryCodes.List.Count} countries.");
+
+            _logger.LogInfo($"Loading Language Codes..");
+            _bot._languageCodes = new();
+            List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>((await new HttpClient().GetStringAsync("https://fortunevale.dd-dns.de/Languages.json")));
+            foreach (var b in lc)
+            {
+                _bot._languageCodes.List.Add(new LanguageCodes.LanguageInfo
+                {
+                    Code = b[0],
+                    Name = b[1],
+                });
+            }
+            _logger.LogInfo($"Loaded {_bot._languageCodes.List.Count} languages.");
         }
         catch (Exception ex)
         {

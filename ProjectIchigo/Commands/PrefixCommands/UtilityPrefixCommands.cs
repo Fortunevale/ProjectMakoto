@@ -1,13 +1,13 @@
 namespace ProjectIchigo.PrefixCommands;
 
-internal class UserPrefixCommands : BaseCommandModule
+internal class UtilityPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
 
 
     [Command("help"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Shows all available commands, their usage and their description")]
     public async Task Help(CommandContext ctx)
     {
@@ -103,7 +103,7 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("user-info"), Aliases("userinfo"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Shows information about you or the mentioned user")]
     public async Task UserInfo(CommandContext ctx, DiscordUser victim = null)
     {
@@ -119,7 +119,7 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("avatar"), Aliases("pfp"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Sends your or the mentioned user's avatar as an embedded image")]
     public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
     {
@@ -135,7 +135,7 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("banner"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Sends your or the mentioned user's banner as an embedded image")]
     public async Task Banner(CommandContext ctx, DiscordUser victim = null)
     {
@@ -151,7 +151,7 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("rank"), Aliases("level", "lvl"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Shows your or the mentioned user's rank and rank progress")]
     public async Task Rank(CommandContext ctx, DiscordUser victim = null)
     {
@@ -167,7 +167,7 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("leaderboard"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Shows the current experience leaderboard")]
     public async Task Leaderboard(CommandContext ctx, [Description("3-50")] int ShowAmount = 10)
     {
@@ -183,7 +183,7 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("submit-url"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Allows submission of new malicous urls to our database")]
     public async Task UrlSubmit(CommandContext ctx, [Description("URL")] string url)
     {
@@ -199,13 +199,26 @@ internal class UserPrefixCommands : BaseCommandModule
 
 
     [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
-    CommandModule("user"),
+    CommandModule("utility"),
     Description("Steals emojis of the message that this command was replied to")]
     public async Task EmojiStealer(CommandContext ctx)
     {
         Task.Run(async () =>
         {
             await new EmojiStealerCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("translate"),
+    CommandModule("utility"),
+    Description("Translate a users message")]
+    public async Task Translate(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new TranslateCommand().ExecuteCommand(ctx, _bot);
         }).Add(_bot._watcher, ctx);
     }
 }

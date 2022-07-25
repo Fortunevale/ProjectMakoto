@@ -1,5 +1,5 @@
 ﻿namespace ProjectIchigo.ApplicationCommands;
-internal class UserAppCommands : ApplicationCommandsModule
+internal class UtilityAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
@@ -81,6 +81,18 @@ internal class UserAppCommands : ApplicationCommandsModule
         Task.Run(async () =>
         {
             await new EmojiStealerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "message", ctx.TargetMessage }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+    
+    [ContextMenu(ApplicationCommandType.Message, "Translate Message")]
+    public async Task Translate(ContextMenuContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new TranslateCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "message", ctx.TargetMessage }
             });
