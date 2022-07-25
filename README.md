@@ -56,6 +56,7 @@ Current noteable features are:
 - [Xorog.UniversalExtensions](https://github.com/TheXorog/Xorog.UniversalExtensions)
 <br></br>
 - [Lavalink](https://github.com/freyacodes/Lavalink)
+- [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) (Please set up your own Instance.)
 - [A MySQL/MariaDB Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
 
 ### Required APIs, Keys and Tokens
@@ -74,7 +75,8 @@ Current noteable features are:
 ## Credits
 
 - [DisCatSharp](https://github.com/Aiko-IT-Systems/DisCatSharp) by Aiko-IT-Systems
-- [Lavalink](https://github.com/freyacodes/Lavalink) by  freyacodes
+- [Lavalink](https://github.com/freyacodes/Lavalink) by freyacodes
+- [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) by LibreTranslate
 #### Phishing Link Repositories
 - [discord-tokenlogger-link-list](https://github.com/nikolaischunk/discord-tokenlogger-link-list/) by nikolaischunk
 - [links](https://github.com/DevSpen/links/) by DevSpen
