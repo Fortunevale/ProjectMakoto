@@ -38,21 +38,33 @@ internal class TranslateCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            HttpClient client = new HttpClient();
+            if (bMessage.Content.IsNullOrWhiteSpace())
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`There is no content to translate in the message you selected.`",
+                    Color = EmbedColors.Error,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+                return;
+            }
 
-            var languagesResponse = await client.GetAsync($"http://{Secrets.Secrets.LibreTranslateHost}/languages");
+            HttpClient client = new();
 
-            var TranslationTargets = JsonConvert.DeserializeObject<List<LibreTranslateLanguage>>(await languagesResponse.Content.ReadAsStringAsync());
+            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36");
 
-            var TranslationSources = TranslationTargets.ToList();
-            TranslationSources.Insert(0, new LibreTranslateLanguage { code = "auto", name = "Auto Detect (experimental)" });
-
-            var TranslationSourcesSelect = new DiscordSelectComponent("Source Language", TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code, null, (x.code == "auto"))));
-            var ConfirmButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Translate", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✒")));
+            var GoogleButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Google (slow, accurate)", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1001098467550179469)));
+            var LibreTranslateButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "LibreTranslate (fast, less accurate)", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1001098468602945598)));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`Please select the languages.`",
+                Description = $"`What provider do you want to use?`",
                 Color = EmbedColors.AwaitingInput,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
@@ -61,94 +73,204 @@ internal class TranslateCommand : BaseCommand
                 },
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
-            }));
+            }).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(Resources.CancelButton));
 
-            string Source;
+            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
 
-            try
-            {
-                var v = new List<DiscordSelectComponentOption>();
-
-                foreach (var b in TranslationSources)
-                {
-                    DiscordEmoji flag_emote = null;
-                    try
-                    { flag_emote = DiscordEmoji.FromName(ctx.Client, $":flag_{b.code.ToLower()}:"); }
-                    catch (Exception) { flag_emote = DiscordEmoji.FromUnicode("⬜"); }
-                    v.Add(new DiscordSelectComponentOption(b.name, b.code, null, false, new DiscordComponentEmoji(flag_emote)));
-                }
-
-                Source = await PromptCustomSelection(v, "Select the Source Language..");
-            }
-            catch (ArgumentException)
+            if (e.TimedOut)
             {
                 ModifyToTimedOut();
-                throw;
+                return;
             }
-            
-            string Target;
 
-            try
+            _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+            if (e.Result.Interaction.Data.CustomId == GoogleButton.CustomId)
             {
-                var v = new List<DiscordSelectComponentOption>();
-
-                foreach (var b in TranslationTargets)
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    DiscordEmoji flag_emote = null;
-                    try
-                    { flag_emote = DiscordEmoji.FromName(ctx.Client, $":flag_{b.code.ToLower()}:"); }
-                    catch (Exception) { flag_emote = DiscordEmoji.FromUnicode("⬜"); }
-                    v.Add(new DiscordSelectComponentOption(b.name, b.code, null, false, new DiscordComponentEmoji(flag_emote)));
+                    Description = $"`Please select the languages.`",
+                    Color = EmbedColors.AwaitingInput,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+
+                string Source;
+
+                try
+                {
+                    Source = await PromptCustomSelection(ctx.Bot._languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
+                }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
+                    throw;
                 }
 
-                Target = await PromptCustomSelection(v, "Select the Target Language..");
-            }
-            catch (ArgumentException)
-            {
-                ModifyToTimedOut();
-                throw;
-            }
+                string Target;
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-            {
-                Description = $"`Translating..`",
-                Color = EmbedColors.Processing,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
+                try
                 {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            }));
-
-            string query;
-
-            using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "q", bMessage.Content },
-                { "source", Source },
-                { "target", Target },
-            }))
-            {
-                query = await content.ReadAsStringAsync();
-            }
-
-            var translateResponse = await client.PostAsync($"http://{Secrets.Secrets.LibreTranslateHost}/translate?{query}", null);
-            var parsedTranslation = JsonConvert.DeserializeObject<LibreTranslateTranslation>(await translateResponse.Content.ReadAsStringAsync());
-
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-            {
-                Description = $"{parsedTranslation.translatedText}",
-                Color = EmbedColors.Info,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
+                    Target = await PromptCustomSelection(ctx.Bot._languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
+                }
+                catch (ArgumentException)
                 {
-                    Name = $"{bMessage.Author.UsernameWithDiscriminator} ({bMessage.Author.Id})",
-                    IconUrl = bMessage.Author.AvatarUrl
-                },
-                Timestamp = bMessage.Timestamp,
-                Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Translated from {(Source == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence.ToString("N0")}%)" : TranslationSources.First(x => x.code == Source).name)} to {TranslationTargets.First(x => x.code == Target).name} using LibreTranslate", IconUrl = "https://cdn.discordapp.com/attachments/906976602557145110/1000921551698399353/cba1464ba45e470db4ec853535218539cf5d4777.png" }
-            }));
+                    ModifyToTimedOut();
+                    throw;
+                }
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Translating..`",
+                    Color = EmbedColors.Processing,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+
+                var TranslationTask = ctx.Bot._translationClient.Translate_a(Source, Target, bMessage.Content);
+
+                int PosInQueue = ctx.Bot._translationClient.Queue.Count;
+
+                bool Announced = false;
+                int Wait = 0;
+
+                while (!TranslationTask.IsCompleted)
+                {
+                    if (Wait > 3 && !Announced)
+                    {
+                        Announced = true;
+
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Description = $"`Your translation request is currently in queue at position {PosInQueue}. This might take a moment to finish..`\n" +
+                                          $"`Your request will be executed, approximately,` {Formatter.Timestamp(DateTime.UtcNow.AddSeconds((PosInQueue * 20) - 3))}`.`",
+                            Color = EmbedColors.Processing,
+                            Author = new DiscordEmbedBuilder.EmbedAuthor
+                            {
+                                Name = ctx.Guild.Name,
+                                IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                            },
+                            Footer = ctx.GenerateUsedByFooter(),
+                            Timestamp = DateTime.UtcNow
+                        }));
+                    }
+
+                    Wait++;
+                    await Task.Delay(1000);
+                }
+
+                var Translation = TranslationTask.Result;
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"{Translation.Item1}",
+                    Color = EmbedColors.Info,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = $"{bMessage.Author.UsernameWithDiscriminator} ({bMessage.Author.Id})",
+                        IconUrl = bMessage.Author.AvatarUrl
+                    },
+                    Timestamp = bMessage.Timestamp,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Translated from {(Source == "auto" ? $"{ctx.Bot._languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot._languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot._languageCodes.List.First(x => x.Code == Target).Name} using Google", IconUrl = "https://cdn.discordapp.com/attachments/906976602557145110/1001112928226910228/2991148.png" }
+                }));
+            }
+            else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
+            {
+                var languagesResponse = await client.GetAsync($"http://{Secrets.Secrets.LibreTranslateHost}/languages");
+
+                var TranslationTargets = JsonConvert.DeserializeObject<List<LibreTranslateLanguage>>(await languagesResponse.Content.ReadAsStringAsync());
+
+                var TranslationSources = TranslationTargets.ToList();
+                TranslationSources.Insert(0, new LibreTranslateLanguage { code = "auto", name = "Auto Detect (experimental)" });
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Please select the languages.`",
+                    Color = EmbedColors.AwaitingInput,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+
+                string Source;
+
+                try
+                {
+                    Source = await PromptCustomSelection(TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Source Language..");
+                }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
+                    throw;
+                }
+
+                string Target;
+
+                try
+                {
+                    Target = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Target Language..");
+                }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
+                    throw;
+                }
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Translating..`",
+                    Color = EmbedColors.Processing,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+
+                string query;
+
+                using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    { "q", bMessage.Content },
+                    { "source", Source },
+                    { "target", Target },
+                }))
+                {
+                    query = await content.ReadAsStringAsync();
+                }
+
+                var translateResponse = await client.PostAsync($"http://{Secrets.Secrets.LibreTranslateHost}/translate?{query}", null);
+                var parsedTranslation = JsonConvert.DeserializeObject<LibreTranslateTranslation>(await translateResponse.Content.ReadAsStringAsync());
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"{parsedTranslation.translatedText}",
+                    Color = EmbedColors.Info,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = $"{bMessage.Author.UsernameWithDiscriminator} ({bMessage.Author.Id})",
+                        IconUrl = bMessage.Author.AvatarUrl
+                    },
+                    Timestamp = bMessage.Timestamp,
+                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Translated from {(Source == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == Source).name)} to {TranslationTargets.First(x => x.code == Target).name} using LibreTranslate", IconUrl = "https://cdn.discordapp.com/attachments/906976602557145110/1000921551698399353/cba1464ba45e470db4ec853535218539cf5d4777.png" }
+                }));
+            }
         });
     }
 }

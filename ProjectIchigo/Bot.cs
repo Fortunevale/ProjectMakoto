@@ -27,7 +27,9 @@ public class Bot
 
 
     internal ScoreSaberClient _scoreSaberClient { get; set; }
+    internal TranslationClient _translationClient { get; set; }
     internal CountryCodes _countryCodes { get; set; }
+    internal LanguageCodes _languageCodes { get; set; }
 
 
     internal BumpReminder _bumpReminder { get; set; }
@@ -68,6 +70,7 @@ public class Bot
         }
 
         _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
+        _translationClient = TranslationClient.Initialize();
 
         _logger.LogDebug($"Enviroment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
