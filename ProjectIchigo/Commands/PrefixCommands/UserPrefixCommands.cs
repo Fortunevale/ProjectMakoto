@@ -208,4 +208,17 @@ internal class UserPrefixCommands : BaseCommandModule
             await new EmojiStealerCommand().ExecuteCommand(ctx, _bot);
         }).Add(_bot._watcher, ctx);
     }
+
+
+
+    [Command("translate"),
+    CommandModule("user"),
+    Description("Translate a users message")]
+    public async Task Translate(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new TranslateCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot._watcher, ctx);
+    }
 }
