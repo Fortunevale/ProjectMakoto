@@ -17,16 +17,16 @@ internal class DatabaseQueue
         {
             while (true)
             {
-                if (Queue.Count == 0 || !Queue.Any<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed))
-                {
-                    Thread.Sleep(10);
-                    continue;
-                }
-
                 KeyValuePair<string, RequestQueue> b;
 
                 try
                 {
+                    if (Queue.Count == 0 || !Queue.Any<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed))
+                    {
+                        Thread.Sleep(10);
+                        continue;
+                    }
+
                     b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
                 }
                 catch (Exception) { continue; }
