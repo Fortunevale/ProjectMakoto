@@ -9,9 +9,12 @@ internal class RegisterCommandsCommand : BaseCommand
             if (!ctx.Bot._status.LoadedConfig.IsDev)
                 throw new Exception("Not in developer mode!");
 
-            await RespondOrEdit("Starting to register commands..");
-
             var appCommands = ctx.Client.GetApplicationCommands();
+
+            if (appCommands.RegisteredCommands.Count > 0)
+                throw new Exception("Commands already registered!");
+
+            await RespondOrEdit("Registering commands. This may take a moment..");
 
             appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
             appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
@@ -20,6 +23,8 @@ internal class RegisterCommandsCommand : BaseCommand
             appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
             appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
             appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
+
+            await ctx.Client.ReconnectAsync(true);
 
             int count = 0;
 
@@ -31,29 +36,7 @@ internal class RegisterCommandsCommand : BaseCommand
 
             try
             {
-                int prevCount = 0;
-                int timeOut = 0;
-
-                while (true)
-                {
-                    if (prevCount != count)
-                    {
-                        prevCount = count;
-                        timeOut = 0;
-
-                        await RespondOrEdit($"Registered {count} commands..");
-                    }
-
-                    timeOut++;
-
-                    if (timeOut > 60)
-                    {
-                        break;
-                    }
-
-                    await Task.Delay(1000);
-                }
-
+                await Task.Delay(90000);
                 await RespondOrEdit($"Registered {count} commands.");
 
                 appCommands.GuildApplicationCommandsRegistered -= GuildApplicationCommandsRegistered;
