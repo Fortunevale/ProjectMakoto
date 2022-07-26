@@ -8,7 +8,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("help"),
     CommandModule("utility"),
-    Description("Shows all available commands, their usage and their description")]
+    Description("Sends you a list of all available commands, their usage and their description via Direct Messages.")]
     public async Task Help(CommandContext ctx)
     {
         Task.Run(async () =>
@@ -104,7 +104,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("user-info"), Aliases("userinfo"),
     CommandModule("utility"),
-    Description("Shows information about you or the mentioned user")]
+    Description("Displays information the bot knows about you or the mentioned user.")]
     public async Task UserInfo(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -120,7 +120,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("avatar"), Aliases("pfp"),
     CommandModule("utility"),
-    Description("Sends your or the mentioned user's avatar as an embedded image")]
+    Description("Displays your or the mentioned user's avatar as an embedded image.")]
     public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -136,7 +136,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("banner"),
     CommandModule("utility"),
-    Description("Sends your or the mentioned user's banner as an embedded image")]
+    Description("Displays your or the mentioned user's banner as an embedded image.")]
     public async Task Banner(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -152,7 +152,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("rank"), Aliases("level", "lvl"),
     CommandModule("utility"),
-    Description("Shows your or the mentioned user's rank and rank progress")]
+    Description("Shows your or the mentioned user's rank and rank progress.")]
     public async Task Rank(CommandContext ctx, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -168,7 +168,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("leaderboard"),
     CommandModule("utility"),
-    Description("Shows the current experience leaderboard")]
+    Description("Displays the current experience rankings on this server.")]
     public async Task Leaderboard(CommandContext ctx, [Description("3-50")] int ShowAmount = 10)
     {
         Task.Run(async () =>
@@ -184,7 +184,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("submit-url"),
     CommandModule("utility"),
-    Description("Allows submission of new malicous urls to our database")]
+    Description("Allows you to contribute a new malicous domain to our database.")]
     public async Task UrlSubmit(CommandContext ctx, [Description("URL")] string url)
     {
         Task.Run(async () =>
@@ -200,7 +200,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
     CommandModule("utility"),
-    Description("Steals emojis of the message that this command was replied to")]
+    Description("Steals all emojis and stickers of a message. Reply to a message to select it.")]
     public async Task EmojiStealer(CommandContext ctx)
     {
         Task.Run(async () =>
@@ -213,7 +213,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("translate"),
     CommandModule("utility"),
-    Description("Translate a users message")]
+    Description("Allows you to translate a message. Reply to a message to select it.")]
     public async Task Translate(CommandContext ctx)
     {
         Task.Run(async () =>

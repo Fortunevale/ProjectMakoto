@@ -7,7 +7,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("join"), Aliases("joinsettings", "join-settings"),
     CommandModule("configuration"), 
-    Description("Allows to review and change settings in the event somebody joins the server")]
+    Description("Allows you to review and change settings in the event somebody joins the server.")]
     public class JoinSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -28,7 +28,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows the currently used settings")]
+        Description("Allows to review the currently used settings in the event somebody joins the server.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -38,7 +38,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modification of the currently used settings")]
+        Description("Allows you to change the currently used settings in the event somebody joins the server.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -50,7 +50,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("experience"), Aliases("experiencesettings", "experience-settings"),
     CommandModule("configuration"),
-    Description("Allows to review and change settings related to experience")]
+    Description("Allows you to review and change settings related to experience.")]
     public class ExperienceSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -71,7 +71,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows the currently used settings")]
+        Description("Allows you to review the currently used settings related to experience.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -81,7 +81,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modification of the currently used settings")]
+        Description("Allows you to change the currently used settings related to experience.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -93,7 +93,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("levelrewards"), Aliases("level-rewards", "rewards"),
     CommandModule("configuration"),
-    Description("Allows to review, add, remove and modify Level Rewards")]
+    Description("Allows you to review, add and change Level Rewards.")]
     public class LevelRewards : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -114,7 +114,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Level Rewards")]
+        Description("Allows you to review currently defined Level Rewards.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -124,7 +124,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows adding, removing and modifying currently defined Level Rewards")]
+        Description("Allows you to add, remove and modify currently defined Level Rewards.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -136,7 +136,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("phishing"), Aliases("phishingsettings", "phishing-settings"),
     CommandModule("configuration"),
-    Description("Allows to review and change settings for the phishing detection")]
+    Description("Allows you to review and change settings related to phishing link protection.")]
     public class PhishingSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -157,7 +157,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Phishing Protection settings")]
+        Description("Allows you to review the currently used settings related to phshing link protection.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -167,7 +167,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently used Phishing Protection settings")]
+        Description("Allows you to change the currently used settings related to phishing link protection.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -179,7 +179,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("bumpreminder"), Aliases("bump-reminder"),
     CommandModule("configuration"),
-    Description("Allows to review, set up and change settings for the Bump Reminder")]
+    Description("Allows you to review, set up and change settings related to the Bump Reminder.")]
     public class BumpReminder : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -200,7 +200,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Bump Reminder settings")]
+        Description("Allows you to review the currently used settings related to the Bump Reminder.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -210,7 +210,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently used Bump Reminder settings")]
+        Description("Allows you to change currently used settings related to the Bump Reminder.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -222,7 +222,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("actionlog"), Aliases("action-log"),
     CommandModule("configuration"),
-    Description("Allows to review and change settings for the actionlog")]
+    Description("Allows you to review and change settings related to the actionlog.")]
     public class ActionLog : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -252,7 +252,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Actionlog Settings")]
+        Description("Allows you to review currently used settings related to the actionlog.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -263,7 +263,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently used Actionlog settings")]
+        Description("Allows you to change currently used settings related to the actionlog.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -275,7 +275,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
     CommandModule("configuration"),
-    Description("Allows to review and change settings for the automatic crossposts")]
+    Description("Allows you to review and change settings related to automatic crossposting.")]
     public class AutoCrosspost : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -296,7 +296,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Auto Crosspost Channels")]
+        Description("Allows you to review currently used settings related to automatic crossposting.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -306,7 +306,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined Auto Crosspost Channels and settings related to it")]
+        Description("Allows you to change currently used settings related to automatic crossposting.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -319,7 +319,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("reactionroles"), Aliases("reactionrole", "reaction-roles", "reaction-role"),
     CommandModule("configuration"),
-    Description("Allows to review and change settings for Reaction Roles")]
+    Description("Allows you to review and change settings related to Reaction Roles.")]
     public class ReactionRoles : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -340,7 +340,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows a list of all currently defined Auto Crosspost Channels")]
+        Description("Allows you to review currently registered Reaction Roles.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -350,7 +350,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows you to add, delete and modify reaction roles")]
+        Description("Allows you to add and remove registered Reaction Roles.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -359,7 +359,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("add"), Description("Allows adding a reaction role to a message directly, skipping the lengthy questioning. **This command requires replying to a message.**"), Priority(0)]
+        [Command("add"), Description("Allows you to add a reaction role to a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message."), Priority(0)]
         public async Task Add(CommandContext ctx, DiscordEmoji emoji_parameter, DiscordRole role_parameter)
         {
             Task.Run(async () =>
@@ -372,10 +372,10 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("add"), Description("Allows adding a reaction role to a message directly, skipping the lengthy questioning. **This command requires replying to a message.**"), Priority(1)]
+        [Command("add"), Description("Allows you to add a reaction role to a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message."), Priority(1)]
         public async Task Add2(CommandContext ctx, DiscordRole role_parameter, DiscordEmoji emoji_parameter) => await Add(ctx, emoji_parameter, role_parameter);
 
-        [Command("remove"), Description("Allows removing a specific reaction role from a message directly, skipping the lengthy questioning. **This command requires replying to a message.**")]
+        [Command("remove"), Description("Allows you to remove a specific reaction role from a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message.")]
         public async Task Remove(CommandContext ctx, DiscordEmoji emoji_parameter)
         {
             Task.Run(async () =>
@@ -387,7 +387,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("removeall"), Description("Allows removing all reaction roles from a message directly, skipping the lengthy questioning. **This command requires replying to a message.**")]
+        [Command("removeall"), Description("Allows you to remove all reaction roles from a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message.")]
         public async Task RemoveAll(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -400,7 +400,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("invoiceprivacy"), Aliases("in-voice-privacy", "vc-privacy", "vcprivacy"),
     CommandModule("configuration"),
-    Description("Allows to review and change In-Voice Text Channel Privacy Settings")]
+    Description("Allows you to review and change settings related to In-Voice Text Channel Privacy.")]
     public class InVoiceTextPrivacy : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -421,7 +421,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows currently defined settings for In-Voice Text Channel Privacy")]
+        Description("Allows you to review currently used settings related to In-Voice Text Channel Privacy.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -431,7 +431,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined In-Voice Text Channel Privacy Settings")]
+        Description("Allows you to change currently used settings related to In-Voice Text Channel Privacy.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -444,7 +444,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("invitetracker"), Aliases("invite-tracker", "invitetracking", "invite-tracking"),
     CommandModule("configuration"),
-    Description("Allows to review and change Invite Tracker Settings")]
+    Description("Allows you to review and change settings related to Invite Tracking.")]
     public class InviteTracker : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -465,7 +465,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows currently defined settings for Invite Tracking Settings")]
+        Description("Allows you to review the currently used settings related to Invite Tracking.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -475,7 +475,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined Invite Tracking Settings")]
+        Description("Allows you to change the currently used settings related to Invite Tracking.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -487,7 +487,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("namenormalizer"), Aliases("name-normalizer"),
     CommandModule("configuration"),
-    Description("Allows to review and change Name Normalizer Settings")]
+    Description("Allows you to review and change settings related to automatic name normalization.")]
     public class NameNormalizer : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -517,7 +517,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows currently defined settings for Name Normalizer")]
+        Description("Allows you to review the currently used settings related to name normalization.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -527,7 +527,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined Name Normalizer Settings")]
+        Description("Allows you to change the currently used settings related to name normalization.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -539,7 +539,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
 
     [Group("autounarchive"), Aliases("auto-unarchive"),
     CommandModule("configuration"),
-    Description("Allows to review and change Auto Thread Unarchiver Settings")]
+    Description("Allows you to review and change settings related to automatic thread unarchiving.")]
     public class AutoUnarchive : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -569,7 +569,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("review"), Aliases("list"),
-        Description("Shows currently defined settings for Auto Thread Unarchiver")]
+        Description("Allows you to review the currently used settings related to automatic thread unarchiving.")]
         public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -579,7 +579,7 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
         }
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
-        Description("Allows modifying currently defined Auto Thread Unarchiver Settings")]
+        Description("Allows you to change the currently used settings related to automatic thread unarchiving.")]
         public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>

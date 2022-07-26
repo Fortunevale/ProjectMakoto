@@ -3,7 +3,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommand("afk", "Set yourself afk: Notify users pinging you that you're currently not around")]
+    [SlashCommand("afk", "Allows you to set yourself afk. It'll notify users pinging you that you're currently not available.")]
     public async Task UserInfo(InteractionContext ctx, [Option("reason", "The reason")]string reason = "-")
     {
         Task.Run(async () =>
@@ -15,7 +15,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
-    [SlashCommand("cuddle", "Cuddle with another user")]
+    [SlashCommand("cuddle", "Cuddle with another user.")]
     public async Task Cuddle(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
@@ -29,7 +29,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
 
 
 
-    [SlashCommand("kiss", "Kiss another user")]
+    [SlashCommand("kiss", "Kiss another user.")]
     public async Task Kiss(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>
@@ -43,7 +43,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
 
 
 
-    [SlashCommand("slap", "Slap another user")]
+    [SlashCommand("slap", "Slap another user.")]
     public async Task Slap(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
     {
         Task.Run(async () =>

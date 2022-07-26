@@ -6,7 +6,7 @@ internal class SocialPrefixCommands : BaseCommandModule
 
     [Command("afk"),
     CommandModule("social"),
-    Description("Set yourself afk: Notify users pinging you that you're currently not around")]
+    Description("Allows you to set yourself afk. It'll notify users pinging you that you're currently not available.")]
     public async Task Afk(CommandContext ctx, [RemainingText][Description("Text (<128 characters)")] string reason = "-")
     {
         Task.Run(async () =>
@@ -20,7 +20,7 @@ internal class SocialPrefixCommands : BaseCommandModule
 
     [Command("cuddle"), PreventCommandDeletion,
     CommandModule("social"),
-    Description("Cuddle with another user")]
+    Description("Cuddle with another user.")]
     public async Task Cuddle(CommandContext ctx, DiscordUser user)
     {
         Task.Run(async () =>
@@ -36,7 +36,7 @@ internal class SocialPrefixCommands : BaseCommandModule
 
     [Command("kiss"), PreventCommandDeletion,
     CommandModule("social"),
-    Description("Kiss another user")]
+    Description("Kiss another user.")]
     public async Task Kiss(CommandContext ctx, DiscordUser user)
     {
         Task.Run(async () =>
@@ -52,7 +52,7 @@ internal class SocialPrefixCommands : BaseCommandModule
 
     [Command("slap"), Aliases("bonk", "punch"), PreventCommandDeletion,
     CommandModule("social"),
-    Description("Slap another user")]
+    Description("Slap another user.")]
     public async Task Slap(CommandContext ctx, DiscordUser user)
     {
         Task.Run(async () =>

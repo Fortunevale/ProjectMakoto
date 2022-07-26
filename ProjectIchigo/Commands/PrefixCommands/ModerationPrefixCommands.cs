@@ -7,7 +7,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("purge"), Aliases("clear"),
     CommandModule("moderation"),
-    Description("Deletes the specified amount of messages")]
+    Description("Deletes the specified amount of messages.")]
     public async Task Purge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -24,7 +24,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("guild-purge"), Aliases("guild-clear", "server-purge", "server-clear"),
     CommandModule("moderation"),
-    Description("Scans the specified amount of messages for the given user's messages and deletes them. Similar to the `purge` command's behaviour.")]
+    Description("Scans all channels and deletes the specified user's messages.")]
     public async Task GuildPurge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser victim)
     {
         Task.Run(async () =>
@@ -41,7 +41,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("clearbackup"), Aliases("clearroles", "clearrole", "clearbackuproles", "clearbackuprole"),
     CommandModule("moderation"),
-    Description($"Clears the stored roles of a user.")]
+    Description($"Clears the stored roles and nickname of a user.")]
     public async Task ClearBackup(CommandContext ctx, DiscordUser victim)
     {
         Task.Run(async () =>
@@ -57,7 +57,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("timeout"), Aliases("time-out", "mute"),
     CommandModule("moderation"),
-    Description("Times the user for the specified amount of time out")]
+    Description("Sets the specified user into a timeout.")]
     public async Task Timeout(CommandContext ctx, DiscordUser victim, [Description("Duration")] string duration = "", [Description("Reason")] string reason = "")
     {
         Task.Run(async () =>
@@ -75,7 +75,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unmute"),
     CommandModule("moderation"),
-    Description("Removes the timeout for the specified user")]
+    Description("Removes a timeout from the specified user.")]
     public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
     {
         Task.Run(async () =>
@@ -91,7 +91,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("kick"),
     CommandModule("moderation"),
-    Description("Kicks the specified user")]
+    Description("Kicks the specified user.")]
     public async Task Kick(CommandContext ctx, DiscordMember victim, [Description("Reason")][RemainingText] string reason = "")
     {
         Task.Run(async () =>
@@ -108,7 +108,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("ban"),
     CommandModule("moderation"),
-    Description("Bans the specified user")]
+    Description("Bans the specified user.")]
     public async Task Ban(CommandContext ctx, DiscordUser victim, [Description("Reason")][RemainingText] string reason = "")
     {
         Task.Run(async () =>
@@ -125,7 +125,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
 
     [Command("unban"),
     CommandModule("moderation"),
-    Description("Unbans the specified user")]
+    Description("Unbans the specified user.")]
     public async Task Unban(CommandContext ctx, DiscordUser victim)
     {
         Task.Run(async () =>
