@@ -101,11 +101,11 @@ internal static class PreMadeEmbedsExtensions
         return msg;
     }
 
-    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this SharedCommandContext ctx, string addText = "")
+    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this SharedCommandContext ctx, string addText = "", string customIcon = "")
     {
         return new DiscordEmbedBuilder.EmbedFooter
         {
-            IconUrl = ctx.User.AvatarUrl,
+            IconUrl = (customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
             Text = $"Command used by {ctx.User.UsernameWithDiscriminator}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
     }

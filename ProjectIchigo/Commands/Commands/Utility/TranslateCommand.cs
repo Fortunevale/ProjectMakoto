@@ -184,7 +184,7 @@ internal class TranslateCommand : BaseCommand
                         IconUrl = bMessage.Author.AvatarUrl
                     },
                     Timestamp = bMessage.Timestamp,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Translated from {(Source == "auto" ? $"{ctx.Bot._languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot._languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot._languageCodes.List.First(x => x.Code == Target).Name} using Google", IconUrl = "https://cdn.discordapp.com/attachments/906976602557145110/1001112928226910228/2991148.png" }
+                    Footer = ctx.GenerateUsedByFooter($"Translated from {(Source == "auto" ? $"{ctx.Bot._languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot._languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot._languageCodes.List.First(x => x.Code == Target).Name} using Google", "https://cdn.discordapp.com/attachments/906976602557145110/1001112928226910228/2991148.png")
                 }));
             }
             else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
@@ -271,7 +271,7 @@ internal class TranslateCommand : BaseCommand
                         IconUrl = bMessage.Author.AvatarUrl
                     },
                     Timestamp = bMessage.Timestamp,
-                    Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Translated from {(Source == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == Source).name)} to {TranslationTargets.First(x => x.code == Target).name} using LibreTranslate", IconUrl = "https://cdn.discordapp.com/attachments/906976602557145110/1000921551698399353/cba1464ba45e470db4ec853535218539cf5d4777.png" }
+                    Footer = ctx.GenerateUsedByFooter($"Translated from {(Source == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == Source).name)} to {TranslationTargets.First(x => x.code == Target).name} using LibreTranslate", "https://cdn.discordapp.com/attachments/906976602557145110/1000921551698399353/cba1464ba45e470db4ec853535218539cf5d4777.png")
                 }));
             }
         });
