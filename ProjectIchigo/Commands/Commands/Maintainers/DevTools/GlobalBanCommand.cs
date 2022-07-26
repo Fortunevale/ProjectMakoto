@@ -57,6 +57,22 @@ internal class GlobalBanCommand : BaseCommand
             embed.Color = EmbedColors.Success;
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
             msg = RespondOrEdit(embed);
+
+
+            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+            await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
+            {
+                Author = new DiscordEmbedBuilder.EmbedAuthor
+                {
+                    Name = ctx.CurrentUser.Username,
+                    IconUrl = Resources.AuditLogIcons.UserBanned
+                },
+                Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was added to the global ban list.\n\n" +
+                              $"Reason: {reason.Sanitize()}\n" +
+                              $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
+                Color = EmbedColors.Error,
+                Timestamp = DateTime.UtcNow
+            });
         });
     }
 }

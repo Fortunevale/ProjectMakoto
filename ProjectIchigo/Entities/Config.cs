@@ -4,6 +4,8 @@ public class Config
 {
     public bool IsDev = false;
 
+    public ulong GlobalBanAnnouncementsChannelId = 0;
+
     public ulong AssetsGuildId = 0;
     public ulong GraphAssetsChannelId = 0;
     public ulong PlaylistAssetsChannelId = 0;

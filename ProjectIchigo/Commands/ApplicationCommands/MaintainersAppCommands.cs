@@ -43,14 +43,15 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [SlashCommand("globalunban", "Removes a user from global bans. (doesn't unban user from all servers)")]
-        public async Task GlobalUnnanCommand(InteractionContext ctx, [Option("user", "The user to unban")]DiscordUser victim)
+        [SlashCommand("globalunban", "Removes a user from global bans.")]
+        public async Task GlobalUnnanCommand(InteractionContext ctx, [Option("user", "The user to unban")]DiscordUser victim, [Option("unbanfromguilds", "Unban user from all guilds.")] bool UnbanFromGuilds = true)
         {
             Task.Run(async () =>
             {
                 await new GlobalUnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "victim", victim },
+                    { "UnbanFromGuilds", UnbanFromGuilds },
                 });
             }).Add(_bot._watcher, ctx);
         }

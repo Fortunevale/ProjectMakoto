@@ -60,13 +60,14 @@ internal class MaintainersPrefixCommands : BaseCommandModule
         }
 
         [Command("globalunban"), Description("Removes a user from global bans. (doesn't unban user from all servers)")]
-        public async Task GlobalUnbanCommand(CommandContext ctx, DiscordUser victim)
+        public async Task GlobalUnbanCommand(CommandContext ctx, DiscordUser victim, bool UnbanFromGuilds = true)
         {
             Task.Run(async () =>
             {
                 await new GlobalUnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "victim", victim },
+                    { "UnbanFromGuilds", UnbanFromGuilds },
                 });
             }).Add(_bot._watcher, ctx);
         }
