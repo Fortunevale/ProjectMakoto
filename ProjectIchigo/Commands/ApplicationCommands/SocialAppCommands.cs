@@ -3,7 +3,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommand("afk", "Allows you to set yourself afk. It'll notify users pinging you that you're currently not available.")]
+    [SlashCommand("afk", "Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.")]
     public async Task UserInfo(InteractionContext ctx, [Option("reason", "The reason")]string reason = "-")
     {
         Task.Run(async () =>

@@ -30,7 +30,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("globalban", "Bans a user from all servers opted into globalbans.")]
+        [SlashCommand("globalban", "Bans a user from all servers opted into global bans.")]
         public async Task GlobalBanCommand(InteractionContext ctx, [Option("user", "The user to ban")]DiscordUser victim, [Option("reason", "The reason")]string reason = "-")
         {
             Task.Run(async () =>

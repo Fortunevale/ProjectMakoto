@@ -63,7 +63,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
     
-    [SlashCommand("submit-url", "Allows you to contribute a new malicous domain to our database.")]
+    [SlashCommand("submit-url", "Allows you to contribute a new malicious domain to our database.")]
     public async Task UrlSubmit(InteractionContext ctx, [Option("url", "The url")] string url)
     {
         Task.Run(async () =>

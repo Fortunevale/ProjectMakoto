@@ -6,7 +6,7 @@ internal class SocialPrefixCommands : BaseCommandModule
 
     [Command("afk"),
     CommandModule("social"),
-    Description("Allows you to set yourself afk. It'll notify users pinging you that you're currently not available.")]
+    Description("Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.")]
     public async Task Afk(CommandContext ctx, [RemainingText][Description("Text (<128 characters)")] string reason = "-")
     {
         Task.Run(async () =>

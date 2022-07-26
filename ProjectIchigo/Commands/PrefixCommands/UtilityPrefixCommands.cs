@@ -184,7 +184,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
     [Command("submit-url"),
     CommandModule("utility"),
-    Description("Allows you to contribute a new malicous domain to our database.")]
+    Description("Allows you to contribute a new malicious domain to our database.")]
     public async Task UrlSubmit(CommandContext ctx, [Description("URL")] string url)
     {
         Task.Run(async () =>
