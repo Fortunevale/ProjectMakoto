@@ -77,11 +77,29 @@ internal class DatabaseQueue
         }).Add(_bot._watcher);
     }
 
-    internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal)
+    internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal, int depth = 0)
     {
+        if (depth > 10)
+            throw new Exception("Failed to run command.");
+
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority });
+        try
+        {
+            Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority });
+        }
+        catch (Exception)
+        {
+            if (Queue is null)
+            {
+                Queue = new();
+
+                await Task.Delay(1000);
+
+                await RunCommand(cmd, priority, depth + 1);
+                return;
+            }    
+        }
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(1);
@@ -98,11 +116,28 @@ internal class DatabaseQueue
         throw new Exception("This exception should be impossible to get.");
     }
 
-    internal async Task<bool> RunPing(MySqlConnection conn)
+    internal async Task<bool> RunPing(MySqlConnection conn, int depth = 0)
     {
+        if (depth > 10)
+            throw new Exception("Failed to run ping.");
+
         string key = Guid.NewGuid().ToString();
 
-        Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low });
+        try
+        {
+            Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low });
+        }
+        catch (Exception)
+        {
+            if (Queue is null)
+            {
+                Queue = new();
+
+                await Task.Delay(1000);
+
+                return await RunPing(conn, depth + 1);
+            }
+        }
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
             Thread.Sleep(50);
@@ -121,7 +156,7 @@ internal class DatabaseQueue
 
     internal int QueueCount => this.Queue.Count;
 
-    readonly Dictionary<string, RequestQueue> Queue = new();
+    private Dictionary<string, RequestQueue> Queue = new();
 
     internal class RequestQueue
     {
