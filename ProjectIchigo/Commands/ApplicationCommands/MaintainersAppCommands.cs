@@ -4,12 +4,12 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Ichigo")]
+    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Ichigo.")]
     public class DevTools : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("info", "Shows information about the current guild and bot.")]
+        [SlashCommand("info", "Shows information about the current server and bot.")]
         public async Task InfoCommand(InteractionContext ctx)
         {
             Task.Run(async () =>

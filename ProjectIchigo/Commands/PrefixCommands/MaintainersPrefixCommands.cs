@@ -5,7 +5,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
 
     [Group("dev_tools"),
     CommandModule("maintainence"),
-    Description("Developer Tools used to develop/manage Ichigo")]
+    Description("Developer Tools used to develop/manage Ichigo.")]
     public class DevTools : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -25,7 +25,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("info"), Description("Shows information about the current guild and bot.")]
+        [Command("info"), Description("Shows information about the current server and bot.")]
         public async Task InfoCommand(CommandContext ctx)
         {
             Task.Run(async () =>
