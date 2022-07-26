@@ -104,7 +104,7 @@ internal class TranslationClient
 
         var parsedResponse = JsonConvert.DeserializeObject<object[]>(translateResponse);
         var parsedTextStep1 = JsonConvert.DeserializeObject<object[]>(parsedResponse[0].ToString());
-        var parsedTextStep2 = JsonConvert.DeserializeObject<object[]>(parsedTextStep1[0].ToString());
+        string translatedText = string.Join(" ", parsedTextStep1.Select(x => JsonConvert.DeserializeObject<object[]>(x.ToString())[0].ToString()));
 
         string translationSource = "";
 
@@ -115,7 +115,6 @@ internal class TranslationClient
             translationSource = parsedLanguageStep2[0].ToString(); 
         }
 
-        string translatedText = parsedTextStep2[0].ToString();
         return new Tuple<string, string>(translatedText, translationSource);
     }
 }
