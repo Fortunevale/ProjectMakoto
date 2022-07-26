@@ -365,17 +365,7 @@ public class Bot
                         EnableDefaultHelp = false
                     });
 
-                    if (_status.LoadedConfig.IsDev)
-                    {
-                        appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(_status.LoadedConfig.AssetsGuildId);
-                    }
-                    else
+                    if (!_status.LoadedConfig.IsDev)
                     {
                         appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();

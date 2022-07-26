@@ -4,12 +4,12 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Project Ichigo")]
+    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Ichigo")]
     public class DevTools : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("info", "Shows information about the current guild and bot")]
+        [SlashCommand("info", "Shows information about the current guild and bot.")]
         public async Task InfoCommand(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -30,7 +30,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("globalban", "Bans a user from all servers opted into globalbans")]
+        [SlashCommand("globalban", "Bans a user from all servers opted into globalbans.")]
         public async Task GlobalBanCommand(InteractionContext ctx, [Option("user", "The user to ban")]DiscordUser victim, [Option("reason", "The reason")]string reason = "-")
         {
             Task.Run(async () =>
@@ -43,7 +43,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [SlashCommand("globalunban", "Removes a user from global bans (doesn't unban user from all servers)")]
+        [SlashCommand("globalunban", "Removes a user from global bans. (doesn't unban user from all servers)")]
         public async Task GlobalUnnanCommand(InteractionContext ctx, [Option("user", "The user to unban")]DiscordUser victim)
         {
             Task.Run(async () =>
@@ -55,7 +55,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("log", "Change the bot's log level")]
+        [SlashCommand("log", "Change the bot's log level.")]
         public async Task Log(InteractionContext ctx, [Option("loglevel", "The new loglevel")] LogLevel Level)
         {
             Task.Run(async () =>
@@ -67,7 +67,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [SlashCommand("stop", "Shuts down the bot")]
+        [SlashCommand("stop", "Shuts down the bot.")]
         public async Task Stop(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -76,7 +76,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("save", "Save all data to Database")]
+        [SlashCommand("save", "Save all data to Database.")]
         public async Task Save(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -85,7 +85,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("create-issue", "Create a new issue on Project-Ichigo's Github Repository")]
+        [SlashCommand("create-issue", "Create a new issue on Ichigo's Github Repository.")]
         public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")] bool UseOldTagsSelector = false)
         {
             Task.Run(async () =>

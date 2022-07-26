@@ -24,8 +24,8 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("profile"), Description("Show a users Score Saber profile by id")]
-        public async Task ScoreSaberC(CommandContext ctx, [Description("Id|@User")] string id = "")
+        [Command("profile"), Description("Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.")]
+        public async Task ScoreSaberC(CommandContext ctx, [Description("ScoreSaber Id or @User")] string id = "")
         {
             Task.Run(async () =>
             {
@@ -36,7 +36,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("search"), Description("Search a user on Score Saber by name")]
+        [Command("search"), Description("Search a user on ScoreSaber by name.")]
         public async Task ScoreSaberSearch(CommandContext ctx, [Description("Name")][RemainingText] string name)
         {
             Task.Run(async () =>
@@ -48,7 +48,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("map-leaderboard"), Description("Display a leaderboard off a specific map")]
+        [Command("map-leaderboard"), Description("Display the leaderboard off a specific map.")]
         public async Task ScoreSaberMapLeaderboard(CommandContext ctx, [Description("LeaderboardId")] int boardId, [Description("Page")] int Page = 1, [Description("Internal Page")] int Internal_Page = 0)
         {
             Task.Run(async () =>
@@ -62,7 +62,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("unlink"), Description("Unlink your Score Saber Profile from your Discord Account")]
+        [Command("unlink"), Description("Allows you to remove the saved ScoreSaber profile from your Discord account.")]
         public async Task ScoreSaberUnlink(CommandContext ctx)
         {
             Task.Run(async () =>

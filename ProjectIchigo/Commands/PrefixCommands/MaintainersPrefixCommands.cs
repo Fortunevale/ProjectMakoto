@@ -5,7 +5,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
 
     [Group("dev_tools"),
     CommandModule("maintainence"),
-    Description("Developer Tools used to develop/manage Project Ichigo")]
+    Description("Developer Tools used to develop/manage Ichigo")]
     public class DevTools : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -25,7 +25,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("info"), Description("Shows information about the current guild and bot")]
+        [Command("info"), Description("Shows information about the current guild and bot.")]
         public async Task InfoCommand(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -46,7 +46,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("globalban"), Description("Bans a user from all servers opted into globalbans")]
+        [Command("globalban"), Description("Bans a user from all servers opted into globalbans.")]
         public async Task Globalban(CommandContext ctx, DiscordUser victim, [RemainingText][Description("Reason")] string reason = "-")
         {
             Task.Run(async () =>
@@ -59,7 +59,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("globalunban"), Description("Removes a user from global bans (doesn't unban user from all servers)")]
+        [Command("globalunban"), Description("Removes a user from global bans. (doesn't unban user from all servers)")]
         public async Task GlobalUnbanCommand(CommandContext ctx, DiscordUser victim)
         {
             Task.Run(async () =>
@@ -71,7 +71,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("log"), Description("Change the bot's log level")]
+        [Command("log"), Description("Change the bot's log level.")]
         public async Task Log(CommandContext ctx, int Level)
         {
             Task.Run(async () =>
@@ -83,7 +83,47 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("stop"), Description("Shuts down the bot")]
+        [Command("register"), Description("Register Slash Commands. Debug only.")]
+        public async Task RegisterCommands(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new RegisterCommandsCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+        
+        [Command("test"), Description("Check description lenghts.")]
+        public async Task Test(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                List<string> list = new();
+
+                var cCtx = ctx.Client.GetCommandsNext();
+
+                foreach (var b in cCtx.RegisteredCommands)
+                {
+                    if (b.Value.Description.Length > 100)
+                        if (!list.Contains(b.Value.Name))
+                            list.Add(b.Value.Name);
+
+                    try
+                    {
+                        foreach (var c in ((CommandGroup)b.Value).Children)
+                        {
+                            if (c.Description.Length > 100)
+                                if (!list.Contains($"{b.Value.Name} {c.Name}"))
+                                    list.Add($"{b.Value.Name} {c.Name}");
+                        }
+                    }
+                    catch (Exception ex) { _logger.LogError(b.Value.Name, ex); }
+                }
+
+                await ctx.RespondAsync(string.Join("\n", list.Select(x => $"`{x}`")));
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("stop"), Description("Shuts down the bot.")]
         public async Task Stop(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -92,7 +132,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("save"), Description("Save all data to Database")]
+        [Command("save"), Description("Save all data to Database.")]
         public async Task Save(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -101,7 +141,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("create-issue"), Description("Create a new issue on Project-Ichigo's Github Repository")]
+        [Command("create-issue"), Description("Create a new issue on Ichigo's Github Repository.")]
         public async Task CreateIssue(CommandContext ctx, bool UseOldTagsSelector = false)
         {
             Task.Run(async () =>

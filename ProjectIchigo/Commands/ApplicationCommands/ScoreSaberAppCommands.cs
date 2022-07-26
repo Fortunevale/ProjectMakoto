@@ -7,7 +7,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("profile", "Show a users Score Saber profile by id")]
+        [SlashCommand("profile", "Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.")]
         public async Task ScoreSaberC(InteractionContext ctx, [Option("profile", "Id|@User")] string id = "")
         {
             Task.Run(async () =>
@@ -19,7 +19,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("search", "Search a user on Score Saber by name")]
+        [SlashCommand("search", "Search a user on Score Saber by name.")]
         public async Task ScoreSaberSearch(InteractionContext ctx, [Option("name", "The name to search for")] string name)
         {
             Task.Run(async () =>
@@ -31,7 +31,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("map-leaderboard", "Display a leaderboard off a specific map")]
+        [SlashCommand("map-leaderboard", "Display the leaderboard off a specific map.")]
         public async Task ScoreSaberMapLeaderboard(InteractionContext ctx, [Option("LeaderboardId", "The LeaderboardId")] int boardId, [Option("Page", "The page")] int Page = 1, [Option("internal_page", "The internal page")] int Internal_Page = 0)
         {
             Task.Run(async () =>
@@ -45,7 +45,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("unlink", "Unlink your Score Saber Profile from your Discord Account")]
+        [SlashCommand("unlink", "Allows you to remove the saved ScoreSaber profile from your Discord account.")]
         public async Task ScoreSaberUnlink(InteractionContext ctx)
         {
             Task.Run(async () =>

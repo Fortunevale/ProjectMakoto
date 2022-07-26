@@ -7,7 +7,7 @@ internal class MusicPrefixCommands : BaseCommandModule
 
     [Group("music"),
     CommandModule("music"), Aliases("m"),
-    Description("Allows to play music and change the current playback settings")]
+    Description("Allows to play music and change the current playback settings.")]
     public class MusicCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -47,7 +47,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("join"), Aliases("connect"), Description("Project Ichigo will join your channel if it's not already being used in the server")]
+        [Command("join"), Aliases("connect"), Description("The bot will join your channel if it's not already being used in this server.")]
         public async Task Join(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -59,7 +59,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("disconnect"), Aliases("dc", "leave"), Description("Starts a voting to disconnect the bot")]
+        [Command("disconnect"), Aliases("dc", "leave"), Description("Starts a voting to disconnect the bot.")]
         public async Task Disconnect(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -68,7 +68,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("forcedisconnect"), Aliases("fdc", "forceleave", "fleave", "stop"), Description("Forces the bot to disconnect from the current channel")]
+        [Command("forcedisconnect"), Aliases("fdc", "forceleave", "fleave", "stop"), Description("Forces the bot to disconnect. `DJ` role or Administrator permissions required.")]
         public async Task ForceDisconnect(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -89,7 +89,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("pause"), Aliases("resume"), Description("Pause or unpause the current song")]
+        [Command("pause"), Aliases("resume"), Description("Pause or unpause the current song.")]
         public async Task Pause(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -98,7 +98,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("queue"), Description("Displays the current queue")]
+        [Command("queue"), Description("Displays the current queue.")]
         public async Task Queue(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -107,7 +107,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [Command("removequeue"), Aliases("rq"), Description("Remove a song from the queue")]
+        [Command("removequeue"), Aliases("rq"), Description("Removes a song from the queue.")]
         public async Task RemoveQueue(CommandContext ctx, [Description("Index/Video Title")][RemainingText]string selection)
         {
             Task.Run(async () =>
@@ -119,7 +119,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("skip"), Description("Starts a voting to skip the current song")]
+        [Command("skip"), Description("Starts a voting to skip the current song.")]
         public async Task Skip(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -128,7 +128,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("forceskip"), Aliases("fs", "fskip"), Description("Forces skipping of the current song. You need to be an Administrator or have a role called `DJ`.")]
+        [Command("forceskip"), Aliases("fs", "fskip"), Description("Forces skipping of the current song. `DJ` role or Administrator permissions required.")]
         public async Task ForceSkip(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -137,7 +137,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("clearqueue"), Aliases("cq"), Description("Starts a voting to clear the current queue")]
+        [Command("clearqueue"), Aliases("cq"), Description("Starts a voting to clear the current queue.")]
         public async Task ClearQueue(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -146,7 +146,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [Command("forceclearqueue"), Aliases("fcq"), Description("Forces clearing the current queue. You need to be an Administrator or have a role called `DJ`.")]
+        [Command("forceclearqueue"), Aliases("fcq"), Description("Forces clearing the current queue. `DJ` role or Administrator permissions required.")]
         public async Task ForceClearQueue(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -155,7 +155,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("shuffle"), Description("Toggles shuffling of the current queue")]
+        [Command("shuffle"), Description("Toggles shuffling of the current queue.")]
         public async Task Shuffle(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -164,7 +164,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("repeat"), Description("Toggles repeating the current queue")]
+        [Command("repeat"), Description("Toggles repeating of the current queue.")]
         public async Task Repeat(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -176,7 +176,7 @@ internal class MusicPrefixCommands : BaseCommandModule
 
     [Group("playlists"), Aliases("playlist", "pl"),
     CommandModule("music"), 
-    Description("Allows managing your personal playlists")]
+    Description("Allows you to manage your personal playlists.")]
     public class Playlists : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -196,7 +196,7 @@ internal class MusicPrefixCommands : BaseCommandModule
         //    }).Add(_bot._watcher, ctx);
         //}
 
-        [GroupCommand, Command("manage"), Description("Allows to review and manage your playlists")]
+        [GroupCommand, Command("manage"), Description("Allows you to use and manage your playlists.")]
         public async Task Manage(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -205,7 +205,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("load-share"), Description("Loads a playlist share")]
+        [Command("load-share"), Description("Loads a playlist share.")]
         public async Task LoadShare(CommandContext ctx, [Description("User")]ulong userid, [Description("Id")]string id)
         {
             Task.Run(async () =>

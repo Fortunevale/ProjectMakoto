@@ -38,7 +38,10 @@ internal class TranslateCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            if (bMessage.Content.IsNullOrWhiteSpace())
+            var transSource = bMessage.Content;
+            transSource = Regex.Replace(transSource, Resources.Regex.Url, "");
+
+            if (transSource.IsNullOrWhiteSpace())
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -137,7 +140,7 @@ internal class TranslateCommand : BaseCommand
                     Timestamp = DateTime.UtcNow
                 }));
 
-                var TranslationTask = ctx.Bot._translationClient.Translate_a(Source, Target, bMessage.Content);
+                var TranslationTask = ctx.Bot._translationClient.Translate_a(Source, Target, transSource);
 
                 int PosInQueue = ctx.Bot._translationClient.Queue.Count;
 
@@ -247,7 +250,7 @@ internal class TranslateCommand : BaseCommand
 
                 using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    { "q", bMessage.Content },
+                    { "q", transSource },
                     { "source", Source },
                     { "target", Target },
                 }))
