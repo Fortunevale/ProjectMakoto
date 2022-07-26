@@ -83,6 +83,15 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
+        [Command("register"), Description("Register Slash Commands. Debug only.")]
+        public async Task RegisterCommands(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new RegisterCommandsCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
         [Command("stop"), Description("Shuts down the bot")]
         public async Task Stop(CommandContext ctx)
         {
