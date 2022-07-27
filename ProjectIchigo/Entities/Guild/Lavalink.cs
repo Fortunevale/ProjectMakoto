@@ -64,6 +64,9 @@ public class Lavalink
                 {
                     Task.Run(async () =>
                     {
+                        if (e.Guild?.Id != Guild?.Id)
+                            return;
+
                         if (e.Channel?.Id == guildConnection.Channel?.Id || e.Before?.Channel?.Id == guildConnection.Channel?.Id)
                         {
                             VoiceUpdateTokenSource.Cancel();
