@@ -120,8 +120,12 @@ internal class UserInfoCommand : BaseCommand
                                                                 $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Mobile.HasValue ? victim.Presence.ClientStatus.Mobile.Value : UserStatus.Offline)} `Mobile`\n" +
                                                                 $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `Web`\n\n", true));
 
-            if (victim.Presence is not null && victim.Presence.Activities?.Count > 0)
-                embed.AddField(new DiscordEmbedField("Current Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"• Status: `{x.CustomStatus.Emoji.Name}`{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"• {x.ActivityType} {x.Name}")}")), true));
+            try
+            {
+                if (victim.Presence is not null && victim.Presence.Activities is not null && victim.Presence.Activities?.Count > 0)
+                    embed.AddField(new DiscordEmbedField("Current Activities", string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"• Status: `{x.CustomStatus.Emoji.Name}`{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"• {x.ActivityType} {x.Name}")}")), true));
+            }
+            catch { }
 
             if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue)
                 embed.AddField(new DiscordEmbedField("Timed out until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
