@@ -22,6 +22,7 @@ internal class DiscordEventHandler
         inviteTrackerEvents = new(_bot);
         autoUnarchiveEvents = new(_bot);
         nameNormalizerEvents = new(_bot);
+        embedMessagesEvents = new(_bot);
     }
 
 
@@ -43,6 +44,7 @@ internal class DiscordEventHandler
     InviteTrackerEvents inviteTrackerEvents { get; set; }
     AutoUnarchiveEvents autoUnarchiveEvents { get; set; }
     NameNormalizerEvents nameNormalizerEvents { get; set; }
+    EmbedMessagesEvents embedMessagesEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -153,6 +155,7 @@ internal class DiscordEventHandler
             _ = phishingProtectionEvents.MessageCreated(sender, e);
             _ = bumpReminderEvents.MessageCreated(sender, e);
             _ = experienceEvents.MessageCreated(sender, e);
+            _ = embedMessagesEvents.MessageCreated(sender, e);
 
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {

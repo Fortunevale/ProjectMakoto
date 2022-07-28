@@ -326,4 +326,28 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
     }
+    
+    [SlashCommandGroup("embedmessages", "Allows you to review and change settings related to automatic message embedding.")]
+    public class MessageEmbedding : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review the currently used settings related to automatic message embedding.", (long)Permissions.Administrator)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.EmbedMessageCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to change the currently used settings related to automatic message embedding.", (long)Permissions.Administrator)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.EmbedMessageCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }

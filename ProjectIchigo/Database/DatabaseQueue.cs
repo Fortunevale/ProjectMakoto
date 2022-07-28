@@ -29,7 +29,15 @@ internal class DatabaseQueue
 
                     b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
                 }
-                catch (Exception) { continue; }
+                catch (Exception ex) 
+                { 
+                    _logger.LogError("Failed to get ordered Queue", ex);
+
+                    if (Queue is null)
+                        Queue = new();
+
+                    continue; 
+                }
 
                 if (b.Value is null)
                     continue;
@@ -98,7 +106,7 @@ internal class DatabaseQueue
 
                 await RunCommand(cmd, priority, depth + 1);
                 return;
-            }    
+            }
         }
 
         while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)

@@ -114,6 +114,11 @@ internal class DatabaseInit
             {
                 NameNormalizerEnabled = b.normalizenames
             };
+            
+            DbGuild.EmbedMessageSettings = new(DbGuild)
+            {
+                UseEmbedding = b.embed_messages
+            };
 
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards));
             DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache));

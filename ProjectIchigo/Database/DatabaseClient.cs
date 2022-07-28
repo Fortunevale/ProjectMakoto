@@ -481,7 +481,9 @@ internal class DatabaseClient
 
                             autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
                             
-                            normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled
+                            normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled,
+
+                            embed_messages = x.Value.EmbedMessageSettings.UseEmbedding
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -556,6 +558,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"autounarchivelist{i}", DatabaseInserts[i].autounarchivelist);
 
                             cmd.Parameters.AddWithValue($"normalizenames{i}", DatabaseInserts[i].normalizenames);
+
+                            cmd.Parameters.AddWithValue($"embed_messages{i}", DatabaseInserts[i].embed_messages);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
