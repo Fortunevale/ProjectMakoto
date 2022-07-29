@@ -10,8 +10,9 @@ internal class JoinCommand : BaseCommand
         {
             bool Announce = arguments?.ContainsKey("announce") ?? false;
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
-                return;
+            if (Announce)
+                if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+                    return;
 
             var lava = ctx.Client.GetLavalink();
             var node = lava.ConnectedNodes.Values.First();
