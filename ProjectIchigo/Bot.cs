@@ -195,14 +195,17 @@ public class Bot
             _logger.AddBlacklist(token);
             _logger.AddBlacklist(Secrets.Secrets.DatabasePassword);
             _logger.AddBlacklist(Secrets.Secrets.LavalinkPassword);
+            _logger.AddBlacklist(Secrets.Secrets.GithubToken);
+            _logger.AddBlacklist(Secrets.Secrets.KawaiiRedToken);
 
             _logger.AddLogLevelBlacklist(LogLevel.TRACE2);
 
-
-            _logger.LogDebug($"Registering DiscordClient..");
+            _logger.LogDebug($"Registering LoggerFactory..");
 
             var logger = new LoggerFactory();
             logger.AddProvider(_loggerProvider);
+
+            _logger.LogDebug($"Registering DiscordClient..");
 
             discordClient = new DiscordClient(new DiscordConfiguration
             {
@@ -214,6 +217,7 @@ public class Bot
                 AutoReconnect = true,
                 LoggerFactory = logger,
                 HttpTimeout = TimeSpan.FromSeconds(60),
+                MessageCacheSize = 4096,
             });
 
             _experienceHandler = new(this);
@@ -443,16 +447,16 @@ public class Bot
         _ = DatabaseClient.QueueWatcher();
         _watcher.Watcher();
 
-        AppDomain.CurrentDomain.ProcessExit += async delegate
+        AppDomain.CurrentDomain.ProcessExit += delegate
         {
-            await RunExitTasks(null, null);
+            ExitApplication().Wait();
         };
 
-        //Console.CancelKeyPress += async delegate
-        //{
-        //    _logger.LogInfo("Exiting, please wait..");
-        //    await FlushToDatabase(null, null);
-        //};
+        Console.CancelKeyPress += delegate
+        {
+            _logger.LogInfo("Exiting, please wait..");
+            ExitApplication().Wait();
+        };
 
 
         _ = Task.Run(async () =>
@@ -462,8 +466,7 @@ public class Bot
                 if (File.Exists("updated"))
                 {
                     File.Delete("updated");
-                    await RunExitTasks(null, null);
-                    Environment.Exit(0);
+                    await ExitApplication();
                     return;
                 }
 
@@ -473,6 +476,7 @@ public class Bot
 
         _ = Task.Run(async () =>
         {
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online);
             await Task.Delay(10000);
 
             while (true)
@@ -493,7 +497,7 @@ public class Bot
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
-                    await discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
@@ -845,55 +849,68 @@ public class Bot
         }).Add(_watcher);
     }
 
-    private async Task FlushToDatabase()
+    internal async Task ExitApplication()
     {
-        _logger.LogInfo($"Flushing to database..");
-        await DatabaseClient.FullSyncDatabase(true);
-        _logger.LogDebug($"Flushed to database.");
+        _ = Task.Delay(TimeSpan.FromMinutes(5)).ContinueWith(x =>
+        {
+            if (x.IsCompletedSuccessfully)
+                Environment.Exit(ExitCodes.ExitTasksTimeout);
+        });
 
-        await Task.Delay(1000);
-
-        _logger.LogInfo($"Closing database..");
-        await DatabaseClient.Dispose();
-        _logger.LogDebug($"Closed database.");
-    }
-
-    private async Task LogOffDiscord()
-    {
-        // Apparently spamming status changes makes it more consistent. Dont ask me how.
-        // It's important that the status changes before the bot shuts down to work around a library issue.
-
-        _logger.LogInfo($"Closing Discord Client..");
-
-        for (int i = 0; i < 10; i++)
-            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Idle);
-        await Task.Delay(1000);
-        for (int i = 0; i < 10; i++)
-            await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-        await Task.Delay(5000);
-        await discordClient.DisconnectAsync();
-        _logger.LogDebug($"Closed Discord Client.");
-    }
-
-    private async Task RunExitTasks(object? sender, EventArgs e)
-    {
-        if (DatabaseClient.IsDisposed())
+        if (DatabaseClient.IsDisposed()) // When the Database Client has been disposed, the Exit Call has already been made.
             return;
 
-        try
+        if (_status.DiscordInitialized)
         {
-            await SyncTasks(discordClient.Guilds);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("Failed to run sync tasks", ex);
+            try
+            {
+                await SyncTasks(discordClient.Guilds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to run sync tasks", ex);
+            }
+
+            try
+            {
+                _logger.LogInfo($"Closing Discord Client..");
+
+                await discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+                await discordClient.DisconnectAsync();
+
+                _logger.LogDebug($"Closed Discord Client.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to close Discord Client gracefully.", ex);
+            }
         }
 
-        await LogOffDiscord();
-        await FlushToDatabase();
+        if (_status.DatabaseInitialLoadCompleted)
+        {
+            try
+            {
+                _logger.LogInfo($"Flushing to database..");
+                await DatabaseClient.FullSyncDatabase(true);
+                _logger.LogDebug($"Flushed to database.");
 
-        Thread.Sleep(1000);
+                Thread.Sleep(500);
+
+                _logger.LogInfo($"Closing database..");
+                await DatabaseClient.Dispose();
+                _logger.LogDebug($"Closed database.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogFatal("Failed to close Database Client gracefully.", ex);
+            }
+        }
+
+        Thread.Sleep(500);
         _logger.LogInfo($"Goodbye!");
+
+        Thread.Sleep(500);
+        Environment.Exit(0);
     }
 
     private void LogHandler(object? sender, LogMessageEventArgs e)
@@ -915,7 +932,7 @@ public class Bot
                 if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
                 {
                     _logger.LogRaised -= LogHandler;
-                    _ = RunExitTasks(null, null);
+                    _ = ExitApplication();
                 }
                 else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
                 {
@@ -926,7 +943,7 @@ public class Bot
                         _logger.LogFatal("4 or more DataReader Exceptions triggered, exiting..");
 
                         _logger.LogRaised -= LogHandler;
-                        _ = RunExitTasks(null, null);
+                        _ = ExitApplication();
                     }
                 }
 

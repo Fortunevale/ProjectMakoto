@@ -2,7 +2,7 @@ namespace ProjectIchigo.Entities;
 
 internal class ExitCodes
 {
-    internal static readonly int UpdatePushed = 5;
+    internal static readonly int ExitTasksTimeout = 21;
 
     internal static readonly int NoToken = 8;
     internal static readonly int FailedDiscordLogin = 9;
