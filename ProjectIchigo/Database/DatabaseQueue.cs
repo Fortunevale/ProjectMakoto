@@ -33,8 +33,7 @@ internal class DatabaseQueue
                 { 
                     _logger.LogError("Failed to get ordered Queue", ex);
 
-                    if (Queue is null)
-                        Queue = new();
+                    Queue = new();
 
                     continue; 
                 }
