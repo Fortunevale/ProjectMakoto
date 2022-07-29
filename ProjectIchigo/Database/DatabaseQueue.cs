@@ -29,6 +29,10 @@ internal class DatabaseQueue
 
                     b = Queue.OrderBy(x => (int)x.Value?.Priority).First(x => !x.Value.Executed && !x.Value.Failed);
                 }
+                catch (InvalidOperationException ex) when (ex.Message.ToLower().Contains("collection was modified"))
+                {
+                    continue;
+                }
                 catch (Exception ex) 
                 { 
                     _logger.LogError("Failed to get ordered Queue", ex);
@@ -122,7 +126,11 @@ internal class DatabaseQueue
         else if (value.Failed)
             throw value.Exception ?? new Exception("The command execution failed but there no exception was stored");
         else
-            throw new Exception("The command was not processed.");
+        {
+            await Task.Delay(1000);
+            await RunCommand(cmd, priority, depth + 1);
+            return;
+        }
 
         throw new Exception("This exception should be impossible to get.");
     }
@@ -164,7 +172,10 @@ internal class DatabaseQueue
         else if (value.Failed)
             return false;
         else
-            throw new Exception("The ping was not processed.");
+        {
+            await Task.Delay(1000);
+            return await RunPing(conn, depth + 1);
+        }
 
         throw new Exception("This exception should be impossible to get.");
     }
