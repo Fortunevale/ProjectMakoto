@@ -769,6 +769,7 @@ public class Bot
             await _databaseClient.CheckGuildTables();
             await _databaseClient.FullSyncDatabase(true);
 
+            List<DiscordUser> UserCache = new();
 
             foreach (var guild in e.Guilds)
             {
@@ -778,6 +779,26 @@ public class Bot
                     {
                         if (!guild.Value.Channels.ContainsKey(_guilds[guild.Key].Lavalink.ChannelId))
                             continue;
+
+                        if (_guilds[guild.Key].Lavalink.SongQueue.Count > 0)
+                        {
+                            for (var i = 0; i < _guilds[guild.Key].Lavalink.SongQueue.Count; i++)
+                            {
+                                Lavalink.QueueInfo b = _guilds[guild.Key].Lavalink.SongQueue[i];
+
+                                _logger.LogDebug($"Fixing queue info for {b.Url}");
+
+                                b.guild = guild.Value;
+
+                                if (!UserCache.Any(x => x.Id == b.UserId))
+                                {
+                                    _logger.LogDebug($"Fetching user '{b.UserId}'");
+                                    UserCache.Add(await discordClient.GetUserAsync(b.UserId));
+                                }
+
+                                b.user = UserCache.First(x => x.Id == b.UserId);
+                            }
+                        }
 
                         var channel = guild.Value.GetChannel(_guilds[guild.Key].Lavalink.ChannelId);
 

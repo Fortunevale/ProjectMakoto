@@ -97,8 +97,38 @@ public class Lavalink
 
         public string VideoTitle { get; set; }
         public string Url { get; set; }
+
+        [JsonIgnore]
         public DiscordGuild guild { get; set; }
+
+        [JsonIgnore]
         public DiscordUser user { get; set; }
+
+        private ulong _GuildId = 0;
+        public ulong GuildId 
+        { 
+            get => guild?.Id ?? _GuildId;
+            set
+            {
+                if (guild is not null)
+                    throw new ArgumentException("Do not set this value when guild is already set.");
+
+                _GuildId = value;
+            }
+        }
+
+        private ulong _UserId = 0;
+        public ulong UserId 
+        { 
+            get => user?.Id ?? UserId; 
+            set
+            {
+                if (user is not null)
+                    throw new ArgumentException("Do not set this value when user is already set.");
+
+                _UserId = value;
+            }
+        }
     }
 
     public bool Disposed { private set; get; } = false;
