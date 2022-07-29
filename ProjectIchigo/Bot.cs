@@ -832,6 +832,7 @@ public class Bot
                 catch (Exception ex)
                 {
                     _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
+                    _guilds[guild.Key].Lavalink = new(_guilds[guild.Key]);
                 }
             }
         }).Add(_watcher);
