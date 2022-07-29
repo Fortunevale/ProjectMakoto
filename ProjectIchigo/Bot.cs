@@ -771,69 +771,76 @@ public class Bot
 
             List<DiscordUser> UserCache = new();
 
+            await Task.Delay(5000);
+
             foreach (var guild in e.Guilds)
             {
-                try
+                Task.Run(async () =>
                 {
-                    if (_guilds[guild.Key].Lavalink.ChannelId != 0)
+                    try
                     {
-                        if (!guild.Value.Channels.ContainsKey(_guilds[guild.Key].Lavalink.ChannelId))
-                            continue;
-
-                        if (_guilds[guild.Key].Lavalink.SongQueue.Count > 0)
+                        if (_guilds[guild.Key].Lavalink.ChannelId != 0)
                         {
-                            for (var i = 0; i < _guilds[guild.Key].Lavalink.SongQueue.Count; i++)
+                            if (!guild.Value.Channels.ContainsKey(_guilds[guild.Key].Lavalink.ChannelId))
+                                return;
+
+                            if (_guilds[guild.Key].Lavalink.SongQueue.Count > 0)
                             {
-                                Lavalink.QueueInfo b = _guilds[guild.Key].Lavalink.SongQueue[i];
-
-                                _logger.LogDebug($"Fixing queue info for {b.Url}");
-
-                                b.guild = guild.Value;
-
-                                if (!UserCache.Any(x => x.Id == b.UserId))
+                                for (var i = 0; i < _guilds[guild.Key].Lavalink.SongQueue.Count; i++)
                                 {
-                                    _logger.LogDebug($"Fetching user '{b.UserId}'");
-                                    UserCache.Add(await discordClient.GetUserAsync(b.UserId));
+                                    Lavalink.QueueInfo b = _guilds[guild.Key].Lavalink.SongQueue[i];
+
+                                    _logger.LogDebug($"Fixing queue info for {b.Url}");
+
+                                    b.guild = guild.Value;
+
+                                    if (!UserCache.Any(x => x.Id == b.UserId))
+                                    {
+                                        _logger.LogDebug($"Fetching user '{b.UserId}'");
+                                        UserCache.Add(await discordClient.GetUserAsync(b.UserId));
+                                    }
+
+                                    b.user = UserCache.First(x => x.Id == b.UserId);
+                                }
+                            }
+
+                            var channel = guild.Value.GetChannel(_guilds[guild.Key].Lavalink.ChannelId);
+
+                            var lava = discordClient.GetLavalink();
+                            var node = lava.ConnectedNodes.Values.First();
+                            var conn = node.GetGuildConnection(guild.Value);
+
+                            if (conn is null)
+                            {
+                                if (!lava.ConnectedNodes.Any())
+                                {
+                                    throw new Exception("Lavalink connection isn't established.");
                                 }
 
-                                b.user = UserCache.First(x => x.Id == b.UserId);
-                            }
-                        }
-
-                        var channel = guild.Value.GetChannel(_guilds[guild.Key].Lavalink.ChannelId);
-
-                        var lava = discordClient.GetLavalink();
-                        var node = lava.ConnectedNodes.Values.First();
-                        var conn = node.GetGuildConnection(guild.Value);
-
-                        if (conn is null)
-                        {
-                            if (!lava.ConnectedNodes.Any())
-                            {
-                                throw new Exception("Lavalink connection isn't established.");
+                                conn = await node.ConnectAsync(channel);
                             }
 
-                            conn = await node.ConnectAsync(channel);
+                            var loadResult = await node.Rest.GetTracksAsync(_guilds[guild.Key].Lavalink.CurrentVideo, LavalinkSearchType.Plain);
+
+                            if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
+                                return;
+
+                            await conn.PlayAsync(loadResult.Tracks.First());
+
+                            await Task.Delay(2000);
+                            await conn.SeekAsync(TimeSpan.FromSeconds(_guilds[guild.Key].Lavalink.CurrentVideoPosition));
+
+                            _guilds[guild.Key].Lavalink.QueueHandler(this, discordClient, node, conn);
                         }
-
-                        var loadResult = await node.Rest.GetTracksAsync(_guilds[guild.Key].Lavalink.CurrentVideo, LavalinkSearchType.Plain);
-
-                        if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
-                            continue;
-
-                        await conn.PlayAsync(loadResult.Tracks.First());
-
-                        await Task.Delay(2000);
-                        await conn.SeekAsync(TimeSpan.FromSeconds(_guilds[guild.Key].Lavalink.CurrentVideoPosition));
-
-                        _guilds[guild.Key].Lavalink.QueueHandler(this, discordClient, node, conn);
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
-                    _guilds[guild.Key].Lavalink = new(_guilds[guild.Key]);
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
+                        _guilds[guild.Key].Lavalink = new(_guilds[guild.Key]);
+                    }
+                }).Add(_watcher);
+
+                await Task.Delay(1000);
             }
         }).Add(_watcher);
     }
