@@ -67,7 +67,7 @@ internal class ForceDisconnectCommand : BaseCommand
             }
 
             ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink = new();
+            ctx.Bot._guilds[ctx.Guild.Id].Lavalink = new(ctx.Bot._guilds[ctx.Guild.Id]);
 
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();

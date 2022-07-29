@@ -114,6 +114,25 @@ internal class DatabaseInit
             {
                 NameNormalizerEnabled = b.normalizenames
             };
+            
+            DbGuild.EmbedMessageSettings = new(DbGuild)
+            {
+                UseEmbedding = b.embed_messages
+            };
+
+            if (b.lavalink_channel != 0)
+                DbGuild.Lavalink = new(DbGuild)
+                {
+                    ChannelId = b.lavalink_channel,
+                    CurrentVideoPosition = b.lavalink_currentposition,
+                    CurrentVideo = b.lavalink_currentvideo,
+                    IsPaused = b.lavalink_paused,
+                    Shuffle = b.lavalink_shuffle,
+                    Repeat = b.lavalink_repeat,
+                    SongQueue = JsonConvert.DeserializeObject<List<Lavalink.QueueInfo>>((b.lavalink_queue is null or "null" or "" ? "[]" : b.lavalink_queue))
+                };
+            else
+                DbGuild.Lavalink = new(DbGuild);
 
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards));
             DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache));

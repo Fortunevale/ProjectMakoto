@@ -15,6 +15,8 @@ public class Guild
         InVoiceTextPrivacySettings = new(this);
         InviteTrackerSettings = new(this);
         NameNormalizerSettings = new(this);
+        EmbedMessageSettings = new(this);
+        Lavalink = new(this);
 
         CrosspostSettings.CrosspostChannels.CollectionChanged += CrosspostSettings.CrosspostCollectionUpdated();
         AutoUnarchiveThreads.CollectionChanged += UnarchiveThreadsUpdated();
@@ -39,8 +41,9 @@ public class Guild
     public InVoiceTextPrivacySettings InVoiceTextPrivacySettings { get; set; }
     public InviteTrackerSettings InviteTrackerSettings { get; set; }
     public NameNormalizerSettings NameNormalizerSettings { get; set; }
+    public EmbedMessageSettings EmbedMessageSettings { get; set; }
 
-    public Lavalink Lavalink { get; set; } = new();
+    public Lavalink Lavalink { get; set; }
 
     public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
     public ObservableCollection<ulong> AutoUnarchiveThreads { get; set; } = new();

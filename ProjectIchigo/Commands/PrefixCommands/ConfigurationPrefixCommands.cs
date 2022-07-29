@@ -492,15 +492,6 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -544,15 +535,6 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
@@ -585,6 +567,49 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.AutoUnarchiveCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
+
+    [Group("embedmessages"),
+    CommandModule("configuration"),
+    Description("Allows you to review and change settings related to automatic message embedding.")]
+    public class MessageEmbedding : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Allows you to review the currently used settings related to automatic message embedding.")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.EmbedMessageCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows you to change the currently used settings related to automatic message embedding.")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.EmbedMessageCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
     }
