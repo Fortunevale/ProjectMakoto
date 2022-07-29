@@ -21,13 +21,13 @@ internal class DatabaseQueue
 
                 try
                 {
-                    if (Queue.Count == 0 || !Queue.Any<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed))
+                    if (!Queue.Any(x => !x.Value.Executed && !x.Value.Failed))
                     {
                         Thread.Sleep(10);
                         continue;
                     }
 
-                    b = Queue.OrderBy(x => (int)x.Value?.Priority).First<KeyValuePair<string, RequestQueue>>(x => !x.Value.Executed && !x.Value.Failed);
+                    b = Queue.OrderBy(x => (int)x.Value?.Priority).First(x => !x.Value.Executed && !x.Value.Failed);
                 }
                 catch (Exception ex) 
                 { 
@@ -92,9 +92,12 @@ internal class DatabaseQueue
 
         string key = Guid.NewGuid().ToString();
 
+        RequestQueue value;
+
         try
         {
-            Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority });
+            value = new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority };
+            Queue.Add(key, value);
         }
         catch (Exception)
         {
@@ -107,19 +110,20 @@ internal class DatabaseQueue
                 await RunCommand(cmd, priority, depth + 1);
                 return;
             }
+            throw;
         }
 
-        while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
+        while (Queue.ContainsKey(key) && !value.Executed && !value.Failed)
             Thread.Sleep(1);
 
-        var response = Queue[key];
         Queue.Remove(key);
 
-        if (response.Executed)
+        if (value.Executed)
             return;
-
-        if (response.Failed)
-            throw response.Exception ?? new Exception("The command execution failed but there no exception was stored");
+        else if (value.Failed)
+            throw value.Exception ?? new Exception("The command execution failed but there no exception was stored");
+        else
+            throw new Exception("The command was not processed.");
 
         throw new Exception("This exception should be impossible to get.");
     }
@@ -131,9 +135,12 @@ internal class DatabaseQueue
 
         string key = Guid.NewGuid().ToString();
 
+        RequestQueue value;
+
         try
         {
-            Queue.Add(key, new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low });
+            value = new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low };
+            Queue.Add(key, value);
         }
         catch (Exception)
         {
@@ -145,19 +152,20 @@ internal class DatabaseQueue
 
                 return await RunPing(conn, depth + 1);
             }
+            throw;
         }
 
-        while (Queue.ContainsKey(key) && !Queue[key].Executed && !Queue[key].Failed)
+        while (Queue.ContainsKey(key) && !value.Executed && !value.Failed)
             Thread.Sleep(50);
 
-        var response = Queue[key];
         Queue.Remove(key);
 
-        if (response.Executed)
+        if (value.Executed)
             return true;
-
-        if (response.Failed)
+        else if (value.Failed)
             return false;
+        else
+            throw new Exception("The ping was not processed.");
 
         throw new Exception("This exception should be impossible to get.");
     }
@@ -172,8 +180,8 @@ internal class DatabaseQueue
         public QueuePriority Priority { get; set; } = QueuePriority.Normal;
         public MySqlConnection Connection { get; set; }
         public MySqlCommand Command { get; set; }
-        public bool Executed { get; set; }
-        public bool Failed { get; set; }
+        public bool Executed { get; set; } = false;
+        public bool Failed { get; set; } = false;
         public Exception Exception { get; set; }
     }
 }
