@@ -120,7 +120,7 @@ public class Lavalink
         private ulong _UserId = 0;
         public ulong UserId 
         { 
-            get => user?.Id ?? UserId; 
+            get => user?.Id ?? _UserId; 
             set
             {
                 if (user is not null)
@@ -158,7 +158,7 @@ public class Lavalink
 
                 _logger.LogDebug($"Initializing Player for {Guild.Id}..");
 
-                int UserAmount = 0;
+                int UserAmount = guildConnection.Channel.Users.Count;
                 CancellationTokenSource VoiceUpdateTokenSource = new();
                 async Task VoiceStateUpdated(DiscordClient s, VoiceStateUpdateEventArgs e)
                 {
