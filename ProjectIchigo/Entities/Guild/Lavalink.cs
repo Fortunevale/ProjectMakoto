@@ -2,6 +2,15 @@ namespace ProjectIchigo.Entities;
 
 public class Lavalink
 {
+    public Lavalink(Guild guild)
+    {
+        Parent = guild;
+    }
+
+    private Guild Parent { get; set; }
+
+
+
     DiscordGuild Guild { get; set; }
 
     public List<QueueInfo> SongQueue = new();
@@ -10,10 +19,71 @@ public class Lavalink
     public List<ulong> collectedDisconnectVotes = new();
     public List<ulong> collectedClearQueueVotes = new();
 
-    public bool Repeat = false;
-    public bool Shuffle = false;
+    private ulong _ChannelId { get; set; } = 0;
+    public ulong ChannelId
+    {
+        get => _ChannelId;
+        set
+        {
+            _ChannelId = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "lavalink_channel", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
+    
+    private string _CurrentVideo { get; set; } = "";
+    public string CurrentVideo
+    {
+        get => _CurrentVideo;
+        set
+        {
+            _CurrentVideo = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "lavalink_currentvideo", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
+    
+    private long _CurrentVideoPosition { get; set; } = -1;
+    public long CurrentVideoPosition
+    {
+        get => _CurrentVideoPosition;
+        set
+        {
+            _CurrentVideoPosition = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "lavalink_currentposition", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
 
-    public bool IsPaused = false;
+    private bool _Repeat { get; set; } = false;
+    public bool Repeat
+    {
+        get => _Repeat;
+        set
+        {
+            _Repeat = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "lavalink_repeat", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
+
+    private bool _Shuffle { get; set; } = false;
+    public bool Shuffle
+    {
+        get => _Shuffle;
+        set
+        {
+            _Shuffle = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "lavalink_shuffle", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
+
+    private bool _IsPaused { get; set; } = false;
+    public bool IsPaused
+    {
+        get => _IsPaused;
+        set
+        {
+            _IsPaused = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "lavalink_paused", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
 
     public class QueueInfo
     {
@@ -40,7 +110,7 @@ public class Lavalink
 
         _logger.LogDebug($"Disposed Player for {Id}. ({reason})");
 
-        _bot._guilds[Id].Lavalink = new();
+        _bot._guilds[Id].Lavalink = new(Parent);
     }
 
     public void QueueHandler(Bot _bot, DiscordClient sender, LavalinkNodeConnection nodeConnection, LavalinkGuildConnection guildConnection)
@@ -88,7 +158,7 @@ public class Lavalink
                                     if (UserAmount <= 1)
                                     {
                                         _bot._guilds[e.Guild.Id].Lavalink.Dispose(_bot, e.Guild.Id, "No users");
-                                        _bot._guilds[e.Guild.Id].Lavalink = new();
+                                        _bot._guilds[e.Guild.Id].Lavalink = new(Parent);
                                     }
                                 });
                         }
@@ -135,13 +205,23 @@ public class Lavalink
                                 await conn.PlayAsync(track);
                                 await conn.SeekAsync((TimeSpan)position);
                                 guildConnection = nodeConnection.GetGuildConnection(Guild);
+                                ChannelId = guildConnection.Channel.Id;
                             }
                         }
                     }).Add(_bot._watcher);
                 }
 
+                async Task PlayerUpdated(LavalinkGuildConnection sender, PlayerUpdateEventArgs e)
+                {
+                    CurrentVideo = (e.Player?.CurrentState?.CurrentTrack?.Uri ?? new UriBuilder().Uri).ToString();
+                    CurrentVideoPosition = (Convert.ToInt64(e.Player?.CurrentState?.PlaybackPosition.TotalSeconds ?? -1d));
+                }
+
                 _logger.LogDebug($"Initializing VoiceStateUpdated Event for {Guild.Id}..");
                 sender.VoiceStateUpdated += VoiceStateUpdated;
+
+                _logger.LogDebug($"Initializing PlayerUpdated Event for {Guild.Id}..");
+                guildConnection.PlayerUpdated += PlayerUpdated;
 
                 QueueInfo LastPlayedTrack = null;
 
@@ -169,6 +249,7 @@ public class Lavalink
                     {
                         _logger.LogDebug($"Destroying Player for {Guild.Id}..");
                         sender.VoiceStateUpdated -= VoiceStateUpdated;
+                        guildConnection.PlayerUpdated -= PlayerUpdated;
 
                         _ = guildConnection.DisconnectAsync();
                         return;
@@ -208,6 +289,7 @@ public class Lavalink
                     var loadedTrack = loadResult.Tracks.First();
 
                     guildConnection = nodeConnection.GetGuildConnection(Guild);
+                    ChannelId = guildConnection.Channel.Id;
 
                     if (guildConnection is not null)
                     {

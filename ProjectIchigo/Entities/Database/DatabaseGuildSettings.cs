@@ -52,4 +52,11 @@ public class DatabaseGuildSettings
     public string autounarchivelist { get; set; }
     public bool normalizenames { get; set; }
     public bool embed_messages { get; set; }
+    public ulong lavalink_channel { get; set; }
+    public string lavalink_currentvideo { get; set; }
+    public long lavalink_currentposition { get; set; }
+    public bool lavalink_paused { get; set; }
+    public bool lavalink_shuffle { get; set; }
+    public bool lavalink_repeat { get; set; }
+    public string lavalink_queue { get; set; }
 }

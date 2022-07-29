@@ -769,6 +769,50 @@ public class Bot
             await _databaseClient.CheckGuildTables();
             await _databaseClient.FullSyncDatabase(true);
 
+
+            foreach (var guild in e.Guilds)
+            {
+                try
+                {
+                    if (_guilds[guild.Key].Lavalink.ChannelId != 0)
+                    {
+                        if (!guild.Value.Channels.ContainsKey(_guilds[guild.Key].Lavalink.ChannelId))
+                            continue;
+
+                        var channel = guild.Value.GetChannel(_guilds[guild.Key].Lavalink.ChannelId);
+
+                        var lava = discordClient.GetLavalink();
+                        var node = lava.ConnectedNodes.Values.First();
+                        var conn = node.GetGuildConnection(guild.Value);
+
+                        if (conn is null)
+                        {
+                            if (!lava.ConnectedNodes.Any())
+                            {
+                                throw new Exception("Lavalink connection isn't established.");
+                            }
+
+                            conn = await node.ConnectAsync(channel);
+                        }
+
+                        var loadResult = await node.Rest.GetTracksAsync(_guilds[guild.Key].Lavalink.CurrentVideo, LavalinkSearchType.Plain);
+
+                        if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
+                            continue;
+
+                        await conn.PlayAsync(loadResult.Tracks.First());
+
+                        await Task.Delay(2000);
+                        await conn.SeekAsync(TimeSpan.FromSeconds(_guilds[guild.Key].Lavalink.CurrentVideoPosition));
+
+                        _guilds[guild.Key].Lavalink.QueueHandler(this, discordClient, node, conn);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
+                }
+            }
         }).Add(_watcher);
     }
 

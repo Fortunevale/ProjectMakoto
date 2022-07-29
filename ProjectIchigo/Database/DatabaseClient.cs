@@ -483,7 +483,15 @@ internal class DatabaseClient
                             
                             normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled,
 
-                            embed_messages = x.Value.EmbedMessageSettings.UseEmbedding
+                            embed_messages = x.Value.EmbedMessageSettings.UseEmbedding,
+
+                            lavalink_channel = x.Value.Lavalink.ChannelId,
+                            lavalink_currentposition = x.Value.Lavalink.CurrentVideoPosition,
+                            lavalink_currentvideo = x.Value.Lavalink.CurrentVideo,
+                            lavalink_paused = x.Value.Lavalink.IsPaused,
+                            lavalink_shuffle = x.Value.Lavalink.Shuffle,
+                            lavalink_repeat = x.Value.Lavalink.Repeat,
+                            lavalink_queue = JsonConvert.SerializeObject(x.Value.Lavalink.SongQueue),
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -560,6 +568,14 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"normalizenames{i}", DatabaseInserts[i].normalizenames);
 
                             cmd.Parameters.AddWithValue($"embed_messages{i}", DatabaseInserts[i].embed_messages);
+
+                            cmd.Parameters.AddWithValue($"lavalink_channel{i}", DatabaseInserts[i].lavalink_channel);
+                            cmd.Parameters.AddWithValue($"lavalink_currentvideo{i}", DatabaseInserts[i].lavalink_currentvideo);
+                            cmd.Parameters.AddWithValue($"lavalink_currentposition{i}", DatabaseInserts[i].lavalink_currentposition);
+                            cmd.Parameters.AddWithValue($"lavalink_paused{i}", DatabaseInserts[i].lavalink_paused);
+                            cmd.Parameters.AddWithValue($"lavalink_shuffle{i}", DatabaseInserts[i].lavalink_shuffle);
+                            cmd.Parameters.AddWithValue($"lavalink_repeat{i}", DatabaseInserts[i].lavalink_repeat);
+                            cmd.Parameters.AddWithValue($"lavalink_queue{i}", DatabaseInserts[i].lavalink_queue);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
