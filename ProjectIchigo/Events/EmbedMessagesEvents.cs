@@ -55,6 +55,7 @@ internal class EmbedMessagesEvents
                                                                     || message.Attachments[0].FileName.EndsWith(".jpg")
                                                                     || message.Attachments[0].FileName.EndsWith(".gif")) ? message.Attachments[0].Url : ""),
                         Timestamp = message.Timestamp,
+                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Deleting via the button is restricted to the original message author."}
                     }).AddComponents(Delete));
 
                     var interaction = await sender.GetInteractivity().WaitForButtonAsync(msg, e.Author, TimeSpan.FromMinutes(30));
@@ -69,7 +70,13 @@ internal class EmbedMessagesEvents
 
                     if (interaction.Result.Interaction.Data.CustomId == Delete.CustomId)
                     {
-                        _ = msg.DeleteAsync();
+                        _ = msg.DeleteAsync().ContinueWith(x =>
+                        {
+                            if (x.IsCompletedSuccessfully)
+                                _ = interaction.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("✅ `The message was deleted.`").AsEphemeral());
+                            else
+                                _ = interaction.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `Failed to delete the message.`").AsEphemeral());
+                        });
                     }
                 }
             }
