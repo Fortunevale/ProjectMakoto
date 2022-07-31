@@ -5,6 +5,8 @@ public class Config
     public bool IsDev = false;
 
     public ulong GlobalBanAnnouncementsChannelId = 0;
+    public ulong GithubLogChannelId = 0;
+    public ulong NewsChannelId = 0;
 
     public ulong AssetsGuildId = 0;
     public ulong GraphAssetsChannelId = 0;
