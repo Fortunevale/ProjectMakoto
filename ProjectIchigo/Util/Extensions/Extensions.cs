@@ -168,7 +168,7 @@ internal static class Extensions
 
     internal static List<Tuple<ulong, string, bool>>? GetEmotes(this string content)
     {
-        if (Regex.IsMatch(content, @"<:((a?)[\w]*):(\d*)>", RegexOptions.ExplicitCapture))
+        if (Regex.IsMatch(content, @"<(a?):([\w]*):(\d*)>", RegexOptions.ExplicitCapture))
         {
             MatchCollection matchCollection = Regex.Matches(content, @"<(a?):([\w]*):(\d*)>");
             return matchCollection.Select<Match, Tuple<ulong, string, bool>>(x => new Tuple<ulong, string, bool>(Convert.ToUInt64(x.Groups[3].Value), x.Groups[2].Value, !x.Groups[1].Value.IsNullOrWhiteSpace())).GroupBy<Tuple<ulong, string, bool>, ulong>(x => x.Item1).Select<IGrouping<ulong, Tuple<ulong, string, bool>>, Tuple<ulong, string, bool>>(y => y.First<Tuple<ulong, string, bool>>()).ToList<Tuple<ulong, string, bool>>();
