@@ -744,10 +744,6 @@ public abstract class BaseCommand
             Color = EmbedColors.Error
         };
 
-        if (ctx.Client.GetCommandsNext()
-            .RegisteredCommands[ctx.Command.Name].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
-            embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
-
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(Context.User.Mention));
     }
     
