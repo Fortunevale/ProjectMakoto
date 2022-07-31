@@ -104,4 +104,16 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot._watcher, ctx);
     }
+    
+    [SlashCommand("follow", "Allows you to follow an announcement channel from our support server.", (long)Permissions.ManageWebhooks, dmPermission: false)]
+    public async Task Follow(InteractionContext ctx, [Option("channel", "The channel")] FollowChannel channel)
+    {
+        Task.Run(async () =>
+        {
+            await new FollowUpdatesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "channel", channel },
+            });
+        }).Add(_bot._watcher, ctx);
+    }
 }

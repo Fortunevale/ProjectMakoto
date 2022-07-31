@@ -136,4 +136,68 @@ internal class ModerationPrefixCommands : BaseCommandModule
             });
         }).Add(_bot._watcher, ctx);
     }
+
+
+
+    [Group("follow"),
+    CommandModule("moderation"),
+    Description("Allows you to follow an announcement channel from our support server.")]
+    public class MessageEmbedding : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("githubupdates"),
+        Description("Follow the github updates channel.")]
+        public async Task GithubUpdates(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new FollowUpdatesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "channel", FollowChannel.GithubUpdates },
+                });
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("globalbans"),
+        Description("Follow the global bans channel.")]
+        public async Task GlobalBans(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new FollowUpdatesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "channel", FollowChannel.GlobalBans },
+                });
+            }).Add(_bot._watcher, ctx);
+        }
+        
+        [Command("news"),
+        Description("Follow the news channel.")]
+        public async Task News(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new FollowUpdatesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "channel", FollowChannel.News },
+                });
+            }).Add(_bot._watcher, ctx);
+        }
+    }
 }
