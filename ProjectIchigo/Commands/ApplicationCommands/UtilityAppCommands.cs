@@ -3,7 +3,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommand("user-info", "Displays information the bot knows about you or the mentioned user.")]
+    [SlashCommand("user-info", "Displays information the bot knows about you or the mentioned user.", dmPermission: false)]
     public async Task UserInfo(InteractionContext ctx, [Option("User", "The User")]DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -15,7 +15,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
-    [SlashCommand("avatar", "Displays your or the mentioned user's avatar as an embedded image.")]
+    [SlashCommand("avatar", "Displays your or the mentioned user's avatar as an embedded image.", dmPermission: false)]
     public async Task Avatar(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -27,7 +27,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
     
-    [SlashCommand("banner", "Displays your or the mentioned user's banner as an embedded image.")]
+    [SlashCommand("banner", "Displays your or the mentioned user's banner as an embedded image.", dmPermission: false)]
     public async Task Banner(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -39,7 +39,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
     
-    [SlashCommand("rank", "Shows your or the mentioned user's rank and rank progress.")]
+    [SlashCommand("rank", "Shows your or the mentioned user's rank and rank progress.", dmPermission: false)]
     public async Task Rank(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -51,7 +51,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
-    [SlashCommand("leaderboard", "Displays the current experience rankings on this server.")]
+    [SlashCommand("leaderboard", "Displays the current experience rankings on this server.", dmPermission: false)]
     public async Task Leaderboard(InteractionContext ctx, [Option("amount", "The amount of rankings to show"), MinimumValue(3), MaximumValue(50)] int ShowAmount = 10)
     {
         Task.Run(async () =>
@@ -63,7 +63,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
     
-    [SlashCommand("submit-url", "Allows you to contribute a new malicious domain to our database.")]
+    [SlashCommand("submit-url", "Allows you to contribute a new malicious domain to our database.", dmPermission: false)]
     public async Task UrlSubmit(InteractionContext ctx, [Option("url", "The url")] string url)
     {
         Task.Run(async () =>

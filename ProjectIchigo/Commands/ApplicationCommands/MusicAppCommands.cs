@@ -1,12 +1,12 @@
 ﻿namespace ProjectIchigo.ApplicationCommands;
 internal class MusicAppCommands : ApplicationCommandsModule
 {
-    [SlashCommandGroup("music", "Allows to play music and change the current playback settings.")]
+    [SlashCommandGroup("music", "Allows to play music and change the current playback settings.", dmPermission: false)]
     public class MusicCommands : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("join", "The bot will join your channel if it's not already being used in this server.")]
+        [SlashCommand("join", "The bot will join your channel if it's not already being used in this server.", dmPermission: false)]
         public async Task Join(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -18,7 +18,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("disconnect", "Starts a voting to disconnect the bot.")]
+        [SlashCommand("disconnect", "Starts a voting to disconnect the bot.", dmPermission: false)]
         public async Task Disconnect(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -27,7 +27,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("forcedisconnect", "Forces the bot to disconnect. `DJ` role or Administrator permissions required.")]
+        [SlashCommand("forcedisconnect", "Forces the bot to disconnect. `DJ` role or Administrator permissions required.", dmPermission: false)]
         public async Task ForceDisconnect(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -36,7 +36,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("play", "Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.")]
+        [SlashCommand("play", "Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.", dmPermission: false)]
         public async Task Play(InteractionContext ctx, [Option("search", "Search Query/Url")] string search)
         {
             Task.Run(async () =>
@@ -48,7 +48,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("pause", "Pause or unpause the current song.")]
+        [SlashCommand("pause", "Pause or unpause the current song.", dmPermission: false)]
         public async Task Pause(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -57,7 +57,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("queue", "Displays the current queue.")]
+        [SlashCommand("queue", "Displays the current queue.", dmPermission: false)]
         public async Task Queue(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -66,7 +66,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("removequeue", "Remove a song from the queue.")]
+        [SlashCommand("removequeue", "Remove a song from the queue.", dmPermission: false)]
         public async Task RemoveQueue(InteractionContext ctx, [Option("video", "The Index or Video Title")] string selection)
         {
             Task.Run(async () =>
@@ -78,7 +78,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("skip", "Starts a voting to skip the current song.")]
+        [SlashCommand("skip", "Starts a voting to skip the current song.", dmPermission: false)]
         public async Task Skip(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -87,7 +87,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("forceskip", "Forces skipping of the current song. `DJ` role or Administrator permissions required.")]
+        [SlashCommand("forceskip", "Forces skipping of the current song. `DJ` role or Administrator permissions required.", dmPermission: false)]
         public async Task ForceSkip(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -96,7 +96,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("clearqueue", "Starts a voting to clear the current queue.")]
+        [SlashCommand("clearqueue", "Starts a voting to clear the current queue.", dmPermission: false)]
         public async Task ClearQueue(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -105,7 +105,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("forceclearqueue", "Forces clearing the current queue. `DJ` role or Administrator permissions required.")]
+        [SlashCommand("forceclearqueue", "Forces clearing the current queue. `DJ` role or Administrator permissions required.", dmPermission: false)]
         public async Task ForceClearQueue(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -114,7 +114,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("shuffle", "Toggles shuffling of the current queue.")]
+        [SlashCommand("shuffle", "Toggles shuffling of the current queue.", dmPermission: false)]
         public async Task Shuffle(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -123,7 +123,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("repeat", "Toggles repeating the current queue.")]
+        [SlashCommand("repeat", "Toggles repeating the current queue.", dmPermission: false)]
         public async Task Repeat(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -133,12 +133,12 @@ internal class MusicAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("playlists", "Allows you to manage your personal playlists.")]
+    [SlashCommandGroup("playlists", "Allows you to manage your personal playlists.", dmPermission: false)]
     public class Playlists : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("manage", "Allows you to use and manage your playlists.")]
+        [SlashCommand("manage", "Allows you to use and manage your playlists.", dmPermission: false)]
         public async Task Manage(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -147,7 +147,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [SlashCommand("load-share", "Loads a playlist share.")]
+        [SlashCommand("load-share", "Loads a playlist share.", dmPermission: false)]
         public async Task LoadShare(InteractionContext ctx, [Option("user", "The user")] DiscordUser userid, [Option("Id", "The Id")] string id)
         {
             Task.Run(async () =>
