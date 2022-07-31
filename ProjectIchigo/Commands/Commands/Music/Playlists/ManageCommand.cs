@@ -329,7 +329,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(new UserPlaylist
+                var v = new UserPlaylist
                 {
                     PlaylistName = PlaylistName.Result.Content,
                     List = Tracks.Select(x => new PlaylistItem
@@ -337,7 +337,9 @@ internal class ManageCommand : BaseCommand
                         Title = x.Title,
                         Url = x.Uri.ToString(),
                     }).ToList()
-                });
+                };
+
+                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(v);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -351,8 +353,7 @@ internal class ManageCommand : BaseCommand
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow
                 }));
-                await Task.Delay(5000);
-                await ExecuteCommand(ctx, arguments);
+                await HandlePlaylistModify(v);
                 return;
             }
             else if (e.Result.Interaction.Data.CustomId == SaveCurrent.CustomId)
@@ -474,7 +475,7 @@ internal class ManageCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`Your playlist '{PlaylistName.Result.Content}' has been created with {Tracks.Count} entries.`",
+                    Description = $"`Your playlist '{PlaylistName.Result.Content}' has been created with {Tracks.Count} entries.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
                     Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
@@ -697,7 +698,7 @@ internal class ManageCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`Your playlist '{PlaylistName}' has been created with {Tracks.Count} entries.`",
+                    Description = $"`Your playlist '{PlaylistName}' has been created with {Tracks.Count} entries.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
                     Color = EmbedColors.Success,
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
@@ -726,6 +727,30 @@ internal class ManageCommand : BaseCommand
 
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
+                UserPlaylist SelectedPlaylist;
+
+                try
+                {
+                    string SelectedPlaylistId = await PromptCustomSelection(Playlists);
+                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+                await HandlePlaylistModify(SelectedPlaylist);
+                return;
+            }
+            else if (e.Result.Interaction.Data.CustomId == DeletePlaylist.CustomId)
+            {
+                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+
                 string SelectedPlaylistId;
                 UserPlaylist SelectedPlaylist;
 
@@ -744,6 +769,44 @@ internal class ManageCommand : BaseCommand
                     throw;
                 }
 
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Deleting your playlist '{SelectedPlaylist.PlaylistName}'..`",
+                    Color = EmbedColors.Loading,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+
+                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
+                    Color = EmbedColors.Success,
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.Guild.Name,
+                        IconUrl = ctx.Guild.IconUrl
+                    },
+                    Footer = ctx.GenerateUsedByFooter(),
+                    Timestamp = DateTime.UtcNow
+                }));
+                await Task.Delay(5000);
+                await ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else
+            {
+                DeleteOrInvalidate();
+            }
+
+            async Task HandlePlaylistModify(UserPlaylist SelectedPlaylist)
+            {
                 int LastInt = 0;
                 int GetInt()
                 {
@@ -837,7 +900,7 @@ internal class ManageCommand : BaseCommand
                                 {
                                     if (SelectedPlaylist.List.Count >= 250)
                                     {
-                                        embed.Description = $"❌ `You already have 250 Tracks stored in this playlist. Please delete one to add a new one.`";
+                                        embed.Description = $"❌ `You already have 250 Tracks stored in this playlist. Please delete one to add a new one.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..";
                                         embed.Color = EmbedColors.Error;
                                         await RespondOrEdit(embed.Build());
                                         _ = Task.Delay(5000).ContinueWith(async x =>
@@ -866,7 +929,7 @@ internal class ManageCommand : BaseCommand
 
                                     if (SelectedPlaylist.List.Count >= 250)
                                     {
-                                        embed.Description = $"❌ `You already have 250 Tracks stored in this playlist. Please delete one to add a new one.`";
+                                        embed.Description = $"❌ `You already have 250 Tracks stored in this playlist. Please delete one to add a new one.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..";
                                         embed.Color = EmbedColors.Error;
                                         await RespondOrEdit(embed.Build());
                                         _ = Task.Delay(5000).ContinueWith(async x =>
@@ -920,7 +983,7 @@ internal class ManageCommand : BaseCommand
 
                                         if (!NewThumbnail.Result.Attachments.Any(x => x.FileName.EndsWith(".png") || x.FileName.EndsWith(".jpeg") || x.FileName.EndsWith(".jpg")))
                                         {
-                                            embed.Description = $"❌ `Please attach an image.`";
+                                            embed.Description = $"❌ `Please attach an image.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..";
                                             embed.Color = EmbedColors.Error;
                                             await RespondOrEdit(embed.Build());
                                             _ = Task.Delay(5000).ContinueWith(async x =>
@@ -934,7 +997,7 @@ internal class ManageCommand : BaseCommand
 
                                         if (attachment.FileSize > 8000000)
                                         {
-                                            embed.Description = $"❌ `Please attach an image below 8mb.`";
+                                            embed.Description = $"❌ `Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..";
                                             embed.Color = EmbedColors.Error;
                                             await RespondOrEdit(embed.Build());
                                             _ = Task.Delay(5000).ContinueWith(async x =>
@@ -955,7 +1018,7 @@ internal class ManageCommand : BaseCommand
                                     catch (Exception ex)
                                     {
                                         _logger.LogError($"Failed to upload thumbnail", ex);
-                                        embed.Description = $"❌ `Something went wrong while trying to upload your thumbnail. Please try again.`";
+                                        embed.Description = $"❌ `Something went wrong while trying to upload your thumbnail. Please try again.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..";
                                         embed.Color = EmbedColors.Error;
                                         await RespondOrEdit(embed.Build());
                                         _ = Task.Delay(5000).ContinueWith(async x =>
@@ -1073,7 +1136,7 @@ internal class ManageCommand : BaseCommand
                                     {
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                                         {
-                                            Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`",
+                                            Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
                                             Color = EmbedColors.Success,
                                             Author = new DiscordEmbedBuilder.EmbedAuthor
                                             {
@@ -1119,63 +1182,6 @@ internal class ManageCommand : BaseCommand
                         }
                     }).Add(ctx.Bot._watcher, ctx);
                 }
-            }
-            else if (e.Result.Interaction.Data.CustomId == DeletePlaylist.CustomId)
-            {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
-
-                string SelectedPlaylistId;
-                UserPlaylist SelectedPlaylist;
-
-                try
-                {
-                    SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut();
-                    return;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
-
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-                {
-                    Description = $"`Deleting your playlist '{SelectedPlaylist.PlaylistName}'..`",
-                    Color = EmbedColors.Loading,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
-
-                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
-
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-                {
-                    Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`",
-                    Color = EmbedColors.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
-                await Task.Delay(5000);
-                await ExecuteCommand(ctx, arguments);
-                return;
-            }
-            else
-            {
-                DeleteOrInvalidate();
             }
         });
     }
