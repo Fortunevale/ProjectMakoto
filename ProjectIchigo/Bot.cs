@@ -913,7 +913,7 @@ public class Bot
         Environment.Exit(0);
     }
 
-    private void LogHandler(object? sender, LogMessageEventArgs e)
+    private async void LogHandler(object? sender, LogMessageEventArgs e)
     {
         switch (e.LogEntry.LogLevel)
         {
@@ -931,8 +931,26 @@ public class Bot
             {
                 if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
                 {
-                    _logger.LogRaised -= LogHandler;
-                    _ = ExitApplication();
+                    _status.DiscordDisconnections++;
+
+                    if (_status.DiscordDisconnections >= 3)
+                    {
+                        _logger.LogRaised -= LogHandler;
+                        _ = ExitApplication();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await discordClient.ConnectAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogFatal("Failed to reconnect to discord", ex);
+                            _logger.LogRaised -= LogHandler;
+                            _ = ExitApplication();
+                        }
+                    }
                 }
                 else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
                 {
