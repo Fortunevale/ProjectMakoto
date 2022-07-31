@@ -19,9 +19,6 @@ internal class PlayCommand : BaseCommand
                 return;
             }
 
-            if (Regex.IsMatch(search, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
-                throw new Exception();
-
             var embed = new DiscordEmbedBuilder
             {
                 Description = $":arrows_counterclockwise: `Preparing connection..`",
@@ -45,55 +42,33 @@ internal class PlayCommand : BaseCommand
                 return;
             }
 
-            var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First();
-
-            embed.Description = $":arrows_counterclockwise: `Looking for '{search}'..`";
-            await RespondOrEdit(embed.Build());
+            var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            LavalinkLoadResult loadResult;
-
-            if (Regex.IsMatch(search, Resources.Regex.YouTubeUrl))
-                loadResult = await node.Rest.GetTracksAsync(search, LavalinkSearchType.Plain);
-            else
-                loadResult = await node.Rest.GetTracksAsync(search);
-
-            if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
-            {
-                embed.Description = $"❌ `Failed to load '{search}'.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(embed.Build());
+            if (!Continue || !Tracks.IsNotNullAndNotEmpty())
                 return;
-            }
-            else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
-            {
-                embed.Description = $"❌ `No matches found for '{search}'.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(embed.Build());
-                return;
-            }
-            else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
+
+            if (Tracks.Count > 1)
             {
                 int added = 0;
 
-                foreach (var b in loadResult.Tracks)
+                foreach (var b in Tracks)
                 {
                     added++;
                     ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), ctx.Guild, ctx.User));
                 }
 
-                embed.Description = $"✅ `Queued {added} songs from `[`{loadResult.PlaylistInfo.Name}`]({search})`.`";
+                embed.Description = $"✅ `Queued {added} songs from `[`{oriResult.PlaylistInfo.Name}`]({search})`.`";
 
                 embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - added + 1)} - {ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
                 embed.Color = EmbedColors.Success;
-                await RespondOrEdit(embed.Build());
+                await ctx.BaseCommand.RespondOrEdit(embed);
             }
-            else if (loadResult.LoadResultType == LavalinkLoadResultType.TrackLoaded)
+            else if (Tracks.Count == 1)
             {
-                LavalinkTrack track = loadResult.Tracks.First();
+                var track = Tracks[0];
 
                 ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
 
@@ -104,41 +79,7 @@ internal class PlayCommand : BaseCommand
                 embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 
                 embed.Color = EmbedColors.Success;
-                await RespondOrEdit(embed.Build());
-            }
-            else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
-            {
-                embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search result(s). Please select the song you want to add below.`";
-                await RespondOrEdit(embed.Build());
-
-                string SelectedUri;
-
-                try
-                {
-                    SelectedUri = await PromptCustomSelection(loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut();
-                    return;
-                }
-
-                LavalinkTrack track = loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri);
-
-                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
-
-                embed.Description = $"✅ `Queued `[`{track.Title}`]({track.Uri})`.`";
-
-                embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
-                embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
-                embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
-
-                embed.Color = EmbedColors.Success;
-                await RespondOrEdit(embed.Build());
-            }
-            else
-            {
-                throw new Exception($"Unknown Load Result Type: {loadResult.LoadResultType}");
+                await ctx.BaseCommand.RespondOrEdit(embed.Build());
             }
         });
     }

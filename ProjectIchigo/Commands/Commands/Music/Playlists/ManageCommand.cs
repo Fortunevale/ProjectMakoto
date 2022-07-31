@@ -294,67 +294,10 @@ internal class ManageCommand : BaseCommand
                 var lava = ctx.Client.GetLavalink();
                 var node = lava.ConnectedNodes.Values.First();
 
-                if (Regex.IsMatch(FirstTrack.Result.Content, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
-                    throw new Exception();
+                var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, FirstTrack.Result.Content);
 
-                LavalinkLoadResult loadResult;
-
-                await RespondOrEdit(new DiscordMessageBuilder()
-                    .WithEmbed(embed
-                        .WithDescription($":arrows_counterclockwise: `Looking for '{FirstTrack.Result.Content}'..`")
-                        .WithAuthor(ctx.Guild.Name, null, Resources.StatusIndicators.DiscordCircleLoading)));
-
-                if (Regex.IsMatch(FirstTrack.Result.Content, Resources.Regex.YouTubeUrl))
-                    loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content, LavalinkSearchType.Plain);
-                else
-                    loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content);
-
-                List<PlaylistItem> Tracks = new();
-
-                if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
-                {
-                    embed.Description = $"❌ `Failed to load '{FirstTrack.Result.Content}'.`";
-                    embed.Color = EmbedColors.Error;
-                    await RespondOrEdit(embed.Build());
+                if (!Continue || !Tracks.IsNotNullAndNotEmpty())
                     return;
-                }
-                else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
-                {
-                    embed.Description = $"❌ `No matches found for '{FirstTrack.Result.Content}'.`";
-                    embed.Color = EmbedColors.Error;
-                    await RespondOrEdit(embed.Build());
-                    return;
-                }
-                else if (loadResult.LoadResultType is LavalinkLoadResultType.PlaylistLoaded or LavalinkLoadResultType.TrackLoaded)
-                {
-                    Tracks.AddRange(loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).Take(250));
-                }
-                else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
-                {
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search results. Please select the song you want to add below.`";
-                    await RespondOrEdit(embed.Build());
-
-                    string SelectedUri;
-
-                    try
-                    {
-                        SelectedUri = await PromptCustomSelection(loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
-                    }
-                    catch (ArgumentException)
-                    {
-                        ModifyToTimedOut();
-                        return;
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
-
-                    LavalinkTrack track = loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri);
-
-                    Tracks.Add(new PlaylistItem { Title = track.Title, Url = track.Uri.ToString() });
-                }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -389,7 +332,11 @@ internal class ManageCommand : BaseCommand
                 ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(new UserPlaylist
                 {
                     PlaylistName = PlaylistName.Result.Content,
-                    List = Tracks
+                    List = Tracks.Select(x => new PlaylistItem
+                    {
+                        Title = x.Title,
+                        Url = x.Uri.ToString(),
+                    }).ToList()
                 });
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -915,87 +862,7 @@ internal class ManageCommand : BaseCommand
                                         _ = FirstTrack.Result.DeleteAsync();
                                     });
 
-                                    var lava = ctx.Client.GetLavalink();
-                                    var node = lava.ConnectedNodes.Values.First();
-
-                                    if (Regex.IsMatch(FirstTrack.Result.Content, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
-                                        throw new Exception();
-
-                                    LavalinkLoadResult loadResult;
-
-                                    await RespondOrEdit(new DiscordMessageBuilder()
-                                        .WithEmbed(embed
-                                            .WithDescription($":arrows_counterclockwise: `Looking for '{FirstTrack.Result.Content}'..`")
-                                            .WithAuthor(ctx.Guild.Name, null, Resources.StatusIndicators.DiscordCircleLoading)));
-
-                                    if (Regex.IsMatch(FirstTrack.Result.Content, Resources.Regex.YouTubeUrl))
-                                        loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content, LavalinkSearchType.Plain);
-                                    else
-                                        loadResult = await node.Rest.GetTracksAsync(FirstTrack.Result.Content);
-
-                                    List<PlaylistItem> Tracks = new();
-
-                                    switch (loadResult.LoadResultType)
-                                    {
-                                        case LavalinkLoadResultType.LoadFailed:
-                                        {
-                                            embed.Description = $"❌ `Failed to load '{FirstTrack.Result.Content}'.`";
-                                            embed.Color = EmbedColors.Error;
-                                            await RespondOrEdit(embed.Build());
-                                            _ = Task.Delay(5000).ContinueWith(async x =>
-                                            {
-                                                await UpdateMessage();
-                                            });
-                                            return;
-                                        }
-
-                                        case LavalinkLoadResultType.NoMatches:
-                                        {
-                                            embed.Description = $"❌ `No matches found for '{FirstTrack.Result.Content}'.`";
-                                            embed.Color = EmbedColors.Error;
-                                            await RespondOrEdit(embed.Build());
-                                            _ = Task.Delay(5000).ContinueWith(async x =>
-                                            {
-                                                await UpdateMessage();
-                                            });
-                                            return;
-                                        }
-
-                                        case LavalinkLoadResultType.PlaylistLoaded:
-                                        case LavalinkLoadResultType.TrackLoaded:
-                                        {
-                                            Tracks.AddRange(loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
-                                            break;
-                                        }
-
-                                        case LavalinkLoadResultType.SearchResult:
-                                        {
-                                            embed.Author.IconUrl = ctx.Guild.IconUrl;
-                                            embed.Description = $"❓ `Found {loadResult.Tracks.Count()} search results. Please select the song you want to add below.`";
-                                            await RespondOrEdit(embed.Build());
-
-                                            string SelectedUri;
-
-                                            try
-                                            {
-                                                SelectedUri = await PromptCustomSelection(loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
-                                            }
-                                            catch (ArgumentException)
-                                            {
-                                                ModifyToTimedOut();
-                                                return;
-                                            }
-                                            catch (Exception)
-                                            {
-                                                throw;
-                                            }
-
-                                            LavalinkTrack track = loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri);
-
-                                            Tracks.Add(new PlaylistItem { Title = track.Title, Url = track.Uri.ToString() });
-                                            break;
-                                        }
-                                    }
+                                    var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, FirstTrack.Result.Content);
 
                                     if (SelectedPlaylist.List.Count >= 250)
                                     {
@@ -1009,7 +876,7 @@ internal class ManageCommand : BaseCommand
                                         return;
                                     }
 
-                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count));
+                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
 
                                     await UpdateMessage();
                                     break;
