@@ -1,4 +1,4 @@
-namespace ProjectIchigo.Util;
+﻿namespace ProjectIchigo.Util;
 
 internal class TaskWatcher
 {
@@ -44,22 +44,21 @@ internal class TaskWatcher
                 else if (SharedCommandContext != null)
                     _logger.LogError($"Failed to execute '{SharedCommandContext.Prefix}{SharedCommandContext.CommandName}' for {SharedCommandContext.User.UsernameWithDiscriminator} ({SharedCommandContext.User.Id}){(SharedCommandContext.Channel is not null ? $"in #{SharedCommandContext.Channel.Name}" : "")}{(SharedCommandContext.Guild is not null ? $" on '{SharedCommandContext.Guild.Name}' ({SharedCommandContext.Guild.Id})" : "")}", b.task.Exception);
                 else
-                    _logger.LogError($"A non-command task failed to execute: {b.task.Exception}");
+                    _logger.LogError($"A non-command task failed to execute", b.task.Exception);
 
                 if (b.task.Exception.InnerException.GetType() == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {
-                    _logger.LogError($"WebRequestUrl: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest.Url}\n\n" +
-                            $"WebRequest: {JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented).Replace("\\", "")}\n\n" +
-                            $"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}");
+                    try { _logger.LogError($"WebRequestUrl: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest.Url}"); } catch { }
+                    try { _logger.LogError($"WebRequest: {JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebRequest, Formatting.Indented).Replace("\\", "")}"); } catch { }
+                    try { _logger.LogError($"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}"); } catch { }
                 }
 
                 if (CommandContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
-                        _ = CommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{CommandContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
-                        $"```csharp\n" +
-                        $"{b.task.Exception}" +
-                        $"\n```\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        _ = CommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
+                        .WithContent($"{CommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)
                                 return;
@@ -70,15 +69,14 @@ internal class TaskWatcher
                             });
                         });
                     }
-                    catch { }
+                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
                 if (InteractionContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
-                        _ = InteractionContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
-                        $"```csharp\n" +
-                        $"{b.task.Exception}" +
-                        $"\n```\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        _ = InteractionContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
+                        .WithContent($"{InteractionContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)
                                 return;
@@ -89,15 +87,14 @@ internal class TaskWatcher
                             });
                         });
                     }
-                    catch (Exception ex) { _logger.LogError("a", ex); }
+                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
                 
                 if (SharedCommandContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
-                        _ = SharedCommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
-                        $"```csharp\n" +
-                        $"{b.task.Exception}" +
-                        $"\n```\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        _ = SharedCommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
+                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)
                                 return;
@@ -108,15 +105,14 @@ internal class TaskWatcher
                             });
                         });
                     }
-                    catch (Exception ex) { _logger.LogError("a", ex); }
+                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
                 
                 if (ContextMenuContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
-                        _ = ContextMenuContext.Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($"{InteractionContext.User.Mention}\n:warning: `An unhandled exception occured while trying to execute your request.`\n\n" +
-                        $"```csharp\n" +
-                        $"{b.task.Exception}" +
-                        $"\n```\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        _ = ContextMenuContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
+                        .WithContent($"{ContextMenuContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)
                                 return;
@@ -127,12 +123,12 @@ internal class TaskWatcher
                             });
                         });
                     }
-                    catch (Exception ex) { _logger.LogError("a", ex); }
+                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
                 tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(500);
         }
     }
 
