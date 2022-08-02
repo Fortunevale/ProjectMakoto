@@ -15,10 +15,7 @@ internal class InviteTrackerEvents
 
         var Invites = await guild.GetInvitesAsync();
 
-        _bot._guilds[guild.Id].InviteTrackerSettings.Cache.Clear();
-
-        for (int i = 0; i < Invites.Count; i++)
-            _bot._guilds[guild.Id].InviteTrackerSettings.Cache.Add(new InviteTrackerCacheItem { Code = Invites[i].Code, CreatorId = Invites[i].Inviter.Id, Uses = Invites[i].Uses });
+        _bot._guilds[guild.Id].InviteTrackerSettings.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter.Id, Uses = x.Uses }).ToList();
 
         _logger.LogDebug($"Fetched {_bot._guilds[guild.Id].InviteTrackerSettings.Cache.Count} invites for {guild.Id}");
     }

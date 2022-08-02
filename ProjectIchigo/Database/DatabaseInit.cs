@@ -101,7 +101,7 @@ internal class DatabaseInit
             DbGuild.InviteTrackerSettings = new(DbGuild)
             {
                 Enabled = b.invitetracker_enabled,
-                Cache = JsonConvert.DeserializeObject<ObservableCollection<InviteTrackerCacheItem>>((b.invitetracker_cache is null or "null" or "" ? "[]" : b.invitetracker_cache))
+                Cache = JsonConvert.DeserializeObject<List<InviteTrackerCacheItem>>((b.invitetracker_cache is null or "null" or "" ? "[]" : b.invitetracker_cache))
             };
 
             DbGuild.InVoiceTextPrivacySettings = new(DbGuild)

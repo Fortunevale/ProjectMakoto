@@ -4,19 +4,7 @@ public class InviteTrackerSettings
 {
     public InviteTrackerSettings(Guild guild)
     {
-        Cache.CollectionChanged += Cache_CollectionChanged;
-
         Parent = guild;
-    }
-
-    ~InviteTrackerSettings()
-    {
-        Cache.CollectionChanged -= Cache_CollectionChanged;
-    }
-
-    private void Cache_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
     private Guild Parent { get; set; }
@@ -33,5 +21,14 @@ public class InviteTrackerSettings
         } 
     }
 
-    public ObservableCollection<InviteTrackerCacheItem> Cache { get; set; } = new();
+    private List<InviteTrackerCacheItem> _Cache { get; set; } = new();
+    public List<InviteTrackerCacheItem> Cache 
+    {
+        get => _Cache;
+        set
+        {
+            _Cache = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "invitetracker_cache", JsonConvert.SerializeObject(value), Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
 }
