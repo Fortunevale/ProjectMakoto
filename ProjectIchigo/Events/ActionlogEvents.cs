@@ -1129,7 +1129,7 @@ internal class ActionlogEvents
                 Color = new DiscordColor("00ff21"),
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
-                                $"**Created by**: {e.Invite.Inviter.Mention} `{e.Invite.Inviter.UsernameWithDiscriminator}`\n" +
+                                $"**Created by**: {e.Invite.Inviter?.Mention ?? "`No Inviter found.`"} `{e.Invite.Inviter?.UsernameWithDiscriminator ?? "-"}`\n" +
                                 $"**Channel**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`"
             }));
         }).Add(_bot._watcher);
@@ -1148,7 +1148,7 @@ internal class ActionlogEvents
                 Color = new DiscordColor("ff0005"),
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
-                                $"**Created by**: {e.Invite.Inviter?.Mention} `{e.Invite.Inviter?.UsernameWithDiscriminator}`\n" +
+                                $"**Created by**: {e.Invite.Inviter?.Mention ?? "`No Inviter found.`"} `{e.Invite.Inviter?.UsernameWithDiscriminator ?? "-"}`\n" +
                                 $"**Channel**: {e.Channel?.Mention} `[{(e.Channel?.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel?.Name}]`"
             };
 
