@@ -30,7 +30,7 @@ internal class HugCommand : BaseCommand
 
             if (ctx.Member.Id == user.Id)
             {
-                _ = ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
                     Color = EmbedColors.HiddenSidebar,
