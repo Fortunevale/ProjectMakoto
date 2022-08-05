@@ -160,8 +160,8 @@ internal class DiscordEventHandler
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {
                 _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Project Ichigo. My prefix is `;;`. To get help, type `;;help`.\n" +
-                                $"If you need help, feel free to join our Support and Development Server: https://discord.gg/SaHT4GPGyW\n\n" +
-                                $"To find out more about me, check my Github Repo: <https://bit.ly/38vWpaj>.");
+                                $"If you need help, feel free to join our Support and Development Server: {_bot._status.DevelopmentServerInvite}\n\n" +
+                                $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/ichigo>.");
             }
         });
     }
