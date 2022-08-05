@@ -38,11 +38,11 @@ internal class KillCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Title = phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username).Replace("%2", user.Username),
+                Description = Formatter.Bold(phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
                 ImageUrl = gif,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
-            }).WithContent(ctx.CommandType == Enums.CommandType.ApplicationCommand ? user.Mention : "").WithAllowedMention(UserMention.All));
+            }).WithAllowedMention(UserMention.All));
         });
     }
 }
