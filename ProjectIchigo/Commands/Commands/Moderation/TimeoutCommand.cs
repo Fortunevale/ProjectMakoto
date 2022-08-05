@@ -103,7 +103,7 @@ internal class TimeoutCommand : BaseCommand
                         IconUrl = ctx.Guild.IconUrl,
                         Name = ctx.Guild.Name
                     },
-                    Description = $"The Duration you specified is invalid.",
+                    Description = $"❌ `The duration you specified is invalid.`",
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Color = EmbedColors.Error
@@ -119,13 +119,14 @@ internal class TimeoutCommand : BaseCommand
                 await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
                 embed.Color = EmbedColors.Success;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"✅ `{victim.UsernameWithDiscriminator} ({victim.Id}) was timed out for {until.GetTotalSecondsUntil().GetHumanReadable(TimeFormat.HOURS)}.`";
+                embed.Description = $"✅ {victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`\n" +
+                                    $"`The time out will last for {until.GetTimespanUntil().GetHumanReadable()}.`";
             }
             catch (Exception)
             {
                 embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ `{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be timed out.`";
+                embed.Description = $"❌ {victim.Mention} `could not be timed out.`";
             }
 
             await RespondOrEdit(embed);

@@ -52,15 +52,13 @@ internal class KickCommand : BaseCommand
 
                 embed.Color = EmbedColors.Success;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was kicked.\n\n" +
-                                                        $"Reason: `{reason}`\n" +
-                                                        $"Kicked by: {ctx.Member.Mention} `{ctx.Member.Username}#{ctx.Member.Discriminator}` (`{ctx.Member.Id}`)";
+                embed.Description = $"✅ {victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
             }
             catch (Exception)
             {
                 embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ `{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be kicked.`";
+                embed.Description = $"❌ {victim.Mention} `could not be kicked.`";
             }
 
             await RespondOrEdit(embed);

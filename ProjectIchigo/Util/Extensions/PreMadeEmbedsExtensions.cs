@@ -2,110 +2,35 @@ namespace ProjectIchigo.Extensions;
 
 internal static class PreMadeEmbedsExtensions
 {
-    public static async Task<DiscordMessage> SendMaintenanceError(this CommandContext ctx)
+    public static DiscordEmbedBuilder SetLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
     {
-        DiscordEmbedBuilder embed = new()
+        b.Author = new DiscordEmbedBuilder.EmbedAuthor
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = ctx.Guild.IconUrl,
-                Name = ctx.Guild.Name
-            },
-            Description = "You dont have permissions to use this command. You need to be <@411950662662881290> to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
-                IconUrl = ctx.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
+            Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
+            IconUrl = Resources.StatusIndicators.DiscordCircleLoading
         };
+        b.Color = EmbedColors.Processing;
 
-        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
-
-        return msg;
+        return b;
     }
 
-    public static async Task<DiscordMessage> SendAdminError(this CommandContext ctx)
+    public static DiscordEmbedBuilder SetDefault(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
     {
-        DiscordEmbedBuilder embed = new()
+        b.Author = new DiscordEmbedBuilder.EmbedAuthor
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = ctx.Guild.IconUrl,
-                Name = ctx.Guild.Name
-            },
-            Title = "",
-            Description = $"You dont have permissions to use this command. You need to be `Admin` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
-                IconUrl = ctx.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
+            Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
+            IconUrl = ctx.Guild.IconUrl
         };
+        b.Color = EmbedColors.Info;
 
-        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
-
-        return msg;
-    }
-
-    public static async Task<DiscordMessage> SendModError(this CommandContext ctx)
-    {
-        DiscordEmbedBuilder embed = new()
-        {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = ctx.Guild.IconUrl,
-                Name = ctx.Guild.Name
-            },
-            Title = "",
-            Description = $"You dont have permissions to use this command. You need to be `Mod` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
-                IconUrl = ctx.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        };
-
-        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
-
-        return msg;
-    }
-
-    public static async Task<DiscordMessage> SendPermissionError(this CommandContext ctx, Permissions perms)
-    {
-        DiscordEmbedBuilder embed = new()
-        {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = ctx.Guild.IconUrl,
-                Name = ctx.Guild.Name
-            },
-            Title = "",
-            Description = $"You dont have permissions to use this command. You need `{perms.ToPermissionString()}` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{ctx.User.Username}#{ctx.User.Discriminator} attempted to use \"{ctx.Prefix}{ctx.Command.Name}\"",
-                IconUrl = ctx.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        };
-
-        var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
-
-        return msg;
+        return b;
     }
 
     public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this SharedCommandContext ctx, string addText = "", string customIcon = "")
     {
         return new DiscordEmbedBuilder.EmbedFooter
         {
-            IconUrl = (customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
+            IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
             Text = $"Command used by {ctx.User.UsernameWithDiscriminator}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
     }
@@ -208,8 +133,5 @@ internal static class PreMadeEmbedsExtensions
         return Usage;
     }
 
-    public static string GenerateAliases(this IReadOnlyList<string> aliases)
-    {
-        return $"{(aliases.Count > 0 ? $" (Aliases: `{String.Join("`, `", aliases)}`)" : "")}";
-    }
+    public static string GenerateAliases(this IReadOnlyList<string> aliases) => $"{(aliases.Count > 0 ? $" (Aliases: `{string.Join("`, `", aliases)}`)" : "")}";
 }

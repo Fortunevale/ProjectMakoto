@@ -46,15 +46,13 @@ internal class BanCommand : BaseCommand
 
                 embed.Color = EmbedColors.Success;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was banned.\n\n" +
-                                                        $"Reason: `{reason}`\n" +
-                                                        $"Banned by: {ctx.Member.Mention} `{ctx.Member.Username}#{ctx.Member.Discriminator}` (`{ctx.Member.Id}`)";
+                embed.Description = $"✅ {victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
             }
             catch (Exception)
             {
                 embed.Color = EmbedColors.Error;
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ `{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be banned.`";
+                embed.Description = $"❌ {victim.Mention} `could not be banned.`";
             }
 
             await RespondOrEdit(embed);

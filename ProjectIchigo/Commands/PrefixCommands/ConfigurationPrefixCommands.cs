@@ -227,15 +227,6 @@ internal class ConfigurationPrefixCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (!ctx.Member.IsAdmin(_bot._status))
-            {
-                _ = ctx.SendAdminError();
-                throw new CancelCommandException("User is missing apprioriate permissions", ctx);
-            }
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {
