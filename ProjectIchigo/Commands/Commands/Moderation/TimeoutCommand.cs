@@ -113,7 +113,7 @@ internal class TimeoutCommand : BaseCommand
 
             try
             {
-                if (ctx.Member.GetHighestPosition() <= victim.GetHighestPosition())
+                if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
                 await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");

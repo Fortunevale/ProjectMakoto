@@ -39,7 +39,7 @@ internal class BanCommand : BaseCommand
 
             try
             {
-                if (ctx.Member.GetHighestPosition() <= (bMember?.GetHighestPosition() ?? -1))
+                if (ctx.Member.GetRoleHighestPosition() <= (bMember?.GetRoleHighestPosition() ?? -1))
                     throw new Exception();
 
                 await ctx.Guild.BanMemberAsync(victim.Id, 7, $"{ctx.User.UsernameWithDiscriminator} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");

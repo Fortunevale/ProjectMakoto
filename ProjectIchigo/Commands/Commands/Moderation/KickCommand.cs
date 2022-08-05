@@ -45,7 +45,7 @@ internal class KickCommand : BaseCommand
 
             try
             {
-                if (ctx.Member.GetHighestPosition() <= victim.GetHighestPosition())
+                if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
                 await victim.RemoveAsync($"{ctx.User.UsernameWithDiscriminator} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");

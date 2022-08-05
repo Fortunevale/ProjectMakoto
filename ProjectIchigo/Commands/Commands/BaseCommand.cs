@@ -220,7 +220,7 @@ public abstract class BaseCommand
 
         foreach (var role in Context.Guild.Roles.OrderByDescending(x => x.Value.Position))
         {
-            if (Context.CurrentMember.GetHighestPosition() > role.Value.Position && Context.Member.GetHighestPosition() > role.Value.Position && !role.Value.IsManaged && role.Value.Id != Context.Guild.EveryoneRole.Id)
+            if (Context.CurrentMember.GetRoleHighestPosition() > role.Value.Position && Context.Member.GetRoleHighestPosition() > role.Value.Position && !role.Value.IsManaged && role.Value.Id != Context.Guild.EveryoneRole.Id)
                 roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(Context.Client))));
         }
 
