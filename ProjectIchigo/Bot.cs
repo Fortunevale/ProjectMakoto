@@ -57,7 +57,7 @@ public class Bot
         try
         {
             string ASCII = File.ReadAllText("Assets/ASCII.txt");
-            Console.WriteLine("\n\n");
+            Console.WriteLine();
             foreach (var b in ASCII)
             {
                 switch (b)
