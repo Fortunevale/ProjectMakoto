@@ -671,7 +671,7 @@ public abstract class BaseCommand
     {
         if (!Context.Member.IsAdmin(Context.Bot._status))
         {
-            SendMaintenanceError();
+            SendAdminError();
             return false;
         }
 
