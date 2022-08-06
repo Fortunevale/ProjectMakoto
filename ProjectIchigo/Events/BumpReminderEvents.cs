@@ -35,7 +35,7 @@ internal class BumpReminderEvents
             if (!(e.Author.Id == sender.CurrentUser.Id && e.Message.Embeds.Any()))
                 _bot._bumpReminder.SendPersistentMessage(sender, e.Channel, bUser);
 
-            if (e.Author.Id != Resources.AccountIds.Disboard || !e.Message.Embeds.Any())
+            if (e.Author.Id != _bot._status.LoadedConfig.DisboardAccountId || !e.Message.Embeds.Any())
                 return;
 
             if (e.Message.Embeds[0].Description.ToLower().Contains(":thumbsup:"))

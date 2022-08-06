@@ -79,8 +79,20 @@ internal class Resources
         public static readonly string Warning = "https://media.discordapp.net/attachments/1005430437952356423/1005430597356892210/Warning.png";
     }
 
-    public class AccountIds
+    public class Emojis
     {
-        public static readonly ulong Disboard = 302050872383242240;
+        public static DiscordEmoji GetCheckboxTickedRed(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxTickedRedEmojiId);
+        public static DiscordEmoji GetCheckboxUntickedRed(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxUntickedRedEmojiId);
+        public static DiscordEmoji GetCheckboxTickedBlue(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxTickedBlueEmojiId);
+        public static DiscordEmoji GetCheckboxUntickedBlue(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxUntickedBlueEmojiId);
+        public static DiscordEmoji GetCheckboxTickedGreen(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxTickedGreenEmojiId);
+        public static DiscordEmoji GetCheckboxUntickedGreen(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxUntickedGreenEmojiId);
+
+        public static DiscordEmoji GetGuild(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.GuildEmojiId);
+        public static DiscordEmoji GetChannel(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.ChannelEmojiId);
+        public static DiscordEmoji GetUser(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.UserEmojiId);
+        public static DiscordEmoji GetVoiceState(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.VoiceStateEmojiId);
+        public static DiscordEmoji GetMessage(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.MessageEmojiId);
+        public static DiscordEmoji GetInvite(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.InviteEmojiId);
     }
 }
