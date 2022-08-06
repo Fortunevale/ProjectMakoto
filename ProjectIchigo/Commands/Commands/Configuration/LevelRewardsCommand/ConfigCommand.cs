@@ -293,7 +293,7 @@ internal class ConfigCommand : BaseCommand
                         }
                         else if (e.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
                         {
-                            await ExecuteCommand(ctx, arguments);
+                            DeleteOrInvalidate();
                             return;
                         }
                     }
