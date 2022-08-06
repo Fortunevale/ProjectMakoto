@@ -13,12 +13,8 @@ internal class ConfigCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = ActionLogAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetInfo(ctx, "Actionlog Settings");
 
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), $"Disable Actionlog", (ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0 ? "Set Channel" : "Change Channel")}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
@@ -27,12 +23,12 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    { Disable }
+                { Disable }
             })
             .AddComponents(new List<DiscordComponent>
             {
-                    { ChangeChannel },
-                    { ChangeFilter }
+                { ChangeChannel },
+                { ChangeFilter }
             }).AddComponents(Resources.CancelButton));
 
             var Button = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
@@ -111,9 +107,8 @@ internal class ConfigCommand : BaseCommand
 
                     if (!ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails && selected.Contains("attempt_further_detail"))
                     {
-                        embed.Description = $"⚠ `The option 'Attempt gathering more details' may sometimes be inaccurate. Please make sure to double check the audit log on serious concerns.`\n\n" +
-                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`The option 'Attempt gathering more details' may sometimes be inaccurate. Please make sure to double check the audit log on serious concerns.`\n\n" +
+                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..").SetWarning(ctx, "Actionlog Settings")));
                         await Task.Delay(5000);
                     }
 

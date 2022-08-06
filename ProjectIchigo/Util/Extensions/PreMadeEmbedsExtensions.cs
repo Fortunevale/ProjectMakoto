@@ -7,14 +7,16 @@ internal static class PreMadeEmbedsExtensions
         b.Author = new DiscordEmbedBuilder.EmbedAuthor
         {
             Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
-            IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+            IconUrl = Resources.StatusIndicators.Loading
         };
         b.Color = EmbedColors.Processing;
+        b.Footer = ctx.GenerateUsedByFooter();
+        b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
-    public static DiscordEmbedBuilder SetDefault(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
     {
         b.Author = new DiscordEmbedBuilder.EmbedAuthor
         {
@@ -22,6 +24,64 @@ internal static class PreMadeEmbedsExtensions
             IconUrl = ctx.Guild.IconUrl
         };
         b.Color = EmbedColors.Info;
+        b.Footer = ctx.GenerateUsedByFooter();
+        b.Timestamp = DateTime.UtcNow;
+
+        return b;
+    }
+    
+    public static DiscordEmbedBuilder SetAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    {
+        b.Author = new DiscordEmbedBuilder.EmbedAuthor
+        {
+            Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
+            IconUrl = ctx.Guild.IconUrl
+        };
+        b.Color = EmbedColors.AwaitingInput;
+        b.Footer = ctx.GenerateUsedByFooter();
+        b.Timestamp = DateTime.UtcNow;
+
+        return b;
+    }
+    
+    public static DiscordEmbedBuilder SetError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    {
+        b.Author = new DiscordEmbedBuilder.EmbedAuthor
+        {
+            Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
+            IconUrl = ctx.Guild.IconUrl
+        };
+        b.Color = EmbedColors.Error;
+        b.Footer = ctx.GenerateUsedByFooter();
+        b.Timestamp = DateTime.UtcNow;
+
+        return b;
+    }
+    
+    public static DiscordEmbedBuilder SetWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    {
+        b.Author = new DiscordEmbedBuilder.EmbedAuthor
+        {
+            Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
+            IconUrl = ctx.Guild.IconUrl
+        };
+        b.Color = EmbedColors.Warning;
+        b.Footer = ctx.GenerateUsedByFooter();
+        b.Timestamp = DateTime.UtcNow;
+
+        return b;
+    }
+    
+    public static DiscordEmbedBuilder SetSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    {
+        b.Author = new DiscordEmbedBuilder.EmbedAuthor
+        {
+            Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
+            IconUrl = ctx.Guild.IconUrl
+        };
+        b.Color = EmbedColors.Success;
+        b.Footer = ctx.GenerateUsedByFooter();
+        b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
