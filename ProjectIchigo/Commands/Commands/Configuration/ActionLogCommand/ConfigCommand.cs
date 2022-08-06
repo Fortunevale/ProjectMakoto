@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = ActionLogAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Actionlog Settings");
+            }.SetAwaitingInput(ctx, "Actionlog");
 
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), $"Disable Actionlog", (ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0 ? "Set Channel" : "Change Channel")}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
@@ -108,7 +108,7 @@ internal class ConfigCommand : BaseCommand
                     if (!ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails && selected.Contains("attempt_further_detail"))
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`The option 'Attempt gathering more details' may sometimes be inaccurate. Please make sure to double check the audit log on serious concerns.`\n\n" +
-                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..").SetWarning(ctx, "Actionlog Settings")));
+                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..").SetWarning(ctx, "Actionlog")));
                         await Task.Delay(5000);
                     }
 
