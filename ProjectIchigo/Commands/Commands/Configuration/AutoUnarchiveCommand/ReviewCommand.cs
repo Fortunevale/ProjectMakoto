@@ -13,12 +13,8 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Auto Thread Unarchiver • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = AutoUnarchiveCommandAbstractions.GetCurrentConfiguration(ctx)
-            });
+            }.SetInfo(ctx, "Auto Thread Unarchiver"));
         });
     }
 }
