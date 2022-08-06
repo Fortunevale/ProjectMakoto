@@ -109,7 +109,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                                 embed.Description = "`Searching for players with specified criteria..`";
-                                embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                                embed.Author.IconUrl = Resources.StatusIndicators.Loading;
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
                                 if (currentFetchedPage != lastFetchedPage)

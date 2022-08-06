@@ -30,7 +30,7 @@ internal class BanCommand : BaseCommand
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                    IconUrl = Resources.StatusIndicators.Loading
                 },
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow

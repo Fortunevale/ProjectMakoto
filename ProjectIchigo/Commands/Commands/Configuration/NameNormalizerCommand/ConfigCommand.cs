@@ -68,7 +68,7 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                    embed.Author.IconUrl = Resources.StatusIndicators.Loading;
                     embed.Color = EmbedColors.Loading;
                     embed.Description = $"`Renaming all members. This might take a while..`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));

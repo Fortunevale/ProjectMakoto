@@ -34,7 +34,7 @@ internal class LeaderboardCommand : BaseCommand
                 Color = EmbedColors.HiddenSidebar,
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
+                    IconUrl = Resources.StatusIndicators.Loading,
                     Name = $"Experience Leaderboard"
                 },
                 Description = $"`Loading Leaderboard, please wait..`",

@@ -15,7 +15,7 @@ internal class InfoCommand : BaseCommand
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading,
+                    IconUrl = Resources.StatusIndicators.Loading,
                     Name = "Informations about this server and bot"
                 },
                 Color = EmbedColors.Info,

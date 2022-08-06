@@ -47,7 +47,7 @@ internal class EmojiStealerCommand : BaseCommand
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                    IconUrl = Resources.StatusIndicators.Loading
                 },
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow
@@ -266,7 +266,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                             bool DiscordWarning = false;
 
-                            embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                            embed.Author.IconUrl = Resources.StatusIndicators.Loading;
                             embed.Description = $"`Added 0/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`";
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -340,7 +340,7 @@ internal class EmojiStealerCommand : BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
 
-                            embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                            embed.Author.IconUrl = Resources.StatusIndicators.Loading;
                             embed.Description = $"`Sending the {emojiText} in your DMs..`";
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -403,7 +403,7 @@ internal class EmojiStealerCommand : BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
 
-                            embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
+                            embed.Author.IconUrl = Resources.StatusIndicators.Loading;
                             embed.Description = $"`Preparing your Zip File..`";
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 

@@ -52,7 +52,7 @@ internal static class Extensions
 
     internal static DiscordEmoji BoolToEmote(this bool b, DiscordClient client)
     {
-        return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 939750475354472478);
+        return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 1005430134070841395);
     }
 
     internal static string DigitsToEmotes(this long i) =>

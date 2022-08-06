@@ -22,7 +22,7 @@ internal class ScoreSaberCommandAbstractions
 
         var embed = new DiscordEmbedBuilder
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Score Saber • {ctx.Guild.Name}" },
+            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Score Saber • {ctx.Guild.Name}" },
             Color = EmbedColors.Processing,
             Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,

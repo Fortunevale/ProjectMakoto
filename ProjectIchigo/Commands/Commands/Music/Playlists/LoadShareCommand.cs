@@ -17,7 +17,7 @@ internal class LoadShareCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Playlists • {ctx.Guild.Name}" },
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Playlists • {ctx.Guild.Name}" },
                 Color = EmbedColors.Loading,
                 Footer = ctx.GenerateUsedByFooter(),
                 Timestamp = DateTime.UtcNow,
@@ -75,7 +75,7 @@ internal class LoadShareCommand : BaseCommand
                     Author = new DiscordEmbedBuilder.EmbedAuthor
                     {
                         Name = ctx.Guild.Name,
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
+                        IconUrl = Resources.StatusIndicators.Loading
                     },
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow
