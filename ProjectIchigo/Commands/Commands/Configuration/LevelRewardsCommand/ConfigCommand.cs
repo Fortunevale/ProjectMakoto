@@ -13,18 +13,14 @@ internal class ConfigCommand : BaseCommand
 
             int CurrentPage = 0;
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Level Rewards • {ctx.Guild.Name}" },
-                Color = EmbedColors.Loading,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Loading Level Rewards..`"
-            };
+            }.SetLoading(ctx, "Level Rewards");
 
             await RespondOrEdit(embed);
-            embed.Author.IconUrl = ctx.Guild.IconUrl;
-            embed.Color = EmbedColors.AwaitingInput;
+
+            embed = embed.SetAwaitingInput(ctx, "Level Rewards");
 
             string selected = "";
 
@@ -72,6 +68,7 @@ internal class ConfigCommand : BaseCommand
                 var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "Delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
 
                 var Dropdown = new DiscordSelectComponent("Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
+                embed = embed.SetAwaitingInput(ctx, "Level Rewards");
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                 if (DefinedRewards.Count > 0)
@@ -152,7 +149,7 @@ internal class ConfigCommand : BaseCommand
                             if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
                             {
                                 embed.Description = "`The role you're trying to add has already been assigned to a level.`";
-                                embed.Color = EmbedColors.Error;
+                                embed = embed.SetError(ctx, "Level Rewards");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 await RefreshMessage();
@@ -180,7 +177,7 @@ internal class ConfigCommand : BaseCommand
                             catch (Exception)
                             {
                                 embed.Description = "`You must specify a valid level.`";
-                                embed.Color = EmbedColors.Error;
+                                embed = embed.SetError(ctx, "Level Rewards");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 await RefreshMessage();
@@ -208,7 +205,7 @@ internal class ConfigCommand : BaseCommand
                             if (CustomMessageResult.Result.Content.Length > 256)
                             {
                                 embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                embed.Color = EmbedColors.Error;
+                                embed = embed.SetError(ctx, "Level Rewards");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 await RefreshMessage();
@@ -251,7 +248,7 @@ internal class ConfigCommand : BaseCommand
                             if (result.Result.Content.Length > 256)
                             {
                                 embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                embed.Color = EmbedColors.Error;
+                                embed = embed.SetError(ctx, "Level Rewards");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);
@@ -272,7 +269,7 @@ internal class ConfigCommand : BaseCommand
                             if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Count == 0)
                             {
                                 embed.Description = $"`There are no more Level Rewards to display.`";
-                                embed.Color = EmbedColors.Success;
+                                embed = embed.SetSuccess(ctx, "Level Rewards");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);
