@@ -39,6 +39,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
+        b.Author.IconUrl = Resources.StatusIndicators.Error;
 
         b.Color = EmbedColors.Error;
         b.Footer = ctx.GenerateUsedByFooter();
@@ -50,6 +51,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
+        b.Author.IconUrl = Resources.StatusIndicators.Warning;
 
         b.Color = EmbedColors.Warning;
         b.Footer = ctx.GenerateUsedByFooter();
@@ -61,6 +63,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
+        b.Author.IconUrl = Resources.StatusIndicators.Success;
 
         b.Color = EmbedColors.Success;
         b.Footer = ctx.GenerateUsedByFooter();
