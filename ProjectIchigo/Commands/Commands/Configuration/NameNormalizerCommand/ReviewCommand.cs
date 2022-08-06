@@ -13,12 +13,8 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Name Normalizer • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = NameNormalizerCommandAbstractions.GetCurrentConfiguration(ctx)
-            });
+            }.SetInfo(ctx, "Name Normalizer"));
         });
     }
 }

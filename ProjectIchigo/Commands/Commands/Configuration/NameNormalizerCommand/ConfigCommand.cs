@@ -13,12 +13,8 @@ internal class ConfigCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Name Normalizer • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = NameNormalizerCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Name Normalizer");
 
             var Toggle = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].NameNormalizerSettings.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Name Normalizer", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var SearchAllNames = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Normalize Everyone's Names", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
@@ -26,8 +22,8 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    Toggle,
-                    SearchAllNames
+                Toggle,
+                SearchAllNames
             })
             .AddComponents(Resources.CancelButton));
 
@@ -52,8 +48,7 @@ internal class ConfigCommand : BaseCommand
             {
                 if (ctx.Bot._guilds[ctx.Guild.Id].NameNormalizerSettings.NameNormalizerRunning)
                 {
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.Color = EmbedColors.Error;
+                    embed = embed.SetError(ctx, "Name Normalizer");
                     embed.Description = $"`A normalizer is already running.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
@@ -68,8 +63,7 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    embed.Author.IconUrl = Resources.StatusIndicators.Loading;
-                    embed.Color = EmbedColors.Loading;
+                    embed = embed.SetLoading(ctx, "Name Normalizer");
                     embed.Description = $"`Renaming all members. This might take a while..`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -93,8 +87,7 @@ internal class ConfigCommand : BaseCommand
                         }
                     }
 
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    embed.Color = EmbedColors.Info;
+                    embed = embed.SetSuccess(ctx, "Name Normalizer");
                     embed.Description = $"`Renamed {Renamed} members.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
