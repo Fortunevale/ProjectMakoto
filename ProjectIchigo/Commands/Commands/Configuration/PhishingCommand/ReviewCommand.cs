@@ -11,15 +11,10 @@ internal class ReviewCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            var ListEmbed = new DiscordEmbedBuilder
+            await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Phishing Protection Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = PhishingCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
-            await RespondOrEdit(embed: ListEmbed);
+            }.SetInfo(ctx, "Phishing Protection"));
         });
     }
 }
