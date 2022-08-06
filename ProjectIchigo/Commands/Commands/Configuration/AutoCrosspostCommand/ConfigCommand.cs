@@ -18,7 +18,7 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = AutoCrosspostCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Auto Crosspost");
+            }.SetAwaitingInput(ctx, "Auto Crosspost");
 
             var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
             var ExcludeBots = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Exclude Bots", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));

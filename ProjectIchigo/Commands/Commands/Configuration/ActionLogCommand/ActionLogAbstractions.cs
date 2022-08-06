@@ -7,7 +7,7 @@ internal class ActionLogAbstractions
         if (ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0)
             return $"❌ `The actionlog is disabled.`";
 
-        return $"{Resources.Emojis.GetChannel(ctx.Client, ctx.Bot)} `Actionlog Channel                 ` : <#{ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel}>\n" +
+        return $"{Resources.Emojis.GetChannel(ctx.Client, ctx.Bot)} `Actionlog Channel                 ` : <#{ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel}>\n\n" +
                $"⚠ `Attempt gathering more details    ` : {ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails.BoolToEmote(ctx.Client)}\n" +
                $"{Resources.Emojis.GetUser(ctx.Client, ctx.Bot)} `Join, Leaves & Kicks              ` : {ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MembersModified.BoolToEmote(ctx.Client)}\n" +
                $"{Resources.Emojis.GetUser(ctx.Client, ctx.Bot)} `Nickname, Role, Membership Updates` : {ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MemberModified.BoolToEmote(ctx.Client)}\n" +
