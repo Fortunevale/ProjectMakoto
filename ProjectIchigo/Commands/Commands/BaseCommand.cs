@@ -241,7 +241,7 @@ public abstract class BaseCommand
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent("Select a role..", roles.Skip(currentPage * 25).Take(25), SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithColor(EmbedColors.AwaitingInput)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).SetAwaitingInput(Context)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
 
             if (roles.Skip(currentPage * 25).Count() > 25)
                 builder.AddComponents(nextPageButton);
@@ -360,7 +360,7 @@ public abstract class BaseCommand
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent("Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithColor(EmbedColors.AwaitingInput)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).SetAwaitingInput(Context)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
 
             if (channels.Skip(currentPage * 25).Count() > 25)
                 builder.AddComponents(nextPageButton);
@@ -461,7 +461,7 @@ public abstract class BaseCommand
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithColor(EmbedColors.AwaitingInput)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).SetAwaitingInput(Context)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
 
             if (options.Skip(currentPage * 25).Count() > 25)
                 builder.AddComponents(nextPageButton);
@@ -540,7 +540,7 @@ public abstract class BaseCommand
 
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.White)));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
@@ -567,80 +567,32 @@ public abstract class BaseCommand
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
             Description = "The user you tagged is required to be on this server for this command to run.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                IconUrl = Context.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        });
+        }.SetError(Context));
     }
     
     public void SendMaintenanceError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
-            Description = "You dont have permissions to use this command. You need to be <@411950662662881290> to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                IconUrl = Context.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        });
+            Description = $"You dont have permissions to use the command `{Context.Prefix}{Context.CommandName}`. You need to be <@411950662662881290> to use this command.",
+        }.SetError(Context));
     }
 
     public void SendAdminError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
-            Description = $"You dont have permissions to use this command. You need to be `Admin` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                IconUrl = Context.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        });
+            Description = $"You dont have permissions to use the command `{Context.Prefix}{Context.CommandName}`. You need to be `Administrator` to use this command.",
+        }.SetError(Context));
     }
     
     public void SendPermissionError(Permissions perms)
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
-            Description = $"You dont have permissions to use this command. You need to be `{perms.ToPermissionString()}` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                IconUrl = Context.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        });
+            Description = $"You dont have permissions to use the command `{Context.Prefix}{Context.CommandName}`. You need to be `{perms.ToPermissionString()}` to use this command.",
+        }.SetError(Context));
     }
     
     public void SendOwnPermissionError(Permissions perms)
@@ -650,20 +602,8 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
-            Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command.",
-            Footer = new DiscordEmbedBuilder.EmbedFooter
-            {
-                Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                IconUrl = Context.User.AvatarUrl
-            },
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        });
+            Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command."
+        }.SetError(Context));
     }
     
     public void SendSourceError(Enums.CommandType commandType)
@@ -672,36 +612,12 @@ public abstract class BaseCommand
         {
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = Context.Guild.IconUrl,
-                    Name = Context.Guild.Name
-                },
                 Description = $"This command is exclusive to application commands.",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                    IconUrl = Context.User.AvatarUrl
-                },
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.Error
-            }),
+            }.SetError(Context)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = Context.Guild.IconUrl,
-                    Name = Context.Guild.Name
-                },
-                Description = $"This command is exclusive to prefixed commands.",
-                Footer = new DiscordEmbedBuilder.EmbedFooter
-                {
-                    Text = $"{Context.User.UsernameWithDiscriminator} attempted to use \"{Context.Prefix}{Context.CommandName}\"",
-                    IconUrl = Context.User.AvatarUrl
-                },
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.Error
-            }),
+                Description = $"This command is exclusive to prefixed commands."
+            }.SetError(Context)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
     }
@@ -709,22 +625,14 @@ public abstract class BaseCommand
     public void SendSyntaxError()
     {
         if (Context.CommandType != Enums.CommandType.PrefixCommand)
-            throw new ArgumentException("Syntax Error cannot be generated for Application Commands.");
+            throw new ArgumentException("Syntax Error can only be generated for Prefix Commands.");
 
         var ctx = Context.OriginalCommandContext;
 
         var embed = new DiscordEmbedBuilder
         {
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                IconUrl = Context.Guild.IconUrl,
-                Name = Context.Guild.Name
-            },
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-            Footer = ctx.GenerateUsedByFooter(),
-            Timestamp = DateTime.UtcNow,
-            Color = EmbedColors.Error
-        };
+        }.SetError(Context);
 
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(Context.User.Mention));
     }
@@ -733,16 +641,8 @@ public abstract class BaseCommand
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"❌ `You aren't in a voice channel.`",
-            Color = EmbedColors.Error,
-            Author = new DiscordEmbedBuilder.EmbedAuthor
-            {
-                Name = Context.Guild.Name,
-                IconUrl = Context.Guild.IconUrl
-            },
-            Footer = Context.GenerateUsedByFooter(),
-            Timestamp = DateTime.UtcNow
-        }).WithContent(Context.User.Mention));
+            Description = $"`You aren't in a voice channel.`",
+        }.SetError(Context)).WithContent(Context.User.Mention));
     }
 
     public async Task<bool> CheckVoiceState()
