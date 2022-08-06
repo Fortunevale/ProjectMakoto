@@ -13,19 +13,15 @@ internal class ConfigCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Embed Messages • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = EmbedMessageCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Embed Messages");
 
             var Toggle = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    Toggle
+                Toggle
             })
             .AddComponents(Resources.CancelButton));
 

@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = LevelRewardsCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Level Rewards");
+            }.SetInfo(ctx, "Level Rewards"));
         });
     }
 }
