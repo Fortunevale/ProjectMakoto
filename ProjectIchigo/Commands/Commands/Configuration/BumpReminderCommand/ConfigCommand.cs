@@ -11,14 +11,10 @@ internal class ConfigCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Loading,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = BumpReminderCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Bump Reminder");
 
             var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Set up Bump Reminder", ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Disable Bump Reminder", !ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
@@ -28,13 +24,13 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    { Setup },
-                    { Disable }
+                { Setup },
+                { Disable }
             })
             .AddComponents(new List<DiscordComponent>
             {
-                    { ChangeChannel },
-                    { ChangeRole }
+                { ChangeChannel },
+                { ChangeRole }
             }).AddComponents(Resources.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
@@ -53,27 +49,19 @@ internal class ConfigCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                        Color = EmbedColors.Error,
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow,
                         Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
-                    });
+                    }.SetError(ctx, "Bump Reminder"));
                     return;
                 }
 
                 embed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Bump Reminder Settings • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Loading,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = $"`Setting up Bump Reminder..`"
-                };
+                }.SetLoading(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Description = "`Please select a role to ping when the server can be bumped.`";
+                embed = embed.SetAwaitingInput(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
                 DiscordRole role;
@@ -103,9 +91,8 @@ internal class ConfigCommand : BaseCommand
 
                 ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled = true;
 
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Description = "`The Bump Reminder has been set up.`";
-                embed.Color = EmbedColors.Success;
+                embed = embed.SetSuccess(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
                 await Task.Delay(5000);
@@ -121,9 +108,8 @@ internal class ConfigCommand : BaseCommand
                     if (GetScheduleTasks().Any(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}"))
                         DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}").Key);
 
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Description = "`The Bump Reminder has been disabled.`";
-                embed.Color = EmbedColors.Success;
+                embed = embed.SetSuccess(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
                 await Task.Delay(5000);

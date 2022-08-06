@@ -36,6 +36,8 @@ public class Config
     public ulong CheckboxTickedGreenEmojiId = 970280278138449920;
     public ulong CheckboxUntickedGreenEmojiId = 970280278025191454;
 
+    public ulong QuestionMarkEmojiId = 1005464121472466984;
+
     public ulong ChannelEmojiId = 1005457978884882493;
     public ulong UserEmojiId = 1005457986564665374;
     public ulong VoiceStateEmojiId = 1005457988494037033;

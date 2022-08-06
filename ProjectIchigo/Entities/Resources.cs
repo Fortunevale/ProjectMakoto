@@ -88,6 +88,8 @@ internal class Resources
         public static DiscordEmoji GetCheckboxTickedGreen(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxTickedGreenEmojiId);
         public static DiscordEmoji GetCheckboxUntickedGreen(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.CheckboxUntickedGreenEmojiId);
 
+        public static DiscordEmoji GetQuestionMark(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.QuestionMarkEmojiId);
+
         public static DiscordEmoji GetGuild(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.GuildEmojiId);
         public static DiscordEmoji GetChannel(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.ChannelEmojiId);
         public static DiscordEmoji GetUser(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot._status.LoadedConfig.UserEmojiId);
