@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = ActionLogAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Actionlog Settings");
+            }.SetAwaitingInput(ctx, "Actionlog Settings");
 
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), $"Disable Actionlog", (ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0 ? "Set Channel" : "Change Channel")}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
