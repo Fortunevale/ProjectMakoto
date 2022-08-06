@@ -38,12 +38,12 @@ public class Config
 
     public ulong QuestionMarkEmojiId = 1005464121472466984;
 
-    public ulong ChannelEmojiId = 1005457978884882493;
-    public ulong UserEmojiId = 1005457986564665374;
-    public ulong VoiceStateEmojiId = 1005457988494037033;
-    public ulong MessageEmojiId = 1005457984492679188;
-    public ulong GuildEmojiId = 1005457980860403722;
-    public ulong InviteEmojiId = 1005457982840123432;
+    public ulong ChannelEmojiId = 1005612865975238706;
+    public ulong UserEmojiId = 1005612863051800746;
+    public ulong VoiceStateEmojiId = 1005612864469487638;
+    public ulong MessageEmojiId = 1005612861676077166;
+    public ulong GuildEmojiId = 1005612867577458729;
+    public ulong InviteEmojiId = 1005612860333899859;
 
     public ulong DisboardAccountId = 302050872383242240;
 }
