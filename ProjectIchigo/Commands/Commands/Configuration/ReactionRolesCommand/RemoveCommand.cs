@@ -15,12 +15,8 @@ internal class RemoveCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                Color = EmbedColors.AwaitingInput,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = "`Removing reaction role..`"
-            };
+            }.SetLoading(ctx, "Reaction Roles");
 
             await RespondOrEdit(embed);
 
@@ -70,8 +66,7 @@ internal class RemoveCommand : BaseCommand
                     case Enums.CommandType.ContextMenu:
                     {
                         embed.Description = $"`Please react with the emoji you want to remove from the target message.`";
-                        embed.Color = EmbedColors.AwaitingInput;
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetAwaitingInput(ctx, "Reaction Roles")));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == message.Id, TimeSpan.FromMinutes(2));
 
@@ -89,13 +84,10 @@ internal class RemoveCommand : BaseCommand
                 }
             }
 
-            embed.Author.IconUrl = ctx.Guild.IconUrl;
-
             if (!ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
                 embed.Description = $"`The specified message doesn't contain specified reaction.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                 return;
             }
 
@@ -108,9 +100,8 @@ internal class RemoveCommand : BaseCommand
 
             ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
-            embed.Color = EmbedColors.Info;
             embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
         });
     }
 }

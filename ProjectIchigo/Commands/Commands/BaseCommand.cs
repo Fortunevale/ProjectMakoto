@@ -540,7 +540,7 @@ public abstract class BaseCommand
 
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out")));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.White)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
@@ -554,7 +554,7 @@ public abstract class BaseCommand
         switch (Context.CommandType)
         {
             case Enums.CommandType.ApplicationCommand:
-                _ = RespondOrEdit("❌ `Cancelled`");
+                _ = RespondOrEdit("✅ `Interaction ended.`");
                 _ = Context.ResponseMessage.DeleteAsync();
                 break;
             default:
@@ -563,24 +563,6 @@ public abstract class BaseCommand
         }
     }
     
-    public void DeleteOrFinish()
-    {
-        switch (Context.CommandType)
-        {
-            case Enums.CommandType.ApplicationCommand:
-                _ = RespondOrEdit("✅ `Finished command`");
-                _ = Context.OriginalInteractionContext.DeleteResponseAsync();
-                break;
-            case Enums.CommandType.ContextMenu:
-                _ = RespondOrEdit("✅ `Finished command`");
-                _ = Context.OriginalInteractionContext.DeleteResponseAsync();
-                break;
-            default:
-                _ = Context.ResponseMessage.DeleteAsync();
-                break;
-        }
-    }
-
     public void SendNoMemberError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()

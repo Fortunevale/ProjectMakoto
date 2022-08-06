@@ -13,12 +13,8 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                Color = EmbedColors.Loading,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = "`Loading Reaction Roles..`"
-            });
+            }.SetLoading(ctx, "Reaction Roles"));
 
             var messageCache = await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
@@ -28,12 +24,8 @@ internal class ReviewCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Info,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = "`No reaction roles are set up.`"
-                }.Build());
+                }.SetInfo(ctx, "Reaction Roles"));
                 return;
             }
 
@@ -71,12 +63,8 @@ internal class ReviewCommand : BaseCommand
 
             List<DiscordEmbed> embeds = Sections.Select(x => new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = x
-            }.Build()).ToList();
+            }.SetInfo(ctx, "Reaction Roles").Build()).ToList();
 
             await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
             return;

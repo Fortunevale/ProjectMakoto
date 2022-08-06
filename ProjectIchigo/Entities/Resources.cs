@@ -74,7 +74,7 @@ internal class Resources
     public class StatusIndicators
     {
         public static readonly string Loading = "https://cdn.discordapp.com/attachments/906976602557145110/940100451213385778/L3.gif";
-        public static readonly string Success = "https://media.discordapp.net/attachments/1005430437952356423/1005430596589342790/CheckMark.png";
+        public static readonly string Success = "https://cdn.discordapp.com/attachments/1005430437952356423/1005552726857486427/CheckMark_Icon.png";
         public static readonly string Error = "https://cdn.discordapp.com/attachments/1005430437952356423/1005544462384103465/Error_Icon.png";
         public static readonly string Warning = "https://media.discordapp.net/attachments/1005430437952356423/1005430597356892210/Warning.png";
     }

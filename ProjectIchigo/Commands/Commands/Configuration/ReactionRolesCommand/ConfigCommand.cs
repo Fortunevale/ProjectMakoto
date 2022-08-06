@@ -13,12 +13,8 @@ internal class ConfigCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                Color = EmbedColors.Loading,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = "`Loading Reaction Roles..`"
-            });
+            }.SetLoading(ctx, "Reaction Roles"));
 
             await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
@@ -27,17 +23,13 @@ internal class ConfigCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`{ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count} reaction roles are set up.`"
-            };
+            }.SetAwaitingInput(ctx, "Reaction Roles");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    AddButton, RemoveButton
+                AddButton, RemoveButton
             })
             .AddComponents(Resources.CancelButton));
 
@@ -55,19 +47,14 @@ internal class ConfigCommand : BaseCommand
             {
                 var action_embed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                    Color = EmbedColors.AwaitingInput,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = "`Please copy and send the message link of the message you want the reaction role to be added to.`",
                     ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
-                };
+                }.SetAwaitingInput(ctx, "Reaction Roles");
 
                 if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
                 {
                     action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                    action_embed.Color = EmbedColors.Error;
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -87,31 +74,15 @@ internal class ConfigCommand : BaseCommand
                 { _ = link.Result.DeleteAsync(); }
                 catch { }
 
-                if (!Regex.IsMatch(link.Result.Content, Resources.Regex.DiscordChannelUrl))
+                if (!Regex.IsMatch(link.Result.Content, Resources.Regex.DiscordChannelUrl) || !link.Result.Content.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
                 {
                     action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
                                                $"`http://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
-                    action_embed.Color = EmbedColors.Error;
                     action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-
-                if (!link.Result.Content.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
-                {
-                    action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
-                                               $"`http://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
-                                               $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
-                                               $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
-                                               $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
-                    action_embed.Color = EmbedColors.Error;
-                    action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -120,9 +91,8 @@ internal class ConfigCommand : BaseCommand
                 if (GuildId != ctx.Guild.Id)
                 {
                     action_embed.Description = $"`The link you provided leads to another server.`";
-                    action_embed.Color = EmbedColors.Error;
                     action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -131,9 +101,8 @@ internal class ConfigCommand : BaseCommand
                 if (!ctx.Guild.Channels.ContainsKey(ChannelId))
                 {
                     action_embed.Description = $"`The link you provided leads to a channel that doesn't exist.`";
-                    action_embed.Color = EmbedColors.Error;
                     action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -144,9 +113,8 @@ internal class ConfigCommand : BaseCommand
                 if (!channel.TryGetMessage(MessageId, out DiscordMessage reactionMessage))
                 {
                     action_embed.Description = $"`The link you provided leads a message that doesn't exist or the bot has no access to.`";
-                    action_embed.Color = EmbedColors.Error;
                     action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -154,7 +122,7 @@ internal class ConfigCommand : BaseCommand
 
                 action_embed.Description = "`Please react with the emoji you want to use for the reaction role to the target message.`";
                 action_embed.ImageUrl = "";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
 
                 var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == reactionMessage.Id, TimeSpan.FromMinutes(2));
 
@@ -173,15 +141,14 @@ internal class ConfigCommand : BaseCommand
                 if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
                 {
                     action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                    action_embed.Color = EmbedColors.Error;
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
 
                 action_embed.Description = "`Please select the role you want to use.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
 
                 try
                 {
@@ -201,8 +168,7 @@ internal class ConfigCommand : BaseCommand
                     if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == MessageId && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
                     {
                         action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
-                        action_embed.Color = EmbedColors.Error;
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -211,8 +177,7 @@ internal class ConfigCommand : BaseCommand
                     if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
                     {
                         action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                        action_embed.Color = EmbedColors.Error;
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -228,9 +193,8 @@ internal class ConfigCommand : BaseCommand
 
                     await reactionMessage.CreateReactionAsync(emoji);
 
-                    action_embed.Color = EmbedColors.Info;
                     action_embed.Description = $"`Added role` {role.Mention} `to message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {emoji} `.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetSuccess(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -257,9 +221,8 @@ internal class ConfigCommand : BaseCommand
 
                     ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
-                    embed.Color = EmbedColors.Info;
                     embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;

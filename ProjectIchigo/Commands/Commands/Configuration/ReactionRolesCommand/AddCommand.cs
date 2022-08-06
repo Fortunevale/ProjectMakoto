@@ -15,12 +15,8 @@ internal class AddCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Reaction Roles • {ctx.Guild.Name}" },
-                Color = EmbedColors.AwaitingInput,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = "`Adding reaction role..`"
-            };
+            }.SetLoading(ctx, "Reaction Roles");
 
             await RespondOrEdit(embed);
 
@@ -73,8 +69,7 @@ internal class AddCommand : BaseCommand
                         try
                         {
                             embed.Description = $"`Please select the role you want this reaction role to assign below.`";
-                            embed.Color = EmbedColors.AwaitingInput;
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetAwaitingInput(ctx, "Reaction Roles")));
                             role_parameter = await PromptRoleSelection();
                         }
                         catch (ArgumentException)
@@ -101,8 +96,7 @@ internal class AddCommand : BaseCommand
                     case Enums.CommandType.ContextMenu:
                     {
                         embed.Description = $"`Please react with the emoji you want to use to the target message.`";
-                        embed.Color = EmbedColors.AwaitingInput;
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetAwaitingInput(ctx, "Reaction Roles")));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == message.Id, TimeSpan.FromMinutes(2));
 
@@ -121,8 +115,7 @@ internal class AddCommand : BaseCommand
                         if (emoji_parameter.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji_parameter.Id))
                         {
                             embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                            embed.Color = EmbedColors.Error;
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                             return;
                         }
 
@@ -138,32 +131,28 @@ internal class AddCommand : BaseCommand
             if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
             {
                 embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                 return;
             }
 
             if (emoji_parameter.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji_parameter.Id))
             {
                 embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                 return;
             }
 
             if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
             {
                 embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                 return;
             }
 
             if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
             {
                 embed.Description = $"`The specified role is already being used in another reaction role.`";
-                embed.Color = EmbedColors.Error;
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                 return;
             }
 
@@ -177,9 +166,8 @@ internal class AddCommand : BaseCommand
                 EmojiName = emoji_parameter.GetUniqueDiscordName()
             }));
 
-            embed.Color = EmbedColors.Info;
             embed.Description = $"`Added role` {role_parameter.Mention} `to message sent by` {message.Author.Mention} `in` {message.Channel.Mention} `with emoji` {emoji_parameter} `.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
         });
     }
 }
