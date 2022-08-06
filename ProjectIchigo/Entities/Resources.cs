@@ -46,29 +46,29 @@ internal class Resources
     {
         public static readonly string QuestionMark = "https://cdn.discordapp.com/attachments/1005430437952356423/1005436838359617546/QuestionMark.png";
 
-        public static readonly string GuildUpdated = "https://media.discordapp.net/attachments/1005430437952356423/1005444849262137364/GuildUpdated.png";
+        public static readonly string GuildUpdated = "https://media.discordapp.net/attachments/1005430437952356423/1005611232172199957/GuildUpdated.png";
 
-        public static readonly string MessageDeleted = "https://media.discordapp.net/attachments/1005430437952356423/1005444899866415144/MessageRemoved.png";
-        public static readonly string MessageEdited = "https://media.discordapp.net/attachments/1005430437952356423/1005444899358912522/MessageUpdated.png";
+        public static readonly string MessageDeleted = "https://media.discordapp.net/attachments/1005430437952356423/1005611256637575238/MessageRemoved.png";
+        public static readonly string MessageEdited = "https://media.discordapp.net/attachments/1005430437952356423/1005611256289435798/MessageUpdated.png";
 
-        public static readonly string InviteAdded = "https://media.discordapp.net/attachments/1005430437952356423/1005444906803798096/InviteAdded.png";
-        public static readonly string InviteRemoved = "https://media.discordapp.net/attachments/1005430437952356423/1005444906342436885/InviteRemoved.png";
+        public static readonly string InviteAdded = "https://media.discordapp.net/attachments/1005430437952356423/1005611245157752963/InviteAdded.png";
+        public static readonly string InviteRemoved = "https://media.discordapp.net/attachments/1005430437952356423/1005611245577191454/InviteRemoved.png";
 
-        public static readonly string ChannelAdded = "https://media.discordapp.net/attachments/1005430437952356423/1005444849434116126/ChannelAdded.png";
-        public static readonly string ChannelRemoved = "https://media.discordapp.net/attachments/1005430437952356423/1005444849908060230/ChannelRemoved.png";
-        public static readonly string ChannelModified = "https://media.discordapp.net/attachments/1005430437952356423/1005444848624611358/ChannelUpdated.png";
+        public static readonly string ChannelAdded = "https://media.discordapp.net/attachments/1005430437952356423/1005611228661555290/ChannelAdded.png";
+        public static readonly string ChannelRemoved = "https://media.discordapp.net/attachments/1005430437952356423/1005611229181640794/ChannelRemoved.png";
+        public static readonly string ChannelModified = "https://media.discordapp.net/attachments/1005430437952356423/1005611228229545984/ChannelUpdated.png";
 
         public static readonly string VoiceStateUserJoined = "https://media.discordapp.net/attachments/1005430437952356423/1005444860091838494/VoiceStateUserJoined.png";
         public static readonly string VoiceStateUserLeft = "https://media.discordapp.net/attachments/1005430437952356423/1005444860385435668/VoiceStateUserLeft.png";
         public static readonly string VoiceStateUserUpdated = "https://media.discordapp.net/attachments/1005430437952356423/1005444860695810149/VoiceStateUserUpdated.png";
 
-        public static readonly string UserAdded = "https://media.discordapp.net/attachments/1005430437952356423/1005444887342227536/UserAdded.png";
-        public static readonly string UserBanned = "https://media.discordapp.net/attachments/1005430437952356423/1005444887723905144/UserBanned.png";
-        public static readonly string UserBanRemoved = "https://media.discordapp.net/attachments/1005430437952356423/1005444886952149032/BanRemoved.png";
-        public static readonly string UserKicked = "https://media.discordapp.net/attachments/1005430437952356423/1005444888025899019/UserKicked.png";
-        public static readonly string UserLeft = "https://media.discordapp.net/attachments/1005430437952356423/1005444888587943936/UserRemoved.png";
-        public static readonly string UserUpdated = "https://media.discordapp.net/attachments/1005430437952356423/1005444888923476048/UserUpdated.png";
-        public static readonly string UserWarned = "https://media.discordapp.net/attachments/1005430437952356423/1005444889250627624/UserWarned.png";
+        public static readonly string UserAdded = "https://media.discordapp.net/attachments/1005430437952356423/1005611280578641920/UserAdded.png";
+        public static readonly string UserBanned = "https://media.discordapp.net/attachments/1005430437952356423/1005611281052614656/UserBanned.png";
+        public static readonly string UserBanRemoved = "https://media.discordapp.net/attachments/1005430437952356423/1005611280222142545/BanRemoved.png";
+        public static readonly string UserKicked = "https://media.discordapp.net/attachments/1005430437952356423/1005611281367171233/UserKicked.png";
+        public static readonly string UserLeft = "https://media.discordapp.net/attachments/1005430437952356423/1005611281715318876/UserRemoved.png";
+        public static readonly string UserUpdated = "https://media.discordapp.net/attachments/1005430437952356423/1005611282298306640/UserUpdated.png";
+        public static readonly string UserWarned = "https://media.discordapp.net/attachments/1005430437952356423/1005611279534268416/UserWarned.png";
     }
 
     public class StatusIndicators
