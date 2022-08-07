@@ -113,7 +113,7 @@ internal class VoicePrivacyEvents
                                     try
                                     {
                                         var MessagesToDelete = BulkDeletions.Take(100).ToList();
-                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete);
+                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete, "In Voice Privacy");
 
                                         for (int i = 0; i < MessagesToDelete.Count; i++)
                                         {
@@ -144,7 +144,7 @@ internal class VoicePrivacyEvents
                                     {
                                         var msg = SingleDeletions[0];
 
-                                        await e.Before.Channel.DeleteMessageAsync(msg);
+                                        await e.Before.Channel.DeleteMessageAsync(msg, "In Voice Privacy");
                                         SingleDeletions.Remove(msg);
 
                                         if (SingleDeletions.Any())
