@@ -15,12 +15,8 @@ internal class GlobalUnbanCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = $"`'{victim.UsernameWithDiscriminator}' is not global banned.`"
-                });
+                }.SetError(ctx, "Global Ban"));
                 return;
             }
 
@@ -32,12 +28,8 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                Color = EmbedColors.Processing,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Removing global ban for '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
-            });
+            }.SetLoading(ctx, "Global Ban"));
 
             if (UnbanFromGuilds)
                 foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
@@ -66,12 +58,8 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
-            });
+            }.SetSuccess(ctx, "Global Ban"));
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);
             await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
