@@ -64,16 +64,14 @@ internal class VoicePrivacyEvents
                     {
                         if (e.Before is not null && e.Before.Channel is not null)
                         {
-                            _logger.LogTrace($"{e.User.Id}: Started In-Voice Text Privacy Cleaner");
+                            if (e.Before.Channel.Type != ChannelType.Voice)
+                                return;
 
                             List<DiscordMessage> discordMessages = new();
                             discordMessages.AddRange(await e.Before.Channel.GetMessagesAsync(1));
 
                             if (!discordMessages.Any())
-                            {
-                                _logger.LogTrace($"{e.User.Id}: Finished In-Voice Text Privacy Cleaner, no messages are present in this Channel");
                                 return;
-                            }
 
                             int failcount = 0;
 
@@ -164,8 +162,6 @@ internal class VoicePrivacyEvents
                                     }
                                 }
                             }
-
-                            _logger.LogTrace($"{e.User.Id}: Finished In-Voice Text Privacy Cleaner");
                         }
                     }
                 }
