@@ -27,12 +27,8 @@ internal class ScoreSaberProfileCommand : BaseCommand
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber • {ctx.Guild.Name}" },
-                                Color = EmbedColors.Error,
-                                Footer = ctx.GenerateUsedByFooter(),
-                                Timestamp = DateTime.UtcNow,
                                 Description = $"`Invalid input.`"
-                            }));
+                            }.SetError(ctx, "Score Saber")));
                             return;
                         }
                     }
@@ -43,12 +39,8 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber • {ctx.Guild.Name}" },
-                        Color = EmbedColors.Error,
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow,
                         Description = $"`The user you tagged does not exist.`"
-                    }));
+                    }.SetError(ctx, "Score Saber")));
                     return;
                 }
 
@@ -64,12 +56,8 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Score Saber • {ctx.Guild.Name}" },
-                        Color = EmbedColors.Error,
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow,
                         Description = $"`This user has no Score Saber Profile linked to their Discord Account.`"
-                    }));
+                    }.SetError(ctx, "Score Saber")));
                     return;
                 }
             }

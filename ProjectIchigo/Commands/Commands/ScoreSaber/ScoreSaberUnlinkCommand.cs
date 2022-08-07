@@ -18,21 +18,15 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Timestamp = DateTime.UtcNow,
                     Description = $"{ctx.User.Mention} `Unlinked your Score Saber Profile from your Discord Account`"
-                }));
+                }.SetSuccess(ctx, "Score Saber")));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Timestamp = DateTime.UtcNow,
                     Description = $"{ctx.User.Mention} `There is no Score Saber Profile linked to your Discord Account.`"
-                }));
+                }.SetError(ctx, "Score Saber")));
             }
         });
     }
