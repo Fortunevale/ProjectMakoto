@@ -12,36 +12,25 @@ internal class UnbanCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Title = "",
                 Description = $"`Unbanning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
-                Color = EmbedColors.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
                 },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.Loading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
             {
                 await ctx.Guild.UnbanMemberAsync(victim);
 
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was unbanned.";
+                embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ `{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be unbanned.`";
+                embed.Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be unbanned.`";
+                embed = embed.SetError(ctx);
             }
 
             await RespondOrEdit(embed);

@@ -22,19 +22,11 @@ internal class BanCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Banning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
-                Color = EmbedColors.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
-                },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.Loading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+                }
+            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -44,15 +36,13 @@ internal class BanCommand : BaseCommand
 
                 await ctx.Guild.BanMemberAsync(victim.Id, 7, $"{ctx.User.UsernameWithDiscriminator} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"✅ {victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
+                embed.Description = $"{victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
+                embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ {victim.Mention} `could not be banned.`";
+                embed.Description = $"{victim.Mention} `could not be banned.`";
+                embed = embed.SetError(ctx);
             }
 
             await RespondOrEdit(embed);

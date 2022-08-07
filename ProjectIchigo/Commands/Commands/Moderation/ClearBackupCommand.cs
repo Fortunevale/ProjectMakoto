@@ -18,19 +18,11 @@ internal class ClearBackupCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
-                    Color = EmbedColors.Error,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                     {
                         Url = victim.AvatarUrl
                     },
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                }.SetError(ctx));
 
                 return;
             }
@@ -47,19 +39,11 @@ internal class ClearBackupCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Deleted stored nickname and roles for {victim.UsernameWithDiscriminator} ({victim.Id}).`",
-                Color = EmbedColors.StrongPunishment,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
-                },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = ctx.Guild.IconUrl
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            });
+                }
+            }.SetSuccess(ctx));
         });
     }
 }

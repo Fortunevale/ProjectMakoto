@@ -10,62 +10,41 @@ internal class FollowUpdatesCommand : BaseCommand
         {
             var channel = (FollowChannel)arguments["channel"];
 
-            switch (channel)
+            try
             {
-                case FollowChannel.GithubUpdates:
+                switch (channel)
                 {
-                    var b = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GithubLogChannelId);
-                    await b.FollowAsync(ctx.Channel);
-
-                    await RespondOrEdit(new DiscordEmbedBuilder
+                    case FollowChannel.GithubUpdates:
                     {
-                        Author = new()
-                        {
-                            Name = ctx.Guild.Name,
-                            IconUrl = ctx.Guild.IconUrl
-                        },
-                        Color = EmbedColors.Info,
-                        Description = "✅ `Successfully followed the github updates channel.`",
-                        Footer = ctx.GenerateUsedByFooter()
-                    });
-                    break;
+                        var b = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GithubLogChannelId);
+                        await b.FollowAsync(ctx.Channel);
+                        break;
+                    }
+                    case FollowChannel.GlobalBans:
+                    {
+                        var b = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+                        await b.FollowAsync(ctx.Channel);
+                        break;
+                    }
+                    case FollowChannel.News:
+                    {
+                        var b = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.NewsChannelId);
+                        await b.FollowAsync(ctx.Channel);
+                        break;
+                    }
                 }
-                case FollowChannel.GlobalBans:
+
+                await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    var b = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);
-                    await b.FollowAsync(ctx.Channel);
-
-                    await RespondOrEdit(new DiscordEmbedBuilder
-                    {
-                        Author = new()
-                        {
-                            Name = ctx.Guild.Name,
-                            IconUrl = ctx.Guild.IconUrl
-                        },
-                        Color = EmbedColors.Info,
-                        Description = "✅ `Successfully followed the global bans channel.`",
-                        Footer = ctx.GenerateUsedByFooter()
-                    });
-                    break;
-                }
-                case FollowChannel.News:
+                    Description = $"`Successfully followed {channel}.`",
+                }.SetSuccess(ctx));
+            }
+            catch (Exception)
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    var b = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.NewsChannelId);
-                    await b.FollowAsync(ctx.Channel);
-
-                    await RespondOrEdit(new DiscordEmbedBuilder
-                    {
-                        Author = new()
-                        {
-                            Name = ctx.Guild.Name,
-                            IconUrl = ctx.Guild.IconUrl
-                        },
-                        Color = EmbedColors.Info,
-                        Description = "✅ `Successfully followed the news channel.`",
-                        Footer = ctx.GenerateUsedByFooter()
-                    });
-                    break;
-                }
+                    Description = $"`Could not follow {channel}.`",
+                }.SetError(ctx));
             }
         });
     }

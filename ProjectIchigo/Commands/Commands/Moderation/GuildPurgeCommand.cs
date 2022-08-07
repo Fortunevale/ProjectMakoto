@@ -22,12 +22,8 @@ internal class GuildPurgeCommand : BaseCommand
 
             var status_embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Server Purge • {ctx.Guild.Name}" },
-                Color = EmbedColors.Processing,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Scanning all channels for messages sent by '{victim.UsernameWithDiscriminator}' ({victim.Id})..`"
-            };
+            }.SetLoading(ctx, "Server Purge");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
 
@@ -126,10 +122,8 @@ internal class GuildPurgeCommand : BaseCommand
                 await ctx.Guild.GetChannel(channel.Key).DeleteMessagesAsync(channel.Value);
             }
 
-            status_embed.Description = $"`Finished operation.`";
-            status_embed.Color = EmbedColors.Success;
-            status_embed.Author.IconUrl = Resources.LogIcons.Info;
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
+            status_embed.Description = $"`{allMsg} were found. {currentProg}/{maxProg} were deleted.`";
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed.SetSuccess(ctx, "Server Purge")));
         });
     }
 }

@@ -29,19 +29,11 @@ internal class TimeoutCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Timing {victim.UsernameWithDiscriminator} ({victim.Id}) out..`",
-                Color = EmbedColors.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
                 },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.Loading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+            }.SetLoading(ctx);
             await RespondOrEdit(embed: embed);
 
             if (string.IsNullOrWhiteSpace(duration))
@@ -80,16 +72,8 @@ internal class TimeoutCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor
-                        {
-                            IconUrl = ctx.Guild.IconUrl,
-                            Name = ctx.Guild.Name
-                        },
                         Description = $"The Duration you specified is invalid.",
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow,
-                        Color = EmbedColors.Error
-                    });
+                    }.SetError(ctx));
                     return;
                 }
             }
@@ -98,16 +82,8 @@ internal class TimeoutCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        IconUrl = ctx.Guild.IconUrl,
-                        Name = ctx.Guild.Name
-                    },
                     Description = $"❌ `The duration you specified is invalid.`",
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Color = EmbedColors.Error
-                });
+                }.SetError(ctx));
                 return;
             }
 
@@ -117,16 +93,14 @@ internal class TimeoutCommand : BaseCommand
                     throw new Exception();
 
                 await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"✅ {victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`\n" +
+                embed.Description = $"{victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`\n" +
                                     $"`The time out will last for {until.GetTimespanUntil().GetHumanReadable()}.`";
+                embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ {victim.Mention} `could not be timed out.`";
+                embed.Description = $"{victim.Mention} `could not be timed out.`";
+                embed = embed.SetError(ctx);
             }
 
             await RespondOrEdit(embed);

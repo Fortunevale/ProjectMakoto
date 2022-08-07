@@ -28,19 +28,11 @@ internal class KickCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Kicking {victim.UsernameWithDiscriminator} ({victim.Id})..`",
-                Color = EmbedColors.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
                 },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.Loading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -50,15 +42,13 @@ internal class KickCommand : BaseCommand
 
                 await victim.RemoveAsync($"{ctx.User.UsernameWithDiscriminator} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"✅ {victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
+                embed.Description = $"{victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
+                embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ {victim.Mention} `could not be kicked.`";
+                embed.Description = $"{victim.Mention} `could not be kicked.`";
+                embed.SetError(ctx);
             }
 
             await RespondOrEdit(embed);
