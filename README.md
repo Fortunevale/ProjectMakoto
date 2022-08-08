@@ -1,6 +1,8 @@
 # Project-Ichigo - A discord bot written in C#
 
-[![wakatime](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg)](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo)
+![](https://img.shields.io/github/contributors/Fortunevale/ProjectIchigo) ![buildstatus](https://img.shields.io/github/workflow/status/Fortunevale/ProjectIchigo/build) ![reposize](https://img.shields.io/github/repo-size/Fortunevale/ProjectIchigo) ![](https://img.shields.io/github/issues-raw/Fortunevale/ProjectIchigo) [![wakatime](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg)](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo)
+
+![](https://img.shields.io/github/stars/Fortunevale/ProjectIchigo?style=social) ![](https://img.shields.io/github/watchers/Fortunevale/ProjectIchigo?style=social)
 
 # **[Skip everything, i want the bot!](#getting-the-bot)**
 
