@@ -17,17 +17,8 @@ internal class BannerCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"{victim.UsernameWithDiscriminator}'s Banner",
-                    Url = victim.AvatarUrl
-                },
                 ImageUrl = victim.BannerUrl,
-                Description = (victim.BannerUrl.IsNullOrWhiteSpace() ? "`This user has no banner.`" : ""),
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.Info
-            };
+            }.SetInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Banner");
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 

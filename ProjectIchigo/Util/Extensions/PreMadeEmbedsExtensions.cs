@@ -2,7 +2,7 @@ namespace ProjectIchigo.Extensions;
 
 internal static class PreMadeEmbedsExtensions
 {
-    public static DiscordEmbedBuilder SetLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
         b.Author.IconUrl = Resources.StatusIndicators.Loading;
@@ -14,7 +14,7 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
 
-    public static DiscordEmbedBuilder SetInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
 
@@ -25,7 +25,7 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
     
-    public static DiscordEmbedBuilder SetAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
 
@@ -36,7 +36,7 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
     
-    public static DiscordEmbedBuilder SetError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
         b.Author.IconUrl = Resources.StatusIndicators.Error;
@@ -48,7 +48,7 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
     
-    public static DiscordEmbedBuilder SetWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
         b.Author.IconUrl = Resources.StatusIndicators.Warning;
@@ -60,7 +60,7 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
     
-    public static DiscordEmbedBuilder SetSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "")
+    public static DiscordEmbedBuilder SetSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
         b.Author.IconUrl = Resources.StatusIndicators.Success;

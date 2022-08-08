@@ -14,12 +14,8 @@ internal class LeaderboardCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                });
+                }.SetError(ctx, "Experience"));
                 return;
             }
 
@@ -29,20 +25,12 @@ internal class LeaderboardCommand : BaseCommand
                 return;
             }
 
-            var PerformingActionEmbed = new DiscordEmbedBuilder
+            var embed = new DiscordEmbedBuilder
             {
-                Color = EmbedColors.HiddenSidebar,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = Resources.StatusIndicators.Loading,
-                    Name = $"Experience Leaderboard"
-                },
                 Description = $"`Loading Leaderboard, please wait..`",
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+            }.SetLoading(ctx, "Experience Leaderboard");
 
-            await RespondOrEdit(embed: PerformingActionEmbed);
+            await RespondOrEdit(embed: embed);
 
             int count = 0;
 
@@ -90,19 +78,18 @@ internal class LeaderboardCommand : BaseCommand
             var fields = Board.PrepareEmbedFields();
 
             foreach (var field in fields)
-                PerformingActionEmbed.AddField(new DiscordEmbedField(field.Key, field.Value));
+                embed.AddField(new DiscordEmbedField(field.Key, field.Value));
 
             if (count != 0)
             {
-                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.";
-                await RespondOrEdit(PerformingActionEmbed);
+                embed.Author.IconUrl = ctx.Guild.IconUrl;
+                embed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.";
+                await RespondOrEdit(embed.SetInfo(ctx, "Experience Leaderboard"));
             }
             else
             {
-                PerformingActionEmbed.Author.IconUrl = ctx.Guild.IconUrl;
-                PerformingActionEmbed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
-                await RespondOrEdit(PerformingActionEmbed);
+                embed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
+                await RespondOrEdit(embed.SetInfo(ctx, "Experience Leaderboard"));
             }
         });
     }

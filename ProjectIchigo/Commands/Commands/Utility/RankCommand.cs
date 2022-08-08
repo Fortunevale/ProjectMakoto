@@ -14,12 +14,8 @@ internal class RankCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Error, Name = $"Experience • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Error,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                });
+                }.SetError(ctx, "Experience"));
                 return;
             }
 
@@ -33,20 +29,12 @@ internal class RankCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"Experience • {ctx.Guild.Name}",
-                    IconUrl = ctx.Guild.IconUrl
-                },
                 Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.DigitsToEmotes()} with `{ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
                               $"**Level {(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).DigitsToEmotes()} Progress**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.HiddenSidebar
-            });
+            }.SetInfo(ctx, "Experience"));
         });
     }
 }

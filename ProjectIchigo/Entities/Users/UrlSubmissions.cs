@@ -10,8 +10,8 @@ public class UrlSubmissions
 
 
 
-    private bool _AcceptedTOS { get; set; } = false;
-    public bool AcceptedTOS 
+    private int _AcceptedTOS { get; set; } = 0;
+    public int AcceptedTOS 
     { 
         get => _AcceptedTOS; 
         set 

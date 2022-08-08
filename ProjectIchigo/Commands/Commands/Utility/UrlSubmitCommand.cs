@@ -16,25 +16,29 @@ internal class UrlSubmitCommand : BaseCommand
 
             var interactivity = ctx.Client.GetInteractivity();
 
-            if (!ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS)
+            int tos_version = 2;
+
+            if (ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS != tos_version)
             {
                 var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", "I accept these conditions", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
-                    Color = EmbedColors.Important,
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
                                   $"{2.DigitsToEmotes()}. You may not spam submissions.\n" +
                                   $"{3.DigitsToEmotes()}. You may not submit unregistered domains.\n" +
-                                  $"{4.DigitsToEmotes()}. You may not submit shortened URLs.\n\n" +
+                                  $"{4.DigitsToEmotes()}. You may not submit shortened URLs.\n" +
+                                  $"{5.DigitsToEmotes()}. You accept that your user account and current server will be tracked and visible to verifiers.\n\n" +
                                   $"We reserve the right to ban you for any reason that may not be listed.\n" +
                                   $"**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n" +
                                   $"**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**\n\n" +
                                   $"To accept these conditions, please click the button below. If you do not see a button to interact with, update your discord client."
-                };
+                }.SetAwaitingInput(ctx, "Phishing Link Submission");
+
+                if (ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS != 0 && ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS < tos_version)
+                {
+                    tos_embed.Description = tos_embed.Description.Insert(0, "The submission conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.\n\n");
+                }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
 
@@ -48,20 +52,16 @@ internal class UrlSubmitCommand : BaseCommand
 
                 await TosAccept.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS = true;
+                ctx.Bot._users[ctx.User.Id].UrlSubmissions.AcceptedTOS = tos_version;
 
                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.WithColor(EmbedColors.Success).WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.SetSuccess(ctx, "Phishing Link Submission").WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
 
                 await Task.Delay(2000);
             }
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.Loading, Name = $"Phishing Link Submission • {ctx.Guild.Name}" },
-                Color = EmbedColors.Processing,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Processing your request..`"
             };
 
@@ -70,9 +70,7 @@ internal class UrlSubmitCommand : BaseCommand
             if (ctx.Bot._users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot._status))
             {
                 embed.Description = $"`You cannot submit a domain for the next {ctx.Bot._users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = Resources.LogIcons.Error;
-                _ = RespondOrEdit(embed.Build());
+                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
                 return;
             }
 
@@ -81,9 +79,7 @@ internal class UrlSubmitCommand : BaseCommand
                 if (ctx.Bot._submittedUrls.List.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 10)
                 {
                     embed.Description = $"`You have 10 open url submissions. Please wait before trying to submit another url.`";
-                    embed.Color = EmbedColors.Error;
-                    embed.Author.IconUrl = Resources.LogIcons.Error;
-                    _ = RespondOrEdit(embed.Build());
+                    _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
                     return;
                 }
             }
@@ -92,9 +88,7 @@ internal class UrlSubmitCommand : BaseCommand
             {
                 embed.Description = $"`You are banned from submitting URLs.`\n" +
                                     $"`Reason: {ctx.Bot._submissionBans.Users[ctx.User.Id].Reason}`";
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = Resources.LogIcons.Error;
-                _ = RespondOrEdit(embed.Build());
+                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
                 return;
             }
 
@@ -102,9 +96,7 @@ internal class UrlSubmitCommand : BaseCommand
             {
                 embed.Description = $"`This guild is banned from submitting URLs.`\n" +
                                     $"`Reason: {ctx.Bot._submissionBans.Guilds[ctx.Guild.Id].Reason}`";
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = Resources.LogIcons.Error;
-                _ = RespondOrEdit(embed.Build());
+                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
                 return;
             }
 
@@ -119,15 +111,12 @@ internal class UrlSubmitCommand : BaseCommand
             if (!domain.Contains('.') || domain.Contains(' '))
             {
                 embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') you're trying to submit is invalid.`";
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = Resources.LogIcons.Error;
-                _ = RespondOrEdit(embed.Build());
+                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
                 return;
             }
 
-            embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCodeBlock()}'. When submitting, your public user account and guild will be tracked and visible to verifiers. Do you want to proceed?`";
-            embed.Color = EmbedColors.Success;
-            embed.Author.IconUrl = Resources.LogIcons.Info;
+            embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCodeBlock()}'. Do you want to proceed?`";
+            embed.SetAwaitingInput(ctx, "Phishing Link Submission");
 
             var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
@@ -150,8 +139,7 @@ internal class UrlSubmitCommand : BaseCommand
             if (e.Result.Interaction.Data.CustomId == ContinueButton.CustomId)
             {
                 embed.Description = $"`Submitting your domain..`";
-                embed.Color = EmbedColors.Loading;
-                embed.Author.IconUrl = Resources.StatusIndicators.Loading;
+                embed.SetLoading(ctx, "Phishing Link Submission");
                 await RespondOrEdit(embed);
 
                 embed.Description = $"`Checking if your domain is already in the database..`";
@@ -162,8 +150,7 @@ internal class UrlSubmitCommand : BaseCommand
                     if (domain.Contains(b.Key))
                     {
                         embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') is already present in the database. Thanks for trying to contribute regardless.`";
-                        embed.Color = EmbedColors.Error;
-                        embed.Author.IconUrl = Resources.LogIcons.Error;
+                        embed.SetError(ctx, "Phishing Link Submission");
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
@@ -177,8 +164,7 @@ internal class UrlSubmitCommand : BaseCommand
                     if (b.Value.Url == domain)
                     {
                         embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') has already been submitted. Thanks for trying to contribute regardless.`";
-                        embed.Color = EmbedColors.Error;
-                        embed.Author.IconUrl = Resources.LogIcons.Error;
+                        embed.SetError(ctx, "Phishing Link Submission");
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
@@ -221,8 +207,7 @@ internal class UrlSubmitCommand : BaseCommand
                 ctx.Bot._users[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                 embed.Description = $"`Submission created. Thanks for your contribution.`";
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = Resources.LogIcons.Info;
+                embed.SetSuccess(ctx, "Phishing Link Submission");
                 await RespondOrEdit(embed);
             }
             else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
