@@ -81,7 +81,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
                         Name = ctx.Guild.Name,
                         IconUrl = ctx.Guild.IconUrl
                     },
-                    Description = "❌ `It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
+                    Description = "`It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
                     Footer = ctx.GenerateUsedByFooter(),
                     Timestamp = DateTime.UtcNow,
                     Color = EmbedColors.Error,

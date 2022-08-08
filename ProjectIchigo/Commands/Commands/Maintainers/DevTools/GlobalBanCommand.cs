@@ -10,22 +10,17 @@ internal class GlobalBanCommand : BaseCommand
             DiscordUser victim = (DiscordUser)arguments["victim"];
             string reason = (string)arguments["reason"];
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Global Ban • {ctx.Guild.Name}" },
-                Color = EmbedColors.Processing,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
-            };
+            }.SetLoading(ctx, "Global Ban");
 
             var msg = RespondOrEdit(embed);
 
             if (ctx.Bot._status.TeamMembers.Contains(victim.Id))
             {
-                embed.Color = EmbedColors.Error;
                 embed.Description = $"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`";
-                msg = RespondOrEdit(embed);
+                msg = RespondOrEdit(embed.SetError(ctx, "Global Ban"));
                 return;
             }
 
@@ -54,9 +49,8 @@ internal class GlobalBanCommand : BaseCommand
                 }
             }
 
-            embed.Color = EmbedColors.Success;
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
-            msg = RespondOrEdit(embed);
+            msg = RespondOrEdit(embed.SetSuccess(ctx, "Global Ban"));
 
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);

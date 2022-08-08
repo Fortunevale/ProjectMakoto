@@ -31,15 +31,7 @@ internal class PurgeCommand : BaseCommand
                 var embed = new DiscordEmbedBuilder
                 {
                     Description = $"`Fetching {number} messages..`",
-                    Color = EmbedColors.Processing,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                };
+                }.SetLoading(ctx);
                 await RespondOrEdit(embed);
 
                 List<DiscordMessage> fetchedMessages = (await ctx.Channel.GetMessagesAsync(100)).ToList();
@@ -82,10 +74,9 @@ internal class PurgeCommand : BaseCommand
                 }
                 else
                 {
-                    embed.Description = $"❌ `No messages were found with the specified filter.`";
-                    embed.Color = EmbedColors.Error;
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    await RespondOrEdit(embed);
+                    embed.Description = $"`No messages were found with the specified filter.`";
+                    await RespondOrEdit(embed.SetError(ctx));
+                    return;
                 }
 
                 int total = fetchedMessages.Count;
@@ -114,10 +105,8 @@ internal class PurgeCommand : BaseCommand
                 catch (Exception ex)
                 {
                     _logger.LogError($"Failed to delete messages", ex);
-                    embed.Description = $"❌ `An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
-                    embed.Color = EmbedColors.Error;
-                    embed.Author.IconUrl = ctx.Guild.IconUrl;
-                    await RespondOrEdit(embed);
+                    embed.Description = $"`An error occured trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
+                    await RespondOrEdit(embed.SetError(ctx));
                     return;
                 }
 
@@ -128,13 +117,9 @@ internal class PurgeCommand : BaseCommand
                     await RespondOrEdit(embed);
                 }
 
-                embed.Description = $"✅ `Successfully deleted {deleted} messages`\n{(FailedToDeleteAmount > 0 ? $"❌ `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}";
+                embed.Description = $"`Successfully deleted {deleted} messages`\n{(FailedToDeleteAmount > 0 ? $"`Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}";
 
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Footer = ctx.GenerateUsedByFooter();
-
-                await RespondOrEdit(embed);
+                await RespondOrEdit(embed.SetSuccess(ctx));
                 return;
             }
             else
@@ -160,17 +145,9 @@ internal class PurgeCommand : BaseCommand
 
                 var embed = new DiscordEmbedBuilder
                 {
-                    Description = $"✅ `Deleted {bMessages.Count} messages.`\n{(FailedToDeleteAmount > 0 ? $"❌ `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}",
-                    Color = EmbedColors.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
+                    Description = $"`Deleted {bMessages.Count} messages.`\n{(FailedToDeleteAmount > 0 ? $"`Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}",
                 };
-                await RespondOrEdit(embed);
+                await RespondOrEdit((FailedToDeleteAmount > 0 ? embed.SetError(ctx) : embed.SetSuccess(ctx)));
             }
         });
     }

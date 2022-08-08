@@ -13,12 +13,8 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"In-Voice Text Channel Privacy • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = InVoicePrivacyCommandAbstractions.GetCurrentConfiguration(ctx)
-            });
+            }.SetInfo(ctx, "In-Voice Text Channel Privacy"));
         });
     }
 }

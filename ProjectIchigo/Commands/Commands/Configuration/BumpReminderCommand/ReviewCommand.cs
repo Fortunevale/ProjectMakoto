@@ -13,12 +13,8 @@ internal class ReviewCommand : BaseCommand
 
             var ListEmbed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Bump Reminder Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = BumpReminderCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetInfo(ctx, "Bump Reminder");
             await RespondOrEdit(ListEmbed);
         });
     }

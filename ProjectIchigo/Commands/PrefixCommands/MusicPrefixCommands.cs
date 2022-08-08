@@ -12,26 +12,6 @@ internal class MusicPrefixCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        public async override Task BeforeExecutionAsync(CommandContext ctx)
-        {
-            if (ctx.Member.VoiceState is null)
-            {
-                _ = ctx.Channel.SendMessageAsync(embed: new DiscordEmbedBuilder
-                {
-                    Description = $"❌ `You aren't in a voice channel.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
-                throw new CancelCommandException("User is not in a voice channel", ctx);
-            }
-        }
-
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
         {

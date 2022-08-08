@@ -13,11 +13,10 @@ internal class MusicModuleAbstractions
         var node = lava.ConnectedNodes.Values.First();
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
+        embed.SetLoading(ctx);
 
-        embed.Description = $":arrows_counterclockwise: `Looking for '{load}'..`";
+        embed.Description = $"`Looking for '{load}'..`";
         await ctx.BaseCommand.RespondOrEdit(embed.Build());
-
-        embed.Author.IconUrl = ctx.Guild.IconUrl;
 
         LavalinkLoadResult loadResult;
 
@@ -28,15 +27,15 @@ internal class MusicModuleAbstractions
 
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
         {
-            embed.Description = $"❌ `Failed to load '{load}'.`";
-            embed.Color = EmbedColors.Error;
+            embed.Description = $"`Failed to load '{load}'.`";
+            embed.SetError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
         {
-            embed.Description = $"❌ `No matches found for '{load}'.`";
-            embed.Color = EmbedColors.Error;
+            embed.Description = $"`No matches found for '{load}'.`";
+            embed.SetError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
@@ -52,7 +51,8 @@ internal class MusicModuleAbstractions
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
         {
-            embed.Description = $"❓ `Found {loadResult.Tracks.Count()} load result(s). Please select the song you want to add below.`";
+            embed.Description = $"`Found {loadResult.Tracks.Count()} load result(s). Please select the song you want to add below.`";
+            embed.SetAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
             string SelectedUri;

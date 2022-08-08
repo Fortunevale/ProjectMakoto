@@ -13,12 +13,8 @@ internal class ConfigCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"In-Voice Text Channel Privacy • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = InVoicePrivacyCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "In-Voice Text Channel Privacy");
 
             var ToggleDeletion = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].InVoiceTextPrivacySettings.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Deletion", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
             var TogglePermission = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].InVoiceTextPrivacySettings.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Permission Protection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));

@@ -17,16 +17,8 @@ internal class AvatarCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = $"{victim.UsernameWithDiscriminator}'s Avatar",
-                    Url = victim.AvatarUrl
-                },
                 ImageUrl = victim.AvatarUrl,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Color = EmbedColors.Info
-            };
+            }.SetInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Avatar");
 
             DiscordMember member = null;
 

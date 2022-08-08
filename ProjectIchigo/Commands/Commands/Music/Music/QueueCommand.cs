@@ -19,16 +19,8 @@ internal class QueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `The bot is not in a voice channel.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`The bot is not in a voice channel.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -36,16 +28,8 @@ internal class QueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `You aren't in the same channel as the bot.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`You aren't in the same channel as the bot.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -92,16 +76,8 @@ internal class QueueCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Color = EmbedColors.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
                     Description = Description
-                }).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
+                }.SetInfo(ctx)).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
 
                 return;
             }

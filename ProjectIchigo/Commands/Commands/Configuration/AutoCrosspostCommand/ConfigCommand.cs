@@ -15,14 +15,10 @@ internal class ConfigCommand : BaseCommand
                 if (!ctx.Guild.Channels.ContainsKey(b))
                     ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Auto Crosspost Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = AutoCrosspostCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Auto Crosspost");
 
             var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
             var ExcludeBots = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Exclude Bots", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
@@ -32,13 +28,13 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    ExcludeBots,
-                    SetDelayButton
+                ExcludeBots,
+                SetDelayButton
             })
             .AddComponents(new List<DiscordComponent>
             {
-                    AddButton,
-                    RemoveButton
+                AddButton,
+                RemoveButton
             }).AddComponents(Resources.CancelButton));
 
             var Button = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
@@ -65,7 +61,7 @@ internal class ConfigCommand : BaseCommand
                     .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (59 max)", "", 1, 2, true, "0"));
 
                 await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`")));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`").SetAwaitingInput(ctx, "Auto Crosspost")));
 
                 var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
 
@@ -94,7 +90,7 @@ internal class ConfigCommand : BaseCommand
 
                     if (length > TimeSpan.FromMinutes(5) || length < TimeSpan.FromSeconds(1))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `The duration has to be between 1 second and 5 minutes.`").WithColor(EmbedColors.Error)));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").SetError(ctx, "Auto Crosspost")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -107,7 +103,7 @@ internal class ConfigCommand : BaseCommand
                 }
                 catch (Exception)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `Invalid duration`").WithColor(EmbedColors.Error)));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid duration`").SetError(ctx, "Auto Crosspost")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -120,7 +116,7 @@ internal class ConfigCommand : BaseCommand
                 if (ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
                 {
                     embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot._status.DevelopmentServerInvite}";
-                    embed.Color = EmbedColors.Error;
+                    embed = embed.SetError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
@@ -142,7 +138,7 @@ internal class ConfigCommand : BaseCommand
                 if (channel.Type != ChannelType.News)
                 {
                     embed.Description = "`The channel you selected is not an announcement channel.`";
-                    embed.Color = EmbedColors.Error;
+                    embed = embed.SetError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
@@ -152,7 +148,7 @@ internal class ConfigCommand : BaseCommand
                 if (ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 5)
                 {
                     embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot._status.DevelopmentServerInvite}";
-                    embed.Color = EmbedColors.Error;
+                    embed = embed.SetError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
@@ -173,7 +169,7 @@ internal class ConfigCommand : BaseCommand
                 if (ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
                 {
                     embed.Description = $"`No Crosspost Channels are set up.`";
-                    embed.Color = EmbedColors.Error;
+                    embed = embed.SetError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);

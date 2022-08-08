@@ -22,39 +22,27 @@ internal class BanCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Banning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
-                Color = EmbedColors.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
-                },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+                }
+            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
             {
-                if (ctx.Member.GetHighestPosition() <= (bMember?.GetHighestPosition() ?? -1))
+                if (ctx.Member.GetRoleHighestPosition() <= (bMember?.GetRoleHighestPosition() ?? -1))
                     throw new Exception();
 
                 await ctx.Guild.BanMemberAsync(victim.Id, 7, $"{ctx.User.UsernameWithDiscriminator} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was banned.\n\n" +
-                                                        $"Reason: `{reason}`\n" +
-                                                        $"Banned by: {ctx.Member.Mention} `{ctx.Member.Username}#{ctx.Member.Discriminator}` (`{ctx.Member.Id}`)";
+                embed.Description = $"{victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
+                embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ `{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be banned.`";
+                embed.Description = $"{victim.Mention} `could not be banned.`";
+                embed = embed.SetError(ctx);
             }
 
             await RespondOrEdit(embed);

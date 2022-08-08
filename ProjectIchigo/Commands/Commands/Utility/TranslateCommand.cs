@@ -46,15 +46,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`There is no content to translate in the message you selected.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                }.SetError(ctx)));
                 return;
             }
 
@@ -68,15 +60,7 @@ internal class TranslateCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = $"`What provider do you want to use?`",
-                Color = EmbedColors.AwaitingInput,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = ctx.Guild.IconUrl
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            }).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(Resources.CancelButton));
+            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(Resources.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
 
@@ -92,16 +76,8 @@ internal class TranslateCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`Please select the languages.`",
-                    Color = EmbedColors.AwaitingInput,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                    Description = $"`Please select the language to translate from.`",
+                }.SetAwaitingInput(ctx)));
 
                 string Source;
 
@@ -114,6 +90,11 @@ internal class TranslateCommand : BaseCommand
                     ModifyToTimedOut();
                     throw;
                 }
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Okay! Translating from {Source}. Now select the language to translate to.`",
+                }.SetAwaitingInput(ctx)));
 
                 string Target;
 
@@ -130,15 +111,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Translating..`",
-                    Color = EmbedColors.Processing,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                }.SetLoading(ctx)));
 
                 var TranslationTask = ctx.Bot._translationClient.Translate_a(Source, Target, transSource);
 
@@ -157,15 +130,7 @@ internal class TranslateCommand : BaseCommand
                         {
                             Description = $"`Your translation request is currently in queue at position {PosInQueue}. This might take a moment to finish..`\n" +
                                           $"`Your request will be executed, approximately,` {Formatter.Timestamp(DateTime.UtcNow.AddSeconds((PosInQueue * 20) - 3))}`.`",
-                            Color = EmbedColors.Processing,
-                            Author = new DiscordEmbedBuilder.EmbedAuthor
-                            {
-                                Name = ctx.Guild.Name,
-                                IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                            },
-                            Footer = ctx.GenerateUsedByFooter(),
-                            Timestamp = DateTime.UtcNow
-                        }));
+                        }.SetLoading(ctx)));
                     }
 
                     Wait++;
@@ -177,15 +142,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"{Translation.Item1}",
-                    Color = EmbedColors.Info,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = $"{bMessage.Author.UsernameWithDiscriminator} ({bMessage.Author.Id})",
-                        IconUrl = bMessage.Author.AvatarUrl
-                    },
-                    Timestamp = bMessage.Timestamp,
-                    Footer = ctx.GenerateUsedByFooter($"Translated from {(Source == "auto" ? $"{ctx.Bot._languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot._languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot._languageCodes.List.First(x => x.Code == Target).Name} using Google", "https://cdn.discordapp.com/attachments/906976602557145110/1001112928226910228/2991148.png")
-                }));
+                }.SetInfo(ctx, "", $"Translated from {(Source == "auto" ? $"{ctx.Bot._languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot._languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot._languageCodes.List.First(x => x.Code == Target).Name} using Google")));
             }
             else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
             {
@@ -198,16 +155,8 @@ internal class TranslateCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`Please select the languages.`",
-                    Color = EmbedColors.AwaitingInput,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                    Description = $"`Please select the language to translate from.`",
+                }.SetAwaitingInput(ctx)));
 
                 string Source;
 
@@ -220,6 +169,11 @@ internal class TranslateCommand : BaseCommand
                     ModifyToTimedOut();
                     throw;
                 }
+
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`Okay! Translating from {Source}. Now select the language to translate to.`",
+                }.SetAwaitingInput(ctx)));
 
                 string Target;
 
@@ -236,15 +190,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Translating..`",
-                    Color = EmbedColors.Processing,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                }.SetLoading(ctx)));
 
                 string query;
 
@@ -264,15 +210,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"{parsedTranslation.translatedText}",
-                    Color = EmbedColors.Info,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = $"{bMessage.Author.UsernameWithDiscriminator} ({bMessage.Author.Id})",
-                        IconUrl = bMessage.Author.AvatarUrl
-                    },
-                    Timestamp = bMessage.Timestamp,
-                    Footer = ctx.GenerateUsedByFooter($"Translated from {(Source == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == Source).name)} to {TranslationTargets.First(x => x.code == Target).name} using LibreTranslate", "https://cdn.discordapp.com/attachments/906976602557145110/1000921551698399353/cba1464ba45e470db4ec853535218539cf5d4777.png")
-                }));
+                }.SetInfo(ctx, "", $"Translated from {(Source == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == Source).name)} to {TranslationTargets.First(x => x.code == Target).name} using LibreTranslate")));
             }
         });
     }

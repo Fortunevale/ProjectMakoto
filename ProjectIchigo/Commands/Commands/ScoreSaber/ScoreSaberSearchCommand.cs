@@ -46,12 +46,8 @@ internal class ScoreSaberSearchCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber Search • {ctx.Guild.Name}" },
-                Color = EmbedColors.AwaitingInput,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Please select a continent filter below.`"
-            };
+            }.SetAwaitingInput(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents("no_country")).AddComponents(start_search_button));
             CancellationTokenSource tokenSource = new();
@@ -109,8 +105,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                                 embed.Description = "`Searching for players with specified criteria..`";
-                                embed.Author.IconUrl = Resources.StatusIndicators.DiscordCircleLoading;
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetLoading(ctx, "Score Saber")));
 
                                 if (currentFetchedPage != lastFetchedPage)
                                 {
@@ -120,22 +115,20 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                     }
                                     catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                                     {
-                                        embed.Author.IconUrl = Resources.LogIcons.Error;
-                                        embed.Color = EmbedColors.Error;
-                                        embed.Description = $"`An internal server exception occured. Please retry later.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+
+                                        embed.Description = $"`An internal server exception occured. Please retry later.`";
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
                                         return;
                                     }
                                     catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
                                     {
-                                        embed.Author.IconUrl = Resources.LogIcons.Error;
-                                        embed.Color = EmbedColors.Error;
-                                        embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+
+                                        embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
                                         return;
                                     }
                                     catch (Exception)
@@ -174,9 +167,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
                                 embed.Description = $"`Found {lastSearch.metadata.total} players. Fetched {lastSearch.players.Length} players. Showing {playerDropDownOptions.Count} players.`";
-                                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                                builder.WithEmbed(embed);
-                                await RespondOrEdit(builder);
+                                await RespondOrEdit(builder.WithEmbed(embed.SetSuccess(ctx, "Score Saber")));
                             }
 
                             if (e.Interaction.Data.CustomId == "start_search")
@@ -283,10 +274,8 @@ internal class ScoreSaberSearchCommand : BaseCommand
                     }
                     catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                     {
-                        embed.Author.IconUrl = Resources.LogIcons.Error;
-                        embed.Color = EmbedColors.Error;
                         embed.Description = $"`Couldn't find any player with the specified criteria.`";
-                        _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                        _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
                     }
                     catch (Exception)
                     {

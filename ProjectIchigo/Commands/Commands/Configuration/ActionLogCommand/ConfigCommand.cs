@@ -13,12 +13,8 @@ internal class ConfigCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Actionlog Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = ActionLogAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Actionlog");
 
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), $"Disable Actionlog", (ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.Channel == 0 ? "Set Channel" : "Change Channel")}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
@@ -27,12 +23,12 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
-                    { Disable }
+                { Disable }
             })
             .AddComponents(new List<DiscordComponent>
             {
-                    { ChangeChannel },
-                    { ChangeFilter }
+                { ChangeChannel },
+                { ChangeFilter }
             }).AddComponents(Resources.CancelButton));
 
             var Button = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
@@ -81,18 +77,18 @@ internal class ConfigCommand : BaseCommand
                 {
                     var Selections = new List<DiscordSelectComponentOption>
                     {
-                        new DiscordSelectComponentOption("Attempt gathering more details", "attempt_further_detail", "This option may sometimes be inaccurate.", ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails),
-                        new DiscordSelectComponentOption("Join, Leaves & Kicks", "log_members_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MembersModified),
-                        new DiscordSelectComponentOption("Nickname, Role Updates", "log_member_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MemberModified),
-                        new DiscordSelectComponentOption("User Profile Updates", "log_memberprofile_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MemberProfileModified),
-                        new DiscordSelectComponentOption("Message Deletions", "log_message_deleted", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MessageDeleted),
-                        new DiscordSelectComponentOption("Message Modifications'", "log_message_updated", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MessageModified),
-                        new DiscordSelectComponentOption("Role Updates", "log_roles_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.RolesModified),
-                        new DiscordSelectComponentOption("Bans & Unbans", "log_banlist_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.BanlistModified),
-                        new DiscordSelectComponentOption("Server Modifications", "log_guild_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.GuildModified),
-                        new DiscordSelectComponentOption("Channel Modifications", "log_channels_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.ChannelsModified),
-                        new DiscordSelectComponentOption("Voice Channel Updates", "log_voice_state", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated),
-                        new DiscordSelectComponentOption("Invite Modifications", "log_invites_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.InvitesModified),
+                        new DiscordSelectComponentOption("Attempt gathering more details", "attempt_further_detail", "This option may sometimes be inaccurate.", ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠"))),
+                        new DiscordSelectComponentOption("Join, Leaves & Kicks", "log_members_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MembersModified, new DiscordComponentEmoji(Resources.Emojis.GetUser(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Nickname, Role Updates", "log_member_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MemberModified, new DiscordComponentEmoji(Resources.Emojis.GetUser(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("User Profile Updates", "log_memberprofile_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MemberProfileModified, new DiscordComponentEmoji(Resources.Emojis.GetUser(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Message Deletions", "log_message_deleted", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MessageDeleted, new DiscordComponentEmoji(Resources.Emojis.GetMessage(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Message Modifications'", "log_message_updated", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.MessageModified, new DiscordComponentEmoji(Resources.Emojis.GetMessage(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Role Updates", "log_roles_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.RolesModified, new DiscordComponentEmoji(Resources.Emojis.GetUser(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Bans & Unbans", "log_banlist_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.BanlistModified, new DiscordComponentEmoji(Resources.Emojis.GetUser(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Server Modifications", "log_guild_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.GuildModified, new DiscordComponentEmoji(Resources.Emojis.GetGuild(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Channel Modifications", "log_channels_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.ChannelsModified, new DiscordComponentEmoji(Resources.Emojis.GetChannel(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Voice Channel Updates", "log_voice_state", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.VoiceStateUpdated, new DiscordComponentEmoji(Resources.Emojis.GetVoiceState(ctx.Client, ctx.Bot))),
+                        new DiscordSelectComponentOption("Invite Modifications", "log_invites_modified", null, ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.InvitesModified, new DiscordComponentEmoji(Resources.Emojis.GetInvite(ctx.Client, ctx.Bot))),
                     };
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordSelectComponent("No options selected.", Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
@@ -111,9 +107,8 @@ internal class ConfigCommand : BaseCommand
 
                     if (!ctx.Bot._guilds[ctx.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails && selected.Contains("attempt_further_detail"))
                     {
-                        embed.Description = $"⚠ `The option 'Attempt gathering more details' may sometimes be inaccurate. Please make sure to double check the audit log on serious concerns.`\n\n" +
-                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`The option 'Attempt gathering more details' may sometimes be inaccurate. Please make sure to double check the audit log on serious concerns.`\n\n" +
+                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..").SetWarning(ctx, "Actionlog")));
                         await Task.Delay(5000);
                     }
 

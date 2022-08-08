@@ -11,15 +11,10 @@ internal class ConfigCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Experience Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
-                Description = $"`Experience Enabled          ` : {ctx.Bot._guilds[ctx.Guild.Id].ExperienceSettings.UseExperience.BoolToEmote(ctx.Client)}\n" +
-                              $"`Experience Boost for Bumpers` : {ctx.Bot._guilds[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder.BoolToEmote(ctx.Client)}"
-            };
+                Description = ExperienceCommandAbstractions.GetCurrentConfiguration(ctx)
+            }.SetAwaitingInput(ctx, "Experience");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -27,12 +22,12 @@ internal class ConfigCommand : BaseCommand
             var ToggleBumperBoost = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience Boost for Bumpers", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
 
             await RespondOrEdit(builder
-                .AddComponents(new List<DiscordComponent>
-                {
-                        ToggleExperienceSystem,
-                        ToggleBumperBoost,
-                })
-                .AddComponents(Resources.CancelButton));
+            .AddComponents(new List<DiscordComponent>
+            {
+                ToggleExperienceSystem,
+                ToggleBumperBoost,
+            })
+            .AddComponents(Resources.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
 

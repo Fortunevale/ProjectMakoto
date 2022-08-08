@@ -35,7 +35,7 @@ internal class BumpReminderEvents
             if (!(e.Author.Id == sender.CurrentUser.Id && e.Message.Embeds.Any()))
                 _bot._bumpReminder.SendPersistentMessage(sender, e.Channel, bUser);
 
-            if (e.Author.Id != Resources.AccountIds.Disboard || !e.Message.Embeds.Any())
+            if (e.Author.Id != _bot._status.LoadedConfig.DisboardAccountId || !e.Message.Embeds.Any())
                 return;
 
             if (e.Message.Embeds[0].Description.ToLower().Contains(":thumbsup:"))
@@ -142,7 +142,7 @@ internal class BumpReminderEvents
             if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == "✅")
+            if (e.Message.Id == _bot._guilds[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.ToString() == "✅")
             {
                 var member = await e.Guild.GetMemberAsync(e.User.Id);
 
@@ -158,7 +158,7 @@ internal class BumpReminderEvents
             if (e.Guild == null || e.Channel.IsPrivate || !_bot._guilds[e.Guild.Id].BumpReminderSettings.Enabled || e.Channel.Id != _bot._guilds[e.Guild.Id].BumpReminderSettings.ChannelId)
                 return;
 
-            if (e.Message.Id == _bot._guilds[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.GetDiscordName() == "✅")
+            if (e.Message.Id == _bot._guilds[e.Guild.Id].BumpReminderSettings.MessageId && e.Emoji.ToString() == "✅")
             {
                 var member = await e.Guild.GetMemberAsync(e.User.Id);
 

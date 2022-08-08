@@ -19,16 +19,8 @@ internal class ShuffleCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `The bot is not in a voice channel.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`The bot is not in a voice channel.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -36,16 +28,8 @@ internal class ShuffleCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `You aren't in the same channel as the bot.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`You aren't in the same channel as the bot.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -53,15 +37,8 @@ internal class ShuffleCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Shuffle ? "✅ `The queue now shuffles.`" : "✅ `The queue no longer shuffles.`"),
-                Color = EmbedColors.Success,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = ctx.Guild.IconUrl
-                },
-                Footer = ctx.GenerateUsedByFooter()
-            });
+                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Shuffle ? "`The queue now shuffles.`" : "`The queue no longer shuffles.`"),
+            }.SetSuccess(ctx));
         });
     }
 }

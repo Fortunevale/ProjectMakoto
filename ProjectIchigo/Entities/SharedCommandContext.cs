@@ -24,6 +24,9 @@ public class SharedCommandContext
         Prefix = ctx.Prefix;
         CommandName = ctx.Command.Name;
 
+        if (ctx.Command.Parent != null)
+            CommandName = CommandName.Insert(0, $"{ctx.Command.Parent.Name} ");
+
         BaseCommand = cmd;
     }
 

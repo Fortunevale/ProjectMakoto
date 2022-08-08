@@ -5,10 +5,10 @@ internal class BumpReminderCommandAbstractions
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
         if (!ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled)
-            return $"`Bump Reminder Enabled` : {ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}";
+            return $"{Resources.Emojis.GetQuestionMark(ctx.Client, ctx.Bot)} `Bump Reminder Enabled` : {ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}";
 
-        return $"`Bump Reminder Enabled` : {ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}\n" +
-            $"`Bump Reminder Channel` : <#{ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
-            $"`Bump Reminder Role   ` : <@&{ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.RoleId})`";
+        return $"{Resources.Emojis.GetQuestionMark(ctx.Client, ctx.Bot)} `Bump Reminder Enabled` : {ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.Enabled.BoolToEmote(ctx.Client)}\n" +
+               $"{Resources.Emojis.GetChannel(ctx.Client, ctx.Bot)} `Bump Reminder Channel` : <#{ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId}> `({ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId})`\n" +
+               $"{Resources.Emojis.GetUser(ctx.Client, ctx.Bot)} `Bump Reminder Role   ` : <@&{ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.RoleId}> `({ctx.Bot._guilds[ctx.Guild.Id].BumpReminderSettings.RoleId})`";
     }
 }

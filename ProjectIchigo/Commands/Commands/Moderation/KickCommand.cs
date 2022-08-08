@@ -28,39 +28,27 @@ internal class KickCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Kicking {victim.UsernameWithDiscriminator} ({victim.Id})..`",
-                Color = EmbedColors.Processing,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
                 },
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
             {
-                if (ctx.Member.GetHighestPosition() <= victim.GetHighestPosition())
+                if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
                 await victim.RemoveAsync($"{ctx.User.UsernameWithDiscriminator} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
-                embed.Color = EmbedColors.Success;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was kicked.\n\n" +
-                                                        $"Reason: `{reason}`\n" +
-                                                        $"Kicked by: {ctx.Member.Mention} `{ctx.Member.Username}#{ctx.Member.Discriminator}` (`{ctx.Member.Id}`)";
+                embed.Description = $"{victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCodeBlock()}' by` {ctx.User.Mention}`.`";
+                embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"❌ `{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be kicked.`";
+                embed.Description = $"{victim.Mention} `could not be kicked.`";
+                embed.SetError(ctx);
             }
 
             await RespondOrEdit(embed);

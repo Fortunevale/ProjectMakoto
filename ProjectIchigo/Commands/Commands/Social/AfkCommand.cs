@@ -25,12 +25,8 @@ internal class AfkCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Afk Status • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"{ctx.User.Mention} `You're now set to be afk. Next time you send a message, your afk status will be removed.`"
-            });
+            }.SetSuccess(ctx, "Afk Status"));
             await Task.Delay(10000);
             _ = ctx.ResponseMessage.DeleteAsync();
         });

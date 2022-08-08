@@ -11,14 +11,10 @@ internal class ConfigCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Phishing Protection Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Loading,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = PhishingCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Phishing Protection");
 
             var ToggleDetectionButton = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
             var ToggleWarningButton = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
@@ -177,7 +173,7 @@ internal class ConfigCommand : BaseCommand
 
                     if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(10))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `The duration has to be between 10 seconds and 28 days.`").WithColor(EmbedColors.Error)));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").SetError(ctx, "Phishing Protection")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -190,7 +186,7 @@ internal class ConfigCommand : BaseCommand
                 }
                 catch (Exception)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("❌ `Invalid duration`").WithColor(EmbedColors.Error)));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid duration`").SetError(ctx, "Phishing Protection")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;

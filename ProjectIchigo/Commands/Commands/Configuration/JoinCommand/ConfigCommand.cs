@@ -11,14 +11,10 @@ internal class ConfigCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Join Settings • {ctx.Guild.Name}" },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = JoinCommandAbstractions.GetCurrentConfiguration(ctx)
-            };
+            }.SetAwaitingInput(ctx, "Join Settings");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -29,18 +25,18 @@ internal class ConfigCommand : BaseCommand
             var ToggleReApplyName = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].JoinSettings.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Nickname Re-Apply", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
             await RespondOrEdit(builder
-                .AddComponents(new List<DiscordComponent>
-                {
-                        ToggleGlobalban,
-                        ToggleReApplyRoles,
-                        ToggleReApplyName,
-                })
-                .AddComponents(new List<DiscordComponent>
-                {
-                        ChangeJoinlogChannel,
-                        ChangeRoleOnJoin,
-                })
-                .AddComponents(Resources.CancelButton));
+            .AddComponents(new List<DiscordComponent>
+            {
+                ToggleGlobalban,
+                ToggleReApplyRoles,
+                ToggleReApplyName,
+            })
+            .AddComponents(new List<DiscordComponent>
+            {
+                ChangeJoinlogChannel,
+                ChangeRoleOnJoin,
+            })
+            .AddComponents(Resources.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
 

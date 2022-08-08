@@ -116,8 +116,17 @@ internal class DatabaseQueue
             throw;
         }
 
-        while (Queue.ContainsKey(key) && !value.Executed && !value.Failed)
-            Thread.Sleep(1);
+        while (true)
+        {
+            try
+            {
+                if (!Queue.ContainsKey(key) || value.Executed || value.Failed)
+                    break;
+            }
+            catch { }
+
+            Thread.Sleep(50);
+        }
 
         Queue.Remove(key);
 
@@ -162,8 +171,17 @@ internal class DatabaseQueue
             throw;
         }
 
-        while (Queue.ContainsKey(key) && !value.Executed && !value.Failed)
+        while (true)
+        {
+            try
+            {
+                if (!Queue.ContainsKey(key) || value.Executed || value.Failed)
+                    break;
+            }
+            catch { }
+
             Thread.Sleep(50);
+        }
 
         Queue.Remove(key);
 

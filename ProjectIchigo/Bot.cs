@@ -54,7 +54,35 @@ public class Bot
 
         _logger.LogRaised += LogHandler;
 
-        _logger.LogInfo("Starting up..");
+        try
+        {
+            string ASCII = File.ReadAllText("Assets/ASCII.txt");
+            Console.WriteLine();
+            foreach (var b in ASCII)
+            {
+                switch (b)
+                {
+                    case 'g':
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+                    case 'r':
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    default:
+                        Console.Write(b);
+                        break;
+                }
+            }
+            Console.WriteLine("\n\n");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Failed to render ASCII art", ex);
+        }
+
+        Console.ResetColor();
+
+        _logger.LogInfo($"Starting up Ichigo..\n");
 
         try
         {

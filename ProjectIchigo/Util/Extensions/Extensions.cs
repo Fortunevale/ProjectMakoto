@@ -52,7 +52,7 @@ internal static class Extensions
 
     internal static DiscordEmoji BoolToEmote(this bool b, DiscordClient client)
     {
-        return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 939750475354472478);
+        return b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 1005430134070841395);
     }
 
     internal static string DigitsToEmotes(this long i) =>
@@ -216,11 +216,8 @@ internal static class Extensions
 
         return Formatter.Sanitize(proc);
     }
-    
-    internal static string SanitizeForCodeBlock(this string str)
-    {
-        return str.Replace("`", "´");
-    }
+
+    internal static string SanitizeForCodeBlock(this string str) => str.Replace("`", "´");
 
     internal static bool TryGetMessage(this DiscordChannel channel, ulong id, out DiscordMessage discordMessage)
     {
@@ -322,7 +319,7 @@ internal static class Extensions
         return $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
     }
 
-    internal static int GetHighestPosition(this DiscordMember member) => (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position);
+    internal static int GetRoleHighestPosition(this DiscordMember member) => (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position);
 }
 
 internal class SqLiteBaseRepository

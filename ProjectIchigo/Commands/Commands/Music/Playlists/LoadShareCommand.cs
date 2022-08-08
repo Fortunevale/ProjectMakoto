@@ -15,14 +15,10 @@ internal class LoadShareCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.StatusIndicators.DiscordCircleLoading, Name = $"Playlists • {ctx.Guild.Name}" },
-                Color = EmbedColors.Loading,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = $"`Loading the shared playlists..`"
-            };
+            }.SetLoading(ctx, "Playlists");
             await RespondOrEdit(embed);
 
             if (!Directory.Exists("PlaylistShares"))
@@ -30,9 +26,8 @@ internal class LoadShareCommand : BaseCommand
 
             if (!Directory.Exists($"PlaylistShares/{userid}") || !File.Exists($"PlaylistShares/{userid}/{id}.json"))
             {
-                embed.Color = EmbedColors.Error;
-                embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = "❌ `The specified sharecode couldn't be found.`";
+                embed.Description = "`The specified sharecode couldn't be found.`";
+                embed.SetError(ctx, "Playlists");
                 await RespondOrEdit(embed.Build());
                 return;
             }
@@ -42,8 +37,7 @@ internal class LoadShareCommand : BaseCommand
             var rawJson = File.ReadAllText($"PlaylistShares/{userid}/{id}.json");
             var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-            embed.Color = EmbedColors.Info;
-            embed.Author.IconUrl = ctx.Guild.IconUrl;
+            embed.SetInfo(ctx, "Playlists");
             embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = ImportJson.PlaylistThumbnail };
             embed.Color = (ImportJson.PlaylistColor is "#FFFFFF" or null or "" ? EmbedColors.Info : new DiscordColor(ImportJson.PlaylistColor.IsValidHexColor()));
             embed.Description = "`Playlist found! Please check details of the playlist below and confirm or deny whether you want to import this playlist.`\n\n" +
@@ -71,30 +65,14 @@ internal class LoadShareCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Importing playlist..`",
-                    Color = EmbedColors.Loading,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = Resources.StatusIndicators.DiscordCircleLoading
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                }.SetLoading(ctx, "Playlists")));
 
                 if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"❌ `You already have 10 Playlists stored. Please delete one to create a new one.`",
-                        Color = EmbedColors.Error,
-                        Author = new DiscordEmbedBuilder.EmbedAuthor
-                        {
-                            Name = ctx.Guild.Name,
-                            IconUrl = ctx.Guild.IconUrl
-                        },
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow
-                    }));
+                        Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
+                    }.SetError(ctx, "Playlists")));
                     return;
                 }
 
@@ -103,15 +81,7 @@ internal class LoadShareCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`The playlist '{ImportJson.PlaylistName}' has been added to your playlists.`",
-                    Color = EmbedColors.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                }));
+                }.SetSuccess(ctx, "Playlists")));
             }
             else
             {

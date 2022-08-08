@@ -13,12 +13,8 @@ internal class ReviewCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { Name = $"Actionlog Settings • {ctx.Guild.Name}", IconUrl = ctx.Guild.IconUrl },
-                Color = EmbedColors.Info,
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow,
                 Description = ActionLogAbstractions.GetCurrentConfiguration(ctx)
-            });
+            }.SetInfo(ctx, "Actionlog"));
         });
     }
 }
