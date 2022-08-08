@@ -63,7 +63,7 @@ internal class UrlSubmitCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Processing your request..`"
-            };
+            }.SetLoading(ctx, "Phishing Link Submission");
 
             await RespondOrEdit(embed);
 
