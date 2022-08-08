@@ -31,16 +31,8 @@ internal class JoinCommand : BaseCommand
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"✅ `The bot joined your channel.`",
-                        Color = EmbedColors.Success,
-                        Author = new DiscordEmbedBuilder.EmbedAuthor
-                        {
-                            Name = ctx.Guild.Name,
-                            IconUrl = ctx.Guild.IconUrl
-                        },
-                        Footer = ctx.GenerateUsedByFooter(),
-                        Timestamp = DateTime.UtcNow
-                    });
+                        Description = $"`The bot joined your channel.`",
+                    }.SetSuccess(ctx));
                 return;
             }
 
@@ -48,16 +40,8 @@ internal class JoinCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `The bot is already in use.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`The bot is already in use.`",
+                }.SetError(ctx));
 
                 throw new CancelCommandException("", null);
             }
@@ -71,16 +55,8 @@ internal class JoinCommand : BaseCommand
             if (Announce)
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"✅ `The bot joined your channel.`",
-                    Color = EmbedColors.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`The bot joined your channel.`",
+                }.SetSuccess(ctx));
         });
     }
 }

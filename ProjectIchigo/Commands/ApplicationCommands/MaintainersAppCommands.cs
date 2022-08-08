@@ -110,12 +110,6 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
         {
             Task.Run(async () =>
             {
-                if (!ctx.User.IsMaintenance(_bot._status))
-                {
-                    _ = ctx.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `This command is restricted to Staff Members of Project Ichigo.`"));
-                    return;
-                }
-
                 throw new InvalidCastException();
             }).Add(_bot._watcher, ctx);
         }

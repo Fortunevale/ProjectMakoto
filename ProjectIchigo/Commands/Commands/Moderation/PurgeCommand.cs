@@ -117,7 +117,7 @@ internal class PurgeCommand : BaseCommand
                     await RespondOrEdit(embed);
                 }
 
-                embed.Description = $"`Successfully deleted {deleted} messages`\n{(FailedToDeleteAmount > 0 ? $"❌ `Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}";
+                embed.Description = $"`Successfully deleted {deleted} messages`\n{(FailedToDeleteAmount > 0 ? $"`Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}";
 
                 await RespondOrEdit(embed.SetSuccess(ctx));
                 return;

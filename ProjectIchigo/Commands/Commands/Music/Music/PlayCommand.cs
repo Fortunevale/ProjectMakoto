@@ -21,16 +21,8 @@ internal class PlayCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $":arrows_counterclockwise: `Preparing connection..`",
-                Color = EmbedColors.Processing,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = Resources.StatusIndicators.Loading
-                },
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+                Description = $"`Preparing connection..`",
+            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -59,11 +51,11 @@ internal class PlayCommand : BaseCommand
                     ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), ctx.Guild, ctx.User));
                 }
 
-                embed.Description = $"✅ `Queued {added} songs from `[`{oriResult.PlaylistInfo.Name}`]({search})`.`";
+                embed.Description = $"`Queued {added} songs from `[`{oriResult.PlaylistInfo.Name}`]({search})`.`";
 
                 embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - added + 1)} - {ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
-                embed.Color = EmbedColors.Success;
+                embed.SetSuccess(ctx);
                 await ctx.BaseCommand.RespondOrEdit(embed);
             }
             else if (Tracks.Count == 1)
@@ -72,13 +64,13 @@ internal class PlayCommand : BaseCommand
 
                 ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
 
-                embed.Description = $"✅ `Queued `[`{track.Title}`]({track.Uri})`.`";
+                embed.Description = $"`Queued `[`{track.Title}`]({track.Uri})`.`";
 
                 embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
                 embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
                 embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 
-                embed.Color = EmbedColors.Success;
+                embed.SetSuccess(ctx);
                 await ctx.BaseCommand.RespondOrEdit(embed.Build());
             }
         });

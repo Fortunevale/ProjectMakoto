@@ -82,7 +82,7 @@ internal class TimeoutCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `The duration you specified is invalid.`",
+                    Description = $"`The duration you specified is invalid.`",
                 }.SetError(ctx));
                 return;
             }

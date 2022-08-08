@@ -19,16 +19,8 @@ internal class ClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `The bot is not in a voice channel.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`The bot is not in a voice channel.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -36,16 +28,8 @@ internal class ClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `You aren't in the same channel as the bot.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`You aren't in the same channel as the bot.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -53,16 +37,8 @@ internal class ClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"❌ `You already voted to clear the current queue.`",
-                    Color = EmbedColors.Error,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`You already voted to clear the current queue.`",
+                }.SetError(ctx));
                 return;
             }
 
@@ -75,30 +51,15 @@ internal class ClearQueueCommand : BaseCommand
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"✅ `The queue was cleared.`",
-                    Color = EmbedColors.Success,
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow
-                });
+                    Description = $"`The queue was cleared.`",
+                }.SetSuccess(ctx));
                 return;
             }
 
-            DiscordEmbedBuilder embed = new()
+            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"❓ `You voted to clear the current queue. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
-                Color = EmbedColors.AwaitingInput,
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    Name = ctx.Guild.Name,
-                    IconUrl = ctx.Guild.IconUrl
-                },
-                Footer = ctx.GenerateUsedByFooter()
-            };
+                Description = $"`You voted to clear the current queue. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+            }.SetAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -149,20 +110,12 @@ internal class ClearQueueCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = $"✅ `The queue was cleared.`",
-                                Color = EmbedColors.Success,
-                                Author = new DiscordEmbedBuilder.EmbedAuthor
-                                {
-                                    Name = ctx.Guild.Name,
-                                    IconUrl = ctx.Guild.IconUrl
-                                },
-                                Footer = ctx.GenerateUsedByFooter(),
-                                Timestamp = DateTime.UtcNow
-                            }));
+                                Description = $"`The queue was cleared.`",
+                            }.SetSuccess(ctx)));
                             return;
                         }
 
-                        embed.Description = $"❓ `You voted to clear the current queue. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`You voted to clear the current queue. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot._watcher);
