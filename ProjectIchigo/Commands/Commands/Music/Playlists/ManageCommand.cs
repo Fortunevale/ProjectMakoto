@@ -887,7 +887,7 @@ internal class ManageCommand : BaseCommand
                                 {
                                     List<DiscordSelectComponentOption> TrackList = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Select(x => new DiscordSelectComponentOption($"{x.Title}", x.Url.MakeValidFileName(), $"Added {x.AddedTime.GetTimespanSince().GetHumanReadable()} ago")).ToList();
 
-                                    DiscordSelectComponent Tracks = new DiscordSelectComponent("Select 1 or more songs to delete..", TrackList, Guid.NewGuid().ToString(), 1, TrackList.Count);
+                                    DiscordSelectComponent Tracks = new("Select 1 or more songs to delete..", TrackList, Guid.NewGuid().ToString(), 1, TrackList.Count);
 
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(Tracks));
 
