@@ -629,8 +629,8 @@ internal class ManageCommand : BaseCommand
                     DiscordButtonComponent ChangePlaylistColor = new(ButtonStyle.Secondary, "ChangeColor", "Change playlist color", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎨")));
                     DiscordButtonComponent ChangePlaylistThumbnail = new(ButtonStyle.Secondary, "ChangeThumbnail", "Change playlist thumbnail", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                    DiscordButtonComponent AddSong = new(ButtonStyle.Success, "AddSong", "Add a song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                    DiscordButtonComponent RemoveSong = new(ButtonStyle.Danger, "DeleteSong", "Remove a song", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+                    DiscordButtonComponent AddSong = new(ButtonStyle.Success, "AddSong", "Add songs", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                    DiscordButtonComponent RemoveSong = new(ButtonStyle.Danger, "DeleteSong", "Remove songs", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
                     DiscordButtonComponent RemoveDuplicates = new(ButtonStyle.Secondary, "RemoveDuplicates", "Remove all duplicates", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("♻")));
 
                     var Description = $"**`There's currently {SelectedPlaylist.List.Count} tracks(s) in this playlist.`**\n\n";
@@ -887,24 +887,22 @@ internal class ManageCommand : BaseCommand
                                 {
                                     List<DiscordSelectComponentOption> TrackList = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Select(x => new DiscordSelectComponentOption($"{x.Title}", x.Url.MakeValidFileName(), $"Added {x.AddedTime.GetTimespanSince().GetHumanReadable()} ago")).ToList();
 
-                                    string SelectedTrackId;
-                                    PlaylistItem SelectedTrack;
+                                    DiscordSelectComponent Tracks = new DiscordSelectComponent("Select 1 or more songs to delete..", TrackList, Guid.NewGuid().ToString(), 1, TrackList.Count);
 
-                                    try
-                                    {
-                                        SelectedTrackId = await PromptCustomSelection(TrackList);
-                                        SelectedTrack = SelectedPlaylist.List.First(x => x.Url.MakeValidFileName() == SelectedTrackId);
-                                    }
-                                    catch (ArgumentException)
+                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(Tracks));
+
+                                    var Response = await s.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id);
+
+                                    if (Response.TimedOut)
                                     {
                                         ModifyToTimedOut();
                                         return;
                                     }
-                                    catch (Exception)
+
+                                    foreach (var b in Response.Result.Values.Select(x => SelectedPlaylist.List.First(y => y.Url.MakeValidFileName() == x)))
                                     {
-                                        throw;
+                                        SelectedPlaylist.List.Remove(b);
                                     }
-                                    SelectedPlaylist.List.Remove(SelectedTrack);
 
                                     if (SelectedPlaylist.List.Count <= 0)
                                     {
