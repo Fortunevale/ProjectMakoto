@@ -75,13 +75,9 @@ internal class ScoreSaberCommandAbstractions
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = ctx.Guild.IconUrl, Name = $"Score Saber • {ctx.Guild.Name}" },
-                                Color = EmbedColors.Success,
-                                Footer = ctx.GenerateUsedByFooter("This message automatically deletes in 10 seconds"),
-                                Timestamp = DateTime.UtcNow,
                                 Description = $"{ctx.User.Mention} `Linked '{player.name.SanitizeForCodeBlock()}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
                                               $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
-                            }));
+                            }.SetSuccess(ctx, "Score Saber")));
 
                             _ = Task.Delay(10000).ContinueWith(x =>
                             {

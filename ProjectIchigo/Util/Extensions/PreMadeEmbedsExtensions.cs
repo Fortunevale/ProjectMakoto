@@ -19,7 +19,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author = MakeDefaultAuthor(ctx, CustomText);
 
         b.Color = EmbedColors.Info;
-        b.Footer = ctx.GenerateUsedByFooter();
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
