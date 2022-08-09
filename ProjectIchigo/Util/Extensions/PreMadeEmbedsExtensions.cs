@@ -8,7 +8,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = Resources.StatusIndicators.Loading;
 
         b.Color = EmbedColors.Processing;
-        b.Footer = ctx.GenerateUsedByFooter();
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -30,7 +30,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author = MakeDefaultAuthor(ctx, CustomText);
 
         b.Color = EmbedColors.AwaitingInput;
-        b.Footer = ctx.GenerateUsedByFooter();
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -42,7 +42,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = Resources.StatusIndicators.Error;
 
         b.Color = EmbedColors.Error;
-        b.Footer = ctx.GenerateUsedByFooter();
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -54,7 +54,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = Resources.StatusIndicators.Warning;
 
         b.Color = EmbedColors.Warning;
-        b.Footer = ctx.GenerateUsedByFooter();
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -66,7 +66,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = Resources.StatusIndicators.Success;
 
         b.Color = EmbedColors.Success;
-        b.Footer = ctx.GenerateUsedByFooter();
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
