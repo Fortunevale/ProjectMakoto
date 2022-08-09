@@ -812,7 +812,8 @@ internal class DatabaseClient
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
-                            moderator = x.Value.Moderator
+                            moderator = x.Value.Moderator,
+                            timestamp = x.Value.Timestamp.Ticks
                         }).ToList();
 
                         if (mainDatabaseConnection == null)
@@ -821,19 +822,20 @@ internal class DatabaseClient
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("globalbans", DatabaseColumnLists.guild_submission_bans);
+                        cmd.CommandText = _helper.GetSaveCommand("globalbans", DatabaseColumnLists.globalbans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.guild_submission_bans, i);
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.globalbans, i);
 
                             cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
                             cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
                             cmd.Parameters.AddWithValue($"moderator{i}", DatabaseInserts[i].moderator);
+                            cmd.Parameters.AddWithValue($"timestamp{i}", DatabaseInserts[i].timestamp);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.globalbans);
 
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);

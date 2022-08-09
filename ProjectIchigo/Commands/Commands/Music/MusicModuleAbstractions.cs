@@ -21,7 +21,22 @@ internal class MusicModuleAbstractions
         LavalinkLoadResult loadResult;
 
         if (Regex.IsMatch(load, Resources.Regex.YouTubeUrl))
+        {
+            load = load.Replace("&list=RDMM", "");
+            load = load.Replace("?list=RDMM", "");
+            load = load.Replace("&start_radio=1", "");
+            load = load.Replace("?start_radio=1", "");
+
+            var AndIndex = load.IndexOf("&");
+
+            if (!load.Contains('?'))
+            {
+                load = load.Remove(AndIndex, 1);
+                load = load.Insert(AndIndex, "?");
+            }
+
             loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
+        }
         else
             loadResult = await node.Rest.GetTracksAsync(load);
 

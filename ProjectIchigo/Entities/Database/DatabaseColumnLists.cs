@@ -19,6 +19,7 @@ internal class DatabaseColumnLists
         new Column("id", "bigint", primary: true),
         new Column("reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("moderator", "bigint"),
+        new Column("timestamp", "bigint"),
     };
 
     internal readonly static List<Column> user_submission_bans = new()

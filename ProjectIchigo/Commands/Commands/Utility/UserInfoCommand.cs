@@ -78,6 +78,7 @@ internal class UserInfoCommand : BaseCommand
                     Text = $"User-Id: {victim.Id}"
                 },
                 Description = $"{(bMember is null ? $"{(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? "`User never joined this server.`" : $"{(isBanned ? "`User is currently banned from this server.`" : "`User is currently not in this server.`")}")}\n\n" : "")}" +
+                        $"{(ctx.Bot._globalBans.List.ContainsKey(victim.Id) ? "💀 `User is globally banned.`\n" : "")}" +
                         $"{(bMember is not null && bMember.IsOwner ? "✨ `This user owns this guild`\n" : "")}" +
                         $"{(victim.IsStaff ? "📘 `Discord Staff`\n" : "")}" +
                         $"{(victim.IsMod ? "⚒ `Certified Content Moderator`\n" : "")}" +
@@ -86,6 +87,16 @@ internal class UserInfoCommand : BaseCommand
                         $"{(bMember is not null && bMember.IsPending.HasValue && bMember.IsPending.Value ? "❗ `User's Membership pending`\n" : "")}" +
                         $"\n**{(bMember is null ? "Roles (Backup)" : "Roles")}**\n{GenerateRoles}"
             };
+
+            if (ctx.Bot._globalBans.List.ContainsKey(victim.Id))
+            {
+                var gBanDetails = ctx.Bot._globalBans.List[victim.Id];
+                var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot._globalBans.List[victim.Id].Moderator);
+
+                embed.AddField(new DiscordEmbedField("Global Ban Reason", $"`{((string.IsNullOrWhiteSpace(gBanDetails.Reason) || gBanDetails.Reason == "-") ? "No reason provided." : gBanDetails.Reason).SanitizeForCodeBlock()}`", true));
+                embed.AddField(new DiscordEmbedField("Global Ban Moderator", $"`{gBanMod.UsernameWithDiscriminator}`", true));
+                embed.AddField(new DiscordEmbedField("Global Ban Date", $"{Formatter.Timestamp(gBanDetails.Timestamp)} ({Formatter.Timestamp(gBanDetails.Timestamp, TimestampFormat.LongDateTime)})", true));
+            }
 
             if (isBanned)
                 embed.AddField(new DiscordEmbedField("Ban Details", $"`{(string.IsNullOrWhiteSpace(banDetails?.Reason) ? "No reason provided." : $"{banDetails.Reason}")}`", false));
