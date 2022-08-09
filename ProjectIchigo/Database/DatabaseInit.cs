@@ -236,7 +236,8 @@ internal class DatabaseInit
             _bot._globalBans.List.Add(b.id, new GlobalBans.BanInfo
             {
                 Reason = b.reason,
-                Moderator = b.moderator
+                Moderator = b.moderator,
+                Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
 
         _logger.LogInfo($"Loaded {_bot._globalBans.List.Count} submission bans from table 'globalbans'.");

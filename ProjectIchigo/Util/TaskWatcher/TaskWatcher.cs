@@ -34,7 +34,7 @@ internal class TaskWatcher
                     else if (ContextMenuContext is not null)
                         _logger.LogInfo($"Successfully executed '{ContextMenuContext.CommandName}' for {ContextMenuContext.User.Username}#{ContextMenuContext.User.Discriminator} ({ContextMenuContext.User.Id}){(ContextMenuContext.Channel is not null ? $"in #{ContextMenuContext.Channel.Name}" : "")}{(ContextMenuContext.Guild is not null ? $" on '{ContextMenuContext.Guild.Name}' ({ContextMenuContext.Guild.Id})" : "")} ({b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}ms)", b.task.Exception);
 
-                    tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
+                    tasks.Remove(b);
                     continue;
                 }
 
