@@ -10,6 +10,9 @@ internal class TaskWatcher
         {
             foreach (var b in tasks.ToList())
             {
+                if (b is null)
+                    continue;
+
                 if (!b.task.IsCompleted)
                     continue;
 
