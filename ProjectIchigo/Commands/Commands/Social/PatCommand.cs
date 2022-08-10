@@ -29,7 +29,7 @@ internal class PatCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter("kawaii.red"),
                 }));
@@ -38,7 +38,7 @@ internal class PatCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.OrderBy(x => Guid.NewGuid()).First().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
                 ImageUrl = gif,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter("kawaii.red"),
