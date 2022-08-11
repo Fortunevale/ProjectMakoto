@@ -75,12 +75,13 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
-    [SlashCommandGroup("data", "Allows you to request or manage your user data.", dmPermission: false)]
+#if DEBUG
+    [SlashCommandGroup("data", "[WIP] Allows you to request or manage your user data.", dmPermission: false)]
     public class Data : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("request", "Allows you to request your user data.", dmPermission: false)]
+        [SlashCommand("request", "[WIP] Allows you to request your user data.", dmPermission: false)]
         public async Task Request(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -89,7 +90,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [SlashCommand("delete", "Allows you to delete your user data. Temporarily redirects to our support guild as this command is not yet finished.", dmPermission: false)]
+        [SlashCommand("delete", "[WIP] Allows you to delete your user data. Temporarily redirects to our support guild as this command is not yet finished.", dmPermission: false)]
         public async Task Delete(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -97,7 +98,26 @@ internal class UtilityAppCommands : ApplicationCommandsModule
                 await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot._watcher, ctx);
         }
+        
+        [SlashCommand("object", "[WIP] Allows you to stop Ichigo from further processing of your user data.", dmPermission: false)]
+        public async Task Object(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.ObjectCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+        
+        [SlashCommand("info", "[WIP] Allows you to view how Ichigo processes your data.", dmPermission: false)]
+        public async Task Info(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.InfoCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
     }
+#endif
 
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
     public async Task EmojiStealer(ContextMenuContext ctx)
