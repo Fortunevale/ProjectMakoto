@@ -11,7 +11,9 @@ public class Member
         Experience = new(this);
     }
 
+    [JsonIgnore]
     internal Guild Guild { get; set; }
+    [JsonIgnore]
     internal ulong MemberId { get; set; }
 
 

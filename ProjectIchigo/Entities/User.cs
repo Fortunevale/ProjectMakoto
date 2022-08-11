@@ -13,6 +13,7 @@ public class User
         ExperienceUserSettings = new(this);
     }
 
+    [JsonIgnore]
     public ulong UserId { get; set; }
 
     public UrlSubmissions UrlSubmissions { get; set; }
@@ -21,5 +22,6 @@ public class User
     public ExperienceUserSettings ExperienceUserSettings { get; set; }
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 
+    [JsonIgnore]
     public Cooldown Cooldown { get; set; }
 }

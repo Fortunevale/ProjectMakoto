@@ -128,7 +128,7 @@ internal class TaskWatcher
                     }
                     catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
-                tasks.RemoveAt(tasks.FindIndex(x => x.uuid == b.uuid));
+                tasks.Remove(b);
             }
 
             await Task.Delay(500);

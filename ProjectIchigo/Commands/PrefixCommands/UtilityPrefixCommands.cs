@@ -198,6 +198,49 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
 
 
+    [Group("data"), 
+    CommandModule("utility"), 
+    Description("Allows you to request or manage your user data.")]
+    public class Join : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("request"), Description("Allows you to request your user data.")]
+        public async Task Request(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+        
+        [Command("delete"), Description("Allows you to delete your user data. Temporarily redirects to our support guild as this command is not yet finished.")]
+        public async Task Delete(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
+
+
+
     [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
     CommandModule("utility"),
     Description("Steals all emojis and stickers of a message. Reply to a message to select it.")]

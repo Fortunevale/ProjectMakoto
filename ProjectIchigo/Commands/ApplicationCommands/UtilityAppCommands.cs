@@ -75,6 +75,30 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
+    [SlashCommandGroup("data", "Allows you to request or manage your user data.", dmPermission: false)]
+    public class Data : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("request", "Allows you to request your user data.", dmPermission: false)]
+        public async Task Request(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+        
+        [SlashCommand("delete", "Allows you to delete your user data. Temporarily redirects to our support guild as this command is not yet finished.", dmPermission: false)]
+        public async Task Delete(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
+
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
     public async Task EmojiStealer(ContextMenuContext ctx)
     {

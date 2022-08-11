@@ -65,7 +65,6 @@ public class AfkStatus
         }
     }
 
-
-
+    [JsonIgnore]
     internal DateTime LastMentionTrigger { get; set; } = DateTime.MinValue;
 }
