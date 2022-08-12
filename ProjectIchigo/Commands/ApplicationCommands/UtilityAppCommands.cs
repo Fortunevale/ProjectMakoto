@@ -90,7 +90,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [SlashCommand("delete", "[WIP] Allows you to delete your user data. Temporarily redirects to our support guild as this command is not yet finished.", dmPermission: false)]
+        [SlashCommand("delete", "[WIP] Allows you to delete your user data.", dmPermission: false)]
         public async Task Delete(InteractionContext ctx)
         {
             Task.Run(async () =>

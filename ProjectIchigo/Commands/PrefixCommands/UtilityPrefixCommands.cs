@@ -230,7 +230,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [Command("delete"), Description("[WIP] Allows you to delete your user data. Temporarily redirects to our support guild as this command is not yet finished.")]
+        [Command("delete"), Description("[WIP] Allows you to delete your user data.")]
         public async Task Delete(CommandContext ctx)
         {
             Task.Run(async () =>
