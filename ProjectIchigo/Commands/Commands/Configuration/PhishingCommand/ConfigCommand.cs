@@ -105,20 +105,24 @@ internal class ConfigCommand : BaseCommand
                 var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
                     .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason));
 
-                await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`")));
+                InteractionCreateEventArgs Response = null;
 
-                var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
-
-                if (e.TimedOut)
+                try
                 {
-                    ModifyToTimedOut(true);
+                    Response = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
+                }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
                     return;
                 }
 
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "new_reason").First().Components.First().Value;
+                ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = Response.Interaction.GetModalValueByCustomId("new_reason");
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -133,64 +137,34 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                var modal = new DiscordInteractionModalBuilder("Define a new timeout length", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", "Days (28 max)", "", 1, 2, true, "14"))
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", "Hours (23 max)", "", 1, 2, true, "0"))
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", "Minutes (59 max)", "", 1, 2, true, "0"))
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (59 max)", "", 1, 2, true, "0"));
-
-                await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`")));
-
-                var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.TimedOut)
-                {
-                    ModifyToTimedOut(true);
-                    return;
-                }
+                TimeSpan Response;
 
                 try
                 {
-                    TimeSpan length = TimeSpan.FromSeconds(0);
-
-                    double seconds = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "seconds").First().Components.First().Value));
-                    double minutes = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "minutes").First().Components.First().Value));
-                    double hours = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "hours").First().Components.First().Value));
-                    double days = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "days").First().Components.First().Value));
-
-                    if (seconds > 59 || seconds < 0 || minutes > 59 || minutes < 0 || hours > 23 || hours < 0 || days > 28 || days < 0 )
-                    {
-                        throw new Exception();
-                    }
-
-                    length = length.Add(TimeSpan.FromSeconds(seconds));
-                    length = length.Add(TimeSpan.FromMinutes(minutes));
-                    length = length.Add(TimeSpan.FromHours(hours));
-                    length = length.Add(TimeSpan.FromDays(days));
-
-                    if (length > TimeSpan.FromDays(28) || length < TimeSpan.FromSeconds(10))
-                    {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").SetError(ctx, "Phishing Protection")));
-                        await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-
-                    ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = length;
-
+                    Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength, false);
+                }
+                catch (CancelCommandException)
+                {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (Exception)
+                catch (InvalidOperationException)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid duration`").SetError(ctx, "Phishing Protection")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").SetError(ctx, "Phishing Protection")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+
+                ctx.Bot._guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = Response;
+
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (Button.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
             {
