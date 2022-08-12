@@ -88,7 +88,7 @@ public class Bot
         {
             if (args.Contains("--debug"))
             {
-                _logger.ChangeLogLevel(LogLevel.TRACE);
+                _logger.ChangeLogLevel(LogLevel.DEBUG);
                 _logger.LogInfo("Debug logs enabled");
             }
         }
@@ -807,14 +807,17 @@ public class Bot
 
             foreach (var guild in e.Guilds)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     try
                     {
                         if (_guilds[guild.Key].Lavalink.ChannelId != 0)
                         {
                             if (!guild.Value.Channels.ContainsKey(_guilds[guild.Key].Lavalink.ChannelId))
-                                return;
+                                throw new Exception("Channel no longer exists");
+
+                            if (_guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("localhost") || _guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("127.0.0.1"))
+                                throw new Exception("Localhost?");
 
                             if (_guilds[guild.Key].Lavalink.SongQueue.Count > 0)
                             {
@@ -870,7 +873,7 @@ public class Bot
                         _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
                         _guilds[guild.Key].Lavalink = new(_guilds[guild.Key]);
                     }
-                }).Add(_watcher);
+                });
 
                 await Task.Delay(1000);
             }
