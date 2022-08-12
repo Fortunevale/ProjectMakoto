@@ -538,6 +538,149 @@ public abstract class BaseCommand
         return Selection;
     }
 
+    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
+
+    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    {
+        timeOutOverride ??= TimeSpan.FromMinutes(15);
+
+        var oriEmbed = Context.ResponseMessage.Embeds[0];
+
+        var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Re-Open Modal", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
+
+        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
+        {
+            Description = "`Waiting for a modal response..`"
+        }.SetAwaitingInput(Context)).AddComponents(new List<DiscordComponent> { ReOpen, Resources.CancelButton }));
+
+        ComponentInteractionCreateEventArgs FinishedInteraction = null;
+
+        bool FinishedSelection = false;
+        bool ExceptionOccured = false;
+        bool Cancelled = false;
+        Exception exception = null;
+
+        await interaction.CreateInteractionModalResponseAsync(builder);
+
+        Context.Client.ComponentInteractionCreated += RunInteraction;
+
+        async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    if (e.Message?.Id == Context.ResponseMessage.Id && e.User.Id == Context.User.Id)
+                    {
+                        if (e.Interaction.Data.CustomId == builder.CustomId)
+                        {
+                            Context.Client.ComponentInteractionCreated -= RunInteraction;
+
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                            FinishedInteraction = e;
+                            FinishedSelection = true;
+                        }
+                        else if (e.Interaction.Data.CustomId == ReOpen.CustomId)
+                        {
+                            await e.Interaction.CreateInteractionModalResponseAsync(builder);
+                        }
+                        else if (e.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                        {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+                            Cancelled = true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    ExceptionOccured = true;
+                    FinishedSelection = true;
+                    throw;
+                }
+            }).Add(Context.Bot._watcher, Context);
+        }
+
+        int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
+
+        while (!FinishedSelection && !ExceptionOccured && !Cancelled && TimeoutSeconds >= 0)
+        {
+            await Task.Delay(500);
+            TimeoutSeconds--;
+        }
+
+        Context.Client.ComponentInteractionCreated -= RunInteraction;
+
+        if (ResetToOriginalEmbed)
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
+
+        if (ExceptionOccured)
+            throw exception;
+
+        if (TimeoutSeconds <= 0)
+            throw new ArgumentException("Modal not submitted");
+        
+        if (Cancelled)
+            throw new CancelCommandException("", null);
+
+        return FinishedInteraction;
+    }
+
+    internal async Task<TimeSpan> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan ? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    {
+        MinTime ??= TimeSpan.Zero;
+        MaxTime ??= TimeSpan.FromDays(356);
+        DefaultTime ??= TimeSpan.FromSeconds(30);
+
+        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a time span").WithCustomId(Guid.NewGuid().ToString());
+
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (max. 59)", "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
+
+        if (MaxTime.Value.TotalMinutes >= 1)
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", $"Minutes (max. {(MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}" )})", $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+
+        if (MaxTime.Value.TotalHours >= 1)
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", $"Hours (max. {(MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}")})", "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
+        
+        if (MaxTime.Value.TotalDays >= 1)
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", $"Days (max. {((int)MaxTime.Value.TotalDays)})", "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
+
+        InteractionCreateEventArgs Response;
+
+        try
+        {
+            Response = await PromptModalWithRetry(interaction, modal, false);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
+        TimeSpan length = TimeSpan.FromSeconds(0);
+
+        if ((Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "seconds").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minutes").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hours").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "days").Components.First().Value.IsDigitsOnly()))
+            throw new InvalidOperationException("Invalid TimeSpan");
+
+        double seconds = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "seconds").Components.First().Value)) : 0;
+        double minutes = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minutes").Components.First().Value)) : 0;
+        double hours = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hours").Components.First().Value)) : 0;
+        double days = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "days").Components.First().Value)) : 0;
+
+        length = length.Add(TimeSpan.FromSeconds(seconds));
+        length = length.Add(TimeSpan.FromMinutes(minutes));
+        length = length.Add(TimeSpan.FromHours(hours));
+        length = length.Add(TimeSpan.FromDays(days));
+
+        if (length > MaxTime || length < MinTime)
+            throw new InvalidOperationException("Invalid TimeSpan");
+
+        return length;
+    }
+
     public void ModifyToTimedOut(bool Delete = false)
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
