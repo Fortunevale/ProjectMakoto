@@ -22,11 +22,28 @@ internal class MusicModuleAbstractions
 
         if (Regex.IsMatch(load, Resources.Regex.YouTubeUrl))
         {
-            load = load.Replace("&list=RDMM", "");
-            load = load.Replace("?list=RDMM", "");
-            load = load.Replace("&start_radio=1", "");
-            load = load.Replace("?start_radio=1", "");
+            if (Regex.IsMatch(load, @"((\?|&)list=RDMM\w+)(&*)"))
+            {
+                Group group = Regex.Match(load, @"((\?|&)list=RDMM\w+)(&*)", RegexOptions.ExplicitCapture);
+                var value = group.Value;
 
+                if (value.EndsWith("&"))
+                    value = value[..^1];
+
+                load = load.Replace(value, "");
+            }
+            
+            if (Regex.IsMatch(load, @"((\?|&)start_radio=\d+)(&*)"))
+            {
+                Group group = Regex.Match(load, @"((\?|&)start_radio=\d+)(&*)", RegexOptions.ExplicitCapture);
+                var value = group.Value;
+
+                if (value.EndsWith("&"))
+                    value = value[..^1];
+
+                load = load.Replace(value, "");
+            }
+                
             var AndIndex = load.IndexOf("&");
 
             if (!load.Contains('?'))
@@ -42,6 +59,7 @@ internal class MusicModuleAbstractions
 
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
         {
+            _logger.LogError($"An exception occured while trying to load lavalink track: {loadResult.Exception.Message} {loadResult.Exception.Severity}");
             embed.Description = $"`Failed to load '{load}'.`";
             embed.SetError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
