@@ -53,8 +53,7 @@ public class AfkStatus
     {
         get
         {
-            if (_Messages == null)
-                _Messages = new();
+            _Messages ??= new();
 
             return _Messages;
         }

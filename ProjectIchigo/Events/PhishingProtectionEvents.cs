@@ -95,7 +95,7 @@ internal class PhishingProtectionEvents
         {
             Dictionary<string, string> redirectUrls = new();
 
-            foreach (Match match in matches)
+            foreach (Match match in matches.Cast<Match>())
             {
                 try
                 {

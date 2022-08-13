@@ -691,8 +691,6 @@ internal class ManageCommand : BaseCommand
                                 }
                             });
 
-                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
                             switch (e.Interaction.Data.CustomId)
                             {
                                 case "AddSong":
@@ -709,22 +707,33 @@ internal class ManageCommand : BaseCommand
                                         return;
                                     }
 
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`Please send a link to the track or playlist you want to add to this playlist.`")));
+                                    var modal = new DiscordInteractionModalBuilder("Add Song to Playlist", Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url or Search Query", "#FF0000", 1, 100, true));
 
-                                    var FirstTrack = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
+                                    InteractionCreateEventArgs Response = null;
 
-                                    if (FirstTrack.TimedOut)
+                                    try
                                     {
-                                        ModifyToTimedOut(true);
+                                        Response = await PromptModalWithRetry(e.Interaction, modal, false);
+                                    }
+                                    catch (CancelCommandException)
+                                    {
+                                        await UpdateMessage();
+                                        break;
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        ModifyToTimedOut();
                                         return;
                                     }
 
-                                    _ = Task.Delay(2000).ContinueWith(_ =>
-                                    {
-                                        _ = FirstTrack.Result.DeleteAsync();
-                                    });
+                                    var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, Response.Interaction.GetModalValueByCustomId("query"));
 
-                                    var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, FirstTrack.Result.Content);
+                                    if (!Continue)
+                                    {
+                                        await UpdateMessage();
+                                        break;
+                                    }
 
                                     if (SelectedPlaylist.List.Count >= 250)
                                     {
@@ -745,12 +754,14 @@ internal class ManageCommand : BaseCommand
                                 }
                                 case "ChangeThumbnail":
                                 {
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                     try
                                     {
                                         embed = new DiscordEmbedBuilder
                                         {
                                             Description = $"`Please upload a new thumbnail for your playlist.`\n\n" +
-                                    $"⚠ `Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                                                $"⚠ `Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                                         }.SetAwaitingInput(ctx, "Playlists");
 
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -823,61 +834,68 @@ internal class ManageCommand : BaseCommand
                                 }
                                 case "ChangeColor":
                                 {
-                                    embed = new DiscordEmbedBuilder
+                                    var modal = new DiscordInteractionModalBuilder("New Playlist Color", Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Playlist Color", "#FF0000", 1, 100, true, SelectedPlaylist.PlaylistName));
+
+                                    InteractionCreateEventArgs Response = null;
+
+                                    try
                                     {
-                                        Description = $"`What color should this playlist be? (e.g. #FF0000)` [`Need help with hex color codes?`](https://g.co/kgs/jDHPp6)",
-                                    }.SetAwaitingInput(ctx, "Playlists");
-
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-                                    var ColorCode = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
-
-                                    if (ColorCode.TimedOut)
+                                        Response = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
+                                        {
+                                            Description = $"`What color should this playlist be? (e.g. #FF0000)` [`Need help with hex color codes?`](https://g.co/kgs/jDHPp6)",
+                                        }.SetAwaitingInput(ctx, "Playlists"), false);
+                                    }
+                                    catch (CancelCommandException)
                                     {
-                                        ModifyToTimedOut(true);
+                                        await UpdateMessage();
+                                        break;
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        ModifyToTimedOut();
                                         return;
                                     }
 
-                                    _ = Task.Delay(2000).ContinueWith(_ =>
-                                    {
-                                        _ = ColorCode.Result.DeleteAsync();
-                                    });
-
-                                    SelectedPlaylist.PlaylistColor = ColorCode.Result.Content;
+                                    SelectedPlaylist.PlaylistColor = Response.Interaction.GetModalValueByCustomId("color");
 
                                     await UpdateMessage();
                                     break;
                                 }
                                 case "ChangePlaylistName":
                                 {
-                                    embed = new DiscordEmbedBuilder
+                                    var modal = new DiscordInteractionModalBuilder("New Playlist Name", Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, SelectedPlaylist.PlaylistName));
+
+                                    InteractionCreateEventArgs Response = null;
+
+                                    try
                                     {
-                                        Description = $"`What do you want to name this playlist?`\n\n" +
-                                        $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
-                                    }.SetAwaitingInput(ctx, "Playlists");
-
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-                                    var PlaylistName = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
-
-                                    if (PlaylistName.TimedOut)
+                                        Response = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
+                                        {
+                                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                                        }.SetAwaitingInput(ctx, "Playlists"), false);
+                                    }
+                                    catch (CancelCommandException)
                                     {
-                                        ModifyToTimedOut(true);
+                                        await UpdateMessage();
+                                        break;
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        ModifyToTimedOut();
                                         return;
                                     }
 
-                                    _ = Task.Delay(2000).ContinueWith(_ =>
-                                    {
-                                        _ = PlaylistName.Result.DeleteAsync();
-                                    });
-
-                                    SelectedPlaylist.PlaylistName = PlaylistName.Result.Content;
+                                    SelectedPlaylist.PlaylistName = Response.Interaction.GetModalValueByCustomId("name");
 
                                     await UpdateMessage();
                                     break;
                                 }
                                 case "RemoveDuplicates":
                                 {
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                     CurrentPage = 0;
                                     SelectedPlaylist.List = SelectedPlaylist.List.GroupBy(x => x.Url).Select(y => y.FirstOrDefault()).ToList();
                                     await UpdateMessage();
@@ -885,6 +903,8 @@ internal class ManageCommand : BaseCommand
                                 }
                                 case "DeleteSong":
                                 {
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                     List<DiscordSelectComponentOption> TrackList = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Select(x => new DiscordSelectComponentOption($"{x.Title}", x.Url.MakeValidFileName(), $"Added {x.AddedTime.GetTimespanSince().GetHumanReadable()} ago")).ToList();
 
                                     DiscordSelectComponent Tracks = new("Select 1 or more songs to delete..", TrackList, Guid.NewGuid().ToString(), 1, TrackList.Count);
@@ -926,18 +946,24 @@ internal class ManageCommand : BaseCommand
                                 }
                                 case "NextPage":
                                 {
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                     CurrentPage++;
                                     await UpdateMessage();
                                     break;
                                 }
                                 case "PreviousPage":
                                 {
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                     CurrentPage--;
                                     await UpdateMessage();
                                     break;
                                 }
                                 case "cancel":
                                 {
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
                                     await ExecuteCommand(ctx, arguments);
                                     return;

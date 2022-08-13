@@ -88,8 +88,7 @@ internal class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                if (CachedTopScores is null)
-                                    CachedTopScores = await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+                                CachedTopScores ??= await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
 
                                 ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot._watcher, ctx);
                             }
@@ -123,8 +122,7 @@ internal class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                if (CachedRecentScores is null)
-                                    CachedRecentScores = await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+                                CachedRecentScores ??= await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
 
                                 ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot._watcher, ctx);
                             }
