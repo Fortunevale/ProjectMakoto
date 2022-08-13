@@ -12,11 +12,11 @@ internal class AfkEvents
     {
         Task.Run(async () =>
         {
-            if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)
+            if (_bot.ObjectedUsers.Contains(e.Author.Id))
                 return;
 
-            if (!_bot._users.ContainsKey(e.Author.Id))
-                _bot._users.Add(e.Author.Id, new User(_bot, e.Author.Id));
+            if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)
+                return;
 
             if (_bot._users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot._users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
             {
@@ -68,9 +68,6 @@ internal class AfkEvents
                 {
                     if (b.Id == e.Author.Id)
                         continue;
-
-                    if (!_bot._users.ContainsKey(b.Id))
-                        _bot._users.Add(b.Id, new User(_bot, b.Id));
 
                     if (_bot._users[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
                     {

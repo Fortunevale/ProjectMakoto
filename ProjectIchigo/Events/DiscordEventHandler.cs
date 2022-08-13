@@ -68,11 +68,11 @@ internal class DiscordEventHandler
         }
 
         if (member is not null)
-            if (!_bot._users.ContainsKey(member.Id))
+            if (!_bot._users.ContainsKey(member.Id) && !_bot.ObjectedUsers.Contains(member.Id))
                 _bot._users.Add(member.Id, new(_bot, member.Id));
 
         if (user is not null)
-            if (!_bot._users.ContainsKey(user.Id))
+            if (!_bot._users.ContainsKey(user.Id) && !_bot.ObjectedUsers.Contains(user.Id))
                 _bot._users.Add(user.Id, new(_bot, user.Id));
     }
 
@@ -160,7 +160,7 @@ internal class DiscordEventHandler
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {
                 _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Ichigo. My prefix is `;;`. To get help, type `;;help`.\n" +
-                                $"If you need help, feel free to join our Support and Development Server: {_bot._status.DevelopmentServerInvite}\n\n" +
+                                $"If you need help, feel free to join our Support and Development Server: <{_bot._status.DevelopmentServerInvite}>\n\n" +
                                 $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/ichigo>.");
             }
         });

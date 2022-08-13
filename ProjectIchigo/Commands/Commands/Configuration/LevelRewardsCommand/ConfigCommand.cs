@@ -121,149 +121,226 @@ internal class ConfigCommand : BaseCommand
                             }
                         });
 
-                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
                         if (e.Interaction.Data.CustomId == "RewardSelection")
                         {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                             selected = e.Values.First();
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == "Add")
                         {
                             ctx.Client.ComponentInteractionCreated -= SelectInteraction;
-                            embed.Description = $"`Select a role to assign.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            DiscordRole role;
+                            DiscordRole selectedRole = null;
+                            int selectedLevel = -1;
+                            string selectedCustomText = "You received ##Role##!";
 
-                            try
+                            while (true)
                             {
-                                role = await PromptRoleSelection();
-                            }
-                            catch (ArgumentException)
-                            {
-                                ModifyToTimedOut(true);
+                                var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Role", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                                var SelectLevel = new DiscordButtonComponent((selectedLevel is -1 ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Level", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
+                                var SelectCustomText = new DiscordButtonComponent((selectedCustomText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Change Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
+                                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (selectedRole is null || selectedLevel is -1 || selectedCustomText.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+
+                                var action_embed = new DiscordEmbedBuilder
+                                {
+                                    Description = $"`Role   `: {(selectedRole is null ? "`Not yet selected.`" : selectedRole.Mention)}\n" +
+                                                  $"`Level  `: {(selectedLevel is -1 ? "`Not yet selected.`" : selectedLevel.DigitsToEmotes())}\n" +
+                                                  $"`Message`: `{selectedCustomText}`"
+                                }.SetAwaitingInput(ctx, "Level Rewards");
+
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
+                                    .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
+                                    .AddComponents(Resources.CancelButton));
+
+                                var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+
+                                if (Menu.TimedOut)
+                                {
+                                    ModifyToTimedOut();
+                                    return;
+                                }
+
+                                if (Menu.Result.Interaction.Data.CustomId == SelectRole.CustomId)
+                                {
+                                    _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                                    action_embed.Description = $"`Select a role to assign.`";
+                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
+
+                                    DiscordRole role;
+
+                                    try
+                                    {
+                                        role = await PromptRoleSelection();
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        ModifyToTimedOut(true);
+                                        return;
+                                    }
+
+                                    if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
+                                    {
+                                        action_embed.Description = $"`The role you're trying to add has already been assigned to level {ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == role.Id).Level}.`";
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
+                                        await Task.Delay(3000);
+                                        continue;
+                                    }
+
+                                    selectedRole = role;
+                                    continue;
+                                }
+                                else if (Menu.Result.Interaction.Data.CustomId == SelectLevel.CustomId)
+                                {
+                                    var modal = new DiscordInteractionModalBuilder("Input Level", Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "level", "Level", "2", 1, 3, true, (selectedLevel is -1 ? 2 : selectedLevel).ToString()));
+
+                                    InteractionCreateEventArgs Response = null;
+
+                                    try
+                                    {
+                                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                                    }
+                                    catch (CancelCommandException)
+                                    {
+                                        continue;
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        ModifyToTimedOut();
+                                        return;
+                                    }
+
+                                    var rawInt = Response.Interaction.GetModalValueByCustomId("level");
+
+                                    uint level;
+
+                                    try
+                                    {
+                                        level = Convert.ToUInt32(rawInt);
+
+                                        if (level < 2)
+                                            throw new Exception("");
+                                    }
+                                    catch (Exception)
+                                    {
+                                        action_embed.Description = "`You must specify a valid level.`";
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
+                                        await Task.Delay(3000);
+                                        continue;
+                                    }
+
+                                    selectedLevel = (int)level;
+                                    continue;
+                                }
+                                else if (Menu.Result.Interaction.Data.CustomId == SelectCustomText.CustomId)
+                                {
+                                    var modal = new DiscordInteractionModalBuilder("Define new custom message", Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "message", "Custom Message", "You received ##Role##!", 1, 256, true, selectedCustomText));
+
+                                    InteractionCreateEventArgs Response = null;
+
+                                    try
+                                    {
+                                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                                    }
+                                    catch (CancelCommandException)
+                                    {
+                                        continue;
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        ModifyToTimedOut();
+                                        return;
+                                    }
+
+                                    var newMessage = Response.Interaction.GetModalValueByCustomId("message");
+
+                                    if (newMessage.Length > 256)
+                                    {
+                                        action_embed.Description = "`Your custom message can't contain more than 256 characters.`";
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
+                                        await Task.Delay(3000);
+                                        continue;
+                                    }
+
+                                    selectedCustomText = newMessage;
+                                    continue;
+                                }
+                                else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                                {
+                                    ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
+                                    {
+                                        Level = selectedLevel,
+                                        RoleId = selectedRole.Id,
+                                        Message = selectedCustomText
+                                    });
+
+                                    action_embed.Description = $"`The role` <@&{selectedRole.Id}> `({selectedRole.Id}) will be assigned at Level {selectedLevel}.`";
+                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetSuccess(ctx, "Level Rewards")));
+
+                                    await Task.Delay(5000);
+                                    await RefreshMessage();
+                                    ctx.Client.ComponentInteractionCreated += SelectInteraction;
+                                    return;
+                                }
+                                else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                                {
+                                    _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                                    await RefreshMessage();
+                                    ctx.Client.ComponentInteractionCreated += SelectInteraction;
+                                    return;
+                                }
+
                                 return;
                             }
-
-                            if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
-                            {
-                                embed.Description = "`The role you're trying to add has already been assigned to a level.`";
-                                embed = embed.SetError(ctx, "Level Rewards");
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-                                await Task.Delay(5000);
-                                await RefreshMessage();
-                                ctx.Client.ComponentInteractionCreated += SelectInteraction;
-                                return;
-                            }
-
-                            embed.Description = $"`Selected` <@&{role.Id}> `({role.Id}). At what Level should this role be assigned?`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-                            var LevelResult = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
-
-                            if (LevelResult.TimedOut)
-                            {
-                                ModifyToTimedOut(true);
-                                return;
-                            }
-
-                            int level;
-
-                            try
-                            {
-                                level = Convert.ToInt32(LevelResult.Result.Content);
-                            }
-                            catch (Exception)
-                            {
-                                embed.Description = "`You must specify a valid level.`";
-                                embed = embed.SetError(ctx, "Level Rewards");
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-                                await Task.Delay(5000);
-                                await RefreshMessage();
-                                ctx.Client.ComponentInteractionCreated += SelectInteraction;
-                                return;
-                            }
-
-                            _ = LevelResult.Result.DeleteAsync();
-
-                            string Message = "";
-
-                            embed.Description = $"`Selected` <@&{role.Id}> `({role.Id}). It will be assigned at Level {level}. Please type out a custom message or send 'cancel', 'continue' or '.' to use the default message. (<256 characters)`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-                            var CustomMessageResult = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id, TimeSpan.FromMinutes(5));
-
-                            if (CustomMessageResult.TimedOut)
-                            {
-                                ModifyToTimedOut(true);
-                                return;
-                            }
-
-                            _ = CustomMessageResult.Result.DeleteAsync();
-
-                            if (CustomMessageResult.Result.Content.Length > 256)
-                            {
-                                embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                embed = embed.SetError(ctx, "Level Rewards");
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-                                await Task.Delay(5000);
-                                await RefreshMessage();
-                                ctx.Client.ComponentInteractionCreated += SelectInteraction;
-                                return;
-                            }
-
-                            if (CustomMessageResult.Result.Content is not "cancel" and not "continue" and not ".")
-                                Message = CustomMessageResult.Result.Content;
-
-                            ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
-                            {
-                                Level = level,
-                                RoleId = role.Id,
-                                Message = (string.IsNullOrEmpty(Message) ? "You received ##Role##!" : Message)
-                            });
-
-                            embed.Description = $"`The role` <@&{role.Id}> `({role.Id}) will be assigned at Level {level}.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-                            await Task.Delay(5000);
-                            await RefreshMessage();
-                            ctx.Client.ComponentInteractionCreated += SelectInteraction;
                         }
                         else if (e.Interaction.Data.CustomId == "Modify")
                         {
-                            embed.Description = $"{embed.Description}\n\n`Please type out your new custom message (<256 characters). Type 'cancel' to cancel.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                            var modal = new DiscordInteractionModalBuilder()
+                                .WithTitle("Define a new custom message")
+                                .WithCustomId(Guid.NewGuid().ToString())
+                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", "Custom Message (<256 characters)", null, 0, 256, false, ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
 
-                            var result = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id, TimeSpan.FromMinutes(5));
+                            InteractionCreateEventArgs Response = null;
 
-                            if (result.TimedOut)
+                            try
                             {
-                                ModifyToTimedOut(true);
+                                Response = await PromptModalWithRetry(e.Interaction, modal, false);
+                            }
+                            catch (CancelCommandException)
+                            {
+                                await RefreshMessage();
+                                return;
+                            }
+                            catch (ArgumentException)
+                            {
+                                ModifyToTimedOut();
                                 return;
                             }
 
-                            _ = result.Result.DeleteAsync();
+                            var result = Response.Interaction.GetModalValueByCustomId("new_text");
 
-                            if (result.Result.Content.Length > 256)
+                            if (result.Length > 256)
                             {
-                                embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                embed = embed.SetError(ctx, "Level Rewards");
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Your custom message can't contain more than 256 characters.`").SetError(ctx, "Level Rewards")));
                                 await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);
                                 return;
                             }
 
-                            if (result.Result.Content.ToLower() != "cancel")
-                            {
-                                ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result.Result.Content;
-                            }
+                            ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result;
 
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == "Delete")
                         {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                             ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Remove(ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
 
                             if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Count == 0)
@@ -283,16 +360,22 @@ internal class ConfigCommand : BaseCommand
                         }
                         else if (e.Interaction.Data.CustomId == "PreviousPage")
                         {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                             CurrentPage--;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == "NextPage")
                         {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                             CurrentPage++;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
                         {
+                            _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                             DeleteOrInvalidate();
                             return;
                         }

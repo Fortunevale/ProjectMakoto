@@ -44,9 +44,6 @@ internal class ScoreSaberProfileCommand : BaseCommand
                     return;
                 }
 
-                if (!ctx.Bot._users.ContainsKey(user.Id))
-                    ctx.Bot._users.Add(user.Id, new User(ctx.Bot, user.Id));
-
                 if (ctx.Bot._users[user.Id].ScoreSaber.Id != 0)
                 {
                     id = ctx.Bot._users[user.Id].ScoreSaber.Id.ToString();

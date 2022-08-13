@@ -13,6 +13,8 @@ public class Cooldown
     private DateTime ModerateCommandLastUse = DateTime.MinValue;
     private DateTime HeavyCommandLastUse = DateTime.MinValue;
 
+    private DateTime LastDataRequest = DateTime.MinValue;
+
     private bool WaitingLight = false;
     private bool WaitingModerate = false;
     private bool WaitingHeavy = false;

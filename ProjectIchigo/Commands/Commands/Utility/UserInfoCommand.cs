@@ -11,8 +11,7 @@ internal class UserInfoCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            if (victim is null)
-                victim = ctx.User;
+            victim ??= ctx.User;
 
             if (!ctx.Bot._guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
                 ctx.Bot._guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot._guilds[ctx.Guild.Id], victim.Id));

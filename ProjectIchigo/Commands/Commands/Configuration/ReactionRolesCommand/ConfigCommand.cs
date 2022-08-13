@@ -45,163 +45,250 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == AddButton.CustomId)
             {
-                var action_embed = new DiscordEmbedBuilder
+                DiscordMessage selectedMessage = null;
+                DiscordEmoji selectedEmoji = null;
+                DiscordRole selectedRole = null;
+
+                while (true)
                 {
-                    Description = "`Please copy and send the message link of the message you want the reaction role to be added to.`",
-                    ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
-                }.SetAwaitingInput(ctx, "Reaction Roles");
+                    var SelectMessage = new DiscordButtonComponent((selectedMessage is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+                    var SelectEmoji = new DiscordButtonComponent((selectedEmoji is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Emoji", (selectedMessage is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("😀")));
+                    var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Role", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (selectedMessage is null || selectedRole is null || selectedEmoji is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-                if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
-                {
-                    action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
+                    var action_embed = new DiscordEmbedBuilder
+                    {
+                        Description = $"`Message`: {(selectedMessage is null ? "`Not yet selected.`" : $"[`Jump to message`]({selectedMessage.JumpLink})")}\n" +
+                                      $"`Emoji  `: {(selectedEmoji is null ? "`Not yet selected.`" : selectedEmoji.ToString())}\n" +
+                                      $"`Role   `: {(selectedRole is null ? "`Not yet selected.`" : selectedRole.Mention)}"
+                    }.SetAwaitingInput(ctx, "Reaction Roles");
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
-
-                var link = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Channel.Id == ctx.Channel.Id && x.Author.Id == ctx.User.Id, TimeSpan.FromMinutes(2));
-
-                if (link.TimedOut)
-                {
-                    ModifyToTimedOut(true);
-                    return;
-                }
-
-                try
-                { _ = link.Result.DeleteAsync(); }
-                catch { }
-
-                if (!Regex.IsMatch(link.Result.Content, Resources.Regex.DiscordChannelUrl) || !link.Result.Content.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
-                {
-                    action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
-                                               $"`http://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
-                                               $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
-                                               $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
-                                               $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
-                    action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-
-                if (GuildId != ctx.Guild.Id)
-                {
-                    action_embed.Description = $"`The link you provided leads to another server.`";
-                    action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-
-                if (!ctx.Guild.Channels.ContainsKey(ChannelId))
-                {
-                    action_embed.Description = $"`The link you provided leads to a channel that doesn't exist.`";
-                    action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-
-                var channel = ctx.Guild.GetChannel(ChannelId);
-
-                if (!channel.TryGetMessage(MessageId, out DiscordMessage reactionMessage))
-                {
-                    action_embed.Description = $"`The link you provided leads a message that doesn't exist or the bot has no access to.`";
-                    action_embed.ImageUrl = "";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-
-                action_embed.Description = "`Please react with the emoji you want to use for the reaction role to the target message.`";
-                action_embed.ImageUrl = "";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
-
-                var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == reactionMessage.Id, TimeSpan.FromMinutes(2));
-
-                if (emoji_wait.TimedOut)
-                {
-                    ModifyToTimedOut(true);
-                    return;
-                }
-
-                try
-                { _ = emoji_wait.Result.Message.DeleteReactionAsync(emoji_wait.Result.Emoji, ctx.User); }
-                catch { }
-
-                var emoji = emoji_wait.Result.Emoji;
-
-                if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
-                {
-                    action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-
-                action_embed.Description = "`Please select the role you want to use.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
-
-                try
-                {
-                    var role = await PromptRoleSelection();
 
                     if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
                     {
                         action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                        action_embed.Color = EmbedColors.Error;
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
-                        await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-
-
-                    if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == MessageId && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
-                    {
-                        action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
 
-                    if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
+                        .AddComponents(new List<DiscordComponent> { SelectMessage, SelectEmoji, SelectRole, Finish })
+                        .AddComponents(Resources.CancelButton));
+
+                    var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+
+                    if (Menu.TimedOut)
                     {
-                        action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                        ModifyToTimedOut();
+                        return;
+                    }
+
+                    if (Menu.Result.Interaction.Data.CustomId == SelectMessage.CustomId)
+                    {
+                        var modal = new DiscordInteractionModalBuilder("Input Message Url", Guid.NewGuid().ToString())
+                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Message Url", "https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678", null, null, true));
+
+                        InteractionCreateEventArgs Response = null;
+
+                        try
+                        {
+                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
+                            {
+                                Description = "`Please copy and paste the message link of the message you want the reaction role to be added to.`",
+                                ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
+                            }.SetAwaitingInput(ctx, "Reaction Roles"), false);
+                        }
+                        catch (CancelCommandException)
+                        {
+                            continue;
+                        }
+                        catch (ArgumentException)
+                        {
+                            ModifyToTimedOut();
+                            return;
+                        }
+
+                        var url = Response.Interaction.GetModalValueByCustomId("url");
+
+                        if (!Regex.IsMatch(url, Resources.Regex.DiscordChannelUrl) || !url.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
+                        {
+                            action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
+                                                       $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                       $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
+                                                       $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
+                            action_embed.ImageUrl = "";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        if (GuildId != ctx.Guild.Id)
+                        {
+                            action_embed.Description = $"`The link you provided leads to another server.`";
+                            action_embed.ImageUrl = "";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        if (!ctx.Guild.Channels.ContainsKey(ChannelId))
+                        {
+                            action_embed.Description = $"`The link you provided leads to a channel that doesn't exist.`";
+                            action_embed.ImageUrl = "";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        var channel = ctx.Guild.GetChannel(ChannelId);
+
+                        if (!channel.TryGetMessage(MessageId, out DiscordMessage reactionMessage))
+                        {
+                            action_embed.Description = $"`The link you provided leads a message that doesn't exist or the bot has no access to.`";
+                            action_embed.ImageUrl = "";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        selectedMessage = reactionMessage;
+                        continue;
+                    }
+                    else if (Menu.Result.Interaction.Data.CustomId == SelectEmoji.CustomId)
+                    {
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        action_embed.Description = "`Please react with the emoji you want to use for the reaction role to the target message.`";
+                        action_embed.ImageUrl = "";
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
+
+                        var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == selectedMessage.Id, TimeSpan.FromMinutes(2));
+
+                        if (emoji_wait.TimedOut)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
+                        }
+
+                        try
+                        { _ = emoji_wait.Result.Message.DeleteReactionAsync(emoji_wait.Result.Emoji, ctx.User); }
+                        catch { }
+
+                        var emoji = emoji_wait.Result.Emoji;
+
+                        if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
+                        {
+                            action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
+                        {
+                            action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        selectedEmoji = emoji;
+                        continue;
+                    }
+                    else if (Menu.Result.Interaction.Data.CustomId == SelectRole.CustomId)
+                    {
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        try
+                        {
+                            action_embed.Description = "`Please select the role you want to use.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
+
+                            var role = await PromptRoleSelection();
+
+                            if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
+                            {
+                                action_embed.Description = $"`The specified role is already being used in another reaction role.`";
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                                await Task.Delay(3000);
+                                continue;
+                            }
+
+                            selectedRole = role;
+                            continue;
+                        }
+                        catch (ArgumentException)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
+                        }
+                    }
+                    else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                    {
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
+                        {
+                            action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(5000);
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+
+                        if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == selectedRole.Id))
+                        {
+                            action_embed.Description = $"`The specified role is already being used in another reaction role.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(5000);
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+
+                        if (selectedEmoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(selectedEmoji.Id))
+                        {
+                            action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(5000);
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+
+                        if (ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == selectedEmoji.GetUniqueDiscordName())))
+                        {
+                            action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(5000);
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+
+                        ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(selectedMessage.Id, new ReactionRoles
+                        {
+                            ChannelId = selectedMessage.Channel.Id,
+                            RoleId = selectedRole.Id,
+                            EmojiId = selectedEmoji.Id,
+                            EmojiName = selectedEmoji.GetUniqueDiscordName()
+                        }));
+
+                        await selectedMessage.CreateReactionAsync(selectedEmoji);
+
+                        action_embed.Description = $"`Added role` {selectedRole.Mention} `to message sent by` {selectedMessage.Author?.Mention ?? "-"} `in` {selectedMessage.Channel.Mention} `with emoji` {selectedEmoji} `.`";
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetSuccess(ctx, "Reaction Roles")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-
-                    ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(reactionMessage.Id, new Entities.ReactionRoles
+                    else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
                     {
-                        ChannelId = ChannelId,
-                        RoleId = role.Id,
-                        EmojiId = emoji.Id,
-                        EmojiName = emoji.GetUniqueDiscordName()
-                    }));
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                    await reactionMessage.CreateReactionAsync(emoji);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
 
-                    action_embed.Description = $"`Added role` {role.Mention} `to message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {emoji} `.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetSuccess(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut(true);
                     return;
                 }
             }

@@ -19,8 +19,7 @@ internal class RankCommand : BaseCommand
                 return;
             }
 
-            if (victim is null)
-                victim = ctx.User;
+            victim ??= ctx.User;
 
             victim = await victim.GetFromApiAsync();
 

@@ -34,9 +34,11 @@ internal class RegisterCommandsCommand : BaseCommand
                 count = e.RegisteredCommands.Count;
             }
 
+            while (count == 0)
+                await Task.Delay(1000);
+
             try
             {
-                await Task.Delay(90000);
                 await RespondOrEdit($"Registered {count} commands.");
 
                 appCommands.GuildApplicationCommandsRegistered -= GuildApplicationCommandsRegistered;

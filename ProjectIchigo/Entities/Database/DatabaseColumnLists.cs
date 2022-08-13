@@ -13,6 +13,11 @@ internal class DatabaseColumnLists
         new Column("origin", "text", "utf8mb4_0900_ai_ci", "", false, false),
         new Column("submitter", "bigint"),
     };
+    
+    internal readonly static List<Column> objected_users = new()
+    {
+        new Column("id", "bigint", primary: true),
+    };
 
     internal readonly static List<Column> globalbans = new()
     {
@@ -142,6 +147,7 @@ internal class DatabaseColumnLists
         { "active_url_submissions", active_url_submissions },
         { "users", users },
         { "guilds", guilds },
+        { "objected_users", objected_users },
         { "writetester", writetester },
     };
 

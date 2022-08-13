@@ -9,9 +9,6 @@ internal class LoadShareCommand : BaseCommand
             ulong userid = (ulong)arguments["userid"];
             string id = (string)arguments["id"];
 
-            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 

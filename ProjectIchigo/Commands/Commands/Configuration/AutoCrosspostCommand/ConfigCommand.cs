@@ -56,58 +56,34 @@ internal class ConfigCommand : BaseCommand
             }
             else if (Button.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder("Define a new delay", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", "Minutes (5 max)", "", 1, 2, true, "1"))
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (59 max)", "", 1, 2, true, "0"));
-
-                await Button.Result.Interaction.CreateInteractionModalResponseAsync(modal);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Waiting for modal..`").SetAwaitingInput(ctx, "Auto Crosspost")));
-
-                var e = await ctx.Client.GetInteractivity().WaitForModalAsync(modal.CustomId, TimeSpan.FromMinutes(10));
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.TimedOut)
-                {
-                    ModifyToTimedOut(true);
-                    return;
-                }
+                TimeSpan Response;
 
                 try
                 {
-                    TimeSpan length = TimeSpan.FromSeconds(0);
-
-                    double seconds = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "seconds").First().Components.First().Value));
-                    double minutes = Convert.ToDouble(Convert.ToUInt32(e.Result.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "minutes").First().Components.First().Value));
-
-                    if (seconds > 59 || seconds < 0 || minutes > 5 || minutes < 0)
-                    {
-                        throw new Exception();
-                    }
-
-                    length = length.Add(TimeSpan.FromSeconds(seconds));
-                    length = length.Add(TimeSpan.FromMinutes(minutes));
-
-                    if (length > TimeSpan.FromMinutes(5) || length < TimeSpan.FromSeconds(1))
-                    {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").SetError(ctx, "Auto Crosspost")));
-                        await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-
-                    ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(length.TotalSeconds);
-
+                    Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting), false);
+                }
+                catch (CancelCommandException)
+                {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (Exception)
+                catch (InvalidOperationException)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid duration`").SetError(ctx, "Auto Crosspost")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").SetError(ctx, "Auto Crosspost")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                catch (ArgumentException)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+
+                ctx.Bot._guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(Response.TotalSeconds);
+
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (Button.Result.Interaction.Data.CustomId == AddButton.CustomId)
             {

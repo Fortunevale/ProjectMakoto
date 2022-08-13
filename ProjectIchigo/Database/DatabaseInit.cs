@@ -26,6 +26,8 @@ internal class DatabaseInit
         _logger.LogInfo($"Loaded {_bot._phishingUrls.List.Count} phishing urls from table 'scam_urls'.");
 
 
+        IEnumerable<ulong> objected_users = _bot._databaseClient.mainDatabaseConnection.Query<ulong>(_bot._databaseClient._helper.GetLoadCommand("objected_users", DatabaseColumnLists.objected_users));
+        _bot.ObjectedUsers = objected_users.ToList();
 
         _logger.LogDebug($"Loading guilds from table 'guilds'..");
 

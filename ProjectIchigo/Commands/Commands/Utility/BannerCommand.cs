@@ -10,8 +10,7 @@ internal class BannerCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            if (victim is null)
-                victim = ctx.User;
+            victim ??= ctx.User;
 
             victim = await victim.GetFromApiAsync();
 

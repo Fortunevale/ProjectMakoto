@@ -46,4 +46,8 @@ public class Config
     public ulong InviteEmojiId = 1005612860333899859;
 
     public ulong DisboardAccountId = 302050872383242240;
+
+    public bool UseLavalinkAutoUpdater = false;
+    public bool LavalinkDownloadPreRelease = true;
+    public string LavalinkJarFolderPath = "";
 }

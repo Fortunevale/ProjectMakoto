@@ -9,9 +9,6 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
             if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id != 0)
             {
                 ctx.Bot._users[ctx.User.Id].ScoreSaber.Id = 0;

@@ -4,9 +4,6 @@ internal class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
-        if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-            ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
         if (string.IsNullOrWhiteSpace(id))
         {
             if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id != 0)
@@ -88,8 +85,7 @@ internal class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                if (CachedTopScores is null)
-                                    CachedTopScores = await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+                                CachedTopScores ??= await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
 
                                 ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot._watcher, ctx);
                             }
@@ -123,8 +119,7 @@ internal class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                if (CachedRecentScores is null)
-                                    CachedRecentScores = await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+                                CachedRecentScores ??= await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
 
                                 ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot._watcher, ctx);
                             }

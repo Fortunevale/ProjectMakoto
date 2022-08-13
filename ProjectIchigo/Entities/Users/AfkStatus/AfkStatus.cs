@@ -53,8 +53,7 @@ public class AfkStatus
     {
         get
         {
-            if (_Messages == null)
-                _Messages = new();
+            _Messages ??= new();
 
             return _Messages;
         }
@@ -65,7 +64,6 @@ public class AfkStatus
         }
     }
 
-
-
+    [JsonIgnore]
     internal DateTime LastMentionTrigger { get; set; } = DateTime.MinValue;
 }
