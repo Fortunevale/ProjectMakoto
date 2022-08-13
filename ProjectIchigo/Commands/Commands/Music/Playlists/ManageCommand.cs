@@ -766,6 +766,8 @@ internal class ManageCommand : BaseCommand
 
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
+                                        // TODO: Update to use an upload system
+
                                         var NewThumbnail = await ctx.Client.GetInteractivity().WaitForMessageAsync(x => x.Author.Id == ctx.User.Id && x.Channel.Id == ctx.Channel.Id);
 
                                         if (NewThumbnail.TimedOut)
