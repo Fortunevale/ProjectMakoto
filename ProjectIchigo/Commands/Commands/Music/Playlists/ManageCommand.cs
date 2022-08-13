@@ -974,7 +974,7 @@ internal class ManageCommand : BaseCommand
                                 case "ChangeColor":
                                 {
                                     var modal = new DiscordInteractionModalBuilder("New Playlist Color", Guid.NewGuid().ToString())
-                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Playlist Color", "#FF0000", 1, 100, true, SelectedPlaylist.PlaylistName));
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Playlist Color", "#FF0000", 1, 100, true, SelectedPlaylist.PlaylistColor));
 
                                     InteractionCreateEventArgs Response = null;
 
