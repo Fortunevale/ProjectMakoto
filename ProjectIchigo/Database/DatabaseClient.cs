@@ -1,4 +1,5 @@
 namespace ProjectIchigo.Database;
+
 internal class DatabaseClient
 {
     internal MySqlConnection mainDatabaseConnection { get; set; }
@@ -659,6 +660,38 @@ internal class DatabaseClient
                                 _logger.LogError($"An exception occured while trying to update the {guild.Key} table", ex);
                             }
                         }
+
+                if (_bot.ObjectedUsers.Count > 0)
+                    try
+                    {
+                        if (mainDatabaseConnection == null)
+                        {
+                            throw new Exception($"Exception occured while trying to update guilds in database: Database mainDatabaseConnection not present");
+                        }
+
+                        var cmd = mainDatabaseConnection.CreateCommand();
+                        cmd.CommandText = _helper.GetSaveCommand($"objected_users", DatabaseColumnLists.objected_users);
+
+                        for (int i = 0; i < _bot.ObjectedUsers.Count; i++)
+                        {
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.objected_users, i);
+
+                            cmd.Parameters.AddWithValue($"id{i}", _bot.ObjectedUsers[i]);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.objected_users);
+
+                        cmd.Connection = mainDatabaseConnection;
+                        await _queue.RunCommand(cmd);
+
+                        _logger.LogDebug($"Inserted {_bot.ObjectedUsers.Count} rows into table 'objected_users'.");
+                        cmd.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An exception occured while trying to update the objected_users table", ex);
+                    }
 
                 if (_bot._users.Count > 0)
                     try

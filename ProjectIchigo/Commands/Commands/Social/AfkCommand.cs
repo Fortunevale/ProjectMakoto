@@ -11,9 +11,6 @@ internal class AfkCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
             if (reason.Length > 128)
             {
                 SendSyntaxError();

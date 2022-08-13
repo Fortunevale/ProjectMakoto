@@ -6,10 +6,141 @@ internal class ObjectCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            await RespondOrEdit(new DiscordEmbedBuilder
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.BoolToEmote(ctx.Client)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.BoolToEmote(ctx.Client)));
+
+            if (ctx.Bot.ObjectedUsers.Contains(ctx.User.Id))
             {
-                Description = $"`Placeholder`"
-            }.SetInfo(ctx));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`You already objected to having your data get processed. Do you want to reverse that decision?`"
+                }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+
+                var Menu1 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+
+                if (Menu1.TimedOut)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+
+                _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (Menu1.Result.Interaction.Data.CustomId == Yes.CustomId)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Okay, removing you from the objection list..`"
+                    }.SetLoading(ctx));
+
+                    try
+                    {
+                        ctx.Bot.ObjectedUsers.Remove(ctx.User.Id);
+                        await ctx.Bot._databaseClient._helper.DeleteRow(ctx.Bot._databaseClient.mainDatabaseConnection, "objected_users", "id", $"{ctx.User.Id}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("An exception occured while trying to remove a user from the objection list", ex);
+
+                        await RespondOrEdit(new DiscordEmbedBuilder
+                        {
+                            Description = $"`I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
+                        }.SetError(ctx));
+                        return;
+                    }
+
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Successfully removed you from the objection list.`"
+                    }.SetSuccess(ctx));
+                }
+                else
+                {
+                    DeleteOrInvalidate();
+                }
+
+                return;
+            }
+
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            {
+                Description = $"`This action will delete all data related to your user account and object to further creation of an user account.`\n" +
+                              $"`This will prevent you from using any commands of the bot.`\n" +
+                              $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
+                              $"**`Are you sure you want to continue?`**"
+            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+
+            var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+
+            if (Menu.TimedOut)
+            {
+                ModifyToTimedOut();
+                return;
+            }
+
+            _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+            if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"**`Please confirm again, are you sure?`**"
+                }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
+
+                Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+
+                if (Menu.TimedOut)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+
+                _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Okay, deleting your profile..`"
+                    }.SetLoading(ctx));
+
+                    try
+                    {
+                        ctx.Bot._users.Remove(ctx.User.Id);
+                        await ctx.Bot._databaseClient._helper.DeleteRow(ctx.Bot._databaseClient.mainDatabaseConnection, "users", "userid", $"{ctx.User.Id}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("An exception occured while trying to delete a user profile", ex);
+
+                        await RespondOrEdit(new DiscordEmbedBuilder
+                        {
+                            Description = $"`I'm sorry but something went wrong while deleting your profile. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
+                        }.SetError(ctx));
+                        return;
+                    }
+
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Adding your account to objection list..`"
+                    }.SetLoading(ctx));
+
+                    ctx.Bot.ObjectedUsers.Add(ctx.User.Id);
+
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`Successfully deleted your profile and added you to the objection list. You will no longer be able to run any commands. To re-allow user account creation, re-run this command.`"
+                    }.SetSuccess(ctx));
+                }
+                else
+                {
+                    DeleteOrInvalidate();
+                }
+            }
+            else
+            {
+                DeleteOrInvalidate();
+            }
         });
     }
 }

@@ -35,6 +35,12 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
+        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        {
+            SendDataError();
+            return;
+        }
+
         await ExecuteCommand(this.ctx, arguments);
     }
     
@@ -69,6 +75,12 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
+        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        {
+            SendDataError();
+            return;
+        }
+
         await ExecuteCommand(this.ctx, arguments);
     }
     
@@ -102,6 +114,12 @@ public abstract class BaseCommand
 
         if (!(await BeforeExecution(this.ctx)))
             return;
+
+        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        {
+            SendDataError();
+            return;
+        }
 
         await ExecuteCommand(this.ctx, arguments);
     }
@@ -817,6 +835,14 @@ public abstract class BaseCommand
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You aren't in a voice channel.`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+    }
+    
+    public void SendDataError()
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
 

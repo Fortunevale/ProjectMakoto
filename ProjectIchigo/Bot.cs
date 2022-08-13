@@ -15,6 +15,7 @@ public class Bot
     internal Dictionary<ulong, Guild> _guilds = new();
     internal Dictionary<ulong, User> _users = new();
 
+    internal List<ulong> ObjectedUsers = new();
 
     internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
 

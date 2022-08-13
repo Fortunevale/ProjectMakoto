@@ -6,9 +6,6 @@ internal class ManageCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 

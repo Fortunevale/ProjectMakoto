@@ -4,6 +4,9 @@ public class User
 {
     public User(Bot _bot, ulong userId)
     {
+        if (_bot.ObjectedUsers.Contains(userId))
+            throw new InvalidOperationException($"User {userId} has objected to having their data processed.");
+
         Cooldown = new(_bot);
         UserId = userId;
 

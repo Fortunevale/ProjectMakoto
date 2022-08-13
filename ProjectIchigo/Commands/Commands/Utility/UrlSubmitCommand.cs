@@ -11,9 +11,6 @@ internal class UrlSubmitCommand : BaseCommand
             if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-                ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
             var interactivity = ctx.Client.GetInteractivity();
 
             int tos_version = 2;

@@ -198,7 +198,6 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
 
 
-#if DEBUG
     [Group("data"), 
     CommandModule("utility"), 
     Description("Allows you to request or manage your user data.")]
@@ -221,7 +220,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
 
-        [Command("request"), Description("[WIP] Allows you to request your user data.")]
+        [Command("request"), Description("Allows you to request your user data.")]
         public async Task Request(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -230,7 +229,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [Command("delete"), Description("[WIP] Allows you to delete your user data.")]
+        [Command("delete"), Description("Allows you to delete your user data.")]
         public async Task Delete(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -239,7 +238,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [Command("object"), Description("[WIP] Allows you to stop Ichigo from further processing of your user data.")]
+        [Command("object"), Description("Allows you to stop Ichigo from further processing of your user data.")]
         public async Task Object(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -248,7 +247,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
         
-        [Command("info"), Description("[WIP] Allows you to view how Ichigo processes your data.")]
+        [Command("policy"), Description("Allows you to view how Ichigo processes your data.")]
         public async Task Info(CommandContext ctx)
         {
             Task.Run(async () =>
@@ -257,7 +256,6 @@ internal class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
     }
-#endif
 
 
 

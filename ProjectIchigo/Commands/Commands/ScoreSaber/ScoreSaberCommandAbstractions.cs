@@ -4,9 +4,6 @@ internal class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
-        if (!ctx.Bot._users.ContainsKey(ctx.User.Id))
-            ctx.Bot._users.Add(ctx.User.Id, new User(ctx.Bot, ctx.User.Id));
-
         if (string.IsNullOrWhiteSpace(id))
         {
             if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id != 0)
