@@ -45,7 +45,7 @@ internal class InfoCommand : BaseCommand
                     $"Ichigo's Privacy Policy does not apply to other advertisers or Discord Bots. Thus, we are advising you to consult the respective Privacy Policies of these third-party (ad) servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options.\n\n" +
                     $"List of Third Party Privacy Policies:\n" +
                     $"• https://discord.com/privacy\n" +
-                    $"• https://aitsys.dev/w/privacy/"
+                    $"• https://aitsys.dev/w/privacy"
                 }.SetInfo(ctx),
                 new DiscordEmbedBuilder
                 {
