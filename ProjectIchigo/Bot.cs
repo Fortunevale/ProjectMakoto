@@ -41,6 +41,8 @@ public class Bot
     internal ILogger _ilogger { get; set; }
     internal ILoggerProvider _loggerProvider { get; set; }
 
+    internal Dictionary<ulong, UserUpload> UploadInteractions { get; set; } = new();
+
     internal string Prefix { get; private set; } = ";;";
 
 

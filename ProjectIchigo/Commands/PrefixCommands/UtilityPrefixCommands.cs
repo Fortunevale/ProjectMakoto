@@ -284,4 +284,27 @@ internal class UtilityPrefixCommands : BaseCommandModule
             await new TranslateCommand().ExecuteCommand(ctx, _bot);
         }).Add(_bot._watcher, ctx);
     }
+
+
+
+    [Command("upload"),
+    CommandModule("utility"),
+    Description("Upload a file to the bot. Only use when instructed to.")]
+    public async Task Upload(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            if (!ctx.Message.Attachments.Any())
+            {
+                _ = ctx.SendSyntaxError("<File>");
+                return;
+            }
+
+            await new UploadCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "stream", await new HttpClient().GetStreamAsync(ctx.Message.Attachments[0].Url) },
+                { "filesize", ctx.Message.Attachments[0].FileSize }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
 }

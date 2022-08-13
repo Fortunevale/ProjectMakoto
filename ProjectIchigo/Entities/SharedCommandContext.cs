@@ -45,7 +45,7 @@ public class SharedCommandContext
 
         BaseCommand = new DummyCommand()
         {
-            Context = this
+            ctx = this
         };
     }
 

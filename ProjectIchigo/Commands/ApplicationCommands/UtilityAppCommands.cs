@@ -75,6 +75,19 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
+    [SlashCommand("upload", "Upload a file to the bot. Only use when instructed to.", dmPermission: false)]
+    public async Task Upload(InteractionContext ctx, [Option("file", "The file you want to upload.")] DiscordAttachment attachment)
+    {
+        Task.Run(async () =>
+        {
+            await new UploadCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "stream", await new HttpClient().GetStreamAsync(attachment.Url) },
+                { "filesize", attachment.FileSize }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
 #if DEBUG
     [SlashCommandGroup("data", "[WIP] Allows you to request or manage your user data.", dmPermission: false)]
     public class Data : ApplicationCommandsModule

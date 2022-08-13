@@ -1,7 +1,7 @@
 ﻿namespace ProjectIchigo.Commands;
 public abstract class BaseCommand
 {
-    internal SharedCommandContext Context { private get; set; }
+    internal SharedCommandContext ctx { private get; set; }
 
     public virtual async Task<bool> BeforeExecution(SharedCommandContext ctx)
     {
@@ -12,7 +12,7 @@ public abstract class BaseCommand
 
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
-        Context = new SharedCommandContext(this, ctx, _bot);
+        this.ctx = new SharedCommandContext(this, ctx, _bot);
 
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return;
@@ -32,10 +32,10 @@ public abstract class BaseCommand
         if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
             return;
 
-        if (!(await BeforeExecution(Context)))
+        if (!(await BeforeExecution(this.ctx)))
             return;
 
-        await ExecuteCommand(Context, arguments);
+        await ExecuteCommand(this.ctx, arguments);
     }
     
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
@@ -46,7 +46,7 @@ public abstract class BaseCommand
                 IsEphemeral = Ephemeral
             });
 
-        Context = new SharedCommandContext(this, ctx, _bot);
+        this.ctx = new SharedCommandContext(this, ctx, _bot);
 
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return;
@@ -66,10 +66,10 @@ public abstract class BaseCommand
         if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
             return;
         
-        if (!(await BeforeExecution(Context)))
+        if (!(await BeforeExecution(this.ctx)))
             return;
 
-        await ExecuteCommand(Context, arguments);
+        await ExecuteCommand(this.ctx, arguments);
     }
     
     public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
@@ -80,7 +80,7 @@ public abstract class BaseCommand
                 IsEphemeral = Ephemeral
             });
 
-        Context = new SharedCommandContext(this, ctx, _bot);
+        this.ctx = new SharedCommandContext(this, ctx, _bot);
 
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return;
@@ -100,10 +100,10 @@ public abstract class BaseCommand
         if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
             return;
 
-        if (!(await BeforeExecution(Context)))
+        if (!(await BeforeExecution(this.ctx)))
             return;
 
-        await ExecuteCommand(Context, arguments);
+        await ExecuteCommand(this.ctx, arguments);
     }
 
     internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed) => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -114,7 +114,7 @@ public abstract class BaseCommand
 
     internal async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
     {
-        switch (Context.CommandType)
+        switch (ctx.CommandType)
         {
             case Enums.CommandType.ApplicationCommand:
             {
@@ -130,8 +130,8 @@ public abstract class BaseCommand
                 discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
-                var msg = await Context.OriginalInteractionContext.EditResponseAsync(discordWebhookBuilder);
-                Context.ResponseMessage = msg;
+                var msg = await ctx.OriginalInteractionContext.EditResponseAsync(discordWebhookBuilder);
+                ctx.ResponseMessage = msg;
                 return msg;
             }
             
@@ -149,57 +149,57 @@ public abstract class BaseCommand
                 discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
-                var msg = await Context.OriginalContextMenuContext.EditResponseAsync(discordWebhookBuilder);
-                Context.ResponseMessage = msg;
+                var msg = await ctx.OriginalContextMenuContext.EditResponseAsync(discordWebhookBuilder);
+                ctx.ResponseMessage = msg;
                 return msg;
             }
 
             case Enums.CommandType.PrefixCommand:
             {
-                if (Context.ResponseMessage is not null)
+                if (ctx.ResponseMessage is not null)
                 {
                     if (discordMessageBuilder.Files?.Any() ?? false)
                     {
-                        await Context.ResponseMessage.DeleteAsync();
-                        var msg1 = await Context.Channel.SendMessageAsync(discordMessageBuilder);
-                        Context.ResponseMessage = msg1;
-                        return Context.ResponseMessage;
+                        await ctx.ResponseMessage.DeleteAsync();
+                        var msg1 = await ctx.Channel.SendMessageAsync(discordMessageBuilder);
+                        ctx.ResponseMessage = msg1;
+                        return ctx.ResponseMessage;
                     }
 
-                    await Context.ResponseMessage.ModifyAsync(discordMessageBuilder);
-                    Context.ResponseMessage = await Context.ResponseMessage.Refresh();
+                    await ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
+                    ctx.ResponseMessage = await ctx.ResponseMessage.Refresh();
 
-                    return Context.ResponseMessage;
+                    return ctx.ResponseMessage;
                 }
 
-                var msg = await Context.Channel.SendMessageAsync(discordMessageBuilder);
+                var msg = await ctx.Channel.SendMessageAsync(discordMessageBuilder);
 
-                Context.ResponseMessage = msg;
+                ctx.ResponseMessage = msg;
 
                 return msg;
             }
             
             case Enums.CommandType.Custom:
             {
-                if (Context.ResponseMessage is not null)
+                if (ctx.ResponseMessage is not null)
                 {
                     if (discordMessageBuilder.Files?.Any() ?? false)
                     {
-                        await Context.ResponseMessage.DeleteAsync();
-                        var msg1 = await Context.Channel.SendMessageAsync(discordMessageBuilder);
-                        Context.ResponseMessage = msg1;
-                        return Context.ResponseMessage;
+                        await ctx.ResponseMessage.DeleteAsync();
+                        var msg1 = await ctx.Channel.SendMessageAsync(discordMessageBuilder);
+                        ctx.ResponseMessage = msg1;
+                        return ctx.ResponseMessage;
                     }
 
-                    await Context.ResponseMessage.ModifyAsync(discordMessageBuilder);
-                    Context.ResponseMessage = await Context.ResponseMessage.Refresh();
+                    await ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
+                    ctx.ResponseMessage = await ctx.ResponseMessage.Refresh();
 
-                    return Context.ResponseMessage;
+                    return ctx.ResponseMessage;
                 }
 
-                var msg = await Context.Channel.SendMessageAsync(discordMessageBuilder);
+                var msg = await ctx.Channel.SendMessageAsync(discordMessageBuilder);
 
-                Context.ResponseMessage = msg;
+                ctx.ResponseMessage = msg;
 
                 return msg;
             }
@@ -218,10 +218,10 @@ public abstract class BaseCommand
         if (IncludeDisable)
             roles.Add(new DiscordSelectComponentOption(DisableString, "disable", "", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
-        foreach (var role in Context.Guild.Roles.OrderByDescending(x => x.Value.Position))
+        foreach (var role in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
         {
-            if (Context.CurrentMember.GetRoleHighestPosition() > role.Value.Position && Context.Member.GetRoleHighestPosition() > role.Value.Position && !role.Value.IsManaged && role.Value.Id != Context.Guild.EveryoneRole.Id)
-                roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(Context.Client))));
+            if (ctx.CurrentMember.GetRoleHighestPosition() > role.Value.Position && ctx.Member.GetRoleHighestPosition() > role.Value.Position && !role.Value.IsManaged && role.Value.Id != ctx.Guild.EveryoneRole.Id)
+                roles.Add(new DiscordSelectComponentOption($"@{role.Value.Name} ({role.Value.Id})", role.Value.Id.ToString(), "", false, new DiscordComponentEmoji(role.Value.Color.GetClosestColorEmoji(ctx.Client))));
         }
 
         int currentPage = 0;
@@ -241,7 +241,7 @@ public abstract class BaseCommand
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent("Select a role..", roles.Skip(currentPage * 25).Take(25), SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).SetAwaitingInput(Context)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (roles.Skip(currentPage * 25).Count() > 25)
                 builder.AddComponents(nextPageButton);
@@ -262,21 +262,21 @@ public abstract class BaseCommand
             {
                 try
                 {
-                    if (e.Message?.Id == Context.ResponseMessage.Id && e.User.Id == Context.User.Id)
+                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
                         TimeoutSeconds = 60;
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
-                            Context.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                            ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
                             if (e.Values.First() is "create_for_me")
-                                Role = await Context.Guild.CreateRoleAsync(CreateForMeName);
+                                Role = await ctx.Guild.CreateRoleAsync(CreateForMeName);
                             else if (e.Values.First() is "disable")
                                 Role = null;
                             else
-                                Role = Context.Guild.GetRole(Convert.ToUInt64(e.Values.First()));
+                                Role = ctx.Guild.GetRole(Convert.ToUInt64(e.Values.First()));
 
 
                             FinishedSelection = true;
@@ -300,10 +300,10 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(Context.Bot._watcher, Context);
+            }).Add(ctx.Bot._watcher, ctx);
         }
 
-        Context.Client.ComponentInteractionCreated += RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
         while (!FinishedSelection && TimeoutSeconds >= 0)
         {
@@ -311,9 +311,9 @@ public abstract class BaseCommand
             TimeoutSeconds--;
         }
 
-        Context.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(Context.ResponseMessage.Embeds[0]).WithContent(Context.ResponseMessage.Content));
+        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
         if (ExceptionOccured)
             throw exception;
@@ -334,7 +334,7 @@ public abstract class BaseCommand
         if (IncludeDisable)
             channels.Add(new DiscordSelectComponentOption(DisableString, "disable", "", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
-        foreach (var category in await Context.Guild.GetOrderedChannelsAsync())
+        foreach (var category in await ctx.Guild.GetOrderedChannelsAsync())
         {
             foreach (var b in category.Value)
                 channels.Add(new DiscordSelectComponentOption(
@@ -360,7 +360,7 @@ public abstract class BaseCommand
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent("Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).SetAwaitingInput(Context)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (channels.Skip(currentPage * 25).Count() > 25)
                 builder.AddComponents(nextPageButton);
@@ -381,21 +381,21 @@ public abstract class BaseCommand
             {
                 try
                 {
-                    if (e.Message?.Id == Context.ResponseMessage.Id && e.User.Id == Context.User.Id)
+                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
                         TimeoutSeconds = 60;
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
-                            Context.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                            ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
                             if (e.Values.First() is "create_for_me")
-                                Channel = await Context.Guild.CreateChannelAsync(CreateForMeName, CreateFormeChannelType);
+                                Channel = await ctx.Guild.CreateChannelAsync(CreateForMeName, CreateFormeChannelType);
                             else if (e.Values.First() is "disable")
                                 Channel = null;
                             else
-                                Channel = Context.Guild.GetChannel(Convert.ToUInt64(e.Values.First()));
+                                Channel = ctx.Guild.GetChannel(Convert.ToUInt64(e.Values.First()));
 
                             FinishedSelection = true;
                         }
@@ -418,10 +418,10 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(Context.Bot._watcher, Context);
+            }).Add(ctx.Bot._watcher, ctx);
         }
 
-        Context.Client.ComponentInteractionCreated += RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
         while (!FinishedSelection && TimeoutSeconds >= 0)
         {
@@ -429,9 +429,9 @@ public abstract class BaseCommand
             TimeoutSeconds--;
         }
 
-        Context.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(Context.ResponseMessage.Embeds[0]).WithContent(Context.ResponseMessage.Content));
+        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
         if (ExceptionOccured)
             throw exception;
@@ -461,7 +461,7 @@ public abstract class BaseCommand
             var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).SetAwaitingInput(Context)).AddComponents(dropdown).WithContent(Context.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (options.Skip(currentPage * 25).Count() > 25)
                 builder.AddComponents(nextPageButton);
@@ -482,14 +482,14 @@ public abstract class BaseCommand
             {
                 try
                 {
-                    if (e.Message?.Id == Context.ResponseMessage.Id && e.User.Id == Context.User.Id)
+                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
                         TimeoutSeconds = 60;
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
-                            Context.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                            ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
                             Selection = e.Values.First();
 
@@ -514,10 +514,10 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(Context.Bot._watcher, Context);
+            }).Add(ctx.Bot._watcher, ctx);
         }
 
-        Context.Client.ComponentInteractionCreated += RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
         while (!FinishedSelection && TimeoutSeconds >= 0)
         {
@@ -525,9 +525,9 @@ public abstract class BaseCommand
             TimeoutSeconds--;
         }
 
-        Context.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(Context.ResponseMessage.Embeds[0]).WithContent(Context.ResponseMessage.Content));
+        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
         if (ExceptionOccured)
             throw exception;
@@ -544,14 +544,14 @@ public abstract class BaseCommand
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
-        var oriEmbed = Context.ResponseMessage.Embeds[0];
+        var oriEmbed = ctx.ResponseMessage.Embeds[0];
 
         var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Re-Open Modal", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
             Description = "`Waiting for a modal response..`"
-        }.SetAwaitingInput(Context)).AddComponents(new List<DiscordComponent> { ReOpen, Resources.CancelButton }));
+        }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, Resources.CancelButton }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
@@ -562,7 +562,7 @@ public abstract class BaseCommand
 
         await interaction.CreateInteractionModalResponseAsync(builder);
 
-        Context.Client.ComponentInteractionCreated += RunInteraction;
+        ctx.Client.ComponentInteractionCreated += RunInteraction;
 
         async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
         {
@@ -570,11 +570,11 @@ public abstract class BaseCommand
             {
                 try
                 {
-                    if (e.Message?.Id == Context.ResponseMessage.Id && e.User.Id == Context.User.Id)
+                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
                         if (e.Interaction.Data.CustomId == builder.CustomId)
                         {
-                            Context.Client.ComponentInteractionCreated -= RunInteraction;
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -599,7 +599,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(Context.Bot._watcher, Context);
+            }).Add(ctx.Bot._watcher, ctx);
         }
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
@@ -610,7 +610,7 @@ public abstract class BaseCommand
             TimeoutSeconds--;
         }
 
-        Context.Client.ComponentInteractionCreated -= RunInteraction;
+        ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
         if (ResetToOriginalEmbed)
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
@@ -681,27 +681,59 @@ public abstract class BaseCommand
         return length;
     }
 
+    internal async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
+    {
+        timeOutOverride ??= TimeSpan.FromMinutes(15);
+
+        if (ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id))
+        {
+            if (ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+                throw new AlreadyAppliedException("");
+
+            ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+        }
+
+        ctx.Bot.UploadInteractions.Add(ctx.User.Id, new UserUpload
+        {
+            TimeOut = DateTime.UtcNow.Add(timeOutOverride.Value)
+        });
+
+        while (ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id) && !ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled && ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
+        {
+            await Task.Delay(500);
+        }
+
+        if (!ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+            throw new ArgumentException("");
+
+        int size = ctx.Bot.UploadInteractions[ctx.User.Id].FileSize;
+        Stream stream = ctx.Bot.UploadInteractions[ctx.User.Id].UploadedData;
+
+        ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+        return (stream, size);
+    }
+
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(Context.ResponseMessage.Embeds[0]).WithFooter(Context.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
             {
-                Context.ResponseMessage.DeleteAsync();
+                ctx.ResponseMessage.DeleteAsync();
             });
     }
 
     public void DeleteOrInvalidate()
     {
-        switch (Context.CommandType)
+        switch (ctx.CommandType)
         {
             case Enums.CommandType.ApplicationCommand:
                 _ = RespondOrEdit("✅ `Interaction ended.`");
-                _ = Context.ResponseMessage.DeleteAsync();
+                _ = ctx.ResponseMessage.DeleteAsync();
                 break;
             default:
-                _ = Context.ResponseMessage.DeleteAsync();
+                _ = ctx.ResponseMessage.DeleteAsync();
                 break;
         }
     }
@@ -711,31 +743,31 @@ public abstract class BaseCommand
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = "The user you tagged is required to be on this server for this command to run.",
-        }.SetError(Context));
+        }.SetError(ctx));
     }
     
     public void SendMaintenanceError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{Context.Prefix}{Context.CommandName}`. You need to be <@411950662662881290> to use this command.",
-        }.SetError(Context));
+            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be <@411950662662881290> to use this command.",
+        }.SetError(ctx));
     }
 
     public void SendAdminError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{Context.Prefix}{Context.CommandName}`. You need to be `Administrator` to use this command.",
-        }.SetError(Context));
+            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Administrator` to use this command.",
+        }.SetError(ctx));
     }
     
     public void SendPermissionError(Permissions perms)
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{Context.Prefix}{Context.CommandName}`. You need to be `{perms.ToPermissionString()}` to use this command.",
-        }.SetError(Context));
+            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `{perms.ToPermissionString()}` to use this command.",
+        }.SetError(ctx));
     }
     
     public void SendOwnPermissionError(Permissions perms)
@@ -746,7 +778,7 @@ public abstract class BaseCommand
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command."
-        }.SetError(Context));
+        }.SetError(ctx));
     }
     
     public void SendSourceError(Enums.CommandType commandType)
@@ -756,28 +788,28 @@ public abstract class BaseCommand
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = $"This command is exclusive to application commands.",
-            }.SetError(Context)),
+            }.SetError(ctx)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = $"This command is exclusive to prefixed commands."
-            }.SetError(Context)),
+            }.SetError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
     }
 
     public void SendSyntaxError()
     {
-        if (Context.CommandType != Enums.CommandType.PrefixCommand)
+        if (this.ctx.CommandType != Enums.CommandType.PrefixCommand)
             throw new ArgumentException("Syntax Error can only be generated for Prefix Commands.");
 
-        var ctx = Context.OriginalCommandContext;
+        var ctx = this.ctx.OriginalCommandContext;
 
         var embed = new DiscordEmbedBuilder
         {
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-        }.SetError(Context);
+        }.SetError(this.ctx);
 
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(Context.User.Mention));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
     }
     
     public void SendVoiceStateError()
@@ -785,12 +817,12 @@ public abstract class BaseCommand
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You aren't in a voice channel.`",
-        }.SetError(Context)).WithContent(Context.User.Mention));
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
 
     public async Task<bool> CheckVoiceState()
     {
-        if (Context.Member.VoiceState is null)
+        if (ctx.Member.VoiceState is null)
         {
             SendVoiceStateError();
             return false;
@@ -801,7 +833,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckMaintenance()
     {
-        if (!Context.User.IsMaintenance(Context.Bot._status))
+        if (!ctx.User.IsMaintenance(ctx.Bot._status))
         {
             SendMaintenanceError();
             return false;
@@ -812,7 +844,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckAdmin()
     {
-        if (!Context.Member.IsAdmin(Context.Bot._status))
+        if (!ctx.Member.IsAdmin(ctx.Bot._status))
         {
             SendAdminError();
             return false;
@@ -823,7 +855,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckPermissions(Permissions perms)
     {
-        if (!Context.Member.Permissions.HasPermission(perms))
+        if (!ctx.Member.Permissions.HasPermission(perms))
         {
             SendPermissionError(perms);
             return false;
@@ -834,7 +866,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckOwnPermissions(Permissions perms)
     {
-        if (!Context.CurrentMember.Permissions.HasPermission(perms))
+        if (!ctx.CurrentMember.Permissions.HasPermission(perms))
         {
             SendOwnPermissionError(perms);
             return false;
@@ -845,7 +877,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckSource(Enums.CommandType commandType)
     {
-        if (Context.CommandType != commandType)
+        if (ctx.CommandType != commandType)
         {
             SendSourceError(commandType);
             return false;
