@@ -437,6 +437,98 @@ public class Bot
             {
                 try
                 {
+                    if (_status.LoadedConfig.UseLavalinkAutoUpdater)
+                    {
+                        try
+                        {
+                            string v = _status.LoadedConfig.LavalinkJarFolderPath.Replace("\\", "/");
+
+                            if (v.EndsWith("/"))
+                                v = v[..^1];
+
+                            string VersionFile = $"{v}/Lavalink.ver";
+                            string JarFile = $"{v}/Lavalink.jar";
+                            string PidFile = $"{v}/Lavalink.pid";
+
+                            string LatestVersion = "";
+                            string InstalledVersion = "";
+
+                            if (File.Exists(VersionFile))
+                            {
+                                InstalledVersion = File.ReadAllText(VersionFile);
+                            }
+
+                            var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
+
+                            var releases = await client.Repository.Release.GetAll("freyacodes", "Lavalink");
+
+                            Release workingRelease;
+
+                            if (_status.LoadedConfig.LavalinkDownloadPreRelease)
+                            {
+                                if (releases.Any(x => x.Prerelease))
+                                    workingRelease = releases.First(x => x.Prerelease);
+                                else
+                                    workingRelease = releases[0];
+                            }
+                            else
+                            {
+                                workingRelease = releases.First(x => !x.Prerelease);
+                            }
+
+                            LatestVersion = workingRelease.TagName;
+
+                            if (LatestVersion != InstalledVersion)
+                            {
+                                _logger.LogInfo($"Lavalink is not up to date. Updating from {InstalledVersion} to {LatestVersion}..");
+
+                                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                                {
+                                    _logger.LogInfo($"Running on windows, killing Lavalink before updating if it exists..");
+
+                                    if (File.Exists(PidFile))
+                                        Process.GetProcessById(Convert.ToInt32(File.ReadAllText(PidFile))).Kill();
+                                }
+
+                                if (File.Exists($"{JarFile}.old"))
+                                    File.Delete($"{JarFile}.old");
+
+                                if (File.Exists(JarFile))
+                                    File.Move(JarFile, $"{JarFile}.old");
+
+                                HttpClient http = new();
+
+                                var response = await http.GetStreamAsync(workingRelease.Assets.First(x => x.Name.EndsWith(".jar")).BrowserDownloadUrl);
+
+                                using (var io = new FileStream(JarFile, System.IO.FileMode.CreateNew))
+                                {
+                                    await response.CopyToAsync(io);
+                                }
+
+                                File.WriteAllText(VersionFile, LatestVersion);
+
+                                if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+                                {
+                                    _logger.LogInfo($"Lavalink updated to {LatestVersion}. Killing old Lavalink Process if it exists..");
+
+                                    if (File.Exists(PidFile))
+                                        Process.GetProcessById(Convert.ToInt32(File.ReadAllText(PidFile))).Kill();
+                                }
+
+                                _logger.LogDebug($"Waiting for Lavalink to start back up..");
+                                await Task.Delay(60000);
+                            }
+                            else
+                            {
+                                _logger.LogInfo("Lavalink is up to date!");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("Failed to update Lavalink", ex);
+                        }
+                    }
+
                     var lavalinkSc = new Stopwatch();
                     lavalinkSc.Start();
                     _logger.LogInfo("Connecting and authenticating with Lavalink..");
@@ -444,8 +536,12 @@ public class Bot
                     LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
                     lavalinkSc.Stop();
                     _logger.LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
-
                     _status.LavalinkInitialized = true;
+
+                    try
+                    {
+                        _logger.LogInfo($"Lavalink is running on {await LavalinkNodeConnection.Rest.GetVersionAsync()}.");
+                    } catch { }
                 }
                 catch (Exception ex)
                 {
@@ -804,6 +900,9 @@ public class Bot
             List<DiscordUser> UserCache = new();
 
             await Task.Delay(5000);
+
+            while (!_status.LavalinkInitialized)
+                await Task.Delay(1000);
 
             foreach (var guild in e.Guilds)
             {
