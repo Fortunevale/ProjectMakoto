@@ -603,6 +603,7 @@ public class Bot
 
         _ = Task.Run(async () =>
         {
+            Thread.Sleep(5000);
             _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
             while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
