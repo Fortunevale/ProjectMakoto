@@ -56,11 +56,14 @@ internal class TaskWatcher
                     try { _logger.LogError($"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)b.task.Exception.InnerException).WebResponse.Response}"); } catch { }
                 }
 
-                if (CommandContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
+                var ExceptionType = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.GetType() : b.task.Exception.InnerException.GetType());
+                string ExceptionMessage = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.Message : b.task.Exception.InnerException.Message);
+
+                if (CommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
                         _ = CommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
-                        .WithContent($"{CommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        .WithContent($"{CommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)
@@ -74,29 +77,11 @@ internal class TaskWatcher
                     }
                     catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
-                if (InteractionContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
+                if (InteractionContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
-                        _ = InteractionContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
-                        .WithContent($"{InteractionContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
-                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
-                        {
-                            if (!x.IsCompletedSuccessfully)
-                                return;
-
-                            _ = Task.Delay(10000).ContinueWith(_ =>
-                            {
-                                _ = x.Result.DeleteAsync();
-                            });
-                        });
-                    }
-                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
-                
-                if (SharedCommandContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
-                    try
-                    {
-                        _ = SharedCommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
-                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        _ = InteractionContext.EditResponseAsync(new DiscordWebhookBuilder()
+                        .WithContent($"{InteractionContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)
@@ -110,11 +95,29 @@ internal class TaskWatcher
                     }
                     catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
                 
-                if (ContextMenuContext != null && b.task.Exception.InnerException.GetType() != typeof(DisCatSharp.Exceptions.NotFoundException))
+                if (SharedCommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
-                        _ = ContextMenuContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
-                        .WithContent($"{ContextMenuContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{b.task.Exception.Message.SanitizeForCodeBlock()}'`\n\n" +
+                        _ = SharedCommandContext.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
+                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n\n" +
+                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        {
+                            if (!x.IsCompletedSuccessfully)
+                                return;
+
+                            _ = Task.Delay(10000).ContinueWith(_ =>
+                            {
+                                _ = x.Result.DeleteAsync();
+                            });
+                        });
+                    }
+                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
+                
+                if (ContextMenuContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
+                    try
+                    {
+                        _ = ContextMenuContext.EditResponseAsync(new DiscordWebhookBuilder()
+                        .WithContent($"{ContextMenuContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your request: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
                             if (!x.IsCompletedSuccessfully)

@@ -153,5 +153,35 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                 });
             }).Add(_bot._watcher, ctx);
         }
+
+#if DEBUG
+        [Command("db-test1"), Description(" ")]
+        public async Task DbTest1(CommandContext ctx, bool UseOldTagsSelector = false)
+        {
+            var v = new List<DatabaseQueue.RequestQueue>
+            {
+                new DatabaseQueue.RequestQueue
+                {
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
+                },
+                new DatabaseQueue.RequestQueue
+                {
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.Normal
+                },
+                new DatabaseQueue.RequestQueue
+                {
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
+                },
+                new DatabaseQueue.RequestQueue
+                {
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.High
+                }
+            };
+
+            v.Sort((a, b) => ((int)a.Priority).CompareTo((int)b.Priority));
+
+            _bot._databaseClient._queue.Queue = v;
+        }
+#endif
     }
 }

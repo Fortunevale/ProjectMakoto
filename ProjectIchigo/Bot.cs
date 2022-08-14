@@ -91,7 +91,7 @@ public class Bot
         {
             if (args.Contains("--debug"))
             {
-                _logger.ChangeLogLevel(LogLevel.DEBUG);
+                _logger.ChangeLogLevel(LogLevel.TRACE);
                 _logger.LogInfo("Debug logs enabled");
             }
         }
@@ -603,8 +603,14 @@ public class Bot
 
         _ = Task.Run(async () =>
         {
-            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online);
-            await Task.Delay(10000);
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
+
+            while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
+                Thread.Sleep(1000);
+
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
+
+            Thread.Sleep(30000);
 
             while (true)
             {
@@ -982,9 +988,9 @@ public class Bot
         }).Add(_watcher);
     }
 
-    internal async Task ExitApplication()
+    internal async Task ExitApplication(bool Immediate = false)
     {
-        _ = Task.Delay(TimeSpan.FromMinutes(5)).ContinueWith(x =>
+        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
         {
             if (x.IsCompletedSuccessfully)
                 Environment.Exit(ExitCodes.ExitTasksTimeout);

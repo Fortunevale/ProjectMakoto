@@ -15,75 +15,110 @@ internal class DatabaseQueue
     {
         Task.Run(async () =>
         {
-            while (true)
+            try
             {
-                KeyValuePair<string, RequestQueue> b;
-
-                try
+                while (true)
                 {
-                    if (!Queue.Any(x => !x.Value.Executed && !x.Value.Failed))
+                    bool Removed = false;
+
+                    for (int i = 0; i < Queue.Count; i++)
                     {
-                        Thread.Sleep(10);
+                        var obj = Queue[i];
+
+                        if (obj is null || obj.Executed || obj.Failed)
+                        {
+                            Queue.Remove(obj);
+                            Removed = true;
+                            break;
+                        }
+                    }
+
+                    if (Removed)
+                        continue;
+
+                    RequestQueue b = null;
+
+                    for (int i = 0; i < Queue.Count; i++)
+                    {
+                        var obj = Queue[i];
+
+                        if (obj is null)
+                            continue;
+
+                        if (!obj.Executed && !obj.Failed)
+                        {
+                            b = obj;
+                            break;
+                        }
+                    }
+
+                    if (b is null)
+                    {
+                        Thread.Sleep(50);
                         continue;
                     }
 
-                    b = Queue.OrderBy(x => (int)x.Value?.Priority).First(x => !x.Value.Executed && !x.Value.Failed);
-                }
-                catch (InvalidOperationException ex) when (ex.Message.ToLower().Contains("collection was modified"))
-                {
-                    continue;
-                }
-                catch (Exception ex) 
-                { 
-                    _logger.LogError("Failed to get ordered Queue", ex);
-
-                    Queue = new();
-
-                    continue; 
-                }
-
-                if (b.Value is null)
-                    continue;
-
-                try
-                {
-                    switch (b.Value.RequestType)
+                    try
                     {
-                        case DatabaseRequestType.Command:
+                        switch (b.RequestType)
                         {
-                            try
+                            case DatabaseRequestType.Command:
                             {
-                                _logger.LogTrace($"Executing command on Database '{b.Value.Command.Connection.Database}': '{b.Value.Command.CommandText.TruncateWithIndication(100)}'");
+                                try
+                                {
+                                    _logger.LogTrace($"Executing command on Database '{b.Command.Connection.Database}': '{b.Command.CommandText.TruncateWithIndication(100)}' with Priority {b.Priority}");
+                                }
+                                catch { }
+
+                                b.Command.ExecuteNonQuery();
+
+                                b.Executed = true;
+                                break;
                             }
-                            catch { }
+                            case DatabaseRequestType.Ping:
+                            {
+                                try
+                                {
+                                    _logger.LogTrace($"Executing ping on Database '{b.Connection.Database}' with Priority {b.Priority}");
+                                }
+                                catch { }
 
-                            b.Value.Command.ExecuteNonQuery();
+                                b.Connection.Ping();
 
-                            Queue[b.Key].Executed = true;
-                            break;
-                        }
-                        case DatabaseRequestType.Ping:
-                        {
-                            b.Value.Connection.Ping();
-
-                            Queue[b.Key].Executed = true;
-                            break;
+                                b.Executed = true;
+                                break;
+                            }
                         }
                     }
+                    catch (MySqlException ex)
+                    {
+                        _logger.LogError($"An exception occured while trying to execute a mysql command", ex);
+                    }
+                    catch (Exception ex)
+                    {
+                        b.Failed = true;
+                        b.Exception = ex;
+                    }
+                    finally
+                    {
+                        Thread.Sleep(10);
+                    }
                 }
-                catch (MySqlException ex)
+            }
+            catch (Exception)
+            {
+                FailCount++;
+
+                if (FailCount > 20)
                 {
-                    _logger.LogError($"An exception occured while trying to execute a mysql command", ex);
+                    _logger.LogFatal("Queue Handler failed 20 times, terminating application.");
+
+                    _ = _bot.ExitApplication(true);
+                    throw;
                 }
-                catch (Exception ex)
-                {
-                    Queue[b.Key].Failed = true;
-                    Queue[b.Key].Exception = ex;
-                }
-                finally
-                {
-                    Thread.Sleep(10);
-                }
+
+                _ = QueueHandler();
+                throw;
             }
         }).Add(_bot._watcher);
     }
@@ -93,55 +128,29 @@ internal class DatabaseQueue
         if (depth > 10)
             throw new Exception("Failed to run command.");
 
-        string key = Guid.NewGuid().ToString();
+        RequestQueue value = new() { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority };
 
-        RequestQueue value;
+        Queue.Add(value);
+        Queue.Sort((a, b) => ((int)a.Priority).CompareTo((int)b.Priority));
 
-        try
-        {
-            value = new RequestQueue { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority };
-            Queue.Add(key, value);
-        }
-        catch (Exception)
-        {
-            if (Queue is null)
-            {
-                Queue = new();
-
-                await Task.Delay(1000);
-
-                await RunCommand(cmd, priority, depth + 1);
-                return;
-            }
-            throw;
-        }
+        Stopwatch sw = new();
 
         while (true)
         {
-            try
-            {
-                if (!Queue.ContainsKey(key) || value.Executed || value.Failed)
-                    break;
-            }
-            catch { }
+            if (value.Executed || value.Failed || sw.ElapsedMilliseconds > 30000)
+                break;
 
             Thread.Sleep(50);
         }
 
-        Queue.Remove(key);
+        sw.Stop();
 
         if (value.Executed)
             return;
         else if (value.Failed)
             throw value.Exception ?? new Exception("The command execution failed but there no exception was stored");
-        else
-        {
-            await Task.Delay(1000);
-            await RunCommand(cmd, priority, depth + 1);
-            return;
-        }
 
-        throw new Exception("This exception should be impossible to get.");
+        throw new Exception("Command execution timed out.");
     }
 
     internal async Task<bool> RunPing(MySqlConnection conn, int depth = 0)
@@ -149,58 +158,36 @@ internal class DatabaseQueue
         if (depth > 10)
             throw new Exception("Failed to run ping.");
 
-        string key = Guid.NewGuid().ToString();
+        RequestQueue value = new() { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low };
 
-        RequestQueue value;
+        Queue.Add(value);
+        Queue.Sort((a, b) => ((int)a.Priority).CompareTo((int)b.Priority));
 
-        try
-        {
-            value = new RequestQueue { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low };
-            Queue.Add(key, value);
-        }
-        catch (Exception)
-        {
-            if (Queue is null)
-            {
-                Queue = new();
-
-                await Task.Delay(1000);
-
-                return await RunPing(conn, depth + 1);
-            }
-            throw;
-        }
+        Stopwatch sw = new();
 
         while (true)
         {
-            try
-            {
-                if (!Queue.ContainsKey(key) || value.Executed || value.Failed)
-                    break;
-            }
-            catch { }
+            if (value.Executed || value.Failed || sw.ElapsedMilliseconds > 30000)
+                break;
 
             Thread.Sleep(50);
         }
 
-        Queue.Remove(key);
+        sw.Stop();
 
         if (value.Executed)
             return true;
         else if (value.Failed)
             return false;
-        else
-        {
-            await Task.Delay(1000);
-            return await RunPing(conn, depth + 1);
-        }
 
-        throw new Exception("This exception should be impossible to get.");
+        throw new Exception("Command execution timed out.");
     }
 
     internal int QueueCount => this.Queue.Count;
 
-    private Dictionary<string, RequestQueue> Queue = new();
+    internal List<RequestQueue> Queue = new();
+
+    int FailCount = 0;
 
     internal class RequestQueue
     {
