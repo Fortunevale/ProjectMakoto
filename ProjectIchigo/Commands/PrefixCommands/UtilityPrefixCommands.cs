@@ -198,66 +198,6 @@ internal class UtilityPrefixCommands : BaseCommandModule
 
 
 
-    [Group("data"), 
-    CommandModule("utility"), 
-    Description("Allows you to request or manage your user data.")]
-    public class Join : BaseCommandModule
-    {
-        public Bot _bot { private get; set; }
-
-        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
-        public async Task Help(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                    return;
-
-                if (ctx.Command.Parent is not null)
-                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
-                else
-                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-            }).Add(_bot._watcher, ctx);
-        }
-
-        [Command("request"), Description("Allows you to request your user data.")]
-        public async Task Request(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
-        }
-        
-        [Command("delete"), Description("Allows you to delete your user data.")]
-        public async Task Delete(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
-        }
-        
-        [Command("object"), Description("Allows you to stop Ichigo from further processing of your user data.")]
-        public async Task Object(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await new Commands.Data.ObjectCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
-        }
-        
-        [Command("policy"), Description("Allows you to view how Ichigo processes your data.")]
-        public async Task Info(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await new Commands.Data.InfoCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
-        }
-    }
-
-
 
     [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
     CommandModule("utility"),
@@ -305,6 +245,85 @@ internal class UtilityPrefixCommands : BaseCommandModule
             });
         }).Add(_bot._watcher, ctx);
     }
+    
+    
+    
+    [Command("urban-dictionary"),
+    CommandModule("utility"),
+    Description("Look up a term on Urban Dictionary.")]
+    public async Task UrbanDictionary(CommandContext ctx, string term)
+    {
+        Task.Run(async () =>
+        {
+            await new UrbanDictionaryCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "term", term }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Group("data"),
+    CommandModule("utility"),
+    Description("Allows you to request or manage your user data.")]
+    public class Join : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("request"), Description("Allows you to request your user data.")]
+        public async Task Request(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("delete"), Description("Allows you to delete your user data.")]
+        public async Task Delete(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("object"), Description("Allows you to stop Ichigo from further processing of your user data.")]
+        public async Task Object(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.ObjectCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+
+        [Command("policy"), Description("Allows you to view how Ichigo processes your data.")]
+        public async Task Info(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Data.InfoCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot._watcher, ctx);
+        }
+    }
+
+
 
     [Command("credits"),
     CommandModule("utility"),
