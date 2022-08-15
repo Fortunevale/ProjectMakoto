@@ -305,4 +305,15 @@ internal class UtilityPrefixCommands : BaseCommandModule
             });
         }).Add(_bot._watcher, ctx);
     }
+
+    [Command("credits"),
+    CommandModule("utility"),
+    Description("Allows you to view who contributed the bot.")]
+    public async Task Credits(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new CreditsCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot._watcher, ctx);
+    }
 }

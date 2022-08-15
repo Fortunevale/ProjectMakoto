@@ -130,6 +130,14 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }
     }
 
+    [SlashCommand("credits", "Allows you to view who contributed the bot.")]
+    public async Task Credits(InteractionContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new CreditsCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot._watcher, ctx);
+    }
 
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
     public async Task EmojiStealer(ContextMenuContext ctx)

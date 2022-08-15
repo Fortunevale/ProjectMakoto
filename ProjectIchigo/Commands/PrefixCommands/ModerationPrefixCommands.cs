@@ -80,7 +80,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            await new KickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            await new RemoveTimeoutCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "victim", victim },
             });
