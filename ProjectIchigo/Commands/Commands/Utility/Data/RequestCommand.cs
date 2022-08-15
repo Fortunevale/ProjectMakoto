@@ -6,6 +6,9 @@ internal class RequestCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+                return;
+
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = "`Fetching all your user data. This might take a moment..`"

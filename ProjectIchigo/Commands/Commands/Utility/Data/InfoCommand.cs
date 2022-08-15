@@ -6,6 +6,9 @@ internal class InfoCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForModerate(ctx.Client, ctx, true))
+                return;
+
             var embeds = new List<DiscordEmbed>
             {
                 new DiscordEmbedBuilder
