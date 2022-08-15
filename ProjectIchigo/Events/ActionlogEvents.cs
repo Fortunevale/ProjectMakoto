@@ -155,7 +155,7 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
                 Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.UsernameWithDiscriminator}`\n" +
-                                $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`"
+                              $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`"
             };
 
             if (!string.IsNullOrWhiteSpace(e.Message.Content))
@@ -166,6 +166,9 @@ internal class ActionlogEvents
 
             if (e.Message.Stickers.Count != 0)
                 embed.AddField(new DiscordEmbedField("Stickers", $"{string.Join("\n", e.Message.Stickers.Select(x => $"`{x.Name}`"))}"));
+
+            if (e.Message.ReferencedMessage is not null)
+                embed.AddField(new DiscordEmbedField("Reply to", $"{(e.Message.ReferencedMessage.Author is not null ? $"{e.Message.ReferencedMessage.Author.Mention}: " : "")}[`Jump to message`]({e.Message.ReferencedMessage.JumpLink})"));
 
             if (embed.Fields.Count == 0)
                 return;
@@ -818,8 +821,8 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
-                                            $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
+                Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`" +
+                              $"{(e.Member.JoinedAt.Year > 2014 ? $"\n**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}" : (_bot._guilds[e.Guild.Id].Members.TryGetValue(e.Member.Id, out var member) ? (member.FirstJoinDate != DateTime.UnixEpoch ? $"\n**First joined at**: `{member.FirstJoinDate.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(member.FirstJoinDate, TimestampFormat.LongDateTime)}" : "") : ""))}"
             };
             var msg = await e.Guild.GetChannel(_bot._guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
 

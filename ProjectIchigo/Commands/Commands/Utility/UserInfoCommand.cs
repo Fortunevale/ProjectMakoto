@@ -137,7 +137,7 @@ internal class UserInfoCommand : BaseCommand
             }
             catch { }
 
-            if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue)
+            if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue && bMember.CommunicationDisabledUntil.Value.GetTotalSecondsUntil() > 0)
                 embed.AddField(new DiscordEmbedField("Timed out until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));

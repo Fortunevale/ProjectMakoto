@@ -604,14 +604,17 @@ public class Bot
         _ = Task.Run(async () =>
         {
             Thread.Sleep(5000);
-            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
+            
+            if (!_status.LoadedConfig.IsDev)
+            {
+                _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
-            while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
-                Thread.Sleep(1000);
+                while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
+                    Thread.Sleep(1000);
 
-            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
-
-            Thread.Sleep(30000);
+                _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
+                Thread.Sleep(30000);
+            }
 
             while (true)
             {
@@ -631,7 +634,7 @@ public class Bot
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
-                    await discordClient.UpdateStatusAsync(activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Serving {users.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} users | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h | {_status.WarnRaised}W {_status.ErrorRaised}E {_status.FatalRaised}F", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
@@ -1057,16 +1060,6 @@ public class Bot
     {
         switch (e.LogEntry.LogLevel)
         {
-            case LogLevel.WARN:
-            {
-                _status.WarnRaised++;
-                break;
-            }
-            case LogLevel.ERROR:
-            {
-                _status.ErrorRaised++;
-                break;
-            }
             case LogLevel.FATAL:
             {
                 if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
@@ -1104,8 +1097,6 @@ public class Bot
                         _ = ExitApplication();
                     }
                 }
-
-                _status.FatalRaised++;
                 break;
             }
             default:
