@@ -58,7 +58,7 @@ Current noteable features are:
 - [Xorog.UniversalExtensions](https://github.com/TheXorog/Xorog.UniversalExtensions)
 <br></br>
 - [Lavalink](https://github.com/freyacodes/Lavalink)
-- [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) (Please set up your own Instance.)
+- [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) (Please set up your own instance.)
 - [A MySQL/MariaDB Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
 
 ### Required APIs, Keys and Tokens
@@ -72,7 +72,7 @@ Current noteable features are:
 - [Github Account](https://github.com/) with [this](#project-ichigo---a-discord-bot-written-in-c) Repository forked
 - [Personal Access Token](https://github.com/settings/tokens) for your Github Account
    - The personal access token should have the `repo` permissions.
-   - This is required for the `/github create-issue` command.
+   - This is required for the `/dev_tools create-issue` command.
 
 ## Credits
 
