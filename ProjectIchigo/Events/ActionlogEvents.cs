@@ -821,8 +821,8 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`\n" +
-                                            $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
+                Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`" +
+                              $"{(e.Member.JoinedAt.Year > 2014 ? $"\n**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}" : (_bot._guilds[e.Guild.Id].Members.TryGetValue(e.Member.Id, out var member) ? (member.FirstJoinDate != DateTime.UnixEpoch ? $"\n**First joined at**: `{member.FirstJoinDate.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(member.FirstJoinDate, TimestampFormat.LongDateTime)}" : "") : ""))}"
             };
             var msg = await e.Guild.GetChannel(_bot._guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
