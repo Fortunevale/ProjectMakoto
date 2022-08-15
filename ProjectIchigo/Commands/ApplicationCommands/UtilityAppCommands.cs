@@ -88,6 +88,18 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
+    [SlashCommand("urban-dictionary", "Look up a term on Urban Dictionary.")]
+    public async Task UrbanDictionary(InteractionContext ctx, [Option("term", "The term you want to look up.")] string term)
+    {
+        Task.Run(async () =>
+        {
+            await new UrbanDictionaryCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "term", term }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
     [SlashCommandGroup("data", "Allows you to request or manage your user data.", dmPermission: false)]
     public class Data : ApplicationCommandsModule
     {
