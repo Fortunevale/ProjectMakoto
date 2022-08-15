@@ -88,7 +88,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot._watcher, ctx);
     }
 
-    [SlashCommand("urban-dictionary", "Look up a term on Urban Dictionary.")]
+    [SlashCommand("urban-dictionary", "Look up a term on Urban Dictionary.", dmPermission: false)]
     public async Task UrbanDictionary(InteractionContext ctx, [Option("term", "The term you want to look up.")] string term)
     {
         Task.Run(async () =>
@@ -142,7 +142,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommand("credits", "Allows you to view who contributed the bot.")]
+    [SlashCommand("credits", "Allows you to view who contributed the bot.", dmPermission: false)]
     public async Task Credits(InteractionContext ctx)
     {
         Task.Run(async () =>
