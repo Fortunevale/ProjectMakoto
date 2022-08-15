@@ -14,7 +14,7 @@ internal class DeleteCommand : BaseCommand
                 Description = $"`This action will delete all data related to your user account. This includes, but is not limited to: Playlists, Settings, Url Submissions.`\n" +
                               $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
                               $"**`Are you sure you want to continue?`**"
-            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+            }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -31,7 +31,7 @@ internal class DeleteCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"**`Please confirm again, are you sure?`**"
-                }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
+                }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -48,7 +48,7 @@ internal class DeleteCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, deleting your profile..`"
-                    }.SetLoading(ctx));
+                    }.SetBotLoading(ctx));
 
                     try
                     {
@@ -62,7 +62,7 @@ internal class DeleteCommand : BaseCommand
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
                             Description = $"`I'm sorry but something went wrong while deleting your profile. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
-                        }.SetError(ctx));
+                        }.SetBotError(ctx));
                         return;
                     }
 
