@@ -155,7 +155,7 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
                 Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.UsernameWithDiscriminator}`\n" +
-                                $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`"
+                              $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`"
             };
 
             if (!string.IsNullOrWhiteSpace(e.Message.Content))
@@ -166,6 +166,9 @@ internal class ActionlogEvents
 
             if (e.Message.Stickers.Count != 0)
                 embed.AddField(new DiscordEmbedField("Stickers", $"{string.Join("\n", e.Message.Stickers.Select(x => $"`{x.Name}`"))}"));
+
+            if (e.Message.ReferencedMessage is not null)
+                embed.AddField(new DiscordEmbedField("Reply to", $"{(e.Message.ReferencedMessage.Author is not null ? $"{e.Message.ReferencedMessage.Author.Mention}: " : "")}[`Jump to message`]({e.Message.ReferencedMessage.JumpLink})"));
 
             if (embed.Fields.Count == 0)
                 return;
