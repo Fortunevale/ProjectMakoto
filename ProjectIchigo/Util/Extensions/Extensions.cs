@@ -215,6 +215,9 @@ internal static class Extensions
         try { proc = Regex.Replace(proc, Resources.Regex.UserMention, ""); } catch { }
         try { proc = Regex.Replace(proc, Resources.Regex.ChannelMention, ""); } catch { }
 
+        proc = proc.Replace("@everyone", "");
+        proc = proc.Replace("@here", "");
+
         return Formatter.Sanitize(proc);
     }
 
