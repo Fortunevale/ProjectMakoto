@@ -181,7 +181,15 @@ public class Bot
                 await _databaseInit.UpdateCountryCodes();
                 await _databaseInit.LoadValuesFromDatabase();
 
-                _status.DatabaseInitialLoadCompleted = true;
+                _ = Task.Run(async () =>
+                {
+                    while (!discordClient.Guilds.Any())
+                        Thread.Sleep(500);
+
+                    await _databaseClient.FullSyncDatabase(true);
+
+                    _status.DatabaseInitialLoadCompleted = true;
+                });
             }
             catch (Exception ex)
             {
@@ -747,6 +755,14 @@ public class Bot
                     await InviteTrackerEvents.UpdateCachedInvites(this, guild.Value);
                 }
 
+                startupTasksSuccess++;
+            }));
+        }
+
+        foreach (var guild in Guilds)
+        {
+            try
+            {
                 List<DiscordThreadChannel> Threads = new();
 
                 while (true)
@@ -763,14 +779,17 @@ public class Bot
                         break;
                 }
 
-                foreach (var b in Threads)
+                foreach (var b in Threads.Where(x => x.CurrentMember is null))
                 {
-                    _ = b.JoinAsync();
+                    _logger.LogDebug($"Joining thread on '{guild.Key}': {b.Id}");
+                    await b.JoinAsync();
                     await Task.Delay(2000);
                 }
-
-                startupTasksSuccess++;
-            }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to join threads on '{guild.Key}'", ex);
+            }
         }
 
         while (runningTasks.Any(x => !x.IsCompleted))
