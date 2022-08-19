@@ -10,7 +10,7 @@ internal class ClearBackupCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))
@@ -27,14 +27,14 @@ internal class ClearBackupCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Bot._guilds.ContainsKey(ctx.Guild.Id))
-                ctx.Bot._guilds.Add(ctx.Guild.Id, new Guild(ctx.Guild.Id));
+            if (!ctx.Bot.guilds.ContainsKey(ctx.Guild.Id))
+                ctx.Bot.guilds.Add(ctx.Guild.Id, new Guild(ctx.Guild.Id));
 
-            if (!ctx.Bot._guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                ctx.Bot._guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot._guilds[ctx.Guild.Id], victim.Id));
+            if (!ctx.Bot.guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                ctx.Bot.guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot.guilds[ctx.Guild.Id], victim.Id));
 
-            ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
-            ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
+            ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
+            ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {

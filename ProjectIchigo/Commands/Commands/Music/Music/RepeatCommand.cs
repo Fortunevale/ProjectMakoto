@@ -8,7 +8,7 @@ internal class RepeatCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -33,11 +33,11 @@ internal class RepeatCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Repeat = !ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Repeat;
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat = !ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Repeat ? "`The queue now repeats itself.`" : "`The queue no longer repeats itself.`"),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat ? "`The queue now repeats itself.`" : "`The queue no longer repeats itself.`"),
             }.SetSuccess(ctx));
         });
     }

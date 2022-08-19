@@ -35,7 +35,7 @@ internal class TranslateCommand : BaseCommand
                 }
             }
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             var transSource = bMessage.Content;
@@ -83,7 +83,7 @@ internal class TranslateCommand : BaseCommand
 
                 try
                 {
-                    Source = await PromptCustomSelection(ctx.Bot._languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
+                    Source = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
                 }
                 catch (ArgumentException)
                 {
@@ -100,7 +100,7 @@ internal class TranslateCommand : BaseCommand
 
                 try
                 {
-                    Target = await PromptCustomSelection(ctx.Bot._languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
+                    Target = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
                 }
                 catch (ArgumentException)
                 {
@@ -113,9 +113,9 @@ internal class TranslateCommand : BaseCommand
                     Description = $"`Translating..`",
                 }.SetLoading(ctx)));
 
-                var TranslationTask = ctx.Bot._translationClient.Translate_a(Source, Target, transSource);
+                var TranslationTask = ctx.Bot.translationClient.Translate_a(Source, Target, transSource);
 
-                int PosInQueue = ctx.Bot._translationClient.Queue.Count;
+                int PosInQueue = ctx.Bot.translationClient.Queue.Count;
 
                 bool Announced = false;
                 int Wait = 0;
@@ -142,7 +142,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"{Translation.Item1}",
-                }.SetInfo(ctx, "", $"Translated from {(Source == "auto" ? $"{ctx.Bot._languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot._languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot._languageCodes.List.First(x => x.Code == Target).Name} using Google")));
+                }.SetInfo(ctx, "", $"Translated from {(Source == "auto" ? $"{ctx.Bot.languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot.languageCodes.List.First(x => x.Code == Source).Name)} to {ctx.Bot.languageCodes.List.First(x => x.Code == Target).Name} using Google")));
             }
             else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
             {

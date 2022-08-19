@@ -8,14 +8,14 @@ internal class KissCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             string gif = await SocialCommandAbstractions.GetGif("kiss");
 
             string[] phrases =
             {
-                $"%1 kisses %2! {ctx.Bot._status.LoadedConfig.CuddleEmoji}",
+                $"%1 kisses %2! {ctx.Bot.status.LoadedConfig.CuddleEmoji}",
             };
 
             string[] self_phrases =

@@ -8,15 +8,15 @@ internal class KillCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             string gif = await SocialCommandAbstractions.GetGif(new string[] { "kill", "wasted" }.SelectRandom());
 
             string[] phrases =
             {
-                $"%1 kills %2! That looks like it hurt.. {ctx.Bot._status.LoadedConfig.SlapEmoji}",
-                $"%1 kills %2! Ouch.. {ctx.Bot._status.LoadedConfig.SlapEmoji}",
+                $"%1 kills %2! That looks like it hurt.. {ctx.Bot.status.LoadedConfig.SlapEmoji}",
+                $"%1 kills %2! Ouch.. {ctx.Bot.status.LoadedConfig.SlapEmoji}",
             };
 
             string[] self_phrases =

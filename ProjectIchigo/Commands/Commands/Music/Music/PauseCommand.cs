@@ -8,7 +8,7 @@ internal class PauseCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -33,16 +33,16 @@ internal class PauseCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused = !ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused;
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused = !ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused;
 
-            if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused)
+            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused)
                 _ = conn.PauseAsync();
             else
                 _ = conn.ResumeAsync();
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.IsPaused ? "`Paused playback.`" : "`Resumed playback.`"),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused ? "`Paused playback.`" : "`Resumed playback.`"),
             }.SetSuccess(ctx));
         });
     }

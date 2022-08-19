@@ -12,7 +12,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "reason", reason }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("cuddle", "Cuddle with another user.", dmPermission: false)]
@@ -24,7 +24,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -38,7 +38,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -52,7 +52,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -66,7 +66,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -80,7 +80,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -94,7 +94,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -108,7 +108,7 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -122,6 +122,6 @@ internal class SocialAppCommands : ApplicationCommandsModule
             {
                 { "user", user }
             }, false, true);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 }

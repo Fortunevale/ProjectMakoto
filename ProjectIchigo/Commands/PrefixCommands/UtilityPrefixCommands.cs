@@ -13,7 +13,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
     {
         Task.Run(async () =>
         {
-            if (await _bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+            if (await _bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                 return;
 
             List<KeyValuePair<string, string>> Commands = new();
@@ -29,11 +29,11 @@ internal class UtilityPrefixCommands : BaseCommandModule
                 switch (module)
                 {
                     case "admin":
-                        if (!ctx.Member.IsAdmin(_bot._status))
+                        if (!ctx.Member.IsAdmin(_bot.status))
                             continue;
                         break;
                     case "maintainence":
-                        if (!ctx.Member.IsMaintenance(_bot._status))
+                        if (!ctx.Member.IsMaintenance(_bot.status))
                             continue;
                         break;
                     case "hidden":
@@ -97,7 +97,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 throw;
             }
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -113,7 +113,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -129,7 +129,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -145,7 +145,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -161,7 +161,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -177,7 +177,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "ShowAmount", ShowAmount }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -193,7 +193,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "url", url }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -207,7 +207,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
         Task.Run(async () =>
         {
             await new EmojiStealerCommand().ExecuteCommand(ctx, _bot);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -220,7 +220,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
         Task.Run(async () =>
         {
             await new TranslateCommand().ExecuteCommand(ctx, _bot);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -243,7 +243,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
                 { "stream", await new HttpClient().GetStreamAsync(ctx.Message.Attachments[0].Url) },
                 { "filesize", ctx.Message.Attachments[0].FileSize }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
     
     
@@ -259,7 +259,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             {
                 { "term", term }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -276,14 +276,14 @@ internal class UtilityPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
                     await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
                 else
                     await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("request"), Description("Allows you to request your user data.")]
@@ -292,7 +292,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("delete"), Description("Allows you to delete your user data.")]
@@ -301,7 +301,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("object"), Description("Allows you to stop Ichigo from further processing of your user data.")]
@@ -310,7 +310,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Data.ObjectCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("policy"), Description("Allows you to view how Ichigo processes your data.")]
@@ -319,7 +319,7 @@ internal class UtilityPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Data.InfoCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 
@@ -333,6 +333,6 @@ internal class UtilityPrefixCommands : BaseCommandModule
         Task.Run(async () =>
         {
             await new CreditsCommand().ExecuteCommand(ctx, _bot);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 }

@@ -6,7 +6,7 @@ internal class RegisterCommandsCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (!ctx.Bot._status.LoadedConfig.IsDev)
+            if (!ctx.Bot.status.LoadedConfig.IsDev)
                 throw new Exception("Not in developer mode!");
 
             var appCommands = ctx.Client.GetApplicationCommands();
@@ -16,13 +16,13 @@ internal class RegisterCommandsCommand : BaseCommand
 
             await RespondOrEdit("Registering commands. This may take a moment..");
 
-            appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
-            appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
-            appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
-            appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(ctx.Bot._status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
+            appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(ctx.Bot.status.LoadedConfig.AssetsGuildId);
 
             await ctx.Client.ReconnectAsync(true);
 

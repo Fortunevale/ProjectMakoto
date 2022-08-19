@@ -13,7 +13,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
                 { "number", number },
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("guild-purge", "Scans all channels and deletes the specified user's messages.", (long)(Permissions.ManageMessages | Permissions.ManageChannels), dmPermission: false)]
@@ -26,7 +26,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
                 { "number", number },
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("clearbackup", "Clears the stored roles and nickname of a user.", (long)Permissions.ManageRoles, dmPermission: false)]
@@ -38,7 +38,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("timeout", "Sets the specified user into a timeout.", (long)Permissions.ModerateMembers, dmPermission: false)]
@@ -52,7 +52,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
                 { "duration", duration },
                 { "reason", reason },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("remove-timeout", "Removes a timeout from the specified user.", (long)Permissions.ModerateMembers, dmPermission: false)]
@@ -64,7 +64,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("kick", "Kicks the specified user.", (long)Permissions.KickMembers, dmPermission: false)]
@@ -77,7 +77,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
                 { "victim", victim },
                 { "reason", reason },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("ban", "Bans the specified user.", (long)Permissions.BanMembers, dmPermission: false)]
@@ -90,7 +90,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
                 { "victim", victim },
                 { "reason", reason },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("unban", "Unbans the specified user.", (long)Permissions.BanMembers, dmPermission: false)]
@@ -102,7 +102,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("follow", "Allows you to follow an announcement channel from our support server.", (long)Permissions.ManageWebhooks, dmPermission: false)]
@@ -114,7 +114,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             {
                 { "channel", channel },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("moveall", "Move all users in your Voice Channel to another Voice Channel", (long)Permissions.MoveMembers, dmPermission: false)]
@@ -126,7 +126,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             {
                 { "newChannel", newChannel }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("movehere", "Move all users from another Voice Channel to your Voice Channel", (long)Permissions.MoveMembers, dmPermission: false)]
@@ -138,7 +138,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             {
                 { "oldChannel", oldChannel }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("customembed", "Create an embbeded message", (long)Permissions.EmbedLinks, dmPermission: false)]
@@ -147,6 +147,6 @@ internal class ModerationAppCommands : ApplicationCommandsModule
         Task.Run(async () =>
         {
             await new CustomEmbedCommand().ExecuteCommand(ctx, _bot);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 }

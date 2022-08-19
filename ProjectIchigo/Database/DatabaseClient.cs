@@ -211,7 +211,7 @@ internal class DatabaseClient
             }
         }
 
-        foreach (var b in _bot._guilds)
+        foreach (var b in _bot.guilds)
         {
             if (!GuildTables.Contains($"{b.Key}"))
             {
@@ -418,10 +418,10 @@ internal class DatabaseClient
         {
             Task key = new(async () =>
             {
-                if (_bot._guilds.Count > 0)
+                if (_bot.guilds.Count > 0)
                     try
                     {
-                        List<DatabaseGuildSettings> DatabaseInserts = _bot._guilds.Select(x => new DatabaseGuildSettings
+                        List<DatabaseGuildSettings> DatabaseInserts = _bot.guilds.Select(x => new DatabaseGuildSettings
                         {
                             serverid = x.Key,
 
@@ -596,10 +596,10 @@ internal class DatabaseClient
                     }
 
                 var check = CheckGuildTables();
-                check.Add(_bot._watcher);
+                check.Add(_bot.watcher);
 
-                if (_bot._guilds.Count > 0)
-                    foreach (var guild in _bot._guilds)
+                if (_bot.guilds.Count > 0)
+                    foreach (var guild in _bot.guilds)
                         if (guild.Value.Members.Count > 0)
                         {
                             try
@@ -661,7 +661,7 @@ internal class DatabaseClient
                             }
                         }
 
-                if (_bot.ObjectedUsers.Count > 0)
+                if (_bot.objectedUsers.Count > 0)
                     try
                     {
                         if (mainDatabaseConnection == null)
@@ -672,11 +672,11 @@ internal class DatabaseClient
                         var cmd = mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = _helper.GetSaveCommand($"objected_users", DatabaseColumnLists.objected_users);
 
-                        for (int i = 0; i < _bot.ObjectedUsers.Count; i++)
+                        for (int i = 0; i < _bot.objectedUsers.Count; i++)
                         {
                             cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.objected_users, i);
 
-                            cmd.Parameters.AddWithValue($"id{i}", _bot.ObjectedUsers[i]);
+                            cmd.Parameters.AddWithValue($"id{i}", _bot.objectedUsers[i]);
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
@@ -685,7 +685,7 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {_bot.ObjectedUsers.Count} rows into table 'objected_users'.");
+                        _logger.LogDebug($"Inserted {_bot.objectedUsers.Count} rows into table 'objected_users'.");
                         cmd.Dispose();
                     }
                     catch (Exception ex)
@@ -693,10 +693,10 @@ internal class DatabaseClient
                         _logger.LogError($"An exception occured while trying to update the objected_users table", ex);
                     }
 
-                if (_bot._users.Count > 0)
+                if (_bot.users.Count > 0)
                     try
                     {
-                        List<DatabaseUsers> DatabaseInserts = _bot._users.Select(x => new DatabaseUsers
+                        List<DatabaseUsers> DatabaseInserts = _bot.users.Select(x => new DatabaseUsers
                         {
                             userid = x.Key,
                             afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
@@ -752,10 +752,10 @@ internal class DatabaseClient
                         _logger.LogError($"An exception occured while trying to update the users table", ex);
                     }
 
-                if (_bot._submissionBans.Users.Count > 0)
+                if (_bot.phishingUrlSubmissionUserBans.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = _bot._submissionBans.Users.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _bot.phishingUrlSubmissionUserBans.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
@@ -795,10 +795,10 @@ internal class DatabaseClient
                         _logger.LogError($"An exception occured while trying to update the user_submission_bans table", ex);
                     }
 
-                if (_bot._submissionBans.Guilds.Count > 0)
+                if (_bot.phishingUrlSubmissionGuildBans.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = _bot._submissionBans.Guilds.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _bot.phishingUrlSubmissionGuildBans.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
@@ -838,10 +838,10 @@ internal class DatabaseClient
                         _logger.LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
                     }
 
-                if (_bot._globalBans.List.Count > 0)
+                if (_bot.globalBans.Count > 0)
                     try
                     {
-                        List<DatabaseBanInfo> DatabaseInserts = _bot._globalBans.List.Select(x => new DatabaseBanInfo
+                        List<DatabaseBanInfo> DatabaseInserts = _bot.globalBans.Select(x => new DatabaseBanInfo
                         {
                             id = x.Key,
                             reason = x.Value.Reason,
@@ -883,10 +883,10 @@ internal class DatabaseClient
                         _logger.LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
                     }
 
-                if (_bot._submittedUrls.List.Count > 0)
+                if (_bot.submittedUrls.Count > 0)
                     try
                     {
-                        List<DatabaseSubmittedUrls> DatabaseInserts = _bot._submittedUrls.List.Select(x => new DatabaseSubmittedUrls
+                        List<DatabaseSubmittedUrls> DatabaseInserts = _bot.submittedUrls.Select(x => new DatabaseSubmittedUrls
                         {
                             messageid = x.Key,
                             url = x.Value.Url,
@@ -947,10 +947,10 @@ internal class DatabaseClient
 
     public async Task UpdateValue(string table, string columnKey, object rowKey, string columnToEdit, object newValue, MySqlConnection connection)
     {
-        if (!_bot._status.DatabaseInitialLoadCompleted)
+        if (!_bot.status.DatabaseInitialLoadCompleted)
             return;
 
-        _queue.RunCommand(new MySqlCommand(_helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(_bot._watcher);
+        _queue.RunCommand(new MySqlCommand(_helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(_bot.watcher);
         return;
     }
 

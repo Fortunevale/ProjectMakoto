@@ -6,9 +6,9 @@ internal class ScoreSaberCommandAbstractions
     {
         if (string.IsNullOrWhiteSpace(id))
         {
-            if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id != 0)
+            if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id != 0)
             {
-                id = ctx.Bot._users[ctx.User.Id].ScoreSaber.Id.ToString();
+                id = ctx.Bot.users[ctx.User.Id].ScoreSaber.Id.ToString();
             }
             else
             {
@@ -26,7 +26,7 @@ internal class ScoreSaberCommandAbstractions
 
         try
         {
-            var player = await ctx.Bot._scoreSaberClient.GetPlayerById(id);
+            var player = await ctx.Bot.scoreSaberClient.GetPlayerById(id);
 
             CancellationTokenSource cancellationTokenSource = new();
 
@@ -67,8 +67,8 @@ internal class ScoreSaberCommandAbstractions
                         if (e.Interaction.Data.CustomId == "thats_me")
                         {
                             AddLinkButton = false;
-                            ShowProfile().Add(ctx.Bot._watcher, ctx);
-                            ctx.Bot._users[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
+                            ShowProfile().Add(ctx.Bot.watcher, ctx);
+                            ctx.Bot.users[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -85,9 +85,9 @@ internal class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                CachedTopScores ??= await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+                                CachedTopScores ??= await ctx.Bot.scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
 
-                                ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot._watcher, ctx);
+                                ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot.watcher, ctx);
                             }
                             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                             {
@@ -119,9 +119,9 @@ internal class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                CachedRecentScores ??= await ctx.Bot._scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+                                CachedRecentScores ??= await ctx.Bot.scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
 
-                                ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot._watcher, ctx);
+                                ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot.watcher, ctx);
                             }
                             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                             {
@@ -150,7 +150,7 @@ internal class ScoreSaberCommandAbstractions
                         }
                         else if (e.Interaction.Data.CustomId == "getmain")
                         {
-                            ShowProfile().Add(ctx.Bot._watcher, ctx);
+                            ShowProfile().Add(ctx.Bot.watcher, ctx);
                         }
 
                         cancellationTokenSource.Cancel();
@@ -166,7 +166,7 @@ internal class ScoreSaberCommandAbstractions
                         }
                         catch { }
                     }
-                }).Add(ctx.Bot._watcher, ctx);
+                }).Add(ctx.Bot.watcher, ctx);
             }
 
             async Task ShowScores(PlayerScores scores, RequestParameters.ScoreType scoreType)
@@ -192,7 +192,7 @@ internal class ScoreSaberCommandAbstractions
 
                 DiscordMessageBuilder builder = new();
 
-                if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
                 await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed).AddComponents((scoreType == RequestParameters.ScoreType.TOP ? TopScoreInteractionRow : RecentScoreInteractionRow)));
@@ -217,7 +217,7 @@ internal class ScoreSaberCommandAbstractions
 
                 DiscordMessageBuilder builder = new();
 
-                if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
                 if (!string.IsNullOrWhiteSpace(LoadedGraph))
@@ -319,7 +319,7 @@ internal class ScoreSaberCommandAbstractions
 
                         using (FileStream stream = File.Open(file, FileMode.Open))
                         {
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GraphAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GraphAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
 
                             LoadedGraph = asset.Attachments[0].Url;
 
@@ -346,7 +346,7 @@ internal class ScoreSaberCommandAbstractions
                 catch { }
             }
 
-            ShowProfile().Add(ctx.Bot._watcher, ctx);
+            ShowProfile().Add(ctx.Bot.watcher, ctx);
 
             ctx.Client.ComponentInteractionCreated += RunInteraction;
 

@@ -9,7 +9,7 @@ internal class LoadShareCommand : BaseCommand
             ulong userid = (ulong)arguments["userid"];
             string id = (string)arguments["id"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
@@ -64,7 +64,7 @@ internal class LoadShareCommand : BaseCommand
                     Description = $"`Importing playlist..`",
                 }.SetLoading(ctx, "Playlists")));
 
-                if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -73,7 +73,7 @@ internal class LoadShareCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(ImportJson);
+                ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(ImportJson);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

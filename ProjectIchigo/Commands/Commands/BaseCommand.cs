@@ -35,7 +35,7 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
-        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
             return;
@@ -75,7 +75,7 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
-        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
             return;
@@ -115,7 +115,7 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
-        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
             return;
@@ -318,7 +318,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -436,7 +436,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -532,7 +532,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -618,7 +618,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
@@ -741,31 +741,31 @@ public abstract class BaseCommand
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
-        if (ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id))
+        if (ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id))
         {
-            if (ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+            if (ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
                 throw new AlreadyAppliedException("");
 
-            ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+            ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
         }
 
-        ctx.Bot.UploadInteractions.Add(ctx.User.Id, new UserUpload
+        ctx.Bot.uploadInteractions.Add(ctx.User.Id, new UserUpload
         {
             TimeOut = DateTime.UtcNow.Add(timeOutOverride.Value)
         });
 
-        while (ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id) && !ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled && ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
+        while (ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id) && !ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled && ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
         {
             await Task.Delay(500);
         }
 
-        if (!ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+        if (!ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
             throw new ArgumentException("");
 
-        int size = ctx.Bot.UploadInteractions[ctx.User.Id].FileSize;
-        Stream stream = ctx.Bot.UploadInteractions[ctx.User.Id].UploadedData;
+        int size = ctx.Bot.uploadInteractions[ctx.User.Id].FileSize;
+        Stream stream = ctx.Bot.uploadInteractions[ctx.User.Id].UploadedData;
 
-        ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+        ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
         return (stream, size);
     }
 
@@ -897,7 +897,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckMaintenance()
     {
-        if (!ctx.User.IsMaintenance(ctx.Bot._status))
+        if (!ctx.User.IsMaintenance(ctx.Bot.status))
         {
             SendMaintenanceError();
             return false;
@@ -908,7 +908,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckAdmin()
     {
-        if (!ctx.Member.IsAdmin(ctx.Bot._status))
+        if (!ctx.Member.IsAdmin(ctx.Bot.status))
         {
             SendAdminError();
             return false;

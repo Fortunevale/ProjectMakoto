@@ -8,7 +8,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             int CurrentPage = 0;
@@ -30,11 +30,11 @@ internal class ConfigCommand : BaseCommand
 
                 embed.Description = "";
 
-                foreach (var reward in ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.ToList().OrderBy(x => x.Level))
+                foreach (var reward in ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.ToList().OrderBy(x => x.Level))
                 {
                     if (!ctx.Guild.Roles.ContainsKey(reward.RoleId))
                     {
-                        ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Remove(reward);
+                        ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Remove(reward);
                         continue;
                     }
 
@@ -182,9 +182,9 @@ internal class ConfigCommand : BaseCommand
                                         return;
                                     }
 
-                                    if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
+                                    if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
                                     {
-                                        action_embed.Description = $"`The role you're trying to add has already been assigned to level {ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == role.Id).Level}.`";
+                                        action_embed.Description = $"`The role you're trying to add has already been assigned to level {ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == role.Id).Level}.`";
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
                                         await Task.Delay(3000);
                                         continue;
@@ -272,7 +272,7 @@ internal class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
                                 {
-                                    ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
+                                    ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
                                     {
                                         Level = selectedLevel,
                                         RoleId = selectedRole.Id,
@@ -304,7 +304,7 @@ internal class ConfigCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder()
                                 .WithTitle("Define a new custom message")
                                 .WithCustomId(Guid.NewGuid().ToString())
-                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", "Custom Message (<256 characters)", null, 0, 256, false, ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
+                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", "Custom Message (<256 characters)", null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
 
                             InteractionCreateEventArgs Response = null;
 
@@ -333,7 +333,7 @@ internal class ConfigCommand : BaseCommand
                                 return;
                             }
 
-                            ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result;
+                            ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result;
 
                             await RefreshMessage();
                         }
@@ -341,9 +341,9 @@ internal class ConfigCommand : BaseCommand
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Remove(ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
+                            ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Remove(ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
 
-                            if (ctx.Bot._guilds[ctx.Guild.Id].LevelRewards.Count == 0)
+                            if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count == 0)
                             {
                                 embed.Description = $"`There are no more Level Rewards to display.`";
                                 embed = embed.SetSuccess(ctx, "Level Rewards");
@@ -380,7 +380,7 @@ internal class ConfigCommand : BaseCommand
                             return;
                         }
                     }
-                }).Add(ctx.Bot._watcher, ctx);
+                }).Add(ctx.Bot.watcher, ctx);
             }
 
             await RefreshMessage();

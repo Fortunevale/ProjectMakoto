@@ -15,7 +15,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new InfoCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("botnick", "Changes the bot's nickname on the current server.")]
@@ -27,7 +27,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
                 {
                     { "newNickname", newNickname }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("globalban", "Bans a user from all servers opted into global bans.")]
@@ -40,7 +40,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
                     { "victim", victim },
                     { "reason", reason },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [SlashCommand("globalunban", "Removes a user from global bans.")]
@@ -53,7 +53,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
                     { "victim", victim },
                     { "UnbanFromGuilds", UnbanFromGuilds },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("log", "Change the bot's log level.")]
@@ -65,7 +65,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
                 {
                     { "Level", Level },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [SlashCommand("stop", "Shuts down the bot.")]
@@ -74,7 +74,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new StopCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("save", "Save all data to Database.")]
@@ -83,7 +83,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new SaveCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("create-issue", "Create a new issue on Ichigo's Github Repository.")]
@@ -95,7 +95,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
                 {
                     { "UseOldTagsSelector", UseOldTagsSelector },
                 }, InitiateInteraction: false);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 
@@ -111,7 +111,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 throw new InvalidCastException();
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("test-component-modify", "Debug")]

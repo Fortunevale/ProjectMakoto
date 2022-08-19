@@ -12,18 +12,18 @@ internal class AfkEvents
     {
         Task.Run(async () =>
         {
-            if (_bot.ObjectedUsers.Contains(e.Author.Id))
+            if (_bot.objectedUsers.Contains(e.Author.Id))
                 return;
 
             if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)
                 return;
 
-            if (_bot._users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot._users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
+            if (_bot.users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
             {
-                DateTime cache = new DateTime().ToUniversalTime().AddTicks(_bot._users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
+                DateTime cache = new DateTime().ToUniversalTime().AddTicks(_bot.users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
 
-                _bot._users[e.Author.Id].AfkStatus.Reason = "";
-                _bot._users[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
+                _bot.users[e.Author.Id].AfkStatus.Reason = "";
+                _bot.users[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
 
                 var embed = new DiscordEmbedBuilder
                 {
@@ -35,20 +35,20 @@ internal class AfkEvents
 
                 bool ExtendDelay = false;
 
-                if (_bot._users[e.Author.Id].AfkStatus.MessagesAmount > 0)
+                if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount > 0)
                 {
                     embed.Description += $"\n\n`Here is what you missed:`\n" +
-                                         $"{string.Join("\n", _bot._users[e.Author.Id].AfkStatus.Messages.Select(x => $"[`Message`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId}) by <@!{x.AuthorId}>"))}";
+                                         $"{string.Join("\n", _bot.users[e.Author.Id].AfkStatus.Messages.Select(x => $"[`Message`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId}) by <@!{x.AuthorId}>"))}";
 
                     ExtendDelay = true;
 
-                    if (_bot._users[e.Author.Id].AfkStatus.MessagesAmount - 5 > 0)
+                    if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5 > 0)
                     {
-                        embed.Description += $"\n`And {_bot._users[e.Author.Id].AfkStatus.MessagesAmount - 5} more..`";
+                        embed.Description += $"\n`And {_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5} more..`";
                     }
 
-                    _bot._users[e.Author.Id].AfkStatus.MessagesAmount = 0;
-                    _bot._users[e.Author.Id].AfkStatus.Messages = new();
+                    _bot.users[e.Author.Id].AfkStatus.MessagesAmount = 0;
+                    _bot.users[e.Author.Id].AfkStatus.Messages = new();
                 }
 
                 _ = e.Message.RespondAsync(embed).ContinueWith(async x =>
@@ -69,14 +69,14 @@ internal class AfkEvents
                     if (b.Id == e.Author.Id)
                         continue;
 
-                    if (_bot._users[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
+                    if (_bot.users[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
                     {
-                        if (_bot._users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
+                        if (_bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
                             return;
 
-                        if (_bot._users[b.Id].AfkStatus.Messages.Count < 5)
+                        if (_bot.users[b.Id].AfkStatus.Messages.Count < 5)
                         {
-                            _bot._users[b.Id].AfkStatus.Messages.Add(new MessageDetails
+                            _bot.users[b.Id].AfkStatus.Messages.Add(new MessageDetails
                             {
                                 AuthorId = e.Author.Id,
                                 ChannelId = e.Channel.Id,
@@ -85,16 +85,16 @@ internal class AfkEvents
                             });
                         }
 
-                        _bot._users[b.Id].AfkStatus.MessagesAmount++;
+                        _bot.users[b.Id].AfkStatus.MessagesAmount++;
 
-                        _bot._users[e.Author.Id].AfkStatus.LastMentionTrigger = DateTime.UtcNow;
+                        _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger = DateTime.UtcNow;
 
                         _ = e.Message.RespondAsync(new DiscordEmbedBuilder
                         {
                             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"Afk Status • {e.Guild.Name}" },
                             Color = EmbedColors.Info,
                             Timestamp = DateTime.UtcNow,
-                            Description = $"{b.Mention} `is currently AFK and has been since` {Formatter.Timestamp(_bot._users[b.Id].AfkStatus.TimeStamp)}`, they most likely wont answer your message: '{_bot._users[b.Id].AfkStatus.Reason}'`"
+                            Description = $"{b.Mention} `is currently AFK and has been since` {Formatter.Timestamp(_bot.users[b.Id].AfkStatus.TimeStamp)}`, they most likely wont answer your message: '{_bot.users[b.Id].AfkStatus.Reason}'`"
                         }).ContinueWith(async x =>
                         {
                             await Task.Delay(10000);
@@ -105,6 +105,6 @@ internal class AfkEvents
                 }
             }
 
-        }).Add(_bot._watcher);
+        }).Add(_bot.watcher);
     }
 }

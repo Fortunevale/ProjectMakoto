@@ -21,7 +21,7 @@ public class Cooldown
 
     public async Task<bool> WaitForLight(DiscordClient client, SharedCommandContext ctx, bool IgnoreStaff = false)
     {
-        if (_bot._status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
+        if (_bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (WaitingLight)
@@ -60,7 +60,7 @@ public class Cooldown
 
     public async Task<bool> WaitForModerate(DiscordClient client, SharedCommandContext ctx, bool IgnoreStaff = false)
     {
-        if (_bot._status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
+        if (_bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (WaitingModerate)
@@ -99,7 +99,7 @@ public class Cooldown
 
     public async Task<bool> WaitForHeavy(DiscordClient client, SharedCommandContext ctx, bool IgnoreStaff = false)
     {
-        if (_bot._status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
+        if (_bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (WaitingHeavy)

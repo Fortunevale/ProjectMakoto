@@ -15,7 +15,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "reason", reason }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [Command("cuddle"), PreventCommandDeletion,
@@ -29,7 +29,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -45,7 +45,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -61,7 +61,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -77,7 +77,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -93,7 +93,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -109,7 +109,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -125,7 +125,7 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -141,6 +141,6 @@ internal class SocialPrefixCommands : BaseCommandModule
             {
                 { "user", user }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 }

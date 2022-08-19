@@ -29,7 +29,7 @@ internal class CommandEvents
             {
                 _ = e.Context.Message.DeleteAsync();
             });
-        }).Add(_bot._watcher);
+        }).Add(_bot.watcher);
     }
 
     internal async Task CommandError(CommandsNextExtension sender, CommandErrorEventArgs e)
@@ -48,7 +48,7 @@ internal class CommandEvents
                     {
                         _ = e.Context.Message.DeleteAsync();
                     });
-                }).Add(_bot._watcher);
+                }).Add(_bot.watcher);
             }
             else if (e.Exception.GetType() == typeof(CancelCommandException))
             {
@@ -70,7 +70,7 @@ internal class CommandEvents
                     {
                         _ = e.Context.Message.DeleteAsync();
                     });
-                }).Add(_bot._watcher);
+                }).Add(_bot.watcher);
             }
     }
 }
