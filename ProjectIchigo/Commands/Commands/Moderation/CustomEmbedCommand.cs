@@ -569,7 +569,7 @@ internal class CustomEmbedCommand : BaseCommand
                     else if (Menu1.Result.Interaction.Data.CustomId == AddField.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Add field for embed", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", "Title", "", 0, 256, true))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 0, 256, true))
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 0, 1024, true))
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "inline", "Inline", "", 4, 5, true, false.ToString()));
 
