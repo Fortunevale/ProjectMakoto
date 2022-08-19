@@ -54,6 +54,8 @@ public abstract class BaseCommand
 
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 
+        this.ctx.RespondedToInitial = InitiateInteraction;
+
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return;
         
@@ -91,6 +93,8 @@ public abstract class BaseCommand
             {
                 IsEphemeral = Ephemeral
             });
+
+        this.ctx.RespondedToInitial = InitiateInteraction;
 
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 

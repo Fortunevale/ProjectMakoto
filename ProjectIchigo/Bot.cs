@@ -170,15 +170,12 @@ public class Bot
                     }
                 }).Add(watcher);
 
-                Stopwatch databaseConnectionSc = new();
-                databaseConnectionSc.Start();
                 _logger.LogInfo($"Connecting to database..");
 
                 DatabaseClient = await DatabaseClient.InitializeDatabase(this);
                 databaseClient = DatabaseClient;
 
-                databaseConnectionSc.Stop();
-                _logger.LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
+                _logger.LogInfo($"Connected to database.");
                 status.DatabaseInitialized = true;
 
                 DatabaseInit _databaseInit = new(this);
@@ -382,9 +379,6 @@ public class Bot
 
             try
             {
-                var discordLoginSc = new Stopwatch();
-                discordLoginSc.Start();
-
                 _ = Task.Delay(10000).ContinueWith(t =>
                 {
                     if (!status.DiscordInitialized)
@@ -398,8 +392,7 @@ public class Bot
                 _logger.LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
-                discordLoginSc.Stop();
-                _logger.LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
+                _logger.LogInfo($"Connected and authenticated with Discord.");
                 status.DiscordInitialized = true;
 
                 Task.Run(async () =>
@@ -544,13 +537,10 @@ public class Bot
                         }
                     }
 
-                    var lavalinkSc = new Stopwatch();
-                    lavalinkSc.Start();
                     _logger.LogInfo("Connecting and authenticating with Lavalink..");
-
                     LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
-                    lavalinkSc.Stop();
-                    _logger.LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
+                    _logger.LogInfo($"Connected and authenticated with Lavalink.");
+
                     status.LavalinkInitialized = true;
 
                     try

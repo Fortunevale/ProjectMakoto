@@ -155,7 +155,11 @@ public class SharedCommandContext
     /// The channel this command was exectued in.
     /// </summary>
     public DiscordChannel Channel { get; set; }
-    
+
+    /// <summary>
+    /// Whether the bot already responded once. Only set if Type is ApplicationCommand or ContextMenu.
+    /// </summary>
+    public bool RespondedToInitial { get; set; }
 
     /// <summary>
     /// The message that's being used to interact with the user.
