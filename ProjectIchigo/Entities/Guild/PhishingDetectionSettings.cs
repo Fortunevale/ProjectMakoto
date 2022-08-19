@@ -23,7 +23,7 @@ public class PhishingDetectionSettings
     }
 
 
-    private bool _WarnOnRedirect { get; set; } = true;
+    private bool _WarnOnRedirect { get; set; } = false;
     public bool WarnOnRedirect 
     { 
         get => _WarnOnRedirect; 
