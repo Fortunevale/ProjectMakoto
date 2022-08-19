@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-internal class EmojiStealer
+internal class EmojiEntry
 {
     public string Name { get; set; }
     public EmojiType Type { get; set; }

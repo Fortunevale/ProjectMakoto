@@ -16,5 +16,5 @@ public class UserPlaylist
     public string PlaylistThumbnail { get => _PlaylistThumbnail; set { _PlaylistThumbnail = value.Truncate(2048); } }
 
     [JsonProperty(Required = Required.Always)]
-    public List<PlaylistItem> List { get; set; } = new();
+    public List<PlaylistEntry> List { get; set; } = new();
 }

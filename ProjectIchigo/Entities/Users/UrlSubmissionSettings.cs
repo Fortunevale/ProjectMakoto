@@ -1,8 +1,8 @@
 namespace ProjectIchigo.Entities;
 
-public class UrlSubmissions
+public class UrlSubmissionSettings
 {
-    public UrlSubmissions(User user)
+    public UrlSubmissionSettings(User user)
     {
         Parent = user;
     }

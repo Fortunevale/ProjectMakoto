@@ -19,9 +19,9 @@ public class User
     [JsonIgnore]
     public ulong UserId { get; set; }
 
-    public UrlSubmissions UrlSubmissions { get; set; }
+    public UrlSubmissionSettings UrlSubmissions { get; set; }
     public AfkStatus AfkStatus { get; set; }
-    public ScoreSaber ScoreSaber { get; set; }
+    public ScoreSaberSettings ScoreSaber { get; set; }
     public ExperienceUserSettings ExperienceUserSettings { get; set; }
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 

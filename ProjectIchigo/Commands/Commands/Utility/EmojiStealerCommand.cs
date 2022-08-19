@@ -46,12 +46,12 @@ internal class EmojiStealerCommand : BaseCommand
             }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
-            Dictionary<ulong, EmojiStealer> SanitizedEmoteList = new();
+            Dictionary<ulong, EmojiEntry> SanitizedEmoteList = new();
 
             var Emotes = bMessage.Content.GetEmotes();
 
             foreach (var b in Emotes)
-                SanitizedEmoteList.Add(b.Item1, new EmojiStealer
+                SanitizedEmoteList.Add(b.Item1, new EmojiEntry
                 {
                     Name = b.Item2,
                     Animated = b.Item3,
@@ -142,7 +142,7 @@ internal class EmojiStealerCommand : BaseCommand
                         await fileStream.FlushAsync();
                     }
 
-                    SanitizedEmoteList.Add(b.Id, new EmojiStealer { Animated = false, Name = b.Name, Path = $"emotes-{guid}/{fileName}", Type = EmojiType.STICKER });
+                    SanitizedEmoteList.Add(b.Id, new EmojiEntry { Animated = false, Name = b.Name, Path = $"emotes-{guid}/{fileName}", Type = EmojiType.STICKER });
                 }
             }
 

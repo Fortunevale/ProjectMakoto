@@ -206,7 +206,7 @@ internal class ManageCommand : BaseCommand
             else if (e.Result.Interaction.Data.CustomId == NewPlaylist.CustomId)
             {
                 string SelectedPlaylistName = "";
-                List<PlaylistItem> SelectedTracks = null;
+                List<PlaylistEntry> SelectedTracks = null;
 
                 while (true)
                 {
@@ -299,7 +299,7 @@ internal class ManageCommand : BaseCommand
                         if (!Continue || !Tracks.IsNotNullAndNotEmpty())
                             continue;
 
-                        SelectedTracks = Tracks.Select(x => new PlaylistItem
+                        SelectedTracks = Tracks.Select(x => new PlaylistEntry
                         {
                             Title = x.Title,
                             Url = x.Uri.ToString(),
@@ -363,7 +363,7 @@ internal class ManageCommand : BaseCommand
                 }
 
                 string SelectedPlaylistName = "";
-                List<PlaylistItem> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistItem { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
+                List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
 
                 while (true)
                 {
@@ -562,7 +562,7 @@ internal class ManageCommand : BaseCommand
                         var v = new UserPlaylist
                         {
                             PlaylistName = loadResult.PlaylistInfo.Name,
-                            List = loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).Take(250).ToList()
+                            List = loadResult.Tracks.Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString() }).Take(250).ToList()
                         };
 
                         ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
@@ -622,7 +622,7 @@ internal class ManageCommand : BaseCommand
 
                         var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-                        ImportJson.List = ImportJson.List.Where(x => Regex.IsMatch(x.Url, Resources.Regex.Url)).Select(x => new PlaylistItem { Title = x.Title, Url = x.Url }).Take(250).ToList();
+                        ImportJson.List = ImportJson.List.Where(x => Regex.IsMatch(x.Url, Resources.Regex.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url }).Take(250).ToList();
 
                         if (!ImportJson.List.Any())
                             throw new Exception();
@@ -892,7 +892,7 @@ internal class ManageCommand : BaseCommand
                                         return;
                                     }
 
-                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
+                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString() }));
 
                                     await UpdateMessage();
                                     break;
