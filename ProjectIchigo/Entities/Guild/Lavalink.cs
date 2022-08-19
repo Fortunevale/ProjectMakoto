@@ -136,7 +136,7 @@ public class Lavalink
 
     public void Dispose(Bot _bot, ulong Id, string reason)
     {
-        Disposed = true;
+        this.Disposed = true;
 
         _logger.LogDebug($"Disposed Player for {Id}. ({reason})");
 
@@ -154,7 +154,7 @@ public class Lavalink
 
                 Initialized = true;
 
-                Guild = guildConnection.Guild;
+                this.Guild = guildConnection.Guild;
 
                 _logger.LogDebug($"Initializing Player for {Guild.Id}..");
 
@@ -201,7 +201,7 @@ public class Lavalink
                             if (e.After is null || e.After.Channel is null)
                             {
                                 _ = guildConnection.DisconnectAsync();
-                                Dispose(_bot, e.Guild.Id, "Disconnected");
+                                this.Dispose(_bot, e.Guild.Id, "Disconnected");
                                 return;
                             }
 
@@ -217,14 +217,14 @@ public class Lavalink
                                 if (track is null || position is null)
                                 {
                                     _ = guildConnection.DisconnectAsync();
-                                    Dispose(_bot, e.Guild.Id, "Error occured carrying on with playback after channel switch");
+                                    this.Dispose(_bot, e.Guild.Id, "Error occured carrying on with playback after channel switch");
                                     return;
                                 }
 
                                 if (conn is null)
                                 {
                                     _ = guildConnection.DisconnectAsync();
-                                    Dispose(_bot, e.Guild.Id, "Conn is null");
+                                    this.Dispose(_bot, e.Guild.Id, "Conn is null");
                                     return;
                                 }
 
@@ -273,7 +273,7 @@ public class Lavalink
                     }
 
                     if (WaitSeconds <= 0)
-                        Dispose(_bot, Guild.Id, "Time out, nothing playing");
+                        this.Dispose(_bot, Guild.Id, "Time out, nothing playing");
 
                     if (Disposed)
                     {
@@ -327,7 +327,7 @@ public class Lavalink
                     }
                     else
                     {
-                        Dispose(_bot, Guild.Id, "guildConnection is null");
+                        this.Dispose(_bot, Guild.Id, "guildConnection is null");
                         continue;
                     }
 
@@ -340,7 +340,7 @@ public class Lavalink
                 _logger.LogError("An exception occured while trying to handle music queue", ex);
 
                 _ = guildConnection.DisconnectAsync();
-                Dispose(_bot, Guild.Id, "Exception");
+                this.Dispose(_bot, Guild.Id, "Exception");
                 throw;
             }
         }).Add(_bot.watcher);

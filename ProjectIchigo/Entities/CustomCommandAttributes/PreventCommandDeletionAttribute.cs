@@ -7,6 +7,6 @@ public class PreventCommandDeletionAttribute : Attribute
 
     public PreventCommandDeletionAttribute(bool PreventDeleteMessage = true)
     {
-        PreventDeleteCommandMessage = PreventDeleteMessage;
+        this.PreventDeleteCommandMessage = PreventDeleteMessage;
     }
 }

@@ -9,25 +9,25 @@ internal class TaskInfo
     
     internal TaskInfo(Task task, CommandContext ctx = null)
     {
-        CommandContext = ctx;
+        this.CommandContext = ctx;
         this.task = task;
     }
 
     internal TaskInfo(Task task, InteractionContext ctx = null)
     {
-        InteractionContext = ctx;
+        this.InteractionContext = ctx;
         this.task = task;
     }
     
     internal TaskInfo(Task task, SharedCommandContext ctx = null)
     {
-        SharedCommandContext = ctx;
+        this.SharedCommandContext = ctx;
         this.task = task;
     }
     
     internal TaskInfo(Task task, ContextMenuContext ctx = null)
     {
-        ContextMenuContext = ctx;
+        this.ContextMenuContext = ctx;
         this.task = task;
     }
 
