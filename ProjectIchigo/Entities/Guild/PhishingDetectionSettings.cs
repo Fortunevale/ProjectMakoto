@@ -35,7 +35,7 @@ public class PhishingDetectionSettings
     }
 
 
-    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.BAN;
+    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.KICK;
     public PhishingPunishmentType PunishmentType 
     { 
         get => _PunishmentType; 
