@@ -12,6 +12,7 @@ public class Config
     public ulong GraphAssetsChannelId = 0;
     public ulong PlaylistAssetsChannelId = 0;
     public ulong UrlSubmissionsChannelId = 0;
+    public ulong OtherAssetsChannelId = 0;
 
     public string DotEmoji = "🅿";
 

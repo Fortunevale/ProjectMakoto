@@ -558,7 +558,7 @@ public abstract class BaseCommand
 
     internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
-    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null, bool open = true)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
@@ -578,7 +578,8 @@ public abstract class BaseCommand
         bool Cancelled = false;
         Exception exception = null;
 
-        await interaction.CreateInteractionModalResponseAsync(builder);
+        if (open)
+            await interaction.CreateInteractionModalResponseAsync(builder);
 
         ctx.Client.ComponentInteractionCreated += RunInteraction;
 
@@ -697,6 +698,43 @@ public abstract class BaseCommand
             throw new InvalidOperationException("Invalid TimeSpan");
 
         return length;
+    }
+
+    internal async Task<DateTime> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    {
+        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a time span").WithCustomId(Guid.NewGuid().ToString());
+
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"{DateTime.UtcNow.Hour}", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"{DateTime.UtcNow.Minute}", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"{DateTime.UtcNow.Day}", 1, 2, true, $"{DateTime.UtcNow.Day}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"{DateTime.UtcNow.Month}", 1, 2, true, $"{DateTime.UtcNow.Month}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"{DateTime.UtcNow.Year}", 1, 2, true, $"{DateTime.UtcNow.Year}"));
+
+        InteractionCreateEventArgs Response;
+
+        try
+        {
+            Response = await PromptModalWithRetry(interaction, modal, false);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
+        if ((Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hour").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minute").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "day").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "month").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "year").Components.First().Value.IsDigitsOnly()))
+            throw new InvalidOperationException("Invalid");
+
+        int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
+        int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
+        int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
+        int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
+        int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
+
+        return new DateTime(year, month, day, hour, minute, 0);
     }
 
     internal async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)

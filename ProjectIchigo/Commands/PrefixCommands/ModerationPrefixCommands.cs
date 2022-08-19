@@ -232,4 +232,17 @@ internal class ModerationPrefixCommands : BaseCommandModule
             });
         }).Add(_bot._watcher, ctx);
     }
+    
+    
+    
+    [Command("customembed"),
+    CommandModule("moderation"),
+    Description("Create an embbeded message")]
+    public async Task CustomEmbed(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new CustomEmbedCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot._watcher, ctx);
+    }
 }

@@ -140,4 +140,13 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot._watcher, ctx);
     }
+
+    [SlashCommand("customembed", "Create an embbeded message", (long)Permissions.EmbedLinks, dmPermission: false)]
+    public async Task CustomEmbed(InteractionContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new CustomEmbedCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot._watcher, ctx);
+    }
 }
