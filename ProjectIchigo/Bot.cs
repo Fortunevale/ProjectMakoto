@@ -777,6 +777,8 @@ public class Bot
 
                     if (!t.HasMore)
                         break;
+
+                    _logger.LogDebug($"Requesting more threads for '{guild.Key}'");
                 }
 
                 foreach (var b in Threads.Where(x => x.CurrentMember is null))

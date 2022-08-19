@@ -3,7 +3,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommand("purge", "Deletes the specified amount of messages.", (long)Permissions.ManageMessages, dmPermission: false) ]
+    [SlashCommand("purge", "Deletes the specified amount of messages.", (long)Permissions.ManageMessages, dmPermission: false)]
     public async Task Purge(InteractionContext ctx, [Option("number", "1-2000"), MinimumValue(1), MaximumValue(2000)] int number, [Option("user", "Only delete messages by this user")] DiscordUser victim = null)
     {
         Task.Run(async () =>
@@ -104,7 +104,7 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot._watcher, ctx);
     }
-    
+
     [SlashCommand("follow", "Allows you to follow an announcement channel from our support server.", (long)Permissions.ManageWebhooks, dmPermission: false)]
     public async Task Follow(InteractionContext ctx, [Option("channel", "The channel")] FollowChannel channel)
     {
@@ -113,6 +113,30 @@ internal class ModerationAppCommands : ApplicationCommandsModule
             await new FollowUpdatesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "channel", channel },
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
+    [SlashCommand("moveall", "Move all users in your Voice Channel to another Voice Channel", (long)Permissions.MoveMembers, dmPermission: false)]
+    public async Task MoveAll(InteractionContext ctx, [Option("channel", "The channel to move to."), ChannelTypes(ChannelType.Voice)] DiscordChannel newChannel)
+    {
+        Task.Run(async () =>
+        {
+            await new MoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "newChannel", newChannel }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
+    [SlashCommand("movehere", "Move all users from another Voice Channel to your Voice Channel", (long)Permissions.MoveMembers, dmPermission: false)]
+    public async Task MoveHere(InteractionContext ctx, [Option("channel", "The channel to move from."), ChannelTypes(ChannelType.Voice)] DiscordChannel oldChannel)
+    {
+        Task.Run(async () =>
+        {
+            await new MoveHereCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "oldChannel", oldChannel }
             });
         }).Add(_bot._watcher, ctx);
     }

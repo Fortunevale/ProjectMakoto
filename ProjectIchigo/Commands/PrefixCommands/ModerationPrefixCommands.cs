@@ -200,4 +200,36 @@ internal class ModerationPrefixCommands : BaseCommandModule
             }).Add(_bot._watcher, ctx);
         }
     }
+
+
+
+    [Command("moveall"),
+    CommandModule("moderation"),
+    Description("Move all users in your Voice Channel to another Voice Channel")]
+    public async Task MoveAll(CommandContext ctx, DiscordChannel newChannel)
+    {
+        Task.Run(async () =>
+        {
+            await new MoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "newChannel", newChannel }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
+
+
+
+    [Command("movehere"),
+    CommandModule("moderation"),
+    Description("Move all users from another Voice Channel to your Voice Channel")]
+    public async Task MoveHere(CommandContext ctx, DiscordChannel oldChannel)
+    {
+        Task.Run(async () =>
+        {
+            await new MoveHereCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "oldChannel", oldChannel }
+            });
+        }).Add(_bot._watcher, ctx);
+    }
 }
