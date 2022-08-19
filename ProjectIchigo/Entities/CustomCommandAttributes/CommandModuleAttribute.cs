@@ -7,6 +7,6 @@ public class CommandModuleAttribute : Attribute
 
     public CommandModuleAttribute(string ModuleName)
     {
-        this.ModuleString = ModuleName;
+        ModuleString = ModuleName;
     }
 }

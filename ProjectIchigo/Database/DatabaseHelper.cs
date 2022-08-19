@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ProjectIchigo.Database;
 internal class DatabaseHelper
 {
@@ -11,7 +5,7 @@ internal class DatabaseHelper
 
     internal DatabaseHelper(DatabaseClient client)
     {
-        this._databaseClient = client;
+        _databaseClient = client;
     }
 
     public string GetLoadCommand(string table, List<DatabaseColumnLists.Column> columns)

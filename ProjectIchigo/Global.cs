@@ -16,10 +16,7 @@ global using System.Text;
 global using System.Globalization;
 global using System.IO.Compression;
 global using System.Data.SQLite;
-global using System.Data.Common;
-global using System.Security.Cryptography;
 global using System.Data;
-global using System.ComponentModel.DataAnnotations;
 global using Microsoft.Extensions.DependencyInjection;
 global using System.Collections.ObjectModel;
 global using Microsoft.Extensions.Logging;
@@ -41,7 +38,6 @@ global using DisCatSharp.Entities;
 global using DisCatSharp.Enums;
 global using DisCatSharp.EventArgs;
 global using DisCatSharp.ApplicationCommands;
-global using DisCatSharp.ApplicationCommands.Attributes;
 global using DisCatSharp.ApplicationCommands.EventArgs;
 global using DisCatSharp.CommandsNext.Attributes;
 global using DisCatSharp.Interactivity.Extensions;
@@ -54,17 +50,12 @@ global using DisCatSharp.CommandsNext.Converters;
 // Own Utils
 
 global using ProjectIchigo.Commands;
-
-global using ProjectIchigo.ApplicationCommands;
-global using ProjectIchigo.PrefixCommands;
 global using ProjectIchigo.Commands.PrefixCommands.Converters;
 
 global using ProjectIchigo.Enums;
-global using ProjectIchigo.Secrets;
 global using ProjectIchigo.Entities;
 global using ProjectIchigo.Entities.Afk;
 global using ProjectIchigo.Entities.Database;
-global using ProjectIchigo.Entities.Legacy;
 
 global using ProjectIchigo.Database;
 
@@ -89,8 +80,6 @@ global using static Xorog.UniversalExtensions.UniversalExtensionsEnums;
 
 
 global using Xorog.Logger;
-global using Xorog.Logger.Entities;
-global using Xorog.Logger.Enums;
 global using static Xorog.Logger.Logger;
 global using LogLevel = Xorog.Logger.Enums.LogLevel;
 

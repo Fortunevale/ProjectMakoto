@@ -155,12 +155,12 @@ internal class DatabaseColumnLists
     {
         public Column(string name, string type, string Collation = "", string Default = "", bool nullable = false, bool primary = false)
         {
-            this.Name = name;
-            this.Type = type;
+            Name = name;
+            Type = type;
             this.Collation = Collation;
             this.Default = Default;
-            this.Nullable = nullable;
-            this.Primary = primary;
+            Nullable = nullable;
+            Primary = primary;
         }
 
         public string Name { get; set; }

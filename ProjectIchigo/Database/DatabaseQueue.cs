@@ -179,7 +179,7 @@ internal class DatabaseQueue
         throw new Exception("Command execution timed out.");
     }
 
-    internal int QueueCount => this.Queue.Count;
+    internal int QueueCount => Queue.Count;
 
     internal List<RequestQueue> Queue = new();
 
