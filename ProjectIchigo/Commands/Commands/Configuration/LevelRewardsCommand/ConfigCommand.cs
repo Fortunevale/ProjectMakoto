@@ -272,7 +272,7 @@ internal class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
                                 {
-                                    ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelReward
+                                    ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelRewardEntry
                                     {
                                         Level = selectedLevel,
                                         RoleId = selectedRole.Id,

@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-public class LevelReward
+public class LevelRewardEntry
 {
     public long Level { get; set; }
     public ulong RoleId { get; set; }

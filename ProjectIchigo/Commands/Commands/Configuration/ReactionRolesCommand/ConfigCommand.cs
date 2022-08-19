@@ -265,7 +265,7 @@ internal class ConfigCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(selectedMessage.Id, new ReactionRoles
+                        ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoleEntry>(selectedMessage.Id, new ReactionRoleEntry
                         {
                             ChannelId = selectedMessage.Channel.Id,
                             RoleId = selectedRole.Id,

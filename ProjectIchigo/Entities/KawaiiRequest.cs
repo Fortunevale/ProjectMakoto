@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-public class KawaiiRequest
+public class KawaiiResponse
 {
     public string response { get; set; }
 }

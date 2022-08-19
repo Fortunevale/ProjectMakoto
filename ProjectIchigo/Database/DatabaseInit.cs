@@ -136,9 +136,9 @@ internal class DatabaseInit
             else
                 DbGuild.Lavalink = new(DbGuild);
 
-            DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelReward>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards));
+            DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelRewardEntry>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards));
             DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache));
-            DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoles>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles));
+            DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles));
             DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.autounarchivelist is null or "null" or "" ? "[]" : b.autounarchivelist));
         }
 

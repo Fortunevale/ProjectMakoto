@@ -158,7 +158,7 @@ internal class AddCommand : BaseCommand
 
             await message.CreateReactionAsync(emoji_parameter);
 
-            ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoles>(message.Id, new Entities.ReactionRoles
+            ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoleEntry>(message.Id, new Entities.ReactionRoleEntry
             {
                 ChannelId = message.Channel.Id,
                 RoleId = role_parameter.Id,
