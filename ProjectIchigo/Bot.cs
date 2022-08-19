@@ -706,6 +706,13 @@ public class Bot
             runningTasks.Add(Task.Run(async () =>
             {
                 _logger.LogDebug($"Performing sync tasks for '{guild.Key}'..");
+
+                if (ObjectedUsers.Contains(guild.Value.OwnerId))
+                {
+                    await guild.Value.LeaveAsync();
+                    return;
+                }
+
                 var guildMembers = await guild.Value.GetAllMembersAsync();
                 var guildBans = await guild.Value.GetBansAsync();
 

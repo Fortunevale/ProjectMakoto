@@ -68,6 +68,7 @@ internal class ObjectCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = $"`This action will delete all data related to your user account and object to further creation of an user account.`\n" +
+                              $"**`In addition, this action will make the bot leave every server you own.`**\n" +
                               $"`This will prevent you from using any commands of the bot.`\n" +
                               $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
                               $"**`Are you sure you want to continue?`**"
@@ -134,6 +135,11 @@ internal class ObjectCommand : BaseCommand
                     {
                         Description = $"`Successfully deleted your profile and added you to the objection list. You will no longer be able to run any commands. To re-allow user account creation, re-run this command.`"
                     }.SetBotSuccess(ctx));
+
+                    foreach (var b in ctx.Client.Guilds.Where(x => x.Value.OwnerId == ctx.User.Id))
+                    {
+                        try { await b.Value.LeaveAsync(); } catch { }
+                    }
                 }
                 else
                 {

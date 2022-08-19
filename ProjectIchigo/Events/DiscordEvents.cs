@@ -13,8 +13,14 @@ internal class DiscordEvents
 
     internal async Task GuildCreated(DiscordClient sender, GuildCreateEventArgs e)
     {
-        Task.Run(() =>
+        Task.Run(async () =>
         {
+            if (_bot.ObjectedUsers.Contains(e.Guild.OwnerId))
+            {
+                await e.Guild.LeaveAsync();
+                return;
+            }
+
             if (!_bot._guilds.ContainsKey(e.Guild.Id))
                 _bot._guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
