@@ -88,8 +88,7 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == SetAuthor.CustomId)
                     {
-                        if (GeneratedEmbed.Author is null)
-                            GeneratedEmbed.Author = new();
+                        GeneratedEmbed.Author ??= new();
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -264,8 +263,7 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == SetThumbnail.CustomId)
                     {
-                        if (GeneratedEmbed.Thumbnail is null)
-                            GeneratedEmbed.Thumbnail = new();
+                        GeneratedEmbed.Thumbnail ??= new();
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -399,8 +397,7 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == SetFooter.CustomId)
                     {
-                        if (GeneratedEmbed.Footer is null)
-                            GeneratedEmbed.Footer = new();
+                        GeneratedEmbed.Footer ??= new();
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
