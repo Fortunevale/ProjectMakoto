@@ -8,14 +8,14 @@ internal class HighFiveCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             string gif = await SocialCommandAbstractions.GetGif("highfive");
 
             string[] phrases =
             {
-                $"%1 highfives %2! That's the spirit. {ctx.Bot._status.LoadedConfig.ProudEmoji}",
+                $"%1 highfives %2! That's the spirit. {ctx.Bot.status.LoadedConfig.ProudEmoji}",
             };
 
             string[] self_phrases =

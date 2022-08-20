@@ -6,12 +6,12 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            if (ctx.Bot._users[ctx.User.Id].ScoreSaber.Id != 0)
+            if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id != 0)
             {
-                ctx.Bot._users[ctx.User.Id].ScoreSaber.Id = 0;
+                ctx.Bot.users[ctx.User.Id].ScoreSaber.Id = 0;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

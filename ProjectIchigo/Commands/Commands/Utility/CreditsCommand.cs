@@ -6,7 +6,7 @@ internal class CreditsCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
             await RespondOrEdit(new DiscordEmbedBuilder
@@ -25,7 +25,7 @@ internal class CreditsCommand : BaseCommand
 
             List<DiscordUser> userlist = new();
 
-            foreach (var b in ctx.Bot._status.TeamMembers.Reverse<ulong>())
+            foreach (var b in ctx.Bot.status.TeamMembers.Reverse<ulong>())
                 userlist.Add(await ctx.Client.GetUserAsync(b));
 
             await RespondOrEdit(new DiscordEmbedBuilder

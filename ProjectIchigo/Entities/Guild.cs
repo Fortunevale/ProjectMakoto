@@ -47,9 +47,9 @@ public class Guild
 
     public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
     public ObservableCollection<ulong> AutoUnarchiveThreads { get; set; } = new();
-    public List<LevelReward> LevelRewards { get; set; } = new();
+    public List<LevelRewardEntry> LevelRewards { get; set; } = new();
     public Dictionary<ulong, Member> Members { get; set; } = new();
-    public List<KeyValuePair<ulong, ReactionRoles>> ReactionRoles { get; set; } = new();
+    public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
 
     private NotifyCollectionChangedEventHandler AuditLogCollectionUpdated()
     {

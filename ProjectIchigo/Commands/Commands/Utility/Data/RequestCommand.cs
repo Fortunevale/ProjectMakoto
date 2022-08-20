@@ -6,7 +6,7 @@ internal class RequestCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
             await RespondOrEdit(new DiscordEmbedBuilder
@@ -16,12 +16,12 @@ internal class RequestCommand : BaseCommand
 
             RequestData requestData = new();
 
-            if (ctx.Bot._users.ContainsKey(ctx.User.Id))
+            if (ctx.Bot.users.ContainsKey(ctx.User.Id))
             {
-                requestData.User = ctx.Bot._users[ctx.User.Id];
+                requestData.User = ctx.Bot.users[ctx.User.Id];
             }
 
-            foreach (var guild in ctx.Bot._guilds)
+            foreach (var guild in ctx.Bot.guilds)
             {
                 if (guild.Value.Members.ContainsKey(ctx.User.Id))
                 {

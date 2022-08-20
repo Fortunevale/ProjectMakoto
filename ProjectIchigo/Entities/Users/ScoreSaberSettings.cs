@@ -1,8 +1,8 @@
 namespace ProjectIchigo.Entities;
 
-public class ScoreSaber
+public class ScoreSaberSettings
 {
-    public ScoreSaber(User user)
+    public ScoreSaberSettings(User user)
     {
         Parent = user;
     }

@@ -8,7 +8,7 @@ internal class HugCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             string gif = await SocialCommandAbstractions.GetGif("hug");
@@ -16,8 +16,8 @@ internal class HugCommand : BaseCommand
             string[] phrases =
             {
                 "%1 hugs %2! How sweet! ♥",
-                $"%1 gives %2 a big fat hug! {ctx.Bot._status.LoadedConfig.HugEmoji}",
-                $"%2, watch out! %1 is coming to squeeze you tight! {ctx.Bot._status.LoadedConfig.HugEmoji}",
+                $"%1 gives %2 a big fat hug! {ctx.Bot.status.LoadedConfig.HugEmoji}",
+                $"%2, watch out! %1 is coming to squeeze you tight! {ctx.Bot.status.LoadedConfig.HugEmoji}",
             };
 
             string[] self_phrases =

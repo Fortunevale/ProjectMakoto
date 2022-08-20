@@ -17,24 +17,24 @@ internal class GlobalBanCommand : BaseCommand
 
             var msg = RespondOrEdit(embed);
 
-            if (ctx.Bot._status.TeamMembers.Contains(victim.Id))
+            if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
                 embed.Description = $"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`";
                 msg = RespondOrEdit(embed.SetError(ctx, "Global Ban"));
                 return;
             }
 
-            ctx.Bot._globalBans.List.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
+            ctx.Bot.globalBans.Add(victim.Id, new() { Reason = reason, Moderator = ctx.User.Id });
 
             int Success = 0;
             int Failed = 0;
 
             foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
-                if (!ctx.Bot._guilds.ContainsKey(b.Key))
-                    ctx.Bot._guilds.Add(b.Key, new Guild(b.Key));
+                if (!ctx.Bot.guilds.ContainsKey(b.Key))
+                    ctx.Bot.guilds.Add(b.Key, new Guild(b.Key));
 
-                if (ctx.Bot._guilds[b.Key].JoinSettings.AutoBanGlobalBans)
+                if (ctx.Bot.guilds[b.Key].JoinSettings.AutoBanGlobalBans)
                 {
                     try
                     {
@@ -53,7 +53,7 @@ internal class GlobalBanCommand : BaseCommand
             msg = RespondOrEdit(embed.SetSuccess(ctx, "Global Ban"));
 
 
-            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GlobalBanAnnouncementsChannelId);
             await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor

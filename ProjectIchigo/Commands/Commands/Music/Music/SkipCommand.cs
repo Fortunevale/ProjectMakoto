@@ -8,7 +8,7 @@ internal class SkipCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -33,7 +33,7 @@ internal class SkipCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Contains(ctx.User.Id))
+            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,9 +42,9 @@ internal class SkipCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Add(ctx.User.Id);
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Add(ctx.User.Id);
 
-            if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
                 await conn.StopAsync();
 
@@ -57,7 +57,7 @@ internal class SkipCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`You voted to skip the current song. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`You voted to skip the current song. ({ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.SetAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -86,7 +86,7 @@ internal class SkipCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Contains(e.User.Id))
+                        if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to skip the current song.`").AsEphemeral());
                             return;
@@ -100,9 +100,9 @@ internal class SkipCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Add(e.User.Id);
+                        ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Add(e.User.Id);
 
-                        if (ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
                             await conn.StopAsync();
 
@@ -113,10 +113,10 @@ internal class SkipCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`You voted to skip the current song. ({ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`You voted to skip the current song. ({ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
-                }).Add(ctx.Bot._watcher);
+                }).Add(ctx.Bot.watcher);
             }
         });
     }

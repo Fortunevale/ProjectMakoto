@@ -23,7 +23,7 @@ public class PhishingDetectionSettings
     }
 
 
-    private bool _WarnOnRedirect { get; set; } = true;
+    private bool _WarnOnRedirect { get; set; } = false;
     public bool WarnOnRedirect 
     { 
         get => _WarnOnRedirect; 
@@ -35,7 +35,7 @@ public class PhishingDetectionSettings
     }
 
 
-    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.BAN;
+    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.KICK;
     public PhishingPunishmentType PunishmentType 
     { 
         get => _PunishmentType; 

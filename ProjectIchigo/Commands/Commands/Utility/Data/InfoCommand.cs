@@ -6,7 +6,7 @@ internal class InfoCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForModerate(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForModerate(ctx.Client, ctx, true))
                 return;
 
             var embeds = new List<DiscordEmbed>
@@ -14,14 +14,14 @@ internal class InfoCommand : BaseCommand
                 new DiscordEmbedBuilder
                 {
                     Title = "Privacy Policy for Ichigo",
-                    Description = $"At Ichigo, accessible via this Discord Bot, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Ichigo and how we use it.\n" +
+                    Description = $"At Ichigo, accessible via this Discord Bot, one of our main priorities is the privacy of our users. This Privacy Policy document contains types of information that is collected and recorded by Ichigo and how we use it.\n" +
                     $"If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.\n" +
                     $"This Privacy Policy applies only to our online activities and is valid for users of Ichigo with regards to the information that they shared and/or collect with Ichigo. Our Privacy Policy was created with the help of the TermsFeed Free Privacy Policy Generator.\n\n" +
                     $"**Consent**\n\n" +
                     $"By using this Discord Bot, you hereby consent to our Privacy Policy and agree to its terms.\n\n" +
                     $"**Information we collect**\n\n" +
                     $"The personal information that you are asked to provide, and the reasons why you have been asked to provide it, will be made clear to you at the point we ask you to provide your personal information.\n" +
-                    $"If you contact us directly, we may receive additional information about you such as your name, email address, phone number, the contents of the message and/or attachments you may send us, and any other information you may choose to provide.\n\n" +
+                    $"If you contact us directly, we may receive additional information about you such as your name, email address, the contents of the message and/or attachments you may send us, and any other information you may choose to provide.\n\n" +
                     $"We use the information we collect in various ways, including to:\n" +
                     $"• Provide, operate, and maintain our Discord Bot\n" +
                     $"• Improve, personalize, and expand our Discord Bot\n" +

@@ -78,7 +78,7 @@ internal class CreateIssueCommand : BaseCommand
 
                         _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"✅ `Issue submitted:` {issue.HtmlUrl}"));
                     }
-                }).Add(ctx.Bot._watcher, ctx);
+                }).Add(ctx.Bot.watcher, ctx);
             }
 
             try

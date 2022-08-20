@@ -17,14 +17,14 @@ internal class MusicPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
                     await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
                 else
                     await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("join"), Aliases("connect"), Description("The bot will join your channel if it's not already being used in this server.")]
@@ -36,7 +36,7 @@ internal class MusicPrefixCommands : BaseCommandModule
                 {
                     { "announce", true }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("disconnect"), Aliases("dc", "leave"), Description("Starts a voting to disconnect the bot.")]
@@ -45,7 +45,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.DisconnectCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("forcedisconnect"), Aliases("fdc", "forceleave", "fleave", "stop"), Description("Forces the bot to disconnect. `DJ` role or Administrator permissions required.")]
@@ -54,7 +54,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ForceDisconnectCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("play"), Description("Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.")]
@@ -66,7 +66,7 @@ internal class MusicPrefixCommands : BaseCommandModule
                 {
                     { "search", search }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("pause"), Aliases("resume"), Description("Pause or unpause the current song.")]
@@ -75,7 +75,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.PauseCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("queue"), Description("Displays the current queue.")]
@@ -84,7 +84,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.QueueCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [Command("removequeue"), Aliases("rq"), Description("Removes a song from the queue.")]
@@ -96,7 +96,7 @@ internal class MusicPrefixCommands : BaseCommandModule
                 {
                     { "selection", selection }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("skip"), Description("Starts a voting to skip the current song.")]
@@ -105,7 +105,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.SkipCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("forceskip"), Aliases("fs", "fskip"), Description("Forces skipping of the current song. `DJ` role or Administrator permissions required.")]
@@ -114,7 +114,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ForceSkipCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("clearqueue"), Aliases("cq"), Description("Starts a voting to clear the current queue.")]
@@ -123,7 +123,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ClearQueueCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [Command("forceclearqueue"), Aliases("fcq"), Description("Forces clearing the current queue. `DJ` role or Administrator permissions required.")]
@@ -132,7 +132,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ForceClearQueueCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("shuffle"), Description("Toggles shuffling of the current queue.")]
@@ -141,7 +141,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ShuffleCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("repeat"), Description("Toggles repeating of the current queue.")]
@@ -150,7 +150,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Music.RepeatCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 
@@ -182,7 +182,7 @@ internal class MusicPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("load-share"), Description("Loads a playlist share.")]
@@ -195,7 +195,7 @@ internal class MusicPrefixCommands : BaseCommandModule
                     { "userid", userid },
                     { "id", id },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 }

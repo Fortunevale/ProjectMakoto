@@ -6,7 +6,7 @@ internal class DeleteCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
             var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.BoolToEmote(ctx.Client)));
@@ -55,8 +55,8 @@ internal class DeleteCommand : BaseCommand
 
                     try
                     {
-                        ctx.Bot._users.Remove(ctx.User.Id);
-                        await ctx.Bot._databaseClient._helper.DeleteRow(ctx.Bot._databaseClient.mainDatabaseConnection, "users", "userid", $"{ctx.User.Id}");
+                        ctx.Bot.users.Remove(ctx.User.Id);
+                        await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "users", "userid", $"{ctx.User.Id}");
                     }
                     catch (Exception ex)
                     {

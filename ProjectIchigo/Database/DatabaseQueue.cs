@@ -116,7 +116,7 @@ internal class DatabaseQueue
                 _ = QueueHandler();
                 throw;
             }
-        }).Add(_bot._watcher);
+        }).Add(_bot.watcher);
     }
 
     internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal, int depth = 0)

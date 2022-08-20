@@ -9,7 +9,7 @@ internal class UploadCommand : BaseCommand
             Stream stream = (Stream)arguments["stream"];
             int filesize = (int)arguments["filesize"];
 
-            if (!ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id))
+            if (!ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id))
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -18,7 +18,7 @@ internal class UploadCommand : BaseCommand
                 return;
             }
             
-            if (ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+            if (ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -27,19 +27,19 @@ internal class UploadCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() < 0)
+            if (ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() < 0)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Your upload interactions timed out {ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTimespanSince().GetHumanReadable()} ago.`"
+                    Description = $"`Your upload interactions timed out {ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTimespanSince().GetHumanReadable()} ago.`"
                 }.SetError(ctx));
-                ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+                ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
                 return;
             }
 
-            ctx.Bot.UploadInteractions[ctx.User.Id].UploadedData = stream;
-            ctx.Bot.UploadInteractions[ctx.User.Id].FileSize = filesize;
-            ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled = true;
+            ctx.Bot.uploadInteractions[ctx.User.Id].UploadedData = stream;
+            ctx.Bot.uploadInteractions[ctx.User.Id].FileSize = filesize;
+            ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled = true;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {

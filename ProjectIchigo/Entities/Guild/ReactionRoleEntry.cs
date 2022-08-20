@@ -1,6 +1,6 @@
 namespace ProjectIchigo.Entities;
 
-public class ReactionRoles
+public class ReactionRoleEntry
 {
     public string UUID = Guid.NewGuid().ToString();
     public ulong EmojiId { get; set; }

@@ -8,7 +8,7 @@ internal class ForceSkipCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -33,7 +33,7 @@ internal class ForceSkipCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Member.IsDJ(ctx.Bot._status))
+            if (!ctx.Member.IsDJ(ctx.Bot.status))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {

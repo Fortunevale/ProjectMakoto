@@ -12,7 +12,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("avatar", "Displays your or the mentioned user's avatar as an embedded image.", dmPermission: false)]
@@ -24,7 +24,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
     
     [SlashCommand("banner", "Displays your or the mentioned user's banner as an embedded image.", dmPermission: false)]
@@ -36,7 +36,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
     
     [SlashCommand("rank", "Shows your or the mentioned user's rank and rank progress.", dmPermission: false)]
@@ -48,7 +48,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "victim", victim }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("leaderboard", "Displays the current experience rankings on this server.", dmPermission: false)]
@@ -60,7 +60,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "ShowAmount", ShowAmount }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
     
     [SlashCommand("submit-url", "Allows you to contribute a new malicious domain to our database.", dmPermission: false)]
@@ -72,7 +72,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "url", url }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("upload", "Upload a file to the bot. Only use when instructed to.", dmPermission: false)]
@@ -85,7 +85,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
                 { "stream", await new HttpClient().GetStreamAsync(attachment.Url) },
                 { "filesize", attachment.FileSize }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommand("urban-dictionary", "Look up a term on Urban Dictionary.", dmPermission: false)]
@@ -97,7 +97,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "term", term }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommandGroup("data", "Allows you to request or manage your user data.", dmPermission: false)]
@@ -111,7 +111,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [SlashCommand("delete", "Allows you to delete your user data.", dmPermission: false)]
@@ -120,7 +120,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [SlashCommand("object", "Allows you to stop Ichigo from further processing of your user data.", dmPermission: false)]
@@ -129,7 +129,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Data.ObjectCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [SlashCommand("policy", "Allows you to view how Ichigo processes your data.", dmPermission: false)]
@@ -138,7 +138,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Data.InfoCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 
@@ -148,7 +148,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
         Task.Run(async () =>
         {
             await new CreditsCommand().ExecuteCommand(ctx, _bot);
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
@@ -160,7 +160,7 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "message", ctx.TargetMessage }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
     
     [ContextMenu(ApplicationCommandType.Message, "Translate Message")]
@@ -172,6 +172,6 @@ internal class UtilityAppCommands : ApplicationCommandsModule
             {
                 { "message", ctx.TargetMessage }
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 }

@@ -15,14 +15,14 @@ internal class MaintainersPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
                     await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "", "", "");
                 else
                     await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "", "", "");
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("info"), Description("Shows information about the current server and bot.")]
@@ -31,7 +31,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new InfoCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("botnick"), Description("Changes the bot's nickname on the current server.")]
@@ -43,7 +43,57 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                 {
                     { "newNickname", newNickname }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("ban-user"), Description("Bans a user from usage of the bot.")]
+        public async Task BanUser(CommandContext ctx, DiscordUser victim, [RemainingText][Description("Reason")] string reason = "")
+        {
+            Task.Run(async () =>
+            {
+                await new BanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                    { "reason", reason },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("unban-user"), Description("Unbans a user from usage of the bot.")]
+        public async Task UnbanUser(CommandContext ctx, DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new UnbanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("ban-guild"), Description("Bans a guild from usage of the bot.")]
+        public async Task BanGuild(CommandContext ctx, ulong guild, [RemainingText][Description("Reason")] string reason = "")
+        {
+            Task.Run(async () =>
+            {
+                await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild },
+                    { "reason", reason },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("unban-guild"), Description("Unbans a guild from usage of the bot.")]
+        public async Task UnbanGuild(CommandContext ctx, ulong guild)
+        {
+            Task.Run(async () =>
+            {
+                await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild },
+                });
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("globalban"), Description("Bans a user from all servers opted into global bans.")]
@@ -56,7 +106,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                     { "victim", victim },
                     { "reason", reason },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("globalunban"), Description("Removes a user from global bans. (doesn't unban user from all servers)")]
@@ -69,7 +119,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                     { "victim", victim },
                     { "UnbanFromGuilds", UnbanFromGuilds },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("log"), Description("Change the bot's log level.")]
@@ -81,7 +131,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                 {
                     { "Level", Level },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("register"), Description("Register Slash Commands. Debug only.")]
@@ -90,7 +140,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new RegisterCommandsCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [Command("test"), Description("Check description lenghts.")]
@@ -121,7 +171,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                 }
 
                 await ctx.RespondAsync(string.Join("\n", list.Select(x => $"`{x}`")));
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("stop"), Description("Shuts down the bot.")]
@@ -130,7 +180,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new StopCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("save"), Description("Save all data to Database.")]
@@ -139,7 +189,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new SaveCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("create-issue"), Description("Create a new issue on Ichigo's Github Repository.")]
@@ -151,7 +201,7 @@ internal class MaintainersPrefixCommands : BaseCommandModule
                 {
                     { "UseOldTagsSelector", UseOldTagsSelector },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
 #if DEBUG
@@ -162,25 +212,25 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             {
                 new DatabaseQueue.RequestQueue
                 {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
                 },
                 new DatabaseQueue.RequestQueue
                 {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.Normal
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.Normal
                 },
                 new DatabaseQueue.RequestQueue
                 {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
                 },
                 new DatabaseQueue.RequestQueue
                 {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot._databaseClient.mainDatabaseConnection, Priority = QueuePriority.High
+                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.High
                 }
             };
 
             v.Sort((a, b) => ((int)a.Priority).CompareTo((int)b.Priority));
 
-            _bot._databaseClient._queue.Queue = v;
+            _bot.databaseClient._queue.Queue = v;
         }
 #endif
     }

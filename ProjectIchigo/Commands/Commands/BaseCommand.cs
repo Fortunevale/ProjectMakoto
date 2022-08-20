@@ -35,9 +35,21 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
-        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
+            return;
+        }
+
+        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        {
+            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            return;
+        }
+        
+        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        {
+            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
             return;
         }
 
@@ -54,6 +66,8 @@ public abstract class BaseCommand
 
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 
+        this.ctx.RespondedToInitial = InitiateInteraction;
+
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return;
         
@@ -75,9 +89,21 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
-        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
+            return;
+        }
+
+        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        {
+            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            return;
+        }
+
+        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        {
+            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
             return;
         }
 
@@ -91,6 +117,8 @@ public abstract class BaseCommand
             {
                 IsEphemeral = Ephemeral
             });
+
+        this.ctx.RespondedToInitial = InitiateInteraction;
 
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 
@@ -115,9 +143,21 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return;
 
-        if (this.ctx.Bot.ObjectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
+            return;
+        }
+
+        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        {
+            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            return;
+        }
+
+        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        {
+            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
             return;
         }
 
@@ -318,7 +358,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -436,7 +476,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -532,7 +572,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
@@ -558,7 +598,7 @@ public abstract class BaseCommand
 
     internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
-    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null, bool open = true)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
@@ -578,7 +618,8 @@ public abstract class BaseCommand
         bool Cancelled = false;
         Exception exception = null;
 
-        await interaction.CreateInteractionModalResponseAsync(builder);
+        if (open)
+            await interaction.CreateInteractionModalResponseAsync(builder);
 
         ctx.Client.ComponentInteractionCreated += RunInteraction;
 
@@ -617,7 +658,7 @@ public abstract class BaseCommand
                     FinishedSelection = true;
                     throw;
                 }
-            }).Add(ctx.Bot._watcher, ctx);
+            }).Add(ctx.Bot.watcher, ctx);
         }
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
@@ -699,35 +740,72 @@ public abstract class BaseCommand
         return length;
     }
 
+    internal async Task<DateTime> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    {
+        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a time span").WithCustomId(Guid.NewGuid().ToString());
+
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"{DateTime.UtcNow.Hour}", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"{DateTime.UtcNow.Minute}", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"{DateTime.UtcNow.Day}", 1, 2, true, $"{DateTime.UtcNow.Day}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"{DateTime.UtcNow.Month}", 1, 2, true, $"{DateTime.UtcNow.Month}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"{DateTime.UtcNow.Year}", 1, 2, true, $"{DateTime.UtcNow.Year}"));
+
+        InteractionCreateEventArgs Response;
+
+        try
+        {
+            Response = await PromptModalWithRetry(interaction, modal, false);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+
+        if ((Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hour").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minute").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "day").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "month").Components.First().Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "year").Components.First().Value.IsDigitsOnly()))
+            throw new InvalidOperationException("Invalid");
+
+        int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
+        int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
+        int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
+        int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
+        int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
+
+        return new DateTime(year, month, day, hour, minute, 0);
+    }
+
     internal async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
-        if (ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id))
+        if (ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id))
         {
-            if (ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+            if (ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
                 throw new AlreadyAppliedException("");
 
-            ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+            ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
         }
 
-        ctx.Bot.UploadInteractions.Add(ctx.User.Id, new UserUpload
+        ctx.Bot.uploadInteractions.Add(ctx.User.Id, new UserUpload
         {
             TimeOut = DateTime.UtcNow.Add(timeOutOverride.Value)
         });
 
-        while (ctx.Bot.UploadInteractions.ContainsKey(ctx.User.Id) && !ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled && ctx.Bot.UploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
+        while (ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id) && !ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled && ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
         {
             await Task.Delay(500);
         }
 
-        if (!ctx.Bot.UploadInteractions[ctx.User.Id].InteractionHandled)
+        if (!ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
             throw new ArgumentException("");
 
-        int size = ctx.Bot.UploadInteractions[ctx.User.Id].FileSize;
-        Stream stream = ctx.Bot.UploadInteractions[ctx.User.Id].UploadedData;
+        int size = ctx.Bot.uploadInteractions[ctx.User.Id].FileSize;
+        Stream stream = ctx.Bot.uploadInteractions[ctx.User.Id].UploadedData;
 
-        ctx.Bot.UploadInteractions.Remove(ctx.User.Id);
+        ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
         return (stream, size);
     }
 
@@ -845,6 +923,22 @@ public abstract class BaseCommand
             Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
+    
+    public void SendUserBanError(BlacklistEntry entry)
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock()}`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+    }
+    
+    public void SendGuildBanError(BlacklistEntry entry)
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock()}`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+    }
 
     public async Task<bool> CheckVoiceState()
     {
@@ -859,7 +953,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckMaintenance()
     {
-        if (!ctx.User.IsMaintenance(ctx.Bot._status))
+        if (!ctx.User.IsMaintenance(ctx.Bot.status))
         {
             SendMaintenanceError();
             return false;
@@ -870,7 +964,7 @@ public abstract class BaseCommand
     
     public async Task<bool> CheckAdmin()
     {
-        if (!ctx.Member.IsAdmin(ctx.Bot._status))
+        if (!ctx.Member.IsAdmin(ctx.Bot.status))
         {
             SendAdminError();
             return false;

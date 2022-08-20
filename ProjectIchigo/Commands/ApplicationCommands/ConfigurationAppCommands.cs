@@ -14,7 +14,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.JoinCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings in the event somebody joins the server.", (long)Permissions.Administrator, dmPermission: false)]
@@ -23,7 +23,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.JoinCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -38,7 +38,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.ExperienceCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings related to experience.", (long)Permissions.Administrator, dmPermission: false)]
@@ -47,7 +47,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.ExperienceCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -62,7 +62,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.LevelRewardsCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to add, remove and modify currently defined Level Rewards.", (long)Permissions.Administrator, dmPermission: false)]
@@ -71,7 +71,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.LevelRewardsCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -86,7 +86,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.PhishingCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings related to phishing link protection.", (long)Permissions.Administrator, dmPermission: false)]
@@ -95,7 +95,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.PhishingCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -110,7 +110,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.BumpReminderCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change currently used settings related to the Bump Reminder.", (long)Permissions.Administrator, dmPermission: false)]
@@ -119,7 +119,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.BumpReminderCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -134,7 +134,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.ActionLogCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change currently used settings related to the actionlog.", (long)Permissions.Administrator, dmPermission: false)]
@@ -143,7 +143,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.ActionLogCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -158,7 +158,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.AutoCrosspostCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change currently used settings related to automatic crossposting.", (long)Permissions.Administrator, dmPermission: false)]
@@ -167,7 +167,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.AutoCrosspostCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 
@@ -182,7 +182,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.ReactionRolesCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to add and remove registered Reaction Roles.", (long)Permissions.Administrator, dmPermission: false)]
@@ -191,7 +191,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.ReactionRolesCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -204,7 +204,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
                 {
                     { "message", ctx.TargetMessage },
                 });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [ContextMenu(ApplicationCommandType.Message, "Remove a Reaction Role", (long)Permissions.Administrator)]
@@ -216,7 +216,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
                 {
                     { "message", ctx.TargetMessage },
                 });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [ContextMenu(ApplicationCommandType.Message, "Remove all Reaction Roles", (long)Permissions.Administrator)]
@@ -228,7 +228,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
                 {
                     { "message", ctx.TargetMessage },
                 });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
     [SlashCommandGroup("invoiceprivacy", "Allows you to review and change settings related to In-Voice Text Channel Privacy.", dmPermission: false)]
@@ -242,7 +242,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.InVoicePrivacyCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change currently used settings related to In-Voice Text Channel Privacy.", (long)Permissions.Administrator, dmPermission: false)]
@@ -251,7 +251,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.InVoicePrivacyCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -266,7 +266,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.InviteTrackerCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings related to Invite Tracking.", (long)Permissions.Administrator, dmPermission: false)]
@@ -275,7 +275,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.InviteTrackerCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -290,7 +290,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.NameNormalizerCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings related to name normalization.", (long)Permissions.Administrator, dmPermission: false)]
@@ -299,7 +299,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.NameNormalizerCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -314,7 +314,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.AutoUnarchiveCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings related to automatic thread unarchiving.", (long)Permissions.Administrator, dmPermission: false)]
@@ -323,7 +323,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.AutoUnarchiveCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
     
@@ -338,7 +338,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.EmbedMessageCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("config", "Allows you to change the currently used settings related to automatic message embedding.", (long)Permissions.Administrator, dmPermission: false)]
@@ -347,7 +347,7 @@ internal class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.EmbedMessageCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 }

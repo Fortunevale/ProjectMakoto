@@ -2,47 +2,52 @@ namespace ProjectIchigo;
 
 public class Bot
 {
+    #region Clients
+
     internal static DatabaseClient DatabaseClient { get; set; }
 
     internal DiscordClient discordClient;
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
+    internal DatabaseClient databaseClient { get; set; }
+    internal ScoreSaberClient scoreSaberClient { get; set; }
+    internal TranslationClient translationClient { get; set; }
 
-    internal DatabaseClient _databaseClient { get; set; }
-
-
-    internal Status _status = new();
-    internal Dictionary<ulong, Guild> _guilds = new();
-    internal Dictionary<ulong, User> _users = new();
-
-    internal List<ulong> ObjectedUsers = new();
-
-    internal PhishingUrlUpdater _phishingUrlUpdater { get; set; }
-
-    internal PhishingUrls _phishingUrls = new();
-    internal PhishingSubmissionBans _submissionBans = new();
-    internal SubmittedUrls _submittedUrls = new();
+    #endregion Clients
 
 
-    internal GlobalBans _globalBans = new();
+    #region Util
+
+    internal CountryCodes countryCodes { get; set; }
+    internal LanguageCodes languageCodes { get; set; }
+
+    internal BumpReminder bumpReminder { get; set; }
+    internal ExperienceHandler experienceHandler { get; set; }
+    internal TaskWatcher watcher = new();
+    internal Dictionary<ulong, UserUpload> uploadInteractions { get; set; } = new();
+    internal Dictionary<string, PhishingUrlEntry> phishingUrls = new();
+    internal Dictionary<ulong, SubmittedUrlEntry> submittedUrls = new();
+
+    #endregion Util
 
 
-    internal ScoreSaberClient _scoreSaberClient { get; set; }
-    internal TranslationClient _translationClient { get; set; }
-    internal CountryCodes _countryCodes { get; set; }
-    internal LanguageCodes _languageCodes { get; set; }
+    #region Bans
+
+    internal List<ulong> objectedUsers = new();
+    internal Dictionary<ulong, BlacklistEntry> bannedUsers = new();
+    internal Dictionary<ulong, BlacklistEntry> bannedGuilds = new();
+
+    internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionUserBans = new();
+    internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionGuildBans = new();
+
+    internal Dictionary<ulong, GlobalBanDetails> globalBans = new();
+
+    #endregion Bans
 
 
-    internal BumpReminder _bumpReminder { get; set; }
-    internal ExperienceHandler _experienceHandler { get; set; }
-
-
-    internal TaskWatcher _watcher = new();
-
-    internal ILogger _ilogger { get; set; }
-    internal ILoggerProvider _loggerProvider { get; set; }
-
-    internal Dictionary<ulong, UserUpload> UploadInteractions { get; set; } = new();
+    internal Status status = new();
+    internal Dictionary<ulong, Guild> guilds = new();
+    internal Dictionary<ulong, User> users = new();
 
     internal string Prefix { get; private set; } = ";;";
 
@@ -53,7 +58,7 @@ public class Bot
             Directory.CreateDirectory("logs");
 
         _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
-        _loggerProvider = _logger._provider;
+        var loggerProvider = _logger._provider;
 
         _logger.LogRaised += LogHandler;
 
@@ -100,8 +105,8 @@ public class Bot
             _logger.LogError($"An exception occured while to enable debug logs", ex);
         }
 
-        _scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
-        _translationClient = TranslationClient.Initialize();
+        scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
+        translationClient = TranslationClient.Initialize();
 
         _logger.LogDebug($"Enviroment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
@@ -114,7 +119,7 @@ public class Bot
                 $"Current Directory: {Environment.CurrentDirectory}\n" +
                 $"Commandline: {Regex.Replace(Environment.CommandLine, @"(--token \S*)", "")}\n");
 
-        _bumpReminder = new(this);
+        bumpReminder = new(this);
 
         var loadDatabase = Task.Run(async () =>
         {
@@ -125,8 +130,8 @@ public class Bot
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
 
-                _status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
-                File.WriteAllText("config.json", JsonConvert.SerializeObject(_status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
                 _logger.LogInfo($"Config loaded.");
 
                 Task.Run(async () =>
@@ -144,7 +149,7 @@ public class Bot
                                 try
                                 {
                                     _logger.LogDebug($"Reloading config..");
-                                    _status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                                    status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
                                     _logger.LogInfo($"Config reloaded.");
                                 }
                                 catch (Exception ex)
@@ -163,18 +168,15 @@ public class Bot
                             await Task.Delay(10000);
                         }
                     }
-                }).Add(_watcher);
+                }).Add(watcher);
 
-                Stopwatch databaseConnectionSc = new();
-                databaseConnectionSc.Start();
                 _logger.LogInfo($"Connecting to database..");
 
                 DatabaseClient = await DatabaseClient.InitializeDatabase(this);
-                _databaseClient = DatabaseClient;
+                databaseClient = DatabaseClient;
 
-                databaseConnectionSc.Stop();
-                _logger.LogInfo($"Connected to database. ({databaseConnectionSc.ElapsedMilliseconds}ms)");
-                _status.DatabaseInitialized = true;
+                _logger.LogInfo($"Connected to database.");
+                status.DatabaseInitialized = true;
 
                 DatabaseInit _databaseInit = new(this);
 
@@ -186,9 +188,9 @@ public class Bot
                     while (!discordClient.Guilds.Any())
                         Thread.Sleep(500);
 
-                    await _databaseClient.FullSyncDatabase(true);
+                    await databaseClient.FullSyncDatabase(true);
 
-                    _status.DatabaseInitialLoadCompleted = true;
+                    status.DatabaseInitialLoadCompleted = true;
                 });
             }
             catch (Exception ex)
@@ -198,8 +200,7 @@ public class Bot
                 Environment.Exit(ExitCodes.FailedDatabaseLogin);
             }
 
-            _phishingUrlUpdater = new(this);
-            _ = _phishingUrlUpdater.UpdatePhishingUrlDatabase(_phishingUrls);
+            _ = new PhishingUrlUpdater(this).UpdatePhishingUrlDatabase();
         });
 
         await loadDatabase.WaitAsync(TimeSpan.FromSeconds(600));
@@ -242,7 +243,7 @@ public class Bot
             _logger.LogDebug($"Registering LoggerFactory..");
 
             var logger = new LoggerFactory();
-            logger.AddProvider(_loggerProvider);
+            logger.AddProvider(loggerProvider);
 
             _logger.LogDebug($"Registering DiscordClient..");
 
@@ -259,7 +260,7 @@ public class Bot
                 MessageCacheSize = 4096,
             });
 
-            _experienceHandler = new(this);
+            experienceHandler = new(this);
 
             _logger.LogDebug($"Registering CommandsNext..");
 
@@ -378,12 +379,9 @@ public class Bot
 
             try
             {
-                var discordLoginSc = new Stopwatch();
-                discordLoginSc.Start();
-
                 _ = Task.Delay(10000).ContinueWith(t =>
                 {
-                    if (!_status.DiscordInitialized)
+                    if (!status.DiscordInitialized)
                     {
                         _logger.LogError($"An exception occured while trying to log into discord: The log in took longer than 10 seconds");
                         Environment.Exit(ExitCodes.FailedDiscordLogin);
@@ -394,9 +392,8 @@ public class Bot
                 _logger.LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
-                discordLoginSc.Stop();
-                _logger.LogInfo($"Connected and authenticated with Discord. ({discordLoginSc.ElapsedMilliseconds}ms)");
-                _status.DiscordInitialized = true;
+                _logger.LogInfo($"Connected and authenticated with Discord.");
+                status.DiscordInitialized = true;
 
                 Task.Run(async () =>
                 {
@@ -408,7 +405,7 @@ public class Bot
                         EnableDefaultHelp = false
                     });
 
-                    if (!_status.LoadedConfig.IsDev)
+                    if (!status.LoadedConfig.IsDev)
                     {
                         appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
@@ -418,17 +415,17 @@ public class Bot
                         appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
                     }
-                }).Add(_watcher);
+                }).Add(watcher);
 
-                if (_status.LoadedConfig.IsDev)
+                if (status.LoadedConfig.IsDev)
                     Prefix = ">>";
 
                 _ = Task.Run(() =>
                 {
                     try
                     {
-                        _status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
-                        _logger.LogInfo($"Added {_status.TeamMembers.Count} users to administrator list");
+                        status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
+                        _logger.LogInfo($"Added {status.TeamMembers.Count} users to administrator list");
                     }
                     catch (Exception ex)
                     {
@@ -448,11 +445,11 @@ public class Bot
             {
                 try
                 {
-                    if (_status.LoadedConfig.UseLavalinkAutoUpdater)
+                    if (status.LoadedConfig.UseLavalinkAutoUpdater)
                     {
                         try
                         {
-                            string v = _status.LoadedConfig.LavalinkJarFolderPath.Replace("\\", "/");
+                            string v = status.LoadedConfig.LavalinkJarFolderPath.Replace("\\", "/");
 
                             if (v.EndsWith("/"))
                                 v = v[..^1];
@@ -475,7 +472,7 @@ public class Bot
 
                             Release workingRelease;
 
-                            if (_status.LoadedConfig.LavalinkDownloadPreRelease)
+                            if (status.LoadedConfig.LavalinkDownloadPreRelease)
                             {
                                 if (releases.Any(x => x.Prerelease))
                                     workingRelease = releases.First(x => x.Prerelease);
@@ -540,14 +537,11 @@ public class Bot
                         }
                     }
 
-                    var lavalinkSc = new Stopwatch();
-                    lavalinkSc.Start();
                     _logger.LogInfo("Connecting and authenticating with Lavalink..");
-
                     LavalinkNodeConnection = await discordClient.GetLavalink().ConnectAsync(lavalinkConfig);
-                    lavalinkSc.Stop();
-                    _logger.LogInfo($"Connected and authenticated with Lavalink. ({lavalinkSc.ElapsedMilliseconds}ms)");
-                    _status.LavalinkInitialized = true;
+                    _logger.LogInfo($"Connected and authenticated with Lavalink.");
+
+                    status.LavalinkInitialized = true;
 
                     try
                     {
@@ -580,7 +574,7 @@ public class Bot
         }
 
         _ = DatabaseClient.QueueWatcher();
-        _watcher.Watcher();
+        watcher.Watcher();
 
         AppDomain.CurrentDomain.ProcessExit += delegate
         {
@@ -613,7 +607,7 @@ public class Bot
         {
             Thread.Sleep(5000);
             
-            if (!_status.LoadedConfig.IsDev)
+            if (!status.LoadedConfig.IsDev)
             {
                 _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
@@ -628,21 +622,21 @@ public class Bot
             {
                 try
                 {
-                    if (_databaseClient.IsDisposed())
+                    if (databaseClient.IsDisposed())
                         return;
 
                     List<ulong> users = new();
 
-                    foreach (var b in _guilds)
+                    foreach (var b in guilds)
                         foreach (var c in b.Value.Members)
                             if (!users.Contains(c.Key))
                                 users.Add(c.Key);
 
-                    foreach (var b in _users)
+                    foreach (var b in this.users)
                         if (!users.Contains(b.Key))
                             users.Add(b.Key);
 
-                    await discordClient.UpdateStatusAsync(activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - _status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
+                    await discordClient.UpdateStatusAsync(activity: new DiscordActivity($"{discordClient.Guilds.Count.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} guilds | Up for {Math.Round((DateTime.UtcNow - status.startupTime).TotalHours, 2).ToString(CultureInfo.CreateSpecificCulture("en-US"))}h", ActivityType.Playing));
                     await Task.Delay(30000);
                 }
                 catch (Exception ex)
@@ -685,7 +679,7 @@ public class Bot
                     foreach (Task b in e.NewItems)
                     {
                         _logger.LogDebug($"Adding sync task to watcher: {b.Id}");
-                        b.Add(_watcher);
+                        b.Add(watcher);
                     }
             };
         }
@@ -706,51 +700,59 @@ public class Bot
             runningTasks.Add(Task.Run(async () =>
             {
                 _logger.LogDebug($"Performing sync tasks for '{guild.Key}'..");
+
+                if (objectedUsers.Contains(guild.Value.OwnerId) || bannedUsers.ContainsKey(guild.Value.OwnerId) || bannedGuilds.ContainsKey(guild.Key))
+                {
+                    _logger.LogInfo($"Leaving guild '{guild.Key}'..");
+                    await guild.Value.LeaveAsync();
+                    return;
+                }
+
                 var guildMembers = await guild.Value.GetAllMembersAsync();
                 var guildBans = await guild.Value.GetBansAsync();
 
                 foreach (var member in guildMembers)
                 {
-                    if (!_guilds[guild.Key].Members.ContainsKey(member.Id))
-                        _guilds[guild.Key].Members.Add(member.Id, new(_guilds[guild.Key], member.Id));
+                    if (!guilds[guild.Key].Members.ContainsKey(member.Id))
+                        guilds[guild.Key].Members.Add(member.Id, new(guilds[guild.Key], member.Id));
 
-                    if (_guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
-                        _guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
+                    if (guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                        guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
 
-                    if (_guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
-                        _guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
+                    if (guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
+                        guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
 
-                    _guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
+                    guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
                     {
                         Id = x.Id,
                         Name = x.Name,
                     }).ToList();
 
-                    _guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+                    guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
                 }
 
-                foreach (var databaseMember in _guilds[guild.Key].Members.ToList())
+                foreach (var databaseMember in guilds[guild.Key].Members.ToList())
                 {
                     if (!guildMembers.Any(x => x.Id == databaseMember.Key))
                     {
-                        if (_guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
-                            _guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
+                        if (guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                            guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
                     }
                 }
 
                 foreach (var banEntry in guildBans)
                 {
-                    if (!_guilds[guild.Key].Members.ContainsKey(banEntry.User.Id))
+                    if (!guilds[guild.Key].Members.ContainsKey(banEntry.User.Id))
                         continue;
 
-                    if (_guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
-                        _guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+                    if (guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
+                        guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
 
-                    if (_guilds[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
-                        _guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
+                    if (guilds[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
+                        guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                 }
 
-                if (_guilds[guild.Key].InviteTrackerSettings.Enabled)
+                if (guilds[guild.Key].InviteTrackerSettings.Enabled)
                 {
                     await InviteTrackerEvents.UpdateCachedInvites(this, guild.Value);
                 }
@@ -777,6 +779,8 @@ public class Bot
 
                     if (!t.HasMore)
                         break;
+
+                    _logger.LogDebug($"Requesting more threads for '{guild.Key}'");
                 }
 
                 foreach (var b in Threads.Where(x => x.CurrentMember is null))
@@ -809,36 +813,36 @@ public class Bot
 
             for (int i = 0; i < 251; i++)
             {
-                _experienceHandler.CalculateLevelRequirement(i);
+                experienceHandler.CalculateLevelRequirement(i);
             }
 
             foreach (var guild in e.Guilds)
             {
-                if (!_guilds.ContainsKey(guild.Key))
-                    _guilds.Add(guild.Key, new Guild(guild.Key));
+                if (!guilds.ContainsKey(guild.Key))
+                    guilds.Add(guild.Key, new Guild(guild.Key));
 
-                if (_guilds[guild.Key].BumpReminderSettings.Enabled)
+                if (guilds[guild.Key].BumpReminderSettings.Enabled)
                 {
-                    _bumpReminder.ScheduleBump(sender, guild.Key);
+                    bumpReminder.ScheduleBump(sender, guild.Key);
                 }
 
                 foreach (var member in guild.Value.Members)
                 {
-                    if (!_guilds[guild.Key].Members.ContainsKey(member.Value.Id))
+                    if (!guilds[guild.Key].Members.ContainsKey(member.Value.Id))
                     {
-                        _guilds[guild.Key].Members.Add(member.Value.Id, new(_guilds[guild.Key], member.Value.Id));
+                        guilds[guild.Key].Members.Add(member.Value.Id, new(guilds[guild.Key], member.Value.Id));
                     }
 
-                    _experienceHandler.CheckExperience(member.Key, guild.Value);
+                    experienceHandler.CheckExperience(member.Key, guild.Value);
                 }
 
-                if (_guilds[guild.Key].CrosspostSettings.CrosspostTasks.Any())
+                if (guilds[guild.Key].CrosspostSettings.CrosspostTasks.Any())
                 {
                     Task.Run(async () =>
                     {
-                        for (var i = 0; i < _guilds[guild.Key].CrosspostSettings.CrosspostTasks.Count; i++)
+                        for (var i = 0; i < guilds[guild.Key].CrosspostSettings.CrosspostTasks.Count; i++)
                         {
-                            CrosspostMessage b = _guilds[guild.Key].CrosspostSettings.CrosspostTasks[0];
+                            CrosspostMessage b = guilds[guild.Key].CrosspostSettings.CrosspostTasks[0];
 
                             if (!guild.Value?.Channels.ContainsKey(b.ChannelId) ?? true)
                                 return;
@@ -847,22 +851,22 @@ public class Bot
 
                             if (!channel.TryGetMessage(b.MessageId, out var msg))
                             {
-                                if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                 {
-                                    var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                    _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                    var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                    guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                 }
                                 continue;
                             }
 
                             _logger.LogDebug($"Handling missing crosspost message '{b.MessageId}' in '{b.ChannelId}' for '{guild.Key}'..");
 
-                            var WaitTime = _guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting - b.MessageId.GetSnowflakeTime().GetTotalSecondsSince();
+                            var WaitTime = guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting - b.MessageId.GetSnowflakeTime().GetTotalSecondsSince();
 
                             if (WaitTime > 0)
                                 await Task.Delay(TimeSpan.FromSeconds(WaitTime));
 
-                            if (_guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
+                            if (guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
                                 _ = msg.DeleteOwnReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 
                             bool ReactionAdded = false;
@@ -871,10 +875,10 @@ public class Bot
                             {
                                 var task = channel.CrosspostMessageAsync(msg).ContinueWith(s =>
                                 {
-                                    if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                    if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                     {
-                                        var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                        _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                        var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                        guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                     }
 
                                     if (ReactionAdded)
@@ -891,10 +895,10 @@ public class Bot
                             }
                             catch (ArgumentException)
                             {
-                                if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                 {
-                                    var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                    _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                    var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                    guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                 }
                                 return;
                             }
@@ -902,10 +906,10 @@ public class Bot
                             {
                                 if (ex.InnerException is ArgumentException aex)
                                 {
-                                    if (_guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                    if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                     {
-                                        var obj = _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                        _guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                        var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
+                                        guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
                                     }
                                     return;
                                 }
@@ -913,7 +917,7 @@ public class Bot
                                 throw;
                             }
                         }
-                    }).Add(_watcher);
+                    }).Add(watcher);
                 }
             }
 
@@ -926,14 +930,14 @@ public class Bot
                 _logger.LogError("Failed to run sync tasks", ex);
             }
 
-            await _databaseClient.CheckGuildTables();
-            await _databaseClient.FullSyncDatabase(true);
+            await databaseClient.CheckGuildTables();
+            await databaseClient.FullSyncDatabase(true);
 
             List<DiscordUser> UserCache = new();
 
             await Task.Delay(5000);
 
-            while (!_status.LavalinkInitialized)
+            while (!status.LavalinkInitialized)
                 await Task.Delay(1000);
 
             foreach (var guild in e.Guilds)
@@ -942,19 +946,19 @@ public class Bot
                 {
                     try
                     {
-                        if (_guilds[guild.Key].Lavalink.ChannelId != 0)
+                        if (guilds[guild.Key].Lavalink.ChannelId != 0)
                         {
-                            if (!guild.Value.Channels.ContainsKey(_guilds[guild.Key].Lavalink.ChannelId))
+                            if (!guild.Value.Channels.ContainsKey(guilds[guild.Key].Lavalink.ChannelId))
                                 throw new Exception("Channel no longer exists");
 
-                            if (_guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("localhost") || _guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("127.0.0.1"))
+                            if (guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("localhost") || guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("127.0.0.1"))
                                 throw new Exception("Localhost?");
 
-                            if (_guilds[guild.Key].Lavalink.SongQueue.Count > 0)
+                            if (guilds[guild.Key].Lavalink.SongQueue.Count > 0)
                             {
-                                for (var i = 0; i < _guilds[guild.Key].Lavalink.SongQueue.Count; i++)
+                                for (var i = 0; i < guilds[guild.Key].Lavalink.SongQueue.Count; i++)
                                 {
-                                    Lavalink.QueueInfo b = _guilds[guild.Key].Lavalink.SongQueue[i];
+                                    Lavalink.QueueInfo b = guilds[guild.Key].Lavalink.SongQueue[i];
 
                                     _logger.LogDebug($"Fixing queue info for {b.Url}");
 
@@ -970,7 +974,7 @@ public class Bot
                                 }
                             }
 
-                            var channel = guild.Value.GetChannel(_guilds[guild.Key].Lavalink.ChannelId);
+                            var channel = guild.Value.GetChannel(guilds[guild.Key].Lavalink.ChannelId);
 
                             var lava = discordClient.GetLavalink();
                             var node = lava.ConnectedNodes.Values.First();
@@ -986,7 +990,7 @@ public class Bot
                                 conn = await node.ConnectAsync(channel);
                             }
 
-                            var loadResult = await node.Rest.GetTracksAsync(_guilds[guild.Key].Lavalink.CurrentVideo, LavalinkSearchType.Plain);
+                            var loadResult = await node.Rest.GetTracksAsync(guilds[guild.Key].Lavalink.CurrentVideo, LavalinkSearchType.Plain);
 
                             if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                                 return;
@@ -994,35 +998,39 @@ public class Bot
                             await conn.PlayAsync(loadResult.Tracks.First());
 
                             await Task.Delay(2000);
-                            await conn.SeekAsync(TimeSpan.FromSeconds(_guilds[guild.Key].Lavalink.CurrentVideoPosition));
+                            await conn.SeekAsync(TimeSpan.FromSeconds(guilds[guild.Key].Lavalink.CurrentVideoPosition));
 
-                            _guilds[guild.Key].Lavalink.QueueHandler(this, discordClient, node, conn);
+                            guilds[guild.Key].Lavalink.QueueHandler(this, discordClient, node, conn);
                         }
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
-                        _guilds[guild.Key].Lavalink = new(_guilds[guild.Key]);
+                        guilds[guild.Key].Lavalink = new(guilds[guild.Key]);
                     }
                 });
 
                 await Task.Delay(1000);
             }
-        }).Add(_watcher);
+        }).Add(watcher);
     }
+
+    bool ExitCalled = false;
 
     internal async Task ExitApplication(bool Immediate = false)
     {
-        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
+        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(1)).ContinueWith(x =>
         {
             if (x.IsCompletedSuccessfully)
                 Environment.Exit(ExitCodes.ExitTasksTimeout);
         });
 
-        if (DatabaseClient.IsDisposed()) // When the Database Client has been disposed, the Exit Call has already been made.
+        if (DatabaseClient.IsDisposed() || ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
             return;
 
-        if (_status.DiscordInitialized)
+        ExitCalled = true;
+
+        if (status.DiscordInitialized)
         {
             try
             {
@@ -1048,7 +1056,7 @@ public class Bot
             }
         }
 
-        if (_status.DatabaseInitialLoadCompleted)
+        if (status.DatabaseInitialLoadCompleted)
         {
             try
             {
@@ -1083,9 +1091,9 @@ public class Bot
             {
                 if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
                 {
-                    _status.DiscordDisconnections++;
+                    status.DiscordDisconnections++;
 
-                    if (_status.DiscordDisconnections >= 3)
+                    if (status.DiscordDisconnections >= 3)
                     {
                         _logger.LogRaised -= LogHandler;
                         _ = ExitApplication();
@@ -1106,9 +1114,9 @@ public class Bot
                 }
                 else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
                 {
-                    _status.DataReaderExceptions++;
+                    status.DataReaderExceptions++;
 
-                    if (_status.DataReaderExceptions >= 4)
+                    if (status.DataReaderExceptions >= 4)
                     {
                         _logger.LogFatal("4 or more DataReader Exceptions triggered, exiting..");
 

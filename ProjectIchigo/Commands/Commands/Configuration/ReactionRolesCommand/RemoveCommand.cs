@@ -8,7 +8,7 @@ internal class RemoveCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             DiscordMessage message;
@@ -84,21 +84,21 @@ internal class RemoveCommand : BaseCommand
                 }
             }
 
-            if (!ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
+            if (!ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
                 embed.Description = $"`The specified message doesn't contain specified reaction.`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
                 return;
             }
 
-            var obj = ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.First(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName());
+            var obj = ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.First(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName());
 
             var role = ctx.Guild.GetRole(obj.Value.RoleId);
             var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
             var reactionMessage = await channel.GetMessageAsync(obj.Key);
             _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-            ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
+            ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
             embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));

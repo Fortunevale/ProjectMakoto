@@ -15,7 +15,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
                 {
                     { "announce", true }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("disconnect", "Starts a voting to disconnect the bot.", dmPermission: false)]
@@ -24,7 +24,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.DisconnectCommand().ExecuteCommand(ctx, _bot, null, false);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("forcedisconnect", "Forces the bot to disconnect. `DJ` role or Administrator permissions required.", dmPermission: false)]
@@ -33,7 +33,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ForceDisconnectCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("play", "Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.", dmPermission: false)]
@@ -45,7 +45,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
                 {
                     { "search", search }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("pause", "Pause or unpause the current song.", dmPermission: false)]
@@ -54,7 +54,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.PauseCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("queue", "Displays the current queue.", dmPermission: false)]
@@ -63,7 +63,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.QueueCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("removequeue", "Remove a song from the queue.", dmPermission: false)]
@@ -75,7 +75,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
                 {
                     { "selection", selection }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("skip", "Starts a voting to skip the current song.", dmPermission: false)]
@@ -84,7 +84,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.SkipCommand().ExecuteCommand(ctx, _bot, null, false);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("forceskip", "Forces skipping of the current song. `DJ` role or Administrator permissions required.", dmPermission: false)]
@@ -93,7 +93,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ForceSkipCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("clearqueue", "Starts a voting to clear the current queue.", dmPermission: false)]
@@ -102,7 +102,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ClearQueueCommand().ExecuteCommand(ctx, _bot, null, false);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("forceclearqueue", "Forces clearing the current queue. `DJ` role or Administrator permissions required.", dmPermission: false)]
@@ -111,7 +111,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ForceClearQueueCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("shuffle", "Toggles shuffling of the current queue.", dmPermission: false)]
@@ -120,7 +120,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.ShuffleCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("repeat", "Toggles repeating the current queue.", dmPermission: false)]
@@ -129,7 +129,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Music.RepeatCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 
@@ -144,7 +144,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("load-share", "Loads a playlist share.", dmPermission: false)]
@@ -157,7 +157,7 @@ internal class MusicAppCommands : ApplicationCommandsModule
                     { "userid", userid.Id },
                     { "id", id },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 }

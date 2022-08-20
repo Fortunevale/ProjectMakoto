@@ -10,7 +10,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             int Page = (int)arguments["Page"];
             int Internal_Page = (int)arguments["Internal_Page"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             if (Page <= 0 || !(Internal_Page is 0 or 1))
@@ -39,8 +39,8 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
 
             try
             {
-                leaderboard = await ctx.Bot._scoreSaberClient.GetScoreboardById(boardId.ToString());
-                LeaderboardScores scores = await ctx.Bot._scoreSaberClient.GetScoreboardScoresById(boardId.ToString());
+                leaderboard = await ctx.Bot.scoreSaberClient.GetScoreboardById(boardId.ToString());
+                LeaderboardScores scores = await ctx.Bot.scoreSaberClient.GetScoreboardScoresById(boardId.ToString());
 
                 TotalPages = scores.metadata.total / scores.metadata.itemsPerPage;
             }
@@ -124,7 +124,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                         }
                         catch { }
                     }
-                }).Add(ctx.Bot._watcher, ctx);
+                }).Add(ctx.Bot.watcher, ctx);
             }
 
             async Task SendPage(int internalPage, int scoreSaberPage)
@@ -140,7 +140,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 try
                 {
                     if (!cachedPages.ContainsKey(scoreSaberPage))
-                        cachedPages.Add(scoreSaberPage, await ctx.Bot._scoreSaberClient.GetScoreboardScoresById(boardId.ToString(), scoreSaberPage));
+                        cachedPages.Add(scoreSaberPage, await ctx.Bot.scoreSaberClient.GetScoreboardScoresById(boardId.ToString(), scoreSaberPage));
 
                     scores = cachedPages[scoreSaberPage];
                 }

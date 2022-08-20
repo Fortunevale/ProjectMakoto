@@ -9,11 +9,11 @@ internal class PhishingUrlUpdater
 
     public Bot _bot { private get; set; }
 
-    public async Task UpdatePhishingUrlDatabase(PhishingUrls phishingUrls)
+    public async Task UpdatePhishingUrlDatabase()
     {
         new Task(new Action(async () =>
         {
-            _ = UpdatePhishingUrlDatabase(phishingUrls);
+            _ = UpdatePhishingUrlDatabase();
         })).CreateScheduleTask(DateTime.UtcNow.AddMinutes(30), $"phishing-update");
 
         var permInviteTask = Task.Run(async () =>
@@ -27,10 +27,10 @@ internal class PhishingUrlUpdater
                     HttpClient client = new();
                     var PermInvite = (await client.GetStringAsync("https://fortunevale.dd-dns.de/ProjectIchigoPermanentInvite.txt")).Split("\n").First();
 
-                    if (_bot._status.DevelopmentServerInvite != PermInvite)
+                    if (_bot.status.DevelopmentServerInvite != PermInvite)
                         _logger.LogInfo($"Updating Development Server Invite to '{PermInvite}'");
 
-                    _bot._status.DevelopmentServerInvite = PermInvite;
+                    _bot.status.DevelopmentServerInvite = PermInvite;
                     break;
                 }
                 catch (HttpRequestException ex)
@@ -58,20 +58,20 @@ internal class PhishingUrlUpdater
 
         foreach (var b in urls)
         {
-            if (!phishingUrls.List.ContainsKey(b.Url))
+            if (!_bot.phishingUrls.ContainsKey(b.Url))
             {
                 DatabaseUpdated = true;
-                phishingUrls.List.Add(b.Url, b);
+                _bot.phishingUrls.Add(b.Url, b);
                 continue;
             }
 
-            if (phishingUrls.List.ContainsKey(b.Url))
+            if (_bot.phishingUrls.ContainsKey(b.Url))
             {
-                if (phishingUrls.List[b.Url].Origin.Count != b.Origin.Count)
+                if (_bot.phishingUrls[b.Url].Origin.Count != b.Origin.Count)
                 {
                     DatabaseUpdated = true;
-                    phishingUrls.List[ b.Url ].Origin = b.Origin;
-                    phishingUrls.List[ b.Url ].Submitter = b.Submitter;
+                    _bot.phishingUrls[ b.Url ].Origin = b.Origin;
+                    _bot.phishingUrls[ b.Url ].Submitter = b.Submitter;
                     continue;
                 }
             }
@@ -79,11 +79,11 @@ internal class PhishingUrlUpdater
 
         List<string> dropUrls = new();
 
-        if (phishingUrls.List.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
-            foreach (var b in phishingUrls.List.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
+        if (_bot.phishingUrls.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
+            foreach (var b in _bot.phishingUrls.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
             {
                 DatabaseUpdated = true;
-                phishingUrls.List.Remove(b.Key);
+                _bot.phishingUrls.Remove(b.Key);
                 dropUrls.Add(b.Key);
             }
 
@@ -94,7 +94,7 @@ internal class PhishingUrlUpdater
 
         try
         {
-            await UpdateDatabase(phishingUrls, dropUrls);
+            await UpdateDatabase(dropUrls);
         }
         catch (Exception ex)
         {
@@ -104,7 +104,7 @@ internal class PhishingUrlUpdater
 
     private bool UpdateRunning = false;
 
-    public async Task UpdateDatabase(PhishingUrls phishingUrls, List<string> dropUrls)
+    public async Task UpdateDatabase(List<string> dropUrls)
     {
         if (UpdateRunning)
         {
@@ -115,24 +115,24 @@ internal class PhishingUrlUpdater
         try
         {
             UpdateRunning = true;
-            List<DatabasePhishingUrlInfo> DatabaseInserts = phishingUrls.List.Select(x => new DatabasePhishingUrlInfo
+            List<DatabasePhishingUrlInfo> DatabaseInserts = _bot.phishingUrls.Select(x => new DatabasePhishingUrlInfo
             {
                 url = x.Value.Url,
                 origin = JsonConvert.SerializeObject(x.Value.Origin),
                 submitter = x.Value.Submitter
             }).OrderBy(x => x.url).ToList();
 
-            if (_bot._databaseClient.mainDatabaseConnection == null)
+            if (_bot.databaseClient.mainDatabaseConnection == null)
             {
                 throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
             }
 
-            var cmd = _bot._databaseClient.mainDatabaseConnection.CreateCommand();
-            cmd.CommandText = _bot._databaseClient._helper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
+            var cmd = _bot.databaseClient.mainDatabaseConnection.CreateCommand();
+            cmd.CommandText = _bot.databaseClient._helper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
 
             for (int i = 0; i < DatabaseInserts.Count; i++)
             {
-                cmd.CommandText += _bot._databaseClient._helper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
+                cmd.CommandText += _bot.databaseClient._helper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
 
                 cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url);
                 cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin);
@@ -140,12 +140,11 @@ internal class PhishingUrlUpdater
             }
 
             cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-            cmd.CommandText += _bot._databaseClient._helper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
+            cmd.CommandText += _bot.databaseClient._helper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
 
-            cmd.Connection = _bot._databaseClient.mainDatabaseConnection;
-            await _bot._databaseClient._queue.RunCommand(cmd);
+            cmd.Connection = _bot.databaseClient.mainDatabaseConnection;
+            await _bot.databaseClient._queue.RunCommand(cmd);
 
-            _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
             UpdateRunning = false;
             DatabaseInserts.Clear();
             DatabaseInserts = null;
@@ -153,7 +152,7 @@ internal class PhishingUrlUpdater
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    await _bot._databaseClient._helper.DeleteRow(_bot._databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
+                    await _bot.databaseClient._helper.DeleteRow(_bot.databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
 
                     _logger.LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }
@@ -173,7 +172,7 @@ internal class PhishingUrlUpdater
         }
     }
 
-    private async Task<List<PhishingUrls.UrlInfo>> GetUrls ()
+    private async Task<List<PhishingUrlEntry>> GetUrls ()
     {
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();
@@ -227,7 +226,7 @@ internal class PhishingUrlUpdater
         }
         catch (Exception ex) { throw new Exception($"Failed to remove whitelisted domains from blacklist", ex); }
 
-        return SanitizedMatches.Select(x => new PhishingUrls.UrlInfo
+        return SanitizedMatches.Select(x => new PhishingUrlEntry
         {
             Url = x.Key,
             Origin = x.Value,

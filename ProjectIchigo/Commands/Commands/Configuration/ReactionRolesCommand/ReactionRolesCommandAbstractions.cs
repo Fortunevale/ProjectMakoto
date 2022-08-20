@@ -4,22 +4,22 @@ internal class ReactionRolesCommandAbstractions
 {
     internal static async Task<Dictionary<ulong, DiscordMessage>> CheckForInvalid(SharedCommandContext ctx)
     {
-        if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+        if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
             return new();
 
         Dictionary<ulong, DiscordMessage> messageCache = new();
 
-        foreach (var b in ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.ToList())
+        foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.ToList())
         {
             if (!ctx.Guild.Channels.ContainsKey(b.Value.ChannelId))
             {
-                ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+                ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
                 continue;
             }
 
             if (!ctx.Guild.Roles.ContainsKey(b.Value.RoleId))
             {
-                ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+                ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
                 continue;
             }
 
@@ -36,21 +36,21 @@ internal class ReactionRolesCommandAbstractions
                 {
                     messageCache.Add(b.Key, null);
 
-                    ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+                    ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
                     continue;
                 }
                 catch (DisCatSharp.Exceptions.UnauthorizedException)
                 {
                     messageCache.Add(b.Key, null);
 
-                    ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+                    ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
                     continue;
                 }
             }
 
             if (messageCache[b.Key] == null)
             {
-                ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+                ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
                 continue;
             }
 
@@ -62,7 +62,7 @@ internal class ReactionRolesCommandAbstractions
                 {
                     if (x.IsFaulted)
                     {
-                        ctx.Bot._guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+                        ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
                     }
                 });
                 continue;

@@ -64,7 +64,6 @@ global using ProjectIchigo.Secrets;
 global using ProjectIchigo.Entities;
 global using ProjectIchigo.Entities.Afk;
 global using ProjectIchigo.Entities.Database;
-global using ProjectIchigo.Entities.Legacy;
 
 global using ProjectIchigo.Database;
 

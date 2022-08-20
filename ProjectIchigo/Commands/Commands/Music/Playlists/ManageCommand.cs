@@ -6,7 +6,7 @@ internal class ManageCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             var countInt = 0;
@@ -19,20 +19,20 @@ internal class ManageCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"{(ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCodeBlock()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
+                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCodeBlock()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
             }.SetAwaitingInput(ctx, "Playlists");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Add a playlist to the current queue", (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
-            var SharePlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Share a playlist", (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📎")));
-            var ExportPlaylist = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Export a playlist", (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
+            var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Add a playlist to the current queue", (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
+            var SharePlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Share a playlist", (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📎")));
+            var ExportPlaylist = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Export a playlist", (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
 
             var ImportPlaylist = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Import a playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
             var SaveCurrent = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Save current queue as playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💾")));
             var NewPlaylist = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Create new playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var ModifyPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Select a playlist to modify", (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚙")));
-            var DeletePlaylist = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Select a playlist to delete", (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            var ModifyPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Select a playlist to modify", (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚙")));
+            var DeletePlaylist = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Select a playlist to delete", (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
             await RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent> {
@@ -65,7 +65,7 @@ internal class ManageCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == AddToQueue.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 string SelectedPlaylistId;
                 UserPlaylist SelectedPlaylist;
@@ -73,7 +73,7 @@ internal class ManageCommand : BaseCommand
                 try
                 {
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
                 catch (ArgumentException)
                 {
@@ -108,18 +108,18 @@ internal class ManageCommand : BaseCommand
                 embed.SetLoading(ctx, "Playlists");
                 await RespondOrEdit(embed);
 
-                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, ctx.Guild, ctx.User)));
+                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, ctx.Guild, ctx.User)));
 
                 embed.Description = $"`Queued {SelectedPlaylist.List.Count} songs from your personal playlist '{SelectedPlaylist.PlaylistName}'.`";
 
-                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
                 await RespondOrEdit(embed.SetSuccess(ctx, "Playlists"));
                 return;
             }
             else if (e.Result.Interaction.Data.CustomId == SharePlaylist.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 string SelectedPlaylistId;
                 UserPlaylist SelectedPlaylist;
@@ -127,7 +127,7 @@ internal class ManageCommand : BaseCommand
                 try
                 {
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
                 catch (ArgumentException)
                 {
@@ -158,7 +158,7 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == ExportPlaylist.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 string SelectedPlaylistId;
                 UserPlaylist SelectedPlaylist;
@@ -166,7 +166,7 @@ internal class ManageCommand : BaseCommand
                 try
                 {
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
                 catch (ArgumentException)
                 {
@@ -206,11 +206,11 @@ internal class ManageCommand : BaseCommand
             else if (e.Result.Interaction.Data.CustomId == NewPlaylist.CustomId)
             {
                 string SelectedPlaylistName = "";
-                List<PlaylistItem> SelectedTracks = null;
+                List<PlaylistEntry> SelectedTracks = null;
 
                 while (true)
                 {
-                    if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -299,7 +299,7 @@ internal class ManageCommand : BaseCommand
                         if (!Continue || !Tracks.IsNotNullAndNotEmpty())
                             continue;
 
-                        SelectedTracks = Tracks.Select(x => new PlaylistItem
+                        SelectedTracks = Tracks.Select(x => new PlaylistEntry
                         {
                             Title = x.Title,
                             Url = x.Uri.ToString(),
@@ -310,7 +310,7 @@ internal class ManageCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                        if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -332,7 +332,7 @@ internal class ManageCommand : BaseCommand
                             List = SelectedTracks
                         };
 
-                        ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(v);
+                        ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -363,11 +363,11 @@ internal class ManageCommand : BaseCommand
                 }
 
                 string SelectedPlaylistName = "";
-                List<PlaylistItem> SelectedTracks = ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistItem { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
+                List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
 
                 while (true)
                 {
-                    if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -431,7 +431,7 @@ internal class ManageCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                        if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -453,7 +453,7 @@ internal class ManageCommand : BaseCommand
                             List = SelectedTracks
                         };
 
-                        ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(v);
+                        ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -474,7 +474,7 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == ImportPlaylist.CustomId)
             {
-                if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -545,7 +545,7 @@ internal class ManageCommand : BaseCommand
                     }
                     else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
                     {
-                        if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                        if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -562,10 +562,10 @@ internal class ManageCommand : BaseCommand
                         var v = new UserPlaylist
                         {
                             PlaylistName = loadResult.PlaylistInfo.Name,
-                            List = loadResult.Tracks.Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }).Take(250).ToList()
+                            List = loadResult.Tracks.Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString() }).Take(250).ToList()
                         };
 
-                        ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(v);
+                        ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -622,12 +622,12 @@ internal class ManageCommand : BaseCommand
 
                         var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-                        ImportJson.List = ImportJson.List.Where(x => Regex.IsMatch(x.Url, Resources.Regex.Url)).Select(x => new PlaylistItem { Title = x.Title, Url = x.Url }).Take(250).ToList();
+                        ImportJson.List = ImportJson.List.Where(x => Regex.IsMatch(x.Url, Resources.Regex.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url }).Take(250).ToList();
 
                         if (!ImportJson.List.Any())
                             throw new Exception();
 
-                        if (ctx.Bot._users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                        if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -648,7 +648,7 @@ internal class ManageCommand : BaseCommand
                             PlaylistColor = ImportJson.PlaylistColor
                         };
 
-                        ctx.Bot._users[ctx.Member.Id].UserPlaylists.Add(v);
+                        ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -685,14 +685,14 @@ internal class ManageCommand : BaseCommand
 
                 await RespondOrEdit(embed.Build());
 
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 UserPlaylist SelectedPlaylist;
 
                 try
                 {
                     string SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
                 catch (ArgumentException)
                 {
@@ -709,7 +709,7 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == DeletePlaylist.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot._users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 string SelectedPlaylistId;
                 UserPlaylist SelectedPlaylist;
@@ -717,7 +717,7 @@ internal class ManageCommand : BaseCommand
                 try
                 {
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot._users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
                 catch (ArgumentException)
                 {
@@ -734,7 +734,7 @@ internal class ManageCommand : BaseCommand
                     Description = $"`Deleting your playlist '{SelectedPlaylist.PlaylistName}'..`",
                 }.SetLoading(ctx, "Playlists")));
 
-                ctx.Bot._users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+                ctx.Bot.users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -892,7 +892,7 @@ internal class ManageCommand : BaseCommand
                                         return;
                                     }
 
-                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistItem { Title = x.Title, Url = x.Uri.ToString() }));
+                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString() }));
 
                                     await UpdateMessage();
                                     break;
@@ -947,7 +947,7 @@ internal class ManageCommand : BaseCommand
                                             return;
                                         }
 
-                                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.PlaylistAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n`{SelectedPlaylist.PlaylistName}`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.PlaylistAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n`{SelectedPlaylist.PlaylistName}`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                                         SelectedPlaylist.PlaylistThumbnail = asset.Attachments[0].Url;
                                     }
@@ -1069,7 +1069,7 @@ internal class ManageCommand : BaseCommand
                                             Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
                                         }.SetSuccess(ctx, "Playlists")));
 
-                                        ctx.Bot._users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+                                        ctx.Bot.users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
 
                                         await Task.Delay(5000);
                                         await ExecuteCommand(ctx, arguments);
@@ -1108,7 +1108,7 @@ internal class ManageCommand : BaseCommand
                                 }
                             }
                         }
-                    }).Add(ctx.Bot._watcher, ctx);
+                    }).Add(ctx.Bot.watcher, ctx);
                 }
             }
         });

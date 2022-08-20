@@ -9,7 +9,7 @@ internal class SaveCommand : BaseCommand
         return Task.Run(async () =>
         {
             await RespondOrEdit("Saving all data to the database..");
-            await ctx.Bot._databaseClient.FullSyncDatabase(true);
+            await ctx.Bot.databaseClient.FullSyncDatabase(true);
             await RespondOrEdit("All data has been saved to the database.");
         });
     }

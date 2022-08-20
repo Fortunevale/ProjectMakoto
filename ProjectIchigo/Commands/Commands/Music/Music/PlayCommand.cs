@@ -10,7 +10,7 @@ internal class PlayCommand : BaseCommand
         {
             string search = (string)arguments["search"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
             if (search.IsNullOrWhiteSpace())
@@ -48,12 +48,12 @@ internal class PlayCommand : BaseCommand
                 foreach (var b in Tracks)
                 {
                     added++;
-                    ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), ctx.Guild, ctx.User));
+                    ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), ctx.Guild, ctx.User));
                 }
 
                 embed.Description = $"`Queued {added} songs from `[`{oriResult.PlaylistInfo.Name}`]({search})`.`";
 
-                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - added + 1)} - {ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - added + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
 
                 embed.SetSuccess(ctx);
                 await ctx.BaseCommand.RespondOrEdit(embed);
@@ -62,11 +62,11 @@ internal class PlayCommand : BaseCommand
             {
                 var track = Tracks[0];
 
-                ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
+                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
 
                 embed.Description = $"`Queued `[`{track.Title}`]({track.Uri})`.`";
 
-                embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+                embed.AddField(new DiscordEmbedField($"📜 Queue position", $"{ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
                 embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
                 embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 

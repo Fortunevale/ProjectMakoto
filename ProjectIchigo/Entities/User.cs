@@ -4,7 +4,7 @@ public class User
 {
     public User(Bot _bot, ulong userId)
     {
-        if (_bot.ObjectedUsers.Contains(userId))
+        if (_bot.objectedUsers.Contains(userId))
             throw new InvalidOperationException($"User {userId} has objected to having their data processed.");
 
         Cooldown = new(_bot);
@@ -19,9 +19,9 @@ public class User
     [JsonIgnore]
     public ulong UserId { get; set; }
 
-    public UrlSubmissions UrlSubmissions { get; set; }
+    public UrlSubmissionSettings UrlSubmissions { get; set; }
     public AfkStatus AfkStatus { get; set; }
-    public ScoreSaber ScoreSaber { get; set; }
+    public ScoreSaberSettings ScoreSaber { get; set; }
     public ExperienceUserSettings ExperienceUserSettings { get; set; }
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 

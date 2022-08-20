@@ -50,30 +50,30 @@ internal class DiscordEventHandler
     {
         if (guild is not null)
         {
-            if (!_bot._guilds.ContainsKey(guild.Id))
-                _bot._guilds.Add(guild.Id, new Guild(guild.Id));
+            if (!_bot.guilds.ContainsKey(guild.Id))
+                _bot.guilds.Add(guild.Id, new Guild(guild.Id));
 
             if (guild.Members is not null && guild.Members.Count > 0)
                 foreach (var b in guild.Members)
-                    if (!_bot._guilds[guild.Id].Members.ContainsKey(b.Key))
-                        _bot._guilds[guild.Id].Members.Add(b.Key, new(_bot._guilds[guild.Id], b.Key));
+                    if (!_bot.guilds[guild.Id].Members.ContainsKey(b.Key))
+                        _bot.guilds[guild.Id].Members.Add(b.Key, new(_bot.guilds[guild.Id], b.Key));
 
             if (member is not null)
-                if (!_bot._guilds[guild.Id].Members.ContainsKey(member.Id))
-                    _bot._guilds[guild.Id].Members.Add(member.Id, new(_bot._guilds[guild.Id], member.Id));
+                if (!_bot.guilds[guild.Id].Members.ContainsKey(member.Id))
+                    _bot.guilds[guild.Id].Members.Add(member.Id, new(_bot.guilds[guild.Id], member.Id));
 
             if (user is not null)
-                if (!_bot._guilds[guild.Id].Members.ContainsKey(user.Id))
-                    _bot._guilds[guild.Id].Members.Add(user.Id, new(_bot._guilds[guild.Id], user.Id));
+                if (!_bot.guilds[guild.Id].Members.ContainsKey(user.Id))
+                    _bot.guilds[guild.Id].Members.Add(user.Id, new(_bot.guilds[guild.Id], user.Id));
         }
 
         if (member is not null)
-            if (!_bot._users.ContainsKey(member.Id) && !_bot.ObjectedUsers.Contains(member.Id))
-                _bot._users.Add(member.Id, new(_bot, member.Id));
+            if (!_bot.users.ContainsKey(member.Id) && !_bot.objectedUsers.Contains(member.Id))
+                _bot.users.Add(member.Id, new(_bot, member.Id));
 
         if (user is not null)
-            if (!_bot._users.ContainsKey(user.Id) && !_bot.ObjectedUsers.Contains(user.Id))
-                _bot._users.Add(user.Id, new(_bot, user.Id));
+            if (!_bot.users.ContainsKey(user.Id) && !_bot.objectedUsers.Contains(user.Id))
+                _bot.users.Add(user.Id, new(_bot, user.Id));
     }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
@@ -160,7 +160,7 @@ internal class DiscordEventHandler
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {
                 _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Ichigo. My prefix is `;;`. To get help, type `;;help`.\n" +
-                                $"If you need help, feel free to join our Support and Development Server: <{_bot._status.DevelopmentServerInvite}>\n\n" +
+                                $"If you need help, feel free to join our Support and Development Server: <{_bot.status.DevelopmentServerInvite}>\n\n" +
                                 $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/ichigo>.");
             }
         });

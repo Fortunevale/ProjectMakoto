@@ -8,7 +8,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             var embed = new DiscordEmbedBuilder
@@ -16,7 +16,7 @@ internal class ConfigCommand : BaseCommand
                 Description = EmbedMessageCommandAbstractions.GetCurrentConfiguration(ctx)
             }.SetAwaitingInput(ctx, "Embed Messages");
 
-            var Toggle = new DiscordButtonComponent((ctx.Bot._guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -37,7 +37,7 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == Toggle.CustomId)
             {
-                ctx.Bot._guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding = !ctx.Bot._guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding;
+                ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

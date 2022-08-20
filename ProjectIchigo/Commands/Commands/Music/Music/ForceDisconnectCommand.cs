@@ -8,7 +8,7 @@ internal class ForceDisconnectCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -33,7 +33,7 @@ internal class ForceDisconnectCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Member.IsDJ(ctx.Bot._status))
+            if (!ctx.Member.IsDJ(ctx.Bot.status))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,8 +42,8 @@ internal class ForceDisconnectCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink = new(ctx.Bot._guilds[ctx.Guild.Id]);
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();

@@ -14,14 +14,14 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
                     await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
                 else
                     await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("profile"), Description("Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.")]
@@ -33,7 +33,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
                 {
                     { "id", id }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("search"), Description("Search a user on ScoreSaber by name.")]
@@ -45,7 +45,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
                 {
                     { "name", name }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("map-leaderboard"), Description("Display the leaderboard off a specific map.")]
@@ -59,7 +59,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
                     { "Page", Page },
                     { "Internal_Page", Internal_Page },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("unlink"), Description("Allows you to remove the saved ScoreSaber profile from your Discord account.")]
@@ -68,7 +68,7 @@ internal class ScoreSaberPrefixCommands : BaseCommandModule
             Task.Run(async () =>
             {
                 await new ScoreSaberUnlinkCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 }

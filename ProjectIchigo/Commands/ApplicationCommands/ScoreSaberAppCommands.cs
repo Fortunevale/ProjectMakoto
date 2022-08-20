@@ -16,7 +16,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
                 {
                     { "id", id }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("search", "Search a user on Score Saber by name.", dmPermission: false)]
@@ -28,7 +28,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
                 {
                     { "name", name }
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("map-leaderboard", "Display the leaderboard off a specific map.", dmPermission: false)]
@@ -42,7 +42,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
                     { "Page", Page },
                     { "Internal_Page", Internal_Page },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("unlink", "Allows you to remove the saved ScoreSaber profile from your Discord account.", dmPermission: false)]
@@ -51,7 +51,7 @@ internal class ScoreSaberAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new ScoreSaberUnlinkCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
     }
 }

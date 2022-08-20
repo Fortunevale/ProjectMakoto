@@ -8,7 +8,7 @@ internal class ForceClearQueueCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();
@@ -33,7 +33,7 @@ internal class ForceClearQueueCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Member.IsDJ(ctx.Bot._status))
+            if (!ctx.Member.IsDJ(ctx.Bot.status))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,8 +42,8 @@ internal class ForceClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
-            ctx.Bot._guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
+            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {

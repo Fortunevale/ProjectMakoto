@@ -8,13 +8,13 @@ internal class UserInfoCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (await ctx.Bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
             victim ??= ctx.User;
 
-            if (!ctx.Bot._guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                ctx.Bot._guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot._guilds[ctx.Guild.Id], victim.Id));
+            if (!ctx.Bot.guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
+                ctx.Bot.guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot.guilds[ctx.Guild.Id], victim.Id));
 
             victim = await victim.GetFromApiAsync();
 
@@ -49,8 +49,8 @@ internal class UserInfoCommand : BaseCommand
             }
             else
             {
-                if (ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
-                    GenerateRoles = string.Join(", ", ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
+                if (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
+                    GenerateRoles = string.Join(", ", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
                 else
                     GenerateRoles = "`User doesn't have any stored roles.`";
             }
@@ -76,8 +76,8 @@ internal class UserInfoCommand : BaseCommand
                 {
                     Text = $"User-Id: {victim.Id}"
                 },
-                Description = $"{(bMember is null ? $"{(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? "`User never joined this server.`" : $"{(isBanned ? "`User is currently banned from this server.`" : "`User is currently not in this server.`")}")}\n\n" : "")}" +
-                        $"{(ctx.Bot._globalBans.List.ContainsKey(victim.Id) ? "💀 `User is globally banned.`\n" : "")}" +
+                Description = $"{(bMember is null ? $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? "`User never joined this server.`" : $"{(isBanned ? "`User is currently banned from this server.`" : "`User is currently not in this server.`")}")}\n\n" : "")}" +
+                        $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? "💀 `User is globally banned.`\n" : "")}" +
                         $"{(bMember is not null && bMember.IsOwner ? "✨ `This user owns this guild`\n" : "")}" +
                         $"{(victim.IsStaff ? "📘 `Discord Staff`\n" : "")}" +
                         $"{(victim.IsMod ? "⚒ `Certified Content Moderator`\n" : "")}" +
@@ -87,10 +87,10 @@ internal class UserInfoCommand : BaseCommand
                         $"\n**{(bMember is null ? "Roles (Backup)" : "Roles")}**\n{GenerateRoles}"
             };
 
-            if (ctx.Bot._globalBans.List.ContainsKey(victim.Id))
+            if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
-                var gBanDetails = ctx.Bot._globalBans.List[victim.Id];
-                var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot._globalBans.List[victim.Id].Moderator);
+                var gBanDetails = ctx.Bot.globalBans[victim.Id];
+                var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot.globalBans[victim.Id].Moderator);
 
                 embed.AddField(new DiscordEmbedField("Global Ban Reason", $"`{((string.IsNullOrWhiteSpace(gBanDetails.Reason) || gBanDetails.Reason == "-") ? "No reason provided." : gBanDetails.Reason).SanitizeForCodeBlock()}`", true));
                 embed.AddField(new DiscordEmbedField("Global Ban Moderator", $"`{gBanMod.UsernameWithDiscriminator}`", true));
@@ -100,18 +100,18 @@ internal class UserInfoCommand : BaseCommand
             if (isBanned)
                 embed.AddField(new DiscordEmbedField("Ban Details", $"`{(string.IsNullOrWhiteSpace(banDetails?.Reason) ? "No reason provided." : $"{banDetails.Reason}")}`", false));
 
-            if (ctx.Bot._guilds[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+            if (ctx.Bot.guilds[ctx.Guild.Id].InviteTrackerSettings.Enabled)
             {
-                embed.AddField(new DiscordEmbedField("Invited by", $"{(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
-                embed.AddField(new DiscordEmbedField("Users invited", $"`{(ctx.Bot._guilds[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
+                embed.AddField(new DiscordEmbedField("Invited by", $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
+                embed.AddField(new DiscordEmbedField("Users invited", $"`{(ctx.Bot.guilds[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
             }
 
             if (bMember is not null)
                 embed.AddField(new DiscordEmbedField("Server Join Date", $"{Formatter.Timestamp(bMember.JoinedAt, TimestampFormat.LongDateTime)}", true));
             else
-                embed.AddField(new DiscordEmbedField("Server Leave Date", (ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})" : "`User never joined this server.`"), true));
+                embed.AddField(new DiscordEmbedField("Server Leave Date", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})" : "`User never joined this server.`"), true));
 
-            embed.AddField(new DiscordEmbedField("First Join Date", (ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot._guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})" : "`User never joined this server.`"), true));
+            embed.AddField(new DiscordEmbedField("First Join Date", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})" : "`User never joined this server.`"), true));
 
             embed.AddField(new DiscordEmbedField("Account Creation Date", $"{Formatter.Timestamp(victim.CreationTimestamp, TimestampFormat.LongDateTime)}", true));
 

@@ -17,7 +17,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 { "number", number },
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -34,7 +34,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 { "number", number },
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -50,7 +50,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
             {
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -68,7 +68,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 { "duration", duration },
                 { "reason", reason },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -84,7 +84,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
             {
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -101,7 +101,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 { "victim", victim },
                 { "reason", reason },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -118,7 +118,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 { "victim", victim },
                 { "reason", reason },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -134,7 +134,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
             {
                 { "victim", victim },
             });
-        }).Add(_bot._watcher, ctx);
+        }).Add(_bot.watcher, ctx);
     }
 
 
@@ -151,14 +151,14 @@ internal class ModerationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot._users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
                     return;
 
                 if (ctx.Command.Parent is not null)
                     await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
                 else
                     await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("githubupdates"),
@@ -171,7 +171,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 {
                     { "channel", FollowChannel.GithubUpdates },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
 
         [Command("globalbans"),
@@ -184,7 +184,7 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 {
                     { "channel", FollowChannel.GlobalBans },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
         
         [Command("news"),
@@ -197,7 +197,52 @@ internal class ModerationPrefixCommands : BaseCommandModule
                 {
                     { "channel", FollowChannel.News },
                 });
-            }).Add(_bot._watcher, ctx);
+            }).Add(_bot.watcher, ctx);
         }
+    }
+
+
+
+    [Command("moveall"),
+    CommandModule("moderation"),
+    Description("Move all users in your Voice Channel to another Voice Channel")]
+    public async Task MoveAll(CommandContext ctx, DiscordChannel newChannel)
+    {
+        Task.Run(async () =>
+        {
+            await new MoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "newChannel", newChannel }
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+
+
+
+    [Command("movehere"),
+    CommandModule("moderation"),
+    Description("Move all users from another Voice Channel to your Voice Channel")]
+    public async Task MoveHere(CommandContext ctx, DiscordChannel oldChannel)
+    {
+        Task.Run(async () =>
+        {
+            await new MoveHereCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "oldChannel", oldChannel }
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+    
+    
+    
+    [Command("customembed"),
+    CommandModule("moderation"),
+    Description("Create an embbeded message")]
+    public async Task CustomEmbed(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new CustomEmbedCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
     }
 }

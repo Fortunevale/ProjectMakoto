@@ -11,7 +11,7 @@ internal class GlobalUnbanCommand : BaseCommand
             DiscordUser victim = (DiscordUser)arguments["victim"];
             bool UnbanFromGuilds = (bool)arguments["UnbanFromGuilds"];
 
-            if (!ctx.Bot._globalBans.List.ContainsKey(victim.Id))
+            if (!ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -20,8 +20,8 @@ internal class GlobalUnbanCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot._globalBans.List.Remove(victim.Id);
-            await ctx.Bot._databaseClient._helper.DeleteRow(ctx.Bot._databaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
+            ctx.Bot.globalBans.Remove(victim.Id);
+            await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             int Success = 0;
             int Failed = 0;
@@ -34,10 +34,10 @@ internal class GlobalUnbanCommand : BaseCommand
             if (UnbanFromGuilds)
                 foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
                 {
-                    if (!ctx.Bot._guilds.ContainsKey(b.Key))
-                        ctx.Bot._guilds.Add(b.Key, new Guild(b.Key));
+                    if (!ctx.Bot.guilds.ContainsKey(b.Key))
+                        ctx.Bot.guilds.Add(b.Key, new Guild(b.Key));
 
-                    if (ctx.Bot._guilds[b.Key].JoinSettings.AutoBanGlobalBans)
+                    if (ctx.Bot.guilds[b.Key].JoinSettings.AutoBanGlobalBans)
                     {
                         try
                         {
@@ -61,7 +61,7 @@ internal class GlobalUnbanCommand : BaseCommand
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
             }.SetSuccess(ctx, "Global Ban"));
 
-            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot._status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GlobalBanAnnouncementsChannelId);
             await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor

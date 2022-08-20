@@ -6,13 +6,13 @@ internal class ObjectCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot._users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
             var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.BoolToEmote(ctx.Client)));
             var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.BoolToEmote(ctx.Client)));
 
-            if (ctx.Bot.ObjectedUsers.Contains(ctx.User.Id))
+            if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -38,8 +38,8 @@ internal class ObjectCommand : BaseCommand
 
                     try
                     {
-                        ctx.Bot.ObjectedUsers.Remove(ctx.User.Id);
-                        await ctx.Bot._databaseClient._helper.DeleteRow(ctx.Bot._databaseClient.mainDatabaseConnection, "objected_users", "id", $"{ctx.User.Id}");
+                        ctx.Bot.objectedUsers.Remove(ctx.User.Id);
+                        await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "objected_users", "id", $"{ctx.User.Id}");
                     }
                     catch (Exception ex)
                     {
@@ -68,6 +68,7 @@ internal class ObjectCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = $"`This action will delete all data related to your user account and object to further creation of an user account.`\n" +
+                              $"**`In addition, this action will make the bot leave every server you own.`**\n" +
                               $"`This will prevent you from using any commands of the bot.`\n" +
                               $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
                               $"**`Are you sure you want to continue?`**"
@@ -109,8 +110,8 @@ internal class ObjectCommand : BaseCommand
 
                     try
                     {
-                        ctx.Bot._users.Remove(ctx.User.Id);
-                        await ctx.Bot._databaseClient._helper.DeleteRow(ctx.Bot._databaseClient.mainDatabaseConnection, "users", "userid", $"{ctx.User.Id}");
+                        ctx.Bot.users.Remove(ctx.User.Id);
+                        await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "users", "userid", $"{ctx.User.Id}");
                     }
                     catch (Exception ex)
                     {
@@ -128,12 +129,17 @@ internal class ObjectCommand : BaseCommand
                         Description = $"`Adding your account to objection list..`"
                     }.SetBotLoading(ctx));
 
-                    ctx.Bot.ObjectedUsers.Add(ctx.User.Id);
+                    ctx.Bot.objectedUsers.Add(ctx.User.Id);
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Successfully deleted your profile and added you to the objection list. You will no longer be able to run any commands. To re-allow user account creation, re-run this command.`"
                     }.SetBotSuccess(ctx));
+
+                    foreach (var b in ctx.Client.Guilds.Where(x => x.Value.OwnerId == ctx.User.Id))
+                    {
+                        try { _logger.LogInfo($"Leaving guild '{b.Key}'.."); await b.Value.LeaveAsync(); } catch { }
+                    }
                 }
                 else
                 {
