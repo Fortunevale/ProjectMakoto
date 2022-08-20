@@ -1014,16 +1014,20 @@ public class Bot
         }).Add(watcher);
     }
 
+    bool ExitCalled = false;
+
     internal async Task ExitApplication(bool Immediate = false)
     {
-        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
+        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(1)).ContinueWith(x =>
         {
             if (x.IsCompletedSuccessfully)
                 Environment.Exit(ExitCodes.ExitTasksTimeout);
         });
 
-        if (DatabaseClient.IsDisposed()) // When the Database Client has been disposed, the Exit Call has already been made.
+        if (DatabaseClient.IsDisposed() || ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
             return;
+
+        ExitCalled = true;
 
         if (status.DiscordInitialized)
         {
