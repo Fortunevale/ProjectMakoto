@@ -41,6 +41,18 @@ public abstract class BaseCommand
             return;
         }
 
+        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        {
+            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            return;
+        }
+        
+        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        {
+            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
+            return;
+        }
+
         await ExecuteCommand(this.ctx, arguments);
     }
     
@@ -83,6 +95,18 @@ public abstract class BaseCommand
             return;
         }
 
+        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        {
+            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            return;
+        }
+
+        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        {
+            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
+            return;
+        }
+
         await ExecuteCommand(this.ctx, arguments);
     }
     
@@ -122,6 +146,18 @@ public abstract class BaseCommand
         if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
+            return;
+        }
+
+        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        {
+            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            return;
+        }
+
+        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        {
+            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
             return;
         }
 
@@ -885,6 +921,22 @@ public abstract class BaseCommand
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+    }
+    
+    public void SendUserBanError(BlacklistEntry entry)
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock}`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+    }
+    
+    public void SendGuildBanError(BlacklistEntry entry)
+    {
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock}`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
 

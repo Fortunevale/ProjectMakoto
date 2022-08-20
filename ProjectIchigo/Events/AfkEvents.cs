@@ -12,7 +12,7 @@ internal class AfkEvents
     {
         Task.Run(async () =>
         {
-            if (_bot.objectedUsers.Contains(e.Author.Id))
+            if (_bot.objectedUsers.Contains(e.Author.Id) || _bot.bannedUsers.ContainsKey(e.Author.Id) || _bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
                 return;
 
             if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)

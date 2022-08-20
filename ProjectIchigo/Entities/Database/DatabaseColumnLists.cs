@@ -27,14 +27,14 @@ internal class DatabaseColumnLists
         new Column("timestamp", "bigint"),
     };
 
-    internal readonly static List<Column> user_submission_bans = new()
+    internal readonly static List<Column> submission_user_bans = new()
     {
         new Column("id", "bigint", primary: true),
         new Column("reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("moderator", "bigint"),
     };
 
-    internal readonly static List<Column> guild_submission_bans = new()
+    internal readonly static List<Column> submission_guild_bans = new()
     {
         new Column("id", "bigint", primary: true),
         new Column("reason", "text", "utf8mb4_0900_ai_ci"),
@@ -141,9 +141,11 @@ internal class DatabaseColumnLists
     internal readonly static Dictionary<string, List<Column>> Tables = new()
     {
         { "scam_urls", scam_urls },
+        { "banned_users", globalbans },
+        { "banned_guilds", globalbans },
         { "globalbans", globalbans },
-        { "user_submission_bans", user_submission_bans },
-        { "guild_submission_bans", guild_submission_bans },
+        { "submission_user_bans", submission_user_bans },
+        { "submission_guild_bans", submission_guild_bans },
         { "active_url_submissions", active_url_submissions },
         { "users", users },
         { "guilds", guilds },

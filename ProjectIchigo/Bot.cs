@@ -34,8 +34,8 @@ public class Bot
     #region Bans
 
     internal List<ulong> objectedUsers = new();
-    internal Dictionary<ulong, Tuple<ulong, string, DateTime>> bannedUsers = new();
-    internal Dictionary<ulong, Tuple<ulong, string, DateTime>> bannedGuilds = new();
+    internal Dictionary<ulong, BlacklistEntry> bannedUsers = new();
+    internal Dictionary<ulong, BlacklistEntry> bannedGuilds = new();
 
     internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionUserBans = new();
     internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionGuildBans = new();
@@ -701,8 +701,9 @@ public class Bot
             {
                 _logger.LogDebug($"Performing sync tasks for '{guild.Key}'..");
 
-                if (objectedUsers.Contains(guild.Value.OwnerId))
+                if (objectedUsers.Contains(guild.Value.OwnerId) || bannedUsers.ContainsKey(guild.Value.OwnerId) || bannedGuilds.ContainsKey(guild.Key))
                 {
+                    _logger.LogInfo($"Leaving guild '{guild.Key}'..");
                     await guild.Value.LeaveAsync();
                     return;
                 }

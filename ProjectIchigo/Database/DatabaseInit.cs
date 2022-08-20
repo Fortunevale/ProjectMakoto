@@ -243,12 +243,38 @@ internal class DatabaseInit
             });
 
         _logger.LogInfo($"Loaded {_bot.globalBans.Count} submission bans from table 'globalbans'.");
+        
+        _logger.LogDebug($"Loading user bans from table 'banned_users'..");
+
+        IEnumerable<DatabaseBanInfo> banned_users = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("banned_users", DatabaseColumnLists.globalbans));
+
+        foreach (var b in banned_users)
+            _bot.bannedUsers.Add(b.id, new BlacklistEntry
+            {
+                Reason = b.reason,
+                Moderator = b.moderator,
+                Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
+            });
+
+        _logger.LogInfo($"Loaded {_bot.bannedUsers.Count} submission bans from table 'banned_users'.");
+        
+        IEnumerable<DatabaseBanInfo> banned_guilds = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("banned_guilds", DatabaseColumnLists.globalbans));
+
+        foreach (var b in banned_users)
+            _bot.bannedGuilds.Add(b.id, new BlacklistEntry
+            {
+                Reason = b.reason,
+                Moderator = b.moderator,
+                Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
+            });
+
+        _logger.LogInfo($"Loaded {_bot.bannedGuilds.Count} submission bans from table 'banned_guilds'.");
 
 
 
-        _logger.LogDebug($"Loading submission bans from table 'user_submission_bans'..");
+        _logger.LogDebug($"Loading submission bans from table 'submission_user_bans'..");
 
-        IEnumerable<DatabaseBanInfo> userbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans));
+        IEnumerable<DatabaseBanInfo> userbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("submission_user_bans", DatabaseColumnLists.submission_user_bans));
 
         foreach (var b in userbans)
             _bot.phishingUrlSubmissionUserBans.Add(b.id, new PhishingSubmissionBanDetails
@@ -257,13 +283,13 @@ internal class DatabaseInit
                 Moderator = b.moderator
             });
 
-        _logger.LogInfo($"Loaded {_bot.phishingUrlSubmissionUserBans.Count} submission bans from table 'user_submission_bans'.");
+        _logger.LogInfo($"Loaded {_bot.phishingUrlSubmissionUserBans.Count} submission bans from table 'submission_user_bans'.");
 
 
 
-        _logger.LogDebug($"Loading submission bans from table 'guild_submission_bans'..");
+        _logger.LogDebug($"Loading submission bans from table 'submission_guild_bans'..");
 
-        IEnumerable<DatabaseBanInfo> guildbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans));
+        IEnumerable<DatabaseBanInfo> guildbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("submission_guild_bans", DatabaseColumnLists.submission_guild_bans));
 
         foreach (var b in guildbans)
             _bot.phishingUrlSubmissionGuildBans.Add(b.id, new PhishingSubmissionBanDetails
@@ -272,7 +298,7 @@ internal class DatabaseInit
                 Moderator = b.moderator
             });
 
-        _logger.LogInfo($"Loaded {_bot.phishingUrlSubmissionGuildBans.Count} submission bans from table 'guild_submission_bans'.");
+        _logger.LogInfo($"Loaded {_bot.phishingUrlSubmissionGuildBans.Count} submission bans from table 'submission_guild_bans'.");
 
 
 

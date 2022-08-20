@@ -138,7 +138,7 @@ internal class ObjectCommand : BaseCommand
 
                     foreach (var b in ctx.Client.Guilds.Where(x => x.Value.OwnerId == ctx.User.Id))
                     {
-                        try { await b.Value.LeaveAsync(); } catch { }
+                        try { _logger.LogInfo($"Leaving guild '{b.Key}'.."); await b.Value.LeaveAsync(); } catch { }
                     }
                 }
                 else

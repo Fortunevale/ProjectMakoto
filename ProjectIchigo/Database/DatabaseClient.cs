@@ -666,7 +666,7 @@ internal class DatabaseClient
                     {
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update guilds in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occured while trying to objected users in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -764,15 +764,15 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update user_submission_bans in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occured while trying to update submission_user_bans in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("user_submission_bans", DatabaseColumnLists.user_submission_bans);
+                        cmd.CommandText = _helper.GetSaveCommand("submission_user_bans", DatabaseColumnLists.submission_user_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.user_submission_bans, i);
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.submission_user_bans, i);
 
                             cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
                             cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
@@ -780,19 +780,19 @@ internal class DatabaseClient
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.user_submission_bans);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.submission_user_bans);
 
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'user_submission_bans'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'submission_user_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the user_submission_bans table", ex);
+                        _logger.LogError($"An exception occured while trying to update the submission_user_bans table", ex);
                     }
 
                 if (_bot.phishingUrlSubmissionGuildBans.Count > 0)
@@ -807,15 +807,15 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update guild_submission_bans in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occured while trying to update submission_guild_bans in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("guild_submission_bans", DatabaseColumnLists.guild_submission_bans);
+                        cmd.CommandText = _helper.GetSaveCommand("submission_guild_bans", DatabaseColumnLists.submission_guild_bans);
 
                         for (int i = 0; i < DatabaseInserts.Count; i++)
                         {
-                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.guild_submission_bans, i);
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.submission_guild_bans, i);
 
                             cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
                             cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
@@ -823,19 +823,109 @@ internal class DatabaseClient
                         }
 
                         cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.guild_submission_bans);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.submission_guild_bans);
 
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guild_submission_bans'.");
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'submission_guild_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
+                        _logger.LogError($"An exception occured while trying to update the submission_guild_bans table", ex);
+                    }
+
+                if (_bot.bannedUsers.Count > 0)
+                    try
+                    {
+                        List<DatabaseBanInfo> DatabaseInserts = _bot.bannedUsers.Select(x => new DatabaseBanInfo
+                        {
+                            id = x.Key,
+                            reason = x.Value.Reason,
+                            moderator = x.Value.Moderator,
+                            timestamp = x.Value.Timestamp.Ticks
+                        }).ToList();
+
+                        if (mainDatabaseConnection == null)
+                        {
+                            throw new Exception($"Exception occured while trying to update banned users in database: Database mainDatabaseConnection not present");
+                        }
+
+                        var cmd = mainDatabaseConnection.CreateCommand();
+                        cmd.CommandText = _helper.GetSaveCommand("banned_users", DatabaseColumnLists.globalbans);
+
+                        for (int i = 0; i < DatabaseInserts.Count; i++)
+                        {
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.globalbans, i);
+
+                            cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
+                            cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
+                            cmd.Parameters.AddWithValue($"moderator{i}", DatabaseInserts[i].moderator);
+                            cmd.Parameters.AddWithValue($"timestamp{i}", DatabaseInserts[i].timestamp);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.globalbans);
+
+                        cmd.Connection = mainDatabaseConnection;
+                        await _queue.RunCommand(cmd);
+
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'banned_users'.");
+                        DatabaseInserts.Clear();
+                        DatabaseInserts = null;
+                        cmd.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An exception occured while trying to update the banned_users table", ex);
+                    }
+
+                if (_bot.bannedGuilds.Count > 0)
+                    try
+                    {
+                        List<DatabaseBanInfo> DatabaseInserts = _bot.bannedGuilds.Select(x => new DatabaseBanInfo
+                        {
+                            id = x.Key,
+                            reason = x.Value.Reason,
+                            moderator = x.Value.Moderator,
+                            timestamp = x.Value.Timestamp.Ticks
+                        }).ToList();
+
+                        if (mainDatabaseConnection == null)
+                        {
+                            throw new Exception($"Exception occured while trying to update banned guilds in database: Database mainDatabaseConnection not present");
+                        }
+
+                        var cmd = mainDatabaseConnection.CreateCommand();
+                        cmd.CommandText = _helper.GetSaveCommand("banned_guilds", DatabaseColumnLists.globalbans);
+
+                        for (int i = 0; i < DatabaseInserts.Count; i++)
+                        {
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.globalbans, i);
+
+                            cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
+                            cmd.Parameters.AddWithValue($"reason{i}", DatabaseInserts[i].reason);
+                            cmd.Parameters.AddWithValue($"moderator{i}", DatabaseInserts[i].moderator);
+                            cmd.Parameters.AddWithValue($"timestamp{i}", DatabaseInserts[i].timestamp);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.globalbans);
+
+                        cmd.Connection = mainDatabaseConnection;
+                        await _queue.RunCommand(cmd);
+
+                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'banned_guilds'.");
+                        DatabaseInserts.Clear();
+                        DatabaseInserts = null;
+                        cmd.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An exception occured while trying to update the banned_guilds table", ex);
                     }
 
                 if (_bot.globalBans.Count > 0)
@@ -880,7 +970,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the guild_submission_bans table", ex);
+                        _logger.LogError($"An exception occured while trying to update the submission_guild_bans table", ex);
                     }
 
                 if (_bot.submittedUrls.Count > 0)

@@ -46,6 +46,56 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
+        [Command("ban-user"), Description("Bans a user from usage of the bot.")]
+        public async Task BanUser(CommandContext ctx, DiscordUser victim, [RemainingText][Description("Reason")] string reason = "")
+        {
+            Task.Run(async () =>
+            {
+                await new BanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                    { "reason", reason },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("unban-user"), Description("Unbans a user from usage of the bot.")]
+        public async Task UnbanUser(CommandContext ctx, DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new UnbanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("ban-guild"), Description("Bans a guild from usage of the bot.")]
+        public async Task BanGuild(CommandContext ctx, ulong guild, [RemainingText][Description("Reason")] string reason = "")
+        {
+            Task.Run(async () =>
+            {
+                await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild },
+                    { "reason", reason },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("unban-guild"), Description("Unbans a guild from usage of the bot.")]
+        public async Task UnbanGuild(CommandContext ctx, ulong guild)
+        {
+            Task.Run(async () =>
+            {
+                await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
         [Command("globalban"), Description("Bans a user from all servers opted into global bans.")]
         public async Task Globalban(CommandContext ctx, DiscordUser victim, [RemainingText][Description("Reason")] string reason = "-")
         {

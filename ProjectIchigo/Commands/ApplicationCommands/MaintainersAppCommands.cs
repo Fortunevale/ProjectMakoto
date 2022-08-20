@@ -30,6 +30,56 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
+        [SlashCommand("ban-user", "Bans a user from usage of the bot.")]
+        public async Task BanUser(InteractionContext ctx, [Option("victim", "The user to ban")] DiscordUser victim, [Option("reason", "The reason")] string reason = "")
+        {
+            Task.Run(async () =>
+            {
+                await new BanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                    { "reason", reason },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("unban-user", "Unbans a user from usage of the bot.")]
+        public async Task UnbanUser(InteractionContext ctx, [Option("victim", "The user to ban")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new UnbanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("ban-guild", "Bans a guild from usage of the bot.")]
+        public async Task BanGuild(InteractionContext ctx, [Option("victim", "The user to ban")] long guild, [Option("reason", "The reason")] string reason = "")
+        {
+            Task.Run(async () =>
+            {
+                await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild },
+                    { "reason", reason },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("unban-guild", "Unbans a guild from usage of the bot.")]
+        public async Task UnbanGuild(InteractionContext ctx, [Option("victim", "The user to ban")] long guild)
+        {
+            Task.Run(async () =>
+            {
+                await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
         [SlashCommand("globalban", "Bans a user from all servers opted into global bans.")]
         public async Task GlobalBanCommand(InteractionContext ctx, [Option("user", "The user to ban")]DiscordUser victim, [Option("reason", "The reason")]string reason = "-")
         {
