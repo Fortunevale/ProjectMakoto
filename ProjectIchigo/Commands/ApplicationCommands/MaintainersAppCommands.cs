@@ -44,7 +44,7 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("unban-user", "Unbans a user from usage of the bot.")]
-        public async Task UnbanUser(InteractionContext ctx, [Option("victim", "The user to ban")] DiscordUser victim)
+        public async Task UnbanUser(InteractionContext ctx, [Option("victim", "The user to unban")] DiscordUser victim)
         {
             Task.Run(async () =>
             {
@@ -56,26 +56,26 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("ban-guild", "Bans a guild from usage of the bot.")]
-        public async Task BanGuild(InteractionContext ctx, [Option("victim", "The user to ban")] long guild, [Option("reason", "The reason")] string reason = "")
+        public async Task BanGuild(InteractionContext ctx, [Option("guild", "The guild to ban")] SnowflakeObject guild, [Option("reason", "The reason")] string reason = "")
         {
             Task.Run(async () =>
             {
                 await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "guild", guild },
+                    { "guild", guild.Id },
                     { "reason", reason },
                 });
             }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("unban-guild", "Unbans a guild from usage of the bot.")]
-        public async Task UnbanGuild(InteractionContext ctx, [Option("victim", "The user to ban")] long guild)
+        public async Task UnbanGuild(InteractionContext ctx, [Option("guild", "The guild to unban")] SnowflakeObject guild)
         {
             Task.Run(async () =>
             {
                 await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "guild", guild },
+                    { "guild", guild.Id },
                 });
             }).Add(_bot.watcher, ctx);
         }
