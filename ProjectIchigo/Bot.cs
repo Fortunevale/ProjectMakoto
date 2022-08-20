@@ -185,11 +185,14 @@ public class Bot
 
                 _ = Task.Run(async () =>
                 {
+                    _logger.LogDebug("Waiting for guilds to download to sync database..");
+
                     while (!discordClient.Guilds.Any())
                         Thread.Sleep(500);
 
                     await databaseClient.FullSyncDatabase(true);
 
+                    _logger.LogInfo("Initial Full Sync finished.");
                     status.DatabaseInitialLoadCompleted = true;
                 });
             }

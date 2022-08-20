@@ -418,6 +418,8 @@ internal class DatabaseClient
         {
             Task key = new(async () =>
             {
+                _logger.LogInfo("Running full Database Sync..");
+
                 if (_bot.guilds.Count > 0)
                     try
                     {
