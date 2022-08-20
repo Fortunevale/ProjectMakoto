@@ -928,7 +928,7 @@ public abstract class BaseCommand
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock}`",
+            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock()}`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
     
@@ -936,7 +936,7 @@ public abstract class BaseCommand
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock}`",
+            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock()}`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
 
