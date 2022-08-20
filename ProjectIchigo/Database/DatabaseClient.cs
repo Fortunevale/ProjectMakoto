@@ -585,7 +585,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'guilds'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -650,7 +649,6 @@ internal class DatabaseClient
                                 cmd.Connection = guildDatabaseConnection;
                                 await _queue.RunCommand(cmd);
 
-                                _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table '{guild.Key}'.");
                                 DatabaseInserts.Clear();
                                 DatabaseInserts = null;
                                 cmd.Dispose();
@@ -685,7 +683,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {_bot.objectedUsers.Count} rows into table 'objected_users'.");
                         cmd.Dispose();
                     }
                     catch (Exception ex)
@@ -742,7 +739,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'users'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -785,7 +781,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'submission_user_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -828,7 +823,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'submission_guild_bans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();

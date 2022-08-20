@@ -145,7 +145,6 @@ internal class PhishingUrlUpdater
             cmd.Connection = _bot.databaseClient.mainDatabaseConnection;
             await _bot.databaseClient._queue.RunCommand(cmd);
 
-            _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'scam_urls'.");
             UpdateRunning = false;
             DatabaseInserts.Clear();
             DatabaseInserts = null;
