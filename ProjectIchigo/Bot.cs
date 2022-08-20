@@ -1059,7 +1059,7 @@ public class Bot
             }
         }
 
-        if (status.DatabaseInitialLoadCompleted)
+        if (status.DatabaseInitialized)
         {
             try
             {
