@@ -867,7 +867,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'banned_users'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -912,7 +911,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'banned_guilds'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -957,7 +955,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'globalbans'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
@@ -1002,7 +999,6 @@ internal class DatabaseClient
                         cmd.Connection = mainDatabaseConnection;
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogDebug($"Inserted {DatabaseInserts.Count} rows into table 'active_url_submissions'.");
                         DatabaseInserts.Clear();
                         DatabaseInserts = null;
                         cmd.Dispose();
