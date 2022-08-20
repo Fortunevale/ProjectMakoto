@@ -56,26 +56,26 @@ internal class MaintainersAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("ban-guild", "Bans a guild from usage of the bot.")]
-        public async Task BanGuild(InteractionContext ctx, [Option("guild", "The guild to ban")] SnowflakeObject guild, [Option("reason", "The reason")] string reason = "")
+        public async Task BanGuild(InteractionContext ctx, [Option("guild", "The guild to ban")] string guild, [Option("reason", "The reason")] string reason = "")
         {
             Task.Run(async () =>
             {
                 await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "guild", guild.Id },
+                    { "guild", Convert.ToUInt64(guild) },
                     { "reason", reason },
                 });
             }).Add(_bot.watcher, ctx);
         }
 
         [SlashCommand("unban-guild", "Unbans a guild from usage of the bot.")]
-        public async Task UnbanGuild(InteractionContext ctx, [Option("guild", "The guild to unban")] SnowflakeObject guild)
+        public async Task UnbanGuild(InteractionContext ctx, [Option("guild", "The guild to unban")] string guild)
         {
             Task.Run(async () =>
             {
                 await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "guild", guild.Id },
+                    { "guild", Convert.ToUInt64(guild) },
                 });
             }).Add(_bot.watcher, ctx);
         }
