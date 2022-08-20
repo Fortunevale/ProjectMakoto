@@ -17,6 +17,7 @@ internal class DiscordEvents
         {
             if (_bot.objectedUsers.Contains(e.Guild.OwnerId) || _bot.bannedUsers.ContainsKey(e.Guild.OwnerId) || _bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
             {
+                await Task.Delay(1000);
                 _logger.LogInfo($"Leaving guild '{e.Guild.Id}'..");
                 await e.Guild.LeaveAsync();
                 return;
