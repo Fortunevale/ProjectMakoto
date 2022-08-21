@@ -621,6 +621,8 @@ public class Bot
                 Thread.Sleep(30000);
             }
 
+            status.DiscordCommandsRegistered = true;
+
             while (true)
             {
                 try
@@ -1022,7 +1024,7 @@ public class Bot
 
     internal async Task ExitApplication(bool Immediate = false)
     {
-        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(1)).ContinueWith(x =>
+        _ = Task.Delay(Immediate ? TimeSpan.FromSeconds(10) : TimeSpan.FromMinutes(5)).ContinueWith(x =>
         {
             if (x.IsCompletedSuccessfully)
                 Environment.Exit(ExitCodes.ExitTasksTimeout);
@@ -1037,6 +1039,15 @@ public class Bot
         {
             try
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                if (!status.DiscordCommandsRegistered)
+                    _logger.LogWarn("Startup is incomplete. Waiting for Startup to finish to shutdown..");
+
+                while (!status.DiscordCommandsRegistered || sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
+                    await Task.Delay(500);
+
                 await SyncTasks(discordClient.Guilds);
             }
             catch (Exception ex)
@@ -1095,6 +1106,9 @@ public class Bot
             {
                 if (status.DiscordInitialized)
                 {
+                    if (e.LogEntry.Message == "[111] Connection terminated (4000, ''), reconnecting")
+                        break;
+
                     var channel = discordClient.Guilds[status.LoadedConfig.AssetsGuildId].GetChannel(status.LoadedConfig.ExceptionLogChannelId);
 
                     _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
