@@ -352,10 +352,10 @@ internal class ActionlogEvents
             if (e.MessageBefore.Content != e.Message.Content)
             {
                 if (!string.IsNullOrWhiteSpace(e.MessageBefore.Content))
-                    embed.AddField(new DiscordEmbedField("Previous Content", $"`{e.MessageBefore.Content.TruncateWithIndication(2022)}`"));
+                    embed.AddField(new DiscordEmbedField("Previous Content", $"`{e.MessageBefore.Content.TruncateWithIndication(1022)}`"));
 
                 if (!string.IsNullOrWhiteSpace(e.Message.Content))
-                    embed.AddField(new DiscordEmbedField("New Content", $"`{e.Message.Content.TruncateWithIndication(2022)}`"));
+                    embed.AddField(new DiscordEmbedField("New Content", $"`{e.Message.Content.TruncateWithIndication(1022)}`"));
             }
             else
             {
