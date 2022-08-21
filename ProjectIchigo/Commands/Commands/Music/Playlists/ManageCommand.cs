@@ -501,8 +501,6 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
 
-                _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
                 if (Menu.Result.Interaction.Data.CustomId == Link.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("Import Playlist", Guid.NewGuid().ToString())
@@ -588,6 +586,8 @@ internal class ManageCommand : BaseCommand
                 {
                     try
                     {
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
                             Description = $"`Please upload an exported playlist via '{ctx.Prefix}upload'.`",
@@ -672,6 +672,8 @@ internal class ManageCommand : BaseCommand
                 }
                 else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
                 {
+                    _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
