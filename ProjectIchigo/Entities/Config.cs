@@ -14,6 +14,8 @@ public class Config
     public ulong UrlSubmissionsChannelId = 0;
     public ulong OtherAssetsChannelId = 0;
 
+    public ulong ExceptionLogChannelId = 0;
+
     public string DotEmoji = "🅿";
 
     public string DisabledRepeatEmoji = "🅿";

@@ -1091,6 +1091,25 @@ public class Bot
         switch (e.LogEntry.LogLevel)
         {
             case LogLevel.FATAL:
+            case LogLevel.ERROR:
+            {
+                if (status.DiscordInitialized)
+                {
+                    var channel = discordClient.Guilds[status.LoadedConfig.AssetsGuildId].GetChannel(status.LoadedConfig.ExceptionLogChannelId);
+
+                    _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
+                        .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
+                        .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
+                        .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCodeBlock()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCodeBlock()}```" : "")}")
+                        .WithTimestamp(e.LogEntry.TimeOfEvent)); 
+                }
+                break;
+            }
+        }
+
+        switch (e.LogEntry.LogLevel)
+        {
+            case LogLevel.FATAL:
             {
                 if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
                 {
