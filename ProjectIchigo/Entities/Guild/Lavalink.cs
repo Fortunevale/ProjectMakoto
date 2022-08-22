@@ -87,16 +87,20 @@ public class Lavalink
 
     public class QueueInfo
     {
-        public QueueInfo(string VideoTitle, string Url, DiscordGuild guild, DiscordUser user)
+        public QueueInfo(string VideoTitle, string Url, TimeSpan length, DiscordGuild guild, DiscordUser user)
         {
             this.VideoTitle = VideoTitle;
             this.Url = Url;
+            this.Length = length;
+
             this.guild = guild;
             this.user = user;
         }
 
         public string VideoTitle { get; set; }
         public string Url { get; set; }
+
+        public TimeSpan Length { get; set; }
 
         [JsonIgnore]
         public DiscordGuild guild { get; set; }

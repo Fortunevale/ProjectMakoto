@@ -493,13 +493,17 @@ public class Bot
                             {
                                 _logger.LogInfo($"Lavalink is not up to date. Updating from {InstalledVersion} to {LatestVersion}..");
 
-                                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                                try
                                 {
-                                    _logger.LogInfo($"Running on windows, killing Lavalink before updating if it exists..");
+                                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                                    {
+                                        _logger.LogInfo($"Running on windows, killing Lavalink before updating if it exists..");
 
-                                    if (File.Exists(PidFile))
-                                        Process.GetProcessById(Convert.ToInt32(File.ReadAllText(PidFile))).Kill();
+                                        if (File.Exists(PidFile))
+                                            Process.GetProcessById(Convert.ToInt32(File.ReadAllText(PidFile))).Kill();
+                                    }
                                 }
+                                catch { }
 
                                 if (File.Exists($"{JarFile}.old"))
                                     File.Delete($"{JarFile}.old");
@@ -816,6 +820,45 @@ public class Bot
         {
             _logger.LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
+            Task.Run(async () =>
+            {
+                while (!status.LavalinkInitialized)
+                    await Task.Delay(1000);
+
+                Dictionary<string, TimeSpan> VideoLengthCache = new();
+
+                foreach (var user in users)
+                {
+                    foreach (var list in user.Value.UserPlaylists)
+                    {
+                        foreach (var b in list.List.ToList())
+                        {
+                            if (b.Length is null || !b.Length.HasValue)
+                            {
+                                if (!VideoLengthCache.ContainsKey(b.Url))
+                                {
+                                    _logger.LogInfo($"Fetching video length for '{b.Url}'");
+
+                                    var track = await discordClient.GetLavalink().ConnectedNodes.First(x => x.Value.IsConnected).Value.Rest.GetTracksAsync(b.Url, LavalinkSearchType.Plain);
+
+                                    if (track.LoadResultType != LavalinkLoadResultType.TrackLoaded)
+                                    {
+                                        list.List.Remove(b);
+                                        _logger.LogError($"Failed to load video length for '{b.Url}'");
+                                        continue;
+                                    }
+
+                                    VideoLengthCache.Add(b.Url, track.Tracks.First().Length);
+                                    await Task.Delay(100);
+                                }
+
+                                b.Length = VideoLengthCache[b.Url];
+                            }
+                        }
+                    }
+                }
+            }).Add(watcher);
+
             for (int i = 0; i < 251; i++)
             {
                 experienceHandler.CalculateLevelRequirement(i);
@@ -1106,7 +1149,7 @@ public class Bot
             {
                 if (status.DiscordInitialized)
                 {
-                    if (e.LogEntry.Message == "[111] Connection terminated (4000, ''), reconnecting")
+                    if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
                         break;
 
                     var channel = discordClient.Guilds[status.LoadedConfig.AssetsGuildId].GetChannel(status.LoadedConfig.ExceptionLogChannelId);

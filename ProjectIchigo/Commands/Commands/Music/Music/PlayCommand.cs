@@ -48,7 +48,7 @@ internal class PlayCommand : BaseCommand
                 foreach (var b in Tracks)
                 {
                     added++;
-                    ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), ctx.Guild, ctx.User));
+                    ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(b.Title, b.Uri.ToString(), b.Length, ctx.Guild, ctx.User));
                 }
 
                 embed.Description = $"`Queued {added} songs from `[`{oriResult.PlaylistInfo.Name}`]({search})`.`";
@@ -62,7 +62,7 @@ internal class PlayCommand : BaseCommand
             {
                 var track = Tracks[0];
 
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), ctx.Guild, ctx.User));
+                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Add(new(track.Title, track.Uri.ToString(), track.Length, ctx.Guild, ctx.User));
 
                 embed.Description = $"`Queued `[`{track.Title}`]({track.Uri})`.`";
 

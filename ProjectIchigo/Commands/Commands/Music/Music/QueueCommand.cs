@@ -51,8 +51,15 @@ internal class QueueCommand : BaseCommand
 
                 LastInt = CurrentPage * 10;
 
-                var Description = $"**`There's currently {ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued.`**\n\n";
-                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. [`{x.VideoTitle}`]({x.Url}) requested by {x.user.Mention}"))}\n\n";
+                var TotalTimespan = TimeSpan.Zero;
+
+                for (int i = 0; i < ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count; i++)
+                {
+                    TotalTimespan = TotalTimespan.Add(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue[i].Length);
+                }
+
+                var Description = $"**`There's currently {ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued. This queue last for {TotalTimespan.GetHumanReadable()}.`**\n\n";
+                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` [`{x.VideoTitle}`]({x.Url}) requested by {x.user.Mention}"))}\n\n";
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count > 0)
                     Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count / 10.0)}`\n\n";
