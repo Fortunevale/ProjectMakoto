@@ -5,7 +5,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Loading;
+        b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -17,7 +17,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetBotLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultBotAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Loading;
+        b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -73,7 +73,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Error;
+        b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -85,7 +85,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetBotError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultBotAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Error;
+        b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -97,7 +97,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Warning;
+        b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -109,7 +109,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Success;
+        b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -121,7 +121,7 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder SetBotSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultBotAuthor(ctx, CustomText);
-        b.Author.IconUrl = Resources.StatusIndicators.Success;
+        b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
         b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
@@ -133,7 +133,7 @@ internal static class PreMadeEmbedsExtensions
     private static DiscordEmbedBuilder.EmbedAuthor MakeDefaultAuthor(SharedCommandContext ctx, string CustomText = "") => new()
     {
         Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{ctx.Guild.Name}",
-        IconUrl = (ctx.Guild.IconHash.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : ctx.Guild.IconUrl)
+        IconUrl = (ctx.Guild.IconHash.IsNullOrWhiteSpace() ? AuditLogIcons.QuestionMark : ctx.Guild.IconUrl)
     };
     
     private static DiscordEmbedBuilder.EmbedAuthor MakeDefaultBotAuthor(SharedCommandContext ctx, string CustomText = "") => new()

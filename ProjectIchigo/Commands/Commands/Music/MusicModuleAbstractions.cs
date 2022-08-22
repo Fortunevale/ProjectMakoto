@@ -20,7 +20,7 @@ internal class MusicModuleAbstractions
 
         LavalinkLoadResult loadResult;
 
-        if (Regex.IsMatch(load, Resources.Regex.YouTubeUrl))
+        if (RegexTemplates.YouTubeUrl.IsMatch(load))
         {
             if (Regex.IsMatch(load, @"((\?|&)list=RDMM\w+)(&*)"))
             {

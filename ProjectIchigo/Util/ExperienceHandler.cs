@@ -28,9 +28,9 @@ internal class ExperienceHandler
         if (message.Attachments is not null && string.IsNullOrWhiteSpace(message.Content))
             Points -= 1;
 
-        if (Regex.IsMatch(message.Content, Resources.Regex.Url))
+        if (RegexTemplates.Url.IsMatch(message.Content))
         {
-            string ModifiedString = Regex.Replace(message.Content, Resources.Regex.Url, "");
+            string ModifiedString = RegexTemplates.Url.Replace(message.Content, "");
 
             if (ModifiedString.Length > 10)
                 Points += 1;

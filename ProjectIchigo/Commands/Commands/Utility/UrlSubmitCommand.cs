@@ -120,7 +120,7 @@ internal class UrlSubmitCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
             {
                 { ContinueButton },
-                { Resources.CancelButton }
+                { MessageComponents.CancelButton }
             }));
 
             var e = await interactivity.WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
@@ -179,7 +179,7 @@ internal class UrlSubmitCommand : BaseCommand
 
                 var subbmited_msg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = Resources.LogIcons.Info, Name = $"Phishing Link Submission" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = $"Phishing Link Submission" },
                     Color = EmbedColors.Success,
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Submitted Url`: `{domain.SanitizeForCodeBlock()}`\n" +
@@ -207,7 +207,7 @@ internal class UrlSubmitCommand : BaseCommand
                 embed.SetSuccess(ctx, "Phishing Link Submission");
                 await RespondOrEdit(embed);
             }
-            else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
             }

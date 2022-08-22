@@ -31,7 +31,7 @@ internal class ConfigCommand : BaseCommand
             {
                 AddButton, RemoveButton
             })
-            .AddComponents(Resources.CancelButton));
+            .AddComponents(MessageComponents.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
 
@@ -75,7 +75,7 @@ internal class ConfigCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectMessage, SelectEmoji, SelectRole, Finish })
-                        .AddComponents(Resources.CancelButton));
+                        .AddComponents(MessageComponents.CancelButton));
 
                     var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -112,7 +112,7 @@ internal class ConfigCommand : BaseCommand
 
                         var url = Response.Interaction.GetModalValueByCustomId("url");
 
-                        if (!Regex.IsMatch(url, Resources.Regex.DiscordChannelUrl) || !url.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
+                        if (!RegexTemplates.DiscordChannelUrl.IsMatch(url) || !url.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
                         {
                             action_embed.Description = $"`This doesn't look correct. A message url should look something like these:`\n" +
                                                        $"`https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
@@ -281,7 +281,7 @@ internal class ConfigCommand : BaseCommand
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -320,7 +320,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

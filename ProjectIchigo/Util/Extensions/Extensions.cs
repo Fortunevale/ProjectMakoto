@@ -212,8 +212,8 @@ internal static class Extensions
 
         proc = proc.Replace("`", "´");
 
-        try { proc = Regex.Replace(proc, Resources.Regex.UserMention, ""); } catch { }
-        try { proc = Regex.Replace(proc, Resources.Regex.ChannelMention, ""); } catch { }
+        try { proc = RegexTemplates.UserMention.Replace(proc, ""); } catch { }
+        try { proc = RegexTemplates.ChannelMention.Replace(proc, ""); } catch { }
 
         proc = proc.Replace("@everyone", "");
         proc = proc.Replace("@here", "");
@@ -252,7 +252,7 @@ internal static class Extensions
     {
         try
         {
-            if (!Regex.IsMatch(link, Resources.Regex.DiscordChannelUrl))
+            if (!RegexTemplates.DiscordChannelUrl.IsMatch(link))
                 throw new Exception("Not a discord channel url");
 
             string processed = link.Remove(0, link.IndexOf("channels/") + 9);

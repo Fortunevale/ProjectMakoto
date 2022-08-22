@@ -25,7 +25,7 @@ internal class ConfigCommand : BaseCommand
                 Add,
                 Remove
             })
-            .AddComponents(Resources.CancelButton));
+            .AddComponents(MessageComponents.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
 
@@ -80,7 +80,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

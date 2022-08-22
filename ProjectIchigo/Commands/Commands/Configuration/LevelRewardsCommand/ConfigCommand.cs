@@ -96,7 +96,7 @@ internal class ConfigCommand : BaseCommand
 
                 builder.AddComponents(Row2);
 
-                builder.AddComponents(Resources.CancelButton);
+                builder.AddComponents(MessageComponents.CancelButton);
 
                 await RespondOrEdit(builder);
             }
@@ -153,7 +153,7 @@ internal class ConfigCommand : BaseCommand
 
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
-                                    .AddComponents(Resources.CancelButton));
+                                    .AddComponents(MessageComponents.CancelButton));
 
                                 var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -287,7 +287,7 @@ internal class ConfigCommand : BaseCommand
                                     ctx.Client.ComponentInteractionCreated += SelectInteraction;
                                     return;
                                 }
-                                else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                                else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                                 {
                                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -372,7 +372,7 @@ internal class ConfigCommand : BaseCommand
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 

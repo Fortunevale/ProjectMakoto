@@ -20,7 +20,7 @@ internal class BumpReminder
             Color = EmbedColors.Info,
             Description = $"**The server can be bumped {Formatter.Timestamp(_bot.guilds[channel.Guild.Id].BumpReminderSettings.LastBump.AddHours(2), TimestampFormat.RelativeTime)}.**\n\n" +
                           $"The server was last bumped by <@{_bot.guilds[channel.Guild.Id].BumpReminderSettings.LastUserId}> {Formatter.Timestamp(_bot.guilds[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(_bot.guilds[channel.Guild.Id].BumpReminderSettings.LastBump, TimestampFormat.LongDateTime)}",
-            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = $"{(bUser is null ? Resources.AuditLogIcons.QuestionMark : bUser.AvatarUrl)}" }
+            Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = $"{(bUser is null ? AuditLogIcons.QuestionMark : bUser.AvatarUrl)}" }
         };
 
         if (_bot.guilds[channel.Guild.Id].BumpReminderSettings.LastBump < DateTime.UtcNow.AddHours(-2))

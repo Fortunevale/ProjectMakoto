@@ -49,7 +49,7 @@ internal class PhishingProtectionEvents
             throw;
         }
 
-        var matches = Regex.Matches(e.Content, Resources.Regex.Url);
+        var matches = RegexTemplates.Url.Matches(e.Content);
         var parsedMatches = matches.Select(x => new UriBuilder(x.Value));
 
         var parsedWords = e.Content.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
