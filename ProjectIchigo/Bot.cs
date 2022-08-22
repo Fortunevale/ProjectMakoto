@@ -1078,6 +1078,8 @@ public class Bot
 
         ExitCalled = true;
 
+        _logger.LogInfo($"Preparing to shut down Ichigo..");
+
         if (status.DiscordInitialized)
         {
             try
@@ -1088,7 +1090,7 @@ public class Bot
                 if (!status.DiscordCommandsRegistered)
                     _logger.LogWarn("Startup is incomplete. Waiting for Startup to finish to shutdown..");
 
-                while (!status.DiscordCommandsRegistered || sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
+                while (!status.DiscordCommandsRegistered && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                     await Task.Delay(500);
 
                 await SyncTasks(discordClient.Guilds);
