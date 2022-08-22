@@ -54,6 +54,14 @@ internal class MusicModuleAbstractions
 
             loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
         }
+        else if (RegexTemplates.SoundcloudUrl.IsMatch(load))
+        {
+            loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
+        }
+        else if (RegexTemplates.BandcampUrl.IsMatch(load))
+        {
+            loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
+        }
         else
             loadResult = await node.Rest.GetTracksAsync(load);
 
