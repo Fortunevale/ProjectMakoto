@@ -16,12 +16,12 @@ internal class EmbedMessagesEvents
             if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseEmbedding)
                 return;
 
-            if (Regex.IsMatch(e.Message.Content, Resources.Regex.DiscordChannelUrl))
+            if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
             {
                 if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot)))
                     return;
 
-                var matches = Regex.Matches(e.Message.Content, Resources.Regex.DiscordChannelUrl);
+                var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
 
                 foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
                 {

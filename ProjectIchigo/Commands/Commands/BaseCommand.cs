@@ -609,7 +609,7 @@ public abstract class BaseCommand
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
             Description = "`Waiting for a modal response..`"
-        }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, Resources.CancelButton }));
+        }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.CancelButton }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
@@ -644,7 +644,7 @@ public abstract class BaseCommand
                         {
                             await e.Interaction.CreateInteractionModalResponseAsync(builder);
                         }
-                        else if (e.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             Cancelled = true;

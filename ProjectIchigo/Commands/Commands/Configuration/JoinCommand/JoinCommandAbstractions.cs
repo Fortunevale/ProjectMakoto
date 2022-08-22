@@ -1,4 +1,5 @@
 ﻿namespace ProjectIchigo.Commands.JoinCommand;
+
 internal class JoinCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)

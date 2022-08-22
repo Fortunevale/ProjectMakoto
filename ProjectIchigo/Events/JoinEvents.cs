@@ -41,14 +41,14 @@ internal class JoinEvents
                     {
                         Author = new()
                         {
-                            IconUrl = Resources.AuditLogIcons.UserAdded,
+                            IconUrl = AuditLogIcons.UserAdded,
                             Name = e.Member.UsernameWithDiscriminator
                         },
                         Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot.status.LoadedConfig.JoinEventsEmojis.SelectRandom()}",
                         Color = EmbedColors.Success,
                         Thumbnail = new()
                         {
-                            Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
+                            Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
                         }
                     });
                 }
@@ -71,7 +71,7 @@ internal class JoinEvents
                     {
                         Author = new()
                         {
-                            IconUrl = Resources.AuditLogIcons.UserLeft,
+                            IconUrl = AuditLogIcons.UserLeft,
                             Name = e.Member.UsernameWithDiscriminator
                         },
                         Description = $"has left **{e.Guild.Name}**.\n" +
@@ -79,7 +79,7 @@ internal class JoinEvents
                         Color = EmbedColors.Error,
                         Thumbnail = new()
                         {
-                            Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? Resources.AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
+                            Url = (e.Member.AvatarUrl.IsNullOrWhiteSpace() ? AuditLogIcons.QuestionMark : e.Member.AvatarUrl)
                         }
                     });
                 }

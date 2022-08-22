@@ -67,7 +67,7 @@ internal class GlobalUnbanCommand : BaseCommand
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = ctx.CurrentUser.Username,
-                    IconUrl = Resources.AuditLogIcons.UserBanRemoved
+                    IconUrl = AuditLogIcons.UserBanRemoved
                 },
                 Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
                               $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",

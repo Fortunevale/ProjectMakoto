@@ -1039,7 +1039,7 @@ public class Bot
         {
             try
             {
-                Stopwatch sw = new Stopwatch();
+                Stopwatch sw = new();
                 sw.Start();
 
                 if (!status.DiscordCommandsRegistered)

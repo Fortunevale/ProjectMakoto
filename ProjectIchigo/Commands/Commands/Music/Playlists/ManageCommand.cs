@@ -51,7 +51,7 @@ internal class ManageCommand : BaseCommand
                 ModifyPlaylist,
                 DeletePlaylist
             })
-            .AddComponents(Resources.CancelButton));
+            .AddComponents(MessageComponents.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
 
@@ -234,7 +234,7 @@ internal class ManageCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectName, SelectFirstTracks, Finish })
-                        .AddComponents(Resources.CancelButton));
+                        .AddComponents(MessageComponents.CancelButton));
 
                     var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -342,7 +342,7 @@ internal class ManageCommand : BaseCommand
                         await HandlePlaylistModify(v);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                     {
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -390,7 +390,7 @@ internal class ManageCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectName, Finish })
-                        .AddComponents(Resources.CancelButton));
+                        .AddComponents(MessageComponents.CancelButton));
 
                     var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -463,7 +463,7 @@ internal class ManageCommand : BaseCommand
                         await HandlePlaylistModify(v);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                     {
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -491,7 +491,7 @@ internal class ManageCommand : BaseCommand
                     Description = $"`Do you want to import a playlist via link or exported playlist?`",
                 }.SetAwaitingInput(ctx, "Playlists"))
                 .AddComponents(new List<DiscordComponent> { Link, ExportedPlaylist })
-                .AddComponents(Resources.CancelButton));
+                .AddComponents(MessageComponents.CancelButton));
 
                 var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
 
@@ -622,7 +622,7 @@ internal class ManageCommand : BaseCommand
 
                         var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-                        ImportJson.List = ImportJson.List.Where(x => Regex.IsMatch(x.Url, Resources.Regex.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url }).Take(250).ToList();
+                        ImportJson.List = ImportJson.List.Where(x => RegexTemplates.Url.IsMatch(x.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url }).Take(250).ToList();
 
                         if (!ImportJson.List.Any())
                             throw new Exception();
@@ -670,7 +670,7 @@ internal class ManageCommand : BaseCommand
                         return;
                     }
                 }
-                else if (Menu.Result.Interaction.Data.CustomId == Resources.CancelButton.CustomId)
+                else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -801,7 +801,7 @@ internal class ManageCommand : BaseCommand
                         .AddComponents(new List<DiscordComponent> { PreviousPage, NextPage })
                         .AddComponents(new List<DiscordComponent> { AddSong, RemoveSong, RemoveDuplicates })
                         .AddComponents(new List<DiscordComponent> { PlaylistName, ChangePlaylistColor, ChangePlaylistThumbnail })
-                        .AddComponents(Resources.CancelButton));
+                        .AddComponents(MessageComponents.CancelButton));
 
                     return;
                 }

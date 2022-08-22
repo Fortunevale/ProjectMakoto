@@ -39,7 +39,7 @@ internal class TranslateCommand : BaseCommand
                 return;
 
             var transSource = bMessage.Content;
-            transSource = Regex.Replace(transSource, Resources.Regex.Url, "");
+            transSource = RegexTemplates.Url.Replace(transSource, "");
 
             if (transSource.IsNullOrWhiteSpace())
             {
@@ -60,7 +60,7 @@ internal class TranslateCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = $"`What provider do you want to use?`",
-            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(Resources.CancelButton));
+            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(MessageComponents.CancelButton));
 
             var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
 

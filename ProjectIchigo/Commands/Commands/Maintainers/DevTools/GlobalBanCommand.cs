@@ -59,7 +59,7 @@ internal class GlobalBanCommand : BaseCommand
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
                     Name = ctx.CurrentUser.Username,
-                    IconUrl = Resources.AuditLogIcons.UserBanned
+                    IconUrl = AuditLogIcons.UserBanned
                 },
                 Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was added to the global ban list.\n\n" +
                               $"Reason: {reason.Sanitize()}\n" +
