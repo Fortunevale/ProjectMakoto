@@ -17,4 +17,7 @@ internal class EmojiTemplates
     public static DiscordEmoji GetVoiceState(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.VoiceStateEmojiId);
     public static DiscordEmoji GetMessage(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.MessageEmojiId);
     public static DiscordEmoji GetInvite(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.InviteEmojiId);
+
+    public static DiscordEmoji GetYouTube(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.YouTubeEmojiId);
+    public static DiscordEmoji GetSoundcloud(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.SoundCloudEmojiId);
 }

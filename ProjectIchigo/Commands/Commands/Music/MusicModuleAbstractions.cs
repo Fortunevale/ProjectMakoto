@@ -63,7 +63,27 @@ internal class MusicModuleAbstractions
             loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
         }
         else
-            loadResult = await node.Rest.GetTracksAsync(load);
+        {
+            embed.Description = $"`On what plattform do you want to search?`";
+            embed.SetError(ctx);
+            
+            var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Client, ctx.Bot)));
+            var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Client, ctx.Bot)));
+
+            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { YouTube, SoundCloud }));
+
+            var Menu1 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+
+            if (Menu1.TimedOut)
+            {
+                ctx.BaseCommand.ModifyToTimedOut();
+                return (null, null, false);
+            }
+
+            _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+            loadResult = await node.Rest.GetTracksAsync(load, (Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
+        }
 
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
         {

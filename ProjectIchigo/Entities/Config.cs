@@ -48,6 +48,9 @@ public class Config
     public ulong GuildEmojiId = 1005612867577458729;
     public ulong InviteEmojiId = 1005612860333899859;
 
+    public ulong YouTubeEmojiId = 1011219477834252368;
+    public ulong SoundCloudEmojiId = 1011219476001337444;
+
     public ulong DisboardAccountId = 302050872383242240;
 
     public bool UseLavalinkAutoUpdater = false;
