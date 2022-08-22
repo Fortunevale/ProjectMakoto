@@ -127,7 +127,7 @@ internal class DatabaseQueue
         RequestQueue value = new() { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority };
 
         Queue.Add(value);
-        Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority));
+        try { Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority)); } catch { }
 
         Stopwatch sw = new();
 
@@ -157,7 +157,7 @@ internal class DatabaseQueue
         RequestQueue value = new() { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low };
 
         Queue.Add(value);
-        Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority));
+        try { Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority)); } catch { }
 
         Stopwatch sw = new();
 
