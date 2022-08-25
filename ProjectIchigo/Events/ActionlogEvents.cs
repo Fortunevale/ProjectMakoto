@@ -1071,7 +1071,7 @@ internal class ActionlogEvents
             if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.ChannelsModified)
                 return;
 
-            if (e.ChannelBefore.Name == e.ChannelAfter.Name && e.ChannelBefore.IsNsfw == e.ChannelAfter.IsNsfw)
+            if (e.ChannelBefore?.Name == e.ChannelAfter?.Name && e.ChannelBefore?.IsNsfw == e.ChannelAfter?.IsNsfw)
                 return;
 
             string Icon = $"{(e.ChannelAfter.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.ChannelAfter.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}";
