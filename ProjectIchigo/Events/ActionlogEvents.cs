@@ -343,8 +343,8 @@ internal class ActionlogEvents
                 Color = EmbedColors.Warning,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Message.Author.Id}" },
                 Timestamp = DateTime.UtcNow,
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
-                Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.UsernameWithDiscriminator}`\n" +
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author?.AvatarUrl },
+                Description = $"**User**: {e.Message.Author?.Mention} `{e.Message.Author?.UsernameWithDiscriminator}`\n" +
                                 $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`\n" +
                                 $"**Message**: [`Jump to message`]({e.Message.JumpLink})"
             };
