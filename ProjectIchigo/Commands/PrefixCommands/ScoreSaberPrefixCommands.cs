@@ -1,6 +1,6 @@
 namespace ProjectIchigo.PrefixCommands;
 
-internal class ScoreSaberPrefixCommands : BaseCommandModule
+public class ScoreSaberPrefixCommands : BaseCommandModule
 {
     [Group("scoresaber"), Aliases("ss"),
     CommandModule("scoresaber"),

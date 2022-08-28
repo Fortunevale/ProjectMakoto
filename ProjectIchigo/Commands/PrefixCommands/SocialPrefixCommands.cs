@@ -1,6 +1,6 @@
 namespace ProjectIchigo.PrefixCommands;
 
-internal class SocialPrefixCommands : BaseCommandModule
+public class SocialPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 

@@ -1,6 +1,6 @@
 namespace ProjectIchigo.PrefixCommands;
 
-internal class MusicPrefixCommands : BaseCommandModule
+public class MusicPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 

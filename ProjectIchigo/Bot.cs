@@ -412,13 +412,13 @@ public class Bot
                 }
                 else
                 {
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
                     appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.AssetsGuildId);
                     appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.AssetsGuildId);
                     appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.AssetsGuildId);
                     appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.AssetsGuildId);
                     appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.AssetsGuildId);
                     appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");

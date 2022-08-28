@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.ApplicationCommands;
 
-internal class ScoreSaberAppCommands : ApplicationCommandsModule
+public class ScoreSaberAppCommands : ApplicationCommandsModule
 {
     [SlashCommandGroup("scoresaber", "Interact with the ScoreSaber API.", dmPermission: false)]
     public class ScoreSaberGroup : ApplicationCommandsModule
