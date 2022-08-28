@@ -42,6 +42,8 @@ global using DisCatSharp.Enums;
 global using DisCatSharp.EventArgs;
 global using DisCatSharp.ApplicationCommands;
 global using DisCatSharp.ApplicationCommands.Attributes;
+global using DisCatSharp.ApplicationCommands.Context;
+global using DisCatSharp.ApplicationCommands.Exceptions;
 global using DisCatSharp.ApplicationCommands.EventArgs;
 global using DisCatSharp.CommandsNext.Attributes;
 global using DisCatSharp.Interactivity.Extensions;

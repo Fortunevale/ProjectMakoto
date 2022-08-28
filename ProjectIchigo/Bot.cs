@@ -418,6 +418,16 @@ public class Bot
                         appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
                         appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
                     }
+                    else
+                    {
+                        appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.AssetsGuildId);
+                        appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    }
                 }).Add(watcher);
 
                 if (status.LoadedConfig.IsDev)
@@ -613,17 +623,14 @@ public class Bot
         _ = Task.Run(async () =>
         {
             Thread.Sleep(5000);
-            
-            if (!status.LoadedConfig.IsDev)
-            {
-                _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
-                while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
-                    Thread.Sleep(1000);
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
-                _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
-                Thread.Sleep(30000);
-            }
+            while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
+                Thread.Sleep(1000);
+
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
+            Thread.Sleep(30000);
 
             status.DiscordCommandsRegistered = true;
 
