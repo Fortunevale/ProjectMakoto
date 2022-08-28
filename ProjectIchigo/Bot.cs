@@ -392,43 +392,40 @@ public class Bot
                     }
                 });
 
+                var appCommands = discordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
+                {
+                    ServiceProvider = new ServiceCollection()
+                                        .AddSingleton(this)
+                                        .BuildServiceProvider(),
+                    EnableDefaultHelp = false
+                });
+
+                if (!status.LoadedConfig.IsDev)
+                {
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
+                }
+                else
+                {
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
+                }
+
                 _logger.LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
                 _logger.LogInfo($"Connected and authenticated with Discord.");
                 status.DiscordInitialized = true;
-
-                Task.Run(async () =>
-                {
-                    var appCommands = discordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
-                    {
-                        ServiceProvider = new ServiceCollection()
-                                .AddSingleton(this)
-                                .BuildServiceProvider(),
-                        EnableDefaultHelp = false
-                    });
-
-                    if (!status.LoadedConfig.IsDev)
-                    {
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
-                    }
-                    else
-                    {
-                        appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.AssetsGuildId);
-                        appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    }
-                }).Add(watcher);
 
                 if (status.LoadedConfig.IsDev)
                     Prefix = ">>";
