@@ -323,7 +323,7 @@ internal static class Extensions
         return $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
     }
 
-    internal static int GetRoleHighestPosition(this DiscordMember member) => (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position);
+    internal static int GetRoleHighestPosition(this DiscordMember member) => (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
 }
 
 internal class SqLiteBaseRepository
