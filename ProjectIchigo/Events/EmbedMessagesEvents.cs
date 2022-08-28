@@ -43,7 +43,7 @@ internal class EmbedMessagesEvents
                     if (!channel.TryGetMessage(MessageId, out var message))
                         return;
 
-                    var Delete = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+                    var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
                     var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -55,29 +55,37 @@ internal class EmbedMessagesEvents
                                                                     || message.Attachments[0].FileName.EndsWith(".jpg")
                                                                     || message.Attachments[0].FileName.EndsWith(".gif")) ? message.Attachments[0].Url : ""),
                         Timestamp = message.Timestamp,
-                        Footer = new DiscordEmbedBuilder.EmbedFooter { Text = "Deleting via the button is restricted to the original message author."}
                     }).AddComponents(Delete));
+                }
+            }
+        });
+    }
 
-                    var interaction = await sender.GetInteractivity().WaitForButtonAsync(msg, e.Author, TimeSpan.FromMinutes(30));
+    internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
+    {
+        _ = Task.Run(async () =>
+        {
+            if (e.Interaction.Data.CustomId == "DeleteEmbedMessage")
+            {
+                var fullMsg = await e.Message.Refresh();
 
-                    if (interaction.TimedOut)
+                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if ((fullMsg.Reference is not null && fullMsg.ReferencedMessage is null) || 
+                (fullMsg.ReferencedMessage is not null && fullMsg.ReferencedMessage.Author.Id == e.Interaction.User.Id) ||
+                (await e.User.ConvertToMember(e.Interaction.Guild)).Roles.Any(x => (x.CheckPermission(Permissions.ManageMessages) == PermissionLevel.Allowed) || (x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed)))
+                {
+                    _ = fullMsg.DeleteAsync().ContinueWith(x =>
                     {
-                        msg.ModifyToTimedOut(true);
-                        return;
-                    }
-
-                    _ = interaction.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                    if (interaction.Result.Interaction.Data.CustomId == Delete.CustomId)
-                    {
-                        _ = msg.DeleteAsync().ContinueWith(x =>
-                        {
-                            if (x.IsCompletedSuccessfully)
-                                _ = interaction.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("✅ `The message was deleted.`").AsEphemeral());
-                            else
-                                _ = interaction.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `Failed to delete the message.`").AsEphemeral());
-                        });
-                    }
+                        if (x.IsCompletedSuccessfully)
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("✅ `The message was deleted.`").AsEphemeral());
+                        else
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `Failed to delete the message.`").AsEphemeral());
+                    });
+                }
+                else
+                {
+                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `You are not the message author of the referenced message.`").AsEphemeral());
                 }
             }
         });
