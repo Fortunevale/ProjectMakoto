@@ -1,5 +1,5 @@
 namespace ProjectIchigo.PrefixCommands;
-internal class MaintainersPrefixCommands : BaseCommandModule
+public class MaintainersPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
@@ -134,15 +134,6 @@ internal class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [Command("register"), Description("Register Slash Commands. Debug only.")]
-        public async Task RegisterCommands(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await new RegisterCommandsCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot.watcher, ctx);
-        }
-        
         [Command("test"), Description("Check description lenghts.")]
         public async Task Test(CommandContext ctx)
         {

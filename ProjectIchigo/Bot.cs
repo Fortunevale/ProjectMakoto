@@ -392,33 +392,40 @@ public class Bot
                     }
                 });
 
+                var appCommands = discordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
+                {
+                    ServiceProvider = new ServiceCollection()
+                                        .AddSingleton(this)
+                                        .BuildServiceProvider(),
+                    EnableDefaultHelp = false
+                });
+
+                if (!status.LoadedConfig.IsDev)
+                {
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
+                }
+                else
+                {
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.AssetsGuildId);
+                }
+
                 _logger.LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
                 _logger.LogInfo($"Connected and authenticated with Discord.");
                 status.DiscordInitialized = true;
-
-                Task.Run(async () =>
-                {
-                    var appCommands = discordClient.UseApplicationCommands(new ApplicationCommandsConfiguration
-                    {
-                        ServiceProvider = new ServiceCollection()
-                                .AddSingleton(this)
-                                .BuildServiceProvider(),
-                        EnableDefaultHelp = false
-                    });
-
-                    if (!status.LoadedConfig.IsDev)
-                    {
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
-                        appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
-                    }
-                }).Add(watcher);
 
                 if (status.LoadedConfig.IsDev)
                     Prefix = ">>";
@@ -493,13 +500,17 @@ public class Bot
                             {
                                 _logger.LogInfo($"Lavalink is not up to date. Updating from {InstalledVersion} to {LatestVersion}..");
 
-                                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                                try
                                 {
-                                    _logger.LogInfo($"Running on windows, killing Lavalink before updating if it exists..");
+                                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                                    {
+                                        _logger.LogInfo($"Running on windows, killing Lavalink before updating if it exists..");
 
-                                    if (File.Exists(PidFile))
-                                        Process.GetProcessById(Convert.ToInt32(File.ReadAllText(PidFile))).Kill();
+                                        if (File.Exists(PidFile))
+                                            Process.GetProcessById(Convert.ToInt32(File.ReadAllText(PidFile))).Kill();
+                                    }
                                 }
+                                catch { }
 
                                 if (File.Exists($"{JarFile}.old"))
                                     File.Delete($"{JarFile}.old");
@@ -609,17 +620,14 @@ public class Bot
         _ = Task.Run(async () =>
         {
             Thread.Sleep(5000);
-            
-            if (!status.LoadedConfig.IsDev)
-            {
-                _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
-                while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
-                    Thread.Sleep(1000);
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
-                _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
-                Thread.Sleep(30000);
-            }
+            while (discordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
+                Thread.Sleep(1000);
+
+            _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
+            Thread.Sleep(30000);
 
             status.DiscordCommandsRegistered = true;
 
@@ -815,6 +823,45 @@ public class Bot
         Task.Run(async () =>
         {
             _logger.LogInfo($"I'm on {e.Guilds.Count} guilds.");
+
+            Task.Run(async () =>
+            {
+                while (!status.LavalinkInitialized)
+                    await Task.Delay(1000);
+
+                Dictionary<string, TimeSpan> VideoLengthCache = new();
+
+                foreach (var user in users)
+                {
+                    foreach (var list in user.Value.UserPlaylists)
+                    {
+                        foreach (var b in list.List.ToList())
+                        {
+                            if (b.Length is null || !b.Length.HasValue)
+                            {
+                                if (!VideoLengthCache.ContainsKey(b.Url))
+                                {
+                                    _logger.LogInfo($"Fetching video length for '{b.Url}'");
+
+                                    var track = await discordClient.GetLavalink().ConnectedNodes.First(x => x.Value.IsConnected).Value.Rest.GetTracksAsync(b.Url, LavalinkSearchType.Plain);
+
+                                    if (track.LoadResultType != LavalinkLoadResultType.TrackLoaded)
+                                    {
+                                        list.List.Remove(b);
+                                        _logger.LogError($"Failed to load video length for '{b.Url}'");
+                                        continue;
+                                    }
+
+                                    VideoLengthCache.Add(b.Url, track.Tracks.First().Length);
+                                    await Task.Delay(100);
+                                }
+
+                                b.Length = VideoLengthCache[b.Url];
+                            }
+                        }
+                    }
+                }
+            }).Add(watcher);
 
             for (int i = 0; i < 251; i++)
             {
@@ -1108,7 +1155,7 @@ public class Bot
             {
                 if (status.DiscordInitialized)
                 {
-                    if (e.LogEntry.Message == "[111] Connection terminated (4000, ''), reconnecting")
+                    if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
                         break;
 
                     var channel = discordClient.Guilds[status.LoadedConfig.AssetsGuildId].GetChannel(status.LoadedConfig.ExceptionLogChannelId);

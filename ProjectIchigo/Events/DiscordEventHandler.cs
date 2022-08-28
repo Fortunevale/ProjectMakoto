@@ -184,6 +184,7 @@ internal class DiscordEventHandler
             FillDatabase(e.Guild, user: e.Interaction.User);
 
             _ = submissionEvents.ComponentInteractionCreated(sender, e);
+            _ = embedMessagesEvents.ComponentInteractionCreated(sender, e);
         });
     }
 

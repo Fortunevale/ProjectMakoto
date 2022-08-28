@@ -1,5 +1,5 @@
 ﻿namespace ProjectIchigo.ApplicationCommands;
-internal class UtilityAppCommands : ApplicationCommandsModule
+public class UtilityAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 

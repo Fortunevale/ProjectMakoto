@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Enums;
 
-internal enum FollowChannel
+public enum FollowChannel
 {
     GithubUpdates,
     GlobalBans,

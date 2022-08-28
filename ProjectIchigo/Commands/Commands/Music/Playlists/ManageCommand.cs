@@ -108,7 +108,7 @@ internal class ManageCommand : BaseCommand
                 embed.SetLoading(ctx, "Playlists");
                 await RespondOrEdit(embed);
 
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, ctx.Guild, ctx.User)));
+                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
 
                 embed.Description = $"`Queued {SelectedPlaylist.List.Count} songs from your personal playlist '{SelectedPlaylist.PlaylistName}'.`";
 
@@ -303,6 +303,7 @@ internal class ManageCommand : BaseCommand
                         {
                             Title = x.Title,
                             Url = x.Uri.ToString(),
+                            Length = x.Length
                         }).ToList();
                         continue;
                     }
@@ -363,7 +364,7 @@ internal class ManageCommand : BaseCommand
                 }
 
                 string SelectedPlaylistName = "";
-                List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url }).Take(250).ToList();
+                List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToList();
 
                 while (true)
                 {
@@ -560,7 +561,7 @@ internal class ManageCommand : BaseCommand
                         var v = new UserPlaylist
                         {
                             PlaylistName = loadResult.PlaylistInfo.Name,
-                            List = loadResult.Tracks.Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString() }).Take(250).ToList()
+                            List = loadResult.Tracks.Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString(), Length = x.Length }).Take(250).ToList()
                         };
 
                         ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
@@ -622,7 +623,7 @@ internal class ManageCommand : BaseCommand
 
                         var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-                        ImportJson.List = ImportJson.List.Where(x => RegexTemplates.Url.IsMatch(x.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url }).Take(250).ToList();
+                        ImportJson.List = ImportJson.List.Where(x => RegexTemplates.Url.IsMatch(x.Url)).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Url, Length = x.Length }).Take(250).ToList();
 
                         if (!ImportJson.List.Any())
                             throw new Exception();
@@ -780,8 +781,15 @@ internal class ManageCommand : BaseCommand
                     DiscordButtonComponent RemoveSong = new(ButtonStyle.Danger, "DeleteSong", "Remove songs", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
                     DiscordButtonComponent RemoveDuplicates = new(ButtonStyle.Secondary, "RemoveDuplicates", "Remove all duplicates", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("♻")));
 
-                    var Description = $"**`There's currently {SelectedPlaylist.List.Count} tracks(s) in this playlist.`**\n\n";
-                    Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. **[`{x.Title}`]({x.Url})** added {Formatter.Timestamp(x.AddedTime)}"))}";
+                    var TotalTimespan = TimeSpan.Zero;
+
+                    for (int i = 0; i < SelectedPlaylist.List.Count; i++)
+                    {
+                        TotalTimespan = TotalTimespan.Add(SelectedPlaylist.List[i].Length.Value);
+                    }
+
+                    var Description = $"**`There's currently {SelectedPlaylist.List.Count} tracks(s) in this playlist. This playlist lasts for {TotalTimespan.GetHumanReadable()}.`**\n\n";
+                    Description += $"{string.Join("\n", CurrentTracks.Select(x => $"**{GetInt()}**. `{x.Length.Value.GetShortHumanReadable(TimeFormat.HOURS)}` **[`{x.Title}`]({x.Url})** added {Formatter.Timestamp(x.AddedTime)}"))}";
 
                     if (SelectedPlaylist.List.Count > 0)
                         Description += $"\n\n`Page {CurrentPage + 1}/{Math.Ceiling(SelectedPlaylist.List.Count / 10.0)}`";
@@ -894,7 +902,7 @@ internal class ManageCommand : BaseCommand
                                         return;
                                     }
 
-                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString() }));
+                                    SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString(), Length = x.Length }));
 
                                     await UpdateMessage();
                                     break;
