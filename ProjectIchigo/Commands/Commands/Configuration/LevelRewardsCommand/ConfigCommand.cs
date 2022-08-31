@@ -40,7 +40,7 @@ internal class ConfigCommand : BaseCommand
 
                     var role = ctx.Guild.GetRole(reward.RoleId);
 
-                    DefinedRewards.Add(new DiscordSelectComponentOption($"Level {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
+                    DefinedRewards.Add(new DiscordSelectComponentOption($"Level {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message.TruncateWithIndication(100)}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
 
                     if (selected == role.Id.ToString())
                     {
