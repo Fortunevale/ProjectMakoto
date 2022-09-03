@@ -480,19 +480,27 @@ public class Bot
 
                             var releases = await client.Repository.Release.GetAll("freyacodes", "Lavalink");
 
-                            Release workingRelease;
+                            Release workingRelease = null;
 
-                            if (status.LoadedConfig.LavalinkDownloadPreRelease)
+                            foreach (var b in releases)
                             {
-                                if (releases.Any(x => x.Prerelease))
-                                    workingRelease = releases.First(x => x.Prerelease);
-                                else
-                                    workingRelease = releases[0];
+                                if (b.Prerelease)
+                                {
+                                    if (status.LoadedConfig.LavalinkDownloadPreRelease)
+                                    {
+                                        workingRelease = b;
+                                        break;
+                                    }
+                                    else
+                                        continue;
+                                }
+
+                                workingRelease = b;
+                                break;
                             }
-                            else
-                            {
-                                workingRelease = releases.First(x => !x.Prerelease);
-                            }
+
+                            if (workingRelease is null)
+                                throw new Exception();
 
                             LatestVersion = workingRelease.TagName;
 
