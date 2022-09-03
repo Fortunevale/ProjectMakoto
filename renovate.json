@@ -4,5 +4,11 @@
     "config:base"
   ],
   "prHourlyLimit": 3,
-  "bumpVersion": "prerelease"
+  "bumpVersion": "prerelease",
+  "packageRules": [
+    {
+      "matchPackagePatterns": [ "discatsharp" ],
+      "groupName": "discatsharp"
+    }
+  ]
 }
