@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="10.0.1-nightly-00462" />
+    <PackageReference Include="DisCatSharp" Version="10.0.1-nightly-00463" />
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.1-nightly-00462" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.1-nightly-00462" />
     <PackageReference Include="DisCatSharp.Common" Version="10.0.1-nightly-00462" />
