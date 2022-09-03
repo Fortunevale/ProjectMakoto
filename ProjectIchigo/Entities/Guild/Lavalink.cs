@@ -208,39 +208,6 @@ public class Lavalink
                                 this.Dispose(_bot, e.Guild.Id, "Disconnected");
                                 return;
                             }
-
-                            if (e.Before?.Channel != e.After?.Channel)
-                            {
-                                _logger.LogTrace($"Switched Channel on {Guild.Id}");
-
-                                var conn = nodeConnection.GetGuildConnection(e.Guild);
-
-                                LavalinkTrack? track = conn?.CurrentState?.CurrentTrack;
-                                TimeSpan? position = conn?.CurrentState?.PlaybackPosition;
-
-                                if (track is null || position is null)
-                                {
-                                    _ = guildConnection.DisconnectAsync();
-                                    this.Dispose(_bot, e.Guild.Id, "Error occured carrying on with playback after channel switch");
-                                    return;
-                                }
-
-                                if (conn is null)
-                                {
-                                    _ = guildConnection.DisconnectAsync();
-                                    this.Dispose(_bot, e.Guild.Id, "Conn is null");
-                                    return;
-                                }
-
-                                await conn.StopAsync();
-
-                                await Task.Delay(1000);
-
-                                await conn.PlayAsync(track);
-                                await conn.SeekAsync((TimeSpan)position);
-                                guildConnection = nodeConnection.GetGuildConnection(Guild);
-                                ChannelId = guildConnection.Channel.Id;
-                            }
                         }
                     }).Add(_bot.watcher);
                 }
