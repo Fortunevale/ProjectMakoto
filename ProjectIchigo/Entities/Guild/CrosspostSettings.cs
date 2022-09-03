@@ -34,7 +34,9 @@ public class CrosspostSettings
     }
 
     public ObservableCollection<ulong> CrosspostChannels { get; set; } = new();
-    
+
+    public Dictionary<ulong, CrosspostRatelimit> CrosspostRatelimits { get; set; } = new();
+
     public ObservableCollection<CrosspostMessage> CrosspostTasks { get; set; } = new();
 
     internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated()
@@ -44,4 +46,6 @@ public class CrosspostSettings
             _ = Bot.DatabaseClient.FullSyncDatabase();
         };
     }
+
+    
 }
