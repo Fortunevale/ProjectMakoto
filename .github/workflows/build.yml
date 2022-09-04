@@ -14,19 +14,23 @@ jobs:
           dotnet-version: '6.x'
       - name: "Clone Repository"
         uses: actions/checkout@v3
+      - run: cd ..
       - name: "Clone Xorog.Logger"
         uses: actions/checkout@v3
         with:
           repository: Fortunevale/Xorog.Logger
+      - run: cd ..
       - name: "Clone Xorog.UniversalExtensions"
         uses: actions/checkout@v3
         with:
           repository: Fortunevale/Xorog.UniversalExtensions
+      - run: cd ..
       - name: "Clone Xorog.ScoreSaber"
         uses: actions/checkout@v3
         with:
           repository: Fortunevale/Xorog.ScoreSaber
           token: ${{ secrets.Access_token }}
+      - run: cd Project-Ichigo
       - name: Install dependencies
         run: dotnet restore
       - name: Build Ichigo
