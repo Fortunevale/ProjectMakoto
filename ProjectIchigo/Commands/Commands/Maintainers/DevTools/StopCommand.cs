@@ -20,7 +20,7 @@ internal class StopCommand : BaseCommand
 
             await RespondOrEdit("Shutting down!");
 
-            File.WriteAllText("updated", "");
+            await ctx.Bot.ExitApplication(true);
         });
     }
 }
