@@ -7,7 +7,7 @@
   "bumpVersion": "prerelease",
   "packageRules": [
     {
-      "matchPackagePatterns": [ "discatsharp" ],
+      "matchPackagePatterns": [ "discatsharp*" ],
       "groupName": "discatsharp"
     }
   ]
