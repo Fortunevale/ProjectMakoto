@@ -3,7 +3,7 @@ on:
     types: [opened]
 jobs:
   createCard:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Add new issue to column
         # You may pin to the exact commit or the version.
