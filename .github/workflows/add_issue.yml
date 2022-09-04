@@ -1,3 +1,4 @@
+name: Add new issue to project
 on:
   issues:
     types: [opened]
