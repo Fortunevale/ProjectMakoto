@@ -30,4 +30,8 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
       - name: Build Ichigo
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "~/build/"
+      - name: Writing current version to file
+        run: git rev-parse --short HEAD > "~/build/LatestGitPush.cfg" && git branch --show-current >> build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> build/LatestGitPush.cfg
+      - name: Cleaning up..
+        run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
