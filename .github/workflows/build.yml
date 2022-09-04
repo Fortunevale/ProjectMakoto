@@ -1,24 +1,33 @@
-name: Push to production
+name: Build and Push to Production
 on: 
   push:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-        version:
-          description: yes
-          default: idk
-          required: false
 jobs:
   push:
-    name: Push to Server
+    name: Build Project
     runs-on: self-hosted
     steps:
-    - name: executing remote ssh commands
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY_ED25519 }}
-        passphrase: ${{ secrets.SSH_KEY_PASSPHRASE }}
-        port: ${{ secrets.SSH_PORT }}
-        script: ${{ secrets.SSH_CMDLINE }}
+      - name: Setup .NET Core SDK 6.x
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '6.x'
+      - name: "Clone Repository"
+        uses: actions/checkout@v3
+      - name: "Clone Xorog.Logger"
+        uses: actions/checkout@v3
+        with:
+          repository: Fortunevale/Xorog.Logger
+      - name: "Clone Xorog.UniversalExtensions"
+        uses: actions/checkout@v3
+        with:
+          repository: Fortunevale/Xorog.UniversalExtensions
+      - name: "Clone Xorog.ScoreSaber"
+        uses: actions/checkout@v3
+        with:
+          repository: Fortunevale/Xorog.ScoreSaber
+          token: ${{ secrets.Access_token }}
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build Ichigo
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained
