@@ -35,11 +35,14 @@ jobs:
           path: Xorog.ScoreSaber
           token: ${{ secrets.Access_token }}
       - name: Install dependencies
-        run: dotnet restore "ProjectIchigo/ProjectIchigo/"
+        run: dotnet restore
+        working-directory: ProjectIchigo/ProjectIchigo/
       - name: Build Ichigo
-        run: dotnet publish "ProjectIchigo/ProjectIchigo/" --configuration RELEASE --runtime linux-x64 --no-self-contained --output "/home/github-runner/build/"
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "/home/github-runner/build/"
+        working-directory: ProjectIchigo/ProjectIchigo/
       - name: Writing current version to file
         run: git rev-parse --short HEAD > "/home/github-runner/build/LatestGitPush.cfg" && git branch --show-current >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> /home/github-runner/build/LatestGitPush.cfg
+        working-directory: ProjectIchigo/
       - name: Cleanup
         run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
       - name: Moving successful build
