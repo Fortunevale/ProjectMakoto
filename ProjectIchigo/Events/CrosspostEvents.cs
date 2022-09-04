@@ -71,7 +71,7 @@ internal class CrosspostEvents
                 if (!_bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits.ContainsKey(e.Channel.Id))
                     _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits.Add(e.Channel.Id, new());
 
-                var ratelimit = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].WaitForRatelimit();
+                var ratelimit = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].WaitForRatelimit(e.Channel.Id);
 
                 await Task.Delay(3000);
 
