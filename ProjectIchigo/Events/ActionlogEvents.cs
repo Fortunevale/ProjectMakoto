@@ -911,7 +911,7 @@ internal class ActionlogEvents
             try { Description += $"{(e.GuildBefore.Name != e.GuildAfter.Name ? $"**Name**: `{e.GuildBefore.Name}` :arrow_right: `{e.GuildAfter.Name}`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.Description != e.GuildAfter.Description ? $"**Description**: `{e.GuildBefore.Description}` :arrow_right: `{e.GuildAfter.Description}`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.IconHash != e.GuildAfter.IconHash ? $"`Icon updated`\n" : "")}"; } catch { }
-            try { Description += $"{(e.GuildBefore.DefaultMessageNotifications != e.GuildAfter.DefaultMessageNotifications ? $"`Default Notifaction Settings: '{e.GuildAfter.DefaultMessageNotifications}'`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.DefaultMessageNotifications != e.GuildAfter.DefaultMessageNotifications ? $"`Default Notification Settings: '{e.GuildAfter.DefaultMessageNotifications}'`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.VerificationLevel != e.GuildAfter.VerificationLevel ? $"`Verification Level changed: '{e.GuildAfter.VerificationLevel}'`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.BannerHash != e.GuildAfter.BannerHash ? $"`Banner updated`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.SplashHash != e.GuildAfter.SplashHash ? $"`Splash updated`\n" : "")}"; } catch { }

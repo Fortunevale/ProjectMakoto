@@ -152,7 +152,7 @@ public class SharedCommandContext
     public DiscordGuild Guild { get; set; }
 
     /// <summary>
-    /// The channel this command was exectued in.
+    /// The channel this command was executed in.
     /// </summary>
     public DiscordChannel Channel { get; set; }
 
