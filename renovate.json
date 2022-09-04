@@ -3,11 +3,11 @@
   "extends": [
     "config:base"
   ],
-  "prHourlyLimit": 3,
+  "prHourlyLimit": 9,
   "bumpVersion": "prerelease",
   "packageRules": [
     {
-      "matchPackagePatterns": [ "discatsharp*" ],
+      "matchPackagePatterns": [ "DisCatSharp", "discatsharp", "Discatsharp" ],
       "groupName": "discatsharp"
     }
   ]
