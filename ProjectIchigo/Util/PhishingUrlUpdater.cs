@@ -124,7 +124,7 @@ internal class PhishingUrlUpdater
 
             if (_bot.databaseClient.mainDatabaseConnection == null)
             {
-                throw new Exception($"Exception occured while trying to update phishing urls saved in database: Database connection not present");
+                throw new Exception($"Exception occurred while trying to update phishing urls saved in database: Database connection not present");
             }
 
             var cmd = _bot.databaseClient.mainDatabaseConnection.CreateCommand();
@@ -204,7 +204,7 @@ internal class PhishingUrlUpdater
             }
             catch (Exception ex)
             {
-                throw new Exception($"An exception occured while trying to download URLs from '{url}'", ex);
+                throw new Exception($"An exception occurred while trying to download URLs from '{url}'", ex);
             }
         }
 
@@ -213,12 +213,12 @@ internal class PhishingUrlUpdater
             var urls = await DownloadList("https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt");
             WhitelistedDomains.AddRange(urls);
         }
-        catch (Exception ex) { throw new Exception($"An exception occured while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt'", ex); }
+        catch (Exception ex) { throw new Exception($"An exception occurred while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt'", ex); }
 
         try
         {
             if (WhitelistedDomains is null || WhitelistedDomains.Count == 0)
-                throw new Exception($"An exception occured while trying to remove whitelisted URLs from blacklist: WhitelistedDomains is empty or null");
+                throw new Exception($"An exception occurred while trying to remove whitelisted URLs from blacklist: WhitelistedDomains is empty or null");
 
             foreach (var b in WhitelistedDomains)
                 if (SanitizedMatches.ContainsKey(b))

@@ -102,7 +102,7 @@ public class Bot
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An exception occured while to enable debug logs", ex);
+            _logger.LogError($"An exception occurred while to enable debug logs", ex);
         }
 
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
@@ -164,7 +164,7 @@ public class Bot
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError("An exception occured while trying to reload the config.json", ex);
+                            _logger.LogError("An exception occurred while trying to reload the config.json", ex);
                             await Task.Delay(10000);
                         }
                     }
@@ -198,7 +198,7 @@ public class Bot
             }
             catch (Exception ex)
             {
-                _logger.LogFatal($"An exception occured while initializing data", ex);
+                _logger.LogFatal($"An exception occurred while initializing data", ex);
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDatabaseLogin);
             }
@@ -219,7 +219,7 @@ public class Bot
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An exception occured while trying to parse a token commandline argument", ex);
+                _logger.LogError($"An exception occurred while trying to parse a token commandline argument", ex);
             }
 
             if (File.Exists("token.cfg") && !args.Contains("--token"))
@@ -386,7 +386,7 @@ public class Bot
                 {
                     if (!status.DiscordInitialized)
                     {
-                        _logger.LogError($"An exception occured while trying to log into discord: The log in took longer than 10 seconds");
+                        _logger.LogError($"An exception occurred while trying to log into discord: The log in took longer than 10 seconds");
                         Environment.Exit(ExitCodes.FailedDiscordLogin);
                         return;
                     }
@@ -439,13 +439,13 @@ public class Bot
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured trying to add team members to administrator list. Is the current bot registered in a team?", ex);
+                        _logger.LogError($"An exception occurred trying to add team members to administrator list. Is the current bot registered in a team?", ex);
                     }
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An exception occured while trying to log into discord", ex);
+                _logger.LogError($"An exception occurred while trying to log into discord", ex);
                 await Task.Delay(5000);
                 Environment.Exit(ExitCodes.FailedDiscordLogin);
                 return;
@@ -572,7 +572,7 @@ public class Bot
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"An exception occured while trying to log into Lavalink", ex);
+                    _logger.LogError($"An exception occurred while trying to log into Lavalink", ex);
                     return;
                 }
             });
@@ -583,14 +583,14 @@ public class Bot
 
         if (!loadDatabase.IsCompletedSuccessfully)
         {
-            _logger.LogFatal($"An uncaught exception occured while initializing the database.", loadDatabase.Exception);
+            _logger.LogFatal($"An uncaught exception occurred while initializing the database.", loadDatabase.Exception);
             await Task.Delay(1000);
             Environment.Exit(ExitCodes.FailedDatabaseLoad);
         }
 
         if (!logInToDiscord.IsCompletedSuccessfully)
         {
-            _logger.LogFatal($"An uncaught exception occured while initializing the discord client.", logInToDiscord.Exception);
+            _logger.LogFatal($"An uncaught exception occurred while initializing the discord client.", logInToDiscord.Exception);
             await Task.Delay(1000);
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
@@ -1065,7 +1065,7 @@ public class Bot
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to continue music playback for '{guild.Key}'", ex);
+                        _logger.LogError($"An exception occurred while trying to continue music playback for '{guild.Key}'", ex);
                         guilds[guild.Key].Lavalink = new(guilds[guild.Key]);
                     }
                 });

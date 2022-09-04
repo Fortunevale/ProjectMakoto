@@ -91,7 +91,7 @@ internal class VoicePrivacyEvents
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogWarn($"An exception occured while trying to get messages from a channel ({failcount}/3)", ex);
+                                    _logger.LogWarn($"An exception occurred while trying to get messages from a channel ({failcount}/3)", ex);
 
                                     await Task.Delay(10000);
                                     failcount++;
@@ -125,7 +125,7 @@ internal class VoicePrivacyEvents
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogWarn($"An exception occured while trying to bulk delete messages from a channel ({failcount}/3)", ex);
+                                        _logger.LogWarn($"An exception occurred while trying to bulk delete messages from a channel ({failcount}/3)", ex);
 
                                         await Task.Delay(30000);
                                         failcount++;
@@ -152,7 +152,7 @@ internal class VoicePrivacyEvents
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogWarn($"An exception occured while trying to delete a message from a channel ({failcount}/3)", ex);
+                                        _logger.LogWarn($"An exception occurred while trying to delete a message from a channel ({failcount}/3)", ex);
 
                                         await Task.Delay(30000);
                                         failcount++;

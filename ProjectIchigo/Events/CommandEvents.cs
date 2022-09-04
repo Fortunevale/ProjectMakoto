@@ -62,7 +62,7 @@ internal class CommandEvents
 
                     try
                     {
-                        _ = e.Context.Channel.SendMessageAsync($"{e.Context.User.Mention}\n:warning: `I'm sorry but an unhandled exception occured while trying to execute your command.`");
+                        _ = e.Context.Channel.SendMessageAsync($"{e.Context.User.Mention}\n:warning: `I'm sorry but an unhandled exception occurred while trying to execute your command.`");
                     }
                     catch { }
 

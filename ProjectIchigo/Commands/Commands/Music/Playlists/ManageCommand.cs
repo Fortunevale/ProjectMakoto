@@ -963,7 +963,7 @@ internal class ManageCommand : BaseCommand
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogError("An exception occured while trying to import thumbnail", ex);
+                                        _logger.LogError("An exception occurred while trying to import thumbnail", ex);
 
                                         embed.Description = $"`Something went wrong while trying to upload your thumbnail. Please try again.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..";
                                         embed.SetError(ctx, "Playlists");

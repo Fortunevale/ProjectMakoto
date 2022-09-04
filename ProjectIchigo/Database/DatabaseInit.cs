@@ -362,7 +362,7 @@ internal class DatabaseInit
         }
         catch (Exception ex)
         {
-            _logger.LogFatal($"An exception occured while trying to load country codes from server", ex);
+            _logger.LogFatal($"An exception occurred while trying to load country codes from server", ex);
             await Task.Delay(5000);
             throw;
         }

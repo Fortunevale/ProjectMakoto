@@ -64,7 +64,7 @@ internal class TaskWatcher
                     try
                     {
                         _ = CommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
-                        .WithContent($"{CommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
+                        .WithContent($"{CommandContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
                         $"`The exception has been automatically reported.`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
@@ -83,7 +83,7 @@ internal class TaskWatcher
                     try
                     {
                         _ = InteractionContext.EditResponseAsync(new DiscordWebhookBuilder()
-                        .WithContent($"{InteractionContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
+                        .WithContent($"{InteractionContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
                         $"`The exception has been automatically reported.`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
@@ -102,7 +102,7 @@ internal class TaskWatcher
                     try
                     {
                         _ = SharedCommandContext.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
+                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
                         $"`The exception has been automatically reported.`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {
@@ -121,7 +121,7 @@ internal class TaskWatcher
                     try
                     {
                         _ = ContextMenuContext.EditResponseAsync(new DiscordWebhookBuilder()
-                        .WithContent($"{ContextMenuContext.User.Mention}\n⚠ `An unhandled exception occured while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
+                        .WithContent($"{ContextMenuContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCodeBlock()}'`\n" +
                         $"`The exception has been automatically reported.`\n\n" +
                         $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
                         {

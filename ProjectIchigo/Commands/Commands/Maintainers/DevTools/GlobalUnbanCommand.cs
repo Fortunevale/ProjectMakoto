@@ -50,7 +50,7 @@ internal class GlobalUnbanCommand : BaseCommand
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError($"Exception occured while trying to unban user from {b.Key}", ex);
+                            _logger.LogError($"Exception occurred while trying to unban user from {b.Key}", ex);
                             Failed++;
                         }
                     }

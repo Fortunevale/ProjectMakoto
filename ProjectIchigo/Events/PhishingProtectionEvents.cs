@@ -124,19 +124,19 @@ internal class PhishingProtectionEvents
                         if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
                             _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                             {
-                                Title = $":no_entry: Couldn't check this link for malicous redirects. Please proceed with caution.",
+                                Title = $":no_entry: Couldn't check this link for malicious redirects. Please proceed with caution.",
                                 Color = EmbedColors.Error
                             });
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"An exception occured while trying to unshorten url '{match}'", ex);
+                    _logger.LogError($"An exception occurred while trying to unshorten url '{match}'", ex);
 
                     if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                         {
-                            Title = $":no_entry: An unknown error occured while trying to check for malicous redirects. Please proceed with caution.",
+                            Title = $":no_entry: An unknown error occurred while trying to check for malicious redirects. Please proceed with caution.",
                             Color = EmbedColors.Error
                         });
                 }
@@ -176,19 +176,19 @@ internal class PhishingProtectionEvents
             case PhishingPunishmentType.TIMEOUT:
             {
                 _ = e.DeleteAsync();
-                _ = member.TimeoutAsync(_bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, _bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.TimeoutAsync(_bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentLength, _bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
             case PhishingPunishmentType.KICK:
             {
                 _ = e.DeleteAsync();
-                _ = member.RemoveAsync(_bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.RemoveAsync(_bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
             case PhishingPunishmentType.BAN:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, _bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected Malicous Url [{url}]"));
+                _ = member.BanAsync(7, _bot.guilds[guild.Id].PhishingDetectionSettings.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
         }

@@ -43,7 +43,7 @@ internal class ObjectCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("An exception occured while trying to remove a user from the objection list", ex);
+                        _logger.LogError("An exception occurred while trying to remove a user from the objection list", ex);
 
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
@@ -115,7 +115,7 @@ internal class ObjectCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("An exception occured while trying to delete a user profile", ex);
+                        _logger.LogError("An exception occurred while trying to delete a user profile", ex);
 
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {

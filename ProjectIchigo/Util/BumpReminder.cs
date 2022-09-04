@@ -54,7 +54,7 @@ internal class BumpReminder
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An exception occured while trying to un-queue previous bump messages for '{ServerId}'", ex);
+            _logger.LogError($"An exception occurred while trying to un-queue previous bump messages for '{ServerId}'", ex);
         }
 
         var task = new Task(new Action(async () =>

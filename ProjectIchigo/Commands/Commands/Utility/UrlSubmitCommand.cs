@@ -21,7 +21,7 @@ internal class UrlSubmitCommand : BaseCommand
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicous.\n" +
+                    Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicious.\n" +
                                   $"{2.DigitsToEmotes()}. You may not spam submissions.\n" +
                                   $"{3.DigitsToEmotes()}. You may not submit unregistered domains.\n" +
                                   $"{4.DigitsToEmotes()}. You may not submit shortened URLs.\n" +

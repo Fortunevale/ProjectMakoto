@@ -290,7 +290,7 @@ public abstract class BaseCommand
         DiscordRole Role = null;
 
         bool FinishedSelection = false;
-        bool ExceptionOccured = false;
+        bool Exceptionoccurred = false;
         Exception exception = null;
 
         async Task RefreshRoleList()
@@ -354,7 +354,7 @@ public abstract class BaseCommand
                 catch (Exception ex)
                 {
                     exception = ex;
-                    ExceptionOccured = true;
+                    Exceptionoccurred = true;
                     FinishedSelection = true;
                     throw;
                 }
@@ -373,7 +373,7 @@ public abstract class BaseCommand
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
-        if (ExceptionOccured)
+        if (Exceptionoccurred)
             throw exception;
 
         if (TimeoutSeconds <= 0)
@@ -409,7 +409,7 @@ public abstract class BaseCommand
         DiscordChannel Channel = null;
 
         bool FinishedSelection = false;
-        bool ExceptionOccured = false;
+        bool Exceptionoccurred = false;
         Exception exception = null;
 
         async Task RefreshRoleList()
@@ -472,7 +472,7 @@ public abstract class BaseCommand
                 catch (Exception ex)
                 {
                     exception = ex;
-                    ExceptionOccured = true;
+                    Exceptionoccurred = true;
                     FinishedSelection = true;
                     throw;
                 }
@@ -491,7 +491,7 @@ public abstract class BaseCommand
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
-        if (ExceptionOccured)
+        if (Exceptionoccurred)
             throw exception;
 
         if (TimeoutSeconds <= 0)
@@ -510,7 +510,7 @@ public abstract class BaseCommand
         string Selection = null;
 
         bool FinishedSelection = false;
-        bool ExceptionOccured = false;
+        bool Exceptionoccurred = false;
         Exception exception = null;
 
         async Task Refresh()
@@ -568,7 +568,7 @@ public abstract class BaseCommand
                 catch (Exception ex)
                 {
                     exception = ex;
-                    ExceptionOccured = true;
+                    Exceptionoccurred = true;
                     FinishedSelection = true;
                     throw;
                 }
@@ -587,7 +587,7 @@ public abstract class BaseCommand
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
-        if (ExceptionOccured)
+        if (Exceptionoccurred)
             throw exception;
 
         if (TimeoutSeconds <= 0)
@@ -614,7 +614,7 @@ public abstract class BaseCommand
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
         bool FinishedSelection = false;
-        bool ExceptionOccured = false;
+        bool Exceptionoccurred = false;
         bool Cancelled = false;
         Exception exception = null;
 
@@ -654,7 +654,7 @@ public abstract class BaseCommand
                 catch (Exception ex)
                 {
                     exception = ex;
-                    ExceptionOccured = true;
+                    Exceptionoccurred = true;
                     FinishedSelection = true;
                     throw;
                 }
@@ -663,7 +663,7 @@ public abstract class BaseCommand
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
 
-        while (!FinishedSelection && !ExceptionOccured && !Cancelled && TimeoutSeconds >= 0)
+        while (!FinishedSelection && !Exceptionoccurred && !Cancelled && TimeoutSeconds >= 0)
         {
             await Task.Delay(500);
             TimeoutSeconds--;
@@ -674,7 +674,7 @@ public abstract class BaseCommand
         if (ResetToOriginalEmbed)
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
 
-        if (ExceptionOccured)
+        if (Exceptionoccurred)
             throw exception;
 
         if (TimeoutSeconds <= 0)

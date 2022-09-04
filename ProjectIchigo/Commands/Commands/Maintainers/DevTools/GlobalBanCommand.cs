@@ -43,7 +43,7 @@ internal class GlobalBanCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Exception occured while trying to ban user from {b.Key}", ex);
+                        _logger.LogError($"Exception occurred while trying to ban user from {b.Key}", ex);
                         Failed++;
                     }
                 }

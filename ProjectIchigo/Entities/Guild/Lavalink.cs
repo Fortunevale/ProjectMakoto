@@ -308,7 +308,7 @@ public class Lavalink
             }
             catch (Exception ex)
             {
-                _logger.LogError("An exception occured while trying to handle music queue", ex);
+                _logger.LogError("An exception occurred while trying to handle music queue", ex);
 
                 _ = guildConnection.DisconnectAsync();
                 this.Dispose(_bot, Guild.Id, "Exception");

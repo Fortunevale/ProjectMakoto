@@ -595,7 +595,7 @@ internal class ActionlogEvents
                                             $"{(e.Role.IsManaged ? "\n`This role belongs to an integration and cannot be deleted.`\n" : "")}" +
                                             $"{Integration}" +
                                             $"{(e.Role.IsMentionable ? "`Everyone can mention this role.`\n" : "")}" +
-                                            $"{(e.Role.IsHoisted ? "`Role members are displayed seperately from others.`\n" : "")}" +
+                                            $"{(e.Role.IsHoisted ? "`Role members are displayed separately from others.`\n" : "")}" +
                                             $"\n**Permissions**: {GeneratePermissions}"
             };
 
@@ -661,7 +661,7 @@ internal class ActionlogEvents
                                             $"{(e.Role.IsManaged ? "\n`This role belonged to an integration and was therefor deleted automatically.`\n" : "")}" +
                                             $"{Integration}" +
                                             $"{(e.Role.IsMentionable ? "`Everyone could mention this role.`\n" : "")}" +
-                                            $"{(e.Role.IsHoisted ? "`Role members were displayed seperately from others.`\n" : "")}" +
+                                            $"{(e.Role.IsHoisted ? "`Role members were displayed separately from others.`\n" : "")}" +
                                             $"\n**Permissions**: {GeneratePermissions}"
             };
 
@@ -756,7 +756,7 @@ internal class ActionlogEvents
 
             string Description = $"{(e.RoleBefore.Name != e.RoleAfter.Name ? "true" : "")}{(e.RoleBefore.Color.ToHex() != e.RoleAfter.Color.ToHex() ? $"**Color**: `{e.RoleBefore.Color.ToHex()}` :arrow_right: `{e.RoleAfter.Color.ToHex()}`\n" : "")}" +
                                     $"{(e.RoleBefore.IsMentionable != e.RoleAfter.IsMentionable ? $"{(!e.RoleBefore.IsMentionable && e.RoleAfter.IsMentionable ? "`Everyone can mention this role now.`\n" : "`The role can no longer be mentioned by everyone.`\n")}" : "")}" +
-                                    $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"{(!e.RoleBefore.IsHoisted && e.RoleAfter.IsHoisted ? "`Role members now display seperately from others.`\n" : "`Role members no longer display seperately from others.`\n")}" : "")}" +
+                                    $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"{(!e.RoleBefore.IsHoisted && e.RoleAfter.IsHoisted ? "`Role members now display separately from others.`\n" : "`Role members no longer display separately from others.`\n")}" : "")}" +
                                     $"{PermissionDifference}";
 
             if (Description.Length == 0)
@@ -767,7 +767,7 @@ internal class ActionlogEvents
                                             $"{(e.RoleAfter.IsManaged ? "\n`This role belongs to an integration and cannot be deleted.`\n" : "")}" +
                                             $"{Integration}" +
                                             $"{(e.RoleBefore.IsMentionable != e.RoleAfter.IsMentionable ? $"{(!e.RoleBefore.IsMentionable && e.RoleAfter.IsMentionable ? "`Everyone can mention this role now.`\n" : "`The role can no longer be mentioned by everyone.`\n")}" : "")}" +
-                                            $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"{(!e.RoleBefore.IsHoisted && e.RoleAfter.IsHoisted ? "`Role members now display seperately from others.`\n" : "`Role members no longer display seperately from others.`\n")}" : "")}" +
+                                            $"{(e.RoleBefore.IsHoisted != e.RoleAfter.IsHoisted ? $"{(!e.RoleBefore.IsHoisted && e.RoleAfter.IsHoisted ? "`Role members now display separately from others.`\n" : "`Role members no longer display separately from others.`\n")}" : "")}" +
                                             $"{PermissionDifference}";
 
             DiscordEmbedBuilder embed = new()

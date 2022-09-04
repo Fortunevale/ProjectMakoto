@@ -46,7 +46,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             }
             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
             {
-                embed.Description = $"`An internal server exception occured. Please retry later.`";
+                embed.Description = $"`An internal server exception occurred. Please retry later.`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
                 return;
             }
@@ -146,7 +146,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 }
                 catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                 {
-                    embed.Description = $"`An internal server exception occured. Please retry later.`";
+                    embed.Description = $"`An internal server exception occurred. Please retry later.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
                     return;
                 }

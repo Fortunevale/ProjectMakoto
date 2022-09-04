@@ -60,7 +60,7 @@ internal class DeleteCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError("An exception occured while trying to delete a user profile", ex);
+                        _logger.LogError("An exception occurred while trying to delete a user profile", ex);
 
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {

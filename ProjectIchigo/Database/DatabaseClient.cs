@@ -75,7 +75,7 @@ internal class DatabaseClient
             }
             catch (Exception ex)
             {
-                _logger.LogError("An exception occured in the database queue handler", ex);
+                _logger.LogError("An exception occurred in the database queue handler", ex);
                 throw;
             }
         }
@@ -500,7 +500,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update guilds in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update guilds in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -595,7 +595,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the guilds table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the guilds table", ex);
                     }
 
                 var check = CheckGuildTables();
@@ -624,7 +624,7 @@ internal class DatabaseClient
 
                                 if (mainDatabaseConnection == null)
                                 {
-                                    throw new Exception($"Exception occured while trying to update guilds in database: Database mainDatabaseConnection not present");
+                                    throw new Exception($"Exception occurred while trying to update guilds in database: Database mainDatabaseConnection not present");
                                 }
 
                                 var cmd = mainDatabaseConnection.CreateCommand();
@@ -659,7 +659,7 @@ internal class DatabaseClient
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogError($"An exception occured while trying to update the {guild.Key} table", ex);
+                                _logger.LogError($"An exception occurred while trying to update the {guild.Key} table", ex);
                             }
                         }
 
@@ -668,7 +668,7 @@ internal class DatabaseClient
                     {
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to objected users in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to objected users in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -691,7 +691,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the objected_users table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the objected_users table", ex);
                     }
 
                 if (_bot.users.Count > 0)
@@ -714,7 +714,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update users in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update users in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -749,7 +749,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the users table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the users table", ex);
                     }
 
                 if (_bot.phishingUrlSubmissionUserBans.Count > 0)
@@ -764,7 +764,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update submission_user_bans in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update submission_user_bans in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -791,7 +791,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the submission_user_bans table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the submission_user_bans table", ex);
                     }
 
                 if (_bot.phishingUrlSubmissionGuildBans.Count > 0)
@@ -806,7 +806,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update submission_guild_bans in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update submission_guild_bans in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -833,7 +833,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the submission_guild_bans table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
                     }
 
                 if (_bot.bannedUsers.Count > 0)
@@ -849,7 +849,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update banned users in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update banned users in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -877,7 +877,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the banned_users table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the banned_users table", ex);
                     }
 
                 if (_bot.bannedGuilds.Count > 0)
@@ -893,7 +893,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update banned guilds in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update banned guilds in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -921,7 +921,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the banned_guilds table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the banned_guilds table", ex);
                     }
 
                 if (_bot.globalBans.Count > 0)
@@ -937,7 +937,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update globalbans in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update globalbans in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -965,7 +965,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the submission_guild_bans table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
                     }
 
                 if (_bot.submittedUrls.Count > 0)
@@ -981,7 +981,7 @@ internal class DatabaseClient
 
                         if (mainDatabaseConnection == null)
                         {
-                            throw new Exception($"Exception occured while trying to update active_url_submissions in database: Database mainDatabaseConnection not present");
+                            throw new Exception($"Exception occurred while trying to update active_url_submissions in database: Database mainDatabaseConnection not present");
                         }
 
                         var cmd = mainDatabaseConnection.CreateCommand();
@@ -1009,7 +1009,7 @@ internal class DatabaseClient
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"An exception occured while trying to update the active_url_submissions table", ex);
+                        _logger.LogError($"An exception occurred while trying to update the active_url_submissions table", ex);
                     }
 
                 await Task.Delay(1000);

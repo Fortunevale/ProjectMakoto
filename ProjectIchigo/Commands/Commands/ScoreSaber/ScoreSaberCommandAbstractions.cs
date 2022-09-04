@@ -95,7 +95,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.SetError(ctx, "Score Saber");
-                                embed.Description = $"`An internal server exception occured. Please retry later.`";
+                                embed.Description = $"`An internal server exception occurred. Please retry later.`";
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 
                                 return;
@@ -129,7 +129,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.SetError(ctx, "Score Saber");
-                                embed.Description = $"`An internal server exception occured. Please retry later.`";
+                                embed.Description = $"`An internal server exception occurred. Please retry later.`";
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -362,7 +362,7 @@ internal class ScoreSaberCommandAbstractions
         }
         catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
         {
-            embed.Description = $"`An internal server exception occured. Please retry later.`";
+            embed.Description = $"`An internal server exception occurred. Please retry later.`";
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
