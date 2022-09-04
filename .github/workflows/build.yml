@@ -8,6 +8,8 @@ jobs:
     name: Build Project
     runs-on: self-hosted
     steps:
+      - name: Cleanup
+        run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
       - name: Setup .NET Core SDK 6.x
         uses: actions/setup-dotnet@v2
         with:
@@ -39,7 +41,7 @@ jobs:
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "/home/github-runner/build/"
       - name: Writing current version to file
         run: git rev-parse --short HEAD > "/home/github-runner/build/LatestGitPush.cfg" && git branch --show-current >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> /home/github-runner/build/LatestGitPush.cfg
-      - name: Cleaning up..
+      - name: Cleanup
         run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
       - name: Moving successful build
         run: mv /home/github-runner/build/ /home/github-runner/successful_build
