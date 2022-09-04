@@ -1,6 +1,6 @@
 # Project-Ichigo - A discord bot written in C#
 
-![](https://img.shields.io/github/contributors/Fortunevale/ProjectIchigo) ![buildstatus](https://img.shields.io/github/workflow/status/Fortunevale/ProjectIchigo/build) ![reposize](https://img.shields.io/github/repo-size/Fortunevale/ProjectIchigo) ![](https://img.shields.io/github/issues-raw/Fortunevale/ProjectIchigo) [![wakatime](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg)](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo)
+![](https://img.shields.io/github/contributors/Fortunevale/ProjectIchigo) [![Build and Push to Production](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/build.yml/badge.svg)](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/build.yml) [![Spellcheck](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/typos.yml/badge.svg)](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/typos.yml) ![reposize](https://img.shields.io/github/repo-size/Fortunevale/ProjectIchigo) ![](https://img.shields.io/github/issues-raw/Fortunevale/ProjectIchigo) [![wakatime](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg)](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo)
 
 ![](https://img.shields.io/github/stars/Fortunevale/ProjectIchigo?style=social) ![](https://img.shields.io/github/watchers/Fortunevale/ProjectIchigo?style=social)
 
