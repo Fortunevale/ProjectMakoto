@@ -32,6 +32,7 @@ jobs:
           repository: Fortunevale/Xorog.ScoreSaber
           path: Xorog.UniversalExtensions
           token: ${{ secrets.Access_token }}
+      - run: pwd
       - name: Install dependencies
         run: dotnet restore
       - name: Build Ichigo
