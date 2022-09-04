@@ -35,6 +35,7 @@ jobs:
           path: Xorog.UniversalExtensions
           token: ${{ secrets.Access_token }}
       - run: pwd
+      - run: cd ProjectIchigo
       - name: Install dependencies
         run: dotnet restore
       - name: Build Ichigo
