@@ -718,16 +718,16 @@ public abstract class BaseCommand
 
         TimeSpan length = TimeSpan.FromSeconds(0);
 
-        if ((Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "seconds").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minutes").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hours").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "days").Components.First().Value.IsDigitsOnly()))
+        if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
             throw new InvalidOperationException("Invalid TimeSpan");
 
-        double seconds = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "seconds").Components.First().Value)) : 0;
-        double minutes = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minutes").Components.First().Value)) : 0;
-        double hours = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hours").Components.First().Value)) : 0;
-        double days = Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "days").Components.First().Value)) : 0;
+        double seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
+        double minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
+        double hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
+        double days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
 
         length = length.Add(TimeSpan.FromSeconds(seconds));
         length = length.Add(TimeSpan.FromMinutes(minutes));
@@ -761,11 +761,11 @@ public abstract class BaseCommand
             throw;
         }
 
-        if ((Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "hour").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "minute").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "day").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "month").Components.First().Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.Components.First().CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.Components.First().CustomId == "year").Components.First().Value.IsDigitsOnly()))
+        if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
+            (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
             throw new InvalidOperationException("Invalid");
 
         int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));

@@ -2,7 +2,7 @@ namespace ProjectIchigo.Extensions;
 
 internal static class Extensions
 {
-    internal static string GetModalValueByCustomId(this DiscordInteraction interaction, string customId) => interaction.Data.Components.First(x => x.Components.First().CustomId == customId).Components.First().Value;
+    internal static string GetModalValueByCustomId(this DiscordInteraction interaction, string customId) => interaction.Data.Components.First(x => x.CustomId == customId).Value;
     internal static async Task<DiscordMessage> Refresh(this DiscordMessage msg) => await msg.Channel.GetMessageAsync(msg.Id, true);
 
     internal static bool IsMaintenance(this DiscordMember member, Status _status) => (member as DiscordUser).IsMaintenance(_status);

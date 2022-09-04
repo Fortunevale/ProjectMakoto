@@ -50,10 +50,10 @@ internal class CreateIssueCommand : BaseCommand
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         var followup = await e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder { IsEphemeral = true }.WithContent(":arrows_counterclockwise: `Submitting your issue..`"));
 
-                        var labelComp = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "labels").First().Components.First();
+                        var labelComp = e.Interaction.Data.Components.Where(x => x.CustomId == "labels").First();
 
-                        string title = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "title").First().Components.First().Value;
-                        string description = e.Interaction.Data.Components.Where(x => x.Components.First().CustomId == "description").First().Components.First().Value;
+                        string title = e.Interaction.Data.Components.Where(x => x.CustomId == "title").First().Value;
+                        string description = e.Interaction.Data.Components.Where(x => x.CustomId == "description").First().Value;
                         List<string> labels;
 
                         if (labelComp.Type == ComponentType.Select)
