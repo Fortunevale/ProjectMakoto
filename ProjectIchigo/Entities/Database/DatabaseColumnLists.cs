@@ -122,6 +122,7 @@ internal class DatabaseColumnLists
         new Column("lavalink_shuffle", "tinyint(1)"),
         new Column("lavalink_repeat", "tinyint(1)"),
         new Column("lavalink_queue", "longtext"),
+        new Column("crosspost_ratelimits", "longtext"),
     };
 
     internal readonly static List<Column> guild_users = new()

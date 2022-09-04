@@ -81,6 +81,7 @@ internal class DatabaseInit
                 DelayBeforePosting = b.crosspostdelay,
                 ExcludeBots = b.crosspostexcludebots,
                 CrosspostTasks = JsonConvert.DeserializeObject<ObservableCollection<CrosspostMessage>>((b.crossposttasks is null or "null" or "" ? "[]" : b.crossposttasks)),
+                CrosspostRatelimits = JsonConvert.DeserializeObject<Dictionary<ulong, CrosspostRatelimit>>((b.crosspost_ratelimits is null or "null" or "" ? "{}" : b.crosspost_ratelimits)),
             };
 
             DbGuild.ActionLogSettings = new(DbGuild)

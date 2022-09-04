@@ -59,4 +59,5 @@ public class DatabaseGuildSettings
     public bool lavalink_shuffle { get; set; }
     public bool lavalink_repeat { get; set; }
     public string lavalink_queue { get; set; }
+    public string crosspost_ratelimits { get; set; }
 }
