@@ -1,2 +1,6 @@
 [files]
 extend-exclude = ["*.pdn"]
+
+[default.extend-words]
+optin = "optin"
+Experiation = "Experiation"

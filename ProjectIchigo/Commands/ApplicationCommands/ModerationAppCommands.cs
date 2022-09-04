@@ -141,7 +141,7 @@ public class ModerationAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
-    [SlashCommand("customembed", "Create an embbeded message", (long)Permissions.EmbedLinks, dmPermission: false)]
+    [SlashCommand("customembed", "Create an embedded message", (long)Permissions.EmbedLinks, dmPermission: false)]
     public async Task CustomEmbed(InteractionContext ctx)
     {
         Task.Run(async () =>

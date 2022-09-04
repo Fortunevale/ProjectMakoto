@@ -32,7 +32,7 @@ public class UtilityPrefixCommands : BaseCommandModule
                         if (!ctx.Member.IsAdmin(_bot.status))
                             continue;
                         break;
-                    case "maintainence":
+                    case "maintenance":
                         if (!ctx.Member.IsMaintenance(_bot.status))
                             continue;
                         break;

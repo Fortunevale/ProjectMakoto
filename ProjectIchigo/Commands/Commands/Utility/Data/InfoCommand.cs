@@ -69,7 +69,7 @@ internal class InfoCommand : BaseCommand
                     $"If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us.\n\n" +
                     $"**Children's Information**\n\n" +
                     $"Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.\n" +
-                    $"**Ichigo does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our plattform, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.**"
+                    $"**Ichigo does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our platform, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.**"
                 }.SetBotInfo(ctx)
             };
 

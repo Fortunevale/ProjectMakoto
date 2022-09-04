@@ -108,7 +108,7 @@ public class Bot
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
         translationClient = TranslationClient.Initialize();
 
-        _logger.LogDebug($"Enviroment Details\n\n" +
+        _logger.LogDebug($"Environment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
                 $"OS & Version: {Environment.OSVersion}\n\n" +
                 $"OS 64x: {Environment.Is64BitOperatingSystem}\n" +

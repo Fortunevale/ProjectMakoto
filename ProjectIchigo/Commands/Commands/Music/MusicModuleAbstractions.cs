@@ -64,7 +64,7 @@ internal class MusicModuleAbstractions
         }
         else
         {
-            embed.Description = $"`On what plattform do you want to search?`";
+            embed.Description = $"`On what platform do you want to search?`";
             embed.SetAwaitingInput(ctx);
             
             var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Client, ctx.Bot)));

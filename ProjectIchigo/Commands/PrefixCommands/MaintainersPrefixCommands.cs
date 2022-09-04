@@ -4,7 +4,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
     public Bot _bot { private get; set; }
 
     [Group("dev_tools"),
-    CommandModule("maintainence"),
+    CommandModule("maintenance"),
     Description("Developer Tools used to develop/manage Ichigo.")]
     public class DevTools : BaseCommandModule
     {
@@ -134,7 +134,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [Command("test"), Description("Check description lenghts.")]
+        [Command("test"), Description("Check description lengths.")]
         public async Task Test(CommandContext ctx)
         {
             Task.Run(async () =>

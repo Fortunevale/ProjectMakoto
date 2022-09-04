@@ -237,7 +237,7 @@ public class ModerationPrefixCommands : BaseCommandModule
     
     [Command("customembed"),
     CommandModule("moderation"),
-    Description("Create an embbeded message")]
+    Description("Create an embedded message")]
     public async Task CustomEmbed(CommandContext ctx)
     {
         Task.Run(async () =>
