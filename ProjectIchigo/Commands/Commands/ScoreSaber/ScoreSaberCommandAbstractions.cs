@@ -319,7 +319,7 @@ internal class ScoreSaberCommandAbstractions
 
                         using (FileStream stream = File.Open(file, FileMode.Open))
                         {
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GraphAssetsChannelId)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
 
                             LoadedGraph = asset.Attachments[0].Url;
 

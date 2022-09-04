@@ -170,7 +170,7 @@ internal class UrlSubmitCommand : BaseCommand
                 embed.Description = $"`Creating submission..`";
                 await RespondOrEdit(embed);
 
-                var channel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.UrlSubmissionsChannelId);
+                var channel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.UrlSubmissions);
 
                 var AcceptSubmission = new DiscordButtonComponent(ButtonStyle.Success, "accept_submission", "Accept submission", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
                 var DenySubmission = new DiscordButtonComponent(ButtonStyle.Danger, "deny_submission", "Deny submission", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));

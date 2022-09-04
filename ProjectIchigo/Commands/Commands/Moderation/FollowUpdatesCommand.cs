@@ -16,19 +16,19 @@ internal class FollowUpdatesCommand : BaseCommand
                 {
                     case FollowChannel.GithubUpdates:
                     {
-                        var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GithubLogChannelId);
+                        var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GithubLog);
                         await b.FollowAsync(ctx.Channel);
                         break;
                     }
                     case FollowChannel.GlobalBans:
                     {
-                        var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+                        var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
                         await b.FollowAsync(ctx.Channel);
                         break;
                     }
                     case FollowChannel.News:
                     {
-                        var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.NewsChannelId);
+                        var b = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.News);
                         await b.FollowAsync(ctx.Channel);
                         break;
                     }

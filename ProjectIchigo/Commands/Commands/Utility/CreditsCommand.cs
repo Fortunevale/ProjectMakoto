@@ -16,10 +16,10 @@ internal class CreditsCommand : BaseCommand
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
 
-            var tokenAuth = new Credentials(Secrets.Secrets.GithubToken);
+            var tokenAuth = new Credentials(ctx.Bot.status.LoadedConfig.Secrets.Github.Token);
             client.Credentials = tokenAuth;
 
-            var contributors = await client.Repository.GetAllContributors(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository);
+            var contributors = await client.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
             var contributorsdcs = await client.Repository.GetAllContributors("Aiko-IT-Systems", "DisCatSharp");
             var contributorslava = await client.Repository.GetAllContributors("freyacodes", "Lavalink");
 

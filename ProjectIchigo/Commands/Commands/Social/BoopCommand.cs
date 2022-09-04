@@ -11,7 +11,7 @@ internal class BoopCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("boop");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "boop");
 
             string[] phrases =
             {

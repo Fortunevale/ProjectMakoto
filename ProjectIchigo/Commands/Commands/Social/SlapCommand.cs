@@ -11,11 +11,11 @@ internal class SlapCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("slap");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "slap");
 
             string[] phrases =
             {
-                $"%1 slaps %2! That looks like it hurt.. {ctx.Bot.status.LoadedConfig.SlapEmoji}",
+                $"%1 slaps %2! That looks like it hurt.. {ctx.Bot.status.LoadedConfig.Emojis.Slap}",
             };
 
             string[] self_phrases =

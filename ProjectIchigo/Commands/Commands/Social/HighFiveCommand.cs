@@ -11,11 +11,11 @@ internal class HighFiveCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("highfive");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "highfive");
 
             string[] phrases =
             {
-                $"%1 highfives %2! That's the spirit. {ctx.Bot.status.LoadedConfig.ProudEmoji}",
+                $"%1 highfives %2! That's the spirit. {ctx.Bot.status.LoadedConfig.Emojis.Proud}",
             };
 
             string[] self_phrases =

@@ -87,8 +87,8 @@ internal class DatabaseClient
         {
             _bot = _bot,
 
-            mainDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;Database={Secrets.Secrets.MainDatabaseName};"),
-            guildDatabaseConnection = new MySqlConnection($"Server={Secrets.Secrets.DatabaseUrl};Port={Secrets.Secrets.DatabasePort};User Id={Secrets.Secrets.DatabaseUserName};Password={Secrets.Secrets.DatabasePassword};Connection Timeout=60;Database={Secrets.Secrets.GuildDatabaseName};")
+            mainDatabaseConnection = new MySqlConnection($"Server={_bot.status.LoadedConfig.Secrets.Database.Host};Port={_bot.status.LoadedConfig.Secrets.Database.Port};User Id={_bot.status.LoadedConfig.Secrets.Database.Username};Password={_bot.status.LoadedConfig.Secrets.Database.Password};Connection Timeout=60;Database={_bot.status.LoadedConfig.Secrets.Database.MainDatabaseName};"),
+            guildDatabaseConnection = new MySqlConnection($"Server={_bot.status.LoadedConfig.Secrets.Database.Host};Port={_bot.status.LoadedConfig.Secrets.Database.Port};User Id={_bot.status.LoadedConfig.Secrets.Database.Username};Password={_bot.status.LoadedConfig.Secrets.Database.Password};Connection Timeout=60;Database={_bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName};")
         };
         databaseClient._helper = new(databaseClient);
         databaseClient._queue = new(_bot);
@@ -105,7 +105,7 @@ internal class DatabaseClient
                 if (!MainTables.Contains(b.Key))
                 {
                     _logger.LogWarn($"Missing table '{b.Key}'. Creating..");
-                    string sql = $"CREATE TABLE `{Secrets.Secrets.MainDatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
+                    string sql = $"CREATE TABLE `{_bot.status.LoadedConfig.Secrets.Database.MainDatabaseName}`.`{b.Key}` ( {string.Join(", ", b.Value.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(b.Value.Any(x => x.Primary) ? $", PRIMARY KEY (`{b.Value.First(x => x.Primary).Name}`)" : "")})";
 
                     var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                     cmd.CommandText = sql;
@@ -216,7 +216,7 @@ internal class DatabaseClient
             if (!GuildTables.Contains($"{b.Key}"))
             {
                 _logger.LogWarn($"Missing table '{b.Key}'. Creating..");
-                string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
+                string sql = $"CREATE TABLE `{_bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", DatabaseColumnLists.guild_users.Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.guild_users.Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.guild_users.First(x => x.Primary).Name}`)" : "")})";
 
                 var cmd = guildDatabaseConnection.CreateCommand();
                 cmd.CommandText = sql;
@@ -287,7 +287,7 @@ internal class DatabaseClient
         if (!GuildTables.Contains("writetester"))
         {
             _logger.LogWarn($"Missing table 'writetester'. Creating..");
-            string sql = $"CREATE TABLE `{Secrets.Secrets.GuildDatabaseName}`.`writetester` ( {string.Join(", ", DatabaseColumnLists.Tables["writetester"].Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.Tables["writetester"].Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.Tables["writetester"].First(x => x.Primary).Name}`)" : "")})";
+            string sql = $"CREATE TABLE `{_bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`writetester` ( {string.Join(", ", DatabaseColumnLists.Tables["writetester"].Select(x => $"`{x.Name}` {x.Type.ToUpper()}{(x.Collation != "" ? $" CHARACTER SET {x.Collation.Remove(x.Collation.IndexOf("_"), x.Collation.Length - x.Collation.IndexOf("_"))} COLLATE {x.Collation}" : "")}{(x.Nullable ? " NULL" : " NOT NULL")}"))}{(DatabaseColumnLists.Tables["writetester"].Any(x => x.Primary) ? $", PRIMARY KEY (`{DatabaseColumnLists.Tables["writetester"].First(x => x.Primary).Name}`)" : "")})";
 
             var cmd = guildDatabaseConnection.CreateCommand();
             cmd.CommandText = sql;

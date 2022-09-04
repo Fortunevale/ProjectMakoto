@@ -62,7 +62,6 @@ global using ProjectIchigo.PrefixCommands;
 global using ProjectIchigo.Commands.PrefixCommands.Converters;
 
 global using ProjectIchigo.Enums;
-global using ProjectIchigo.Secrets;
 global using ProjectIchigo.Entities;
 global using ProjectIchigo.Entities.Afk;
 global using ProjectIchigo.Entities.Database;

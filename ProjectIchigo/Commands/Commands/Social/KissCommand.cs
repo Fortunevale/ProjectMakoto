@@ -11,11 +11,11 @@ internal class KissCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("kiss");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "kiss");
 
             string[] phrases =
             {
-                $"%1 kisses %2! {ctx.Bot.status.LoadedConfig.CuddleEmoji}",
+                $"%1 kisses %2! {ctx.Bot.status.LoadedConfig.Emojis.Cuddle}",
             };
 
             string[] self_phrases =

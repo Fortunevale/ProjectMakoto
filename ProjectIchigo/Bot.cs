@@ -90,7 +90,9 @@ public class Bot
 
         Console.ResetColor();
 
-        _logger.LogInfo($"Starting up Ichigo..\n");
+        string RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
+
+        _logger.LogInfo($"Starting up Ichigo {RunningVersion}..\n");
 
         try
         {
@@ -236,10 +238,10 @@ public class Bot
 
 
             _logger.AddBlacklist(token);
-            _logger.AddBlacklist(Secrets.Secrets.DatabasePassword);
-            _logger.AddBlacklist(Secrets.Secrets.LavalinkPassword);
-            _logger.AddBlacklist(Secrets.Secrets.GithubToken);
-            _logger.AddBlacklist(Secrets.Secrets.KawaiiRedToken);
+            _logger.AddBlacklist(status.LoadedConfig.Secrets.Database.Password);
+            _logger.AddBlacklist(status.LoadedConfig.Secrets.Lavalink.Password);
+            _logger.AddBlacklist(status.LoadedConfig.Secrets.Github.Token);
+            _logger.AddBlacklist(status.LoadedConfig.Secrets.KawaiiRedToken);
 
             _logger.AddLogLevelBlacklist(LogLevel.TRACE2);
 
@@ -285,13 +287,13 @@ public class Bot
 
             var endpoint = new ConnectionEndpoint
             {
-                Hostname = Secrets.Secrets.LavalinkUrl,
-                Port = Secrets.Secrets.LavalinkPort
+                Hostname = status.LoadedConfig.Secrets.Lavalink.Host,
+                Port = status.LoadedConfig.Secrets.Lavalink.Port
             };
 
             var lavalinkConfig = new LavalinkConfiguration
             {
-                Password = Secrets.Secrets.LavalinkPassword,
+                Password = status.LoadedConfig.Secrets.Lavalink.Password,
                 RestEndpoint = endpoint,
                 SocketEndpoint = endpoint
             };
@@ -412,13 +414,13 @@ public class Bot
                 }
                 else
                 {
-                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.AssetsGuildId);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.AssetsGuildId);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets);
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
@@ -429,6 +431,22 @@ public class Bot
 
                 if (status.LoadedConfig.IsDev)
                     Prefix = ">>";
+
+                _ = Task.Run(async () =>
+                {
+                    if (status.LoadedConfig.DontModify.LastStartedVersion != RunningVersion)
+                    {
+                        status.LoadedConfig.DontModify.LastStartedVersion = RunningVersion;
+                        File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+
+                        var channel = await discordClient.GetChannelAsync(status.LoadedConfig.Channels.GithubLog);
+                        await channel.SendMessageAsync(new DiscordEmbedBuilder
+                        {
+                            Color = EmbedColors.Success,
+                            Title = $"Successfully updated to `{RunningVersion}`."
+                        }); 
+                    }
+                });
 
                 _ = Task.Run(() =>
                 {
@@ -455,11 +473,11 @@ public class Bot
             {
                 try
                 {
-                    if (status.LoadedConfig.UseLavalinkAutoUpdater)
+                    if (status.LoadedConfig.Lavalink.UseAutoUpdater)
                     {
                         try
                         {
-                            string v = status.LoadedConfig.LavalinkJarFolderPath.Replace("\\", "/");
+                            string v = status.LoadedConfig.Lavalink.JarFolderPath.Replace("\\", "/");
 
                             if (v.EndsWith("/"))
                                 v = v[..^1];
@@ -486,7 +504,7 @@ public class Bot
                             {
                                 if (b.Prerelease)
                                 {
-                                    if (status.LoadedConfig.LavalinkDownloadPreRelease)
+                                    if (status.LoadedConfig.Lavalink.DownloadPreRelease)
                                     {
                                         workingRelease = b;
                                         break;
@@ -1166,7 +1184,7 @@ public class Bot
                     if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
                         break;
 
-                    var channel = discordClient.Guilds[status.LoadedConfig.AssetsGuildId].GetChannel(status.LoadedConfig.ExceptionLogChannelId);
+                    var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
 
                     _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
                         .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)

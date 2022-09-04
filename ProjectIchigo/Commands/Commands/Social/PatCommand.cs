@@ -11,7 +11,7 @@ internal class PatCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("pat");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "pat");
 
             string[] phrases =
             {

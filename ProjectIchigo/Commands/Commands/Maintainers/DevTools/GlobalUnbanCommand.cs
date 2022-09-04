@@ -61,7 +61,7 @@ internal class GlobalUnbanCommand : BaseCommand
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
             }.SetSuccess(ctx, "Global Ban"));
 
-            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
             await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor

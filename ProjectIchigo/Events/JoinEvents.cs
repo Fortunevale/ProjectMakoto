@@ -44,7 +44,7 @@ internal class JoinEvents
                             IconUrl = AuditLogIcons.UserAdded,
                             Name = e.Member.UsernameWithDiscriminator
                         },
-                        Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot.status.LoadedConfig.JoinEventsEmojis.SelectRandom()}",
+                        Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
                         Color = EmbedColors.Success,
                         Thumbnail = new()
                         {

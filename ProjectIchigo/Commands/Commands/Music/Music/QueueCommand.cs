@@ -65,9 +65,9 @@ internal class QueueCommand : BaseCommand
                     Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count / 10.0)}`\n\n";
 
                 Description += $"`Currently playing:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
-                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.DisabledRepeatEmoji)}";
-                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.DisabledShuffleEmoji)}";
-                Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused ? ctx.Bot.status.LoadedConfig.PausedEmoji : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.DisabledPlayEmoji)} ")}";
+                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
+                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
+                Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
 
                 if (conn.CurrentState.CurrentTrack is not null)
                 {

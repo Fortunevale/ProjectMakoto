@@ -53,7 +53,7 @@ internal class GlobalBanCommand : BaseCommand
             msg = RespondOrEdit(embed.SetSuccess(ctx, "Global Ban"));
 
 
-            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.GlobalBanAnnouncementsChannelId);
+            var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
             await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor

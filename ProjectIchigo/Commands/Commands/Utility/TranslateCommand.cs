@@ -146,7 +146,7 @@ internal class TranslateCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
             {
-                var languagesResponse = await client.GetAsync($"http://{Secrets.Secrets.LibreTranslateHost}/languages");
+                var languagesResponse = await client.GetAsync($"http://{ctx.Bot.status.LoadedConfig.Secrets.LibreTranslateHost}/languages");
 
                 var TranslationTargets = JsonConvert.DeserializeObject<List<LibreTranslateLanguage>>(await languagesResponse.Content.ReadAsStringAsync());
 
@@ -204,7 +204,7 @@ internal class TranslateCommand : BaseCommand
                     query = await content.ReadAsStringAsync();
                 }
 
-                var translateResponse = await client.PostAsync($"http://{Secrets.Secrets.LibreTranslateHost}/translate?{query}", null);
+                var translateResponse = await client.PostAsync($"http://{ctx.Bot.status.LoadedConfig.Secrets.LibreTranslateHost}/translate?{query}", null);
                 var parsedTranslation = JsonConvert.DeserializeObject<LibreTranslateTranslation>(await translateResponse.Content.ReadAsStringAsync());
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder

@@ -10,7 +10,7 @@ internal class CreateIssueCommand : BaseCommand
         {
             bool UseOldTagsSelector = (bool)arguments["UseOldTagsSelector"];
 
-            if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
+            if (ctx.Bot.status.LoadedConfig.Secrets.Github.TokenExperiation.GetTotalSecondsUntil() <= 0)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithContent($"❌ `The GitHub Token expired, please update.`"));
                 return;
@@ -18,10 +18,10 @@ internal class CreateIssueCommand : BaseCommand
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
 
-            var tokenAuth = new Credentials(Secrets.Secrets.GithubToken);
+            var tokenAuth = new Credentials(ctx.Bot.status.LoadedConfig.Secrets.Github.Token);
             client.Credentials = tokenAuth;
 
-            var labels = await client.Issue.Labels.GetAllForRepository(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository);
+            var labels = await client.Issue.Labels.GetAllForRepository(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
 
             var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                 .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
@@ -65,16 +65,16 @@ internal class CreateIssueCommand : BaseCommand
                             labels = labelComp.Value.Split("\n", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Where(x => x.StartsWith("#")).Select(x => x.Replace("#", "")).ToList();
                         }
 
-                        if (Secrets.Secrets.GithubTokenExperiation.GetTotalSecondsUntil() <= 0)
+                        if (ctx.Bot.status.LoadedConfig.Secrets.Github.TokenExperiation.GetTotalSecondsUntil() <= 0)
                         {
                             _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"❌ `The GitHub Token expired, please update.`"));
                             return;
                         }
 
-                        var issue = await client.Issue.Create(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.UsernameWithDiscriminator}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
+                        var issue = await client.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.UsernameWithDiscriminator}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
 
                         if (labels.Count > 0)
-                            await client.Issue.Labels.ReplaceAllForIssue(Secrets.Secrets.GithubUsername, Secrets.Secrets.GithubRepository, issue.Number, labels.ToArray());
+                            await client.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());
 
                         _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"✅ `Issue submitted:` {issue.HtmlUrl}"));
                     }

@@ -11,12 +11,12 @@ internal class KillCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif(new string[] { "kill", "wasted" }.SelectRandom());
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, new string[] { "kill", "wasted" }.SelectRandom());
 
             string[] phrases =
             {
-                $"%1 kills %2! That looks like it hurt.. {ctx.Bot.status.LoadedConfig.SlapEmoji}",
-                $"%1 kills %2! Ouch.. {ctx.Bot.status.LoadedConfig.SlapEmoji}",
+                $"%1 kills %2! That looks like it hurt.. {ctx.Bot.status.LoadedConfig.Emojis.Slap}",
+                $"%1 kills %2! Ouch.. {ctx.Bot.status.LoadedConfig.Emojis.Slap}",
             };
 
             string[] self_phrases =

@@ -45,7 +45,7 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == Setup.CustomId)
             {
-                if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == ctx.Bot.status.LoadedConfig.DisboardAccountId))
+                if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == ctx.Bot.status.LoadedConfig.Accounts.Disboard))
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {

@@ -11,11 +11,11 @@ internal class CuddleCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("cuddle");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "cuddle");
 
             string[] phrases =
             {
-                $"%1 cuddles with %2! {ctx.Bot.status.LoadedConfig.CuddleEmoji}",
+                $"%1 cuddles with %2! {ctx.Bot.status.LoadedConfig.Emojis.Cuddle}",
             };
 
             string[] self_phrases =

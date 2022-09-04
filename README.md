@@ -51,8 +51,6 @@ Current notable features are:
 
 ### Required Dependencies that you can't get on nuget:
 
-- [Project-Ichigo.Secrets](https://github.com/TheXorog/Project-Ichigo.Secrets.Dummy)
-   - Make sure to fill in all fields in the [Secrets.cs](https://github.com/TheXorog/Project-Ichigo.Secrets.Dummy/blob/main/Secrets.cs)!
 - [Xorog.ScoreSaber](https://github.com/TheXorog/Xorog.ScoreSaber)
 - [Xorog.Logger](https://github.com/TheXorog/Xorog.Logger)
 - [Xorog.UniversalExtensions](https://github.com/TheXorog/Xorog.UniversalExtensions)

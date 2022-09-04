@@ -11,13 +11,13 @@ internal class HugCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif("hug");
+            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "hug");
 
             string[] phrases =
             {
                 "%1 hugs %2! How sweet! ♥",
-                $"%1 gives %2 a big fat hug! {ctx.Bot.status.LoadedConfig.HugEmoji}",
-                $"%2, watch out! %1 is coming to squeeze you tight! {ctx.Bot.status.LoadedConfig.HugEmoji}",
+                $"%1 gives %2 a big fat hug! {ctx.Bot.status.LoadedConfig.Emojis.Hug}",
+                $"%2, watch out! %1 is coming to squeeze you tight! {ctx.Bot.status.LoadedConfig.Emojis.Hug}",
             };
 
             string[] self_phrases =
