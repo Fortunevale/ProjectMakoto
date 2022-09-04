@@ -635,7 +635,7 @@ public class Bot
                 Thread.Sleep(1000);
 
             _ = discordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Commands registered. Bot is available again!", ActivityType.Playing));
-            Thread.Sleep(30000);
+            Thread.Sleep(10000);
 
             status.DiscordCommandsRegistered = true;
 
