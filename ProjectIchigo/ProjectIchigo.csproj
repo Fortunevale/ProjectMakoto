@@ -39,7 +39,7 @@
     <PackageReference Include="DisCatSharp" Version="10.0.1-nightly-00462" />
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.1-nightly-00462" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.1-nightly-00462" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.0.1-nightly-00462" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.0.1-nightly-00465" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.1-nightly-00462" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.1-nightly-00462" />
     <PackageReference Include="MySql.Data" Version="8.0.30" />
