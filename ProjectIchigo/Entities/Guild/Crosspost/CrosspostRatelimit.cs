@@ -6,6 +6,7 @@ public class CrosspostRatelimit
 
     public int PostsRemaining { get; set; } = 0;
 
+    [JsonIgnore]
     public bool Waiting { get; set; } = false;
 
     public async Task WaitForRatelimit(ulong channelid = 0)
