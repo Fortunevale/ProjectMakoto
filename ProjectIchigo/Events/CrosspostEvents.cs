@@ -26,7 +26,7 @@ internal class CrosspostEvents
             if (!_bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(e.Channel.Id))
                 return;
 
-            if (e.Message.Reference is not null || e.Message.MessageType is MessageType.ChannelPinnedMessage or MessageType.GuildMemberJoin or MessageType.ChannelFollowAdd)
+            if (e.Message.Reference is not null || e.Message.MessageType is MessageType.ChannelPinnedMessage or MessageType.GuildMemberJoin or MessageType.ChannelFollowAdd or MessageType.ChatInputCommand or MessageType.ContextMenuCommand)
                 return;
 
             if (e.Channel.Type == ChannelType.News)
