@@ -2,12 +2,19 @@
 
 public class CrosspostRatelimit
 {
-    public DateTimeOffset FirstPost { get; set; } = DateTimeOffset.MinValue;
+    public DateTime FirstPost { get; set; } = DateTime.MinValue;
 
     public int PostsRemaining { get; set; } = 0;
 
     public async Task WaitForRatelimit(ulong channelid = 0)
     {
+        if (FirstPost.AddHours(1).GetTotalSecondsUntil() <= 0)
+        {
+            _logger.LogDebug($"First crosspost for '{channelid}' was at {FirstPost.AddHours(1)}, setting crosspost availability");
+            FirstPost = DateTime.UtcNow;
+            PostsRemaining = 10;
+        }
+
         if (PostsRemaining > 0)
         {
             _logger.LogDebug($"{PostsRemaining} crossposts available for '{channelid}', allowing request");
@@ -15,14 +22,16 @@ public class CrosspostRatelimit
             return;
         }
 
-        _logger.LogDebug($"No crossposts available for '{channelid}', waiting until {FirstPost.AddHours(1)} ({FirstPost.AddHours(1).GetTotalSecondsUntil()} seconds)");
-        if (FirstPost.AddHours(1).GetTotalSecondsUntil() > 0)
+        if (FirstPost.AddMinutes(70).GetTotalSecondsUntil() > 0)
+        {
+            _logger.LogDebug($"No crossposts available for '{channelid}', waiting until {FirstPost.AddHours(1)} ({FirstPost.AddHours(1).GetTotalSecondsUntil()} seconds)");
             await Task.Delay(FirstPost.AddHours(1).GetTimespanUntil());
+        }
 
         _logger.LogDebug($"Crossposts for '{channelid}' available again, allowing request");
 
         PostsRemaining = 9;
-        FirstPost = DateTimeOffset.Now;
+        FirstPost = DateTime.UtcNow;
         return;
     }
 }

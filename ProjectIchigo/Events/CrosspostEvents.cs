@@ -111,7 +111,7 @@ internal class CrosspostEvents
 
                     _logger.LogWarn("Ratelimit hit for Crosspost, overriding ratelimit values");
 
-                    _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].FirstPost = DateTimeOffset.Now;
+                    _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].FirstPost = DateTime.UtcNow;
                     _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].PostsRemaining = 0;
                 }
             }
