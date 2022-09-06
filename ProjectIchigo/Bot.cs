@@ -970,6 +970,9 @@ public class Bot
                                     await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
                                     ReactionAdded = true;
                                 }
+
+                                while (!task.IsCompleted)
+                                    task.Wait();
                             }
                             catch (ArgumentException)
                             {
