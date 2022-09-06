@@ -61,7 +61,12 @@ public class CrosspostSettings
         {
             var task = channel.CrosspostMessageAsync(message);
 
-            await Task.Delay(5000);
+            Stopwatch sw = new();
+            sw.Start();
+            while (!task.IsCompleted && sw.ElapsedMilliseconds < 3000)
+                Thread.Sleep(50);
+            sw.Stop();
+
             if (!task.IsCompleted)
             {
                 _logger.LogWarn($"Crosspost Ratelimit tripped for '{channel.Id}': {message.Id}");
