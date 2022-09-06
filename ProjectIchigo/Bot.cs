@@ -949,31 +949,9 @@ public class Bot
 
                             bool ReactionAdded = false;
 
-                            if (!guilds[guild.Value.Id].CrosspostSettings.CrosspostRatelimits.ContainsKey(channel.Id))
-                                guilds[guild.Value.Id].CrosspostSettings.CrosspostRatelimits.Add(channel.Id, new());
-
-                            var ratelimit = guilds[guild.Value.Id].CrosspostSettings.CrosspostRatelimits[channel.Id].WaitForRatelimit(channel.Id);
-
-                            await Task.Delay(3000);
-
-                            while (!ratelimit.IsCompleted)
-                            {
-                                if (!ReactionAdded)
-                                {
-                                    await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                    ReactionAdded = true;
-                                }
-
-                                _logger.LogWarn("Ratelimit hit for Crosspost, overriding ratelimit values");
-
-                                guilds[guild.Value.Id].CrosspostSettings.CrosspostRatelimits[channel.Id].FirstPost = DateTime.UtcNow;
-                                guilds[guild.Value.Id].CrosspostSettings.CrosspostRatelimits[channel.Id].PostsRemaining = 0;
-                                await Task.Delay(1000);
-                            }
-
                             try
                             {
-                                var task = channel.CrosspostMessageAsync(msg).ContinueWith(s =>
+                                var task = guilds[guild.Value.Id].CrosspostSettings.CrosspostWithRatelimit(channel, msg).ContinueWith(s =>
                                 {
                                     if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
                                     {

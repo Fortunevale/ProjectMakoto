@@ -68,26 +68,7 @@ internal class CrosspostEvents
 
                 bool ReactionAdded = false;
 
-                if (!_bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits.ContainsKey(e.Channel.Id))
-                    _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits.Add(e.Channel.Id, new());
-
-                var ratelimit = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].WaitForRatelimit(e.Channel.Id);
-
-                await Task.Delay(3000);
-
-                while (!ratelimit.IsCompleted)
-                {
-                    if (!ReactionAdded)
-                    {
-                        await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                        ReactionAdded = true;
-                    }
-
-                    
-                    await Task.Delay(1000);
-                }
-
-                var task = e.Channel.CrosspostMessageAsync(msg).ContinueWith(s =>
+                var task = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostWithRatelimit(e.Channel, e.Message).ContinueWith(s =>
                 {
                     if (_bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == MessageId))
                     {
@@ -108,11 +89,6 @@ internal class CrosspostEvents
                         await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
                         ReactionAdded = true; 
                     }
-
-                    _logger.LogWarn("Ratelimit hit for Crosspost, overriding ratelimit values");
-
-                    _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].FirstPost = DateTime.UtcNow;
-                    _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostRatelimits[e.Channel.Id].PostsRemaining = 0;
                 }
             }
         }).Add(_bot.watcher);
