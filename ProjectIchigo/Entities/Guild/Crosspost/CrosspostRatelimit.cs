@@ -32,6 +32,9 @@ public class CrosspostRatelimit
 
         sw.Stop();
 
+        if (sw.ElapsedMilliseconds >= TimeSpan.FromMinutes(60).TotalMilliseconds)
+            Waiting = false;
+
         if (FirstPost.AddMinutes(70).GetTotalSecondsUntil() > 0)
         {
             _logger.LogDebug($"No crossposts available for '{channelid}', waiting until {FirstPost.AddHours(1)} ({FirstPost.AddHours(1).GetTotalSecondsUntil()} seconds)");
