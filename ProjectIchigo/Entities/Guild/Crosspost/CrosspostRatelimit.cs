@@ -12,7 +12,7 @@ public class CrosspostRatelimit
     {
         if (FirstPost.AddHours(1).GetTotalSecondsUntil() <= 0)
         {
-            _logger.LogDebug($"First crosspost for '{channelid}' was at {FirstPost.AddHours(1)}, setting crosspost availability");
+            _logger.LogDebug($"First crosspost for '{channelid}' was at {FirstPost.AddHours(1)}, resetting crosspost availability");
             FirstPost = DateTime.UtcNow;
             PostsRemaining = 10;
         }
@@ -44,10 +44,10 @@ public class CrosspostRatelimit
             Waiting = false;
         }
 
-        _logger.LogDebug($"Crossposts for '{channelid}' available again, allowing request");
-
         PostsRemaining = 9;
         FirstPost = DateTime.UtcNow;
+
+        _logger.LogDebug($"Crossposts for '{channelid}' available again, allowing request. {PostsRemaining} requests remaining, first post at {FirstPost}.");
         return;
     }
 }
