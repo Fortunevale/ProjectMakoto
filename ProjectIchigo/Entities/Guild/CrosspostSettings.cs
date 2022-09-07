@@ -57,6 +57,9 @@ public class CrosspostSettings
 
         var r = CrosspostRatelimits[channel.Id];
 
+        _logger.LogDebug($"Crosspost Ratelimit '{channel.Id}' First Post: {r.FirstPost}");
+        _logger.LogDebug($"Crosspost Ratelimit '{channel.Id}' Remaining Post: {r.PostsRemaining}");
+
         async Task Crosspost()
         {
             var task = channel.CrosspostMessageAsync(message);
@@ -66,6 +69,8 @@ public class CrosspostSettings
             while (!task.IsCompleted && sw.ElapsedMilliseconds < 3000)
                 Thread.Sleep(50);
             sw.Stop();
+
+            _logger.LogDebug($"It took {sw.ElapsedMilliseconds}ms to process a crosspost");
 
             if (!task.IsCompleted)
             {
