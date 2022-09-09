@@ -47,71 +47,122 @@ public class CrosspostSettings
         };
     }
 
-    public async Task CrosspostWithRatelimit(DiscordChannel channel, DiscordMessage message)
+    private bool QueueInitialized = false;
+    private Dictionary<DiscordMessage, DiscordChannel> _queue = new();
+
+    public async Task CrosspostQueue()
     {
-        if (!CrosspostRatelimits.ContainsKey(channel.Id))
+        QueueInitialized = true;
+        _logger.LogDebug($"Initializing crosspost queue for '{Parent.ServerId}'");
+
+        while (true)
         {
-            _logger.LogDebug($"Initialized new crosspost ratelimit for '{channel.Id}'");
-            CrosspostRatelimits.Add(channel.Id, new());
-        }
+            KeyValuePair<DiscordMessage, DiscordChannel> _;
 
-        var r = CrosspostRatelimits[channel.Id];
+            DiscordChannel channel;
+            DiscordMessage message;
 
-        _logger.LogDebug($"Crosspost Ratelimit '{channel.Id}' First Post: {r.FirstPost}");
-        _logger.LogDebug($"Crosspost Ratelimit '{channel.Id}' Remaining Post: {r.PostsRemaining}");
-
-        async Task Crosspost()
-        {
-            var task = channel.CrosspostMessageAsync(message);
-
-            Stopwatch sw = new();
-            sw.Start();
-            while (!task.IsCompleted && sw.ElapsedMilliseconds < 3000)
-                Thread.Sleep(50);
-            sw.Stop();
-
-            _logger.LogDebug($"It took {sw.ElapsedMilliseconds}ms to process a crosspost");
-
-            if (!task.IsCompleted)
+            try
             {
-                _logger.LogWarn($"Crosspost Ratelimit tripped for '{channel.Id}': {message.Id}");
+                while (!_queue.IsNotNullAndNotEmpty())
+                    await Task.Delay(1000);
 
-                r.FirstPost = DateTime.UtcNow;
-                r.PostsRemaining = 0;
+                _ = _queue.First();
+                channel = _.Value;
+                message = _.Key;
+            }
+            catch (Exception) 
+            {
+                _queue ??= new();
+                continue; 
             }
 
-            while (!task.IsCompleted)
-                task.Wait();
+            try
+            {
+                if (!CrosspostRatelimits.ContainsKey(channel.Id))
+                {
+                    _logger.LogDebug($"Initialized new crosspost ratelimit for '{channel.Id}'");
+                    CrosspostRatelimits.Add(channel.Id, new());
+                }
 
-            return;
+                var r = CrosspostRatelimits[channel.Id];
+
+                _logger.LogDebug($"Crosspost Ratelimit '{channel.Id}' First Post: {r.FirstPost}");
+                _logger.LogDebug($"Crosspost Ratelimit '{channel.Id}' Remaining Post: {r.PostsRemaining}");
+
+                async Task Crosspost()
+                {
+                    var task = channel.CrosspostMessageAsync(message);
+
+                    Stopwatch sw = new();
+                    sw.Start();
+                    while (!task.IsCompleted && sw.ElapsedMilliseconds < 3000)
+                        Thread.Sleep(50);
+                    sw.Stop();
+
+                    _logger.LogDebug($"It took {sw.ElapsedMilliseconds}ms to process a crosspost");
+
+                    if (!task.IsCompleted)
+                    {
+                        _logger.LogWarn($"Crosspost Ratelimit tripped for '{channel.Id}': {message.Id}");
+
+                        r.FirstPost = DateTime.UtcNow;
+                        r.PostsRemaining = 0;
+                    }
+
+                    while (!task.IsCompleted)
+                        task.Wait();
+
+                    _queue.Remove(message);
+                    _logger.LogDebug($"Crossposted message in '{channel.Id}': {message.Id}");
+                }
+
+                if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() <= 0)
+                {
+                    _logger.LogDebug($"First crosspost for '{channel.Id}' was at {r.FirstPost.AddHours(1)}, resetting crosspost availability");
+                    r.FirstPost = DateTime.UtcNow;
+                    r.PostsRemaining = 10;
+                }
+
+                if (r.PostsRemaining > 0)
+                {
+                    _logger.LogDebug($"{r.PostsRemaining} crossposts available for '{channel.Id}', allowing request");
+                    r.PostsRemaining--;
+                    await Crosspost();
+                    continue;
+                }
+
+                if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() > 0)
+                {
+                    _logger.LogDebug($"No crossposts available for '{channel.Id}', waiting until {r.FirstPost.AddHours(1)} ({r.FirstPost.AddHours(1).GetTotalSecondsUntil()} seconds)");
+                    await Task.Delay(r.FirstPost.AddHours(1).GetTimespanUntil());
+                }
+
+                r.PostsRemaining = 9;
+                r.FirstPost = DateTime.UtcNow;
+
+                _logger.LogDebug($"Crossposts for '{channel.Id}' available again, allowing request. {r.PostsRemaining} requests remaining, first post at {r.FirstPost}.");
+                await Crosspost();
+                continue;
+            }
+            catch (Exception ex)
+            {
+                _queue.Remove(message);
+                _logger.LogError($"Failed to process crosspost queue: {ex}");
+            } 
         }
+    }
 
-        if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() <= 0)
+    public async Task CrosspostWithRatelimit(DiscordChannel channel, DiscordMessage message)
+    {
+        if (!QueueInitialized)
+            _ = CrosspostQueue();
+
+        _queue.Add(message, channel);
+
+        while (_queue.ContainsKey(message))
         {
-            _logger.LogDebug($"First crosspost for '{channel.Id}' was at {r.FirstPost.AddHours(1)}, resetting crosspost availability");
-            r.FirstPost = DateTime.UtcNow;
-            r.PostsRemaining = 10;
+            await Task.Delay(1000);
         }
-
-        if (r.PostsRemaining > 0)
-        {
-            _logger.LogDebug($"{r.PostsRemaining} crossposts available for '{channel.Id}', allowing request");
-            r.PostsRemaining--;
-            await Crosspost();
-            return;
-        }
-
-        if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() > 0)
-        {
-            _logger.LogDebug($"No crossposts available for '{channel.Id}', waiting until {r.FirstPost.AddHours(1)} ({r.FirstPost.AddHours(1).GetTotalSecondsUntil()} seconds)");
-            await Task.Delay(r.FirstPost.AddHours(1).GetTimespanUntil());
-        }
-
-        r.PostsRemaining = 9;
-        r.FirstPost = DateTime.UtcNow;
-
-        _logger.LogDebug($"Crossposts for '{channel.Id}' available again, allowing request. {r.PostsRemaining} requests remaining, first post at {r.FirstPost}.");
-        await Crosspost();
-        return;
     }
 }
