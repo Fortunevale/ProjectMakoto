@@ -92,6 +92,10 @@ public class CrosspostSettings
 
                 async Task Crosspost()
                 {
+                    if (message.Flags.HasValue && message.Flags.Value is MessageFlags.Crossposted)
+                        return;
+
+                    r.PostsRemaining--;
                     var task = channel.CrosspostMessageAsync(message);
 
                     Stopwatch sw = new();
@@ -117,17 +121,21 @@ public class CrosspostSettings
                     _logger.LogDebug($"Crossposted message in '{channel.Id}': {message.Id}");
                 }
 
+                void ResetLimits()
+                {
+                    r.PostsRemaining = 10;
+                    r.FirstPost = DateTime.UtcNow;
+                }
+
                 if (r.FirstPost.AddHours(1).GetTotalSecondsUntil() <= 0)
                 {
                     _logger.LogDebug($"First crosspost for '{channel.Id}' was at {r.FirstPost.AddHours(1)}, resetting crosspost availability");
-                    r.FirstPost = DateTime.UtcNow;
-                    r.PostsRemaining = 10;
+                    ResetLimits();
                 }
 
                 if (r.PostsRemaining > 0)
                 {
                     _logger.LogDebug($"{r.PostsRemaining} crossposts available for '{channel.Id}', allowing request");
-                    r.PostsRemaining--;
                     await Crosspost();
                     continue;
                 }
@@ -138,8 +146,7 @@ public class CrosspostSettings
                     await Task.Delay(r.FirstPost.AddHours(1).GetTimespanUntil());
                 }
 
-                r.PostsRemaining = 9;
-                r.FirstPost = DateTime.UtcNow;
+                ResetLimits();
 
                 _logger.LogDebug($"Crossposts for '{channel.Id}' available again, allowing request. {r.PostsRemaining} requests remaining, first post at {r.FirstPost}.");
                 await Crosspost();
