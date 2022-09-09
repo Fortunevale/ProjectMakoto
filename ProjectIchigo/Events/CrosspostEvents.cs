@@ -49,7 +49,7 @@ internal class CrosspostEvents
                 await Task.Delay(TimeSpan.FromSeconds(_bot.guilds[e.Guild.Id].CrosspostSettings.DelayBeforePosting));
 
                 if (_bot.guilds[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
-                    _ = e.Message.DeleteOwnReactionAsync(DiscordEmoji.FromUnicode("🕒"));
+                    _ = e.Message.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
                 DiscordMessage msg;
 
@@ -77,7 +77,7 @@ internal class CrosspostEvents
                     }
 
                     if (ReactionAdded)
-                        _ = msg.DeleteOwnReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
+                        _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
                 });
 
                 await Task.Delay(5000);

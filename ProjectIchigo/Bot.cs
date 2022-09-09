@@ -945,7 +945,7 @@ public class Bot
                                 await Task.Delay(TimeSpan.FromSeconds(WaitTime));
 
                             if (guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
-                                _ = msg.DeleteOwnReactionAsync(DiscordEmoji.FromUnicode("🕒"));
+                                _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
                             bool ReactionAdded = false;
 
@@ -960,7 +960,7 @@ public class Bot
                                     }
 
                                     if (ReactionAdded)
-                                        _ = msg.DeleteOwnReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
+                                        _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
                                 });
 
                                 await Task.Delay(5000);
