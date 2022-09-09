@@ -13,7 +13,7 @@ internal class ReactionRoleEvents
     {
         Task.Run(async () =>
         {
-            if (e.Guild == null || e.Channel.IsPrivate)
+            if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate)
                 return;
 
             if (!_bot.guilds.ContainsKey(e.Guild.Id))
