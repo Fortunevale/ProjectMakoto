@@ -544,6 +544,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
                             cmd.Parameters.AddWithValue($"bump_missed{i}", DatabaseInserts[i].bump_missed);
 
+                            cmd.Parameters.AddWithValue($"tokens_detect{i}", DatabaseInserts[i].tokens_detect);
+
                             cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
                             cmd.Parameters.AddWithValue($"phishing_warnonredirect{i}", DatabaseInserts[i].phishing_warnonredirect);
                             cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
