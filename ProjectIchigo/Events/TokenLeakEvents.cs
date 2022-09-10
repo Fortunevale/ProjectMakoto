@@ -74,7 +74,8 @@ internal class TokenLeakEvents
 
         _ = e.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(
         new DiscordEmbedBuilder()
-        .SetBotError(new SharedCommandContext(e, _bot), "Token Leak Protection")
+        .WithColor(EmbedColors.Error)
+        .WithAuthor(sender.CurrentUser.Username, null, sender.CurrentUser.AvatarUrl)
         .WithDescription($"`Heads up!`\n\n" +
                          $"`I've detected {InvalidateCount} authentication token{s} within your last message. The token{s} will soon be invalidated and the owner{(s.IsNullOrWhiteSpace() ? "" : "(s)")} of the bot{s} will receive {(s.IsNullOrWhiteSpace() ? "an " : "")}official notification{s} from Discord.`\n\n" +
                          $"`You can disable the token check on this server via '/tokendetectionsettings config'.`"))
