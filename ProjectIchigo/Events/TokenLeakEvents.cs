@@ -44,6 +44,9 @@ internal class TokenLeakEvents
 
         var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
 
+        var tokenAuth = new Credentials(_bot.status.LoadedConfig.Secrets.Github.Token);
+        client.Credentials = tokenAuth;
+
         int InvalidateCount = 0;
 
         foreach (var token in filtered_matches)
