@@ -436,6 +436,8 @@ internal class DatabaseClient
                             reapplyroles = x.Value.JoinSettings.ReApplyRoles,
                             reapplynickname = x.Value.JoinSettings.ReApplyNickname,
 
+                            tokens_detect = x.Value.TokenLeakDetectionSettings.DetectTokens,
+
                             phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
                             phishing_warnonredirect = x.Value.PhishingDetectionSettings.WarnOnRedirect,
                             phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),

@@ -6,6 +6,7 @@ public class Guild
     {
         ServerId = serverId;
 
+        TokenLeakDetectionSettings = new(this);
         PhishingDetectionSettings = new(this);
         BumpReminderSettings = new(this);
         JoinSettings = new(this);
@@ -32,6 +33,7 @@ public class Guild
 
     public ulong ServerId { get; set; }
 
+    public TokenLeakDetectionSettings TokenLeakDetectionSettings { get; set; }
     public PhishingDetectionSettings PhishingDetectionSettings { get; set; }
     public BumpReminderSettings BumpReminderSettings { get; set; }
     public JoinSettings JoinSettings { get; set; }

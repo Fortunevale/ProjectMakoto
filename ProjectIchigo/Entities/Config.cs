@@ -91,6 +91,8 @@ public class Config
             public DateTimeOffset TokenExperiation = new(0001, 01, 01, 15, 00, 00, TimeSpan.Zero);
             public string Username = "";
             public string Repository = "";
+            public string TokenLeakRepoOwner = "";
+            public string TokenLeakRepo = "";
         }
 
         public class DatabaseSecrets
