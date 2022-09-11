@@ -920,10 +920,14 @@ public class Bot
                     {
                         for (var i = 0; i < guilds[guild.Key].CrosspostSettings.CrosspostTasks.Count; i++)
                         {
+                            if (!guilds[guild.Key].CrosspostSettings.CrosspostTasks.IsNotNullAndNotEmpty())
+                                return;
+
                             CrosspostMessage b = guilds[guild.Key].CrosspostSettings.CrosspostTasks[0];
 
                             if ((!guild.Value?.Channels?.ContainsKey(b.ChannelId) ?? true) || b is null)
                             {
+                                _logger.LogDebug($"Missing crosspost message '{b.MessageId}' in '{b.ChannelId}' for '{guild.Key}' has it's channel deleted or the task is null.");
                                 guilds[guild.Key].CrosspostSettings.CrosspostTasks.Remove(b);
                                 continue;
                             }
