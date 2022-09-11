@@ -74,7 +74,6 @@ internal class DatabaseColumnLists
         new Column("crosspostexcludebots", "tinyint(1)"),
         new Column("crosspostdelay", "int", Default: "10"),
         new Column("crosspostchannels", "text", "utf8mb4_0900_ai_ci"),
-        new Column("crossposttasks", "text", "utf8mb4_0900_ai_ci"),
         new Column("normalizenames", "tinyint(1)"),
         new Column("reapplyroles", "tinyint(1)"),
         new Column("reapplynickname", "tinyint(1)"),
