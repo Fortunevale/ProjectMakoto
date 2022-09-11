@@ -914,92 +914,56 @@ public class Bot
                     experienceHandler.CheckExperience(member.Key, guild.Value);
                 }
 
-                if (guilds[guild.Key].CrosspostSettings.CrosspostTasks.Any())
+                if (guilds[guild.Key].CrosspostSettings.CrosspostChannels.Any())
                 {
                     Task.Run(async () =>
                     {
-                        for (var i = 0; i < guilds[guild.Key].CrosspostSettings.CrosspostTasks.Count; i++)
+                        for (int i = 0; i < guilds[guild.Key].CrosspostSettings.CrosspostChannels.Count; i++)
                         {
-                            CrosspostMessage b = guilds[guild.Key].CrosspostSettings.CrosspostTasks[0];
-
-                            if (b is null)
+                            if (guild.Value is null)
                                 return;
 
-                            if (!guild.Value?.Channels?.ContainsKey(b.ChannelId) ?? true)
+                            var ChannelId = guilds[guild.Key].CrosspostSettings.CrosspostChannels[i];
+
+                            _logger.LogDebug($"Checking channel '{ChannelId}' for missing crossposts..");
+
+                            if (!guild.Value.Channels.ContainsKey(ChannelId))
                                 return;
 
-                            var channel = guild.Value.GetChannel(b.ChannelId);
+                            var Messages = await guild.Value.GetChannel(ChannelId).GetMessagesAsync(20);
 
-                            if (!channel.TryGetMessage(b.MessageId, out var msg))
-                            {
-                                if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                            if (Messages.Any(x => x.Flags != MessageFlags.Crossposted))
+                                foreach (var msg in Messages.Where(x => x.Flags != MessageFlags.Crossposted))
                                 {
-                                    var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                    guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
-                                }
-                                continue;
-                            }
+                                    _logger.LogDebug($"Handling missing crosspost message '{msg.Id}' in '{msg.ChannelId}' for '{guild.Key}'..");
 
-                            _logger.LogDebug($"Handling missing crosspost message '{b.MessageId}' in '{b.ChannelId}' for '{guild.Key}'..");
+                                    var WaitTime = guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting - msg.Id.GetSnowflakeTime().GetTotalSecondsSince();
 
-                            var WaitTime = guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting - b.MessageId.GetSnowflakeTime().GetTotalSecondsSince();
+                                    if (WaitTime > 0)
+                                        await Task.Delay(TimeSpan.FromSeconds(WaitTime));
 
-                            if (WaitTime > 0)
-                                await Task.Delay(TimeSpan.FromSeconds(WaitTime));
+                                    if (guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
+                                        _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
-                            if (guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
-                                _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
+                                    bool ReactionAdded = false;
 
-                            bool ReactionAdded = false;
-
-                            try
-                            {
-                                var task = guilds[guild.Value.Id].CrosspostSettings.CrosspostWithRatelimit(channel, msg).ContinueWith(s =>
-                                {
-                                    if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
+                                    var task = guilds[guild.Value.Id].CrosspostSettings.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
                                     {
-                                        var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                        guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
+                                        if (ReactionAdded)
+                                            _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
+                                    });
+
+                                    await Task.Delay(5000);
+
+                                    if (!task.IsCompleted)
+                                    {
+                                        await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
+                                        ReactionAdded = true;
                                     }
 
-                                    if (ReactionAdded)
-                                        _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                });
-
-                                await Task.Delay(5000);
-
-                                if (!task.IsCompleted)
-                                {
-                                    await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                    ReactionAdded = true;
+                                    while (!task.IsCompleted)
+                                        task.Wait();
                                 }
-
-                                while (!task.IsCompleted)
-                                    task.Wait();
-                            }
-                            catch (ArgumentException)
-                            {
-                                if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
-                                {
-                                    var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                    guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
-                                }
-                                return;
-                            }
-                            catch (AggregateException ex)
-                            {
-                                if (ex.InnerException is ArgumentException aex)
-                                {
-                                    if (guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == b.MessageId))
-                                    {
-                                        var obj = guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == b.MessageId);
-                                        guilds[guild.Value.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
-                                    }
-                                    return;
-                                }
-
-                                throw;
-                            }
                         }
                     }).Add(watcher);
                 }

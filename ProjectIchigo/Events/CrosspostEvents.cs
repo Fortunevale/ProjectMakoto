@@ -37,12 +37,6 @@ internal class CrosspostEvents
 
                 ulong MessageId = e.Message.Id;
 
-                _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostTasks.Add(new CrosspostMessage
-                {
-                    MessageId = e.Message.Id,
-                    ChannelId = e.Channel.Id
-                });
-
                 if (_bot.guilds[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
                     _ = e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 
@@ -70,12 +64,6 @@ internal class CrosspostEvents
 
                 var task = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostWithRatelimit(e.Channel, e.Message).ContinueWith(s =>
                 {
-                    if (_bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostTasks.Any(x => x.MessageId == MessageId))
-                    {
-                        var obj = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostTasks.First(x => x.MessageId == MessageId);
-                        _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostTasks.Remove(obj);
-                    }
-
                     if (ReactionAdded)
                         _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
                 });

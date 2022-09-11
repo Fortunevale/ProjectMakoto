@@ -37,8 +37,6 @@ public class CrosspostSettings
 
     public Dictionary<ulong, CrosspostRatelimit> CrosspostRatelimits { get; set; } = new();
 
-    public ObservableCollection<CrosspostMessage> CrosspostTasks { get; set; } = new();
-
     internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated()
     {
         return (s, e) =>
