@@ -90,7 +90,7 @@ public class CrosspostSettings
 
                 async Task Crosspost()
                 {
-                    if (message.Flags.HasValue && message.Flags.Value is MessageFlags.Crossposted)
+                    if (message.Flags.HasValue && message.Flags.Value.HasMessageFlag(MessageFlags.Crossposted))
                         return;
 
                     r.PostsRemaining--;

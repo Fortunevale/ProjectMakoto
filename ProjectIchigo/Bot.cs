@@ -932,8 +932,8 @@ public class Bot
 
                             var Messages = await guild.Value.GetChannel(ChannelId).GetMessagesAsync(20);
 
-                            if (Messages.Any(x => x.Flags != MessageFlags.Crossposted))
-                                foreach (var msg in Messages.Where(x => x.Flags != MessageFlags.Crossposted))
+                            if (Messages.Any(x => x.Flags.HasValue && !x.Flags.Value.HasMessageFlag(MessageFlags.Crossposted)))
+                                foreach (var msg in Messages.Where(x => x.Flags.HasValue && !x.Flags.Value.HasMessageFlag(MessageFlags.Crossposted)))
                                 {
                                     _logger.LogDebug($"Handling missing crosspost message '{msg.Id}' in '{msg.ChannelId}' for '{guild.Key}'..");
 
