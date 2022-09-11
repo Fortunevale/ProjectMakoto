@@ -37,8 +37,6 @@ public class CrosspostSettings
 
     public Dictionary<ulong, CrosspostRatelimit> CrosspostRatelimits { get; set; } = new();
 
-    public ObservableCollection<CrosspostMessage> CrosspostTasks { get; set; } = new();
-
     internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated()
     {
         return (s, e) =>
@@ -92,7 +90,7 @@ public class CrosspostSettings
 
                 async Task Crosspost()
                 {
-                    if (message.Flags.HasValue && message.Flags.Value is MessageFlags.Crossposted)
+                    if (message.Flags.HasValue && message.Flags.Value.HasMessageFlag(MessageFlags.Crossposted))
                         return;
 
                     r.PostsRemaining--;
