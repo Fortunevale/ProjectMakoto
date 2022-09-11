@@ -154,10 +154,10 @@ internal class DatabaseClient
                 {
                     if (!b.Value.Any(x => x.Name == col.Key))
                     {
-                        _logger.LogWarn($"Invalid column '{col.Key}' in '{b}'");
+                        _logger.LogWarn($"Invalid column '{col.Key}' in '{b.Key}'");
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
+                        cmd.CommandText = $"ALTER TABLE `{b.Key}` DROP COLUMN `{col.Key}`";
                         cmd.Connection = databaseClient.mainDatabaseConnection;
 
                         await databaseClient._queue.RunCommand(cmd);
