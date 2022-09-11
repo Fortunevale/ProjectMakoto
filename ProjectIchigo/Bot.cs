@@ -922,9 +922,6 @@ public class Bot
                         {
                             CrosspostMessage b = guilds[guild.Key].CrosspostSettings.CrosspostTasks[0];
 
-                            _logger.LogTrace($"Crosspost: {JsonConvert.SerializeObject(b)}");
-                            _logger.LogTrace($"Guild: {JsonConvert.SerializeObject(guild.Value)}");
-
                             if ((!guild.Value?.Channels?.ContainsKey(b.ChannelId) ?? true) || b is null)
                             {
                                 guilds[guild.Key].CrosspostSettings.CrosspostTasks.Remove(b);
