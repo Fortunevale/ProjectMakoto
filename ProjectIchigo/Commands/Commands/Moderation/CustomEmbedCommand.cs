@@ -693,6 +693,12 @@ internal class CustomEmbedCommand : BaseCommand
                             ModifyToTimedOut();
                             continue;
                         }
+                        catch (NullReferenceException)
+                        {
+                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
+                            await Task.Delay(3000);
+                            continue;
+                        }
 
                         await channel.SendMessageAsync(GeneratedEmbed);
                         DeleteOrInvalidate();

@@ -131,6 +131,13 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut(true);
                     return;
                 }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
             }
             else if (e.Result.Interaction.Data.CustomId == ChangeRole.CustomId)
             {

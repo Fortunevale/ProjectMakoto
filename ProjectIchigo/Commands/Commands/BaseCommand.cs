@@ -409,6 +409,9 @@ public abstract class BaseCommand
                     $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}"));
         }
 
+        if (!channels.IsNotNullAndNotEmpty())
+            throw new NullReferenceException("No valid channel found.");
+
         int currentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
         string NextPageId = Guid.NewGuid().ToString();

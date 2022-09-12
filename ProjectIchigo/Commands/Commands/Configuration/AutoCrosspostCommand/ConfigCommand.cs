@@ -110,6 +110,13 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut();
                     return;
                 }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any announcement channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
 
                 if (channel.Type != ChannelType.News)
                 {

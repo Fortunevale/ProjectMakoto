@@ -50,6 +50,13 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut(true);
                     return;
                 }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or forum channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
 
                 if (!ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(channel.Id))
                     ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Add(channel.Id);
