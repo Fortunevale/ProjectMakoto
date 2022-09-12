@@ -164,6 +164,8 @@ public abstract class BaseCommand
         await ExecuteCommand(this.ctx, arguments);
     }
 
+
+
     internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed) => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
     internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed) => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
@@ -265,6 +267,8 @@ public abstract class BaseCommand
 
         throw new NotImplementedException();
     }
+
+
 
     internal async Task<DiscordRole> PromptRoleSelection(bool IncludeCreateForMe = false, string CreateForMeName = "Role", bool IncludeDisable = false, string DisableString = "Disable")
     {
@@ -382,7 +386,10 @@ public abstract class BaseCommand
         return Role;
     }
 
-    internal async Task<DiscordChannel> PromptChannelSelection(bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
+    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType? channelType = null, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
+        => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), IncludeCreateForMe, CreateForMeName, CreateFormeChannelType, IncludeDisable, DisableString);
+
+    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelType = null, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
     {
         List<DiscordSelectComponentOption> channels = new();
 
@@ -395,8 +402,9 @@ public abstract class BaseCommand
         foreach (var category in await ctx.Guild.GetOrderedChannelsAsync())
         {
             foreach (var b in category.Value)
-                channels.Add(new DiscordSelectComponentOption(
-                    $"#{b.Name} ({b.Id})",
+                if (channelType is null || channelType.Contains(b.Type))
+                    channels.Add(new DiscordSelectComponentOption(
+                    $"{b.GetIcon()}{b.Name} ({b.Id})",
                     b.Id.ToString(),
                     $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}"));
         }
@@ -596,6 +604,8 @@ public abstract class BaseCommand
         return Selection;
     }
 
+
+
     internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
     internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null, bool open = true)
@@ -685,6 +695,8 @@ public abstract class BaseCommand
 
         return FinishedInteraction;
     }
+
+
 
     internal async Task<TimeSpan> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan ? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
@@ -809,6 +821,8 @@ public abstract class BaseCommand
         return (stream, size);
     }
 
+
+
     public void ModifyToTimedOut(bool Delete = false)
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
@@ -834,6 +848,8 @@ public abstract class BaseCommand
         }
     }
     
+
+
     public void SendNoMemberError()
     {
         _ = RespondOrEdit(new DiscordEmbedBuilder()

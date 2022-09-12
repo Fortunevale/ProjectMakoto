@@ -91,7 +91,7 @@ internal class ConfigCommand : BaseCommand
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 50)
                 {
-                    embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
+                    embed.Description = $"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
                     embed = embed.SetError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
@@ -103,7 +103,7 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    channel = await PromptChannelSelection();
+                    channel = await PromptChannelSelection(ChannelType.News);
                 }
                 catch (ArgumentException)
                 {
@@ -123,7 +123,7 @@ internal class ConfigCommand : BaseCommand
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 50)
                 {
-                    embed.Description = $"`You cannot add more than 5 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
+                    embed.Description = $"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
                     embed = embed.SetError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);

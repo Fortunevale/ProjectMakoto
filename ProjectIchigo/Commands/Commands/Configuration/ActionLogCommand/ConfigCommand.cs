@@ -52,7 +52,7 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var channel = await PromptChannelSelection(true, "actionlog", ChannelType.Text);
+                    var channel = await PromptChannelSelection(ChannelType.Text, true, "actionlog", ChannelType.Text);
 
                     await channel.ModifyAsync(x => x.PermissionOverwrites = new List<DiscordOverwriteBuilder>
                     {

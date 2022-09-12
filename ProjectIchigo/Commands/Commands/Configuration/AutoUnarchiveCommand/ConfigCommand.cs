@@ -43,7 +43,7 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    channel = await PromptChannelSelection();
+                    channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.Forum });
                 }
                 catch (ArgumentException)
                 {

@@ -686,7 +686,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                         try
                         {
-                            channel = await PromptChannelSelection();
+                            channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
                         }
                         catch (ArgumentException)
                         {

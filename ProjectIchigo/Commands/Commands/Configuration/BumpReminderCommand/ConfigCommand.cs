@@ -120,7 +120,7 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var channel = await PromptChannelSelection();
+                    var channel = await PromptChannelSelection(ChannelType.Text);
 
                     ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId = channel.Id;
                     await ExecuteCommand(ctx, arguments);

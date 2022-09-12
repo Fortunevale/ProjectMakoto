@@ -73,7 +73,7 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var channel = await PromptChannelSelection(true, "joinlog", ChannelType.Text, true, "Disable Joinlog");
+                    var channel = await PromptChannelSelection(ChannelType.Text, true, "joinlog", ChannelType.Text, true, "Disable Joinlog");
 
                     if (channel is null)
                         ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
