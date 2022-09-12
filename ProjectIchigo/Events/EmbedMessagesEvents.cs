@@ -123,10 +123,14 @@ internal class EmbedMessagesEvents
 
                     lines = lines.Select(x => x.Remove(0, shortestIndent)).ToList();
 
-                    var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithContent($"`{relativeFilePath}` {(StartLine != EndLine ? $"lines {StartLine} to {EndLine}" : $"line {StartLine}")}\n\n" +
+                    string content = $"`{relativeFilePath}` {(StartLine != EndLine ? $"lines {StartLine} to {EndLine}" : $"line {StartLine}")}\n\n" +
                                       $"```{fileEnding}\n" +
                                       $"{string.Join("\n", lines)}\n" +
-                                      $"```".TruncateWithIndication(2000)).AddComponents(Delete));
+                                      $"```".TruncateWithIndication(1997);
+                    if (!content.EndsWith("```"))
+                        content += "```";
+
+                    var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithContent(content).AddComponents(Delete));
                     _ = e.Message.ModifySuppressionAsync(true);
                 }
             }
