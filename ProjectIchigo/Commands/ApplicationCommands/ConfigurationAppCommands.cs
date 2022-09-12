@@ -350,4 +350,28 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
     }
+
+    [SlashCommandGroup("tokendetectionsettings", "Allows you to review and change settings related to automatic token invalidation.", dmPermission: false)]
+    public class TokenDetection : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review the currently used settings related to automatic token invalidation.", (long)Permissions.Administrator, dmPermission: false)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.TokenDetectionCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to change the currently used settings related to automatic token invalidation.", (long)Permissions.Administrator, dmPermission: false)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.TokenDetectionCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
 }

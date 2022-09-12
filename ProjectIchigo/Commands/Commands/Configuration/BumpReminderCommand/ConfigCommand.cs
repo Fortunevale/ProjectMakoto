@@ -120,7 +120,7 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var channel = await PromptChannelSelection();
+                    var channel = await PromptChannelSelection(ChannelType.Text);
 
                     ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId = channel.Id;
                     await ExecuteCommand(ctx, arguments);
@@ -129,6 +129,13 @@ internal class ConfigCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
                     return;
                 }
             }

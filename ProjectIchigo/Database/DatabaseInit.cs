@@ -38,6 +38,11 @@ internal class DatabaseInit
             var DbGuild = new Guild(b.serverid);
             _bot.guilds.Add(b.serverid, DbGuild);
 
+            DbGuild.TokenLeakDetectionSettings = new(DbGuild)
+            {
+                DetectTokens = b.tokens_detect
+            };
+
             DbGuild.PhishingDetectionSettings = new(DbGuild)
             {
                 DetectPhishing = b.phishing_detect,
@@ -119,7 +124,8 @@ internal class DatabaseInit
             
             DbGuild.EmbedMessageSettings = new(DbGuild)
             {
-                UseEmbedding = b.embed_messages
+                UseEmbedding = b.embed_messages,
+                UseGithubEmbedding = b.embed_github
             };
 
             if (b.lavalink_channel != 0)

@@ -73,7 +73,7 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var channel = await PromptChannelSelection(true, "joinlog", ChannelType.Text, true, "Disable Joinlog");
+                    var channel = await PromptChannelSelection(ChannelType.Text, true, "joinlog", ChannelType.Text, true, "Disable Joinlog");
 
                     if (channel is null)
                         ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
@@ -86,6 +86,13 @@ internal class ConfigCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
                 }
                 catch (Exception)
                 {

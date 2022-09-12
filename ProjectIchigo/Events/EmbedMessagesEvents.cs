@@ -11,13 +11,15 @@ internal class EmbedMessagesEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseEmbedding)
-                return;
+            var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
             if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
             {
+                if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseEmbedding)
+                    return;
+
                 if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot)))
                     return;
 
@@ -43,8 +45,6 @@ internal class EmbedMessagesEvents
                     if (!channel.TryGetMessage(MessageId, out var message))
                         return;
 
-                    var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
-
                     var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.UsernameWithDiscriminator} ({message.Author.Id})" },
@@ -58,7 +58,86 @@ internal class EmbedMessagesEvents
                     }).AddComponents(Delete));
                 }
             }
-        });
+
+            if (RegexTemplates.GitHubUrl.IsMatch(e.Message.Content))
+            {
+                if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseGithubEmbedding)
+                    return;
+
+                var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);
+
+                foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
+                {
+                    _logger.LogDebug("Attempting to parse github link");
+                    string fileUrl = b.Value;
+                    fileUrl = fileUrl.Replace("github.com", "raw.githubusercontent.com");
+                    fileUrl = fileUrl.Replace("/blob", "");
+                    fileUrl = fileUrl[..fileUrl.LastIndexOf("#")];
+
+                    string repoOwner = b.Groups[1].Value;
+                    string repoName = b.Groups[2].Value;
+
+                    string relativeFilePath = b.Groups[5].Value;
+
+                    string fileEnding = "";
+
+                    try
+                    {
+                        fileEnding = relativeFilePath.Remove(0, relativeFilePath.LastIndexOf(".") + 1);
+                    }
+                    catch { }
+
+                    uint StartLine = Convert.ToUInt32(b.Groups[6].Value.Replace("L", ""));
+                    uint EndLine = Convert.ToUInt32(b.Groups[8].Value.IsNullOrWhiteSpace() ? $"{StartLine}" : b.Groups[8].Value.Replace("L", ""));
+
+                    if (EndLine < StartLine)
+                        return;
+
+                    _logger.LogDebug("Attempting to fetch code");
+
+                    var rawFile = await new HttpClient().GetStringAsync(fileUrl);
+                    rawFile = rawFile.ReplaceLineEndings("\n");
+
+                    var lines = rawFile.Split("\n").Skip((int)(StartLine - 1)).Take((int)(EndLine - (StartLine - 1))).ToList();
+
+                    if (!lines.IsNotNullAndNotEmpty())
+                        return;
+
+                    int shortestIndent = -1;
+
+                    foreach (var c in lines)
+                    {
+                        int currentIndent = 0;
+
+                        foreach (var d in c)
+                        {
+                            if (d is ' ' or '	')
+                                currentIndent++;
+                            else
+                                break;
+                        }
+
+                        if (currentIndent < shortestIndent || shortestIndent == -1)
+                            shortestIndent = currentIndent;
+                    }
+
+                    lines = lines.Select(x => x.Remove(0, shortestIndent)).ToList();
+
+                    string content = $"`{relativeFilePath}` {(StartLine != EndLine ? $"lines {StartLine} to {EndLine}" : $"line {StartLine}")}\n\n" +
+                                      $"```{fileEnding}\n" +
+                                      $"{string.Join("\n", lines)}\n" +
+                                      $"```";
+
+                    content = content.TruncateWithIndication(1997);
+
+                    if (!content.EndsWith("```"))
+                        content += "```";
+
+                    var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithContent(content).AddComponents(Delete));
+                    _ = e.Message.ModifySuppressionAsync(true);
+                }
+            }
+        }).Add(_bot.watcher);
     }
 
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
@@ -77,9 +156,7 @@ internal class EmbedMessagesEvents
                 {
                     _ = fullMsg.DeleteAsync().ContinueWith(x =>
                     {
-                        if (x.IsCompletedSuccessfully)
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("✅ `The message was deleted.`").AsEphemeral());
-                        else
+                        if (!x.IsCompletedSuccessfully)
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `Failed to delete the message.`").AsEphemeral());
                     });
                 }

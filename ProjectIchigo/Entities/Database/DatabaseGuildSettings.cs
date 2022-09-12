@@ -25,6 +25,7 @@ public class DatabaseGuildSettings
     public long bump_last_time { get; set; }
     public long bump_last_reminder { get; set; }
     public int bump_missed { get; set; }
+    public bool tokens_detect { get; set; }
     public bool phishing_detect { get; set; }
     public bool phishing_warnonredirect { get; set; }
     public int phishing_type { get; set; }
@@ -51,6 +52,7 @@ public class DatabaseGuildSettings
     public string autounarchivelist { get; set; }
     public bool normalizenames { get; set; }
     public bool embed_messages { get; set; }
+    public bool embed_github { get; set; }
     public ulong lavalink_channel { get; set; }
     public string lavalink_currentvideo { get; set; }
     public long lavalink_currentposition { get; set; }

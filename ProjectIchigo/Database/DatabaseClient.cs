@@ -436,6 +436,8 @@ internal class DatabaseClient
                             reapplyroles = x.Value.JoinSettings.ReApplyRoles,
                             reapplynickname = x.Value.JoinSettings.ReApplyNickname,
 
+                            tokens_detect = x.Value.TokenLeakDetectionSettings.DetectTokens,
+
                             phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
                             phishing_warnonredirect = x.Value.PhishingDetectionSettings.WarnOnRedirect,
                             phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
@@ -487,6 +489,7 @@ internal class DatabaseClient
                             normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled,
 
                             embed_messages = x.Value.EmbedMessageSettings.UseEmbedding,
+                            embed_github = x.Value.EmbedMessageSettings.UseGithubEmbedding,
 
                             lavalink_channel = x.Value.Lavalink.ChannelId,
                             lavalink_currentposition = x.Value.Lavalink.CurrentVideoPosition,
@@ -540,6 +543,8 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"bump_persistent_msg{i}", DatabaseInserts[i].bump_persistent_msg);
                             cmd.Parameters.AddWithValue($"bump_missed{i}", DatabaseInserts[i].bump_missed);
 
+                            cmd.Parameters.AddWithValue($"tokens_detect{i}", DatabaseInserts[i].tokens_detect);
+
                             cmd.Parameters.AddWithValue($"phishing_detect{i}", DatabaseInserts[i].phishing_detect);
                             cmd.Parameters.AddWithValue($"phishing_warnonredirect{i}", DatabaseInserts[i].phishing_warnonredirect);
                             cmd.Parameters.AddWithValue($"phishing_type{i}", DatabaseInserts[i].phishing_type);
@@ -571,6 +576,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"normalizenames{i}", DatabaseInserts[i].normalizenames);
 
                             cmd.Parameters.AddWithValue($"embed_messages{i}", DatabaseInserts[i].embed_messages);
+                            cmd.Parameters.AddWithValue($"embed_github{i}", DatabaseInserts[i].embed_github);
 
                             cmd.Parameters.AddWithValue($"lavalink_channel{i}", DatabaseInserts[i].lavalink_channel);
                             cmd.Parameters.AddWithValue($"lavalink_currentvideo{i}", DatabaseInserts[i].lavalink_currentvideo);

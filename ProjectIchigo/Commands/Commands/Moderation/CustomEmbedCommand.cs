@@ -686,11 +686,17 @@ internal class CustomEmbedCommand : BaseCommand
 
                         try
                         {
-                            channel = await PromptChannelSelection();
+                            channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
                         }
                         catch (ArgumentException)
                         {
                             ModifyToTimedOut();
+                            continue;
+                        }
+                        catch (NullReferenceException)
+                        {
+                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
+                            await Task.Delay(3000);
                             continue;
                         }
 

@@ -52,7 +52,7 @@ internal class ConfigCommand : BaseCommand
             {
                 try
                 {
-                    var channel = await PromptChannelSelection(true, "actionlog", ChannelType.Text);
+                    var channel = await PromptChannelSelection(ChannelType.Text, true, "actionlog", ChannelType.Text);
 
                     await channel.ModifyAsync(x => x.PermissionOverwrites = new List<DiscordOverwriteBuilder>
                     {
@@ -68,6 +68,13 @@ internal class ConfigCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
                     return;
                 }
             }

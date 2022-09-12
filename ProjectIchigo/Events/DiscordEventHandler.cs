@@ -23,6 +23,7 @@ internal class DiscordEventHandler
         autoUnarchiveEvents = new(_bot);
         nameNormalizerEvents = new(_bot);
         embedMessagesEvents = new(_bot);
+        tokenLeakEvents = new(_bot);
     }
 
 
@@ -45,6 +46,7 @@ internal class DiscordEventHandler
     AutoUnarchiveEvents autoUnarchiveEvents { get; set; }
     NameNormalizerEvents nameNormalizerEvents { get; set; }
     EmbedMessagesEvents embedMessagesEvents { get; set; }
+    TokenLeakEvents tokenLeakEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -156,6 +158,7 @@ internal class DiscordEventHandler
             _ = bumpReminderEvents.MessageCreated(sender, e);
             _ = experienceEvents.MessageCreated(sender, e);
             _ = embedMessagesEvents.MessageCreated(sender, e);
+            _ = tokenLeakEvents.MessageCreated(sender, e);
 
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {
@@ -174,6 +177,7 @@ internal class DiscordEventHandler
 
             _ = phishingProtectionEvents.MessageUpdated(sender, e);
             _ = actionlogEvents.MessageUpdated(sender, e);
+            _ = tokenLeakEvents.MessageUpdated(sender, e);
         });
     }
 

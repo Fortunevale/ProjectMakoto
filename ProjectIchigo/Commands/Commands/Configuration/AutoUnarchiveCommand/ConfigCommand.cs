@@ -43,11 +43,18 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    channel = await PromptChannelSelection();
+                    channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.Forum });
                 }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or forum channels in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
                     return;
                 }
 

@@ -2,6 +2,24 @@ namespace ProjectIchigo.Extensions;
 
 internal static class Extensions
 {
+    internal static string GetIcon(this DiscordChannel discordChannel)
+    {
+        return discordChannel.Type switch
+        {
+            ChannelType.Text => "#",
+            ChannelType.Voice => "🔊",
+            ChannelType.Group => "👥",
+            ChannelType.Private => "👤",
+            ChannelType.GuildDirectory or ChannelType.Category => "📁",
+            ChannelType.News => "📣",
+            ChannelType.Store => "🛒",
+            ChannelType.NewsThread or ChannelType.PrivateThread or ChannelType.PublicThread => "🗣",
+            ChannelType.Stage => "🎤",
+            ChannelType.Forum => "📄",
+            _ => "❔",
+        };
+    }
+
     internal static string GetModalValueByCustomId(this DiscordInteraction interaction, string customId) => interaction.Data.Components.First(x => x.CustomId == customId).Value;
     internal static async Task<DiscordMessage> Refresh(this DiscordMessage msg) => await msg.Channel.GetMessageAsync(msg.Id, true);
 
