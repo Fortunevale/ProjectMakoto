@@ -124,7 +124,8 @@ internal class DatabaseInit
             
             DbGuild.EmbedMessageSettings = new(DbGuild)
             {
-                UseEmbedding = b.embed_messages
+                UseEmbedding = b.embed_messages,
+                UseGithubEmbedding = b.embed_github
             };
 
             if (b.lavalink_channel != 0)

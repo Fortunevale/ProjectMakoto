@@ -489,6 +489,7 @@ internal class DatabaseClient
                             normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled,
 
                             embed_messages = x.Value.EmbedMessageSettings.UseEmbedding,
+                            embed_github = x.Value.EmbedMessageSettings.UseGithubEmbedding,
 
                             lavalink_channel = x.Value.Lavalink.ChannelId,
                             lavalink_currentposition = x.Value.Lavalink.CurrentVideoPosition,
@@ -575,6 +576,7 @@ internal class DatabaseClient
                             cmd.Parameters.AddWithValue($"normalizenames{i}", DatabaseInserts[i].normalizenames);
 
                             cmd.Parameters.AddWithValue($"embed_messages{i}", DatabaseInserts[i].embed_messages);
+                            cmd.Parameters.AddWithValue($"embed_github{i}", DatabaseInserts[i].embed_github);
 
                             cmd.Parameters.AddWithValue($"lavalink_channel{i}", DatabaseInserts[i].lavalink_channel);
                             cmd.Parameters.AddWithValue($"lavalink_currentvideo{i}", DatabaseInserts[i].lavalink_currentvideo);

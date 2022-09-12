@@ -115,6 +115,7 @@ internal class DatabaseColumnLists
         new Column("invitetracker_cache", "text", "utf8mb4_0900_ai_ci"),
         new Column("autounarchivelist", "text", "utf8mb4_0900_ai_ci"),
         new Column("embed_messages", "tinyint(1)"),
+        new Column("embed_github", "tinyint(1)"),
         new Column("lavalink_channel", "bigint"),
         new Column("lavalink_currentvideo", "text", "utf8mb4_0900_ai_ci"),
         new Column("lavalink_currentposition", "bigint"),

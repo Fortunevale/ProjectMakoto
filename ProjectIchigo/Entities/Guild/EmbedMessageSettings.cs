@@ -21,4 +21,15 @@ public class EmbedMessageSettings
             _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "embed_messages", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
+
+    private bool _UseGithubEmbedding { get; set; } = false;
+    public bool UseGithubEmbedding
+    {
+        get => _UseGithubEmbedding;
+        set
+        {
+            _UseGithubEmbedding = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "embed_github_code", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
+    }
 }

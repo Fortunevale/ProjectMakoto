@@ -52,6 +52,7 @@ public class DatabaseGuildSettings
     public string autounarchivelist { get; set; }
     public bool normalizenames { get; set; }
     public bool embed_messages { get; set; }
+    public bool embed_github { get; set; }
     public ulong lavalink_channel { get; set; }
     public string lavalink_currentvideo { get; set; }
     public long lavalink_currentposition { get; set; }
