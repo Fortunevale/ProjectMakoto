@@ -149,9 +149,7 @@ internal class EmbedMessagesEvents
                 {
                     _ = fullMsg.DeleteAsync().ContinueWith(x =>
                     {
-                        if (x.IsCompletedSuccessfully)
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("✅ `The message was deleted.`").AsEphemeral());
-                        else
+                        if (!x.IsCompletedSuccessfully)
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `Failed to delete the message.`").AsEphemeral());
                     });
                 }
