@@ -126,7 +126,10 @@ internal class EmbedMessagesEvents
                     string content = $"`{relativeFilePath}` {(StartLine != EndLine ? $"lines {StartLine} to {EndLine}" : $"line {StartLine}")}\n\n" +
                                       $"```{fileEnding}\n" +
                                       $"{string.Join("\n", lines)}\n" +
-                                      $"```".TruncateWithIndication(1997);
+                                      $"```";
+
+                    content = content.TruncateWithIndication(1997);
+
                     if (!content.EndsWith("```"))
                         content += "```";
 
