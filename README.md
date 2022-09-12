@@ -39,6 +39,7 @@ Current notable features are:
 ## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=8&scope=bot%20applications.commands)
 
 - Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `;;phishing config`.
+- Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/tokendetectionsettings config` to disable it.
 - Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `;;join config`.
 - You can join a support server [here](https://discord.gg/SaHT4GPGyW).
 
