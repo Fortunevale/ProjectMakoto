@@ -33,7 +33,7 @@ internal class ConfigCommand : BaseCommand
             })
             .AddComponents(MessageComponents.CancelButton));
 
-            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
             if (e.TimedOut)
             {
@@ -77,7 +77,7 @@ internal class ConfigCommand : BaseCommand
                         .AddComponents(new List<DiscordComponent> { SelectMessage, SelectEmoji, SelectRole, Finish })
                         .AddComponents(MessageComponents.CancelButton));
 
-                    var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                    var Menu = await ctx.WaitForButtonAsync();
 
                     if (Menu.TimedOut)
                     {

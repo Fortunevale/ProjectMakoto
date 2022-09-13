@@ -389,7 +389,7 @@ public abstract class BaseCommand
     internal async Task<DiscordChannel> PromptChannelSelection(ChannelType? channelType = null, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
         => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), IncludeCreateForMe, CreateForMeName, CreateFormeChannelType, IncludeDisable, DisableString);
 
-    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelType = null, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateFormeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
+    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelType = null, bool IncludeCreateForMe = false, string CreateForMeName = "Channel", ChannelType CreateForMeChannelType = ChannelType.Text, bool IncludeDisable = false, string DisableString = "Disable")
     {
         List<DiscordSelectComponentOption> channels = new();
 
@@ -460,7 +460,7 @@ public abstract class BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
                             if (e.Values.First() is "create_for_me")
-                                Channel = await ctx.Guild.CreateChannelAsync(CreateForMeName, CreateFormeChannelType);
+                                Channel = await ctx.Guild.CreateChannelAsync(CreateForMeName, CreateForMeChannelType);
                             else if (e.Values.First() is "disable")
                                 Channel = null;
                             else

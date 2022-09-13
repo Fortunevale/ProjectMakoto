@@ -19,7 +19,7 @@ internal class DeleteCommand : BaseCommand
                               $"**`Are you sure you want to continue?`**"
             }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
-            var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+            var Menu = await ctx.WaitForButtonAsync();
 
             if (Menu.TimedOut)
             {
@@ -36,7 +36,7 @@ internal class DeleteCommand : BaseCommand
                     Description = $"**`Please confirm again, are you sure?`**"
                 }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
-                Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                Menu = await ctx.WaitForButtonAsync();
 
                 if (Menu.TimedOut)
                 {

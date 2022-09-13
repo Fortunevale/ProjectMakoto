@@ -28,7 +28,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                 Description = $"`Urban Dictionary can potentionally contain Adult Content. Continue?`"
             }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
-            var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+            var Menu = await ctx.WaitForButtonAsync();
 
             if (Menu.TimedOut)
             {

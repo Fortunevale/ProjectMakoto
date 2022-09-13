@@ -46,7 +46,7 @@ internal class CustomEmbedCommand : BaseCommand
                         continue;
                     }
 
-                    var Menu1 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(15));
+                    var Menu1 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
                     if (Menu1.TimedOut)
                     {
@@ -104,7 +104,7 @@ internal class CustomEmbedCommand : BaseCommand
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
                             .AddComponents(new List<DiscordComponent> { MessageComponents.BackButton }));
 
-                        var Menu2 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(15));
+                        var Menu2 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
                         if (Menu2.TimedOut)
                         {
@@ -412,7 +412,7 @@ internal class CustomEmbedCommand : BaseCommand
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
                             .AddComponents(new List<DiscordComponent> { MessageComponents.BackButton }));
 
-                        var Menu2 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(15));
+                        var Menu2 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
                         if (Menu2.TimedOut)
                         {

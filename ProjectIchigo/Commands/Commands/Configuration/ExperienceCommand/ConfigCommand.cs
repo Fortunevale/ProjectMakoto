@@ -29,7 +29,7 @@ internal class ConfigCommand : BaseCommand
             })
             .AddComponents(MessageComponents.CancelButton));
 
-            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
             if (e.TimedOut)
             {

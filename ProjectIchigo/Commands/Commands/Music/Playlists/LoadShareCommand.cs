@@ -46,7 +46,7 @@ internal class LoadShareCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { Confirm, MessageComponents.CancelButton }));
 
-            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
             if (e.TimedOut)
             {

@@ -11,8 +11,6 @@ internal class UrlSubmitCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            var interactivity = ctx.Client.GetInteractivity();
-
             int tos_version = 2;
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != tos_version)
@@ -39,7 +37,7 @@ internal class UrlSubmitCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
 
-                var TosAccept = await interactivity.WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+                var TosAccept = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
                 if (TosAccept.TimedOut)
                 {
@@ -123,7 +121,7 @@ internal class UrlSubmitCommand : BaseCommand
                 { MessageComponents.CancelButton }
             }));
 
-            var e = await interactivity.WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
             if (e.TimedOut)
             {

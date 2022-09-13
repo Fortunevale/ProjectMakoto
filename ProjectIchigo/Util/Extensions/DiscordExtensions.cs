@@ -20,23 +20,20 @@ internal static class DiscordExtensions
     internal static string ToEmotes(this int i) 
         => DigitsToEmotes(i.ToString());
 
-    internal static string GetIcon(this DiscordChannel discordChannel)
+    internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
     {
-        return discordChannel.Type switch
-        {
-            ChannelType.Text => "#",
-            ChannelType.Voice => "🔊",
-            ChannelType.Group => "👥",
-            ChannelType.Private => "👤",
-            ChannelType.GuildDirectory or ChannelType.Category => "📁",
-            ChannelType.News => "📣",
-            ChannelType.Store => "🛒",
-            ChannelType.NewsThread or ChannelType.PrivateThread or ChannelType.PublicThread => "🗣",
-            ChannelType.Stage => "🎤",
-            ChannelType.Forum => "📄",
-            _ => "❔",
-        };
-    }
+        ChannelType.Text => "#",
+        ChannelType.Voice => "🔊",
+        ChannelType.Group => "👥",
+        ChannelType.Private => "👤",
+        ChannelType.GuildDirectory or ChannelType.Category => "📁",
+        ChannelType.News => "📣",
+        ChannelType.Store => "🛒",
+        ChannelType.NewsThread or ChannelType.PrivateThread or ChannelType.PublicThread => "🗣",
+        ChannelType.Stage => "🎤",
+        ChannelType.Forum => "📄",
+        _ => "❔",
+    };
 
     internal static List<Tuple<ulong, string, bool>>? GetEmotes(this string content)
     {

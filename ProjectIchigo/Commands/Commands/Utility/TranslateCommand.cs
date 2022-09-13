@@ -62,7 +62,7 @@ internal class TranslateCommand : BaseCommand
                 Description = $"`What provider do you want to use?`",
             }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(MessageComponents.CancelButton));
 
-            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
             if (e.TimedOut)
             {

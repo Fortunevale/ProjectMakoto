@@ -155,7 +155,7 @@ internal class ConfigCommand : BaseCommand
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
                                     .AddComponents(MessageComponents.CancelButton));
 
-                                var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                                var Menu = await ctx.WaitForButtonAsync();
 
                                 if (Menu.TimedOut)
                                 {
