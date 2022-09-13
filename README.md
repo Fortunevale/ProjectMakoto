@@ -17,7 +17,7 @@ Ichigo has a lot of features, current notable features are:
 - **No premium features**. (This may change in the future, it'll depend on how viable a hosting this bot is without them. The source code itself will always stay available and you could simply host your own Ichigo instance.)
 <br></br>
 - **Music Playback**
-- Customizable **protection against phishing** and other malicous websites, with little to no false positives.
+- Customizable **protection against phishing** and other malicious websites, with little to no false positives.
 - Easy to set up **Reaction Roles**.
 - An easy to use **emoji and sticker stealer**.
 - A **Bump Reminder** with a subscriber role to never miss bumping your server.
