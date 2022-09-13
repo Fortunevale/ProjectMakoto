@@ -124,11 +124,15 @@ internal class UserInfoCommand : BaseCommand
             if (victim.BannerColor is not null)
                 embed.AddField(new DiscordEmbedField("Banner Color", $"`{victim.BannerColor.Value}`", true));
 
-            if (victim.Presence is not null)
-                embed.AddField(new DiscordEmbedField("Current Presence", $"{GetStatusIcon(victim.Presence.Status)} `{victim.Presence.Status}`\n" +
-                                                                $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Desktop.HasValue ? victim.Presence.ClientStatus.Desktop.Value : UserStatus.Offline)} `Desktop`\n" +
-                                                                $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Mobile.HasValue ? victim.Presence.ClientStatus.Mobile.Value : UserStatus.Offline)} `Mobile`\n" +
-                                                                $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `Web`\n\n", true));
+            try
+            {
+                if (victim.Presence is not null)
+                    embed.AddField(new DiscordEmbedField("Current Presence", $"{GetStatusIcon(victim.Presence.Status)} `{victim.Presence.Status}`\n" +
+                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Desktop.HasValue ? victim.Presence.ClientStatus.Desktop.Value : UserStatus.Offline)} `Desktop`\n" +
+                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Mobile.HasValue ? victim.Presence.ClientStatus.Mobile.Value : UserStatus.Offline)} `Mobile`\n" +
+                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `Web`\n\n", true));
+            }
+            catch { }
 
             try
             {
