@@ -5,43 +5,50 @@
 
 ![](https://img.shields.io/github/stars/Fortunevale/ProjectIchigo?style=social) ![](https://img.shields.io/github/watchers/Fortunevale/ProjectIchigo?style=social)
 
-# **[Skip everything, i want the bot!](#getting-the-bot)**
+# **[Skip everything, i want the bot!](#getting-ichigo)**
 
-## Table of Contents
+## What is Ichigo?
 
-* **[What is this?](#what-is-this)**
-* **[Getting the bot](#getting-the-bot)**
-* **[Contributing or forking](#building-debugging-and-deployment)**
-* **[Credits](#credits)**
-
-## What is this?
-
-This is a multi-purpose Discord Bot written in C# using .NET 6.
-
-Current notable features are:
-- Music Playback
-- [ScoreSaber API](https://scoresaber.com) Integration
-- Protection against Phishing Links using a huge database (Credits for huge amounts links [here](#phishing-link-repositories))
-- An experience system with leaderboard and level rewards
-- Social Commands like `hug`, `pat` and a few more
-- An easy to use emoji and sticker stealer
-- A system to backup user's roles and nickname when they leave*
-- Important Moderation Features such as an Actionlog, A purge Command and a guild-purge Command**
-- Reaction Roles
-- No unfair premium features. (Currently no premium features at all.)
+**Ichigo is a multi-purpose Discord Bot written in C# using .NET 6.**
+<br></br>
+Ichigo has a lot of features, current notable features are:
+- **No premium features**. (This may change in the future, it'll depend on how viable a hosting this bot is without them. The source code itself will always stay available and you could simply host your own Ichigo instance.)
+<br></br>
+- **Music Playback**
+- Customizable **protection against phishing** and other malicous websites, with little to no false positives.
+- Easy to set up **Reaction Roles**.
+- An easy to use **emoji and sticker stealer**.
+- A **Bump Reminder** with a subscriber role to never miss bumping your server.
+<br></br>
+- Important **Moderation Features** such as a **detailed Actionlog**, commands to quickly clean up the chat(s) like `purge` or `guild-purge` and more.
+- Quick and Easy **Message Translation** through the `Apps` Context Menu.
+- **[ScoreSaber API](https://scoresaber.com)** Integration.
+- An **experience** system with **role rewards**.
+- **Social Commands** like `hug`, `pat` and a few more.
+- **Automatic Nickname Normalization**, allowing quickly mentioning people with non-standard characters in their usernames.
+- **Invite Tracking** so you can track a Raid's origin with just a few commands***.
+<br></br>
+- A system to **backup** user's **roles** and **nickname** when they leave*.
+- **Custom Embed Creator** within Discord.
+- **Embeds** for **message links** and **github code**.
+- **Automatic Thread Unarchiving**, allowing threads to stay open for as long as you want them to.
+- **Automatic Crossposting** so you can have automatic feeds in announcement channels.
+- Additional Privacy and Security Features such as the **In-Voice Chat Privacy** or the **automatic bot/user token invalidation**.
 <br></br>
 ##### \* Roles with any significant Permissions like Administrator won't be re-applied. In addition, if the user hasn't been on the server for more than 60 days, neither the roles nor the nickname will be reapplied. Also the `clearbackup` command gives moderators ability to remove stored roles.
 
 ##### \** A guild-purge is similar to a purge command. However, instead of scanning just one channel for messages by the specified user, it scans all channels.
 
-## Getting the bot
+##### \*** This depends on how users can join your server. If they join through invites by, for example, Disboard or through the Vanity Invite, it won't be as easy to track them down.
+<br></br>
+## Getting Ichigo
 
 ## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=8&scope=bot%20applications.commands)
 
-- Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `;;phishing config`.
-- Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/tokendetectionsettings config` to disable it.
-- Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `;;join config`.
-- You can join a support server [here](https://discord.gg/SaHT4GPGyW).
+- Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `/phishing config`.
+- Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/tokendetection config` to disable it.
+- Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `/join config`.
+- You can join a support server [here](https://s.aitsys.dev/ichigoguild).
 
 ## Building, Debugging and Deployment
 
@@ -69,8 +76,7 @@ Current notable features are:
 - [Kawaii API Key](https://kawaii.red/)
    - This is mainly for social commands like `hug`, `cuddle`, `pat` and so on.
 <br></br>
-- [Github Account](https://github.com/) with [this](#project-ichigo---a-discord-bot-written-in-c) Repository forked
-- [Personal Access Token](https://github.com/settings/tokens) for your Github Account
+- [Github Account](https://github.com/) with a [Personal Access Token](https://github.com/settings/tokens) for your Github Account
    - The personal access token should have the `repo` permissions.
    - This is required for the `/dev_tools create-issue` command.
 
