@@ -19,7 +19,7 @@ internal class ManageCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCodeBlock()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
+                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCode()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
             }.SetAwaitingInput(ctx, "Playlists");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);

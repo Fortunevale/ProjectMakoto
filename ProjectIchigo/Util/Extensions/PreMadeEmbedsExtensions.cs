@@ -1,4 +1,4 @@
-namespace ProjectIchigo.Extensions;
+namespace ProjectIchigo.Util;
 
 internal static class PreMadeEmbedsExtensions
 {
@@ -196,7 +196,7 @@ internal static class PreMadeEmbedsExtensions
                 Name = ctx.Guild.Name
             },
             Title = "",
-            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{CustomArguments}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{CustomArguments}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCode().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
             Footer = ctx.GenerateUsedByFooter(),
             Timestamp = DateTime.UtcNow,
             Color = EmbedColors.Error

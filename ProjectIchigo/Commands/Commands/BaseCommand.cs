@@ -227,7 +227,7 @@ public abstract class BaseCommand
                     }
 
                     await ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
-                    ctx.ResponseMessage = await ctx.ResponseMessage.Refresh();
+                    ctx.ResponseMessage = await ctx.ResponseMessage.Refetch();
 
                     return ctx.ResponseMessage;
                 }
@@ -252,7 +252,7 @@ public abstract class BaseCommand
                     }
 
                     await ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
-                    ctx.ResponseMessage = await ctx.ResponseMessage.Refresh();
+                    ctx.ResponseMessage = await ctx.ResponseMessage.Refetch();
 
                     return ctx.ResponseMessage;
                 }
@@ -921,7 +921,7 @@ public abstract class BaseCommand
 
         var embed = new DiscordEmbedBuilder
         {
-            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCodeBlock().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+            Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCode().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
         }.SetError(this.ctx);
 
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
@@ -947,7 +947,7 @@ public abstract class BaseCommand
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock()}`",
+            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
     
@@ -955,7 +955,7 @@ public abstract class BaseCommand
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCodeBlock()}`",
+            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
         }.SetError(ctx)).WithContent(ctx.User.Mention));
     }
 

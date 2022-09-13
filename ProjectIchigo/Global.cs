@@ -72,8 +72,6 @@ global using ProjectIchigo.Events;
 
 global using ProjectIchigo.Util;
 
-global using ProjectIchigo.Extensions;
-
 global using ProjectIchigo.Exceptions;
 
 global using User = ProjectIchigo.Entities.User;

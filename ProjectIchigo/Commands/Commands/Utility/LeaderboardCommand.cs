@@ -67,7 +67,7 @@ internal class LeaderboardCommand : BaseCommand
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.DigitsToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`Level {b.Value.Experience.Level} with {b.Value.Experience.Points} XP`)"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`Level {b.Value.Experience.Level} with {b.Value.Experience.Points} XP`)"));
 
                     if (count >= ShowAmount)
                         break;

@@ -1163,7 +1163,7 @@ public class Bot
                     _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
                         .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
                         .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
-                        .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCodeBlock()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCodeBlock()}```" : "")}")
+                        .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
                         .WithTimestamp(e.LogEntry.TimeOfEvent)); 
                 }
                 break;

@@ -92,7 +92,7 @@ internal class UserInfoCommand : BaseCommand
                 var gBanDetails = ctx.Bot.globalBans[victim.Id];
                 var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot.globalBans[victim.Id].Moderator);
 
-                embed.AddField(new DiscordEmbedField("Global Ban Reason", $"`{((string.IsNullOrWhiteSpace(gBanDetails.Reason) || gBanDetails.Reason == "-") ? "No reason provided." : gBanDetails.Reason).SanitizeForCodeBlock()}`", true));
+                embed.AddField(new DiscordEmbedField("Global Ban Reason", $"`{((string.IsNullOrWhiteSpace(gBanDetails.Reason) || gBanDetails.Reason == "-") ? "No reason provided." : gBanDetails.Reason).SanitizeForCode()}`", true));
                 embed.AddField(new DiscordEmbedField("Global Ban Moderator", $"`{gBanMod.UsernameWithDiscriminator}`", true));
                 embed.AddField(new DiscordEmbedField("Global Ban Date", $"{Formatter.Timestamp(gBanDetails.Timestamp)} ({Formatter.Timestamp(gBanDetails.Timestamp, TimestampFormat.LongDateTime)})", true));
             }
