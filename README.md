@@ -1,11 +1,13 @@
-# Project-Ichigo - A discord bot written in C#
+<h1 align="center">Ichigo</h1>
+<p align="center"><img src="ProjectIchigo/Assets/Prod.png" width=250 align="center"></p>
+<p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
+<a href="#getting-ichigo" ><p align="center"><img src="ProjectIchigo/Assets/AddToServer.png" width=350 align="center"></p></a>
 
-[![Build and Push to Production](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/build.yml/badge.svg)](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/build.yml) [![Spellcheck](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/typos.yml/badge.svg)](https://github.com/Fortunevale/ProjectIchigo/actions/workflows/typos.yml) ![](https://img.shields.io/github/contributors/Fortunevale/ProjectIchigo) ![reposize](https://img.shields.io/github/repo-size/Fortunevale/ProjectIchigo) ![](https://img.shields.io/github/issues-raw/Fortunevale/ProjectIchigo)
-[![wakatime](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg)](https://wakatime.com/badge/github/Fortunevale/ProjectIchigo)
+<p align="center"><img src="https://github.com/Fortunevale/ProjectIchigo/actions/workflows/build.yml/badge.svg" align="center"> <img src="https://github.com/Fortunevale/ProjectIchigo/actions/workflows/typos.yml/badge.svg" align="center"></p>
+<p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectIchigo" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectIchigo" align="center"></p>
+<p align="center"><img src="https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg" align="center"></p>
 
-![](https://img.shields.io/github/stars/Fortunevale/ProjectIchigo?style=social) ![](https://img.shields.io/github/watchers/Fortunevale/ProjectIchigo?style=social)
-
-# **[Skip everything, i want the bot!](#getting-ichigo)**
+<p align="center"><img src="https://img.shields.io/github/stars/Fortunevale/ProjectIchigo?style=social" align="center"> <img src="https://img.shields.io/github/watchers/Fortunevale/ProjectIchigo?style=social" align="center"></p>
 
 ## What is Ichigo?
 
