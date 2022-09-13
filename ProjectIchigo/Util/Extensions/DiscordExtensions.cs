@@ -20,6 +20,18 @@ internal static class DiscordExtensions
     internal static string ToEmotes(this int i) 
         => DigitsToEmotes(i.ToString());
 
+    internal static string ToTimestamp(this DateTime dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
+        => Formatter.Timestamp(dateTime, format);
+    
+    internal static string ToTimestamp(this DateTimeOffset dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
+        => Formatter.Timestamp(dateTime, format);
+
+    internal static string GetCommandMention(this DiscordClient client, Bot bot, string command)
+        => (bot.status.LoadedConfig.IsDev ?
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value.ToList() :
+        client.GetApplicationCommands().GlobalCommands.ToList())
+        .First(x => x.Name == command).Mention;
+
     internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
     {
         ChannelType.Text => "#",
