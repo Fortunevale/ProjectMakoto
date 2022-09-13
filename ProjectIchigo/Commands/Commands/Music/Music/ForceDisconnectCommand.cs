@@ -12,7 +12,7 @@ internal class ForceDisconnectCommand : BaseCommand
                 return;
 
             var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First();
+            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
             if (conn is null)

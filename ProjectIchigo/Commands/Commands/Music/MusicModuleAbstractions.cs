@@ -10,7 +10,7 @@ internal class MusicModuleAbstractions
         List<LavalinkTrack> Tracks = new();
 
         var lava = ctx.Client.GetLavalink();
-        var node = lava.ConnectedNodes.Values.First();
+        var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
         embed.SetLoading(ctx);

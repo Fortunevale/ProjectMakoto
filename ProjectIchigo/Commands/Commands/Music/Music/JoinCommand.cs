@@ -15,7 +15,11 @@ internal class JoinCommand : BaseCommand
                     return;
 
             var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First();
+
+            while (!lava.ConnectedNodes.Values.Any(x => x.IsConnected))
+                await Task.Delay(1000);
+
+            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
             if (conn is null)

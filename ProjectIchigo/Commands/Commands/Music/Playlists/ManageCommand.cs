@@ -101,7 +101,7 @@ internal class ManageCommand : BaseCommand
                 }
 
                 var lava = ctx.Client.GetLavalink();
-                var node = lava.ConnectedNodes.Values.First();
+                var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
                 var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
                 embed.Description = $"`Adding '{SelectedPlaylist.PlaylistName}' with {SelectedPlaylist.List.Count} track(s) to the queue..`";
@@ -527,7 +527,7 @@ internal class ManageCommand : BaseCommand
                     var query = Response.Interaction.GetModalValueByCustomId("query");
 
                     var lava = ctx.Client.GetLavalink();
-                    var node = lava.ConnectedNodes.Values.First();
+                    var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
 
                     if (Regex.IsMatch(query, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
                         throw new Exception();

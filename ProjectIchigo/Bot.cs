@@ -1025,7 +1025,11 @@ public class Bot
                             var channel = guild.Value.GetChannel(guilds[guild.Key].Lavalink.ChannelId);
 
                             var lava = discordClient.GetLavalink();
-                            var node = lava.ConnectedNodes.Values.First();
+
+                            while (!lava.ConnectedNodes.Values.Any(x => x.IsConnected))
+                                await Task.Delay(1000);
+
+                            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
                             var conn = node.GetGuildConnection(guild.Value);
 
                             if (conn is null)
