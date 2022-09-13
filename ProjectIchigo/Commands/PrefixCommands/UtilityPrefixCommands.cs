@@ -251,7 +251,7 @@ public class UtilityPrefixCommands : BaseCommandModule
     [Command("urban-dictionary"),
     CommandModule("utility"),
     Description("Look up a term on Urban Dictionary.")]
-    public async Task UrbanDictionary(CommandContext ctx, string term)
+    public async Task UrbanDictionary(CommandContext ctx, [RemainingText]string term)
     {
         Task.Run(async () =>
         {

@@ -58,7 +58,7 @@ public class ModerationPrefixCommands : BaseCommandModule
     [Command("timeout"), Aliases("time-out", "mute"),
     CommandModule("moderation"),
     Description("Sets the specified user into a timeout.")]
-    public async Task Timeout(CommandContext ctx, DiscordUser victim, [Description("Duration")] string duration = "", [Description("Reason")] string reason = "")
+    public async Task Timeout(CommandContext ctx, DiscordUser victim, [Description("Duration")] string duration = "", [Description("Reason")][RemainingText] string reason = "")
     {
         Task.Run(async () =>
         {
