@@ -72,7 +72,7 @@ internal class MusicModuleAbstractions
 
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { YouTube, SoundCloud }));
 
-            var Menu1 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var Menu1 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
             if (Menu1.TimedOut)
             {

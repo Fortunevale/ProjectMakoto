@@ -1,4 +1,4 @@
-namespace ProjectIchigo.Extensions;
+namespace ProjectIchigo.Util;
 
 public class MemoryMetrics
 {
@@ -9,21 +9,11 @@ public class MemoryMetrics
 
 public class MemoryMetricsClient
 {
-    public static MemoryMetrics GetMetrics()
-    {
-        if (IsUnix())
-            return GetUnixMetrics();
+    public static MemoryMetrics GetMetrics() 
+        => IsUnix() ? GetUnixMetrics() : GetWindowsMetrics();
 
-        return GetWindowsMetrics();
-    }
-
-    private static bool IsUnix()
-    {
-        var isUnix = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
-                        RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
-        return isUnix;
-    }
+    private static bool IsUnix() 
+        => RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
     private static MemoryMetrics GetWindowsMetrics()
     {

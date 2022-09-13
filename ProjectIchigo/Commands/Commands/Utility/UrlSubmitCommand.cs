@@ -11,8 +11,6 @@ internal class UrlSubmitCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            var interactivity = ctx.Client.GetInteractivity();
-
             int tos_version = 2;
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != tos_version)
@@ -21,11 +19,11 @@ internal class UrlSubmitCommand : BaseCommand
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Description = $"{1.DigitsToEmotes()}. You may not submit URLs that are non-malicious.\n" +
-                                  $"{2.DigitsToEmotes()}. You may not spam submissions.\n" +
-                                  $"{3.DigitsToEmotes()}. You may not submit unregistered domains.\n" +
-                                  $"{4.DigitsToEmotes()}. You may not submit shortened URLs.\n" +
-                                  $"{5.DigitsToEmotes()}. You accept that your user account and current server will be tracked and visible to verifiers.\n\n" +
+                    Description = $"{1.ToEmotes()}. You may not submit URLs that are non-malicious.\n" +
+                                  $"{2.ToEmotes()}. You may not spam submissions.\n" +
+                                  $"{3.ToEmotes()}. You may not submit unregistered domains.\n" +
+                                  $"{4.ToEmotes()}. You may not submit shortened URLs.\n" +
+                                  $"{5.ToEmotes()}. You accept that your user account and current server will be tracked and visible to verifiers.\n\n" +
                                   $"We reserve the right to ban you for any reason that may not be listed.\n" +
                                   $"**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n" +
                                   $"**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**\n\n" +
@@ -39,7 +37,7 @@ internal class UrlSubmitCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
 
-                var TosAccept = await interactivity.WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+                var TosAccept = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
                 if (TosAccept.TimedOut)
                 {
@@ -107,12 +105,12 @@ internal class UrlSubmitCommand : BaseCommand
 
             if (!domain.Contains('.') || domain.Contains(' '))
             {
-                embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') you're trying to submit is invalid.`";
+                embed.Description = $"`The domain ('{domain.SanitizeForCode()}') you're trying to submit is invalid.`";
                 _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
                 return;
             }
 
-            embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCodeBlock()}'. Do you want to proceed?`";
+            embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCode()}'. Do you want to proceed?`";
             embed.SetAwaitingInput(ctx, "Phishing Link Submission");
 
             var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
@@ -123,7 +121,7 @@ internal class UrlSubmitCommand : BaseCommand
                 { MessageComponents.CancelButton }
             }));
 
-            var e = await interactivity.WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
             if (e.TimedOut)
             {
@@ -146,7 +144,7 @@ internal class UrlSubmitCommand : BaseCommand
                 {
                     if (domain.Contains(b.Key))
                     {
-                        embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') is already present in the database. Thanks for trying to contribute regardless.`";
+                        embed.Description = $"`The domain ('{domain.SanitizeForCode()}') is already present in the database. Thanks for trying to contribute regardless.`";
                         embed.SetError(ctx, "Phishing Link Submission");
                         _ = RespondOrEdit(embed.Build());
                         return;
@@ -160,7 +158,7 @@ internal class UrlSubmitCommand : BaseCommand
                 {
                     if (b.Value.Url == domain)
                     {
-                        embed.Description = $"`The domain ('{domain.SanitizeForCodeBlock()}') has already been submitted. Thanks for trying to contribute regardless.`";
+                        embed.Description = $"`The domain ('{domain.SanitizeForCode()}') has already been submitted. Thanks for trying to contribute regardless.`";
                         embed.SetError(ctx, "Phishing Link Submission");
                         _ = RespondOrEdit(embed.Build());
                         return;
@@ -182,7 +180,7 @@ internal class UrlSubmitCommand : BaseCommand
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = $"Phishing Link Submission" },
                     Color = EmbedColors.Success,
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Submitted Url`: `{domain.SanitizeForCodeBlock()}`\n" +
+                    Description = $"`Submitted Url`: `{domain.SanitizeForCode()}`\n" +
                                     $"`Submission by`: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
                                     $"`Submitted on `: `{ctx.Guild.Name} ({ctx.Guild.Id})`"
                 })

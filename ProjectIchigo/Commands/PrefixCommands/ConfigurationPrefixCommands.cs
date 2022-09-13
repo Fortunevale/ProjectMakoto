@@ -605,7 +605,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         }
     }
 
-    [Group("tokendetectionsettings"),
+    [Group("tokendetection"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to automatic token invalidation.")]
     public class TokenDetection : BaseCommandModule

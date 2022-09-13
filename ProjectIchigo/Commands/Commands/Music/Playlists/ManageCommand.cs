@@ -19,7 +19,7 @@ internal class ManageCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCodeBlock()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
+                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCode()}`: `{x.List.Count} track(s)`")) : $"`No playlist created yet.`")}"
             }.SetAwaitingInput(ctx, "Playlists");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -53,7 +53,7 @@ internal class ManageCommand : BaseCommand
             })
             .AddComponents(MessageComponents.CancelButton));
 
-            var e = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(1));
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
             if (e.TimedOut)
             {
@@ -236,7 +236,7 @@ internal class ManageCommand : BaseCommand
                         .AddComponents(new List<DiscordComponent> { SelectName, SelectFirstTracks, Finish })
                         .AddComponents(MessageComponents.CancelButton));
 
-                    var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                    var Menu = await ctx.WaitForButtonAsync();
 
                     if (Menu.TimedOut)
                     {
@@ -393,7 +393,7 @@ internal class ManageCommand : BaseCommand
                         .AddComponents(new List<DiscordComponent> { SelectName, Finish })
                         .AddComponents(MessageComponents.CancelButton));
 
-                    var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                    var Menu = await ctx.WaitForButtonAsync();
 
                     if (Menu.TimedOut)
                     {
@@ -494,7 +494,7 @@ internal class ManageCommand : BaseCommand
                 .AddComponents(new List<DiscordComponent> { Link, ExportedPlaylist })
                 .AddComponents(MessageComponents.CancelButton));
 
-                var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                var Menu = await ctx.WaitForButtonAsync();
 
                 if (Menu.TimedOut)
                 {

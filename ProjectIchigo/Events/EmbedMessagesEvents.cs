@@ -146,7 +146,7 @@ internal class EmbedMessagesEvents
         {
             if (e.Interaction.Data.CustomId == "DeleteEmbedMessage")
             {
-                var fullMsg = await e.Message.Refresh();
+                var fullMsg = await e.Message.Refetch();
 
                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 

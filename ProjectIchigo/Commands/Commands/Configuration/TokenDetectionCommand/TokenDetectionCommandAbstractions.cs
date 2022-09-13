@@ -4,6 +4,6 @@ internal class TokenDetectionCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"⚠ `Detect Tokens`: {ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetectionSettings.DetectTokens.BoolToEmote(ctx.Client)}";
+        return $"⚠ `Detect Tokens`: {ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetectionSettings.DetectTokens.ToEmote(ctx.Client)}";
     }
 }

@@ -9,8 +9,8 @@ internal class ObjectCommand : BaseCommand
             if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.BoolToEmote(ctx.Client)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.BoolToEmote(ctx.Client)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.ToEmote(ctx.Client)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.ToEmote(ctx.Client)));
 
             if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
             {
@@ -19,7 +19,7 @@ internal class ObjectCommand : BaseCommand
                     Description = $"`You already objected to having your data get processed. Do you want to reverse that decision?`"
                 }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
-                var Menu1 = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                var Menu1 = await ctx.WaitForButtonAsync();
 
                 if (Menu1.TimedOut)
                 {
@@ -74,7 +74,7 @@ internal class ObjectCommand : BaseCommand
                               $"**`Are you sure you want to continue?`**"
             }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
-            var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+            var Menu = await ctx.WaitForButtonAsync();
 
             if (Menu.TimedOut)
             {
@@ -91,7 +91,7 @@ internal class ObjectCommand : BaseCommand
                     Description = $"**`Please confirm again, are you sure?`**"
                 }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
-                Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                Menu = await ctx.WaitForButtonAsync();
 
                 if (Menu.TimedOut)
                 {

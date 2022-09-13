@@ -29,6 +29,9 @@ internal class ActionlogEvents
         return true;
     }
 
+    private async Task<DiscordMessage> SendActionlog(DiscordGuild guild, DiscordMessageBuilder builder)
+        => await guild.GetChannel(_bot.guilds[guild.Id].ActionLogSettings.Channel).SendMessageAsync(builder);
+
     internal async Task UserJoined(DiscordClient sender, GuildMemberAddEventArgs e)
     {
         Task.Run(async () =>
@@ -38,7 +41,7 @@ internal class ActionlogEvents
 
             DiscordEmbedBuilder embed = new()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserAdded, Name = $"User joined" },
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserAdded, Name = $"User {(e.Member.MemberFlags.HasFlag(MemberFlags.DidRejoin) ? "re" : "")}joined" },
                 Color = EmbedColors.Success,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
@@ -47,7 +50,7 @@ internal class ActionlogEvents
                               $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
             };
 
-            _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith<Task>(async x =>
+            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
             {
                 if (!x.IsCompletedSuccessfully || !_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)
                     return;
@@ -91,7 +94,7 @@ internal class ActionlogEvents
                                 $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             for (int i = 0; i < 3; i++)
             {
@@ -109,7 +112,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Kicked by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
-                        embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCodeBlock()}";
+                        embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCode()}";
 
                     embed.Footer = new();
                     embed.Footer.Text += "\n(Please note that the 'Kicked by' and 'Reason' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -155,11 +158,11 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
                 Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.UsernameWithDiscriminator}`\n" +
-                              $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`"
+                              $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`"
             };
 
             if (!string.IsNullOrWhiteSpace(e.Message.Content))
-                embed.AddField(new DiscordEmbedField("Content", $"`{e.Message.Content.SanitizeForCodeBlock().TruncateWithIndication(1022)}`"));
+                embed.AddField(new DiscordEmbedField("Content", $"`{e.Message.Content.SanitizeForCode().TruncateWithIndication(1022)}`"));
 
             if (e.Message.Attachments.Count != 0)
                 embed.AddField(new DiscordEmbedField("Attachments", $"{string.Join("\n", e.Message.Attachments.Select(x => $"`[{Math.Round(Convert.ToDecimal(x.FileSize / 1024), 2)} KB]` `{x.Url}`"))}"));
@@ -173,7 +176,7 @@ internal class ActionlogEvents
             if (embed.Fields.Count == 0)
                 return;
 
-            _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
         }).Add(_bot.watcher);
     }
 
@@ -248,7 +251,7 @@ internal class ActionlogEvents
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.MessageDeleted, Name = $"Multiple Messages deleted" },
                 Color = EmbedColors.Error,
                 Timestamp = DateTime.UtcNow,
-                Description = $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`\n" +
+                Description = $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
                                 $"`Check the attached file to view the deleted messages.`"
             };
 
@@ -297,14 +300,14 @@ internal class ActionlogEvents
                 return;
 
             string FileContent = $"All dates are saved in universal time (UTC+0).\n\n\n" +
-                                $"{e.Messages.Count} messages deleted in #{e.Channel.Name} ({e.Channel.Id}) on {e.Guild.Name} ({e.Guild.Id})\n\n\n" +
+                                $"{e.Messages.Count} messages deleted in {e.Channel.GetIcon()}{e.Channel.Name} ({e.Channel.Id}) on {e.Guild.Name} ({e.Guild.Id})\n\n\n" +
                                 $"{Messages}";
 
             string FileName = $"{Guid.NewGuid()}.txt";
             File.WriteAllText(FileName, FileContent);
             using (FileStream fileStream = new(FileName, FileMode.Open))
             {
-                await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
+                await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));
             }
 
             _ = Task.Run(async () =>
@@ -345,7 +348,7 @@ internal class ActionlogEvents
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author?.AvatarUrl },
                 Description = $"**User**: {e.Message.Author?.Mention} `{e.Message.Author?.UsernameWithDiscriminator}`\n" +
-                                $"**Channel**: {e.Channel.Mention} `[#{e.Channel.Name}]`\n" +
+                                $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
                                 $"**Message**: [`Jump to message`]({e.Message.JumpLink})"
             };
 
@@ -362,7 +365,7 @@ internal class ActionlogEvents
                 return;
             }
 
-            _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
         }).Add(_bot.watcher);
     }
@@ -396,7 +399,7 @@ internal class ActionlogEvents
                 else
                     embed.AddField(new DiscordEmbedField("New Nickname", $"`{e.NicknameAfter}`"));
 
-                _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
             }
 
             bool RolesUpdated = false;
@@ -476,7 +479,7 @@ internal class ActionlogEvents
 
                 embed.Description += $"\n\n{Roles}";
 
-                _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
             }
 
             if (e.TimeoutBefore != e.TimeoutAfter)
@@ -484,7 +487,7 @@ internal class ActionlogEvents
                 // Timeouts don't seem to fire the member updated event, will keep this code for potential future updates.
 
                 if (e.TimeoutAfter?.ToUniversalTime() > e.TimeoutBefore?.ToUniversalTime())
-                    _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserBanned, Name = $"User timed out" },
                         Color = EmbedColors.Error,
@@ -496,7 +499,7 @@ internal class ActionlogEvents
                     }));
 
                 if (e.TimeoutAfter?.ToUniversalTime() < e.TimeoutBefore?.ToUniversalTime())
-                    _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                    _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserBanRemoved, Name = $"User timeout removed" },
                         Color = EmbedColors.Success,
@@ -512,7 +515,7 @@ internal class ActionlogEvents
                 try
                 {
                     if ((e.PendingBefore is null && e.PendingAfter is true) || (e.PendingAfter is true && e.PendingBefore is false))
-                        _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                        _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         {
                             Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserAdded, Name = $"Membership approved" },
                             Color = EmbedColors.Success,
@@ -532,7 +535,7 @@ internal class ActionlogEvents
             {
                 // Normal avatar updates don't seem to fire the member updated event, will keep this code for potential future updates.
 
-                _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserUpdated, Name = $"Member Profile Picture updated" },
                     Color = EmbedColors.Warning,
@@ -546,7 +549,7 @@ internal class ActionlogEvents
 
             if (e.GuildAvatarHashBefore != e.GuildAvatarHashAfter)
             {
-                _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
                     Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserUpdated, Name = $"Member Guild Profile Picture updated" },
                     Color = EmbedColors.Warning,
@@ -599,7 +602,7 @@ internal class ActionlogEvents
                                             $"\n**Permissions**: {GeneratePermissions}"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -665,7 +668,7 @@ internal class ActionlogEvents
                                             $"\n**Permissions**: {GeneratePermissions}"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -779,7 +782,7 @@ internal class ActionlogEvents
                 Description = Description
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -824,7 +827,7 @@ internal class ActionlogEvents
                 Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`" +
                               $"{(e.Member.JoinedAt.Year > 2014 ? $"\n**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}" : (_bot.guilds[e.Guild.Id].Members.TryGetValue(e.Member.Id, out var member) ? (member.FirstJoinDate != DateTime.UnixEpoch ? $"\n**First joined at**: `{member.FirstJoinDate.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(member.FirstJoinDate, TimestampFormat.LongDateTime)}" : "") : ""))}"
             };
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -841,7 +844,7 @@ internal class ActionlogEvents
                     embed.Description += $"\n\n**Banned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
-                        embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCodeBlock()}";
+                        embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCode()}";
 
                     embed.Footer.Text += "\n(Please note that the 'Banned by' and 'Reason' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
@@ -871,7 +874,7 @@ internal class ActionlogEvents
                 Description = $"**User**: {e.Member.Mention} `{e.Member.UsernameWithDiscriminator}`"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -992,7 +995,7 @@ internal class ActionlogEvents
                 Description = $"**Name**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`\n"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -1036,7 +1039,7 @@ internal class ActionlogEvents
                 Description = $"**Name**: `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`\n"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -1091,7 +1094,7 @@ internal class ActionlogEvents
                 Description = Description
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
@@ -1126,7 +1129,7 @@ internal class ActionlogEvents
             if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.InvitesModified)
                 return;
 
-            _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+            _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.InviteAdded, Name = $"Invite created" },
                 Color = EmbedColors.Success,
@@ -1155,7 +1158,7 @@ internal class ActionlogEvents
                                 $"**Channel**: {e.Channel?.Mention} `[{(e.Channel?.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel?.Name}]`"
             };
 
-            var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;

@@ -37,7 +37,7 @@ internal class ConfigCommand : BaseCommand
                 RemoveButton
             }).AddComponents(MessageComponents.CancelButton));
 
-            var Button = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User, TimeSpan.FromMinutes(2));
+            var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
             if (Button.TimedOut)
             {

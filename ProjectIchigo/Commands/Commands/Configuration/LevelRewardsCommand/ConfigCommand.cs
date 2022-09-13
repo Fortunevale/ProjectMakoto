@@ -147,7 +147,7 @@ internal class ConfigCommand : BaseCommand
                                 var action_embed = new DiscordEmbedBuilder
                                 {
                                     Description = $"`Role   `: {(selectedRole is null ? "`Not yet selected.`" : selectedRole.Mention)}\n" +
-                                                  $"`Level  `: {(selectedLevel is -1 ? "`Not yet selected.`" : selectedLevel.DigitsToEmotes())}\n" +
+                                                  $"`Level  `: {(selectedLevel is -1 ? "`Not yet selected.`" : selectedLevel.ToEmotes())}\n" +
                                                   $"`Message`: `{selectedCustomText}`"
                                 }.SetAwaitingInput(ctx, "Level Rewards");
 
@@ -155,7 +155,7 @@ internal class ConfigCommand : BaseCommand
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
                                     .AddComponents(MessageComponents.CancelButton));
 
-                                var Menu = await ctx.Client.GetInteractivity().WaitForButtonAsync(ctx.ResponseMessage, ctx.User);
+                                var Menu = await ctx.WaitForButtonAsync();
 
                                 if (Menu.TimedOut)
                                 {

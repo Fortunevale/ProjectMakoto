@@ -606,7 +606,7 @@ internal class DatabaseClient
                 check.Add(_bot.watcher);
 
                 if (_bot.guilds.Count > 0)
-                    foreach (var guild in _bot.guilds)
+                    foreach (var guild in _bot.guilds.ToList())
                         if (guild.Value.Members.Count > 0)
                         {
                             try

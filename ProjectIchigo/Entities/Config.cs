@@ -3,6 +3,7 @@
 public class Config
 {
     public bool IsDev = false;
+    public bool AllowMoreThan100Guilds = false;
 
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();

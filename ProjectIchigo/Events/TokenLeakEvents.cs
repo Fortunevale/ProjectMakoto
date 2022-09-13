@@ -78,7 +78,7 @@ internal class TokenLeakEvents
         .WithAuthor(sender.CurrentUser.Username, null, sender.CurrentUser.AvatarUrl)
         .WithDescription($"`Heads up!`\n\n" +
                          $"`I've detected {InvalidateCount} authentication token{s} within your last message. The token{s} will soon be invalidated and the owner{(s.IsNullOrWhiteSpace() ? "" : "(s)")} of the bot{s} will receive {(s.IsNullOrWhiteSpace() ? "an " : "")}official notification{s} from Discord.`\n\n" +
-                         $"`You can disable the token check on this server via '/tokendetectionsettings config'.`"))
+                         $"`You can disable the token check on this server via '/tokendetection config'.`"))
         .WithContent(e.Author.Mention));
     }
 
