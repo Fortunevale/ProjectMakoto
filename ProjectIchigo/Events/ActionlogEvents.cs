@@ -41,7 +41,7 @@ internal class ActionlogEvents
 
             DiscordEmbedBuilder embed = new()
             {
-                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserAdded, Name = $"User joined" },
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = AuditLogIcons.UserAdded, Name = $"User {(e.Member.MemberFlags.HasFlag(MemberFlags.DidRejoin) ? "re" : "")}joined" },
                 Color = EmbedColors.Success,
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
