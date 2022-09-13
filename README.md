@@ -49,7 +49,7 @@ Ichigo has a lot of features, current notable features are:
 - Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/tokendetection config` to disable it.
 - Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `/join config`.
 - You can join a support server [here](https://s.aitsys.dev/ichigoguild).
-
+<br></br>
 ## Building, Debugging and Deployment
 
 ### Prerequisites
@@ -79,7 +79,7 @@ Ichigo has a lot of features, current notable features are:
 - [Github Account](https://github.com/) with a [Personal Access Token](https://github.com/settings/tokens) for your Github Account
    - The personal access token should have the `repo` permissions.
    - This is required for the `/dev_tools create-issue` command.
-
+<br></br>
 ## Credits
 
 - [DisCatSharp](https://github.com/Aiko-IT-Systems/DisCatSharp) by Aiko-IT-Systems
