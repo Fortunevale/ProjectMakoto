@@ -351,7 +351,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("tokendetectionsettings", "Allows you to review and change settings related to automatic token invalidation.", dmPermission: false)]
+    [SlashCommandGroup("tokendetection", "Allows you to review and change settings related to automatic token invalidation.", dmPermission: false)]
     public class TokenDetection : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
