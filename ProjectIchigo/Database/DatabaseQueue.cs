@@ -92,6 +92,9 @@ internal class DatabaseQueue
                     }
                     catch (Exception ex)
                     {
+                        if (ex.Message.ToLower().Contains("open datareader"))
+                            continue;
+
                         b.Failed = true;
                         b.Exception = ex;
                     }
