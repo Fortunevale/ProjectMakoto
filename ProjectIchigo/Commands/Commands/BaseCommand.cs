@@ -468,46 +468,7 @@ public abstract class BaseCommand
             }).Add(ctx.Bot.watcher, ctx);
         }
 
-        async Task ChannelCreated(DiscordClient sender, ChannelCreateEventArgs e)
-        {
-            _ = Task.Run(async () =>
-            {
-                if (e.Guild.Id == ctx.Guild.Id)
-                {
-                    await RefreshList();
-                    _ = RefreshMessage();
-                }
-            });
-        }
-
-        async Task ChannelDeleted(DiscordClient sender, ChannelDeleteEventArgs e)
-        {
-            _ = Task.Run(async () =>
-            {
-                if (e.Guild.Id == ctx.Guild.Id)
-                {
-                    await RefreshList();
-                    _ = RefreshMessage();
-                }
-            });
-        }
-
-        async Task ChannelUpdated(DiscordClient sender, ChannelUpdateEventArgs e)
-        {
-            _ = Task.Run(async () =>
-            {
-                if (e.Guild.Id == ctx.Guild.Id)
-                {
-                    await RefreshList();
-                    _ = RefreshMessage();
-                }
-            });
-        }
-
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
-        ctx.Client.ChannelCreated += ChannelCreated;
-        ctx.Client.ChannelDeleted += ChannelDeleted;
-        ctx.Client.ChannelUpdated += ChannelUpdated;
 
         while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
         {
@@ -515,10 +476,6 @@ public abstract class BaseCommand
         }
 
         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
-        ctx.Client.ChannelCreated -= ChannelCreated;
-        ctx.Client.ChannelDeleted -= ChannelDeleted;
-        ctx.Client.ChannelUpdated -= ChannelUpdated;
-
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
