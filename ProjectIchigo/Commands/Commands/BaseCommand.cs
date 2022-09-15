@@ -1,8 +1,10 @@
 ﻿namespace ProjectIchigo.Commands;
+
 public abstract class BaseCommand
 {
     internal SharedCommandContext ctx { private get; set; }
 
+    #region Execution
     public virtual async Task<bool> BeforeExecution(SharedCommandContext ctx)
     {
         return true;
@@ -14,48 +16,10 @@ public abstract class BaseCommand
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 
-        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
-            return;
-
-        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
-            return;
-
-        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
-            return;
-
-        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
-            return;
-
-        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
-            return;
-
-        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
-            return;
-
-        if (!(await BeforeExecution(this.ctx)))
-            return;
-
-        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
-        {
-            SendDataError();
-            return;
-        }
-
-        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
-        {
-            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
-            return;
-        }
-        
-        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
-        {
-            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
-            return;
-        }
-
-        await ExecuteCommand(this.ctx, arguments);
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
     }
-    
+
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
     {
         if (InitiateInteraction)
@@ -68,48 +32,10 @@ public abstract class BaseCommand
 
         this.ctx.RespondedToInitial = InitiateInteraction;
 
-        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
-            return;
-        
-        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
-            return;
-        
-        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
-            return;
-        
-        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
-            return;
-        
-        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
-            return;
-        
-        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
-            return;
-        
-        if (!(await BeforeExecution(this.ctx)))
-            return;
-
-        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
-        {
-            SendDataError();
-            return;
-        }
-
-        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
-        {
-            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
-            return;
-        }
-
-        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
-        {
-            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
-            return;
-        }
-
-        await ExecuteCommand(this.ctx, arguments);
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
     }
-    
+
     public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
     {
         if (InitiateInteraction)
@@ -122,55 +48,68 @@ public abstract class BaseCommand
 
         this.ctx.RespondedToInitial = InitiateInteraction;
 
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
+    }
+
+    internal async Task<bool> BasePreExecutionCheck()
+    {
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
-            return;
+            return false;
 
         if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
-            return;
+            return false;
 
         if (!(await CheckOwnPermissions(Permissions.AddReactions)))
-            return;
+            return false;
 
         if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
-            return;
+            return false;
 
         if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
-            return;
+            return false;
 
         if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
-            return;
+            return false;
 
         if (!(await BeforeExecution(this.ctx)))
-            return;
+            return false;
 
         if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
         {
             SendDataError();
-            return;
+            return false;
         }
 
         if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
         {
             SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
-            return;
+            return false;
         }
 
         if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
         {
             SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
-            return;
+            return false;
         }
 
-        await ExecuteCommand(this.ctx, arguments);
+
+        if (this.ctx.User.IsBot)
+            return false;
+
+        return true;
     }
+    #endregion
 
+    #region RespondOrEdit
+    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
+        => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
+    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
+        => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
 
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed) => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed) => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
-
-    internal async Task<DiscordMessage> RespondOrEdit(string content) => await RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
+    internal async Task<DiscordMessage> RespondOrEdit(string content)
+        => await RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
 
     internal async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
     {
@@ -194,7 +133,7 @@ public abstract class BaseCommand
                 ctx.ResponseMessage = msg;
                 return msg;
             }
-            
+
             case Enums.CommandType.ContextMenu:
             {
                 DiscordWebhookBuilder discordWebhookBuilder = new();
@@ -238,7 +177,7 @@ public abstract class BaseCommand
 
                 return msg;
             }
-            
+
             case Enums.CommandType.Custom:
             {
                 if (ctx.ResponseMessage is not null)
@@ -267,9 +206,10 @@ public abstract class BaseCommand
 
         throw new NotImplementedException();
     }
+    #endregion
 
 
-
+    #region Selections
     internal async Task<DiscordRole> PromptRoleSelection(bool IncludeCreateForMe = false, string CreateForMeName = "Role", bool IncludeDisable = false, string DisableString = "Disable")
     {
         List<DiscordSelectComponentOption> roles = new();
@@ -551,7 +491,7 @@ public abstract class BaseCommand
                 }
             });
         }
-        
+
         async Task ChannelUpdated(DiscordClient sender, ChannelUpdateEventArgs e)
         {
             _ = Task.Run(async () =>
@@ -685,9 +625,9 @@ public abstract class BaseCommand
 
         return Selection;
     }
+    #endregion
 
-
-
+    #region Modals
     internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
     internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null, bool open = true)
@@ -771,7 +711,7 @@ public abstract class BaseCommand
 
         if (TimeoutSeconds <= 0)
             throw new ArgumentException("Modal not submitted");
-        
+
         if (Cancelled)
             throw new CancelCommandException("", null);
 
@@ -779,8 +719,7 @@ public abstract class BaseCommand
     }
 
 
-
-    internal async Task<TimeSpan> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan ? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<TimeSpan> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
@@ -791,11 +730,11 @@ public abstract class BaseCommand
         modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (max. 59)", "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
 
         if (MaxTime.Value.TotalMinutes >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", $"Minutes (max. {(MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}" )})", $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", $"Minutes (max. {(MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}")})", $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
 
         if (MaxTime.Value.TotalHours >= 1)
             modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", $"Hours (max. {(MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}")})", "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
-        
+
         if (MaxTime.Value.TotalDays >= 1)
             modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", $"Days (max. {((int)MaxTime.Value.TotalDays)})", "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
@@ -869,7 +808,8 @@ public abstract class BaseCommand
         int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
 
         return new DateTime(year, month, day, hour, minute, 0);
-    }
+    } 
+    #endregion
 
     internal async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
     {
@@ -903,8 +843,7 @@ public abstract class BaseCommand
         return (stream, size);
     }
 
-
-
+    #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
@@ -912,7 +851,8 @@ public abstract class BaseCommand
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
             {
-                ctx.ResponseMessage.DeleteAsync();
+                if (!ctx.ResponseMessage?.Flags.Value.HasMessageFlag(MessageFlags.Ephemeral) ?? false)
+                    ctx.ResponseMessage.DeleteAsync();
             });
     }
 
@@ -929,55 +869,121 @@ public abstract class BaseCommand
                 break;
         }
     }
-    
+    #endregion
 
-
-    public void SendNoMemberError()
+    #region Checks
+    public async Task<bool> CheckVoiceState()
     {
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        if (ctx.Member.VoiceState is null)
         {
-            Description = "The user you tagged is required to be on this server for this command to run.",
-        }.SetError(ctx));
+            SendVoiceStateError();
+            return false;
+        }
+
+        return true;
     }
-    
-    public void SendMaintenanceError()
+
+    public async Task<bool> CheckMaintenance()
     {
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        if (!ctx.User.IsMaintenance(ctx.Bot.status))
+        {
+            SendMaintenanceError();
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> CheckAdmin()
+    {
+        if (!ctx.Member.IsAdmin(ctx.Bot.status))
+        {
+            SendAdminError();
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> CheckPermissions(Permissions perms)
+    {
+        if (!ctx.Member.Permissions.HasPermission(perms))
+        {
+            SendPermissionError(perms);
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> CheckOwnPermissions(Permissions perms)
+    {
+        if (!ctx.CurrentMember.Permissions.HasPermission(perms))
+        {
+            SendOwnPermissionError(perms);
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> CheckSource(Enums.CommandType commandType)
+    {
+        if (ctx.CommandType != commandType)
+        {
+            SendSourceError(commandType);
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
+
+    #region ErrorTemplates
+    public void SendNoMemberError()
+    => _ = RespondOrEdit(new DiscordEmbedBuilder()
+    {
+        Description = "The user you tagged is required to be on this server for this command to run.",
+    }.SetError(ctx));
+
+    public void SendMaintenanceError()
+        => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be <@411950662662881290> to use this command.",
         }.SetError(ctx));
-    }
 
     public void SendAdminError()
-    {
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Administrator` to use this command.",
         }.SetError(ctx));
-    }
-    
+
     public void SendPermissionError(Permissions perms)
-    {
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `{perms.ToPermissionString()}` to use this command.",
         }.SetError(ctx));
-    }
-    
-    public void SendOwnPermissionError(Permissions perms)
-    {
-        if (perms is Permissions.AccessChannels or Permissions.SendMessages or Permissions.EmbedLinks)
-            return;
 
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
+    public void SendVoiceStateError()
+        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command."
-        }.SetError(ctx));
-    }
-    
+            Description = $"`You aren't in a voice channel.`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+
+    public void SendUserBanError(BlacklistEntry entry)
+        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+
+    public void SendGuildBanError(BlacklistEntry entry)
+        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+
     public void SendSourceError(Enums.CommandType commandType)
-    {
-        _ = commandType switch
+        => _ = commandType switch
         {
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
@@ -989,6 +995,22 @@ public abstract class BaseCommand
             }.SetError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
+
+    public void SendDataError()
+        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
+        }.SetError(ctx)).WithContent(ctx.User.Mention));
+
+    public void SendOwnPermissionError(Permissions perms)
+    {
+        if (perms is Permissions.AccessChannels or Permissions.SendMessages or Permissions.EmbedLinks)
+            return;
+
+        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        {
+            Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command."
+        }.SetError(ctx));
     }
 
     public void SendSyntaxError()
@@ -1005,102 +1027,5 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
     }
-    
-    public void SendVoiceStateError()
-    {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-        {
-            Description = $"`You aren't in a voice channel.`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
-    }
-    
-    public void SendDataError()
-    {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-        {
-            Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
-    }
-    
-    public void SendUserBanError(BlacklistEntry entry)
-    {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-        {
-            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
-    }
-    
-    public void SendGuildBanError(BlacklistEntry entry)
-    {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-        {
-            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
-    }
-
-    public async Task<bool> CheckVoiceState()
-    {
-        if (ctx.Member.VoiceState is null)
-        {
-            SendVoiceStateError();
-            return false;
-        }
-
-        return true;
-    }
-    
-    public async Task<bool> CheckMaintenance()
-    {
-        if (!ctx.User.IsMaintenance(ctx.Bot.status))
-        {
-            SendMaintenanceError();
-            return false;
-        }
-
-        return true;
-    }
-    
-    public async Task<bool> CheckAdmin()
-    {
-        if (!ctx.Member.IsAdmin(ctx.Bot.status))
-        {
-            SendAdminError();
-            return false;
-        }
-
-        return true;
-    }
-    
-    public async Task<bool> CheckPermissions(Permissions perms)
-    {
-        if (!ctx.Member.Permissions.HasPermission(perms))
-        {
-            SendPermissionError(perms);
-            return false;
-        }
-
-        return true;
-    }
-    
-    public async Task<bool> CheckOwnPermissions(Permissions perms)
-    {
-        if (!ctx.CurrentMember.Permissions.HasPermission(perms))
-        {
-            SendOwnPermissionError(perms);
-            return false;
-        }
-
-        return true;
-    }
-    
-    public async Task<bool> CheckSource(Enums.CommandType commandType)
-    {
-        if (ctx.CommandType != commandType)
-        {
-            SendSourceError(commandType);
-            return false;
-        }
-
-        return true;
-    }
+    #endregion
 }
