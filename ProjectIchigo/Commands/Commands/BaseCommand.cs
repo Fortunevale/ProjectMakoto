@@ -329,7 +329,7 @@ public abstract class BaseCommand
     internal async Task<DiscordChannel> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null)
         => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration);
 
-    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelType = null, ChannelPromptConfiguration configuration = null)
+    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null)
     {
         configuration ??= new();
 
@@ -365,7 +365,7 @@ public abstract class BaseCommand
             foreach (var category in ctx.Guild.GetOrderedChannels())
             {
                 foreach (var b in category.Value)
-                    if (channelType is null || channelType.Contains(b.Type))
+                    if (channelTypes is null || channelTypes.Contains(b.Type))
                         channels.Add(new DiscordSelectComponentOption(
                         $"{b.GetIcon()}{b.Name} ({b.Id})",
                         b.Id.ToString(),
