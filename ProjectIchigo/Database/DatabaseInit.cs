@@ -11,8 +11,6 @@ internal class DatabaseInit
 
     internal async Task LoadValuesFromDatabase()
     {
-        _logger.LogDebug($"Loading phishing urls from table 'scam_urls'..");
-
         IEnumerable<DatabasePhishingUrlInfo> scamUrls = _bot.databaseClient.mainDatabaseConnection.Query<DatabasePhishingUrlInfo>(_bot.databaseClient._helper.GetLoadCommand("scam_urls", DatabaseColumnLists.scam_urls));
 
         foreach (DatabasePhishingUrlInfo b in scamUrls)
@@ -22,14 +20,14 @@ internal class DatabaseInit
                 Origin = JsonConvert.DeserializeObject<List<string>>(b.origin),
                 Submitter = b.submitter
             });
-
-        _logger.LogInfo($"Loaded {_bot.phishingUrls.Count} phishing urls from table 'scam_urls'.");
+        _logger.LogDebug($"Loaded {_bot.phishingUrls.Count} malicious urls");
 
 
         IEnumerable<ulong> objected_users = _bot.databaseClient.mainDatabaseConnection.Query<ulong>(_bot.databaseClient._helper.GetLoadCommand("objected_users", DatabaseColumnLists.objected_users));
+        
         _bot.objectedUsers = objected_users.ToList();
+        _logger.LogDebug($"Loaded {_bot.objectedUsers.Count} objected users");
 
-        _logger.LogDebug($"Loading guilds from table 'guilds'..");
 
         IEnumerable<DatabaseGuildSettings> serverSettings = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseGuildSettings>(_bot.databaseClient._helper.GetLoadCommand("guilds", DatabaseColumnLists.guilds));
 
@@ -147,21 +145,14 @@ internal class DatabaseInit
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles));
             DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.autounarchivelist is null or "null" or "" ? "[]" : b.autounarchivelist));
         }
+        _logger.LogDebug($"Loaded {_bot.guilds.Count} guilds");
 
-        _logger.LogInfo($"Loaded {_bot.guilds.Count} guilds from table 'guilds'.");
 
-        foreach (var table in await _bot.databaseClient._helper.ListTables(_bot.databaseClient.guildDatabaseConnection))
+        IEnumerable<string> tables = await _bot.databaseClient._helper.ListTables(_bot.databaseClient.guildDatabaseConnection);
+        foreach (var table in tables)
         {
-            if (table.StartsWith("guild-"))
-            {
-                _logger.LogWarn($"Table '{table}' uses old format. Dropping table.");
-                await _bot.databaseClient._helper.DropTable(_bot.databaseClient.guildDatabaseConnection, table);
-                continue;
-            }
-
             if (Regex.IsMatch(table, @"^\d+$"))
             {
-                _logger.LogDebug($"Loading members from table '{table}'..");
                 IEnumerable<DatabaseMembers> memberList = _bot.databaseClient.guildDatabaseConnection.Query<DatabaseMembers>(_bot.databaseClient._helper.GetLoadCommand(table, DatabaseColumnLists.guild_users));
 
                 if (!_bot.guilds.ContainsKey(Convert.ToUInt64(table)))
@@ -193,12 +184,10 @@ internal class DatabaseInit
                     DbUser.SavedNickname = b.saved_nickname;
                 }
 
-                _logger.LogInfo($"Loaded {_bot.guilds[Convert.ToUInt64(table)].Members.Count} members from table '{table}'.");
+                _logger.LogDebug($"Loaded {_bot.guilds[Convert.ToUInt64(table)].Members.Count} members for {table}");
             }
         }
 
-
-        _logger.LogDebug($"Loading users from table 'users'..");
 
         IEnumerable<DatabaseUsers> users = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseUsers>(_bot.databaseClient._helper.GetLoadCommand("users", DatabaseColumnLists.users));
 
@@ -231,12 +220,8 @@ internal class DatabaseInit
             };
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>((b.playlists is null or "null" or "" ? "[]" : b.playlists));
         }
+        _logger.LogDebug($"Loaded {_bot.users.Count} users");
 
-        _logger.LogInfo($"Loaded {_bot.users.Count} users from table 'users'.");
-
-
-
-        _logger.LogDebug($"Loading global bans from table 'globalbans'..");
 
         IEnumerable<DatabaseBanInfo> globalbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("globalbans", DatabaseColumnLists.globalbans));
 
@@ -247,10 +232,8 @@ internal class DatabaseInit
                 Moderator = b.moderator,
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
-
-        _logger.LogInfo($"Loaded {_bot.globalBans.Count} submission bans from table 'globalbans'.");
+        _logger.LogDebug($"Loaded {_bot.globalBans.Count} global bans");
         
-        _logger.LogDebug($"Loading user bans from table 'banned_users'..");
 
         IEnumerable<DatabaseBanInfo> banned_users = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("banned_users", DatabaseColumnLists.globalbans));
 
@@ -262,23 +245,19 @@ internal class DatabaseInit
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
 
-        _logger.LogInfo($"Loaded {_bot.bannedUsers.Count} submission bans from table 'banned_users'.");
+        _logger.LogDebug($"Loaded {_bot.bannedUsers.Count} user bans");
         
         IEnumerable<DatabaseBanInfo> banned_guilds = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("banned_guilds", DatabaseColumnLists.globalbans));
 
-        foreach (var b in banned_users)
+        foreach (var b in banned_guilds)
             _bot.bannedGuilds.Add(b.id, new BlacklistEntry
             {
                 Reason = b.reason,
                 Moderator = b.moderator,
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
+        _logger.LogDebug($"Loaded {_bot.bannedGuilds.Count} guild bans");
 
-        _logger.LogInfo($"Loaded {_bot.bannedGuilds.Count} submission bans from table 'banned_guilds'.");
-
-
-
-        _logger.LogDebug($"Loading submission bans from table 'submission_user_bans'..");
 
         IEnumerable<DatabaseBanInfo> userbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("submission_user_bans", DatabaseColumnLists.submission_user_bans));
 
@@ -289,11 +268,8 @@ internal class DatabaseInit
                 Moderator = b.moderator
             });
 
-        _logger.LogInfo($"Loaded {_bot.phishingUrlSubmissionUserBans.Count} submission bans from table 'submission_user_bans'.");
+        _logger.LogDebug($"Loaded {_bot.phishingUrlSubmissionUserBans.Count} user submission bans");
 
-
-
-        _logger.LogDebug($"Loading submission bans from table 'submission_guild_bans'..");
 
         IEnumerable<DatabaseBanInfo> guildbans = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("submission_guild_bans", DatabaseColumnLists.submission_guild_bans));
 
@@ -304,11 +280,8 @@ internal class DatabaseInit
                 Moderator = b.moderator
             });
 
-        _logger.LogInfo($"Loaded {_bot.phishingUrlSubmissionGuildBans.Count} submission bans from table 'submission_guild_bans'.");
+        _logger.LogDebug($"Loaded {_bot.phishingUrlSubmissionGuildBans.Count} guild submission bans");
 
-
-
-        _logger.LogDebug($"Loading active submissions from table 'active_url_submissions'..");
 
         IEnumerable<DatabaseSubmittedUrls> active_submissions = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseSubmittedUrls>(_bot.databaseClient._helper.GetLoadCommand("active_url_submissions", DatabaseColumnLists.active_url_submissions));
 
@@ -320,14 +293,13 @@ internal class DatabaseInit
                 GuildOrigin = b.guild
             });
 
-        _logger.LogInfo($"Loaded {_bot.submittedUrls.Count} active submissions from table 'active_url_submissions'.");
+        _logger.LogDebug($"Loaded {_bot.submittedUrls.Count} active submissions");
     }
 
     internal async Task UpdateCountryCodes()
     {
         try
         {
-            _logger.LogInfo($"Loading Country Codes..");
             _bot.countryCodes = new();
             List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>((await new HttpClient().GetStringAsync("https://fortunevale.dd-dns.de/Countries.json")));
             foreach (var b in cc)
@@ -350,9 +322,9 @@ internal class DatabaseInit
                 });
             }
 
-            _logger.LogInfo($"Loaded {_bot.countryCodes.List.Count} countries.");
+            _logger.LogDebug($"Loaded {_bot.countryCodes.List.Count} countries");
 
-            _logger.LogInfo($"Loading Language Codes..");
+
             _bot.languageCodes = new();
             List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>((await new HttpClient().GetStringAsync("https://fortunevale.dd-dns.de/Languages.json")));
             foreach (var b in lc)
@@ -363,7 +335,7 @@ internal class DatabaseInit
                     Name = b[1],
                 });
             }
-            _logger.LogInfo($"Loaded {_bot.languageCodes.List.Count} languages.");
+            _logger.LogDebug($"Loaded {_bot.languageCodes.List.Count} languages");
         }
         catch (Exception ex)
         {
