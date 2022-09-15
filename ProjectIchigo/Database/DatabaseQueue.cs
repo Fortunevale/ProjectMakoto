@@ -97,7 +97,7 @@ internal class DatabaseQueue
                     }
                     finally
                     {
-                        Thread.Sleep(50);
+                        Thread.Sleep(100);
                     }
                 }
             }
