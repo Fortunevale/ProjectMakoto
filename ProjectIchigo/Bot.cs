@@ -189,7 +189,7 @@ public class Bot
                 {
                     _logger.LogDebug("Waiting for guilds to download to sync database..");
 
-                    while (!discordClient.Guilds.Any())
+                    while (!discordClient?.Guilds.Any() ?? true)
                         Thread.Sleep(500);
 
                     await databaseClient.FullSyncDatabase(true);
