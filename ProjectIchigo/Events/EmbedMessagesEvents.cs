@@ -68,7 +68,6 @@ internal class EmbedMessagesEvents
 
                 foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
                 {
-                    _logger.LogDebug("Attempting to parse github link");
                     string fileUrl = b.Value;
                     fileUrl = fileUrl.Replace("github.com", "raw.githubusercontent.com");
                     fileUrl = fileUrl.Replace("/blob", "");
@@ -93,12 +92,10 @@ internal class EmbedMessagesEvents
                     if (EndLine < StartLine)
                         return;
 
-                    _logger.LogDebug("Attempting to fetch code");
-
                     var rawFile = await new HttpClient().GetStringAsync(fileUrl);
                     rawFile = rawFile.ReplaceLineEndings("\n");
 
-                    var lines = rawFile.Split("\n").Skip((int)(StartLine - 1)).Take((int)(EndLine - (StartLine - 1))).ToList();
+                    var lines = rawFile.Split("\n").Skip((int)(StartLine - 1)).Take((int)(EndLine - (StartLine - 1))).Select(x => x.Replace("\t", "    ")).ToList();
 
                     if (!lines.IsNotNullAndNotEmpty())
                         return;
@@ -111,7 +108,7 @@ internal class EmbedMessagesEvents
 
                         foreach (var d in c)
                         {
-                            if (d is ' ' or '	')
+                            if (d is ' ' or '\t')
                                 currentIndent++;
                             else
                                 break;
