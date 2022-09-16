@@ -184,7 +184,7 @@ internal class VoicePrivacyEvents
 
                 foreach (var b in e.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
                 {
-                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages, "In-Voice Privacy is enabled");
+                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, "In-Voice Privacy is enabled");
                 }
             }
         }).Add(_bot.watcher);
