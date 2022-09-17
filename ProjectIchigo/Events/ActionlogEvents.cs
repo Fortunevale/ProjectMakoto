@@ -95,7 +95,7 @@ internal class ActionlogEvents
             };
 
             if (e.Member.Roles.Any())
-                embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}"));
+                embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -833,7 +833,7 @@ internal class ActionlogEvents
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             if (e.Member.Roles.Any())
-                embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}"));
+                embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;
