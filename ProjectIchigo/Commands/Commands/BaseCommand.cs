@@ -883,7 +883,6 @@ public abstract class BaseCommand
             case Enums.CommandType.ContextMenu:
             case Enums.CommandType.ApplicationCommand:
                 _ = RespondOrEdit("✅ _`Interaction finished.`_");
-                _ = ctx.ResponseMessage.DeleteAsync();
                 break;
             default:
                 _ = ctx.ResponseMessage.DeleteAsync();
