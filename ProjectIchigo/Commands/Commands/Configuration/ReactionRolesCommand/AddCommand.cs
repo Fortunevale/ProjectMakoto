@@ -77,6 +77,18 @@ internal class AddCommand : BaseCommand
                             ModifyToTimedOut();
                             return;
                         }
+                        catch (NullReferenceException)
+                        {
+                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                            await Task.Delay(3000);
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+                        catch (CancelCommandException)
+                        {
+                            DeleteOrInvalidate();
+                            return;
+                        }
 
                         break;
                     }

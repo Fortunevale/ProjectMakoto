@@ -219,10 +219,20 @@ internal class ConfigCommand : BaseCommand
                             selectedRole = role;
                             continue;
                         }
+                        catch (NullReferenceException)
+                        {
+                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                            await Task.Delay(3000);
+                            continue;
+                        }
                         catch (ArgumentException)
                         {
                             ModifyToTimedOut(true);
                             return;
+                        }
+                        catch (CancelCommandException) 
+                        { 
+                            continue;
                         }
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
@@ -311,6 +321,11 @@ internal class ConfigCommand : BaseCommand
                     embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
                     await Task.Delay(5000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                catch (CancelCommandException)
+                {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }

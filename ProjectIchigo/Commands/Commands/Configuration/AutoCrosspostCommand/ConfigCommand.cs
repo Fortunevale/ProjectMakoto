@@ -110,6 +110,11 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut();
                     return;
                 }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
                 catch (NullReferenceException)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any announcement channels in your server.`"));
@@ -167,6 +172,11 @@ internal class ConfigCommand : BaseCommand
                         .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                     ChannelToRemove = Convert.ToUInt64(channel);
+                }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
                 }
                 catch (ArgumentException)
                 {

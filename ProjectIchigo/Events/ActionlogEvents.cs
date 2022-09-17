@@ -94,6 +94,9 @@ internal class ActionlogEvents
                                 $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
             };
 
+            if (e.Member.Roles.Any())
+                embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
+
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
             for (int i = 0; i < 3; i++)
@@ -828,6 +831,9 @@ internal class ActionlogEvents
                               $"{(e.Member.JoinedAt.Year > 2014 ? $"\n**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}" : (_bot.guilds[e.Guild.Id].Members.TryGetValue(e.Member.Id, out var member) ? (member.FirstJoinDate != DateTime.UnixEpoch ? $"\n**First joined at**: `{member.FirstJoinDate.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(member.FirstJoinDate, TimestampFormat.LongDateTime)}" : "") : ""))}"
             };
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+
+            if (e.Member.Roles.Any())
+                embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
             if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
                 return;

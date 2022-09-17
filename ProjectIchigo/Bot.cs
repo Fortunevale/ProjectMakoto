@@ -98,8 +98,7 @@ public class Bot
         {
             if (args.Contains("--debug"))
             {
-                _logger.ChangeLogLevel(LogLevel.TRACE);
-                _logger.LogInfo("Debug logs enabled");
+                _logger.ChangeLogLevel(LogLevel.DEBUG);
             }
         }
         catch (Exception ex)
@@ -127,14 +126,8 @@ public class Bot
         {
             try
             {
-                _logger.LogDebug($"Loading config..");
-
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
-
-                status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
-                File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
-                _logger.LogInfo($"Config loaded.");
 
                 Task.Run(async () =>
                 {
@@ -146,7 +139,7 @@ public class Bot
                         {
                             FileInfo fileInfo = new("config.json");
 
-                            if (lastModify != fileInfo.LastWriteTimeUtc)
+                            if (lastModify != fileInfo.LastWriteTimeUtc || status.LoadedConfig is null)
                             {
                                 try
                                 {
@@ -171,6 +164,7 @@ public class Bot
                         }
                     }
                 }).Add(watcher);
+                await Task.Delay(1000);
 
                 _logger.LogInfo($"Connecting to database..");
 
@@ -189,7 +183,7 @@ public class Bot
                 {
                     _logger.LogDebug("Waiting for guilds to download to sync database..");
 
-                    while (!discordClient.Guilds.Any())
+                    while (!discordClient?.Guilds.Any() ?? true)
                         Thread.Sleep(500);
 
                     await databaseClient.FullSyncDatabase(true);
@@ -717,7 +711,6 @@ public class Bot
                 if (e is not null && e.NewItems is not null)
                     foreach (Task b in e.NewItems)
                     {
-                        _logger.LogDebug($"Adding sync task to watcher: {b.Id}");
                         b.Add(watcher);
                     }
             };

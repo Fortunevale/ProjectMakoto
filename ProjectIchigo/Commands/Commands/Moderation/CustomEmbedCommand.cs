@@ -613,6 +613,10 @@ internal class CustomEmbedCommand : BaseCommand
 
                             FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
                         }
+                        catch (CancelCommandException)
+                        {
+                            continue;
+                        }
                         catch (ArgumentException)
                         {
                             ModifyToTimedOut();
@@ -669,6 +673,10 @@ internal class CustomEmbedCommand : BaseCommand
 
                             FieldToRemove = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
                         }
+                        catch (CancelCommandException)
+                        {
+                            continue;
+                        }
                         catch (ArgumentException)
                         {
                             ModifyToTimedOut();
@@ -697,6 +705,10 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
                             await Task.Delay(3000);
+                            continue;
+                        }
+                        catch (CancelCommandException)
+                        {
                             continue;
                         }
 

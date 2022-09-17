@@ -68,7 +68,19 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    role = await PromptRoleSelection(true, "BumpReminder");
+                    role = await PromptRoleSelection(new() { CreateRoleOption = "BumpReminder" });
+                }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
                 }
                 catch (ArgumentException)
                 {
@@ -126,6 +138,11 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);
@@ -146,6 +163,18 @@ internal class ConfigCommand : BaseCommand
                     var role = await PromptRoleSelection();
 
                     ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.RoleId = role.Id;
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                    await Task.Delay(3000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }

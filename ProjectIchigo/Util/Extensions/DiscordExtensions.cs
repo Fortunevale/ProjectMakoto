@@ -47,6 +47,13 @@ internal static class DiscordExtensions
         _ => "❔",
     };
 
+    internal static DiscordEmbedField AddField(this DiscordEmbedBuilder builder, string name, string value, bool inline = false)
+    {
+        var field = new DiscordEmbedField(name, value, inline);
+        builder.AddField(field);
+        return field;
+    }
+
     internal static List<Tuple<ulong, string, bool>>? GetEmotes(this string content)
     {
         if (Regex.IsMatch(content, @"<(a?):([\w]*):(\d*)>", RegexOptions.ExplicitCapture))
