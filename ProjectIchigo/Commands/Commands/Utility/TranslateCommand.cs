@@ -93,7 +93,7 @@ internal class TranslateCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
-                    throw;
+                    return;
                 }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -115,7 +115,7 @@ internal class TranslateCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
-                    throw;
+                    return;
                 }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -182,7 +182,7 @@ internal class TranslateCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
-                    throw;
+                    return;
                 }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -204,7 +204,7 @@ internal class TranslateCommand : BaseCommand
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
-                    throw;
+                    return;
                 }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
