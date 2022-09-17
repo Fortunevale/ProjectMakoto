@@ -102,16 +102,17 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (Exception)
+                catch (CancelCommandException)
                 {
-                    throw;
+                    await ExecuteCommand(ctx, arguments);
+                    return;
                 }
             }
             else if (e.Result.Interaction.Data.CustomId == ChangeRoleOnJoin.CustomId)
             {
                 try
                 {
-                    var role = await PromptRoleSelection(true, "AutoAssignedRole", true, "Disable Role on join");
+                    var role = await PromptRoleSelection(new RolePromptConfiguration { CreateRoleOption = "AutoAssignedRole", DisableOption = "Disable Role on join" });
 
                     if (role is null)
                         ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
@@ -121,13 +122,21 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                catch (NullReferenceException)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);
-                }
-                catch (Exception)
-                {
-                    throw;
                 }
             }
             else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)

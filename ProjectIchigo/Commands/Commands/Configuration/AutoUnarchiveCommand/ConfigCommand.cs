@@ -50,6 +50,11 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut(true);
                     return;
                 }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
                 catch (NullReferenceException)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or forum channels in your server.`"));

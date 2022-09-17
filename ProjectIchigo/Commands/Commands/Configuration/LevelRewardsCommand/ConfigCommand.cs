@@ -181,6 +181,16 @@ internal class ConfigCommand : BaseCommand
                                         ModifyToTimedOut(true);
                                         return;
                                     }
+                                    catch (NullReferenceException)
+                                    {
+                                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                        await Task.Delay(3000);
+                                        continue;
+                                    }
+                                    catch (CancelCommandException)
+                                    {
+                                        continue;
+                                    }
 
                                     if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
                                     {

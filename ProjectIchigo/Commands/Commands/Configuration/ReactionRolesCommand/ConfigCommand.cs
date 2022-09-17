@@ -219,10 +219,20 @@ internal class ConfigCommand : BaseCommand
                             selectedRole = role;
                             continue;
                         }
+                        catch (NullReferenceException)
+                        {
+                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                            await Task.Delay(3000);
+                            continue;
+                        }
                         catch (ArgumentException)
                         {
                             ModifyToTimedOut(true);
                             return;
+                        }
+                        catch (CancelCommandException) 
+                        { 
+                            continue;
                         }
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)

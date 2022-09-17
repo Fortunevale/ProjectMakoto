@@ -699,6 +699,10 @@ internal class CustomEmbedCommand : BaseCommand
                             await Task.Delay(3000);
                             continue;
                         }
+                        catch (CancelCommandException)
+                        {
+                            continue;
+                        }
 
                         await channel.SendMessageAsync(GeneratedEmbed);
                         DeleteOrInvalidate();
