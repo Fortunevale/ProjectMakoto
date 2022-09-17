@@ -574,7 +574,8 @@ public abstract class BaseCommand
 
         _ = RefreshMessage();
 
-        int TimeoutSeconds = 60;
+        Stopwatch sw = new();
+        sw.Start();
 
         async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
         {
@@ -584,7 +585,7 @@ public abstract class BaseCommand
                 {
                     if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
-                        TimeoutSeconds = 60;
+                        sw.Restart();
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
@@ -627,10 +628,9 @@ public abstract class BaseCommand
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-        while (!FinishedSelection && TimeoutSeconds >= 0)
+        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
         {
-            await Task.Delay(1000);
-            TimeoutSeconds--;
+            await Task.Delay(100);
         }
 
         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
@@ -640,7 +640,7 @@ public abstract class BaseCommand
         if (Exceptionoccurred)
             throw exception;
 
-        if (TimeoutSeconds <= 0)
+        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
             throw new ArgumentException("No selection made");
 
         return Selection;
@@ -880,6 +880,7 @@ public abstract class BaseCommand
     {
         switch (ctx.CommandType)
         {
+            case Enums.CommandType.ContextMenu:
             case Enums.CommandType.ApplicationCommand:
                 _ = RespondOrEdit("✅ `Interaction ended.`");
                 _ = ctx.ResponseMessage.DeleteAsync();
