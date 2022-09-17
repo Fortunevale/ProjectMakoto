@@ -85,6 +85,11 @@ internal class TranslateCommand : BaseCommand
                 {
                     Source = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
                 }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
@@ -101,6 +106,11 @@ internal class TranslateCommand : BaseCommand
                 try
                 {
                     Target = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
+                }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
                 }
                 catch (ArgumentException)
                 {
@@ -164,6 +174,11 @@ internal class TranslateCommand : BaseCommand
                 {
                     Source = await PromptCustomSelection(TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Source Language..");
                 }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
@@ -180,6 +195,11 @@ internal class TranslateCommand : BaseCommand
                 try
                 {
                     Target = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Target Language..");
+                }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
                 }
                 catch (ArgumentException)
                 {

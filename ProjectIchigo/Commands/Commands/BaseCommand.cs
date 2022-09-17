@@ -538,22 +538,25 @@ public abstract class BaseCommand
 
     internal async Task<string> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..")
     {
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+
+        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+
         int currentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
-        string NextPageId = Guid.NewGuid().ToString();
-        string PrevPageId = Guid.NewGuid().ToString();
+        
 
         string Selection = null;
+
+        string Selected = "";
 
         bool FinishedSelection = false;
         bool Exceptionoccurred = false;
         Exception exception = null;
 
-        async Task Refresh()
+        async Task RefreshMessage()
         {
-            var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-            var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-
             var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
@@ -563,16 +566,19 @@ public abstract class BaseCommand
             if (currentPage != 0)
                 builder.AddComponents(previousPageButton);
 
+            builder.AddComponents(ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.CancelButton);
+
             await RespondOrEdit(builder);
         }
 
-        _ = Refresh();
+        _ = RefreshMessage();
 
         int TimeoutSeconds = 60;
 
         async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
@@ -583,22 +589,31 @@ public abstract class BaseCommand
 
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
+                            Selected = e.Values.First();
+                            options = options.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+
+                            await RefreshMessage();
+                        }
+                        else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
+                        {
                             ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                            Selection = e.Values.First();
+                            Selection = Selected;
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == PrevPageId)
+                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
                         {
                             currentPage--;
-                            await Refresh();
+                            await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == NextPageId)
+                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
                         {
                             currentPage++;
-                            await Refresh();
+                            await RefreshMessage();
                         }
+                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                            throw new CancelCommandException("Cancelled", null);
                     }
                 }
                 catch (Exception ex)
@@ -606,9 +621,8 @@ public abstract class BaseCommand
                     exception = ex;
                     Exceptionoccurred = true;
                     FinishedSelection = true;
-                    throw;
                 }
-            }).Add(ctx.Bot.watcher, ctx);
+            });
         }
 
         ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;

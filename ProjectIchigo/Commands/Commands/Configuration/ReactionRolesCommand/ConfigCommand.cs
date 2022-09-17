@@ -324,6 +324,11 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();

@@ -80,6 +80,11 @@ internal class ConfigCommand : BaseCommand
 
                     ChannelToRemove = Convert.ToUInt64(channel);
                 }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut(true);

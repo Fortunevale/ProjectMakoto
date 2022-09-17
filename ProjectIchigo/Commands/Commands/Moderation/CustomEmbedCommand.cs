@@ -613,6 +613,10 @@ internal class CustomEmbedCommand : BaseCommand
 
                             FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
                         }
+                        catch (CancelCommandException)
+                        {
+                            continue;
+                        }
                         catch (ArgumentException)
                         {
                             ModifyToTimedOut();
@@ -668,6 +672,10 @@ internal class CustomEmbedCommand : BaseCommand
                             var channel = await PromptCustomSelection(GeneratedEmbed.Fields.Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
                             FieldToRemove = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
+                        }
+                        catch (CancelCommandException)
+                        {
+                            continue;
                         }
                         catch (ArgumentException)
                         {

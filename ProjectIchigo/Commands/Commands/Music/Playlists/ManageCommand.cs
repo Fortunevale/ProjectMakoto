@@ -75,14 +75,15 @@ internal class ManageCommand : BaseCommand
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
                     return;
-                }
-                catch (Exception)
-                {
-                    throw;
                 }
 
                 embed = new DiscordEmbedBuilder
@@ -129,14 +130,15 @@ internal class ManageCommand : BaseCommand
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
                     return;
-                }
-                catch (Exception)
-                {
-                    throw;
                 }
 
                 string ShareCode = $"{Guid.NewGuid()}";
@@ -167,6 +169,11 @@ internal class ManageCommand : BaseCommand
                 {
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
                 }
                 catch (ArgumentException)
                 {
@@ -697,6 +704,11 @@ internal class ManageCommand : BaseCommand
                     string SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
+                catch (CancelCommandException)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
                 catch (ArgumentException)
                 {
                     ModifyToTimedOut();
@@ -721,6 +733,11 @@ internal class ManageCommand : BaseCommand
                 {
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
+                }
+                catch (CancelCommandException)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
                 }
                 catch (ArgumentException)
                 {
