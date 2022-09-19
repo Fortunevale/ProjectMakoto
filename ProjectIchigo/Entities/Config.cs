@@ -5,6 +5,8 @@ public class Config
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
+    public string SupportServerInvite = "";
+
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();
     public LavalinkConfig Lavalink = new();

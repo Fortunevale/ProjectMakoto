@@ -4,8 +4,6 @@ internal class Status
 {
     internal DateTime startupTime { get; set; } = DateTime.UtcNow;
 
-    internal string DevelopmentServerInvite = "";
-
     internal bool DiscordInitialized { get; set; } = false;
     internal bool DiscordCommandsRegistered { get; set; } = false;
     internal bool LavalinkInitialized { get; set; } = false;
@@ -17,4 +15,19 @@ internal class Status
     internal long DiscordDisconnections = 0;
 
     internal Config LoadedConfig { get; set; }
+
+    #region Legacy
+
+    internal string DevelopmentServerInvite
+    {
+        get
+        {
+            if (LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace())
+                return "Invite not set.";
+
+            return LoadedConfig.SupportServerInvite;
+        }
+    }
+
+    #endregion
 }
