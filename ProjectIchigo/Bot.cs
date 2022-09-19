@@ -133,6 +133,10 @@ public class Bot
                 {
                     DateTime lastModify = new();
 
+                    status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                    await Task.Delay(500);
+                    File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented));
+
                     while (true)
                     {
                         try
