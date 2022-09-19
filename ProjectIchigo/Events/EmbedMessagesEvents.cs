@@ -70,6 +70,9 @@ internal class EmbedMessagesEvents
                 if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseGithubEmbedding)
                     return;
 
+                if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot), true))
+                    return;
+
                 var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);
 
                 foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
