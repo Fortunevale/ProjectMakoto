@@ -13,6 +13,9 @@ internal class EmbedMessagesEvents
     {
         Task.Run(async () =>
         {
+            if (e.Guild is null)
+                return;
+
             var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
             if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
