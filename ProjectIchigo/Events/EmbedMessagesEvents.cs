@@ -18,49 +18,52 @@ internal class EmbedMessagesEvents
 
             var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
-            if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
+            do
             {
-                if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseEmbedding)
-                    return;
-
-                if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot)))
-                    return;
-
-                var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
-
-                foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
+                if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
                 {
-                    if (!b.Value.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
-                        continue;
+                    if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseEmbedding)
+                        break;
 
-                    if (GuildId != e.Guild.Id)
-                        return;
+                    if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot), true))
+                        break;
 
-                    if (!e.Guild.Channels.ContainsKey(ChannelId))
-                        return;
+                    var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
 
-                    var channel = e.Guild.GetChannel(ChannelId);
-                    var perms = channel.PermissionsFor(await e.Author.ConvertToMember(e.Guild));
-
-                    if (!perms.HasPermission(Permissions.AccessChannels) || !perms.HasPermission(Permissions.ReadMessageHistory))
-                        return;
-
-                    if (!channel.TryGetMessage(MessageId, out var message))
-                        return;
-
-                    var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    foreach (Match b in matches.GroupBy(x => x.Value).Select(y => y.FirstOrDefault()).Take(2))
                     {
-                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.UsernameWithDiscriminator} ({message.Author.Id})" },
-                        Color = message.Author.BannerColor ?? EmbedColors.Info,
-                        Description = $"[`Jump to message`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
-                        ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].FileName.EndsWith(".png")
-                                                                    || message.Attachments[0].FileName.EndsWith(".jpeg")
-                                                                    || message.Attachments[0].FileName.EndsWith(".jpg")
-                                                                    || message.Attachments[0].FileName.EndsWith(".gif")) ? message.Attachments[0].Url : ""),
-                        Timestamp = message.Timestamp,
-                    }).AddComponents(Delete));
-                }
-            }
+                        if (!b.Value.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
+                            continue;
+
+                        if (GuildId != e.Guild.Id)
+                            continue;
+
+                        if (!e.Guild.Channels.ContainsKey(ChannelId))
+                            continue;
+
+                        var channel = e.Guild.GetChannel(ChannelId);
+                        var perms = channel.PermissionsFor(await e.Author.ConvertToMember(e.Guild));
+
+                        if (!perms.HasPermission(Permissions.AccessChannels) || !perms.HasPermission(Permissions.ReadMessageHistory))
+                            continue;
+
+                        if (!channel.TryGetMessage(MessageId, out var message))
+                            continue;
+
+                        var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        {
+                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.UsernameWithDiscriminator} ({message.Author.Id})" },
+                            Color = message.Author.BannerColor ?? EmbedColors.Info,
+                            Description = $"[`Jump to message`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
+                            ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].FileName.EndsWith(".png")
+                                                                        || message.Attachments[0].FileName.EndsWith(".jpeg")
+                                                                        || message.Attachments[0].FileName.EndsWith(".jpg")
+                                                                        || message.Attachments[0].FileName.EndsWith(".gif")) ? message.Attachments[0].Url : ""),
+                            Timestamp = message.Timestamp,
+                        }).AddComponents(Delete));
+                    }
+                } 
+            } while (false);
 
             if (RegexTemplates.GitHubUrl.IsMatch(e.Message.Content))
             {
