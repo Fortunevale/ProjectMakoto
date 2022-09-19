@@ -1190,18 +1190,6 @@ public class Bot
                         }
                     }
                 }
-                else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
-                {
-                    status.DataReaderExceptions++;
-
-                    if (status.DataReaderExceptions >= 4)
-                    {
-                        _logger.LogFatal("4 or more DataReader Exceptions triggered, exiting..");
-
-                        _logger.LogRaised -= LogHandler;
-                        _ = ExitApplication();
-                    }
-                }
                 break;
             }
             default:

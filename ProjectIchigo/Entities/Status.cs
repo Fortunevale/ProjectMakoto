@@ -14,7 +14,6 @@ internal class Status
 
     internal List<ulong> TeamMembers { get; set; } = new();
 
-    internal long DataReaderExceptions = 0;
     internal long DiscordDisconnections = 0;
 
     internal Config LoadedConfig { get; set; }
