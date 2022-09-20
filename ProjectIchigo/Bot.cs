@@ -12,6 +12,7 @@ public class Bot
     internal DatabaseClient databaseClient { get; set; }
     internal ScoreSaberClient scoreSaberClient { get; set; }
     internal GoogleTranslateClient translationClient { get; set; }
+    internal AbuseIpDbClient abuseIpDbClient { get; set; }
 
     #endregion Clients
 
@@ -169,6 +170,8 @@ public class Bot
                     }
                 }).Add(watcher);
                 await Task.Delay(1000);
+
+                abuseIpDbClient = AbuseIpDbClient.Initialize(this);
 
                 _logger.LogInfo($"Connecting to database..");
 

@@ -24,6 +24,12 @@ internal class AbuseIpDbClient
     {
         HttpClient client = new();
 
+        while (_bot.status.LoadedConfig.Secrets.AbuseIpDbToken.IsNullOrWhiteSpace())
+        {
+            _logger.LogWarn($"No AbuseIpDbToken provided.");
+            await Task.Delay(5000);
+        }
+
         client.DefaultRequestHeaders.Add("Key", _bot.status.LoadedConfig.Secrets.AbuseIpDbToken);
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
