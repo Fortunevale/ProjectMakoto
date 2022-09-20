@@ -29,6 +29,21 @@ internal class AbuseIpDbClient
 
         while (true)
         {
+            while (RequestsRemaining <= 0)
+            {
+                var now = DateTimeOffset.UtcNow;
+                var tomorrow = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(1);
+
+                _logger.LogWarn($"Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..");
+                TimeSpan delay = tomorrow - DateTimeOffset.UtcNow;
+
+                if (delay > TimeSpan.Zero)
+                    await Task.Delay(delay);
+
+                _logger.LogInfo($"Ratelimit cleared for AbuseIPDB.");
+                RequestsRemaining = 1;
+            }
+
             if (Queue.Count == 0 || !Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
             {
                 await Task.Delay(100);
@@ -55,7 +70,10 @@ internal class AbuseIpDbClient
                         throw new Exceptions.ForbiddenException();
 
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
+                    {
+                        RequestsRemaining = 0;
                         throw new Exceptions.TooManyRequestsException();
+                    }
 
                     throw new Exception($"Unhandled, unsuccessful request: {response.StatusCode}");
                 }
@@ -100,7 +118,7 @@ internal class AbuseIpDbClient
         throw new Exception("This exception should be impossible to get.");
     }
 
-    public async Task<AbuseIpDbQuery> QueryIp(string Ip)
+    public async Task<AbuseIpDbQuery> QueryIp(string Ip, bool bypassCache = false)
     {
         string query;
 
@@ -114,7 +132,7 @@ internal class AbuseIpDbClient
             query = await content.ReadAsStringAsync();
         }
 
-        if (Cache.ContainsKey(Ip) && Cache[Ip].Item2.AddHours(4).GetTotalSecondsUntil() > 0)
+        if (Cache.ContainsKey(Ip) && Cache[Ip].Item2.AddHours(4).GetTotalSecondsUntil() > 0 && !bypassCache)
             return Cache[Ip].Item1;
         else if (Cache.ContainsKey(Ip))
             Cache.Remove(Ip);
