@@ -60,7 +60,7 @@ internal class AbuseIpDbClient
 
             try
             {
-                var response = await client.PostAsync(b.Value.Url, null);
+                var response = await client.GetAsync(b.Value.Url);
 
                 Queue[b.Key].StatusCode = response.StatusCode;
 
@@ -126,27 +126,32 @@ internal class AbuseIpDbClient
 
     public async Task<AbuseIpDbQuery> QueryIp(string Ip, bool bypassCache = false)
     {
-        string query;
-
-        using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    { "ipAddress", Ip },
-                    { "maxAgeInDays", "90" },
-                    { "verbose", "" },
-                }))
-        {
-            query = await content.ReadAsStringAsync();
-        }
+        while (Cache.ContainsKey(Ip) && Cache[Ip] is null)
+            await Task.Delay(100);
 
         if (Cache.ContainsKey(Ip) && Cache[Ip].Item2.AddHours(4).GetTotalSecondsUntil() > 0 && !bypassCache)
             return Cache[Ip].Item1;
         else if (Cache.ContainsKey(Ip))
             Cache.Remove(Ip);
 
+        Cache.Add(Ip, null);
+
+        string query;
+
+        using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    { "ipAddress", Ip },
+                    { "maxAgeInDays", "90" },
+                    { "verbose", "true" },
+                }))
+        {
+            query = await content.ReadAsStringAsync();
+        }
+
         var rawResponse = await MakeRequest($"https://api.abuseipdb.com/api/v2/check?{query}");
         var parsedResponse = JsonConvert.DeserializeObject<AbuseIpDbQuery>(rawResponse);
 
-        Cache.Add(Ip, new Tuple<AbuseIpDbQuery, DateTime>(parsedResponse, DateTime.UtcNow));
+        Cache[Ip] = new Tuple<AbuseIpDbQuery, DateTime>(parsedResponse, DateTime.UtcNow);
         return parsedResponse;
     }
 }

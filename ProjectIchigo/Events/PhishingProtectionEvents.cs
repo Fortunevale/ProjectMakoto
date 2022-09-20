@@ -38,15 +38,48 @@ internal class PhishingProtectionEvents
         if (!_bot.guilds[guild.Id].PhishingDetectionSettings.DetectPhishing)
             return;
 
-        DiscordMember member;
+        DiscordMember member = await guild.GetMemberAsync(e.Author.Id);
 
-        try
+        async void CheckDb(Uri uri)
         {
-            member = await guild.GetMemberAsync(e.Author.Id);
-        }
-        catch (Exception)
-        {
-            throw;
+            var task = Dns.GetHostAddressesAsync(uri.Host);
+
+            try
+            {
+                task.Wait();
+            }
+            catch { }
+            
+            if (task.IsFaulted || task.Result.Length <= 0)
+                return;
+
+            var parsedIp = task.Result;
+
+            var query = await _bot.abuseIpDbClient.QueryIp(parsedIp[0].ToString());
+
+            if (query.data.abuseConfidenceScore.HasValue && query.data.abuseConfidenceScore.Value > 60)
+            {
+                var report_fields = query.data.reports.Select(x => new DiscordEmbedField($"{x.reporterCountryCode.IsoCountryCodeToFlagEmoji()} {x.reporterId}{(x.reportedAt.HasValue ? $" {x.reportedAt.Value.ToTimestamp()}" : "")}", x.comment.Sanitize().TruncateWithIndication(1000))).ToList();
+
+                DiscordEmbedBuilder embed = new()
+                {
+                    Title = "AbuseIPDB Report",
+                    Description = $"**`{uri.Host} ({parsedIp[0]})` was found in AbuseIPDB.**\n" +
+                                $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**Confidence of Abuse**: {query.data.abuseConfidenceScore}%\n\n")}" +
+                                $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**Country**: {query.data.countryCode.IsoCountryCodeToFlagEmoji()} {query.data.countryName}\n")}" +
+                                $"{(query.data.isp.IsNullOrWhiteSpace() ? "" : $"**ISP**: {query.data.isp}\n")}" +
+                                $"{(query.data.domain.IsNullOrWhiteSpace() ? "" : $"**Domain Name**: {query.data.domain}\n")}",
+                    Color = EmbedColors.Error,
+                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                    {
+                        Url = Resources.AbuseIpDbIcon
+                    },
+                };
+
+                embed.AddFields(report_fields.Take(2));
+
+                _ = e.RespondAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordLinkButtonComponent($"https://www.abuseipdb.com/check/{parsedIp[0]}", "Open in Browser")));
+            }
         }
 
         var matches = RegexTemplates.Url.Matches(e.Content);
@@ -79,6 +112,11 @@ internal class PhishingProtectionEvents
             }
         }
 
+        foreach (var match in parsedMatches)
+        {
+            CheckDb(match.Uri);
+        }
+
         foreach (var url in _bot.phishingUrls)
         {
             foreach (var match in parsedMatches)
@@ -102,6 +140,8 @@ internal class PhishingProtectionEvents
                     var unshortened_url = await UnshortenUrl(match.Value);
                     var parsedUri = new UriBuilder(unshortened_url);
 
+                    CheckDb(parsedUri.Uri);
+
                     if (unshortened_url != match.Value)
                     {
                         foreach (var url in _bot.phishingUrls)
@@ -117,17 +157,23 @@ internal class PhishingProtectionEvents
                             redirectUrls.Add(match.Value, unshortened_url);
                     }
                 }
-                catch (HttpRequestException ex)
+                catch (TimeoutException)
                 {
-                    if (ex.Message.Contains("Cannot write more bytes"))
-                    {
-                        if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
-                            _ = e.RespondAsync(embed: new DiscordEmbedBuilder
-                            {
-                                Title = $":no_entry: Couldn't check this link for malicious redirects. Please proceed with caution.",
-                                Color = EmbedColors.Error
-                            });
-                    }
+                    if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
+                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                        {
+                            Title = $":no_entry: Couldn't check this link for malicious redirects, the request timed out.",
+                            Color = EmbedColors.Error
+                        });
+                }
+                catch (HttpRequestException ex) when (ex.Message.Contains("Cannot write more bytes"))
+                {
+                    if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
+                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                        {
+                            Title = $":no_entry: Couldn't check this link for malicious redirects. Please proceed with caution.",
+                            Color = EmbedColors.Error
+                        });
                 }
                 catch (Exception ex)
                 {

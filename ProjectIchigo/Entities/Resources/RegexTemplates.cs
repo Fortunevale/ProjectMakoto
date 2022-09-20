@@ -14,4 +14,5 @@ internal class RegexTemplates
     public static readonly Regex Token = new(@"(mfa\.[a-z0-9_-]{20,})|((?<botid>[a-z0-9_-]{23,28})\.(?<creation>[a-z0-9_-]{6,7})\.(?<enc>[a-z0-9_-]{27,}))", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public static readonly Regex GitHubUrl = new(@"https:\/\/github\.com\/([^ \/]*)\/([^ \/]*)(\/blob\/([^ \/]*))?\/([^ #]*)#(L\d*)(-(L\d*))?", RegexOptions.IgnoreCase);
+    public static readonly Regex Ip = new(@"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$");
 }
