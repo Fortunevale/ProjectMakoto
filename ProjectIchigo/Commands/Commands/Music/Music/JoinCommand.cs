@@ -47,7 +47,7 @@ internal class JoinCommand : BaseCommand
                     Description = $"`The bot is already in use.`",
                 }.SetError(ctx));
 
-                throw new CancelException("", null);
+                throw new CancelException();
             }
 
             if (ctx.Member.VoiceState.Channel.Id != conn.Channel.Id)

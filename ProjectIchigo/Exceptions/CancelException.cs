@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ProjectIchigo.Exceptions;
 internal class CancelException : Exception
 {
-    public CancelException(string message) : base(message)
+    public CancelException(string message = null) : base(message)
     {
     }
 }

@@ -338,7 +338,7 @@ public abstract class BaseCommand
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
-                            throw new CancelException("Cancelled", null);
+                            throw new CancelException();
                     }
                 }
                 catch (Exception ex)
@@ -505,7 +505,7 @@ public abstract class BaseCommand
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
-                            throw new CancelException("Cancelled", null);
+                            throw new CancelException();
                     }
                 }
                 catch (Exception ex)
@@ -614,7 +614,7 @@ public abstract class BaseCommand
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
-                            throw new CancelException("Cancelled", null);
+                            throw new CancelException();
                     }
                 }
                 catch (Exception ex)
@@ -733,7 +733,7 @@ public abstract class BaseCommand
             throw new ArgumentException("Modal not submitted");
 
         if (Cancelled)
-            throw new CancelException("", null);
+            throw new CancelException();
 
         return FinishedInteraction;
     }
