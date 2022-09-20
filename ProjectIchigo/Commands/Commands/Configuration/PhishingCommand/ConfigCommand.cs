@@ -111,7 +111,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     Response = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -143,7 +143,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength, false);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

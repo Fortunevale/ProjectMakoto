@@ -11,7 +11,7 @@ public class Bot
 
     internal DatabaseClient databaseClient { get; set; }
     internal ScoreSaberClient scoreSaberClient { get; set; }
-    internal TranslationClient translationClient { get; set; }
+    internal GoogleTranslateClient translationClient { get; set; }
 
     #endregion Clients
 
@@ -107,7 +107,7 @@ public class Bot
         }
 
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
-        translationClient = TranslationClient.Initialize();
+        translationClient = GoogleTranslateClient.Initialize();
 
         _logger.LogDebug($"Environment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +

@@ -75,7 +75,7 @@ internal class ManageCommand : BaseCommand
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -96,7 +96,7 @@ internal class ManageCommand : BaseCommand
                 {
                     await new Commands.Music.JoinCommand().ExecuteCommand(ctx, null);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     return;
                 }
@@ -130,7 +130,7 @@ internal class ManageCommand : BaseCommand
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -170,7 +170,7 @@ internal class ManageCommand : BaseCommand
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -265,7 +265,7 @@ internal class ManageCommand : BaseCommand
                                 Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                             }.SetAwaitingInput(ctx, "Playlists"), false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -289,7 +289,7 @@ internal class ManageCommand : BaseCommand
                         {
                             Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -422,7 +422,7 @@ internal class ManageCommand : BaseCommand
                                 Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                             }.SetAwaitingInput(ctx, "Playlists"), false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -520,7 +520,7 @@ internal class ManageCommand : BaseCommand
                     {
                         Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
                     }
-                    catch (CancelCommandException)
+                    catch (CancelException)
                     {
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -704,7 +704,7 @@ internal class ManageCommand : BaseCommand
                     string SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -734,7 +734,7 @@ internal class ManageCommand : BaseCommand
                     SelectedPlaylistId = await PromptCustomSelection(Playlists);
                     SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -888,7 +888,7 @@ internal class ManageCommand : BaseCommand
                                     {
                                         Response = await PromptModalWithRetry(e.Interaction, modal, false);
                                     }
-                                    catch (CancelCommandException)
+                                    catch (CancelException)
                                     {
                                         await UpdateMessage();
                                         break;
@@ -1009,7 +1009,7 @@ internal class ManageCommand : BaseCommand
                                             Description = $"`What color should this playlist be? (e.g. #FF0000)` [`Need help with hex color codes?`](https://g.co/kgs/jDHPp6)",
                                         }.SetAwaitingInput(ctx, "Playlists"), false);
                                     }
-                                    catch (CancelCommandException)
+                                    catch (CancelException)
                                     {
                                         await UpdateMessage();
                                         break;
@@ -1039,7 +1039,7 @@ internal class ManageCommand : BaseCommand
                                             Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                                         }.SetAwaitingInput(ctx, "Playlists"), false);
                                     }
-                                    catch (CancelCommandException)
+                                    catch (CancelException)
                                     {
                                         await UpdateMessage();
                                         break;

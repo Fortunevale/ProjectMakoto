@@ -102,7 +102,7 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -122,7 +122,7 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

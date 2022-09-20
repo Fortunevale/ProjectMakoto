@@ -50,7 +50,7 @@ internal class CommandEvents
                     });
                 }).Add(_bot.watcher);
             }
-            else if (e.Exception.GetType() == typeof(CancelCommandException))
+            else if (e.Exception.GetType() == typeof(CancelException))
             {
                 return;
             }

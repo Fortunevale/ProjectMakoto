@@ -85,7 +85,7 @@ internal class TranslateCommand : BaseCommand
                 {
                     Source = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -107,7 +107,7 @@ internal class TranslateCommand : BaseCommand
                 {
                     Target = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -174,7 +174,7 @@ internal class TranslateCommand : BaseCommand
                 {
                     Source = await PromptCustomSelection(TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Source Language..");
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -196,7 +196,7 @@ internal class TranslateCommand : BaseCommand
                 {
                     Target = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Target Language..");
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;

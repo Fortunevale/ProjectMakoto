@@ -29,7 +29,7 @@ internal class PlayCommand : BaseCommand
             {
                 await new JoinCommand().ExecuteCommand(ctx, null);
             }
-            catch (CancelCommandException)
+            catch (CancelException)
             {
                 return;
             }

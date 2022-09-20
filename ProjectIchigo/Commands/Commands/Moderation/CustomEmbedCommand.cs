@@ -66,7 +66,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -123,7 +123,7 @@ internal class CustomEmbedCommand : BaseCommand
                             {
                                 Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
                             }
-                            catch (CancelCommandException)
+                            catch (CancelException)
                             {
                                 continue;
                             }
@@ -147,7 +147,7 @@ internal class CustomEmbedCommand : BaseCommand
                             {
                                 Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
                             }
-                            catch (CancelCommandException)
+                            catch (CancelException)
                             {
                                 continue;
                             }
@@ -219,7 +219,7 @@ internal class CustomEmbedCommand : BaseCommand
                             {
                                 Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
                             }
-                            catch (CancelCommandException)
+                            catch (CancelException)
                             {
                                 continue;
                             }
@@ -316,7 +316,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -382,7 +382,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -431,7 +431,7 @@ internal class CustomEmbedCommand : BaseCommand
                             {
                                 Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
                             }
-                            catch (CancelCommandException)
+                            catch (CancelException)
                             {
                                 continue;
                             }
@@ -497,7 +497,7 @@ internal class CustomEmbedCommand : BaseCommand
                             {
                                 Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
                             }
-                            catch (CancelCommandException)
+                            catch (CancelException)
                             {
                                 continue;
                             }
@@ -546,7 +546,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             Response = await PromptModalForDateTime(Menu1.Result.Interaction, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -576,7 +576,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -613,7 +613,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                             FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -634,7 +634,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, null, false, null, false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -673,7 +673,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                             FieldToRemove = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -707,7 +707,7 @@ internal class CustomEmbedCommand : BaseCommand
                             await Task.Delay(3000);
                             continue;
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }

@@ -77,7 +77,7 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

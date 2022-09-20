@@ -122,7 +122,7 @@ internal class MusicModuleAbstractions
             {
                 SelectedUri = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
             }
-            catch (CancelCommandException)
+            catch (CancelException)
             {
                 return (null, loadResult, false);
             }

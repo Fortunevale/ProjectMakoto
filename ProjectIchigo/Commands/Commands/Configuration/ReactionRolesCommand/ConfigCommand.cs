@@ -100,7 +100,7 @@ internal class ConfigCommand : BaseCommand
                                 ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
                             }.SetAwaitingInput(ctx, "Reaction Roles"), false);
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             continue;
                         }
@@ -230,7 +230,7 @@ internal class ConfigCommand : BaseCommand
                             ModifyToTimedOut(true);
                             return;
                         }
-                        catch (CancelCommandException) 
+                        catch (CancelException) 
                         { 
                             continue;
                         }
@@ -324,7 +324,7 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

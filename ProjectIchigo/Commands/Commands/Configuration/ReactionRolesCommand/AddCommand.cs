@@ -84,7 +84,7 @@ internal class AddCommand : BaseCommand
                             await ExecuteCommand(ctx, arguments);
                             return;
                         }
-                        catch (CancelCommandException)
+                        catch (CancelException)
                         {
                             DeleteOrInvalidate();
                             return;

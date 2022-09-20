@@ -50,7 +50,7 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -80,7 +80,7 @@ internal class ConfigCommand : BaseCommand
 
                     ChannelToRemove = Convert.ToUInt64(channel);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
