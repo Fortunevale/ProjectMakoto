@@ -82,6 +82,7 @@ public class Config
     public class SecretsConfig
     {
         public string KawaiiRedToken = "";
+        public string AbuseIpDbToken = "";
         public string LibreTranslateHost = "127.0.0.1";
 
         public GithubSecrets Github = new();
