@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Commands;
 
-internal class UrlSubmitCommand : BaseCommand
+internal class ReportHostCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -11,7 +11,7 @@ internal class UrlSubmitCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            int tos_version = 2;
+            int tos_version = 3;
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != tos_version)
             {
@@ -19,20 +19,19 @@ internal class UrlSubmitCommand : BaseCommand
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Description = $"{1.ToEmotes()}. You may not submit URLs that are non-malicious.\n" +
+                    Description = $"{1.ToEmotes()}. You may not submit Hosts that are non-malicious.\n" +
                                   $"{2.ToEmotes()}. You may not spam submissions.\n" +
-                                  $"{3.ToEmotes()}. You may not submit unregistered domains.\n" +
-                                  $"{4.ToEmotes()}. You may not submit shortened URLs.\n" +
-                                  $"{5.ToEmotes()}. You accept that your user account and current server will be tracked and visible to verifiers.\n\n" +
+                                  $"{3.ToEmotes()}. You may not submit unregistered hosts.\n" +
+                                  $"{4.ToEmotes()}. You accept that your user account and current server will be tracked and visible to Ichigo staff.\n\n" +
                                   $"We reserve the right to ban you for any reason that may not be listed.\n" +
                                   $"**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n" +
                                   $"**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**\n\n" +
-                                  $"To accept these conditions, please click the button below. If you do not see a button to interact with, update your discord client."
-                }.SetAwaitingInput(ctx, "Phishing Link Submission");
+                                  $"To accept these conditions, please click the button below. If you do not see a button, update your discord client."
+                }.SetAwaitingInput(ctx, "Malicious Host Submissions");
 
                 if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != 0 && ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS < tos_version)
                 {
-                    tos_embed.Description = tos_embed.Description.Insert(0, "The submission conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.\n\n");
+                    tos_embed.Description = tos_embed.Description.Insert(0, "**The submission conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.**\n\n");
                 }
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed).AddComponents(button));
@@ -50,7 +49,7 @@ internal class UrlSubmitCommand : BaseCommand
                 ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS = tos_version;
 
                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.SetSuccess(ctx, "Phishing Link Submission").WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.SetSuccess(ctx, "Malicious Host Submissions").WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
 
                 await Task.Delay(2000);
             }
@@ -58,62 +57,60 @@ internal class UrlSubmitCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Processing your request..`"
-            }.SetLoading(ctx, "Phishing Link Submission");
+            }.SetLoading(ctx, "Malicious Host Submissions");
 
             await RespondOrEdit(embed);
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                embed.Description = $"`You cannot submit a domain for the next {ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
+                embed.Description = $"`You cannot submit a host for the next {ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
+                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
             if (ctx.Bot.submittedUrls.Any(x => x.Value.Submitter == ctx.User.Id) && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                if (ctx.Bot.submittedUrls.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 10)
+                if (ctx.Bot.submittedUrls.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
                 {
-                    embed.Description = $"`You have 10 open url submissions. Please wait before trying to submit another url.`";
-                    _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
+                    embed.Description = $"`You have 5 open host submissions. Please wait before trying to submit another host.`";
+                    _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
                     return;
                 }
             }
 
             if (ctx.Bot.phishingUrlSubmissionUserBans.ContainsKey(ctx.User.Id))
             {
-                embed.Description = $"`You are banned from submitting URLs.`\n" +
+                embed.Description = $"`You are banned from submitting hosts.`\n" +
                                     $"`Reason: {ctx.Bot.phishingUrlSubmissionUserBans[ctx.User.Id].Reason}`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
+                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
             if (ctx.Bot.phishingUrlSubmissionGuildBans.ContainsKey(ctx.Guild.Id))
             {
-                embed.Description = $"`This guild is banned from submitting URLs.`\n" +
+                embed.Description = $"`This guild is banned from submitting hosts.`\n" +
                                     $"`Reason: {ctx.Bot.phishingUrlSubmissionGuildBans[ctx.Guild.Id].Reason}`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
+                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
-            string domain = url.ToLower();
+            string host;
 
-            if (domain.StartsWith("https://") || domain.StartsWith("http://"))
-                domain = domain.Replace("https://", "").Replace("http://", "");
-
-            if (domain.Contains('/'))
-                domain = domain.Remove(domain.IndexOf("/"), domain.Length - domain.IndexOf("/"));
-
-            if (!domain.Contains('.') || domain.Contains(' '))
+            try
             {
-                embed.Description = $"`The domain ('{domain.SanitizeForCode()}') you're trying to submit is invalid.`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Phishing Link Submission"));
+                host = new UriBuilder(url).Host;
+            }
+            catch (Exception)
+            {
+                embed.Description = $"`The host ('{url.SanitizeForCode()}') you're trying to submit is invalid.`";
+                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
-            embed.Description = $"`You are about to submit the domain '{domain.SanitizeForCode()}'. Do you want to proceed?`";
-            embed.SetAwaitingInput(ctx, "Phishing Link Submission");
+            embed.Description = $"`You are about to submit the host '{host.SanitizeForCode()}'. Do you want to proceed?`";
+            embed.SetAwaitingInput(ctx, "Malicious Host Submissions");
 
-            var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit domain", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+            var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit host", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
             {
@@ -133,33 +130,33 @@ internal class UrlSubmitCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == ContinueButton.CustomId)
             {
-                embed.Description = $"`Submitting your domain..`";
-                embed.SetLoading(ctx, "Phishing Link Submission");
+                embed.Description = $"`Submitting your host..`";
+                embed.SetLoading(ctx, "Malicious Host Submissions");
                 await RespondOrEdit(embed);
 
-                embed.Description = $"`Checking if your domain is already in the database..`";
+                embed.Description = $"`Checking if your host is already in the database..`";
                 await RespondOrEdit(embed);
 
                 foreach (var b in ctx.Bot.phishingUrls)
                 {
-                    if (domain.Contains(b.Key))
+                    if (host.Contains(b.Key))
                     {
-                        embed.Description = $"`The domain ('{domain.SanitizeForCode()}') is already present in the database. Thanks for trying to contribute regardless.`";
-                        embed.SetError(ctx, "Phishing Link Submission");
+                        embed.Description = $"`The host ('{host.SanitizeForCode()}') is already present in the database. Thanks for trying to contribute regardless.`";
+                        embed.SetError(ctx, "Malicious Host Submissions");
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
                 }
 
-                embed.Description = $"`Checking if your domain has already been submitted before..`";
+                embed.Description = $"`Checking if your host has already been submitted before..`";
                 await RespondOrEdit(embed);
 
                 foreach (var b in ctx.Bot.submittedUrls)
                 {
-                    if (b.Value.Url == domain)
+                    if (b.Value.Url == host)
                     {
-                        embed.Description = $"`The domain ('{domain.SanitizeForCode()}') has already been submitted. Thanks for trying to contribute regardless.`";
-                        embed.SetError(ctx, "Phishing Link Submission");
+                        embed.Description = $"`The host ('{host.SanitizeForCode()}') has already been submitted. Thanks for trying to contribute regardless.`";
+                        embed.SetError(ctx, "Malicious Host Submissions");
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
@@ -177,10 +174,10 @@ internal class UrlSubmitCommand : BaseCommand
 
                 var subbmited_msg = await channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = $"Phishing Link Submission" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = StatusIndicatorIcons.Success, Name = $"Malicious Host Submissions" },
                     Color = EmbedColors.Success,
                     Timestamp = DateTime.UtcNow,
-                    Description = $"`Submitted Url`: `{domain.SanitizeForCode()}`\n" +
+                    Description = $"`Submitted host`: `{host.SanitizeForCode()}`\n" +
                                     $"`Submission by`: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
                                     $"`Submitted on `: `{ctx.Guild.Name} ({ctx.Guild.Id})`"
                 })
@@ -194,7 +191,7 @@ internal class UrlSubmitCommand : BaseCommand
 
                 ctx.Bot.submittedUrls.Add(subbmited_msg.Id, new SubmittedUrlEntry
                 {
-                    Url = domain,
+                    Url = host,
                     Submitter = ctx.User.Id,
                     GuildOrigin = ctx.Guild.Id
                 });
@@ -202,7 +199,7 @@ internal class UrlSubmitCommand : BaseCommand
                 ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                 embed.Description = $"`Submission created. Thanks for your contribution.`";
-                embed.SetSuccess(ctx, "Phishing Link Submission");
+                embed.SetSuccess(ctx, "Malicious Host Submissions");
                 await RespondOrEdit(embed);
             }
             else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
