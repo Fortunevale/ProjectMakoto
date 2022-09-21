@@ -62,7 +62,7 @@ internal class PhishingProtectionEvents
 
             if (query.data.abuseConfidenceScore.HasValue && query.data.abuseConfidenceScore.Value > 60)
             {
-                var report_fields = query.data.reports.Select(x => new DiscordEmbedField($"{x.reporterCountryCode.IsoCountryCodeToFlagEmoji()} {x.reporterId}{(x.reportedAt.HasValue ? $" {x.reportedAt.Value.ToTimestamp()}" : "")}", x.comment.Sanitize().TruncateWithIndication(1000))).ToList();
+                var report_fields = query.data.reports.Select(x => new DiscordEmbedField($"{x.reporterCountryCode.IsoCountryCodeToFlagEmoji()} {x.reporterId}{(x.reportedAt.HasValue ? $" {x.reportedAt.Value.ToTimestamp()}" : "")}", (x.comment.IsNullOrWhiteSpace() ? "No comment provided." : x.comment).Sanitize().TruncateWithIndication(1000))).ToList();
 
                 DiscordEmbedBuilder embed = new()
                 {
@@ -169,14 +169,15 @@ internal class PhishingProtectionEvents
                             Color = EmbedColors.Error
                         });
                 }
-                catch (HttpRequestException ex) when (ex.Message.Contains("Cannot write more bytes"))
+                catch (HttpRequestException ex)
                 {
-                    if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
-                        _ = e.RespondAsync(embed: new DiscordEmbedBuilder
-                        {
-                            Title = $":no_entry: Couldn't check this link for malicious redirects. Please proceed with caution.",
-                            Color = EmbedColors.Error
-                        });
+                    if (ex.Message.Contains("Cannot write more bytes"))
+                        if (_bot.guilds[guild.Id].PhishingDetectionSettings.WarnOnRedirect)
+                            _ = e.RespondAsync(embed: new DiscordEmbedBuilder
+                            {
+                                Title = $":no_entry: Couldn't check this link for malicious redirects. Please proceed with caution.",
+                                Color = EmbedColors.Error
+                            });
                 }
                 catch (Exception ex)
                 {
