@@ -72,6 +72,7 @@ public class Config
 
         public ulong YouTubeId = 1011219477834252368;
         public ulong SoundCloudId = 1011219476001337444;
+        public ulong AbuseIPDBId = 1022142812659126334;
     }
 
     public class AccountIdsConfig

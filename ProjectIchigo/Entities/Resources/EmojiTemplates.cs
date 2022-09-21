@@ -20,4 +20,5 @@ internal class EmojiTemplates
 
     public static DiscordEmoji GetYouTube(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.Emojis.YouTubeId);
     public static DiscordEmoji GetSoundcloud(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.Emojis.SoundCloudId);
+    public static DiscordEmoji GetAbuseIpDb(DiscordClient client, Bot bot) => DiscordEmoji.FromGuildEmote(client, bot.status.LoadedConfig.Emojis.AbuseIPDBId);
 }

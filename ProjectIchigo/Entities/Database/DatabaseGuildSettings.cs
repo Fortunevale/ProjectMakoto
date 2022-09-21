@@ -28,6 +28,7 @@ public class DatabaseGuildSettings
     public bool tokens_detect { get; set; }
     public bool phishing_detect { get; set; }
     public bool phishing_warnonredirect { get; set; }
+    public bool phishing_abuseipdb { get; set; }
     public int phishing_type { get; set; }
     public string phishing_reason { get; set; }
     public long phishing_time { get; set; }

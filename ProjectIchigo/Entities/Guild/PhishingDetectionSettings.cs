@@ -33,6 +33,17 @@ public class PhishingDetectionSettings
             _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "phishing_warnonredirect", value, Bot.DatabaseClient.mainDatabaseConnection);
         } 
     }
+    
+    private bool _AbuseIpDbReports { get; set; } = false;
+    public bool AbuseIpDbReports
+    { 
+        get => _AbuseIpDbReports; 
+        set 
+        {
+            _AbuseIpDbReports = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "phishing_abuseipdb", value, Bot.DatabaseClient.mainDatabaseConnection);
+        } 
+    }
 
 
     private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.KICK;

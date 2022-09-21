@@ -42,6 +42,9 @@ internal class PhishingProtectionEvents
 
         async void CheckDb(Uri uri)
         {
+            if (!_bot.guilds[guild.Id].PhishingDetectionSettings.AbuseIpDbReports)
+                return;
+
             var task = Dns.GetHostAddressesAsync(uri.Host);
 
             try

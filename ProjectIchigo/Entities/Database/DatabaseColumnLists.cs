@@ -93,6 +93,7 @@ internal class DatabaseColumnLists
         new Column("tokens_detect", "tinyint(1)", Default: "1"),
         new Column("phishing_detect", "tinyint(1)", Default: "1"),
         new Column("phishing_warnonredirect", "tinyint(1)", Default: "0"),
+        new Column("phishing_abuseipdb", "tinyint(1)", Default: "0"),
         new Column("phishing_type", "int"),
         new Column("phishing_reason", "text", "utf8mb4_0900_ai_ci"),
         new Column("phishing_time", "bigint"),

@@ -45,6 +45,7 @@ internal class DatabaseInit
             {
                 DetectPhishing = b.phishing_detect,
                 WarnOnRedirect = b.phishing_warnonredirect,
+                AbuseIpDbReports = b.phishing_abuseipdb,
                 PunishmentType = (PhishingPunishmentType)b.phishing_type,
                 CustomPunishmentReason = b.phishing_reason,
                 CustomPunishmentLength = TimeSpan.FromSeconds(b.phishing_time)
