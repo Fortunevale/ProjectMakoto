@@ -82,6 +82,12 @@
     <None Update="Assets\ASCII.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\Countries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Languages.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="GraphTemplate.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

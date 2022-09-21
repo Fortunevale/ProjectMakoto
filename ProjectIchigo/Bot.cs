@@ -127,6 +127,43 @@ public class Bot
         {
             try
             {
+                countryCodes = new();
+                List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Countries.json"));
+                foreach (var b in cc)
+                {
+                    countryCodes.List.Add(b[2], new CountryCodes.CountryInfo
+                    {
+                        Name = b[0],
+                        ContinentCode = b[1],
+                        ContinentName = b[1].ToLower() switch
+                        {
+                            "af" => "Africa",
+                            "an" => "Antarctica",
+                            "as" => "Asia",
+                            "eu" => "Europe",
+                            "na" => "North America",
+                            "oc" => "Oceania",
+                            "sa" => "South America",
+                            _ => "Invalid Continent"
+                        }
+                    });
+                }
+
+                _logger.LogDebug($"Loaded {countryCodes.List.Count} countries");
+
+
+                languageCodes = new();
+                List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
+                foreach (var b in lc)
+                {
+                    languageCodes.List.Add(new LanguageCodes.LanguageInfo
+                    {
+                        Code = b[0],
+                        Name = b[1],
+                    });
+                }
+                _logger.LogDebug($"Loaded {languageCodes.List.Count} languages");
+
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
 
@@ -183,7 +220,6 @@ public class Bot
 
                 DatabaseInit _databaseInit = new(this);
 
-                await _databaseInit.UpdateCountryCodes();
                 await _databaseInit.LoadValuesFromDatabase();
 
                 _ = Task.Run(async () =>
