@@ -95,6 +95,33 @@ internal class DatabaseQueue
                         if (ex.Message.ToLower().Contains("open datareader"))
                             continue;
 
+                        try
+                        {
+                            if (ex.Message.ToLower().Contains("connection must be valid and open."))
+                            {
+                                _logger.LogWarn($"Connection with Database broken, attempting to reconnect..");
+
+                                switch (b.RequestType)
+                                {
+                                    case DatabaseRequestType.Command:
+                                    {
+                                        b.Command.Connection.Open();
+                                        break;
+                                    }
+                                    case DatabaseRequestType.Ping:
+                                    {
+                                        b.Connection.Open();
+                                        break;
+                                    }
+                                }
+                                continue;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            _logger.LogFatal($"Connection with Database broken, reconnecting failed.");
+                        }
+
                         b.Failed = true;
                         b.Exception = ex;
                     }
