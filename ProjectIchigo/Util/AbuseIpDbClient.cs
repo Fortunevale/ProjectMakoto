@@ -78,13 +78,15 @@ internal class AbuseIpDbClient
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         RequestsRemaining = 0;
-                        throw new Exceptions.TooManyRequestsException();
+                        _logger.LogError($"Daily Ratelimit hit for AbuseIPDB.");
+                        continue;
                     }
 
                     throw new Exception($"Unhandled, unsuccessful request: {response.StatusCode}");
                 }
 
                 RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
+                _logger.LogDebug($"{RequestsRemaining} AbuseIPDB requests remaining.");
 
                 Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
                 Queue[b.Key].Resolved = true;
