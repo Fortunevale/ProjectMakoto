@@ -62,7 +62,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting), false);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -110,7 +110,7 @@ internal class ConfigCommand : BaseCommand
                     ModifyToTimedOut();
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -173,7 +173,7 @@ internal class ConfigCommand : BaseCommand
 
                     ChannelToRemove = Convert.ToUInt64(channel);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

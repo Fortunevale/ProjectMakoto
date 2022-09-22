@@ -63,12 +63,12 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
     
-    [SlashCommand("submit-url", "Allows you to contribute a new malicious domain to our database.", dmPermission: false)]
-    public async Task UrlSubmit(InteractionContext ctx, [Option("url", "The url")] string url)
+    [SlashCommand("report-host", "Allows you to contribute a new malicious host to our database.", dmPermission: false)]
+    public async Task ReportHost(InteractionContext ctx, [Option("url", "The host")] string url)
     {
         Task.Run(async () =>
         {
-            await new UrlSubmitCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            await new ReportHostCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "url", url }
             });

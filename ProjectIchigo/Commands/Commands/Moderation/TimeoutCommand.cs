@@ -16,7 +16,7 @@ internal class TimeoutCommand : BaseCommand
             {
                 victim = await ((DiscordUser)arguments["victim"]).ConvertToMember(ctx.Guild);
             }
-            catch (NotFoundException)
+            catch (DisCatSharp.Exceptions.NotFoundException)
             {
                 SendNoMemberError();
                 throw;

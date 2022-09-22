@@ -182,14 +182,14 @@ public class UtilityPrefixCommands : BaseCommandModule
 
 
 
-    [Command("submit-url"),
+    [Command("report-host"),
     CommandModule("utility"),
-    Description("Allows you to contribute a new malicious domain to our database.")]
-    public async Task UrlSubmit(CommandContext ctx, [Description("URL")] string url)
+    Description("Allows you to contribute a new malicious host to our database.")]
+    public async Task ReportHost(CommandContext ctx, [Description("Host")] string url)
     {
         Task.Run(async () =>
         {
-            await new UrlSubmitCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            await new ReportHostCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "url", url }
             });

@@ -70,7 +70,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     role = await PromptRoleSelection(new() { CreateRoleOption = "BumpReminder" });
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     DeleteOrInvalidate();
                     return;
@@ -138,7 +138,7 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -166,7 +166,7 @@ internal class ConfigCommand : BaseCommand
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

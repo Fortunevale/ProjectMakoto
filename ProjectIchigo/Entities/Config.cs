@@ -5,6 +5,8 @@ public class Config
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
+    public string SupportServerInvite = "";
+
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();
     public LavalinkConfig Lavalink = new();
@@ -70,6 +72,7 @@ public class Config
 
         public ulong YouTubeId = 1011219477834252368;
         public ulong SoundCloudId = 1011219476001337444;
+        public ulong AbuseIPDBId = 1022142812659126334;
     }
 
     public class AccountIdsConfig
@@ -80,6 +83,7 @@ public class Config
     public class SecretsConfig
     {
         public string KawaiiRedToken = "";
+        public string AbuseIpDbToken = "";
         public string LibreTranslateHost = "127.0.0.1";
 
         public GithubSecrets Github = new();

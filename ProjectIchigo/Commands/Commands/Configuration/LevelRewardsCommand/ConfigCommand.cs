@@ -187,7 +187,7 @@ internal class ConfigCommand : BaseCommand
                                         await Task.Delay(3000);
                                         continue;
                                     }
-                                    catch (CancelCommandException)
+                                    catch (CancelException)
                                     {
                                         continue;
                                     }
@@ -214,7 +214,7 @@ internal class ConfigCommand : BaseCommand
                                     {
                                         Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
                                     }
-                                    catch (CancelCommandException)
+                                    catch (CancelException)
                                     {
                                         continue;
                                     }
@@ -257,7 +257,7 @@ internal class ConfigCommand : BaseCommand
                                     {
                                         Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
                                     }
-                                    catch (CancelCommandException)
+                                    catch (CancelException)
                                     {
                                         continue;
                                     }
@@ -322,7 +322,7 @@ internal class ConfigCommand : BaseCommand
                             {
                                 Response = await PromptModalWithRetry(e.Interaction, modal, false);
                             }
-                            catch (CancelCommandException)
+                            catch (CancelException)
                             {
                                 await RefreshMessage();
                                 return;

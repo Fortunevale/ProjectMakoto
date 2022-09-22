@@ -1,15 +1,15 @@
 ﻿namespace ProjectIchigo.Util;
 
-internal class TranslationClient
+internal class GoogleTranslateClient
 {
-    public static TranslationClient Initialize()
+    public static GoogleTranslateClient Initialize()
     {
-        TranslationClient translationClient = new();
+        GoogleTranslateClient translationClient = new();
         _ = translationClient.QueueHandler();
         return translationClient;
     }
 
-    internal readonly Dictionary<string, RequestQueue> Queue = new();
+    internal readonly Dictionary<string, RequestItem> Queue = new();
 
     private async Task QueueHandler()
     {
@@ -36,13 +36,13 @@ internal class TranslationClient
                 if (!response.IsSuccessStatusCode)
                 {
                     if (response.StatusCode == HttpStatusCode.NotFound)
-                        throw new Xorog.ScoreSaber.Exceptions.NotFoundException("");
+                        throw new Exceptions.NotFoundException("");
 
                     if (response.StatusCode == HttpStatusCode.InternalServerError)
-                        throw new Xorog.ScoreSaber.Exceptions.InternalServerError("");
+                        throw new Exceptions.InternalServerErrorException("");
 
                     if (response.StatusCode == HttpStatusCode.Forbidden)
-                        throw new Xorog.ScoreSaber.Exceptions.ForbiddenException("");
+                        throw new Exceptions.ForbiddenException("");
 
                     throw new Exception($"Unsuccessful request: {response.StatusCode}");
                 }
@@ -66,7 +66,7 @@ internal class TranslationClient
     private async Task<string> MakeRequest(string url)
     {
         string key = Guid.NewGuid().ToString();
-        Queue.Add(key, new RequestQueue { Url = url });
+        Queue.Add(key, new RequestItem { Url = url });
 
         while (Queue.ContainsKey(key) && !Queue[key].Resolved && !Queue[key].Failed)
             await Task.Delay(100);

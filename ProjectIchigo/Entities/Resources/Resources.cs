@@ -22,4 +22,6 @@ internal class Resources
 
         Permissions.ViewAuditLog,
     };
+
+    public static readonly string AbuseIpDbIcon = "https://cdn.discordapp.com/attachments/1005430437952356423/1021782030511517757/ezgif.com-gif-maker.png";
 }

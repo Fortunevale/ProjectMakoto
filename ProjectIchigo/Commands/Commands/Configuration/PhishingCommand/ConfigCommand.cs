@@ -18,6 +18,7 @@ internal class ConfigCommand : BaseCommand
 
             var ToggleDetectionButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
             var ToggleWarningButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle AbuseIPDB Reports", false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Client, ctx.Bot)));
             var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Punishment", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
             var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Reason", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Timeout Length", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
@@ -27,6 +28,7 @@ internal class ConfigCommand : BaseCommand
             {
                 { ToggleDetectionButton },
                 { ToggleWarningButton },
+                { ToggleAbuseIpDbButton },
             })
             .AddComponents(new List<DiscordComponent>
             {
@@ -56,6 +58,14 @@ internal class ConfigCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect = !ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.WarnOnRedirect;
+                await ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (Button.Result.Interaction.Data.CustomId == ToggleAbuseIpDbButton.CustomId)
+            {
+                _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.AbuseIpDbReports = !ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.AbuseIpDbReports;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -111,7 +121,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     Response = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -143,7 +153,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength, false);
                 }
-                catch (CancelCommandException)
+                catch (CancelException)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;

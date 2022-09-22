@@ -194,35 +194,5 @@ public class MaintainersPrefixCommands : BaseCommandModule
                 });
             }).Add(_bot.watcher, ctx);
         }
-
-#if DEBUG
-        [Command("db-test1"), Description(" ")]
-        public async Task DbTest1(CommandContext ctx, bool UseOldTagsSelector = false)
-        {
-            var v = new List<DatabaseQueue.RequestQueue>
-            {
-                new DatabaseQueue.RequestQueue
-                {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
-                },
-                new DatabaseQueue.RequestQueue
-                {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.Normal
-                },
-                new DatabaseQueue.RequestQueue
-                {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.Low
-                },
-                new DatabaseQueue.RequestQueue
-                {
-                    RequestType = DatabaseRequestType.Ping, Connection = _bot.databaseClient.mainDatabaseConnection, Priority = QueuePriority.High
-                }
-            };
-
-            v.Sort((a, b) => ((int)a.Priority).CompareTo((int)b.Priority));
-
-            _bot.databaseClient._queue.Queue = v;
-        }
-#endif
     }
 }

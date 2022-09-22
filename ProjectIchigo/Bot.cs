@@ -11,7 +11,8 @@ public class Bot
 
     internal DatabaseClient databaseClient { get; set; }
     internal ScoreSaberClient scoreSaberClient { get; set; }
-    internal TranslationClient translationClient { get; set; }
+    internal GoogleTranslateClient translationClient { get; set; }
+    internal AbuseIpDbClient abuseIpDbClient { get; set; }
 
     #endregion Clients
 
@@ -107,7 +108,7 @@ public class Bot
         }
 
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
-        translationClient = TranslationClient.Initialize();
+        translationClient = GoogleTranslateClient.Initialize();
 
         _logger.LogDebug($"Environment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
@@ -126,12 +127,53 @@ public class Bot
         {
             try
             {
+                countryCodes = new();
+                List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Countries.json"));
+                foreach (var b in cc)
+                {
+                    countryCodes.List.Add(b[2], new CountryCodes.CountryInfo
+                    {
+                        Name = b[0],
+                        ContinentCode = b[1],
+                        ContinentName = b[1].ToLower() switch
+                        {
+                            "af" => "Africa",
+                            "an" => "Antarctica",
+                            "as" => "Asia",
+                            "eu" => "Europe",
+                            "na" => "North America",
+                            "oc" => "Oceania",
+                            "sa" => "South America",
+                            _ => "Invalid Continent"
+                        }
+                    });
+                }
+
+                _logger.LogDebug($"Loaded {countryCodes.List.Count} countries");
+
+
+                languageCodes = new();
+                List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
+                foreach (var b in lc)
+                {
+                    languageCodes.List.Add(new LanguageCodes.LanguageInfo
+                    {
+                        Code = b[0],
+                        Name = b[1],
+                    });
+                }
+                _logger.LogDebug($"Loaded {languageCodes.List.Count} languages");
+
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
 
                 Task.Run(async () =>
                 {
                     DateTime lastModify = new();
+
+                    status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                    await Task.Delay(500);
+                    File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented));
 
                     while (true)
                     {
@@ -166,6 +208,8 @@ public class Bot
                 }).Add(watcher);
                 await Task.Delay(1000);
 
+                abuseIpDbClient = AbuseIpDbClient.Initialize(this);
+
                 _logger.LogInfo($"Connecting to database..");
 
                 DatabaseClient = await DatabaseClient.InitializeDatabase(this);
@@ -176,7 +220,6 @@ public class Bot
 
                 DatabaseInit _databaseInit = new(this);
 
-                await _databaseInit.UpdateCountryCodes();
                 await _databaseInit.LoadValuesFromDatabase();
 
                 _ = Task.Run(async () =>
@@ -1188,18 +1231,6 @@ public class Bot
                             _logger.LogRaised -= LogHandler;
                             _ = ExitApplication();
                         }
-                    }
-                }
-                else if (e.LogEntry.Message.ToLower().Contains("open DataReader associated".ToLower()))
-                {
-                    status.DataReaderExceptions++;
-
-                    if (status.DataReaderExceptions >= 4)
-                    {
-                        _logger.LogFatal("4 or more DataReader Exceptions triggered, exiting..");
-
-                        _logger.LogRaised -= LogHandler;
-                        _ = ExitApplication();
                     }
                 }
                 break;
