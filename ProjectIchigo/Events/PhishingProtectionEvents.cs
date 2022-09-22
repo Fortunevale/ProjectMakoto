@@ -72,7 +72,7 @@ internal class PhishingProtectionEvents
                                 $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**Country**: {query.data.countryCode.IsoCountryCodeToFlagEmoji()} {query.data.countryName}\n")}" +
                                 $"{(query.data.isp.IsNullOrWhiteSpace() ? "" : $"**ISP**: {query.data.isp}\n")}" +
                                 $"{(query.data.domain.IsNullOrWhiteSpace() ? "" : $"**Domain Name**: {query.data.domain}\n")}",
-                    Color = EmbedColors.Error,
+                    Color = new DiscordColor("#FF0000"),
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                     {
                         Url = Resources.AbuseIpDbIcon
