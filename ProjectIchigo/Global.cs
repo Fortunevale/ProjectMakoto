@@ -102,4 +102,4 @@ global using Octokit;
 
 global using FileMode = System.IO.FileMode;
 global using RequestParameters = Xorog.ScoreSaber.Objects.RequestParameters;
-global using PermissionLevel = DisCatSharp.PermissionLevel;
+global using PermissionLevel = DisCatSharp.Enums.PermissionLevel;
