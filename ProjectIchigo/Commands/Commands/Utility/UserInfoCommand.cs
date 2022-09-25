@@ -59,6 +59,8 @@ internal class UserInfoCommand : BaseCommand
             bool isBanned = banList.Any(x => x.User.Id == victim.Id);
             DiscordBan? banDetails = (isBanned ? banList.First(x => x.User.Id == victim.Id) : null);
 
+            var builder = new DiscordMessageBuilder();
+
             var embed = new DiscordEmbedBuilder()
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
@@ -100,10 +102,18 @@ internal class UserInfoCommand : BaseCommand
             if (isBanned)
                 embed.AddField(new DiscordEmbedField("Ban Details", $"`{(string.IsNullOrWhiteSpace(banDetails?.Reason) ? "No reason provided." : $"{banDetails.Reason}")}`", false));
 
+            bool InviterButtonAdded = false;
+
             if (ctx.Bot.guilds[ctx.Guild.Id].InviteTrackerSettings.Enabled)
             {
                 embed.AddField(new DiscordEmbedField("Invited by", $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
                 embed.AddField(new DiscordEmbedField("Users invited", $"`{(ctx.Bot.guilds[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
+
+                if (!ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace())
+                {
+                    InviterButtonAdded = true;
+                    builder.AddComponents(new DiscordButtonComponent(ButtonStyle.Secondary, $"userinfo-inviter", "Show Profile of Inviter", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤"))));
+                }
             }
 
             if (bMember is not null)
@@ -144,7 +154,46 @@ internal class UserInfoCommand : BaseCommand
             if (bMember is not null && bMember.CommunicationDisabledUntil.HasValue && bMember.CommunicationDisabledUntil.Value.GetTotalSecondsUntil() > 0)
                 embed.AddField(new DiscordEmbedField("Timed out until", $"{Formatter.Timestamp(bMember.CommunicationDisabledUntil.Value, TimestampFormat.LongDateTime)}", true));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+            await RespondOrEdit(builder.WithEmbed(embed));
+
+            if (InviterButtonAdded)
+            {
+                ctx.ResponseMessage.WaitForButtonAsync(ctx.User, TimeSpan.FromMinutes(15)).ContinueWith(async x =>
+                {
+                    if (x.IsFaulted)
+                        return;
+
+                    var e = x.Result;
+
+                    if (e.TimedOut)
+                    {
+                        ModifyToTimedOut();
+                        return;
+                    }
+
+                    _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                    DiscordUser newVictim;
+
+                    try
+                    {
+                        newVictim = await ctx.Client.GetUserAsync(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId);
+                    }
+                    catch (Exception)
+                    {
+                        _ = e.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
+                            .AddEmbed(new DiscordEmbedBuilder().WithDescription($"`Failed to fetch user '{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}'`").SetError(ctx)));
+                        return;
+                    }
+
+                    await ExecuteCommand(ctx, new Dictionary<string, object>
+                    {
+                        { "victim", newVictim }
+                    });
+
+                    return;
+                }).Add(ctx.Bot.watcher, ctx);
+            }
         });
     }
 
