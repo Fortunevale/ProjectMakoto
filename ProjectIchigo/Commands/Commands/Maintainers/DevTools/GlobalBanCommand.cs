@@ -16,6 +16,29 @@ internal class GlobalBanCommand : BaseCommand
                 return;
             }
 
+            if (ctx.Bot.globalBans.ContainsKey(victim.Id))
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.UsernameWithDiscriminator}'..`").SetLoading(ctx, "Global Ban"));
+                ctx.Bot.globalBans[victim.Id] = new() { Reason = reason, Moderator = ctx.User.Id };
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.UsernameWithDiscriminator}' updated.`").SetSuccess(ctx, "Global Ban"));
+
+                var announceChannel1 = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
+                await announceChannel1.SendMessageAsync(new DiscordEmbedBuilder
+                {
+                    Author = new DiscordEmbedBuilder.EmbedAuthor
+                    {
+                        Name = ctx.CurrentUser.Username,
+                        IconUrl = AuditLogIcons.UserUpdated
+                    },
+                    Description = $"The global ban entry of {victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was updated.\n\n" +
+                                  $"Reason: `{reason.SanitizeForCode()}`\n" +
+                                  $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
+                    Color = EmbedColors.Warning,
+                    Timestamp = DateTime.UtcNow
+                });
+                return;
+            }
+
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
@@ -68,7 +91,7 @@ internal class GlobalBanCommand : BaseCommand
                     IconUrl = AuditLogIcons.UserBanned
                 },
                 Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was added to the global ban list.\n\n" +
-                              $"Reason: {reason.Sanitize()}\n" +
+                              $"Reason: `{reason.SanitizeForCode()}`\n" +
                               $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
                 Color = EmbedColors.Error,
                 Timestamp = DateTime.UtcNow
