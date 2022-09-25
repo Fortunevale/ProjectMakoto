@@ -183,6 +183,18 @@ public class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
+        [Command("batch-lookup"), Description("Looks up multiple users. Separate by spaces.")]
+        public async Task BatchLookupCommand(CommandContext ctx, [RemainingText][Description("List of Users")] string victims)
+        {
+            Task.Run(async () =>
+            {
+                await new BatchLookupCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "IDs", victims },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
         [Command("create-issue"), Description("Create a new issue on Ichigo's Github Repository.")]
         public async Task CreateIssue(CommandContext ctx, bool UseOldTagsSelector = false)
         {

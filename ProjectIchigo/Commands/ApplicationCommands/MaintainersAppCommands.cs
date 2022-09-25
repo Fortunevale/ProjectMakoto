@@ -136,6 +136,18 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
+        [SlashCommand("batch-lookup", "Looks up multiple users. Separate by spaces.")]
+        public async Task BatchLookupCommand(InteractionContext ctx, [Option("users", "The users to look up")] string victims)
+        {
+            Task.Run(async () =>
+            {
+                await new BatchLookupCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "IDs", victims },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
         [SlashCommand("create-issue", "Create a new issue on Ichigo's Github Repository.")]
         public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")] bool UseOldTagsSelector = false)
         {
