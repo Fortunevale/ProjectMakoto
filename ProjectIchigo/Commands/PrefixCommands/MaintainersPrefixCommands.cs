@@ -97,7 +97,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
         }
 
         [Command("globalban"), Description("Bans a user from all servers opted into global bans.")]
-        public async Task Globalban(CommandContext ctx, DiscordUser victim, [RemainingText][Description("Reason")] string reason = "-")
+        public async Task Globalban(CommandContext ctx, DiscordUser victim, [RemainingText][Description("Reason")] string reason)
         {
             Task.Run(async () =>
             {

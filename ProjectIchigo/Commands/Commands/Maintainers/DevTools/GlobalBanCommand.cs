@@ -10,6 +10,12 @@ internal class GlobalBanCommand : BaseCommand
             DiscordUser victim = (DiscordUser)arguments["victim"];
             string reason = (string)arguments["reason"];
 
+            if (reason.IsNullOrWhiteSpace())
+            {
+                _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Please provide a reason for the global ban.`").SetError(ctx, "Global Ban"));
+                return;
+            }
+
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
