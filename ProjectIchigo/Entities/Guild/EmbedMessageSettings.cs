@@ -29,7 +29,7 @@ public class EmbedMessageSettings
         set
         {
             _UseGithubEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "embed_github_code", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "embed_github", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }
