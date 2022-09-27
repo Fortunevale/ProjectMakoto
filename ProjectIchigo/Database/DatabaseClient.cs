@@ -973,6 +973,46 @@ internal class DatabaseClient
                     {
                         _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
                     }
+                
+                if (_bot.globalNotes.Count > 0)
+                    try
+                    {
+                        List<DatabaseGlobalNotes> DatabaseInserts = _bot.globalNotes.Select(x => new DatabaseGlobalNotes
+                        {
+                            id = x.Key,
+                            notes = JsonConvert.SerializeObject(x.Value),
+                        }).ToList();
+
+                        if (mainDatabaseConnection == null)
+                        {
+                            throw new Exception($"Exception occurred while trying to update globalnotes in database: Database mainDatabaseConnection not present");
+                        }
+
+                        var cmd = mainDatabaseConnection.CreateCommand();
+                        cmd.CommandText = _helper.GetSaveCommand("globalnotes", DatabaseColumnLists.globalnotes);
+
+                        for (int i = 0; i < DatabaseInserts.Count; i++)
+                        {
+                            cmd.CommandText += _helper.GetValueCommand(DatabaseColumnLists.globalnotes, i);
+
+                            cmd.Parameters.AddWithValue($"id{i}", DatabaseInserts[i].id);
+                            cmd.Parameters.AddWithValue($"notes{i}", DatabaseInserts[i].notes);
+                        }
+
+                        cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
+                        cmd.CommandText += _helper.GetOverwriteCommand(DatabaseColumnLists.globalnotes);
+
+                        cmd.Connection = mainDatabaseConnection;
+                        await _queue.RunCommand(cmd);
+
+                        DatabaseInserts.Clear();
+                        DatabaseInserts = null;
+                        cmd.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
+                    }
 
                 if (_bot.submittedUrls.Count > 0)
                     try

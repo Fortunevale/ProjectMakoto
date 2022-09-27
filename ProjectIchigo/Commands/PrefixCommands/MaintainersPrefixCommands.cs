@@ -109,6 +109,18 @@ public class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
+        [Command("globalnotes"), Description("Add and remove global notes of a user.")]
+        public async Task GlobalBanCommand(CommandContext ctx, DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new GlobalNotesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
         [Command("globalunban"), Description("Removes a user from global bans. (doesn't unban user from all servers)")]
         public async Task GlobalUnbanCommand(CommandContext ctx, DiscordUser victim, bool UnbanFromGuilds = true)
         {

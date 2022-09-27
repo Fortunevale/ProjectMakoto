@@ -2,6 +2,9 @@
 
 internal static class DiscordExtensions
 {
+    internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
+        => new(emoji);
+
     internal static async Task<DiscordMessage> Refetch(this DiscordMessage msg) 
         => await msg.Channel.GetMessageAsync(msg.Id, true);
 

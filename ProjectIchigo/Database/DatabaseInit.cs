@@ -234,7 +234,14 @@ internal class DatabaseInit
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
         _logger.LogDebug($"Loaded {_bot.globalBans.Count} global bans");
-        
+
+
+        IEnumerable<DatabaseGlobalNotes> globalnotes = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseGlobalNotes>(_bot.databaseClient._helper.GetLoadCommand("globalnotes", DatabaseColumnLists.globalnotes));
+
+        foreach (var b in globalnotes)
+            _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<GlobalBanDetails>>((b.notes is null or "null" or "" ? "[]" : b.notes)));
+        _logger.LogDebug($"Loaded {_bot.globalBans.Count} global notes");
+
 
         IEnumerable<DatabaseBanInfo> banned_users = _bot.databaseClient.mainDatabaseConnection.Query<DatabaseBanInfo>(_bot.databaseClient._helper.GetLoadCommand("banned_users", DatabaseColumnLists.globalbans));
 

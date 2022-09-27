@@ -42,6 +42,7 @@ public class Bot
     internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionGuildBans = new();
 
     internal Dictionary<ulong, GlobalBanDetails> globalBans = new();
+    internal Dictionary<ulong, List<GlobalBanDetails>> globalNotes = new();
 
     #endregion Bans
 

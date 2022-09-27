@@ -90,6 +90,11 @@ internal class UserInfoCommand : BaseCommand
                         $"\n**{(bMember is null ? "Roles (Backup)" : "Roles")}**\n{GenerateRoles}"
             };
 
+            if (ctx.Bot.globalNotes.ContainsKey(victim.Id) && ctx.Bot.globalNotes[victim.Id].Any())
+            {
+                embed.AddField(new DiscordEmbedField("Ichigo Staff Notes", $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.Sanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+            }
+
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
                 var gBanDetails = ctx.Bot.globalBans[victim.Id];
