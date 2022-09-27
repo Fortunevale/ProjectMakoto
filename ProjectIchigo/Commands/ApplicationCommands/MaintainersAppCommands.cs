@@ -92,7 +92,19 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 });
             }).Add(_bot.watcher, ctx);
         }
-        
+
+        [SlashCommand("globalnotes", "Add and remove global notes of a user.")]
+        public async Task GlobalBanCommand(InteractionContext ctx, [Option("user", "The user's to notes to edit")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new GlobalNotesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
         [SlashCommand("globalunban", "Removes a user from global bans.")]
         public async Task GlobalUnnanCommand(InteractionContext ctx, [Option("user", "The user to unban")]DiscordUser victim, [Option("unbanfromguilds", "Unban user from all guilds.")] bool UnbanFromGuilds = true)
         {

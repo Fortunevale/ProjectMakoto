@@ -79,15 +79,21 @@ internal class UserInfoCommand : BaseCommand
                     Text = $"User-Id: {victim.Id}"
                 },
                 Description = $"{(bMember is null ? $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? "`User never joined this server.`" : $"{(isBanned ? "`User is currently banned from this server.`" : "`User is currently not in this server.`")}")}\n\n" : "")}" +
-                        $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? "💀 `User is globally banned.`\n" : "")}" +
+                        $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? "💀 **`User is globally banned.`**\n" : "")}" +
+                        $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? "🔏 **`Ichigo Staff`**\n\n" : "")}" +
                         $"{(bMember is not null && bMember.IsOwner ? "✨ `This user owns this guild`\n" : "")}" +
-                        $"{(victim.IsStaff ? "📘 `Discord Staff`\n" : "")}" +
+                        $"{(victim.IsStaff ? "📘 **`Discord Staff`**\n" : "")}" +
                         $"{(victim.IsMod ? "⚒ `Certified Content Moderator`\n" : "")}" +
                         $"{(victim.IsBotDev ? "⌨ `Verified Bot Developer`\n" : "")}" +
                         $"{(victim.IsPartner ? "👥 `Discord Partner`\n" : "")}" +
                         $"{(bMember is not null && bMember.IsPending.HasValue && bMember.IsPending.Value ? "❗ `User's Membership pending`\n" : "")}" +
                         $"\n**{(bMember is null ? "Roles (Backup)" : "Roles")}**\n{GenerateRoles}"
             };
+
+            if (ctx.Bot.globalNotes.ContainsKey(victim.Id) && ctx.Bot.globalNotes[victim.Id].Any())
+            {
+                embed.AddField(new DiscordEmbedField("Ichigo Staff Notes", $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.Sanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+            }
 
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {

@@ -50,6 +50,11 @@ internal class ActionlogEvents
                               $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
             };
 
+            if (_bot.globalNotes.ContainsKey(e.Member.Id) && _bot.globalNotes[e.Member.Id].Any())
+            {
+                embed.AddField(new DiscordEmbedField("Ichigo Staff Notes", $"{string.Join("\n\n", _bot.globalNotes[e.Member.Id].Select(x => $"{x.Reason.Sanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+            }
+
             _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
             {
                 if (!x.IsCompletedSuccessfully || !_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)

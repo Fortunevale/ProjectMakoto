@@ -71,7 +71,7 @@ public class Cooldown
             return true;
         }
 
-        int cooldownTime = 8;
+        int cooldownTime = 6;
 
         if (ModerateCommandLastUse.ToUniversalTime().AddSeconds(cooldownTime).GetTotalSecondsUntil() <= 0)
         {

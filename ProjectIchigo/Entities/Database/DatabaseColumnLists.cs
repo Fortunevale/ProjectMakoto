@@ -26,6 +26,12 @@ internal class DatabaseColumnLists
         new Column("moderator", "bigint"),
         new Column("timestamp", "bigint"),
     };
+    
+    internal readonly static List<Column> globalnotes = new()
+    {
+        new Column("id", "bigint", primary: true),
+        new Column("notes", "longtext"),
+    };
 
     internal readonly static List<Column> submission_user_bans = new()
     {
@@ -147,6 +153,7 @@ internal class DatabaseColumnLists
         { "banned_users", globalbans },
         { "banned_guilds", globalbans },
         { "globalbans", globalbans },
+        { "globalnotes", globalnotes },
         { "submission_user_bans", submission_user_bans },
         { "submission_guild_bans", submission_guild_bans },
         { "active_url_submissions", active_url_submissions },

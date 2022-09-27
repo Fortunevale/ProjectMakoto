@@ -878,16 +878,11 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        switch (ctx.CommandType)
+        _ = ctx.CommandType switch
         {
-            case Enums.CommandType.ContextMenu:
-            case Enums.CommandType.ApplicationCommand:
-                _ = RespondOrEdit("✅ _`Interaction finished.`_");
-                break;
-            default:
-                _ = ctx.ResponseMessage.DeleteAsync();
-                break;
-        }
+            Enums.CommandType.ContextMenu or Enums.CommandType.ApplicationCommand => RespondOrEdit("✅ _`Interaction finished.`_"),
+            _ => ctx.ResponseMessage.DeleteAsync(),
+        };
     }
     #endregion
 
