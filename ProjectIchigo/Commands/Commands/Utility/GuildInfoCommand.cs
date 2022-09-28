@@ -50,7 +50,7 @@ internal class GuildInfoCommand : BaseCommand
                                   $"🚪 **Verification Level**: `{guild.VerificationLevel}`\n" +
                                   $"🔍 **Explicit Content Filter**: `{guild.ExplicitContentFilter}`\n" +
                                   $"⚠ **NSFW Level**: `{guild.NsfwLevel}`\n" +
-                                  $"💬 **Default Notifactions**: `{guild.DefaultMessageNotifications}`\n" +
+                                  $"💬 **Default Notifications**: `{guild.DefaultMessageNotifications}`\n" +
                                   $"👁‍🗨 **Membership Screening enabled?**: `{(guild.Features.HasMembershipScreeningEnabled ? "Yes" : "No")}`\n" +
                                   $"👋 **Welcome Screen enabled?**: `{(guild.Features.HasWelcomeScreenEnabled ? "Yes" : "No")}`", true));
 
