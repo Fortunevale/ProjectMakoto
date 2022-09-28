@@ -117,6 +117,20 @@ public class UtilityPrefixCommands : BaseCommandModule
     }
 
 
+    [Command("guild-info"),
+    CommandModule("utility"),
+    Description("Displays information this or the mentioned guild.")]
+    public async Task GuildInfo(CommandContext ctx, ulong? guildId = null)
+    {
+        Task.Run(async () =>
+        {
+            await new GuildInfoCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "guildId", guildId }
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+
 
     [Command("avatar"), Aliases("pfp"),
     CommandModule("utility"),
