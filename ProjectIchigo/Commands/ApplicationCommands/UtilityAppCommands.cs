@@ -14,6 +14,24 @@ public class UtilityAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot.watcher, ctx);
     }
+    
+    [SlashCommand("guild-info", "Displays information this or the mentioned guild.", dmPermission: false)]
+    public async Task GuildInfo(InteractionContext ctx, [Option("Guild", "The Guild")]string guildId = null)
+    {
+        Task.Run(async () =>
+        {
+            if (guildId != null && !guildId.IsDigitsOnly())
+            {
+                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("❌ `Please use digits.`").AsEphemeral());
+                return;
+            }
+
+            await new GuildInfoCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "guildId", guildId.ToUInt64() }
+            });
+        }).Add(_bot.watcher, ctx);
+    }
 
     [SlashCommand("avatar", "Displays your or the mentioned user's avatar as an embedded image.", dmPermission: false)]
     public async Task Avatar(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
