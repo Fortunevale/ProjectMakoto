@@ -6,7 +6,7 @@ internal class GuildInfoCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-			ulong? rawGuildId = (ulong)arguments["guildId"];
+			ulong? rawGuildId = (ulong?)arguments["guildId"];
 
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
