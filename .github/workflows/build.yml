@@ -11,7 +11,7 @@ jobs:
       - name: Cleanup before build
         run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
       - name: Setup .NET Core SDK 6.x
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.x'
       - name: "Clone Repository"
