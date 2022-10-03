@@ -55,7 +55,7 @@ public class Guild
 
     private void AuditLogCollectionUpdated(object sender, object e)
     {
-        if (ProcessedAuditLogs.Count > 50)
+        while (ProcessedAuditLogs.Count > 50)
             ProcessedAuditLogs.Remove(ProcessedAuditLogs[0]);
 
         _ = Bot.DatabaseClient.FullSyncDatabase();
