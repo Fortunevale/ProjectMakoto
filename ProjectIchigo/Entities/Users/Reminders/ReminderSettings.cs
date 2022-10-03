@@ -5,11 +5,12 @@ public class ReminderSettings
     public ReminderSettings(User user, Bot bot)
     {
         Parent = user;
+        _bot = bot;
 
-        ScheduledReminders.CollectionChanged += CollectionChanged;
+        ScheduledReminders.ItemsChanged += ItemsChanged;
     }
 
-    private void CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void ItemsChanged(object? sender, ObservableListUpdate<ReminderItem> e)
     {
         if (ScheduledReminders.Count > 10)
             ScheduledReminders.RemoveAt(0);
@@ -52,11 +53,8 @@ public class ReminderSettings
         _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
-
-
     private User Parent { get; set; }
     private Bot _bot { get; set; }
 
-
-    public ObservableCollection<ReminderItem> ScheduledReminders = new();
+    public ObservableList<ReminderItem> ScheduledReminders = new();
 }

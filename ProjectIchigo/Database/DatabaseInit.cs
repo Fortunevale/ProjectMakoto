@@ -220,7 +220,9 @@ internal class DatabaseInit
                 DirectMessageOptOut = b.experience_directmessageoptout
             };
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>((b.playlists is null or "null" or "" ? "[]" : b.playlists));
-            DbUser.ReminderSettings.ScheduledReminders = JsonConvert.DeserializeObject<ObservableCollection<ReminderItem>>((b.reminders is null or "null" or "" ? "[]" : b.reminders));
+
+            foreach (var c in JsonConvert.DeserializeObject<List<ReminderItem>>((b.reminders is null or "null" or "" ? "[]" : b.reminders)))
+                DbUser.ReminderSettings.ScheduledReminders.Add(c);
         }
         _logger.LogDebug($"Loaded {_bot.users.Count} users");
 
