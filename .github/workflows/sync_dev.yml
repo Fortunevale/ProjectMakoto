@@ -1,4 +1,4 @@
-name: Sync
+name: Update Development Branch
 on:
   push:
     branches:
@@ -19,6 +19,8 @@ jobs:
         id: pull
         uses: tretuna/sync-branches@1.4.0
         with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.ACCESS_TOKEN}}
           FROM_BRANCH: "main"
           TO_BRANCH: "dev"
+          PULL_REQUEST_BODY: ""
+          REVIEWERS: '["TheXorog"]'
