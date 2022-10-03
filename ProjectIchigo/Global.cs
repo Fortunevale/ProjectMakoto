@@ -82,6 +82,7 @@ global using Xorog.ScoreSaber.Objects;
 global using static ProjectIchigo.Util.Log;
 
 global using Xorog.UniversalExtensions;
+global using Xorog.UniversalExtensions.Entities;
 global using static Xorog.UniversalExtensions.UniversalExtensions;
 global using static Xorog.UniversalExtensions.UniversalExtensionsEnums;
 

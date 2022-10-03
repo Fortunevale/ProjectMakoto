@@ -746,21 +746,18 @@ public class Bot
 
     private async Task SyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
     {
-        ObservableCollection<Task> runningTasks = new();
+        ObservableList<Task> runningTasks = new();
 
-        NotifyCollectionChangedEventHandler runningTasksUpdated()
+        void runningTasksUpdated(object sender, ObservableListUpdate<Task> e)
         {
-            return (s, e) =>
-            {
-                if (e is not null && e.NewItems is not null)
-                    foreach (Task b in e.NewItems)
-                    {
-                        b.Add(watcher);
-                    }
-            };
+            if (e is not null && e.NewItems is not null)
+                foreach (Task b in e.NewItems)
+                {
+                    b.Add(watcher);
+                }
         }
 
-        runningTasks.CollectionChanged += runningTasksUpdated();
+        runningTasks.ItemsChanged += runningTasksUpdated;
 
         int startupTasksSuccess = 0;
 
@@ -875,7 +872,7 @@ public class Bot
         while (runningTasks.Any(x => !x.IsCompleted))
             await Task.Delay(100);
 
-        runningTasks.CollectionChanged -= runningTasksUpdated();
+        runningTasks.ItemsChanged -= runningTasksUpdated;
         runningTasks.Clear();
 
         _logger.LogInfo($"Sync Tasks successfully finished for {startupTasksSuccess}/{Guilds.Count} guilds.");

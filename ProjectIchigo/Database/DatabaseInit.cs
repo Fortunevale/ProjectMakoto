@@ -81,7 +81,7 @@ internal class DatabaseInit
 
             DbGuild.CrosspostSettings = new(DbGuild)
             {
-                CrosspostChannels = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
+                CrosspostChannels = JsonConvert.DeserializeObject<ObservableList<ulong>>((b.crosspostchannels is null or "null" or "" ? "[]" : b.crosspostchannels)),
                 DelayBeforePosting = b.crosspostdelay,
                 ExcludeBots = b.crosspostexcludebots,
                 CrosspostRatelimits = JsonConvert.DeserializeObject<Dictionary<ulong, CrosspostRatelimit>>((b.crosspost_ratelimits is null or "null" or "" ? "{}" : b.crosspost_ratelimits)),
@@ -142,9 +142,9 @@ internal class DatabaseInit
                 DbGuild.Lavalink = new(DbGuild);
 
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelRewardEntry>>((b.levelrewards is null or "null" or "" ? "[]" : b.levelrewards));
-            DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache));
+            DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>((b.auditlogcache is null or "null" or "" ? "[]" : b.auditlogcache));
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>((b.reactionroles is null or "null" or "" ? "[]" : b.reactionroles));
-            DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableCollection<ulong>>((b.autounarchivelist is null or "null" or "" ? "[]" : b.autounarchivelist));
+            DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableList<ulong>>((b.autounarchivelist is null or "null" or "" ? "[]" : b.autounarchivelist));
         }
         _logger.LogDebug($"Loaded {_bot.guilds.Count} guilds");
 
