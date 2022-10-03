@@ -40,7 +40,7 @@ internal class RemindersCommand : BaseCommand
 
                 while (true)
                 {
-                    if (!selectedDueDate.HasValue || selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks)
+                    if (!selectedDueDate.HasValue || selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6))
                         selectedDueDate = null;
 
                     var SelectDescriptionButton = new DiscordButtonComponent((selectedDescription.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Description", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✏")));
