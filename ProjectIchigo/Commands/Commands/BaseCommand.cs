@@ -827,7 +827,7 @@ public abstract class BaseCommand
         int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
         int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
 
-        return new DateTime(year, month, day, hour, minute, 0);
+        return new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
     } 
     #endregion
 

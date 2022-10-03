@@ -33,16 +33,13 @@ public class CrosspostSettings
         } 
     }
 
-    public ObservableCollection<ulong> CrosspostChannels { get; set; } = new();
+    public ObservableList<ulong> CrosspostChannels { get; set; } = new();
 
     public Dictionary<ulong, CrosspostRatelimit> CrosspostRatelimits { get; set; } = new();
 
-    internal NotifyCollectionChangedEventHandler CrosspostCollectionUpdated()
+    internal void CrosspostCollectionUpdated(object sender, object e)
     {
-        return (s, e) =>
-        {
-            _ = Bot.DatabaseClient.FullSyncDatabase();
-        };
+        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
     private bool QueueInitialized = false;
