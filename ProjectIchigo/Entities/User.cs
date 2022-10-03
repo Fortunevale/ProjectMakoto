@@ -14,7 +14,7 @@ public class User
         AfkStatus = new(this);
         ScoreSaber = new(this);
         ExperienceUserSettings = new(this);
-        ReminderSettings = new(this);
+        ReminderSettings = new(this, _bot);
     }
 
     [JsonIgnore]

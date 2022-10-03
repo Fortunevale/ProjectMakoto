@@ -33,6 +33,15 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
+    [SlashCommand("reminders", "Allows you to manage your reminders.")]
+    public async Task Reminders(InteractionContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new RemindersCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
+
     [SlashCommand("avatar", "Displays your or the mentioned user's avatar as an embedded image.", dmPermission: false)]
     public async Task Avatar(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {

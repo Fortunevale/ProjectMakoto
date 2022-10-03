@@ -17,5 +17,5 @@ public class ReminderItem
         }
     }
 
-    public DateTimeOffset DueTime { get; set; }
+    public DateTime DueTime { get; set; }
 }
