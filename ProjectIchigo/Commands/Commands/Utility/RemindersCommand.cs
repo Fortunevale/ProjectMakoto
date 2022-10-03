@@ -16,8 +16,9 @@ internal class RemindersCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
-                    .WithDescription($"`You have {rem.ScheduledReminders.Count} reminders.`")
-                    .AddFields((rem.ScheduledReminders.IsNotNullAndNotEmpty() ? rem.ScheduledReminders.Select(x => new DiscordEmbedField($"{x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)} ({x.DueTime.ToTimestamp()})", $"`{x.Description.Sanitize()}`")) : new List<DiscordEmbedField>()))
+                    .WithDescription($"`You have {rem.ScheduledReminders.Count} reminders.`\n\n" +
+                     $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.Sanitize()}\nCreated on **{x.CreationPlace}**\nDue {x.DueTime.ToTimestamp()} ({x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)})").ToList())}\n\n" +
+                     $"**⚠ For reminders to work, you need to enable Direct Messages on at least one server you share with {ctx.CurrentUser.Username}.**")
                     .SetInfo(ctx, "Reminders"))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.CancelButton));
@@ -121,7 +122,8 @@ internal class RemindersCommand : BaseCommand
                         rem.ScheduledReminders.Add(new ReminderItem
                         {
                             Description = selectedDescription,
-                            DueTime = selectedDueDate.Value.ToUniversalTime()
+                            DueTime = selectedDueDate.Value.ToUniversalTime(),
+                            CreationPlace = $"[`{ctx.Guild.Name}`](https://discord.com/channels/{ctx.Guild.Id}/{ctx.Channel.Id})"
                         });
 
                         await ExecuteCommand(ctx, arguments);

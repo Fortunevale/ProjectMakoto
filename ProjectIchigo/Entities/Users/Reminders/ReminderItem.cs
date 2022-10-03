@@ -4,6 +4,8 @@ public class ReminderItem
 {
     public string UUID { get; set; } = Guid.NewGuid().ToString();
 
+    public string CreationPlace { get; set; }
+
     private string _Description { get; set; }
     public string Description
     {
@@ -18,4 +20,6 @@ public class ReminderItem
     }
 
     public DateTime DueTime { get; set; }
+
+    public DateTime CreationTime { get; set; } = DateTime.UtcNow;
 }

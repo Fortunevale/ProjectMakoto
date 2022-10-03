@@ -882,6 +882,8 @@ public class Bot
     {
         Task.Run(async () =>
         {
+            status.DiscordGuildDownloadCompleted = true;
+
             _logger.LogInfo($"I'm on {e.Guilds.Count} guilds.");
 
             Task.Run(async () =>
