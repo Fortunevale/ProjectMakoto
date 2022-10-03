@@ -33,7 +33,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
-    [SlashCommand("reminders", "Allows you to manage your reminders.")]
+    [SlashCommand("reminders", "Allows you to manage your reminders.", dmPermission: false)]
     public async Task Reminders(InteractionContext ctx)
     {
         Task.Run(async () =>
