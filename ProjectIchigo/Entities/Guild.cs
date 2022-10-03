@@ -19,16 +19,16 @@ public class Guild
         EmbedMessageSettings = new(this);
         Lavalink = new(this);
 
-        CrosspostSettings.CrosspostChannels.CollectionChanged += CrosspostSettings.CrosspostCollectionUpdated();
-        AutoUnarchiveThreads.CollectionChanged += UnarchiveThreadsUpdated();
-        ProcessedAuditLogs.CollectionChanged += AuditLogCollectionUpdated();
+        CrosspostSettings.CrosspostChannels.ItemsChanged += CrosspostSettings.CrosspostCollectionUpdated;
+        AutoUnarchiveThreads.ItemsChanged += UnarchiveThreadsUpdated;
+        ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated;
     }
 
     ~Guild()
     {
-        CrosspostSettings.CrosspostChannels.CollectionChanged -= CrosspostSettings.CrosspostCollectionUpdated();
-        ProcessedAuditLogs.CollectionChanged -= AuditLogCollectionUpdated();
-        AutoUnarchiveThreads.CollectionChanged -= UnarchiveThreadsUpdated();
+        CrosspostSettings.CrosspostChannels.ItemsChanged -= CrosspostSettings.CrosspostCollectionUpdated;
+        ProcessedAuditLogs.ItemsChanged -= AuditLogCollectionUpdated;
+        AutoUnarchiveThreads.ItemsChanged -= UnarchiveThreadsUpdated;
     }
 
     public ulong ServerId { get; set; }
@@ -47,28 +47,22 @@ public class Guild
 
     public Lavalink Lavalink { get; set; }
 
-    public ObservableCollection<ulong> ProcessedAuditLogs { get; set; } = new();
-    public ObservableCollection<ulong> AutoUnarchiveThreads { get; set; } = new();
+    public ObservableList<ulong> ProcessedAuditLogs { get; set; } = new();
+    public ObservableList<ulong> AutoUnarchiveThreads { get; set; } = new();
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
     public Dictionary<ulong, Member> Members { get; set; } = new();
     public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
 
-    private NotifyCollectionChangedEventHandler AuditLogCollectionUpdated()
+    private void AuditLogCollectionUpdated(object sender, object e)
     {
-        return (s, e) =>
-        {
-            if (ProcessedAuditLogs.Count > 50)
-                ProcessedAuditLogs.Remove(ProcessedAuditLogs[0]);
+        while (ProcessedAuditLogs.Count > 50)
+            ProcessedAuditLogs.Remove(ProcessedAuditLogs[0]);
 
-            _ = Bot.DatabaseClient.FullSyncDatabase();
-        };
+        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
-    private NotifyCollectionChangedEventHandler UnarchiveThreadsUpdated()
+    private void UnarchiveThreadsUpdated(object sender, object e)
     {
-        return (s, e) =>
-        {
-            _ = Bot.DatabaseClient.FullSyncDatabase();
-        };
+        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 }

@@ -566,6 +566,11 @@ public abstract class BaseCommand
             if (currentPage != 0)
                 builder.AddComponents(previousPageButton);
 
+            if (Selected.IsNullOrWhiteSpace())
+                ConfirmSelectionButton.Disable();
+            else
+                ConfirmSelectionButton.Enable();
+
             builder.AddComponents(ConfirmSelectionButton);
             builder.AddComponents(MessageComponents.CancelButton);
 
@@ -827,7 +832,7 @@ public abstract class BaseCommand
         int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
         int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
 
-        return new DateTime(year, month, day, hour, minute, 0);
+        return new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
     } 
     #endregion
 

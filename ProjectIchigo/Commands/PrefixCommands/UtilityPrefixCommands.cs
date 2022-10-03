@@ -132,6 +132,18 @@ public class UtilityPrefixCommands : BaseCommandModule
     }
 
 
+    [Command("reminders"),
+    CommandModule("utility"),
+    Description("Allows you to manage your reminders.")]
+    public async Task Reminders(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new RemindersCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
+
+
     [Command("avatar"), Aliases("pfp"),
     CommandModule("utility"),
     Description("Displays your or the mentioned user's avatar as an embedded image.")]

@@ -68,6 +68,7 @@ internal class DatabaseColumnLists
         new Column("submission_accepted_submissions", "text", "utf8mb4_0900_ai_ci"),
         new Column("submission_last_datetime", "bigint"),
         new Column("playlists", "longtext"),
+        new Column("reminders", "longtext"),
     };
 
     internal readonly static List<Column> guilds = new()
