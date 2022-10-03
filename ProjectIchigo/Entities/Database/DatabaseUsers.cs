@@ -7,6 +7,7 @@ internal class DatabaseUsers
     public long afk_since { get; set; }
     public string afk_reason { get; set; }
     public string playlists { get; set; }
+    public string reminders { get; set; }
     public long afk_pingamount { get; set; }
     public string afk_pings { get; set; }
     public int submission_accepted_tos { get; set; }

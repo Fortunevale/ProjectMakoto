@@ -14,6 +14,7 @@ public class User
         AfkStatus = new(this);
         ScoreSaber = new(this);
         ExperienceUserSettings = new(this);
+        ReminderSettings = new(this);
     }
 
     [JsonIgnore]
@@ -23,6 +24,8 @@ public class User
     public AfkStatus AfkStatus { get; set; }
     public ScoreSaberSettings ScoreSaber { get; set; }
     public ExperienceUserSettings ExperienceUserSettings { get; set; }
+    public ReminderSettings ReminderSettings { get; set; }
+
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 
     [JsonIgnore]
