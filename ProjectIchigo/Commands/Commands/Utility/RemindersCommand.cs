@@ -40,8 +40,12 @@ internal class RemindersCommand : BaseCommand
 
                 while (true)
                 {
-                    if (!selectedDueDate.HasValue || selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6))
+                    if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6)))
+                    {
                         selectedDueDate = null;
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 6 months.`").SetError(ctx));
+                        await Task.Delay(5000);
+                    }
 
                     var SelectDescriptionButton = new DiscordButtonComponent((selectedDescription.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Description", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✏")));
                     var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Due Date & Time", (selectedDescription is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
@@ -168,7 +172,8 @@ internal class RemindersCommand : BaseCommand
                 }
 
                 rem.ScheduledReminders.Remove(rem.ScheduledReminders.First(x => x.UUID == UuidResult.Result));
-
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {

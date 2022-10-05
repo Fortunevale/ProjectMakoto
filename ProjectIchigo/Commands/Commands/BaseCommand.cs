@@ -718,7 +718,6 @@ public abstract class BaseCommand
                     ThrownException = ex;
                     ExceptionOccurred = true;
                     FinishedSelection = true;
-                    throw;
                 }
             }).Add(ctx.Bot.watcher, ctx);
         }
@@ -817,12 +816,11 @@ public abstract class BaseCommand
     {
         var modal = new DiscordInteractionModalBuilder().WithTitle("Select a date and time").WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds", $"{DateTime.UtcNow.Second}", 1, 2, true, $"Second"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"{DateTime.UtcNow.Minute}", 1, 2, true, $"Minute"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"{DateTime.UtcNow.Hour}", 1, 2, true, $"Hour"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"{DateTime.UtcNow.Day}", 1, 2, true, $"Day"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"{DateTime.UtcNow.Month}", 1, 2, true, $"Month"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"{DateTime.UtcNow.Year}", 1, 2, true, $"Year"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"Minute", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"Hour", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"Day", 1, 2, true, $"{DateTime.UtcNow.Day}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"Month", 1, 2, true, $"{DateTime.UtcNow.Month}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"Year", 1, 2, true, $"{DateTime.UtcNow.Year}"));
 
 
         var ModalResult = await PromptModalWithRetry(interaction, modal, false);
@@ -848,20 +846,18 @@ public abstract class BaseCommand
         {
             if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
                 (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
-                (Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
                 (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
                 (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
                 (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
-                throw new InvalidOperationException("Invalid");
+                throw new ArgumentException("Invalid date time");
 
             int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
             int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
-            int second = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("seconds"));
             int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
             int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
             int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
 
-            dateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc);
+            dateTime = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
         }
         catch (Exception ex)
         {
