@@ -82,6 +82,9 @@ internal class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
+            embed.Description = $"`Looking for '{load}' on {(Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`";
+            await ctx.BaseCommand.RespondOrEdit(embed.Build());
+
             loadResult = await node.Rest.GetTracksAsync(load, (Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
         }
 
@@ -116,23 +119,24 @@ internal class MusicModuleAbstractions
             embed.SetAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
-            string SelectedUri;
+            var UriResult = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks
+                .Select(x => new DiscordSelectComponentOption(x.Title.TruncateWithIndication(100), x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
 
-            try
-            {
-                SelectedUri = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks.Select(x => new DiscordSelectComponentOption(x.Title, x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
-            }
-            catch (CancelException)
-            {
-                return (null, loadResult, false);
-            }
-            catch (ArgumentException)
+            if (UriResult.TimedOut)
             {
                 ctx.BaseCommand.ModifyToTimedOut();
                 return (null, loadResult, false);
             }
+            else if (UriResult.Cancelled)
+            {
+                return (null, loadResult, false);
+            }
+            else if (UriResult.Errored)
+            {
+                throw UriResult.Exception;
+            }
 
-            Tracks.Add(loadResult.Tracks.First(x => x.Uri.ToString() == SelectedUri));
+            Tracks.Add(loadResult.Tracks.First(x => x.Uri.ToString() == UriResult.Result));
 
             return (Tracks, loadResult, true);
         }

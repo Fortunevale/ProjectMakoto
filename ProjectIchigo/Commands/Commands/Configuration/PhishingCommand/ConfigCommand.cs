@@ -115,24 +115,24 @@ internal class ConfigCommand : BaseCommand
                 var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
                     .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason));
 
-                InteractionCreateEventArgs Response = null;
+                var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
-                try
+                if (ModalResult.TimedOut)
                 {
-                    Response = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
+                    ModifyToTimedOut(true);
+                    return;
                 }
-                catch (CancelException)
+                else if (ModalResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (ArgumentException)
+                else if (ModalResult.Errored)
                 {
-                    ModifyToTimedOut();
-                    return;
+                    throw ModalResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = Response.Interaction.GetModalValueByCustomId("new_reason");
+                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentReason = ModalResult.Result.Interaction.GetModalValueByCustomId("new_reason");
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -147,31 +147,33 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                TimeSpan Response;
 
-                try
+                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength, false);
+
+                if (ModalResult.TimedOut)
                 {
-                    Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength, false);
+                    ModifyToTimedOut(true);
+                    return;
                 }
-                catch (CancelException)
+                else if (ModalResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (InvalidOperationException)
+                else if (ModalResult.Errored)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").SetError(ctx, "Phishing Protection")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut();
-                    return;
+                    if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
+                    {
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").SetError(ctx, "Phishing Protection")));
+                        await Task.Delay(5000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ModalResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = Response;
+                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetectionSettings.CustomPunishmentLength = ModalResult.Result;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

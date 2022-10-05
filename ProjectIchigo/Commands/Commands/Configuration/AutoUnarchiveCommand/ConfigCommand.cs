@@ -39,57 +39,58 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == Add.CustomId)
             {
-                DiscordChannel channel;
+                var ChannelResult = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.Forum });
 
-                try
-                {
-                    channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.Forum });
-                }
-                catch (ArgumentException)
+                if (ChannelResult.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelException)
+                else if (ChannelResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (NullReferenceException)
+                else if (ChannelResult.Failed)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or forum channels in your server.`"));
-                    await Task.Delay(3000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or forum channels in your server.`"));
+                        await Task.Delay(3000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
                 }
 
-                if (!ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(channel.Id))
-                    ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Add(channel.Id);
+                if (!ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelResult.Result.Id))
+                    ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Add(ChannelResult.Result.Id);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.Result.Interaction.Data.CustomId == Remove.CustomId)
             {
-                ulong ChannelToRemove;
-
-                try
-                {
-                    var channel = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads
+                var ChannelResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads
                         .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
-                    ChannelToRemove = Convert.ToUInt64(channel);
-                }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (ChannelResult.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
+                else if (ChannelResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (ChannelResult.Errored)
+                {
+                    throw ChannelResult.Exception;
+                }
+
+                ulong ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelToRemove))
                     ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Remove(ChannelToRemove);

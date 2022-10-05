@@ -50,45 +50,48 @@ internal class ConfigCommand : BaseCommand
             }
             else if (Button.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
             {
-                try
+                var ChannelResult = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
                 {
-                    var channel = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration 
-                    { 
-                        CreateChannelOption = new()
-                        {
-                            Name = "actionlog",
-                            ChannelType = ChannelType.Text
-                        }
-                    });
-
-                    await channel.ModifyAsync(x => x.PermissionOverwrites = new List<DiscordOverwriteBuilder>
+                    CreateChannelOption = new()
                     {
-                        new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) { Denied = Permissions.All },
-                        new DiscordOverwriteBuilder(ctx.Member) { Allowed = Permissions.All },
-                    });
+                        Name = "actionlog",
+                        ChannelType = ChannelType.Text
+                    }
+                });
 
-                    ctx.Bot.guilds[ctx.Guild.Id].ActionLogSettings.Channel = channel.Id;
-
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (ChannelResult.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelException)
+                else if (ChannelResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (NullReferenceException)
+                else if (ChannelResult.Failed)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
-                    await Task.Delay(3000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                        await Task.Delay(3000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
                 }
+
+                await ChannelResult.Result.ModifyAsync(x => x.PermissionOverwrites = new List<DiscordOverwriteBuilder>
+                {
+                    new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) { Denied = Permissions.All },
+                    new DiscordOverwriteBuilder(ctx.Member) { Allowed = Permissions.All },
+                });
+
+                ctx.Bot.guilds[ctx.Guild.Id].ActionLogSettings.Channel = ChannelResult.Result.Id;
+
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (Button.Result.Interaction.Data.CustomId == ChangeFilter.CustomId)
             {

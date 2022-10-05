@@ -40,8 +40,12 @@ internal class RemindersCommand : BaseCommand
 
                 while (true)
                 {
-                    if (!selectedDueDate.HasValue || selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6))
+                    if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6)))
+                    {
                         selectedDueDate = null;
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 6 months.`").SetError(ctx));
+                        await Task.Delay(5000);
+                    }
 
                     var SelectDescriptionButton = new DiscordButtonComponent((selectedDescription.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Description", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✏")));
                     var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Due Date & Time", (selectedDescription is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
@@ -70,43 +74,52 @@ internal class RemindersCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("New Reminder", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "desc", "Description", "Enter a reminder description..", 1, 512, true));
 
-                        InteractionCreateEventArgs Response = null;
 
-                        try
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
-                        selectedDescription = Response.Interaction.GetModalValueByCustomId("desc");
+                        selectedDescription = ModalResult.Result.Interaction.GetModalValueByCustomId("desc");
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == SelectDueDateButton.CustomId)
                     {
-                        DateTime Response;
 
-                        try
+                        var ModalResult = await PromptModalForDateTime(Menu.Result.Interaction, false);
+
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalForDateTime(Menu.Result.Interaction, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
+                            {
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").SetError(ctx));
+                                await Task.Delay(5000);
+                                continue;
+                            }
+
+                            throw ModalResult.Exception;
                         }
 
-                        selectedDueDate = Response;
+                        selectedDueDate = ModalResult.Result;
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
                     {
@@ -140,26 +153,27 @@ internal class RemindersCommand : BaseCommand
             }
             else if (Button.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
             {
-                try
-                {
-                    var uuid = await PromptCustomSelection(rem.ScheduledReminders
+                var UuidResult = await PromptCustomSelection(rem.ScheduledReminders
                         .Select(x => new DiscordSelectComponentOption($"{x.Description}".TruncateWithIndication(100), x.UUID, $"in {x.DueTime.GetTotalSecondsUntil().GetHumanReadable()}")).ToList());
 
-                    rem.ScheduledReminders.Remove(rem.ScheduledReminders.First(x => x.UUID == uuid));
-
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (UuidResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
+                else if (UuidResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (UuidResult.Errored)
+                {
+                    throw UuidResult.Exception;
+                }
+
+                rem.ScheduledReminders.Remove(rem.ScheduledReminders.First(x => x.UUID == UuidResult.Result));
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {

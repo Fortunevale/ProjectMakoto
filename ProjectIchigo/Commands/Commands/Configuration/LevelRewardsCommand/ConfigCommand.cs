@@ -170,37 +170,30 @@ internal class ConfigCommand : BaseCommand
                                     action_embed.Description = $"`Select a role to assign.`";
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
 
-                                    DiscordRole role;
+                                    var RoleResult = await PromptRoleSelection();
 
-                                    try
+                                    if (RoleResult.TimedOut)
                                     {
-                                        role = await PromptRoleSelection();
-                                    }
-                                    catch (ArgumentException)
-                                    {
-                                        ModifyToTimedOut(true);
+                                        ModifyToTimedOut();
                                         return;
                                     }
-                                    catch (NullReferenceException)
+                                    else if (RoleResult.Cancelled)
                                     {
-                                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                                        await Task.Delay(3000);
                                         continue;
                                     }
-                                    catch (CancelException)
+                                    else if (RoleResult.Failed)
                                     {
-                                        continue;
+                                        if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                                        {
+                                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                            await Task.Delay(3000);
+                                            return;
+                                        }
+
+                                        throw RoleResult.Exception;
                                     }
 
-                                    if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
-                                    {
-                                        action_embed.Description = $"`The role you're trying to add has already been assigned to level {ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == role.Id).Level}.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
-                                        await Task.Delay(3000);
-                                        continue;
-                                    }
-
-                                    selectedRole = role;
+                                    selectedRole = RoleResult.Result;
                                     continue;
                                 }
                                 else if (Menu.Result.Interaction.Data.CustomId == SelectLevel.CustomId)
@@ -208,22 +201,24 @@ internal class ConfigCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("Input Level", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "level", "Level", "2", 1, 3, true, (selectedLevel is -1 ? 2 : selectedLevel).ToString()));
 
-                                    InteractionCreateEventArgs Response = null;
 
-                                    try
+                                    var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                                    if (ModalResult.TimedOut)
                                     {
-                                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         continue;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
 
+                                    InteractionCreateEventArgs Response = ModalResult.Result;
                                     var rawInt = Response.Interaction.GetModalValueByCustomId("level");
 
                                     uint level;
@@ -251,21 +246,24 @@ internal class ConfigCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("Define new custom message", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "message", "Custom Message", "You received ##Role##!", 1, 256, true, selectedCustomText));
 
-                                    InteractionCreateEventArgs Response = null;
 
-                                    try
+                                    var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                                    if (ModalResult.TimedOut)
                                     {
-                                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         continue;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
+
+                                    InteractionCreateEventArgs Response = ModalResult.Result;
 
                                     var newMessage = Response.Interaction.GetModalValueByCustomId("message");
 
@@ -316,23 +314,24 @@ internal class ConfigCommand : BaseCommand
                                 .WithCustomId(Guid.NewGuid().ToString())
                                 .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", "Custom Message (<256 characters)", null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(e.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(e.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 await RefreshMessage();
                                 return;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
 
+                            InteractionCreateEventArgs Response = ModalResult.Result;
                             var result = Response.Interaction.GetModalValueByCustomId("new_text");
 
                             if (result.Length > 256)

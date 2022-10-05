@@ -210,49 +210,50 @@ public abstract class BaseCommand
 
 
     #region Selections
-    internal async Task<DiscordRole> PromptRoleSelection(RolePromptConfiguration configuration = null)
+    internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
+        timeOutOverride ??= TimeSpan.FromSeconds(60);
 
-        List<DiscordSelectComponentOption> roles = new();
+        List<DiscordSelectComponentOption> FetchedRoles = new();
 
         var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int currentPage = 0;
+        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
 
-        DiscordRole Role = null;
+        DiscordRole FinalSelection = null;
 
         string Selected = "";
 
         bool FinishedSelection = false;
-        bool Exceptionoccurred = false;
-        Exception exception = null;
+        bool ExceptionOccurred = false;
+        Exception ThrownException = null;
 
         async Task RefreshList()
         {
-            roles.Clear();
+            FetchedRoles.Clear();
 
             if (!configuration.CreateRoleOption.IsNullOrWhiteSpace())
-                roles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
+                FetchedRoles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                roles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+                FetchedRoles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
             foreach (var b in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
             {
                 if (ctx.CurrentMember.GetRoleHighestPosition() > b.Value.Position && ctx.Member.GetRoleHighestPosition() > b.Value.Position && !b.Value.IsManaged && b.Value.Id != ctx.Guild.EveryoneRole.Id)
-                    roles.Add(new DiscordSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                    FetchedRoles.Add(new DiscordSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
             }
 
-            if (!roles.Any(x => x.Default))
+            if (!FetchedRoles.Any(x => x.Default))
                 Selected = "";
 
-            if (!roles.IsNotNullAndNotEmpty())
+            if (!FetchedRoles.IsNotNullAndNotEmpty())
                 throw new NullReferenceException("No valid role found.");
         }
 
@@ -260,20 +261,20 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent("Select a role..", roles.Skip(currentPage * 25).Take(25), SelectionInteractionId);
+            var dropdown = new DiscordSelectComponent("Select a role..", FetchedRoles.Skip(CurrentPage * 25).Take(25), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
-            if (!roles.Skip(currentPage * 25).Any())
-                currentPage--;
+            if (!FetchedRoles.Skip(CurrentPage * 25).Any())
+                CurrentPage--;
 
-            if (currentPage < 0)
-                currentPage = 0;
+            if (CurrentPage < 0)
+                CurrentPage = 0;
 
-            if (roles.Skip(currentPage * 25).Count() > 25)
-                builder.AddComponents(nextPageButton);
+            if (FetchedRoles.Skip(CurrentPage * 25).Count() > 25)
+                builder.AddComponents(NextPageButton);
 
-            if (currentPage != 0)
-                builder.AddComponents(previousPageButton);
+            if (CurrentPage != 0)
+                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
@@ -305,7 +306,7 @@ public abstract class BaseCommand
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
-                            roles = roles.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+                            FetchedRoles = FetchedRoles.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
@@ -319,22 +320,22 @@ public abstract class BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                             if (Selected is "create_for_me")
-                                Role = await ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
+                                FinalSelection = await ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
                             else if (Selected is "disable")
-                                Role = null;
+                                FinalSelection = null;
                             else
-                                Role = ctx.Guild.GetRole(Convert.ToUInt64(Selected));
+                                FinalSelection = ctx.Guild.GetRole(Convert.ToUInt64(Selected));
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
                         {
-                            currentPage--;
+                            CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
                         {
-                            currentPage++;
+                            CurrentPage++;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
@@ -343,174 +344,7 @@ public abstract class BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
-                    Exceptionoccurred = true;
-                    FinishedSelection = true;
-                }
-            });
-        }
-
-        ctx.Client.ComponentInteractionCreated += RunInteraction;
-
-        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
-        {
-            await Task.Delay(100);
-        }
-
-        ctx.Client.ComponentInteractionCreated -= RunInteraction;
-
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
-
-        if (Exceptionoccurred)
-            throw exception;
-
-        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
-            throw new ArgumentException("No selection made");
-
-        return Role;
-    }
-
-    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null)
-        => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration);
-
-    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null)
-    {
-        configuration ??= new();
-
-        List<DiscordSelectComponentOption> channels = new();
-
-        var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
-
-        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-
-        int currentPage = 0;
-        string SelectionInteractionId = Guid.NewGuid().ToString();
-
-        DiscordChannel Channel = null;
-
-        string Selected = "";
-
-        bool FinishedSelection = false;
-        bool ExceptionOccurred = false;
-        Exception exception = null;
-
-        async Task RefreshList()
-        {
-            channels.Clear();
-
-            if (configuration.CreateChannelOption is not null)
-                channels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
-
-            if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                channels.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
-
-            foreach (var category in ctx.Guild.GetOrderedChannels())
-            {
-                foreach (var b in category.Value)
-                    if (channelTypes is null || channelTypes.Contains(b.Type))
-                        channels.Add(new DiscordSelectComponentOption(
-                        $"{b.GetIcon()}{b.Name} ({b.Id})",
-                        b.Id.ToString(),
-                        $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}", (b.Id.ToString() == Selected)));
-            }
-
-            if (!channels.Any(x => x.Default))
-                Selected = "";
-
-            if (!channels.IsNotNullAndNotEmpty())
-                throw new NullReferenceException("No valid channel found.");
-        }
-
-        await RefreshList();
-
-        async Task RefreshMessage()
-        {
-            var dropdown = new DiscordSelectComponent("Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
-
-            if (!channels.Skip(currentPage * 25).Any())
-                currentPage--;
-
-            if (currentPage < 0)
-                currentPage = 0;
-
-            if (channels.Skip(currentPage * 25).Count() > 25)
-                builder.AddComponents(nextPageButton);
-
-            if (currentPage != 0)
-                builder.AddComponents(previousPageButton);
-
-            if (Selected.IsNullOrWhiteSpace())
-                ConfirmSelectionButton.Disable();
-            else
-                ConfirmSelectionButton.Enable();
-
-            builder.AddComponents(new List<DiscordComponent> { RefreshListButton, ConfirmSelectionButton });
-            builder.AddComponents(MessageComponents.CancelButton);
-
-            await RespondOrEdit(builder);
-        }
-
-        _ = RefreshMessage();
-
-        Stopwatch sw = new();
-        sw.Start();
-
-        async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
-        {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
-                    {
-                        sw.Restart();
-                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                        if (e.Interaction.Data.CustomId == SelectionInteractionId)
-                        {
-                            Selected = e.Values.First();
-                            channels = channels.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
-
-                            await RefreshMessage();
-                        }
-                        else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
-                        {
-                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
-
-                            if (Selected is "create_for_me")
-                                Channel = await ctx.Guild.CreateChannelAsync(configuration.CreateChannelOption.Name, configuration.CreateChannelOption.ChannelType);
-                            else if (Selected is "disable")
-                                Channel = null;
-                            else
-                                Channel = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
-
-                            FinishedSelection = true;
-                        }
-                        else if (e.Interaction.Data.CustomId == RefreshListButton.CustomId)
-                        {
-                            await RefreshList();
-                            await RefreshMessage();
-                        }
-                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
-                        {
-                            currentPage--;
-                            await RefreshMessage();
-                        }
-                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
-                        {
-                            currentPage++;
-                            await RefreshMessage();
-                        }
-                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
-                            throw new CancelException();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
+                    ThrownException = ex;
                     ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
@@ -519,7 +353,175 @@ public abstract class BaseCommand
 
         ctx.Client.ComponentInteractionCreated += RunInteraction;
 
-        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
+        while (!FinishedSelection && sw.Elapsed <= timeOutOverride)
+        {
+            await Task.Delay(100);
+        }
+
+        ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
+
+        if (ExceptionOccurred)
+            return new InteractionResult<DiscordRole>(ThrownException);
+
+        if (sw.Elapsed >= timeOutOverride)
+            return new InteractionResult<DiscordRole>(new TimedOutException());
+
+        return new InteractionResult<DiscordRole>(FinalSelection);
+    }
+
+    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+        => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
+
+    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    {
+        configuration ??= new();
+        timeOutOverride ??= TimeSpan.FromSeconds(60);
+
+        List<DiscordSelectComponentOption> FetchedChannels = new();
+
+        var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+
+        int CurrentPage = 0;
+        string SelectionInteractionId = Guid.NewGuid().ToString();
+
+        DiscordChannel FinalSelection = null;
+
+        string Selected = "";
+
+        bool FinishedSelection = false;
+        bool ExceptionOccurred = false;
+        Exception ThrownException = null;
+
+        async Task RefreshList()
+        {
+            FetchedChannels.Clear();
+
+            if (configuration.CreateChannelOption is not null)
+                FetchedChannels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
+
+            if (!configuration.DisableOption.IsNullOrWhiteSpace())
+                FetchedChannels.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+
+            foreach (var category in ctx.Guild.GetOrderedChannels())
+            {
+                foreach (var b in category.Value)
+                    if (channelTypes is null || channelTypes.Contains(b.Type))
+                        FetchedChannels.Add(new DiscordSelectComponentOption(
+                        $"{b.GetIcon()}{b.Name} ({b.Id})",
+                        b.Id.ToString(),
+                        $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}", (b.Id.ToString() == Selected)));
+            }
+
+            if (!FetchedChannels.Any(x => x.Default))
+                Selected = "";
+
+            if (!FetchedChannels.IsNotNullAndNotEmpty())
+                throw new NullReferenceException("No valid channel found.");
+        }
+
+        await RefreshList();
+
+        async Task RefreshMessage()
+        {
+            var dropdown = new DiscordSelectComponent("Select a channel..", FetchedChannels.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
+
+            if (!FetchedChannels.Skip(CurrentPage * 25).Any())
+                CurrentPage--;
+
+            if (CurrentPage < 0)
+                CurrentPage = 0;
+
+            if (FetchedChannels.Skip(CurrentPage * 25).Count() > 25)
+                builder.AddComponents(NextPageButton);
+
+            if (CurrentPage != 0)
+                builder.AddComponents(PrevPageButton);
+
+            if (Selected.IsNullOrWhiteSpace())
+                ConfirmSelectionButton.Disable();
+            else
+                ConfirmSelectionButton.Enable();
+
+            builder.AddComponents(new List<DiscordComponent> { RefreshListButton, ConfirmSelectionButton });
+            builder.AddComponents(MessageComponents.CancelButton);
+
+            await RespondOrEdit(builder);
+        }
+
+        _ = RefreshMessage();
+
+        Stopwatch sw = new();
+        sw.Start();
+
+        async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
+                    {
+                        sw.Restart();
+                        _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                        if (e.Interaction.Data.CustomId == SelectionInteractionId)
+                        {
+                            Selected = e.Values.First();
+                            FetchedChannels = FetchedChannels.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+
+                            await RefreshMessage();
+                        }
+                        else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
+                        {
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                            if (Selected is "create_for_me")
+                                FinalSelection = await ctx.Guild.CreateChannelAsync(configuration.CreateChannelOption.Name, configuration.CreateChannelOption.ChannelType);
+                            else if (Selected is "disable")
+                                FinalSelection = null;
+                            else
+                                FinalSelection = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
+
+                            FinishedSelection = true;
+                        }
+                        else if (e.Interaction.Data.CustomId == RefreshListButton.CustomId)
+                        {
+                            await RefreshList();
+                            await RefreshMessage();
+                        }
+                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
+                        {
+                            CurrentPage--;
+                            await RefreshMessage();
+                        }
+                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
+                        {
+                            CurrentPage++;
+                            await RefreshMessage();
+                        }
+                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                            throw new CancelException();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ThrownException = ex;
+                    ExceptionOccurred = true;
+                    FinishedSelection = true;
+                }
+            });
+        }
+
+        ctx.Client.ComponentInteractionCreated += RunInteraction;
+
+        while (!FinishedSelection && sw.Elapsed <= timeOutOverride)
         {
             await Task.Delay(100);
         }
@@ -528,43 +530,45 @@ public abstract class BaseCommand
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
-            throw exception;
+            return new InteractionResult<DiscordChannel>(ThrownException);
 
-        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
-            throw new ArgumentException("No selection made");
+        if (sw.Elapsed >= timeOutOverride)
+            return new InteractionResult<DiscordChannel>(new TimedOutException());
 
-        return Channel;
+        return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<string> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..")
+    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
     {
+        timeOutOverride ??= TimeSpan.FromSeconds(60);
+
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int currentPage = 0;
+        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
         
 
-        string Selection = null;
+        string FinalSelection = null;
 
         string Selected = "";
 
         bool FinishedSelection = false;
-        bool Exceptionoccurred = false;
-        Exception exception = null;
+        bool ExceptionOccurred = false;
+        Exception ThrownException = null;
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
+            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
-            if (options.Skip(currentPage * 25).Count() > 25)
-                builder.AddComponents(nextPageButton);
+            if (options.Skip(CurrentPage * 25).Count() > 25)
+                builder.AddComponents(NextPageButton);
 
-            if (currentPage != 0)
-                builder.AddComponents(previousPageButton);
+            if (CurrentPage != 0)
+                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
@@ -582,7 +586,7 @@ public abstract class BaseCommand
         Stopwatch sw = new();
         sw.Start();
 
-        async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+        async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
         {
             _ = Task.Run(async () =>
             {
@@ -602,20 +606,20 @@ public abstract class BaseCommand
                         }
                         else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
                         {
-                            ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                            Selection = Selected;
+                            FinalSelection = Selected;
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
                         {
-                            currentPage--;
+                            CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
                         {
-                            currentPage++;
+                            CurrentPage++;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
@@ -624,38 +628,39 @@ public abstract class BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
-                    Exceptionoccurred = true;
+                    ThrownException = ex;
+                    ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
             });
         }
 
-        ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated += RunInteraction;
 
-        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
+        while (!FinishedSelection && sw.Elapsed <= timeOutOverride)
         {
             await Task.Delay(100);
         }
 
-        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
-        if (Exceptionoccurred)
-            throw exception;
+        if (ExceptionOccurred)
+            return new InteractionResult<string>(ThrownException);
 
-        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
-            throw new ArgumentException("No selection made");
+        if (sw.Elapsed >= timeOutOverride)
+            return new InteractionResult<string>(new TimedOutException());
 
-        return Selection;
+        return new InteractionResult<string>(FinalSelection);
     }
     #endregion
 
     #region Modals
-    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
+    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null) 
+        => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
-    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null, bool open = true)
+    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
@@ -671,9 +676,9 @@ public abstract class BaseCommand
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
         bool FinishedSelection = false;
-        bool Exceptionoccurred = false;
+        bool ExceptionOccurred = false;
         bool Cancelled = false;
-        Exception exception = null;
+        Exception ThrownException = null;
 
         if (open)
             await interaction.CreateInteractionModalResponseAsync(builder);
@@ -704,23 +709,22 @@ public abstract class BaseCommand
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-                            Cancelled = true;
+                            throw new CancelException();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
-                    Exceptionoccurred = true;
+                    ThrownException = ex;
+                    ExceptionOccurred = true;
                     FinishedSelection = true;
-                    throw;
                 }
             }).Add(ctx.Bot.watcher, ctx);
         }
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
 
-        while (!FinishedSelection && !Exceptionoccurred && !Cancelled && TimeoutSeconds >= 0)
+        while (!FinishedSelection && !ExceptionOccurred && !Cancelled && TimeoutSeconds >= 0)
         {
             await Task.Delay(500);
             TimeoutSeconds--;
@@ -731,20 +735,17 @@ public abstract class BaseCommand
         if (ResetToOriginalEmbed)
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
 
-        if (Exceptionoccurred)
-            throw exception;
+        if (ExceptionOccurred)
+            return new InteractionResult<ComponentInteractionCreateEventArgs>(ThrownException);
 
         if (TimeoutSeconds <= 0)
-            throw new ArgumentException("Modal not submitted");
+            return new InteractionResult<ComponentInteractionCreateEventArgs>(new TimeoutException());
 
-        if (Cancelled)
-            throw new CancelException();
-
-        return FinishedInteraction;
+        return new InteractionResult<ComponentInteractionCreateEventArgs>(FinishedInteraction);
     }
 
 
-    internal async Task<TimeSpan> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
@@ -763,76 +764,107 @@ public abstract class BaseCommand
         if (MaxTime.Value.TotalDays >= 1)
             modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", $"Days (max. {((int)MaxTime.Value.TotalDays)})", "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
-        InteractionCreateEventArgs Response;
+        var ModalResult = await PromptModalWithRetry(interaction, modal, false);
 
-        try
+        if (ModalResult.TimedOut)
         {
-            Response = await PromptModalWithRetry(interaction, modal, false);
+            return new InteractionResult<TimeSpan>(new TimedOutException());
         }
-        catch (Exception)
+        else if (ModalResult.Cancelled)
         {
-            throw;
+            return new InteractionResult<TimeSpan>(new CancelException());
         }
+        else if (ModalResult.Errored)
+        {
+            return new InteractionResult<TimeSpan>(ModalResult.Exception);
+        }
+
+        InteractionCreateEventArgs Response = ModalResult.Result;
 
         TimeSpan length = TimeSpan.FromSeconds(0);
 
-        if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
-            throw new InvalidOperationException("Invalid TimeSpan");
+        try
+        {
+            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
+                throw new InvalidOperationException("Invalid TimeSpan");
 
-        double seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
-        double minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
-        double hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
-        double days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
+            double seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
+            double minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
+            double hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
+            double days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
 
-        length = length.Add(TimeSpan.FromSeconds(seconds));
-        length = length.Add(TimeSpan.FromMinutes(minutes));
-        length = length.Add(TimeSpan.FromHours(hours));
-        length = length.Add(TimeSpan.FromDays(days));
+            length = length.Add(TimeSpan.FromSeconds(seconds));
+            length = length.Add(TimeSpan.FromMinutes(minutes));
+            length = length.Add(TimeSpan.FromHours(hours));
+            length = length.Add(TimeSpan.FromDays(days));
+        }
+        catch (Exception ex)
+        {
+            return new InteractionResult<TimeSpan>(ex);
+        }
 
         if (length > MaxTime || length < MinTime)
-            throw new InvalidOperationException("Invalid TimeSpan");
+            return new InteractionResult<TimeSpan>(new InvalidOperationException("Invalid TimeSpan"));
 
-        return length;
+        return new InteractionResult<TimeSpan>(length);
     }
 
-    internal async Task<DateTime> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
-        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a time span").WithCustomId(Guid.NewGuid().ToString());
+        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a date and time").WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"{DateTime.UtcNow.Hour}", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"{DateTime.UtcNow.Minute}", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"{DateTime.UtcNow.Day}", 1, 2, true, $"{DateTime.UtcNow.Day}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"{DateTime.UtcNow.Month}", 1, 2, true, $"{DateTime.UtcNow.Month}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"{DateTime.UtcNow.Year}", 1, 2, true, $"{DateTime.UtcNow.Year}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"Minute", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"Hour", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"Day", 1, 2, true, $"{DateTime.UtcNow.Day}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"Month", 1, 2, true, $"{DateTime.UtcNow.Month}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"Year", 1, 2, true, $"{DateTime.UtcNow.Year}"));
 
-        InteractionCreateEventArgs Response;
+
+        var ModalResult = await PromptModalWithRetry(interaction, modal, false);
+
+        if (ModalResult.TimedOut)
+        {
+            return new InteractionResult<DateTime>(new TimedOutException());
+        }
+        else if (ModalResult.Cancelled)
+        {
+            return new InteractionResult<DateTime>(new CancelException());
+        }
+        else if (ModalResult.Errored)
+        {
+            return new InteractionResult<DateTime>(ModalResult.Exception);
+        }
+
+        InteractionCreateEventArgs Response = ModalResult.Result;
+
+        DateTime dateTime;
 
         try
         {
-            Response = await PromptModalWithRetry(interaction, modal, false);
+            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
+                throw new ArgumentException("Invalid date time");
+
+            int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
+            int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
+            int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
+            int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
+            int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
+
+            dateTime = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            return new InteractionResult<DateTime>(ex);
         }
 
-        if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
-            throw new InvalidOperationException("Invalid");
-
-        int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
-        int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
-        int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
-        int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
-        int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
-
-        return new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
+        return new InteractionResult<DateTime>(dateTime);
     } 
     #endregion
 

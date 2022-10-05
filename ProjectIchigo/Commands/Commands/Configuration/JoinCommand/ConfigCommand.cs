@@ -71,73 +71,74 @@ internal class ConfigCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == ChangeJoinlogChannel.CustomId)
             {
-                try
+                var ChannelResult = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
                 {
-                    var channel = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration 
-                    { 
-                        CreateChannelOption = new()
-                        {
-                            Name = "joinlog",
-                            ChannelType = ChannelType.Text
-                        },
-                        DisableOption = "Disable Joinglog"
-                    });
+                    CreateChannelOption = new()
+                    {
+                        Name = "joinlog",
+                        ChannelType = ChannelType.Text
+                    },
+                    DisableOption = "Disable Joinglog"
+                });
 
-                    if (channel is null)
-                        ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = 0;
-                    else
-                        ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = channel.Id;
-
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (ChannelResult.TimedOut)
                 {
                     ModifyToTimedOut(true);
-                }
-                catch (NullReferenceException)
-                {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
-                    await Task.Delay(3000);
-                    await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (CancelException)
+                else if (ChannelResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                else if (ChannelResult.Failed)
+                {
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                        await Task.Delay(3000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
+                }
+
+                ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.JoinlogChannelId = ChannelResult.Result is null ? 0 : ChannelResult.Result.Id;
+
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (e.Result.Interaction.Data.CustomId == ChangeRoleOnJoin.CustomId)
             {
-                try
-                {
-                    var role = await PromptRoleSelection(new RolePromptConfiguration { CreateRoleOption = "AutoAssignedRole", DisableOption = "Disable Role on join" });
+                var RoleResult = await PromptRoleSelection(new RolePromptConfiguration { CreateRoleOption = "AutoAssignedRole", DisableOption = "Disable Role on join" });
 
-                    if (role is null)
-                        ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = 0;
-                    else
-                        ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = role.Id;
+                if (RoleResult.TimedOut)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+                else if (RoleResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (RoleResult.Failed)
+                {
+                    if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await Task.Delay(3000);
+                        return;
+                    }
 
-                    await ExecuteCommand(ctx, arguments);
-                    return;
+                    throw RoleResult.Exception;
                 }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (NullReferenceException)
-                {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                    await Task.Delay(3000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut(true);
-                }
+
+                ctx.Bot.guilds[ctx.Guild.Id].JoinSettings.AutoAssignRoleId = RoleResult.Result is null ? 0 : RoleResult.Result.Id;
+
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {

@@ -60,23 +60,32 @@ internal class CustomEmbedCommand : BaseCommand
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 0, 256, false, GeneratedEmbed.Title))
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Url", "", 0, 256, false, GeneratedEmbed.Url));
 
-                        InteractionCreateEventArgs Response = null;
+                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
-                        try
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
+                        InteractionCreateEventArgs Response = ModalResult.Result;
+
                         var url = Response.Interaction.GetModalValueByCustomId("url");
+
+                        try
+                        {
+                            url = new UriBuilder(url).Uri.ToString();
+                        }
+                        catch (Exception)
+                        { continue; }
 
                         if (!url.IsNullOrWhiteSpace())
                             if (!url.ToLower().StartsWith("https://") && !url.ToLower().StartsWith("http://"))
@@ -117,21 +126,23 @@ internal class CustomEmbedCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder("Set name for author field", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Name", "", 0, 256, false, GeneratedEmbed.Author.Name));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 continue;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
+
+                            InteractionCreateEventArgs Response = ModalResult.Result;
 
                             GeneratedEmbed.Author.Name = Response.Interaction.GetModalValueByCustomId("name");
                             continue;
@@ -141,21 +152,23 @@ internal class CustomEmbedCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder("Set url for author field", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Url", "", 0, 256, false, GeneratedEmbed.Author.Url));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 continue;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
+
+                            InteractionCreateEventArgs Response = ModalResult.Result;
 
                             var url = Response.Interaction.GetModalValueByCustomId("url");
 
@@ -213,21 +226,23 @@ internal class CustomEmbedCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder("Select user by id", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", "User Id", "", 0, 20, false));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 continue;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
+
+                            InteractionCreateEventArgs Response = ModalResult.Result;
 
                             try
                             {
@@ -310,21 +325,23 @@ internal class CustomEmbedCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("Set description for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 0, 4000, false, GeneratedEmbed.Description));
 
-                        InteractionCreateEventArgs Response = null;
+                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
-                        try
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
+
+                        InteractionCreateEventArgs Response = ModalResult.Result;
 
                         GeneratedEmbed.Description = Response.Interaction.GetModalValueByCustomId("description");
                         continue;
@@ -376,21 +393,23 @@ internal class CustomEmbedCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("Set color for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Color", "#FF0000", 1, 100, false));
 
-                        InteractionCreateEventArgs Response = null;
+                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
-                        try
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
+
+                        InteractionCreateEventArgs Response = ModalResult.Result;
 
                         GeneratedEmbed.Color = new DiscordColor(Response.Interaction.GetModalValueByCustomId("color").Truncate(7).IsValidHexColor());
                         continue;
@@ -425,21 +444,23 @@ internal class CustomEmbedCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder("Set text for footer field", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "text", "Text", "", 0, 2048, false, GeneratedEmbed.Footer.Text));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 continue;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
+
+                            InteractionCreateEventArgs Response = ModalResult.Result;
 
                             GeneratedEmbed.Footer.Text = Response.Interaction.GetModalValueByCustomId("text");
                             continue;
@@ -491,21 +512,23 @@ internal class CustomEmbedCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder("Select user by id", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", "User Id", "", 0, 20, false));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 continue;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
+
+                            InteractionCreateEventArgs Response = ModalResult.Result;
 
                             try
                             {
@@ -540,27 +563,24 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == SetTimestamp.CustomId)
                     {
-                        DateTime Response;
+                        var ModalResult = await PromptModalForDateTime(Menu1.Result.Interaction, false);
 
-                        try
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalForDateTime(Menu1.Result.Interaction, false);
-                        }
-                        catch (CancelException)
-                        {
-                            continue;
-                        }
-                        catch (ArgumentException)
-                        {
-                            ModifyToTimedOut();
+                            ModifyToTimedOut(true);
                             return;
                         }
-                        catch (Exception)
+                        else if (ModalResult.Cancelled)
+                        {
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+                        else if (ModalResult.Errored)
                         {
                             continue;
                         }
 
-                        GeneratedEmbed.Timestamp = Response;
+                        GeneratedEmbed.Timestamp = ModalResult.Result;
                         continue;
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == AddField.CustomId)
@@ -570,21 +590,23 @@ internal class CustomEmbedCommand : BaseCommand
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 0, 1024, true))
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "inline", "Inline", "", 4, 5, true, false.ToString()));
 
-                        InteractionCreateEventArgs Response = null;
+                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
-                        try
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
+
+                        InteractionCreateEventArgs Response = ModalResult.Result;
 
                         try
                         {
@@ -605,44 +627,47 @@ internal class CustomEmbedCommand : BaseCommand
                             return Count;
                         }
 
-                        DiscordEmbedField FieldToEdit;
+                        var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
+                            .Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
-                        try
+                        if (FieldResult.TimedOut)
                         {
-                            var channel = await PromptCustomSelection(GeneratedEmbed.Fields.Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
-
-                            FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (FieldResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (FieldResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw FieldResult.Exception;
                         }
+
+                        DiscordEmbedField FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)];
 
                         var modal = new DiscordInteractionModalBuilder("Modify field for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", "Title", "", 1, 256, true, FieldToEdit.Name))
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 1, 1024, true, FieldToEdit.Value))
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "inline", "Inline", "", 4, 5, true, FieldToEdit.Inline.ToString()));
 
-                        InteractionCreateEventArgs Response = null;
+                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
-                        try
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu1.Result.Interaction, modal, null, false, null, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
+
+                        InteractionCreateEventArgs Response = ModalResult.Result;
 
                         try
                         {
@@ -665,54 +690,55 @@ internal class CustomEmbedCommand : BaseCommand
                             return Count;
                         }
 
-                        DiscordEmbedField FieldToRemove;
+                        var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
+                            .Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
-                        try
+                        if (FieldResult.TimedOut)
                         {
-                            var channel = await PromptCustomSelection(GeneratedEmbed.Fields.Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
-
-                            FieldToRemove = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (FieldResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (FieldResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw FieldResult.Exception;
                         }
 
-                        GeneratedEmbed.RemoveField(FieldToRemove);
+                        GeneratedEmbed.RemoveField(GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)]);
                         continue;
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == FinishAndSend.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        DiscordChannel channel;
+                        var ChannelResult = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
 
-                        try
+                        if (ChannelResult.TimedOut)
                         {
-                            channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (ArgumentException)
+                        else if (ChannelResult.Cancelled)
                         {
-                            ModifyToTimedOut();
-                            continue;
+                            await ExecuteCommand(ctx, arguments);
+                            return;
                         }
-                        catch (NullReferenceException)
+                        else if (ChannelResult.Failed)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
-                            await Task.Delay(3000);
-                            continue;
-                        }
-                        catch (CancelException)
-                        {
-                            continue;
+                            if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                            {
+                                await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
+                                await Task.Delay(3000);
+                                continue;
+                            }
+
+                            throw ChannelResult.Exception;
                         }
 
-                        await channel.SendMessageAsync(GeneratedEmbed);
+                        await ChannelResult.Result.SendMessageAsync(GeneratedEmbed);
                         DeleteOrInvalidate();
                         return;
                     }

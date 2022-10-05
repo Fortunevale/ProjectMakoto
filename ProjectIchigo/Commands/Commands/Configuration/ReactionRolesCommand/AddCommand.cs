@@ -66,30 +66,33 @@ internal class AddCommand : BaseCommand
                 {
                     case Enums.CommandType.ContextMenu:
                     {
-                        try
-                        {
-                            embed.Description = $"`Please select the role you want this reaction role to assign below.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetAwaitingInput(ctx, "Reaction Roles")));
-                            role_parameter = await PromptRoleSelection();
-                        }
-                        catch (ArgumentException)
+                        embed.Description = $"`Please select the role you want this reaction role to assign below.`";
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetAwaitingInput(ctx, "Reaction Roles")));
+                        var RoleResult = await PromptRoleSelection();
+
+                        if (RoleResult.TimedOut)
                         {
                             ModifyToTimedOut();
                             return;
                         }
-                        catch (NullReferenceException)
-                        {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                            await Task.Delay(3000);
-                            await ExecuteCommand(ctx, arguments);
-                            return;
-                        }
-                        catch (CancelException)
+                        else if (RoleResult.Cancelled)
                         {
                             DeleteOrInvalidate();
                             return;
                         }
+                        else if (RoleResult.Failed)
+                        {
+                            if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                            {
+                                await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                await Task.Delay(3000);
+                                return;
+                            }
 
+                            throw RoleResult.Exception;
+                        }
+
+                        role_parameter = RoleResult.Result;
                         break;
                     }
                     default:
