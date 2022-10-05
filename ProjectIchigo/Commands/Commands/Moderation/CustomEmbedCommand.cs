@@ -605,23 +605,24 @@ internal class CustomEmbedCommand : BaseCommand
                             return Count;
                         }
 
-                        DiscordEmbedField FieldToEdit;
+                        var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
+                            .Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
-                        try
+                        if (FieldResult.TimedOut)
                         {
-                            var channel = await PromptCustomSelection(GeneratedEmbed.Fields.Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
-
-                            FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (FieldResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (FieldResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw FieldResult.Exception;
                         }
+
+                        DiscordEmbedField FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)];
 
                         var modal = new DiscordInteractionModalBuilder("Modify field for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", "Title", "", 1, 256, true, FieldToEdit.Name))
@@ -665,54 +666,55 @@ internal class CustomEmbedCommand : BaseCommand
                             return Count;
                         }
 
-                        DiscordEmbedField FieldToRemove;
+                        var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
+                            .Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
-                        try
+                        if (FieldResult.TimedOut)
                         {
-                            var channel = await PromptCustomSelection(GeneratedEmbed.Fields.Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
-
-                            FieldToRemove = GeneratedEmbed.Fields[Convert.ToInt32(channel)];
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (FieldResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (FieldResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw FieldResult.Exception;
                         }
 
-                        GeneratedEmbed.RemoveField(FieldToRemove);
+                        GeneratedEmbed.RemoveField(GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)]);
                         continue;
                     }
                     else if (Menu1.Result.Interaction.Data.CustomId == FinishAndSend.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        DiscordChannel channel;
+                        var ChannelResult = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
 
-                        try
+                        if (ChannelResult.TimedOut)
                         {
-                            channel = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (ArgumentException)
+                        else if (ChannelResult.Cancelled)
                         {
-                            ModifyToTimedOut();
-                            continue;
+                            await ExecuteCommand(ctx, arguments);
+                            return;
                         }
-                        catch (NullReferenceException)
+                        else if (ChannelResult.Failed)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
-                            await Task.Delay(3000);
-                            continue;
-                        }
-                        catch (CancelException)
-                        {
-                            continue;
+                            if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                            {
+                                await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
+                                await Task.Delay(3000);
+                                continue;
+                            }
+
+                            throw ChannelResult.Exception;
                         }
 
-                        await channel.SendMessageAsync(GeneratedEmbed);
+                        await ChannelResult.Result.SendMessageAsync(GeneratedEmbed);
                         DeleteOrInvalidate();
                         return;
                     }

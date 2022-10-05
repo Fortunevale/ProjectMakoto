@@ -64,28 +64,29 @@ internal class ConfigCommand : BaseCommand
                 embed = embed.SetAwaitingInput(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
-                DiscordRole role;
 
-                try
+                var RoleResult = await PromptRoleSelection(new() { CreateRoleOption = "BumpReminder" });
+
+                if (RoleResult.TimedOut)
                 {
-                    role = await PromptRoleSelection(new() { CreateRoleOption = "BumpReminder" });
-                }
-                catch (CancelException)
-                {
-                    DeleteOrInvalidate();
+                    ModifyToTimedOut();
                     return;
                 }
-                catch (NullReferenceException)
+                else if (RoleResult.Cancelled)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                    await Task.Delay(3000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (ArgumentException)
+                else if (RoleResult.Failed)
                 {
-                    ModifyToTimedOut(true);
-                    return;
+                    if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await Task.Delay(3000);
+                        return;
+                    }
+
+                    throw RoleResult.Exception;
                 }
 
                 var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with ✅ to receive notifications as soon as the server can be bumped again.");
@@ -94,7 +95,7 @@ internal class ConfigCommand : BaseCommand
 
                 _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
 
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.RoleId = role.Id;
+                ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.RoleId = RoleResult.Result.Id;
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId = ctx.Channel.Id;
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.MessageId = bump_reaction_msg.Id;
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.LastBump = DateTime.UtcNow.AddHours(-2);
@@ -130,59 +131,65 @@ internal class ConfigCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
             {
-                try
-                {
-                    var channel = await PromptChannelSelection(ChannelType.Text);
+                var ChannelResult = await PromptChannelSelection(ChannelType.Text);
 
-                    ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId = channel.Id;
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (ChannelResult.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
-                catch (NullReferenceException)
+                else if (ChannelResult.Cancelled)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
-                    await Task.Delay(3000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                else if (ChannelResult.Failed)
+                {
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                        await Task.Delay(3000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
+                }
+
+                ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.ChannelId = ChannelResult.Result.Id;
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (e.Result.Interaction.Data.CustomId == ChangeRole.CustomId)
             {
-                try
-                {
-                    var role = await PromptRoleSelection();
 
-                    ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.RoleId = role.Id;
-                    await ExecuteCommand(ctx, arguments);
+                var RoleResult = await PromptRoleSelection();
+
+                if (RoleResult.TimedOut)
+                {
+                    ModifyToTimedOut();
                     return;
                 }
-                catch (CancelException)
+                else if (RoleResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (NullReferenceException)
+                else if (RoleResult.Failed)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                    await Task.Delay(3000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
+                    if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await Task.Delay(3000);
+                        return;
+                    }
+
+                    throw RoleResult.Exception;
                 }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut(true);
-                    return;
-                }
+
+                ctx.Bot.guilds[ctx.Guild.Id].BumpReminderSettings.RoleId = RoleResult.Result.Id;
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {

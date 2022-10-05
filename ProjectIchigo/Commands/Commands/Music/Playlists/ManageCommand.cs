@@ -67,24 +67,24 @@ internal class ManageCommand : BaseCommand
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
-                string SelectedPlaylistId;
-                UserPlaylist SelectedPlaylist;
+                var PlaylistResult = await PromptCustomSelection(Playlists);
 
-                try
-                {
-                    SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
-                }
-                catch (CancelException)
-                {
-                    DeleteOrInvalidate();
-                    return;
-                }
-                catch (ArgumentException)
+                if (PlaylistResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
+                else if (PlaylistResult.Cancelled)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
+                else if (PlaylistResult.Errored)
+                {
+                    throw PlaylistResult.Exception;
+                }
+
+                UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == PlaylistResult.Result);
 
                 embed = new DiscordEmbedBuilder
                 {
@@ -122,24 +122,24 @@ internal class ManageCommand : BaseCommand
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
-                string SelectedPlaylistId;
-                UserPlaylist SelectedPlaylist;
+                var PlaylistResult = await PromptCustomSelection(Playlists);
 
-                try
-                {
-                    SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
-                }
-                catch (CancelException)
-                {
-                    DeleteOrInvalidate();
-                    return;
-                }
-                catch (ArgumentException)
+                if (PlaylistResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
+                else if (PlaylistResult.Cancelled)
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
+                else if (PlaylistResult.Errored)
+                {
+                    throw PlaylistResult.Exception;
+                }
+
+                UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == PlaylistResult.Result);
 
                 string ShareCode = $"{Guid.NewGuid()}";
 
@@ -162,28 +162,24 @@ internal class ManageCommand : BaseCommand
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
-                string SelectedPlaylistId;
-                UserPlaylist SelectedPlaylist;
+                var PlaylistResult = await PromptCustomSelection(Playlists);
 
-                try
-                {
-                    SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
-                }
-                catch (CancelException)
-                {
-                    DeleteOrInvalidate();
-                    return;
-                }
-                catch (ArgumentException)
+                if (PlaylistResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
-                catch (Exception)
+                else if (PlaylistResult.Cancelled)
                 {
-                    throw;
+                    DeleteOrInvalidate();
+                    return;
                 }
+                else if (PlaylistResult.Errored)
+                {
+                    throw PlaylistResult.Exception;
+                }
+
+                UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == PlaylistResult.Result);
 
                 string FileName = $"{Guid.NewGuid()}.json";
                 File.WriteAllText(FileName, JsonConvert.SerializeObject(SelectedPlaylist, Formatting.Indented));
@@ -697,27 +693,24 @@ internal class ManageCommand : BaseCommand
 
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
-                UserPlaylist SelectedPlaylist;
+                var PlaylistResult = await PromptCustomSelection(Playlists);
 
-                try
-                {
-                    string SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
-                }
-                catch (CancelException)
-                {
-                    DeleteOrInvalidate();
-                    return;
-                }
-                catch (ArgumentException)
+                if (PlaylistResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
-                catch (Exception)
+                else if (PlaylistResult.Cancelled)
                 {
-                    throw;
+                    DeleteOrInvalidate();
+                    return;
                 }
+                else if (PlaylistResult.Errored)
+                {
+                    throw PlaylistResult.Exception;
+                }
+
+                UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == PlaylistResult.Result);
 
                 await HandlePlaylistModify(SelectedPlaylist);
                 return;
@@ -726,28 +719,24 @@ internal class ManageCommand : BaseCommand
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
-                string SelectedPlaylistId;
-                UserPlaylist SelectedPlaylist;
+                var PlaylistResult = await PromptCustomSelection(Playlists);
 
-                try
-                {
-                    SelectedPlaylistId = await PromptCustomSelection(Playlists);
-                    SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == SelectedPlaylistId);
-                }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (PlaylistResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
-                catch (Exception)
+                else if (PlaylistResult.Cancelled)
                 {
-                    throw;
+                    DeleteOrInvalidate();
+                    return;
                 }
+                else if (PlaylistResult.Errored)
+                {
+                    throw PlaylistResult.Exception;
+                }
+
+                UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == PlaylistResult.Result);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

@@ -140,26 +140,26 @@ internal class RemindersCommand : BaseCommand
             }
             else if (Button.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
             {
-                try
-                {
-                    var uuid = await PromptCustomSelection(rem.ScheduledReminders
+                var UuidResult = await PromptCustomSelection(rem.ScheduledReminders
                         .Select(x => new DiscordSelectComponentOption($"{x.Description}".TruncateWithIndication(100), x.UUID, $"in {x.DueTime.GetTotalSecondsUntil().GetHumanReadable()}")).ToList());
 
-                    rem.ScheduledReminders.Remove(rem.ScheduledReminders.First(x => x.UUID == uuid));
-
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
+                if (UuidResult.TimedOut)
                 {
                     ModifyToTimedOut();
                     return;
                 }
+                else if (UuidResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (UuidResult.Errored)
+                {
+                    throw UuidResult.Exception;
+                }
+
+                rem.ScheduledReminders.Remove(rem.ScheduledReminders.First(x => x.UUID == UuidResult.Result));
+
             }
             else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {

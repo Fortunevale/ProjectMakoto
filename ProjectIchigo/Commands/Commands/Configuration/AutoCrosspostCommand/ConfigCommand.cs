@@ -99,35 +99,34 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                DiscordChannel channel;
+                var ChannelResult = await PromptChannelSelection(ChannelType.News);
 
-                try
+                if (ChannelResult.TimedOut)
                 {
-                    channel = await PromptChannelSelection(ChannelType.News);
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut();
+                    ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelException)
+                else if (ChannelResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (NullReferenceException)
+                else if (ChannelResult.Failed)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any announcement channels in your server.`"));
-                    await Task.Delay(3000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
+                    if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any announcement channels in your server.`"));
+                        await Task.Delay(3000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ChannelResult.Exception;
                 }
 
-                if (channel.Type != ChannelType.News)
+                if (ChannelResult.Result.Type != ChannelType.News)
                 {
-                    embed.Description = "`The channel you selected is not an announcement channel.`";
-                    embed = embed.SetError(ctx, "Auto Crosspost");
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The channel you selected is not an announcement channel.`").SetError(ctx, "Auto Crosspost")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -135,16 +134,14 @@ internal class ConfigCommand : BaseCommand
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 50)
                 {
-                    embed.Description = $"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
-                    embed = embed.SetError(ctx, "Auto Crosspost");
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(embed.WithDescription($"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}").SetError(ctx, "Auto Crosspost"));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
 
-                if (!ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(channel.Id))
-                    ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Add(channel.Id);
+                if (!ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelResult.Result.Id))
+                    ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Add(ChannelResult.Result.Id);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -156,33 +153,31 @@ internal class ConfigCommand : BaseCommand
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
                 {
-                    embed.Description = $"`No Crosspost Channels are set up.`";
-                    embed = embed.SetError(ctx, "Auto Crosspost");
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(embed.WithDescription($"`No Crosspost Channels are set up.`").SetError(ctx, "Auto Crosspost"));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
 
-                ulong ChannelToRemove;
-
-                try
-                {
-                    var channel = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels
+                var ChannelResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels
                         .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
-                    ChannelToRemove = Convert.ToUInt64(channel);
+                if (ChannelResult.TimedOut)
+                {
+                    ModifyToTimedOut(true);
+                    return;
                 }
-                catch (CancelException)
+                else if (ChannelResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (ArgumentException)
+                else if (ChannelResult.Errored)
                 {
-                    ModifyToTimedOut();
-                    return;
+                    throw ChannelResult.Exception;
                 }
+
+                ulong ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelToRemove))
                     ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(ChannelToRemove);

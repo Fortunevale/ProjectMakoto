@@ -170,37 +170,30 @@ internal class ConfigCommand : BaseCommand
                                     action_embed.Description = $"`Select a role to assign.`";
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
 
-                                    DiscordRole role;
+                                    var RoleResult = await PromptRoleSelection();
 
-                                    try
+                                    if (RoleResult.TimedOut)
                                     {
-                                        role = await PromptRoleSelection();
-                                    }
-                                    catch (ArgumentException)
-                                    {
-                                        ModifyToTimedOut(true);
+                                        ModifyToTimedOut();
                                         return;
                                     }
-                                    catch (NullReferenceException)
+                                    else if (RoleResult.Cancelled)
                                     {
-                                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                                        await Task.Delay(3000);
                                         continue;
                                     }
-                                    catch (CancelException)
+                                    else if (RoleResult.Failed)
                                     {
-                                        continue;
+                                        if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                                        {
+                                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                            await Task.Delay(3000);
+                                            return;
+                                        }
+
+                                        throw RoleResult.Exception;
                                     }
 
-                                    if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == role.Id))
-                                    {
-                                        action_embed.Description = $"`The role you're trying to add has already been assigned to level {ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == role.Id).Level}.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
-                                        await Task.Delay(3000);
-                                        continue;
-                                    }
-
-                                    selectedRole = role;
+                                    selectedRole = RoleResult.Result;
                                     continue;
                                 }
                                 else if (Menu.Result.Interaction.Data.CustomId == SelectLevel.CustomId)

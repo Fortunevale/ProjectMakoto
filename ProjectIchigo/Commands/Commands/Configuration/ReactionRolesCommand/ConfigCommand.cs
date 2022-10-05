@@ -201,39 +201,41 @@ internal class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        try
-                        {
-                            action_embed.Description = "`Please select the role you want to use.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
+                        await RespondOrEdit(action_embed.WithDescription("`Please select the role you want to use.`").SetAwaitingInput(ctx, "Reaction Roles"));
 
-                            var role = await PromptRoleSelection();
+                        var RoleResult = await PromptRoleSelection();
 
-                            if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role.Id))
-                            {
-                                action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
-                                await Task.Delay(3000);
-                                continue;
-                            }
-
-                            selectedRole = role;
-                            continue;
-                        }
-                        catch (NullReferenceException)
-                        {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
-                            await Task.Delay(3000);
-                            continue;
-                        }
-                        catch (ArgumentException)
+                        if (RoleResult.TimedOut)
                         {
                             ModifyToTimedOut(true);
                             return;
                         }
-                        catch (CancelException) 
-                        { 
+                        else if (RoleResult.Cancelled)
+                        {
                             continue;
                         }
+                        else if (RoleResult.Failed)
+                        {
+                            if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
+                            {
+                                await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                await Task.Delay(3000);
+                                continue;
+                            }
+
+                            throw RoleResult.Exception;
+                        }
+
+                        if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == RoleResult.Result.Id))
+                        {
+                            action_embed.Description = $"`The specified role is already being used in another reaction role.`";
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await Task.Delay(3000);
+                            continue;
+                        }
+
+                        selectedRole = RoleResult.Result;
+                        continue;
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
                     {
@@ -304,36 +306,38 @@ internal class ConfigCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
             {
-                try
+                var RoleResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles
+                    .Select(x => new DiscordSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
+
+                if (RoleResult.TimedOut)
                 {
-                    var roleuuid = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles
-                                                    .Select(x => new DiscordSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
+                    ModifyToTimedOut(true);
+                    return;
+                }
+                else if (RoleResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (RoleResult.Errored)
+                {
+                    throw RoleResult.Exception;
+                }
 
-                    var obj = ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.First(x => x.Value.UUID == roleuuid);
+                var obj = ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.First(x => x.Value.UUID == RoleResult.Result);
 
-                    var role = ctx.Guild.GetRole(obj.Value.RoleId);
-                    var channel = ctx.Guild.GetChannel(obj.Value.ChannelId);
-                    var reactionMessage = await channel.GetMessageAsync(obj.Key);
+                if (ctx.Guild.GetChannel(obj.Value.ChannelId).TryGetMessage(obj.Key, out var reactionMessage))
                     _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-                    ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
+                var role = ctx.Guild.GetRole(obj.Value.RoleId);                
 
-                    embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (CancelException)
-                {
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut();
-                    return;
-                }
+                ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
+
+                embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage?.Author.Mention ?? "`/`"} `in` {reactionMessage?.Channel.Mention ?? "`/`"} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
+                await Task.Delay(5000);
+                await ExecuteCommand(ctx, arguments);
+                return;
             }
             else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
             {

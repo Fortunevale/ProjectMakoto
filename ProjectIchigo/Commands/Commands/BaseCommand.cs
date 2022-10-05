@@ -210,49 +210,49 @@ public abstract class BaseCommand
 
 
     #region Selections
-    internal async Task<DiscordRole> PromptRoleSelection(RolePromptConfiguration configuration = null)
+    internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null)
     {
         configuration ??= new();
 
-        List<DiscordSelectComponentOption> roles = new();
+        List<DiscordSelectComponentOption> FetchedRoles = new();
 
         var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int currentPage = 0;
+        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
 
-        DiscordRole Role = null;
+        DiscordRole FinalSelection = null;
 
         string Selected = "";
 
         bool FinishedSelection = false;
-        bool Exceptionoccurred = false;
-        Exception exception = null;
+        bool ExceptionOccurred = false;
+        Exception ThrownException = null;
 
         async Task RefreshList()
         {
-            roles.Clear();
+            FetchedRoles.Clear();
 
             if (!configuration.CreateRoleOption.IsNullOrWhiteSpace())
-                roles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
+                FetchedRoles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                roles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+                FetchedRoles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
             foreach (var b in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
             {
                 if (ctx.CurrentMember.GetRoleHighestPosition() > b.Value.Position && ctx.Member.GetRoleHighestPosition() > b.Value.Position && !b.Value.IsManaged && b.Value.Id != ctx.Guild.EveryoneRole.Id)
-                    roles.Add(new DiscordSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                    FetchedRoles.Add(new DiscordSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
             }
 
-            if (!roles.Any(x => x.Default))
+            if (!FetchedRoles.Any(x => x.Default))
                 Selected = "";
 
-            if (!roles.IsNotNullAndNotEmpty())
+            if (!FetchedRoles.IsNotNullAndNotEmpty())
                 throw new NullReferenceException("No valid role found.");
         }
 
@@ -260,20 +260,20 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent("Select a role..", roles.Skip(currentPage * 25).Take(25), SelectionInteractionId);
+            var dropdown = new DiscordSelectComponent("Select a role..", FetchedRoles.Skip(CurrentPage * 25).Take(25), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
-            if (!roles.Skip(currentPage * 25).Any())
-                currentPage--;
+            if (!FetchedRoles.Skip(CurrentPage * 25).Any())
+                CurrentPage--;
 
-            if (currentPage < 0)
-                currentPage = 0;
+            if (CurrentPage < 0)
+                CurrentPage = 0;
 
-            if (roles.Skip(currentPage * 25).Count() > 25)
-                builder.AddComponents(nextPageButton);
+            if (FetchedRoles.Skip(CurrentPage * 25).Count() > 25)
+                builder.AddComponents(NextPageButton);
 
-            if (currentPage != 0)
-                builder.AddComponents(previousPageButton);
+            if (CurrentPage != 0)
+                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
@@ -305,7 +305,7 @@ public abstract class BaseCommand
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
-                            roles = roles.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+                            FetchedRoles = FetchedRoles.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
@@ -319,22 +319,22 @@ public abstract class BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                             if (Selected is "create_for_me")
-                                Role = await ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
+                                FinalSelection = await ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
                             else if (Selected is "disable")
-                                Role = null;
+                                FinalSelection = null;
                             else
-                                Role = ctx.Guild.GetRole(Convert.ToUInt64(Selected));
+                                FinalSelection = ctx.Guild.GetRole(Convert.ToUInt64(Selected));
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
                         {
-                            currentPage--;
+                            CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
                         {
-                            currentPage++;
+                            CurrentPage++;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
@@ -343,8 +343,8 @@ public abstract class BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
-                    Exceptionoccurred = true;
+                    ThrownException = ex;
+                    ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
             });
@@ -361,65 +361,65 @@ public abstract class BaseCommand
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
-        if (Exceptionoccurred)
-            throw exception;
+        if (ExceptionOccurred)
+            return new InteractionResult<DiscordRole>(ThrownException);
 
         if (sw.Elapsed >= TimeSpan.FromSeconds(60))
-            throw new ArgumentException("No selection made");
+            return new InteractionResult<DiscordRole>(new TimedOutException());
 
-        return Role;
+        return new InteractionResult<DiscordRole>(FinalSelection);
     }
 
-    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null)
+    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null)
         => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration);
 
-    internal async Task<DiscordChannel> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null)
+    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null)
     {
         configuration ??= new();
 
-        List<DiscordSelectComponentOption> channels = new();
+        List<DiscordSelectComponentOption> FetchedChannels = new();
 
         var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int currentPage = 0;
+        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
 
-        DiscordChannel Channel = null;
+        DiscordChannel FinalSelection = null;
 
         string Selected = "";
 
         bool FinishedSelection = false;
         bool ExceptionOccurred = false;
-        Exception exception = null;
+        Exception ThrownException = null;
 
         async Task RefreshList()
         {
-            channels.Clear();
+            FetchedChannels.Clear();
 
             if (configuration.CreateChannelOption is not null)
-                channels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
+                FetchedChannels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                channels.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+                FetchedChannels.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
             foreach (var category in ctx.Guild.GetOrderedChannels())
             {
                 foreach (var b in category.Value)
                     if (channelTypes is null || channelTypes.Contains(b.Type))
-                        channels.Add(new DiscordSelectComponentOption(
+                        FetchedChannels.Add(new DiscordSelectComponentOption(
                         $"{b.GetIcon()}{b.Name} ({b.Id})",
                         b.Id.ToString(),
                         $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}", (b.Id.ToString() == Selected)));
             }
 
-            if (!channels.Any(x => x.Default))
+            if (!FetchedChannels.Any(x => x.Default))
                 Selected = "";
 
-            if (!channels.IsNotNullAndNotEmpty())
+            if (!FetchedChannels.IsNotNullAndNotEmpty())
                 throw new NullReferenceException("No valid channel found.");
         }
 
@@ -427,20 +427,20 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent("Select a channel..", channels.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
+            var dropdown = new DiscordSelectComponent("Select a channel..", FetchedChannels.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
-            if (!channels.Skip(currentPage * 25).Any())
-                currentPage--;
+            if (!FetchedChannels.Skip(CurrentPage * 25).Any())
+                CurrentPage--;
 
-            if (currentPage < 0)
-                currentPage = 0;
+            if (CurrentPage < 0)
+                CurrentPage = 0;
 
-            if (channels.Skip(currentPage * 25).Count() > 25)
-                builder.AddComponents(nextPageButton);
+            if (FetchedChannels.Skip(CurrentPage * 25).Count() > 25)
+                builder.AddComponents(NextPageButton);
 
-            if (currentPage != 0)
-                builder.AddComponents(previousPageButton);
+            if (CurrentPage != 0)
+                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
@@ -472,7 +472,7 @@ public abstract class BaseCommand
                         if (e.Interaction.Data.CustomId == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
-                            channels = channels.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+                            FetchedChannels = FetchedChannels.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
@@ -481,11 +481,11 @@ public abstract class BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                             if (Selected is "create_for_me")
-                                Channel = await ctx.Guild.CreateChannelAsync(configuration.CreateChannelOption.Name, configuration.CreateChannelOption.ChannelType);
+                                FinalSelection = await ctx.Guild.CreateChannelAsync(configuration.CreateChannelOption.Name, configuration.CreateChannelOption.ChannelType);
                             else if (Selected is "disable")
-                                Channel = null;
+                                FinalSelection = null;
                             else
-                                Channel = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
+                                FinalSelection = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
 
                             FinishedSelection = true;
                         }
@@ -494,14 +494,14 @@ public abstract class BaseCommand
                             await RefreshList();
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
                         {
-                            currentPage--;
+                            CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
                         {
-                            currentPage++;
+                            CurrentPage++;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
@@ -510,7 +510,7 @@ public abstract class BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
+                    ThrownException = ex;
                     ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
@@ -528,43 +528,43 @@ public abstract class BaseCommand
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
-            throw exception;
+            return new InteractionResult<DiscordChannel>(ThrownException);
 
         if (sw.Elapsed >= TimeSpan.FromSeconds(60))
-            throw new ArgumentException("No selection made");
+            return new InteractionResult<DiscordChannel>(new TimedOutException());
 
-        return Channel;
+        return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<string> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..")
+    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..")
     {
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int currentPage = 0;
+        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
         
 
-        string Selection = null;
+        string FinalSelection = null;
 
         string Selected = "";
 
         bool FinishedSelection = false;
-        bool Exceptionoccurred = false;
-        Exception exception = null;
+        bool ExceptionOccurred = false;
+        Exception ThrownException = null;
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(currentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
+            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
-            if (options.Skip(currentPage * 25).Count() > 25)
-                builder.AddComponents(nextPageButton);
+            if (options.Skip(CurrentPage * 25).Count() > 25)
+                builder.AddComponents(NextPageButton);
 
-            if (currentPage != 0)
-                builder.AddComponents(previousPageButton);
+            if (CurrentPage != 0)
+                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
@@ -582,7 +582,7 @@ public abstract class BaseCommand
         Stopwatch sw = new();
         sw.Start();
 
-        async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
+        async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
         {
             _ = Task.Run(async () =>
             {
@@ -602,20 +602,20 @@ public abstract class BaseCommand
                         }
                         else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
                         {
-                            ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                            Selection = Selected;
+                            FinalSelection = Selected;
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == previousPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
                         {
-                            currentPage--;
+                            CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == nextPageButton.CustomId)
+                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
                         {
-                            currentPage++;
+                            CurrentPage++;
                             await RefreshMessage();
                         }
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
@@ -624,31 +624,31 @@ public abstract class BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
-                    Exceptionoccurred = true;
+                    ThrownException = ex;
+                    ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
             });
         }
 
-        ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated += RunInteraction;
 
         while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
         {
             await Task.Delay(100);
         }
 
-        ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
+        ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(ctx.ResponseMessage.Embeds[0]).WithContent(ctx.ResponseMessage.Content));
 
-        if (Exceptionoccurred)
-            throw exception;
+        if (ExceptionOccurred)
+            return new InteractionResult<string>(ThrownException);
 
         if (sw.Elapsed >= TimeSpan.FromSeconds(60))
-            throw new ArgumentException("No selection made");
+            return new InteractionResult<string>(new TimedOutException());
 
-        return Selection;
+        return new InteractionResult<string>(FinalSelection);
     }
     #endregion
 

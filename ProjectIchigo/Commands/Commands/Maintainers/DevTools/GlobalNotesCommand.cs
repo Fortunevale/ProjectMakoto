@@ -84,23 +84,25 @@ internal class GlobalNotesCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                try
-                {
-                    var selection = await PromptCustomSelection(ctx.Bot.globalNotes[victim.Id].Select(x => new DiscordSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
+                var SelectionResult = await PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
+                    .Select(x => new DiscordSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
 
-                    ctx.Bot.globalNotes[victim.Id].Remove(ctx.Bot.globalNotes[victim.Id].First(x => x.Timestamp.Ticks.ToString() == selection));
-                }
-                catch (ArgumentException)
+                if (SelectionResult.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelException)
+                else if (SelectionResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                else if (SelectionResult.Errored)
+                {
+                    throw SelectionResult.Exception;
+                }
 
+                ctx.Bot.globalNotes[victim.Id].Remove(ctx.Bot.globalNotes[victim.Id].First(x => x.Timestamp.Ticks.ToString() == SelectionResult.Result));
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
