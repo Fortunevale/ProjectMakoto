@@ -210,9 +210,10 @@ public abstract class BaseCommand
 
 
     #region Selections
-    internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null)
+    internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
+        timeOutOverride ??= TimeSpan.FromSeconds(60);
 
         List<DiscordSelectComponentOption> FetchedRoles = new();
 
@@ -352,7 +353,7 @@ public abstract class BaseCommand
 
         ctx.Client.ComponentInteractionCreated += RunInteraction;
 
-        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
+        while (!FinishedSelection && sw.Elapsed <= timeOutOverride)
         {
             await Task.Delay(100);
         }
@@ -364,18 +365,19 @@ public abstract class BaseCommand
         if (ExceptionOccurred)
             return new InteractionResult<DiscordRole>(ThrownException);
 
-        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
+        if (sw.Elapsed >= timeOutOverride)
             return new InteractionResult<DiscordRole>(new TimedOutException());
 
         return new InteractionResult<DiscordRole>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null)
-        => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration);
+    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+        => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
 
-    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null)
+    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
+        timeOutOverride ??= TimeSpan.FromSeconds(60);
 
         List<DiscordSelectComponentOption> FetchedChannels = new();
 
@@ -519,7 +521,7 @@ public abstract class BaseCommand
 
         ctx.Client.ComponentInteractionCreated += RunInteraction;
 
-        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
+        while (!FinishedSelection && sw.Elapsed <= timeOutOverride)
         {
             await Task.Delay(100);
         }
@@ -530,14 +532,16 @@ public abstract class BaseCommand
         if (ExceptionOccurred)
             return new InteractionResult<DiscordChannel>(ThrownException);
 
-        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
+        if (sw.Elapsed >= timeOutOverride)
             return new InteractionResult<DiscordChannel>(new TimedOutException());
 
         return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..")
+    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
     {
+        timeOutOverride ??= TimeSpan.FromSeconds(60);
+
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
         var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
@@ -633,7 +637,7 @@ public abstract class BaseCommand
 
         ctx.Client.ComponentInteractionCreated += RunInteraction;
 
-        while (!FinishedSelection && sw.Elapsed <= TimeSpan.FromSeconds(60))
+        while (!FinishedSelection && sw.Elapsed <= timeOutOverride)
         {
             await Task.Delay(100);
         }
@@ -645,7 +649,7 @@ public abstract class BaseCommand
         if (ExceptionOccurred)
             return new InteractionResult<string>(ThrownException);
 
-        if (sw.Elapsed >= TimeSpan.FromSeconds(60))
+        if (sw.Elapsed >= timeOutOverride)
             return new InteractionResult<string>(new TimedOutException());
 
         return new InteractionResult<string>(FinalSelection);
@@ -653,9 +657,10 @@ public abstract class BaseCommand
     #endregion
 
     #region Modals
-    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null) => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
+    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null) 
+        => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
-    internal async Task<ComponentInteractionCreateEventArgs> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null, bool open = true)
+    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
@@ -671,9 +676,9 @@ public abstract class BaseCommand
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
         bool FinishedSelection = false;
-        bool Exceptionoccurred = false;
+        bool ExceptionOccurred = false;
         bool Cancelled = false;
-        Exception exception = null;
+        Exception ThrownException = null;
 
         if (open)
             await interaction.CreateInteractionModalResponseAsync(builder);
@@ -704,14 +709,14 @@ public abstract class BaseCommand
                         else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-                            Cancelled = true;
+                            throw new CancelException();
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
-                    Exceptionoccurred = true;
+                    ThrownException = ex;
+                    ExceptionOccurred = true;
                     FinishedSelection = true;
                     throw;
                 }
@@ -720,7 +725,7 @@ public abstract class BaseCommand
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
 
-        while (!FinishedSelection && !Exceptionoccurred && !Cancelled && TimeoutSeconds >= 0)
+        while (!FinishedSelection && !ExceptionOccurred && !Cancelled && TimeoutSeconds >= 0)
         {
             await Task.Delay(500);
             TimeoutSeconds--;
@@ -731,20 +736,17 @@ public abstract class BaseCommand
         if (ResetToOriginalEmbed)
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
 
-        if (Exceptionoccurred)
-            throw exception;
+        if (ExceptionOccurred)
+            return new InteractionResult<ComponentInteractionCreateEventArgs>(ThrownException);
 
         if (TimeoutSeconds <= 0)
-            throw new ArgumentException("Modal not submitted");
+            return new InteractionResult<ComponentInteractionCreateEventArgs>(new TimeoutException());
 
-        if (Cancelled)
-            throw new CancelException();
-
-        return FinishedInteraction;
+        return new InteractionResult<ComponentInteractionCreateEventArgs>(FinishedInteraction);
     }
 
 
-    internal async Task<TimeSpan> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
@@ -763,76 +765,110 @@ public abstract class BaseCommand
         if (MaxTime.Value.TotalDays >= 1)
             modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", $"Days (max. {((int)MaxTime.Value.TotalDays)})", "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
-        InteractionCreateEventArgs Response;
+        var ModalResult = await PromptModalWithRetry(interaction, modal, false);
 
-        try
+        if (ModalResult.TimedOut)
         {
-            Response = await PromptModalWithRetry(interaction, modal, false);
+            return new InteractionResult<TimeSpan>(new TimedOutException());
         }
-        catch (Exception)
+        else if (ModalResult.Cancelled)
         {
-            throw;
+            return new InteractionResult<TimeSpan>(new CancelException());
         }
+        else if (ModalResult.Errored)
+        {
+            return new InteractionResult<TimeSpan>(ModalResult.Exception);
+        }
+
+        InteractionCreateEventArgs Response = ModalResult.Result;
 
         TimeSpan length = TimeSpan.FromSeconds(0);
 
-        if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
-            throw new InvalidOperationException("Invalid TimeSpan");
+        try
+        {
+            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
+                throw new InvalidOperationException("Invalid TimeSpan");
 
-        double seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
-        double minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
-        double hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
-        double days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
+            double seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
+            double minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
+            double hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
+            double days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
 
-        length = length.Add(TimeSpan.FromSeconds(seconds));
-        length = length.Add(TimeSpan.FromMinutes(minutes));
-        length = length.Add(TimeSpan.FromHours(hours));
-        length = length.Add(TimeSpan.FromDays(days));
+            length = length.Add(TimeSpan.FromSeconds(seconds));
+            length = length.Add(TimeSpan.FromMinutes(minutes));
+            length = length.Add(TimeSpan.FromHours(hours));
+            length = length.Add(TimeSpan.FromDays(days));
+        }
+        catch (Exception ex)
+        {
+            return new InteractionResult<TimeSpan>(ex);
+        }
 
         if (length > MaxTime || length < MinTime)
-            throw new InvalidOperationException("Invalid TimeSpan");
+            return new InteractionResult<TimeSpan>(new InvalidOperationException("Invalid TimeSpan"));
 
-        return length;
+        return new InteractionResult<TimeSpan>(length);
     }
 
-    internal async Task<DateTime> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    internal async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
-        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a time span").WithCustomId(Guid.NewGuid().ToString());
+        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a date and time").WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"{DateTime.UtcNow.Hour}", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"{DateTime.UtcNow.Minute}", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"{DateTime.UtcNow.Day}", 1, 2, true, $"{DateTime.UtcNow.Day}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"{DateTime.UtcNow.Month}", 1, 2, true, $"{DateTime.UtcNow.Month}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"{DateTime.UtcNow.Year}", 1, 2, true, $"{DateTime.UtcNow.Year}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds", $"{DateTime.UtcNow.Second}", 1, 2, true, $"Second"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"{DateTime.UtcNow.Minute}", 1, 2, true, $"Minute"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"{DateTime.UtcNow.Hour}", 1, 2, true, $"Hour"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"{DateTime.UtcNow.Day}", 1, 2, true, $"Day"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"{DateTime.UtcNow.Month}", 1, 2, true, $"Month"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"{DateTime.UtcNow.Year}", 1, 2, true, $"Year"));
 
-        InteractionCreateEventArgs Response;
+
+        var ModalResult = await PromptModalWithRetry(interaction, modal, false);
+
+        if (ModalResult.TimedOut)
+        {
+            return new InteractionResult<DateTime>(new TimedOutException());
+        }
+        else if (ModalResult.Cancelled)
+        {
+            return new InteractionResult<DateTime>(new CancelException());
+        }
+        else if (ModalResult.Errored)
+        {
+            return new InteractionResult<DateTime>(ModalResult.Exception);
+        }
+
+        InteractionCreateEventArgs Response = ModalResult.Result;
+
+        DateTime dateTime;
 
         try
         {
-            Response = await PromptModalWithRetry(interaction, modal, false);
+            if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") && !Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
+                (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
+                throw new InvalidOperationException("Invalid");
+
+            int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
+            int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
+            int second = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("seconds"));
+            int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
+            int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
+            int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
+
+            dateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            return new InteractionResult<DateTime>(ex);
         }
 
-        if ((Response.Interaction.Data.Components.Any(x => x.CustomId == "hour") && !Response.Interaction.Data.Components.First(x => x.CustomId == "hour").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "minute") && !Response.Interaction.Data.Components.First(x => x.CustomId == "minute").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "day") && !Response.Interaction.Data.Components.First(x => x.CustomId == "day").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "month") && !Response.Interaction.Data.Components.First(x => x.CustomId == "month").Value.IsDigitsOnly()) ||
-            (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
-            throw new InvalidOperationException("Invalid");
-
-        int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
-        int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
-        int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
-        int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
-        int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
-
-        return new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
+        return new InteractionResult<DateTime>(dateTime);
     } 
     #endregion
 

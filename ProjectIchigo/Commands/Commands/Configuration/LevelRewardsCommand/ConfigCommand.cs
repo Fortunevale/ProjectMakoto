@@ -201,22 +201,24 @@ internal class ConfigCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("Input Level", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "level", "Level", "2", 1, 3, true, (selectedLevel is -1 ? 2 : selectedLevel).ToString()));
 
-                                    InteractionCreateEventArgs Response = null;
 
-                                    try
+                                    var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                                    if (ModalResult.TimedOut)
                                     {
-                                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         continue;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
 
+                                    InteractionCreateEventArgs Response = ModalResult.Result;
                                     var rawInt = Response.Interaction.GetModalValueByCustomId("level");
 
                                     uint level;
@@ -244,21 +246,24 @@ internal class ConfigCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("Define new custom message", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "message", "Custom Message", "You received ##Role##!", 1, 256, true, selectedCustomText));
 
-                                    InteractionCreateEventArgs Response = null;
 
-                                    try
+                                    var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                                    if (ModalResult.TimedOut)
                                     {
-                                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         continue;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
+
+                                    InteractionCreateEventArgs Response = ModalResult.Result;
 
                                     var newMessage = Response.Interaction.GetModalValueByCustomId("message");
 
@@ -309,23 +314,24 @@ internal class ConfigCommand : BaseCommand
                                 .WithCustomId(Guid.NewGuid().ToString())
                                 .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", "Custom Message (<256 characters)", null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
 
-                            InteractionCreateEventArgs Response = null;
+                            var ModalResult = await PromptModalWithRetry(e.Interaction, modal, false);
 
-                            try
+                            if (ModalResult.TimedOut)
                             {
-                                Response = await PromptModalWithRetry(e.Interaction, modal, false);
+                                ModifyToTimedOut(true);
+                                return;
                             }
-                            catch (CancelException)
+                            else if (ModalResult.Cancelled)
                             {
                                 await RefreshMessage();
                                 return;
                             }
-                            catch (ArgumentException)
+                            else if (ModalResult.Errored)
                             {
-                                ModifyToTimedOut();
-                                return;
+                                throw ModalResult.Exception;
                             }
 
+                            InteractionCreateEventArgs Response = ModalResult.Result;
                             var result = Response.Interaction.GetModalValueByCustomId("new_text");
 
                             if (result.Length > 256)

@@ -51,32 +51,34 @@ internal class GlobalNotesCommand : BaseCommand
 
             if (Button.Result.Interaction.Data.CustomId == AddButton.CustomId)
             {
-                try
-                {
-                    var Response = await PromptModalWithRetry(Button.Result.Interaction, 
+                var ModalResult = await PromptModalWithRetry(Button.Result.Interaction,
                         new DiscordInteractionModalBuilder().AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 256, true)), false);
 
-                    var note = Response.Interaction.GetModalValueByCustomId("Note");
-
-                    if (!ctx.Bot.globalNotes.TryGetValue(victim.Id, out var user))
-                    {
-                        ctx.Bot.globalNotes.Add(victim.Id, new());
-                        user = ctx.Bot.globalNotes[victim.Id];
-                    }
-
-                    user.Add(new GlobalBanDetails { Moderator = ctx.User.Id, Reason = note });
-                }
-                catch (ArgumentException)
+                if (ModalResult.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    ModifyToTimedOut(true);
                     return;
                 }
-                catch (CancelException)
+                else if (ModalResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
+                else if (ModalResult.Errored)
+                {
+                    throw ModalResult.Exception;
+                }
 
+                var note = ModalResult.Result.Interaction.GetModalValueByCustomId("Note");
+
+                if (!ctx.Bot.globalNotes.TryGetValue(victim.Id, out var user))
+                {
+                    ctx.Bot.globalNotes.Add(victim.Id, new());
+                    user = ctx.Bot.globalNotes[victim.Id];
+                }
+
+                user.Add(new GlobalBanDetails { Moderator = ctx.User.Id, Reason = note });
+                
                 await ExecuteCommand(ctx, arguments);
                 return;
             }

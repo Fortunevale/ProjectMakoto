@@ -90,27 +90,27 @@ internal class ConfigCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("Input Message Url", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Message Url", "https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678", null, null, true));
 
-                        InteractionCreateEventArgs Response = null;
-
-                        try
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                         {
-                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
-                            {
-                                Description = "`Please copy and paste the message link of the message you want the reaction role to be added to.`",
-                                ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
-                            }.SetAwaitingInput(ctx, "Reaction Roles"), false);
+                            Description = "`Please copy and paste the message link of the message you want the reaction role to be added to.`",
+                            ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
+                        }.SetAwaitingInput(ctx, "Reaction Roles"), false);
+
+                        if (ModalResult.TimedOut)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
-                        var url = Response.Interaction.GetModalValueByCustomId("url");
+                        var url = ModalResult.Result.Interaction.GetModalValueByCustomId("url");
 
                         if (!RegexTemplates.DiscordChannelUrl.IsMatch(url) || !url.TryParseMessageLink(out ulong GuildId, out ulong ChannelId, out ulong MessageId))
                         {

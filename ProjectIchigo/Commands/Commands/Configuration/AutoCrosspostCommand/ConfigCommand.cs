@@ -56,31 +56,40 @@ internal class ConfigCommand : BaseCommand
             }
             else if (Button.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
             {
-                TimeSpan Response;
 
-                try
+                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting), false);
+
+                if (ModalResult.TimedOut)
                 {
-                    Response = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting), false);
+                    ModifyToTimedOut(true);
+                    return;
                 }
-                catch (CancelException)
+                else if (ModalResult.Cancelled)
                 {
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-                catch (InvalidOperationException)
+                else if (ModalResult.Errored)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").SetError(ctx, "Auto Crosspost")));
-                    await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
-                    return;
-                }
-                catch (ArgumentException)
-                {
-                    ModifyToTimedOut();
-                    return;
+                    if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
+                    {
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").SetError(ctx, "Auto Crosspost")));
+                        await Task.Delay(5000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+                    else if (ModalResult.Exception.GetType() == typeof(ArgumentException))
+                    {
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid Time Span`").SetError(ctx, "Auto Crosspost")));
+                        await Task.Delay(5000);
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
+
+                    throw ModalResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(Response.TotalSeconds);
+                ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(ModalResult.Result.TotalSeconds);
 
                 await ExecuteCommand(ctx, arguments);
                 return;

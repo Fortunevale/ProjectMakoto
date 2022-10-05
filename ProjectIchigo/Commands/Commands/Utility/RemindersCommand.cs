@@ -70,43 +70,52 @@ internal class RemindersCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("New Reminder", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "desc", "Description", "Enter a reminder description..", 1, 512, true));
 
-                        InteractionCreateEventArgs Response = null;
 
-                        try
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
-                        selectedDescription = Response.Interaction.GetModalValueByCustomId("desc");
+                        selectedDescription = ModalResult.Result.Interaction.GetModalValueByCustomId("desc");
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == SelectDueDateButton.CustomId)
                     {
-                        DateTime Response;
 
-                        try
+                        var ModalResult = await PromptModalForDateTime(Menu.Result.Interaction, false);
+
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalForDateTime(Menu.Result.Interaction, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
+                            {
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").SetError(ctx));
+                                await Task.Delay(5000);
+                                continue;
+                            }
+
+                            throw ModalResult.Exception;
                         }
 
-                        selectedDueDate = Response;
+                        selectedDueDate = ModalResult.Result;
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
                     {

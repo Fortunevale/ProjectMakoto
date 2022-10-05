@@ -252,26 +252,26 @@ internal class ManageCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "" : SelectedPlaylistName)));
 
-                        InteractionCreateEventArgs Response = null;
-
-                        try
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                         {
-                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
-                            {
-                                Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
-                            }.SetAwaitingInput(ctx, "Playlists"), false);
+                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                        }.SetAwaitingInput(ctx, "Playlists"), false);
+
+                        if (ModalResult.TimedOut)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
-                        SelectedPlaylistName = Response.Interaction.GetModalValueByCustomId("name");
+                        SelectedPlaylistName = ModalResult.Result.Interaction.GetModalValueByCustomId("name");
                         continue;
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == SelectFirstTracks.CustomId)
@@ -279,23 +279,24 @@ internal class ManageCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("Set first track(s) for your Playlist", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url, Playlist Url or Search Query", "", 1, 100, true));
 
-                        InteractionCreateEventArgs Response = null;
 
-                        try
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+
+                        if (ModalResult.TimedOut)
                         {
-                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
-                        var query = Response.Interaction.GetModalValueByCustomId("query");
+                        var query = ModalResult.Result.Interaction.GetModalValueByCustomId("query");
 
                         var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, query);
 
@@ -409,26 +410,27 @@ internal class ManageCommand : BaseCommand
                         var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "" : SelectedPlaylistName)));
 
-                        InteractionCreateEventArgs Response = null;
 
-                        try
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                         {
-                            Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
-                            {
-                                Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
-                            }.SetAwaitingInput(ctx, "Playlists"), false);
+                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                        }.SetAwaitingInput(ctx, "Playlists"), false);
+
+                        if (ModalResult.TimedOut)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
                         }
-                        catch (CancelException)
+                        else if (ModalResult.Cancelled)
                         {
                             continue;
                         }
-                        catch (ArgumentException)
+                        else if (ModalResult.Errored)
                         {
-                            ModifyToTimedOut();
-                            return;
+                            throw ModalResult.Exception;
                         }
 
-                        SelectedPlaylistName = Response.Interaction.GetModalValueByCustomId("name");
+                        SelectedPlaylistName = ModalResult.Result.Interaction.GetModalValueByCustomId("name");
                         continue;
                     }
                     else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
@@ -510,24 +512,24 @@ internal class ManageCommand : BaseCommand
                     var modal = new DiscordInteractionModalBuilder("Import Playlist", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Playlist Url, Playlist Url", "", 1, 100, true));
 
-                    InteractionCreateEventArgs Response = null;
+                    var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
 
-                    try
+                    if (ModalResult.TimedOut)
                     {
-                        Response = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
+                        ModifyToTimedOut(true);
+                        return;
                     }
-                    catch (CancelException)
+                    else if (ModalResult.Cancelled)
                     {
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    catch (ArgumentException)
+                    else if (ModalResult.Errored)
                     {
-                        ModifyToTimedOut();
-                        return;
+                        throw ModalResult.Exception;
                     }
 
-                    var query = Response.Interaction.GetModalValueByCustomId("query");
+                    var query = ModalResult.Result.Interaction.GetModalValueByCustomId("query");
 
                     var lava = ctx.Client.GetLavalink();
                     var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
@@ -871,24 +873,24 @@ internal class ManageCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("Add Song to Playlist", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url or Search Query", "", 1, 100, true));
 
-                                    InteractionCreateEventArgs Response = null;
+                                    var ModalResult = await PromptModalWithRetry(e.Interaction, modal, false);
 
-                                    try
+                                    if (ModalResult.TimedOut)
                                     {
-                                        Response = await PromptModalWithRetry(e.Interaction, modal, false);
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         await UpdateMessage();
                                         break;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
 
-                                    var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, Response.Interaction.GetModalValueByCustomId("query"));
+                                    var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, ModalResult.Result.Interaction.GetModalValueByCustomId("query"));
 
                                     if (!Continue)
                                     {
@@ -989,27 +991,27 @@ internal class ManageCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("New Playlist Color", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Playlist Color", "#FF0000", 1, 100, true, SelectedPlaylist.PlaylistColor));
 
-                                    InteractionCreateEventArgs Response = null;
-
-                                    try
+                                    var ModalResult = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
                                     {
-                                        Response = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
-                                        {
-                                            Description = $"`What color should this playlist be? (e.g. #FF0000)` [`Need help with hex color codes?`](https://g.co/kgs/jDHPp6)",
-                                        }.SetAwaitingInput(ctx, "Playlists"), false);
+                                        Description = $"`What color should this playlist be? (e.g. #FF0000)` [`Need help with hex color codes?`](https://g.co/kgs/jDHPp6)",
+                                    }.SetAwaitingInput(ctx, "Playlists"), false);
+
+                                    if (ModalResult.TimedOut)
+                                    {
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         await UpdateMessage();
                                         break;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
 
-                                    SelectedPlaylist.PlaylistColor = Response.Interaction.GetModalValueByCustomId("color");
+                                    SelectedPlaylist.PlaylistColor = ModalResult.Result.Interaction.GetModalValueByCustomId("color");
 
                                     await UpdateMessage();
                                     break;
@@ -1019,27 +1021,27 @@ internal class ManageCommand : BaseCommand
                                     var modal = new DiscordInteractionModalBuilder("New Playlist Name", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, SelectedPlaylist.PlaylistName));
 
-                                    InteractionCreateEventArgs Response = null;
-
-                                    try
+                                    var ModalResult = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
                                     {
-                                        Response = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
-                                        {
-                                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
-                                        }.SetAwaitingInput(ctx, "Playlists"), false);
+                                        Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                                    }.SetAwaitingInput(ctx, "Playlists"), false);
+
+                                    if (ModalResult.TimedOut)
+                                    {
+                                        ModifyToTimedOut(true);
+                                        return;
                                     }
-                                    catch (CancelException)
+                                    else if (ModalResult.Cancelled)
                                     {
                                         await UpdateMessage();
                                         break;
                                     }
-                                    catch (ArgumentException)
+                                    else if (ModalResult.Errored)
                                     {
-                                        ModifyToTimedOut();
-                                        return;
+                                        throw ModalResult.Exception;
                                     }
 
-                                    SelectedPlaylist.PlaylistName = Response.Interaction.GetModalValueByCustomId("name");
+                                    SelectedPlaylist.PlaylistName = ModalResult.Result.Interaction.GetModalValueByCustomId("name");
 
                                     await UpdateMessage();
                                     break;
