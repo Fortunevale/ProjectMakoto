@@ -859,6 +859,10 @@ public abstract class BaseCommand
 
             dateTime = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
         }
+        catch (OverflowException)
+        {
+            return new InteractionResult<DateTime>(new InvalidOperationException());
+        }
         catch (Exception ex)
         {
             return new InteractionResult<DateTime>(ex);
