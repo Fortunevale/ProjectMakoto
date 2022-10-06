@@ -61,6 +61,9 @@ public class Config
         public ulong CheckboxTickedGreenId = 970280278138449920;
         public ulong CheckboxUntickedGreenId = 970280278025191454;
 
+        public ulong PillOnId = 1027551252382494741;
+        public ulong PillOffId = 1027551250818015322;
+
         public ulong QuestionMarkId = 1005464121472466984;
 
         public ulong ChannelId = 1005612865975238706;

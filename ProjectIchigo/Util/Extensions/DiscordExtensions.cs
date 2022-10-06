@@ -16,6 +16,9 @@ internal static class DiscordExtensions
 
     internal static DiscordEmoji ToEmote(this bool b, DiscordClient client) 
         => b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 1005430134070841395);
+    
+    internal static DiscordEmoji ToPillEmote(this bool b, Bot client) 
+        => b ? EmojiTemplates.GetPillOn(client.discordClient, client) : EmojiTemplates.GetPillOff(client.discordClient, client);
 
     internal static string ToEmotes(this long i) 
         => DigitsToEmotes(i.ToString());
