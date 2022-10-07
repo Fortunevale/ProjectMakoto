@@ -227,7 +227,7 @@ public class Bot
                 {
                     _logger.LogDebug("Waiting for guilds to download to sync database..");
 
-                    while (!discordClient?.Guilds.Any() ?? true)
+                    while (!status.DiscordGuildDownloadCompleted)
                         Thread.Sleep(500);
 
                     await databaseClient.FullSyncDatabase(true);
@@ -655,7 +655,7 @@ public class Bot
 
         AppDomain.CurrentDomain.ProcessExit += delegate
         {
-            ExitApplication().Wait();
+            ExitApplication(true).Wait();
         };
 
         Console.CancelKeyPress += delegate
@@ -1013,9 +1013,6 @@ public class Bot
                 _logger.LogError("Failed to run sync tasks", ex);
             }
 
-            await databaseClient.CheckGuildTables();
-            await databaseClient.FullSyncDatabase(true);
-
             List<DiscordUser> UserCache = new();
 
             await Task.Delay(5000);
@@ -1119,7 +1116,7 @@ public class Bot
 
         _logger.LogInfo($"Preparing to shut down Ichigo..");
 
-        if (status.DiscordInitialized)
+        if (status.DiscordInitialized && !Immediate)
         {
             try
             {

@@ -319,6 +319,8 @@ internal class DatabaseClient
             throw new Exception($"Exception occurred while trying to update guilds in database: Database mainDatabaseConnection not present");
         }
 
+        List<Task> syncs_running = new();
+
         async Task SyncTable(MySqlConnection conn, string table, IReadOnlyList<object> DatabaseInserts, string? propertyname = null)
         {
             if (IsCancellationRequested())
@@ -329,7 +331,7 @@ internal class DatabaseClient
             if (!DatabaseInserts.Any())
                 return;
 
-            _logger.LogDebug($"Writing to table {table}/{propertyname} with {DatabaseInserts.Count()} inserts");
+            _logger.LogDebug($"Writing to table {table}/{propertyname} with {DatabaseInserts.Count} inserts");
 
             var cmd = conn.CreateCommand();
             cmd.CommandText = _helper.GetSaveCommand(table, propertyname);
@@ -359,7 +361,7 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "guilds", _bot.guilds.Select(x => new TableDefinitions.guilds
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "guilds", _bot.guilds.Select(x => new TableDefinitions.guilds
             {
                 serverid = x.Key,
 
@@ -435,7 +437,7 @@ internal class DatabaseClient
                 lavalink_shuffle = x.Value.Lavalink.Shuffle,
                 lavalink_repeat = x.Value.Lavalink.Repeat,
                 lavalink_queue = JsonConvert.SerializeObject(x.Value.Lavalink.SongQueue),
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -444,10 +446,10 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "objected_users", _bot.objectedUsers.Select(x => new TableDefinitions.objected_users
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "objected_users", _bot.objectedUsers.Select(x => new TableDefinitions.objected_users
             {
                 id = x
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -456,7 +458,7 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "users", _bot.users.Select(x => new TableDefinitions.users
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "users", _bot.users.Select(x => new TableDefinitions.users
             {
                 userid = x.Key,
                 afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
@@ -470,7 +472,7 @@ internal class DatabaseClient
                 reminders = JsonConvert.SerializeObject(x.Value.ReminderSettings.ScheduledReminders),
                 submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
                 scoresaber_id = x.Value.ScoreSaber.Id
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -479,12 +481,12 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "submission_user_bans", _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_user_bans", _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans
             {
                 id = x.Key,
                 reason = x.Value.Reason,
                 moderator = x.Value.Moderator
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -493,12 +495,12 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "submission_guild_bans", _bot.phishingUrlSubmissionGuildBans.Select(x => new TableDefinitions.submission_guild_bans
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_guild_bans", _bot.phishingUrlSubmissionGuildBans.Select(x => new TableDefinitions.submission_guild_bans
             {
                 id = x.Key,
                 reason = x.Value.Reason,
                 moderator = x.Value.Moderator
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -507,13 +509,13 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "banned_users", _bot.bannedUsers.Select(x => new TableDefinitions.banned_users
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "banned_users", _bot.bannedUsers.Select(x => new TableDefinitions.banned_users
             {
                 id = x.Key,
                 reason = x.Value.Reason,
                 moderator = x.Value.Moderator,
                 timestamp = x.Value.Timestamp.Ticks
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -522,13 +524,13 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "banned_guilds", _bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "banned_guilds", _bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
             {
                 id = x.Key,
                 reason = x.Value.Reason,
                 moderator = x.Value.Moderator,
                 timestamp = x.Value.Timestamp.Ticks
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -537,13 +539,13 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "globalbans", _bot.globalBans.Select(x => new TableDefinitions.globalbans
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "globalbans", _bot.globalBans.Select(x => new TableDefinitions.globalbans
             {
                 id = x.Key,
                 reason = x.Value.Reason,
                 moderator = x.Value.Moderator,
                 timestamp = x.Value.Timestamp.Ticks
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -552,11 +554,11 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
             {
                 id = x.Key,
                 notes = JsonConvert.SerializeObject(x.Value),
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -565,13 +567,13 @@ internal class DatabaseClient
 
         try
         {
-            await SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
             {
                 messageid = x.Key,
                 url = x.Value.Url,
                 submitter = x.Value.Submitter,
                 guild = x.Value.GuildOrigin
-            }).ToList());
+            }).ToList()));
         }
         catch (Exception ex)
         {
@@ -584,7 +586,7 @@ internal class DatabaseClient
         foreach (var guild in _bot.guilds.ToList())
             try
             {
-                await SyncTable(guildDatabaseConnection, $"{guild.Key}", guild.Value.Members.Select(x => new TableDefinitions.guild_users
+                syncs_running.Add(SyncTable(guildDatabaseConnection, $"{guild.Key}", guild.Value.Members.Select(x => new TableDefinitions.guild_users
                 {
                     userid = x.Key,
 
@@ -597,12 +599,15 @@ internal class DatabaseClient
                     saved_nickname = x.Value.SavedNickname,
                     invite_code = x.Value.InviteTracker.Code,
                     invite_user = x.Value.InviteTracker.UserId,
-                }).ToList(), "guild_users");
+                }).ToList(), "guild_users"));
             }
             catch (Exception ex)
             {
                 _logger.LogError($"An exception occurred while trying to update the {guild.Key} table", ex);
             }
+
+        while (syncs_running.Any(x => !x.IsCompleted))
+            await Task.Delay(100);
 
         RunningFullSync = false;
         _logger.LogInfo("Full database sync completed.");
