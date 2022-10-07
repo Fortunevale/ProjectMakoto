@@ -94,7 +94,7 @@ internal class TimeoutCommand : BaseCommand
 
                 await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
                 embed.Description = $"{victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`\n" +
-                                    $"`The time out will last for {until.GetTimespanUntil().GetHumanReadable()}.`";
+                                    $"`The time out will end` {until.ToTimestamp()}`.`";
                 embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
