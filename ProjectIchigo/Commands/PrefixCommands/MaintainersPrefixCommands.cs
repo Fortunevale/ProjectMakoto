@@ -33,6 +33,18 @@ public class MaintainersPrefixCommands : BaseCommandModule
                 await new InfoCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
+        
+        [Command("raw-guild"), Description("RawGuild Entry")]
+        public async Task RawGuild(CommandContext ctx, ulong? guild = null)
+        {
+            Task.Run(async () =>
+            {
+                await new RawGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild }
+                });
+            }).Add(_bot.watcher, ctx);
+        }
 
         [Command("botnick"), Description("Changes the bot's nickname on the current server.")]
         public async Task BotNick(CommandContext ctx, string newNickname = "")
