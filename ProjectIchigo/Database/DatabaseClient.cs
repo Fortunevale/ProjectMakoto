@@ -14,76 +14,6 @@ internal class DatabaseClient
 
     private bool Disposed { get; set; } = false;
 
-    private Dictionary<Task, bool> queuedUpdates = new();
-
-    public async Task QueueWatcher()
-    {
-        CancellationTokenSource tokenSource = new();
-
-        _ = Task.Run(async () =>
-        {
-            while (true)
-            {
-                await Task.Delay(TimeSpan.FromMinutes(30));
-
-                if (Disposed)
-                    return;
-
-                _ = FullSyncDatabase();
-            }
-        });
-
-        _ = Task.Run(async () =>
-        {
-            while (true)
-            {
-                if (Disposed)
-                    return;
-
-                if (queuedUpdates.Any(x => x.Value))
-                {
-                    foreach (var b in queuedUpdates.Where(x => !x.Value).ToList())
-                        queuedUpdates.Remove(b.Key);
-
-                    tokenSource.Cancel();
-                    tokenSource = new();
-                }
-
-                Thread.Sleep(100);
-            }
-        });
-
-        while (true)
-        {
-            if (Disposed)
-                return;
-
-            try
-            {
-                if (queuedUpdates.Any(x => x.Key.IsCompleted))
-                    foreach (var task in queuedUpdates.Where(x => x.Key.IsCompleted).ToList())
-                        queuedUpdates.Remove(task.Key);
-
-                foreach (var task in queuedUpdates.Where(x => x.Key.Status == TaskStatus.Created).ToList())
-                {
-                    task.Key.Start();
-                    await Task.Delay(20000, tokenSource.Token);
-                }
-
-                await Task.Delay(1000);
-            }
-            catch (TaskCanceledException)
-            {
-                continue;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("An exception occurred in the database queue handler", ex);
-                throw;
-            }
-        }
-    }
-
     public static async Task<DatabaseClient> InitializeDatabase(Bot _bot)
     {
         var databaseClient = new DatabaseClient
@@ -350,592 +280,335 @@ internal class DatabaseClient
         }
     }
 
+    public bool RunningFullSync = false;
+    public CancellationTokenSource FullSyncCancel = new();
+
     public async Task FullSyncDatabase(bool Important = false)
     {
         if (Disposed)
             throw new Exception("DatabaseHelper is disposed");
 
-        if (queuedUpdates.Count < 2 || Important)
+        if (Important && RunningFullSync)
         {
-            Task key = new(async () =>
-            {
-                _logger.LogInfo("Running full Database Sync..");
-
-                if (mainDatabaseConnection == null || guildDatabaseConnection == null)
-                {
-                    throw new Exception($"Exception occurred while trying to update guilds in database: Database mainDatabaseConnection not present");
-                }
-
-                if (_bot.guilds.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.guilds> DatabaseInserts = _bot.guilds.Select(x => new TableDefinitions.guilds
-                        {
-                            serverid = x.Key,
-
-                            experience_use = x.Value.ExperienceSettings.UseExperience,
-                            experience_boost_bumpreminder = x.Value.ExperienceSettings.BoostXpForBumpReminder,
-
-                            auto_assign_role_id = x.Value.JoinSettings.AutoAssignRoleId,
-                            joinlog_channel_id = x.Value.JoinSettings.JoinlogChannelId,
-                            autoban_global_ban = x.Value.JoinSettings.AutoBanGlobalBans,
-                            reapplyroles = x.Value.JoinSettings.ReApplyRoles,
-                            reapplynickname = x.Value.JoinSettings.ReApplyNickname,
-
-                            tokens_detect = x.Value.TokenLeakDetectionSettings.DetectTokens,
-
-                            phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
-                            phishing_warnonredirect = x.Value.PhishingDetectionSettings.AbuseIpDbReports,
-                            phishing_abuseipdb = x.Value.PhishingDetectionSettings.WarnOnRedirect,
-                            phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
-                            phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
-                            phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
-
-                            bump_enabled = x.Value.BumpReminderSettings.Enabled,
-                            bump_role = x.Value.BumpReminderSettings.RoleId,
-                            bump_channel = x.Value.BumpReminderSettings.ChannelId,
-                            bump_last_reminder = x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks,
-                            bump_last_time = x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks,
-                            bump_last_user = x.Value.BumpReminderSettings.LastUserId,
-                            bump_message = x.Value.BumpReminderSettings.MessageId,
-                            bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
-                            bump_missed = x.Value.BumpReminderSettings.BumpsMissed,
-
-                            levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
-                            auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
-
-                            crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostChannels),
-                            crosspostdelay = x.Value.CrosspostSettings.DelayBeforePosting,
-                            crosspostexcludebots = x.Value.CrosspostSettings.ExcludeBots,
-                            crosspost_ratelimits = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostRatelimits),
-
-                            reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
-
-                            actionlog_channel = x.Value.ActionLogSettings.Channel,
-                            actionlog_attempt_further_detail = x.Value.ActionLogSettings.AttemptGettingMoreDetails,
-                            actionlog_log_members_modified = x.Value.ActionLogSettings.MembersModified,
-                            actionlog_log_member_modified = x.Value.ActionLogSettings.MemberModified,
-                            actionlog_log_memberprofile_modified = x.Value.ActionLogSettings.MemberProfileModified,
-                            actionlog_log_message_deleted = x.Value.ActionLogSettings.MessageDeleted,
-                            actionlog_log_message_updated = x.Value.ActionLogSettings.MessageModified,
-                            actionlog_log_roles_modified = x.Value.ActionLogSettings.RolesModified,
-                            actionlog_log_banlist_modified = x.Value.ActionLogSettings.BanlistModified,
-                            actionlog_log_guild_modified = x.Value.ActionLogSettings.GuildModified,
-                            actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified,
-                            actionlog_log_voice_state = x.Value.ActionLogSettings.VoiceStateUpdated,
-                            actionlog_log_channels_modified = x.Value.ActionLogSettings.ChannelsModified,
-
-                            vc_privacy_clear = x.Value.InVoiceTextPrivacySettings.ClearTextEnabled,
-                            vc_privacy_perms = x.Value.InVoiceTextPrivacySettings.SetPermissionsEnabled,
-
-                            invitetracker_enabled = x.Value.InviteTrackerSettings.Enabled,
-                            invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache),
-
-                            autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
-                            
-                            normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled,
-
-                            embed_messages = x.Value.EmbedMessageSettings.UseEmbedding,
-                            embed_github = x.Value.EmbedMessageSettings.UseGithubEmbedding,
-
-                            lavalink_channel = x.Value.Lavalink.ChannelId,
-                            lavalink_currentposition = x.Value.Lavalink.CurrentVideoPosition,
-                            lavalink_currentvideo = x.Value.Lavalink.CurrentVideo,
-                            lavalink_paused = x.Value.Lavalink.IsPaused,
-                            lavalink_shuffle = x.Value.Lavalink.Shuffle,
-                            lavalink_repeat = x.Value.Lavalink.Repeat,
-                            lavalink_queue = JsonConvert.SerializeObject(x.Value.Lavalink.SongQueue),
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("guilds");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("guilds", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", prop.GetValue(b));
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("guilds");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the guilds table", ex);
-                    }
-
-                var check = CheckGuildTables();
-                check.Add(_bot.watcher);
-
-                try
-                {
-                    await check.WaitAsync(TimeSpan.FromSeconds(120));
-                }
-                catch { }
-
-                if (_bot.guilds.Count > 0)
-                    foreach (var guild in _bot.guilds.ToList())
-                        if (guild.Value.Members.Count > 0)
-                        {
-                            try
-                            {
-                                List<TableDefinitions.guild_users> DatabaseInserts = guild.Value.Members.Select(x => new TableDefinitions.guild_users
-                                {
-                                    userid = x.Key,
-
-                                    experience = x.Value.Experience.Points,
-                                    experience_level = x.Value.Experience.Level,
-                                    experience_last_message = x.Value.Experience.Last_Message.ToUniversalTime().Ticks,
-                                    first_join = x.Value.FirstJoinDate.ToUniversalTime().Ticks,
-                                    last_leave = x.Value.LastLeaveDate.ToUniversalTime().Ticks,
-                                    roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
-                                    saved_nickname = x.Value.SavedNickname,
-                                    invite_code = x.Value.InviteTracker.Code,
-                                    invite_user = x.Value.InviteTracker.UserId,
-                                }).ToList();
-
-                                var cmd = mainDatabaseConnection.CreateCommand();
-                                cmd.CommandText = _helper.GetSaveCommand($"{guild.Key}", "guild_users");
-
-                                for (int i = 0; i < DatabaseInserts.Count; i++)
-                                {
-                                    var b = DatabaseInserts[i];
-                                    var properties = b.GetType().GetProperties();
-
-                                    cmd.CommandText += _helper.GetValueCommand($"guild_users", i);
-                                    for (int i1 = 0; i1 < properties.Length; i1++)
-                                    {
-                                        var prop = properties[i1];
-
-                                        cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                                    }
-                                }
-
-                                cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                                cmd.CommandText += _helper.GetOverwriteCommand($"guild_users");
-
-                                cmd.Connection = guildDatabaseConnection;
-                                await _queue.RunCommand(cmd);
-
-                                DatabaseInserts.Clear();
-                                DatabaseInserts = null;
-                                cmd.Dispose();
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError($"An exception occurred while trying to update the {guild.Key} table", ex);
-                            }
-                        }
-
-                if (_bot.objectedUsers.Count > 0)
-                    try
-                    {
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand($"objected_users");
-
-                        for (int i = 0; i < _bot.objectedUsers.Count; i++)
-                        {
-                            cmd.CommandText += _helper.GetValueCommand("objected_users", i);
-
-                            cmd.Parameters.AddWithValue($"id{i}", _bot.objectedUsers[i]);
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("objected_users");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the objected_users table", ex);
-                    }
-
-                if (_bot.users.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.users> DatabaseInserts = _bot.users.Select(x => new TableDefinitions.users
-                        {
-                            userid = x.Key,
-                            afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
-                            afk_reason = x.Value.AfkStatus.Reason,
-                            afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
-                            afk_pingamount = x.Value.AfkStatus.MessagesAmount,
-                            experience_directmessageoptout = x.Value.ExperienceUserSettings.DirectMessageOptOut,
-                            submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
-                            submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
-                            playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
-                            reminders = JsonConvert.SerializeObject(x.Value.ReminderSettings.ScheduledReminders),
-                            submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
-                            scoresaber_id = x.Value.ScoreSaber.Id
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = cmd.CommandText = _helper.GetSaveCommand("users");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("users", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("users");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the users table", ex);
-                    }
-
-                if (_bot.phishingUrlSubmissionUserBans.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.submission_user_bans> DatabaseInserts = _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans
-                        {
-                            id = x.Key,
-                            reason = x.Value.Reason,
-                            moderator = x.Value.Moderator
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("submission_user_bans");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("submission_user_bans", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("submission_user_bans");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the submission_user_bans table", ex);
-                    }
-
-                if (_bot.phishingUrlSubmissionGuildBans.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.submission_guild_bans> DatabaseInserts = _bot.phishingUrlSubmissionGuildBans.Select(x => new TableDefinitions.submission_guild_bans
-                        {
-                            id = x.Key,
-                            reason = x.Value.Reason,
-                            moderator = x.Value.Moderator
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("submission_guild_bans");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("submission_guild_bans", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("submission_guild_bans");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
-                    }
-
-                if (_bot.bannedUsers.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.banned_users> DatabaseInserts = _bot.bannedUsers.Select(x => new TableDefinitions.banned_users
-                        {
-                            id = x.Key,
-                            reason = x.Value.Reason,
-                            moderator = x.Value.Moderator,
-                            timestamp = x.Value.Timestamp.Ticks
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("banned_users");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("banned_users", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("banned_users");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the banned_users table", ex);
-                    }
-
-                if (_bot.bannedGuilds.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.banned_guilds> DatabaseInserts = _bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
-                        {
-                            id = x.Key,
-                            reason = x.Value.Reason,
-                            moderator = x.Value.Moderator,
-                            timestamp = x.Value.Timestamp.Ticks
-                        }).ToList();
-
-                        if (mainDatabaseConnection == null)
-                        {
-                            throw new Exception($"Exception occurred while trying to update banned guilds in database: Database mainDatabaseConnection not present");
-                        }
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("banned_guilds");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("banned_guilds", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("banned_guilds");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the banned_guilds table", ex);
-                    }
-
-                if (_bot.globalBans.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.globalbans> DatabaseInserts = _bot.globalBans.Select(x => new TableDefinitions.globalbans
-                        {
-                            id = x.Key,
-                            reason = x.Value.Reason,
-                            moderator = x.Value.Moderator,
-                            timestamp = x.Value.Timestamp.Ticks
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("globalbans");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("globalbans", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("globalbans");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
-                    }
-                
-                if (_bot.globalNotes.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.globalnotes> DatabaseInserts = _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
-                        {
-                            id = x.Key,
-                            notes = JsonConvert.SerializeObject(x.Value),
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("globalnotes");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("globalnotes", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("globalnotes");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
-                    }
-
-                if (_bot.submittedUrls.Count > 0)
-                    try
-                    {
-                        List<TableDefinitions.active_url_submissions> DatabaseInserts = _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
-                        {
-                            messageid = x.Key,
-                            url = x.Value.Url,
-                            submitter = x.Value.Submitter,
-                            guild = x.Value.GuildOrigin
-                        }).ToList();
-
-                        var cmd = mainDatabaseConnection.CreateCommand();
-                        cmd.CommandText = _helper.GetSaveCommand("active_url_submissions");
-
-                        for (int i = 0; i < DatabaseInserts.Count; i++)
-                        {
-                            var b = DatabaseInserts[i];
-                            var properties = b.GetType().GetProperties();
-
-                            cmd.CommandText += _helper.GetValueCommand("active_url_submissions", i);
-                            for (int i1 = 0; i1 < properties.Length; i1++)
-                            {
-                                var prop = properties[i1];
-
-                                cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
-                            }
-                        }
-
-                        cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-                        cmd.CommandText += _helper.GetOverwriteCommand("active_url_submissions");
-
-                        cmd.Connection = mainDatabaseConnection;
-                        await _queue.RunCommand(cmd);
-
-                        DatabaseInserts.Clear();
-                        DatabaseInserts = null;
-                        cmd.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"An exception occurred while trying to update the active_url_submissions table", ex);
-                    }
-
-                await Task.Delay(1000);
-                GC.Collect();
-            });
-
-            queuedUpdates.Add(key, Important);
-
-            if (Important)
-            {
-                while (!key.IsCompleted && queuedUpdates.ContainsKey(key))
-                {
-                    await Task.Delay(100);
-                }
-                return;
-            }
+            FullSyncCancel.Cancel();
+            while (RunningFullSync)
+                await Task.Delay(100);
         }
+
+        if (RunningFullSync)
+            return;
+
+        bool IsCancellationRequested()
+        {
+            if (FullSyncCancel.IsCancellationRequested)
+            {
+                RunningFullSync = false;
+                FullSyncCancel = new();
+                return true;
+            }
+
+            return false;
+        }
+
+        RunningFullSync = true;
+
+        _logger.LogDebug("Running full database sync..");
+
+        if (mainDatabaseConnection == null || guildDatabaseConnection == null)
+        {
+            throw new Exception($"Exception occurred while trying to update guilds in database: Database mainDatabaseConnection not present");
+        }
+
+        async Task SyncTable(MySqlConnection conn, string table, IReadOnlyList<object> DatabaseInserts, string? propertyname = null)
+        {
+            if (IsCancellationRequested())
+                return;
+
+            propertyname ??= table;
+
+            if (!DatabaseInserts.Any())
+                return;
+
+            _logger.LogDebug($"Writing to table {table}/{propertyname} with {DatabaseInserts.Count()} inserts");
+
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = _helper.GetSaveCommand(table, propertyname);
+
+            for (int i = 0; i < DatabaseInserts.Count; i++)
+            {
+                var b = DatabaseInserts[i];
+                var properties = b.GetType().GetProperties();
+
+                cmd.CommandText += _helper.GetValueCommand(propertyname, i);
+                for (int i1 = 0; i1 < properties.Length; i1++)
+                {
+                    var prop = properties[i1];
+
+                    cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
+                }
+            }
+
+            cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
+            cmd.CommandText += _helper.GetOverwriteCommand(propertyname);
+
+            cmd.Connection = conn;
+            await _queue.RunCommand(cmd);
+
+            cmd.Dispose();
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "guilds", _bot.guilds.Select(x => new TableDefinitions.guilds
+            {
+                serverid = x.Key,
+
+                experience_use = x.Value.ExperienceSettings.UseExperience,
+                experience_boost_bumpreminder = x.Value.ExperienceSettings.BoostXpForBumpReminder,
+
+                auto_assign_role_id = x.Value.JoinSettings.AutoAssignRoleId,
+                joinlog_channel_id = x.Value.JoinSettings.JoinlogChannelId,
+                autoban_global_ban = x.Value.JoinSettings.AutoBanGlobalBans,
+                reapplyroles = x.Value.JoinSettings.ReApplyRoles,
+                reapplynickname = x.Value.JoinSettings.ReApplyNickname,
+
+                tokens_detect = x.Value.TokenLeakDetectionSettings.DetectTokens,
+
+                phishing_detect = x.Value.PhishingDetectionSettings.DetectPhishing,
+                phishing_warnonredirect = x.Value.PhishingDetectionSettings.AbuseIpDbReports,
+                phishing_abuseipdb = x.Value.PhishingDetectionSettings.WarnOnRedirect,
+                phishing_type = Convert.ToInt32(x.Value.PhishingDetectionSettings.PunishmentType),
+                phishing_reason = x.Value.PhishingDetectionSettings.CustomPunishmentReason,
+                phishing_time = Convert.ToInt64(x.Value.PhishingDetectionSettings.CustomPunishmentLength.TotalSeconds),
+
+                bump_enabled = x.Value.BumpReminderSettings.Enabled,
+                bump_role = x.Value.BumpReminderSettings.RoleId,
+                bump_channel = x.Value.BumpReminderSettings.ChannelId,
+                bump_last_reminder = x.Value.BumpReminderSettings.LastReminder.ToUniversalTime().Ticks,
+                bump_last_time = x.Value.BumpReminderSettings.LastBump.ToUniversalTime().Ticks,
+                bump_last_user = x.Value.BumpReminderSettings.LastUserId,
+                bump_message = x.Value.BumpReminderSettings.MessageId,
+                bump_persistent_msg = x.Value.BumpReminderSettings.PersistentMessageId,
+                bump_missed = x.Value.BumpReminderSettings.BumpsMissed,
+
+                levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
+                auditlogcache = JsonConvert.SerializeObject(x.Value.ProcessedAuditLogs),
+
+                crosspostchannels = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostChannels),
+                crosspostdelay = x.Value.CrosspostSettings.DelayBeforePosting,
+                crosspostexcludebots = x.Value.CrosspostSettings.ExcludeBots,
+                crosspost_ratelimits = JsonConvert.SerializeObject(x.Value.CrosspostSettings.CrosspostRatelimits),
+
+                reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
+
+                actionlog_channel = x.Value.ActionLogSettings.Channel,
+                actionlog_attempt_further_detail = x.Value.ActionLogSettings.AttemptGettingMoreDetails,
+                actionlog_log_members_modified = x.Value.ActionLogSettings.MembersModified,
+                actionlog_log_member_modified = x.Value.ActionLogSettings.MemberModified,
+                actionlog_log_memberprofile_modified = x.Value.ActionLogSettings.MemberProfileModified,
+                actionlog_log_message_deleted = x.Value.ActionLogSettings.MessageDeleted,
+                actionlog_log_message_updated = x.Value.ActionLogSettings.MessageModified,
+                actionlog_log_roles_modified = x.Value.ActionLogSettings.RolesModified,
+                actionlog_log_banlist_modified = x.Value.ActionLogSettings.BanlistModified,
+                actionlog_log_guild_modified = x.Value.ActionLogSettings.GuildModified,
+                actionlog_log_invites_modified = x.Value.ActionLogSettings.InvitesModified,
+                actionlog_log_voice_state = x.Value.ActionLogSettings.VoiceStateUpdated,
+                actionlog_log_channels_modified = x.Value.ActionLogSettings.ChannelsModified,
+
+                vc_privacy_clear = x.Value.InVoiceTextPrivacySettings.ClearTextEnabled,
+                vc_privacy_perms = x.Value.InVoiceTextPrivacySettings.SetPermissionsEnabled,
+
+                invitetracker_enabled = x.Value.InviteTrackerSettings.Enabled,
+                invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTrackerSettings.Cache),
+
+                autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
+
+                normalizenames = x.Value.NameNormalizerSettings.NameNormalizerEnabled,
+
+                embed_messages = x.Value.EmbedMessageSettings.UseEmbedding,
+                embed_github = x.Value.EmbedMessageSettings.UseGithubEmbedding,
+
+                lavalink_channel = x.Value.Lavalink.ChannelId,
+                lavalink_currentposition = x.Value.Lavalink.CurrentVideoPosition,
+                lavalink_currentvideo = x.Value.Lavalink.CurrentVideo,
+                lavalink_paused = x.Value.Lavalink.IsPaused,
+                lavalink_shuffle = x.Value.Lavalink.Shuffle,
+                lavalink_repeat = x.Value.Lavalink.Repeat,
+                lavalink_queue = JsonConvert.SerializeObject(x.Value.Lavalink.SongQueue),
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the guilds table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "objected_users", _bot.objectedUsers.Select(x => new TableDefinitions.objected_users
+            {
+                id = x
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the objected_users table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "users", _bot.users.Select(x => new TableDefinitions.users
+            {
+                userid = x.Key,
+                afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
+                afk_reason = x.Value.AfkStatus.Reason,
+                afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
+                afk_pingamount = x.Value.AfkStatus.MessagesAmount,
+                experience_directmessageoptout = x.Value.ExperienceUserSettings.DirectMessageOptOut,
+                submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
+                submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
+                playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
+                reminders = JsonConvert.SerializeObject(x.Value.ReminderSettings.ScheduledReminders),
+                submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
+                scoresaber_id = x.Value.ScoreSaber.Id
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the users table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "submission_user_bans", _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the submission_user_bans table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "submission_guild_bans", _bot.phishingUrlSubmissionGuildBans.Select(x => new TableDefinitions.submission_guild_bans
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "banned_users", _bot.bannedUsers.Select(x => new TableDefinitions.banned_users
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator,
+                timestamp = x.Value.Timestamp.Ticks
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the banned_users table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "banned_guilds", _bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator,
+                timestamp = x.Value.Timestamp.Ticks
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the banned_guilds table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "globalbans", _bot.globalBans.Select(x => new TableDefinitions.globalbans
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator,
+                timestamp = x.Value.Timestamp.Ticks
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
+            {
+                id = x.Key,
+                notes = JsonConvert.SerializeObject(x.Value),
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
+        }
+
+        try
+        {
+            await SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
+            {
+                messageid = x.Key,
+                url = x.Value.Url,
+                submitter = x.Value.Submitter,
+                guild = x.Value.GuildOrigin
+            }).ToList());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the active_url_submissions table", ex);
+        }
+
+        var check = CheckGuildTables();
+        try { check.Add(_bot.watcher); await check.WaitAsync(TimeSpan.FromSeconds(120)); } catch { }
+
+        foreach (var guild in _bot.guilds.ToList())
+            try
+            {
+                await SyncTable(guildDatabaseConnection, $"{guild.Key}", guild.Value.Members.Select(x => new TableDefinitions.guild_users
+                {
+                    userid = x.Key,
+
+                    experience = x.Value.Experience.Points,
+                    experience_level = x.Value.Experience.Level,
+                    experience_last_message = x.Value.Experience.Last_Message.ToUniversalTime().Ticks,
+                    first_join = x.Value.FirstJoinDate.ToUniversalTime().Ticks,
+                    last_leave = x.Value.LastLeaveDate.ToUniversalTime().Ticks,
+                    roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
+                    saved_nickname = x.Value.SavedNickname,
+                    invite_code = x.Value.InviteTracker.Code,
+                    invite_user = x.Value.InviteTracker.UserId,
+                }).ToList(), "guild_users");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An exception occurred while trying to update the {guild.Key} table", ex);
+            }
+
+        RunningFullSync = false;
+        _logger.LogInfo("Full database sync completed.");
+
+        await Task.Delay(1000);
+        GC.Collect();
     }
 
     public async Task UpdateValue(string table, string columnKey, object rowKey, string columnToEdit, object newValue, MySqlConnection connection)

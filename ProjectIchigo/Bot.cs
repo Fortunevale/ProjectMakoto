@@ -651,7 +651,6 @@ public class Bot
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
 
-        _ = DatabaseClient.QueueWatcher();
         watcher.Watcher();
 
         AppDomain.CurrentDomain.ProcessExit += delegate
