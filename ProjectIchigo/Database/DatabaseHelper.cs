@@ -14,36 +14,36 @@ internal class DatabaseHelper
         this._databaseClient = client;
     }
 
-    public string GetLoadCommand(string table, List<DatabaseColumnLists.Column> columns)
+    public string GetLoadCommand(string table, string? propertyname = null)
     {
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        return $"SELECT {string.Join(", ", columns.Select(x => x.Name))} FROM `{table}`";
+        return $"SELECT {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == (propertyname ?? table)).GetProperties().Select(x => x.Name))} FROM `{table}`";
     }
 
-    public string GetSaveCommand(string table, List<DatabaseColumnLists.Column> columns)
+    public string GetSaveCommand(string table, string? propertyname = null)
     {
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        return $"INSERT INTO `{table}` ( {string.Join(", ", columns.Select(x => x.Name))} ) VALUES ";
+        return $"INSERT INTO `{table}` ( {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == (propertyname ?? table)).GetProperties().Select(x => x.Name))} ) VALUES ";
     }
 
-    public string GetValueCommand(List<DatabaseColumnLists.Column> columns, int i)
+    public string GetValueCommand(string propertyname, int i)
     {
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        return $"( {string.Join(", ", columns.Select(x => $"@{x.Name}{i}"))} ), ";
+        return $"( {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"{x.Name}{i}"))} ), ";
     }
 
-    public string GetOverwriteCommand(List<DatabaseColumnLists.Column> columns)
+    public string GetOverwriteCommand(string propertyname)
     {
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        return $" ON DUPLICATE KEY UPDATE {string.Join(", ", columns.Select(x => $"{x.Name}=values({x.Name})"))}";
+        return $" ON DUPLICATE KEY UPDATE {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"{x.Name}=values({x.Name})"))}";
     }
 
     public string GetUpdateValueCommand(string table, string columnKey, object rowKey, string columnToEdit, object newValue)
@@ -60,7 +60,7 @@ internal class DatabaseHelper
         var v = MySqlHelper.EscapeString(newValue.ToString());
 
         if (Regex.IsMatch(v, @"^(?=.*SELECT.*FROM)(?!.*(?:CREATE|DROP|UPDATE|INSERT|ALTER|DELETE|ATTACH|DETACH)).*$", RegexOptions.IgnoreCase))
-            throw new Exception("Sql detected.");
+            throw new InvalidOperationException("Sql detected.");
 
         return $"UPDATE `{table}` SET `{columnToEdit}`='{v}' WHERE `{columnKey}`='{rowKey}'";
     }
@@ -80,7 +80,7 @@ internal class DatabaseHelper
             }
         }
 
-        return SavedTables as IEnumerable<string>;
+        return SavedTables;
     }
 
     public async Task<Dictionary<string, string>> ListColumns(MySqlConnection connection, string table)

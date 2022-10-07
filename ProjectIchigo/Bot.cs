@@ -1189,19 +1189,23 @@ public class Bot
             case LogLevel.FATAL:
             case LogLevel.ERROR:
             {
-                if (status.DiscordInitialized)
+                try
                 {
-                    if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
-                        break;
+                    if (status.DiscordInitialized)
+                    {
+                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
+                            break;
 
-                    var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
 
-                    _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
-                        .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
-                        .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
-                        .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
-                        .WithTimestamp(e.LogEntry.TimeOfEvent)); 
+                        _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
+                            .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
+                            .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
+                            .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
+                            .WithTimestamp(e.LogEntry.TimeOfEvent));
+                    }
                 }
+                catch {}
                 break;
             }
         }

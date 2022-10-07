@@ -79,7 +79,7 @@ internal class PhishingUrlUpdater
         try
         {
             UpdateRunning = true;
-            List<DatabasePhishingUrlInfo> DatabaseInserts = _bot.phishingUrls.Select(x => new DatabasePhishingUrlInfo
+            List<TableDefinitions.scam_urls> DatabaseInserts = _bot.phishingUrls.Select(x => new TableDefinitions.scam_urls
             {
                 url = x.Value.Url,
                 origin = JsonConvert.SerializeObject(x.Value.Origin),
@@ -92,19 +92,19 @@ internal class PhishingUrlUpdater
             }
 
             var cmd = _bot.databaseClient.mainDatabaseConnection.CreateCommand();
-            cmd.CommandText = _bot.databaseClient._helper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
+            cmd.CommandText = _bot.databaseClient._helper.GetSaveCommand("scam_urls");
 
             for (int i = 0; i < DatabaseInserts.Count; i++)
             {
-                cmd.CommandText += _bot.databaseClient._helper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
+                cmd.CommandText += _bot.databaseClient._helper.GetValueCommand("scam_urls", i);
 
-                cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url);
-                cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin);
-                cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].submitter);
+                cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url.Value);
+                cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin.Value);
+                cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].submitter.Value);
             }
 
-            cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-            cmd.CommandText += _bot.databaseClient._helper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
+            cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
+            cmd.CommandText += _bot.databaseClient._helper.GetOverwriteCommand("scam_urls");
 
             cmd.Connection = _bot.databaseClient.mainDatabaseConnection;
             await _bot.databaseClient._queue.RunCommand(cmd);

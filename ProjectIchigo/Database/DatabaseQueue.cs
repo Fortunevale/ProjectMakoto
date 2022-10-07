@@ -95,6 +95,8 @@ internal class DatabaseQueue
                         if (ex.Message.ToLower().Contains("open datareader"))
                             continue;
 
+                        _logger.LogError(b.Command.CommandText);
+
                         try
                         {
                             if (ex.Message.ToLower().Contains("connection must be valid and open."))
