@@ -10,10 +10,10 @@ public class BigInt : BaseColumn
         this.MaxValue = MaxValue;
     }
 
-    public long MaxValue { get; private set; }
+    public long MaxValue { get; private set; } = 9223372036854775807;
 
     private long? _Value { get; set; }
-    public long Value { get => _Value ?? throw new NullReferenceException(); set { _Value = (value.ToInt64() > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
+    public long Value { get => _Value ?? 0; set { _Value = (value.ToInt64() > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
 
     public static implicit operator long(BigInt b) => b.Value;
     public static implicit operator ulong(BigInt b) => (ulong)b.Value;

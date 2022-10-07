@@ -84,7 +84,7 @@ internal class PhishingUrlUpdater
                 url = x.Value.Url,
                 origin = JsonConvert.SerializeObject(x.Value.Origin),
                 submitter = x.Value.Submitter
-            }).OrderBy(x => x.url).ToList();
+            }).ToList();
 
             if (_bot.databaseClient.mainDatabaseConnection == null)
             {

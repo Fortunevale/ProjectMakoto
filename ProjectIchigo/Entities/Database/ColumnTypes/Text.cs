@@ -10,13 +10,13 @@ public class Text : BaseColumn
         this.MaxLength = MaxLength;
     }
 
-    public long MaxLength { get; private set; }
+    public long MaxLength { get; private set; } = 65535;
 
-    private string? _Value { get; set; }
-    public string? Value { get => _Value; set { _Value = (value.Length.ToInt64() > MaxLength ? throw new ArgumentException($"The maximum length for this string is {MaxLength}") : value); } }
+    private string? _Value { get; set; } = "";
+    public string Value { get => _Value.IsNullOrEmpty() ? "" : _Value; set { _Value = (value.Length.ToInt64() > MaxLength ? throw new ArgumentException($"The maximum length for this string is {MaxLength}") : value); } }
 
     public static implicit operator string(Text b) => b.Value;
-    public static implicit operator Text(string v) => new() { Value = v };
+    public static implicit operator Text(string v) => new() { Value = v ?? "" };
 
     public override string ToString()
         => this.Value;

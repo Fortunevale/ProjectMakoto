@@ -10,10 +10,10 @@ public class VarChar : BaseColumn
         this.MaxLength = MaxLength;
     }
 
-    public long MaxLength { get; private set; }
+    public long MaxLength { get; private set; } = 65535;
 
     private string? _Value { get; set; }
-    public string? Value { get => _Value; set { _Value = (value.Length.ToInt64() > MaxLength ? throw new ArgumentException($"The maximum length for this string is {MaxLength}") : value); } }
+    public string Value { get => _Value.IsNullOrEmpty() ? "" : _Value; set { _Value = (value.Length.ToInt64() > MaxLength ? throw new ArgumentException($"The maximum length for this string is {MaxLength}") : value); } }
 
     public static implicit operator string(VarChar b) => b.Value;
     public static implicit operator VarChar(string v) => new() { Value = v };

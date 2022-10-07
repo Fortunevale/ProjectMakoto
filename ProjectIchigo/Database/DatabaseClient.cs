@@ -481,7 +481,12 @@ internal class DatabaseClient
 
                 var check = CheckGuildTables();
                 check.Add(_bot.watcher);
-                await check.WaitAsync(TimeSpan.FromSeconds(120));
+
+                try
+                {
+                    await check.WaitAsync(TimeSpan.FromSeconds(120));
+                }
+                catch { }
 
                 if (_bot.guilds.Count > 0)
                     foreach (var guild in _bot.guilds.ToList())

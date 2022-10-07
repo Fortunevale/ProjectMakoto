@@ -10,10 +10,10 @@ public class TinyInt : BaseColumn
         this.MaxValue = MaxValue;
     }
 
-    public uint MaxValue { get; private set; }
+    public uint MaxValue { get; private set; } = 127;
 
     private int? _Value { get; set; }
-    public int Value { get => _Value ?? throw new NullReferenceException(); set { _Value = (value > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
+    public int Value { get => _Value ?? 0; set { _Value = (value > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
 
     public static implicit operator int(TinyInt b) => b.Value;
     public static implicit operator uint(TinyInt b) => (uint)b.Value;

@@ -35,7 +35,7 @@ internal class DatabaseHelper
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        return $"( {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"{x.Name}{i}"))} ), ";
+        return $"( {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"@{x.Name}{i}"))} ), ";
     }
 
     public string GetOverwriteCommand(string propertyname)
@@ -70,17 +70,25 @@ internal class DatabaseHelper
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        List<string> SavedTables = new();
-
-        using (IDataReader reader = connection.ExecuteReader($"SHOW TABLES"))
+        try
         {
-            while (reader.Read())
-            {
-                SavedTables.Add(reader.GetString(0));
-            }
-        }
+            List<string> SavedTables = new();
 
-        return SavedTables;
+            using (IDataReader reader = connection.ExecuteReader($"SHOW TABLES"))
+            {
+                while (reader.Read())
+                {
+                    SavedTables.Add(reader.GetString(0));
+                }
+            }
+
+            return SavedTables;
+        }
+        catch (Exception)
+        {
+            await Task.Delay(1000);
+            return await ListTables(connection);
+        }
     }
 
     public async Task<Dictionary<string, string>> ListColumns(MySqlConnection connection, string table)
@@ -88,17 +96,25 @@ internal class DatabaseHelper
         if (_databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
-        Dictionary<string, string> Columns = new();
-
-        using (IDataReader reader = connection.ExecuteReader($"SHOW FIELDS FROM `{table}`"))
+        try
         {
-            while (reader.Read())
-            {
-                Columns.Add(reader.GetString(0), reader.GetString(1));
-            }
-        }
+            Dictionary<string, string> Columns = new();
 
-        return Columns;
+            using (IDataReader reader = connection.ExecuteReader($"SHOW FIELDS FROM `{table}`"))
+            {
+                while (reader.Read())
+                {
+                    Columns.Add(reader.GetString(0), reader.GetString(1));
+                }
+            }
+
+            return Columns;
+        }
+        catch (Exception)
+        {
+            await Task.Delay(1000);
+            return await ListColumns(connection, table);
+        }
     }
 
     public async Task DeleteRow(MySqlConnection connection, string table, string row_match, string value)
