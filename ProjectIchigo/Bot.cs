@@ -227,7 +227,7 @@ public class Bot
                 {
                     _logger.LogDebug("Waiting for guilds to download to sync database..");
 
-                    while (!discordClient?.Guilds.Any() ?? true)
+                    while (!status.DiscordGuildDownloadCompleted)
                         Thread.Sleep(500);
 
                     await databaseClient.FullSyncDatabase(true);
@@ -651,12 +651,11 @@ public class Bot
             Environment.Exit(ExitCodes.FailedDiscordLogin);
         }
 
-        _ = DatabaseClient.QueueWatcher();
         watcher.Watcher();
 
         AppDomain.CurrentDomain.ProcessExit += delegate
         {
-            ExitApplication().Wait();
+            ExitApplication(true).Wait();
         };
 
         Console.CancelKeyPress += delegate
@@ -1014,9 +1013,6 @@ public class Bot
                 _logger.LogError("Failed to run sync tasks", ex);
             }
 
-            await databaseClient.CheckGuildTables();
-            await databaseClient.FullSyncDatabase(true);
-
             List<DiscordUser> UserCache = new();
 
             await Task.Delay(5000);
@@ -1120,7 +1116,7 @@ public class Bot
 
         _logger.LogInfo($"Preparing to shut down Ichigo..");
 
-        if (status.DiscordInitialized)
+        if (status.DiscordInitialized && !Immediate)
         {
             try
             {
@@ -1189,19 +1185,23 @@ public class Bot
             case LogLevel.FATAL:
             case LogLevel.ERROR:
             {
-                if (status.DiscordInitialized)
+                try
                 {
-                    if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
-                        break;
+                    if (status.DiscordInitialized)
+                    {
+                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
+                            break;
 
-                    var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
 
-                    _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
-                        .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
-                        .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
-                        .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
-                        .WithTimestamp(e.LogEntry.TimeOfEvent)); 
+                        _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
+                            .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
+                            .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
+                            .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
+                            .WithTimestamp(e.LogEntry.TimeOfEvent));
+                    }
                 }
+                catch {}
                 break;
             }
         }
