@@ -4,7 +4,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Ichigo.")]
+    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Ichigo.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
     public class DevTools : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
@@ -15,6 +15,18 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new InfoCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("raw-guild", "RawGuild Entry")]
+        public async Task RawGuild(InteractionContext ctx, [Option("guild", "guild")]string? guild = null)
+        {
+            Task.Run(async () =>
+            {
+                await new RawGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "guild", guild is not null ? Convert.ToUInt64(guild) : null }
+                });
             }).Add(_bot.watcher, ctx);
         }
 

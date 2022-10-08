@@ -1,7 +1,22 @@
-﻿namespace ProjectIchigo.Util;
+﻿using System.Reflection;
+
+namespace ProjectIchigo.Util;
 
 internal static class GenericExtensions
 {
+    internal static bool TryGetCustomAttribute<T>(this PropertyInfo collection, Type type, out T? attribute)
+    {
+        var objects = collection.GetCustomAttributes(false);
+        if (objects.Any(x => x.GetType() == type))
+        {
+            attribute = (T)objects.First(x => x.GetType() == type);
+            return true;
+        }
+
+        attribute = default;
+        return false;
+    }
+
     internal static string IsValidHexColor(this string str, string Default = "#FFFFFF") 
         => !str.IsNullOrWhiteSpace() && Regex.IsMatch(str, @"^(#([a-fA-f0-9]{6}))$") ? str : Default;
 
@@ -30,5 +45,13 @@ internal static class GenericExtensions
         return Formatter.Sanitize(proc);
     }
 
-
+    internal static Stream ToStream(this string s)
+    {
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+        writer.Write(s);
+        writer.Flush();
+        stream.Position = 0;
+        return stream;
+    }
 }

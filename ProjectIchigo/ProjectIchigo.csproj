@@ -15,6 +15,7 @@
     <Copyright>Project-Ichigo</Copyright>
     <PackageProjectUrl>https://github.com/TheXorog/Project-Ichigo</PackageProjectUrl>
     <AnalysisLevel>latest</AnalysisLevel>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -43,7 +44,7 @@
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.1.4" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.1.4" />
     <PackageReference Include="MySql.Data" Version="8.0.30" />
-    <PackageReference Include="Octokit" Version="3.0.0" />
+    <PackageReference Include="Octokit" Version="3.0.1" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
   </ItemGroup>

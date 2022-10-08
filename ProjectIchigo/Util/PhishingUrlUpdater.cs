@@ -79,39 +79,8 @@ internal class PhishingUrlUpdater
         try
         {
             UpdateRunning = true;
-            List<DatabasePhishingUrlInfo> DatabaseInserts = _bot.phishingUrls.Select(x => new DatabasePhishingUrlInfo
-            {
-                url = x.Value.Url,
-                origin = JsonConvert.SerializeObject(x.Value.Origin),
-                submitter = x.Value.Submitter
-            }).OrderBy(x => x.url).ToList();
 
-            if (_bot.databaseClient.mainDatabaseConnection == null)
-            {
-                throw new Exception($"Exception occurred while trying to update phishing urls saved in database: Database connection not present");
-            }
-
-            var cmd = _bot.databaseClient.mainDatabaseConnection.CreateCommand();
-            cmd.CommandText = _bot.databaseClient._helper.GetSaveCommand("scam_urls", DatabaseColumnLists.scam_urls);
-
-            for (int i = 0; i < DatabaseInserts.Count; i++)
-            {
-                cmd.CommandText += _bot.databaseClient._helper.GetValueCommand(DatabaseColumnLists.scam_urls, i);
-
-                cmd.Parameters.AddWithValue($"url{i}", DatabaseInserts[ i ].url);
-                cmd.Parameters.AddWithValue($"origin{i}", DatabaseInserts[ i ].origin);
-                cmd.Parameters.AddWithValue($"submitter{i}", DatabaseInserts[ i ].submitter);
-            }
-
-            cmd.CommandText = cmd.CommandText.Remove(cmd.CommandText.LastIndexOf(','), 2);
-            cmd.CommandText += _bot.databaseClient._helper.GetOverwriteCommand(DatabaseColumnLists.scam_urls);
-
-            cmd.Connection = _bot.databaseClient.mainDatabaseConnection;
-            await _bot.databaseClient._queue.RunCommand(cmd);
-
-            UpdateRunning = false;
-            DatabaseInserts.Clear();
-            DatabaseInserts = null;
+            await _bot.databaseClient.FullSyncDatabase();
 
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
@@ -120,8 +89,6 @@ internal class PhishingUrlUpdater
 
                     _logger.LogDebug($"Dropped '{b}' from table 'scam_urls'.");
                 }
-
-            cmd.Dispose();
         }
         catch (Exception)
         {
@@ -134,6 +101,8 @@ internal class PhishingUrlUpdater
             await Task.Delay(1000);
             GC.Collect();
         }
+
+        UpdateRunning = false;
     }
 
     private async Task<List<PhishingUrlEntry>> GetUrls ()
