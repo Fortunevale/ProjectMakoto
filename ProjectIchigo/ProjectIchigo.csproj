@@ -15,6 +15,7 @@
     <Copyright>Project-Ichigo</Copyright>
     <PackageProjectUrl>https://github.com/TheXorog/Project-Ichigo</PackageProjectUrl>
     <AnalysisLevel>latest</AnalysisLevel>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

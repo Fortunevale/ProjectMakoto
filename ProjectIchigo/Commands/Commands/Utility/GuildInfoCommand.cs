@@ -30,7 +30,7 @@ internal class GuildInfoCommand : BaseCommand
 						Url = guild.IconUrl ?? AuditLogIcons.QuestionMark,
 					},
 					ImageUrl = guild.DiscoverySplashUrl ?? guild.SplashUrl ?? "",
-					Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}"
+					Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}",
 				}.SetBotInfo(ctx);
 
                 embed.AddField(new DiscordEmbedField("Members", $"👥 `{guild.Members.Count}` **Members**\n" +
@@ -42,29 +42,29 @@ internal class GuildInfoCommand : BaseCommand
                                   $"🗺 **Preferred Locale**: `{guild.PreferredLocale}`\n" +
                                   $"🔮 `{guild.PremiumSubscriptionCount}` **Boosts (`{guild.PremiumTier}`)**\n\n" +
                                   $"😀 `{guild.Emojis.Count}` **Emojis**\n" +
-                                  $"🖼 `{guild.Stickers.Count}` **Stickers**\n" +
-                                  $"📄 **Widget enabled?**: `{(guild.WidgetEnabled ?? false ? "Yes" : "No")}`\n" +
-                                  $"🌐 **Community?**: `{(guild.IsCommunity ? "Yes" : "No")}`", true));
+                                  $"🖼 `{guild.Stickers.Count}` **Stickers**\n\n" +
+                                  $"{(guild.WidgetEnabled ?? false).ToPillEmote(ctx.Bot)} **Widget**\n" +
+                                  $"{(guild.IsCommunity).ToPillEmote(ctx.Bot)} **Community**", true));
                 
-                embed.AddField(new DiscordEmbedField("Security", $"🔐 **2FA required for mods**: `{(guild.MfaLevel == MfaLevel.Enabled ? "Yes" : "No")}`\n" +
+                embed.AddField(new DiscordEmbedField("Security", $"{(guild.MfaLevel == MfaLevel.Enabled).ToPillEmote(ctx.Bot)} **2FA required for mods**\n" +
+                                  $"{(guild.Features.HasMembershipScreeningEnabled).ToPillEmote(ctx.Bot)} **Membership Screening**\n" +
+                                  $"{(guild.Features.HasWelcomeScreenEnabled).ToPillEmote(ctx.Bot)} **Welcome Screen**\n" +
                                   $"🚪 **Verification Level**: `{guild.VerificationLevel}`\n" +
-                                  $"🔍 **Explicit Content Filter**: `{guild.ExplicitContentFilter}`\n" +
-                                  $"⚠ **NSFW Level**: `{guild.NsfwLevel}`\n" +
-                                  $"💬 **Default Notifications**: `{guild.DefaultMessageNotifications}`\n" +
-                                  $"👁‍🗨 **Membership Screening enabled?**: `{(guild.Features.HasMembershipScreeningEnabled ? "Yes" : "No")}`\n" +
-                                  $"👋 **Welcome Screen enabled?**: `{(guild.Features.HasWelcomeScreenEnabled ? "Yes" : "No")}`", true));
+                                  $"🔍 **Scan for explicit content of**: `{guild.ExplicitContentFilter switch { ExplicitContentFilter.Disabled => "No members", ExplicitContentFilter.MembersWithoutRoles => "Members without roles", ExplicitContentFilter.AllMembers => "All members", _ => "?", }}`\n" +
+                                  $"⚠ **NSFW Level**: `{guild.NsfwLevel switch { NsfwLevel.Default => "No Rating", NsfwLevel.Explicit => "Explicit, Only suitable for mature audiences", NsfwLevel.Safe => "Safe, Suitable for all age groups", NsfwLevel.Age_Restricted => "Questionable, May only be suitable for mature audiences", _ => "?", }}`\n" +
+                                  $"💬 **Default Notifications**: `{guild.DefaultMessageNotifications switch { DefaultMessageNotifications.AllMessages => "All messages", DefaultMessageNotifications.MentionsOnly => "Mentions only", _ => "?", }}`\n", true));
 
-                embed.AddField(new DiscordEmbedField("Special Channels", $"⌨ **Inactive Channel**: {guild.AfkChannel?.Mention ?? "None"}\n" +
-                                  $"> **Inactive Timeout**: `{((long)guild.AfkTimeout).GetHumanReadable()}`\n" +
-                                  $"🤖 **System Messages**: {guild.SystemChannel?.Mention ?? "None"}\n" +
-                                  $"> **Welcome Messages**: `{(guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotifications) ? "No" : "Yes")}`\n" +
-                                  $"> **Welcome Sticker Replies**: `{(guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotificationReplies) ? "No" : "Yes")}`\n" +
-                                  $"> **Boost Messages**: `{(guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressPremiumSubscriptions) ? "No" : "Yes")}`\n" +
-                                  $"> **Role Purchase Message**: `{(guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotification) ? "No" : "Yes")}`\n" +
-                                  $"> **Role Purchase Message Replies**: `{(guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotificationReplies) ? "No" : "Yes")}`\n" +
-                                  $"> **Server Setup Tips**: `{(guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressGuildReminderNotifications) ? "No" : "Yes")}`\n" +
-                                  $"📑 **Rules**: {guild.RulesChannel?.Mention ?? "None"}\n" +
-                                  $"📰 **Community Updates**: {guild.PublicUpdatesChannel?.Mention ?? "None"}\n"));
+                embed.AddField(new DiscordEmbedField("Special Channels", $"📑 **Rules**: {guild.RulesChannel?.Mention ?? "`None`"}\n" +
+                                  $"📰 **Community Updates**: {guild.PublicUpdatesChannel?.Mention ?? "`None`"}\n\n" +
+                                  $"⌨ **Inactive Channel**: {guild.AfkChannel?.Mention ?? "`None`"}\n" +
+                                  $"> **Inactive Timeout**: `{((long)guild.AfkTimeout).GetHumanReadable()}`\n\n" +
+                                  $"🤖 **System Messages**: {guild.SystemChannel?.Mention ?? "`None`"}\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotifications)).ToPillEmote(ctx.Bot)} **Welcome Messages**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotificationReplies)).ToPillEmote(ctx.Bot)} **Welcome Sticker Replies**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressPremiumSubscriptions)).ToPillEmote(ctx.Bot)} **Boost Messages**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotification)).ToPillEmote(ctx.Bot)} **Role Purchase Message**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotificationReplies)).ToPillEmote(ctx.Bot)} **Role Purchase Message Replies**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressGuildReminderNotifications)).ToPillEmote(ctx.Bot)} **Server Setup Tips**\n"));
 
                 embed.AddField(new DiscordEmbedField("Guild Features", $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 

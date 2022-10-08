@@ -33,14 +33,9 @@ public class CrosspostSettings
         } 
     }
 
-    public ObservableList<ulong> CrosspostChannels { get; set; } = new();
+    public List<ulong> CrosspostChannels { get; set; } = new();
 
     public Dictionary<ulong, CrosspostRatelimit> CrosspostRatelimits { get; set; } = new();
-
-    internal void CrosspostCollectionUpdated(object sender, object e)
-    {
-        _ = Bot.DatabaseClient.FullSyncDatabase();
-    }
 
     private bool QueueInitialized = false;
     private Dictionary<DiscordMessage, DiscordChannel> _queue = new();
