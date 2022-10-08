@@ -74,7 +74,7 @@ internal class DatabaseInit
 
             DbGuild.CrosspostSettings = new(DbGuild)
             {
-                CrosspostChannels = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.crosspostchannels) ?? new(),
+                CrosspostChannels = JsonConvert.DeserializeObject<List<ulong>>(b.crosspostchannels) ?? new(),
                 DelayBeforePosting = b.crosspostdelay,
                 ExcludeBots = b.crosspostexcludebots,
                 CrosspostRatelimits = JsonConvert.DeserializeObject<Dictionary<ulong, CrosspostRatelimit>>(b.crosspost_ratelimits) ?? new(),
@@ -137,7 +137,7 @@ internal class DatabaseInit
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelRewardEntry>>(b.levelrewards) ?? new();
             DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.auditlogcache) ?? new();
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>(b.reactionroles) ?? new();
-            DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.autounarchivelist) ?? new();
+            DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<List<ulong>>(b.autounarchivelist) ?? new();
         }
         _logger.LogDebug($"Loaded {_bot.guilds.Count} guilds");
 

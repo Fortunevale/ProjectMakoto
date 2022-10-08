@@ -19,16 +19,7 @@ public class Guild
         EmbedMessageSettings = new(this);
         Lavalink = new(this);
 
-        CrosspostSettings.CrosspostChannels.ItemsChanged += CrosspostSettings.CrosspostCollectionUpdated;
-        AutoUnarchiveThreads.ItemsChanged += UnarchiveThreadsUpdated;
         ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated;
-    }
-
-    ~Guild()
-    {
-        CrosspostSettings.CrosspostChannels.ItemsChanged -= CrosspostSettings.CrosspostCollectionUpdated;
-        ProcessedAuditLogs.ItemsChanged -= AuditLogCollectionUpdated;
-        AutoUnarchiveThreads.ItemsChanged -= UnarchiveThreadsUpdated;
     }
 
     public ulong ServerId { get; set; }
@@ -47,8 +38,11 @@ public class Guild
 
     public Lavalink Lavalink { get; set; }
 
-    public ObservableList<ulong> ProcessedAuditLogs { get; set; } = new();
-    public ObservableList<ulong> AutoUnarchiveThreads { get; set; } = new();
+    private ObservableList<ulong> _ProcessedAuditLogs { get; set; } = new();
+    public ObservableList<ulong> ProcessedAuditLogs { get => _ProcessedAuditLogs; set { _ProcessedAuditLogs = value; _ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated; } }
+
+    public List<ulong> AutoUnarchiveThreads { get; set; } = new();
+
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
     public Dictionary<ulong, Member> Members { get; set; } = new();
     public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
@@ -56,13 +50,9 @@ public class Guild
     private void AuditLogCollectionUpdated(object sender, object e)
     {
         while (ProcessedAuditLogs.Count > 50)
-            ProcessedAuditLogs.Remove(ProcessedAuditLogs[0]);
-
-        _ = Bot.DatabaseClient.FullSyncDatabase();
-    }
-
-    private void UnarchiveThreadsUpdated(object sender, object e)
-    {
-        _ = Bot.DatabaseClient.FullSyncDatabase();
+        {
+            _logger.LogDebug($"Removing {ProcessedAuditLogs[0]}");
+            ProcessedAuditLogs.RemoveAt(0);
+        }
     }
 }
