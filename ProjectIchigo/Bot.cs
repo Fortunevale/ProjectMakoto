@@ -222,19 +222,6 @@ public class Bot
                 DatabaseInit _databaseInit = new(this);
 
                 await _databaseInit.LoadValuesFromDatabase();
-
-                _ = Task.Run(async () =>
-                {
-                    _logger.LogDebug("Waiting for guilds to download to sync database..");
-
-                    while (!status.DiscordGuildDownloadCompleted)
-                        Thread.Sleep(500);
-
-                    await databaseClient.FullSyncDatabase(true);
-
-                    _logger.LogInfo("Initial Full Sync finished.");
-                    status.DatabaseInitialLoadCompleted = true;
-                });
             }
             catch (Exception ex)
             {
@@ -875,6 +862,7 @@ public class Bot
         runningTasks.Clear();
 
         _logger.LogInfo($"Sync Tasks successfully finished for {startupTasksSuccess}/{Guilds.Count} guilds.");
+        _ = databaseClient.FullSyncDatabase();
     }
 
     private async Task GuildDownloadCompleted(DiscordClient sender, GuildDownloadCompletedEventArgs e)
@@ -1156,7 +1144,7 @@ public class Bot
             try
             {
                 _logger.LogInfo($"Flushing to database..");
-                await DatabaseClient.FullSyncDatabase(true);
+                await databaseClient.FullSyncDatabase(true);
                 _logger.LogDebug($"Flushed to database.");
 
                 Thread.Sleep(500);
