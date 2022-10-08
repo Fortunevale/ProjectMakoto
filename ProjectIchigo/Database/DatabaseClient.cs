@@ -331,32 +331,40 @@ internal class DatabaseClient
             if (!DatabaseInserts.Any())
                 return;
 
-            _logger.LogDebug($"Writing to table {table}/{propertyname} with {DatabaseInserts.Count} inserts");
-
-            var cmd = conn.CreateCommand();
-            cmd.CommandText = _helper.GetSaveCommand(table, propertyname);
-
-            for (int i = 0; i < DatabaseInserts.Count; i++)
+            foreach (var chunk in DatabaseInserts.Chunk(3000))
             {
-                var b = DatabaseInserts[i];
-                var properties = b.GetType().GetProperties();
+                _logger.LogDebug($"Writing to table {table}/{propertyname} with {chunk.Length} inserts");
 
-                cmd.CommandText += _helper.GetValueCommand(propertyname, i);
-                for (int i1 = 0; i1 < properties.Length; i1++)
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = _helper.GetSaveCommand(table, propertyname);
+
+                for (int i = 0; i < chunk.Length; i++)
                 {
-                    var prop = properties[i1];
+                    var b = chunk[i];
+                    var properties = b.GetType().GetProperties();
 
-                    cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
+                    cmd.CommandText += _helper.GetValueCommand(propertyname, i);
+                    for (int i1 = 0; i1 < properties.Length; i1++)
+                    {
+                        var prop = properties[i1];
+
+                        cmd.Parameters.AddWithValue($"{prop.Name}{i}", ((BaseColumn)prop.GetValue(b)).GetValue());
+                    }
+                    properties = null;
                 }
+
+                cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
+                cmd.CommandText += _helper.GetOverwriteCommand(propertyname);
+
+                cmd.Connection = conn;
+                await _queue.RunCommand(cmd);
+                cmd.Dispose();
+                cmd = null;
+                GC.Collect();
             }
 
-            cmd.CommandText = cmd.CommandText[..(cmd.CommandText.Length - 2)];
-            cmd.CommandText += _helper.GetOverwriteCommand(propertyname);
-
-            cmd.Connection = conn;
-            await _queue.RunCommand(cmd);
-
-            cmd.Dispose();
+            DatabaseInserts = null;
+            GC.Collect();
         }
 
         try
