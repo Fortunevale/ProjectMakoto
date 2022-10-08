@@ -4,16 +4,16 @@
 			"path": ".."
 		},
 		{
-			"path": "..\\..\\Xorog.Logger"
+			"path": "../../Xorog.Logger"
 		},
 		{
-			"path": "..\\..\\Xorog.ScoreSaber"
+			"path": "../../Xorog.ScoreSaber"
 		},
 		{
-			"path": "..\\..\\Xorog.UniversalExtensions"
+			"path": "../../Xorog.UniversalExtensions"
 		},
 		{
-			"path": "..\\..\\Xorog.YoutubeDownloader"
+			"path": "../../Xorog.YoutubeDownloader"
 		}
 	],
 	"settings": {
