@@ -282,6 +282,7 @@ internal class DatabaseClient
 
     public bool RunningFullSync = false;
     public CancellationTokenSource FullSyncCancel = new();
+    public DateTimeOffset LastFullSync = DateTimeOffset.MinValue;
 
     public async Task FullSyncDatabase(bool Important = false)
     {
@@ -294,6 +295,11 @@ internal class DatabaseClient
             while (RunningFullSync)
                 await Task.Delay(100);
         }
+
+        if (!Important && LastFullSync.GetTimespanSince() < TimeSpan.FromMinutes(20))
+            return;
+
+        LastFullSync = DateTimeOffset.UtcNow;
 
         if (RunningFullSync)
             return;
