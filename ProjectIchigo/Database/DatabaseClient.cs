@@ -614,6 +614,13 @@ internal class DatabaseClient
                 _logger.LogError($"An exception occurred while trying to update the {guild.Key} table", ex);
             }
 
+        syncs_running.Add(SyncTable(mainDatabaseConnection, "scam_urls", _bot.phishingUrls.Select(x => new TableDefinitions.scam_urls
+        {
+            url = x.Value.Url,
+            origin = JsonConvert.SerializeObject(x.Value.Origin),
+            submitter = x.Value.Submitter
+        }).ToList()));
+
         while (syncs_running.Any(x => !x.IsCompleted))
             await Task.Delay(100);
 
