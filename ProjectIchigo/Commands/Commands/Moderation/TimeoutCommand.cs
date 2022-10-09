@@ -43,46 +43,32 @@ internal class TimeoutCommand : BaseCommand
             {
                 try
                 {
-                    switch (duration[^1..])
+                    until = duration[^1..] switch
                     {
-                        case "Y":
-                            until = DateTime.UtcNow.AddYears(Convert.ToInt32(duration.Replace("Y", "")));
-                            break;
-                        case "M":
-                            until = DateTime.UtcNow.AddMonths(Convert.ToInt32(duration.Replace("M", "")));
-                            break;
-                        case "d":
-                            until = DateTime.UtcNow.AddDays(Convert.ToInt32(duration.Replace("d", "")));
-                            break;
-                        case "h":
-                            until = DateTime.UtcNow.AddHours(Convert.ToInt32(duration.Replace("h", "")));
-                            break;
-                        case "m":
-                            until = DateTime.UtcNow.AddMinutes(Convert.ToInt32(duration.Replace("m", "")));
-                            break;
-                        case "s":
-                            until = DateTime.UtcNow.AddSeconds(Convert.ToInt32(duration.Replace("s", "")));
-                            break;
-                        default:
-                            until = DateTime.UtcNow.AddMinutes(Convert.ToInt32(duration));
-                            return;
-                    }
+                        "Y" => DateTime.UtcNow.AddYears(Convert.ToInt32(duration.Replace("Y", ""))),
+                        "M" => DateTime.UtcNow.AddMonths(Convert.ToInt32(duration.Replace("M", ""))),
+                        "d" => DateTime.UtcNow.AddDays(Convert.ToInt32(duration.Replace("d", ""))),
+                        "h" => DateTime.UtcNow.AddHours(Convert.ToInt32(duration.Replace("h", ""))),
+                        "m" => DateTime.UtcNow.AddMinutes(Convert.ToInt32(duration.Replace("m", ""))),
+                        "s" => DateTime.UtcNow.AddSeconds(Convert.ToInt32(duration.Replace("s", ""))),
+                        _ => DateTime.UtcNow.AddMinutes(Convert.ToInt32(duration)),
+                    };
                 }
                 catch (Exception)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"The Duration you specified is invalid.",
+                        Description = $"`The Duration you specified is invalid.`",
                     }.SetError(ctx));
                     return;
                 }
             }
 
-            if (DateTime.UtcNow > until)
+            if (DateTime.UtcNow > until || DateTime.UtcNow.AddDays(28) < until)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`The duration you specified is invalid.`",
+                    Description = $"``The duration you specified is invalid.``",
                 }.SetError(ctx));
                 return;
             }
