@@ -43,7 +43,7 @@
     <PackageReference Include="DisCatSharp.Common" Version="10.1.4" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.1.4" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.1.4" />
-    <PackageReference Include="MySql.Data" Version="8.0.30" />
+    <PackageReference Include="MySql.Data" Version="8.0.31" />
     <PackageReference Include="Octokit" Version="3.0.1" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
