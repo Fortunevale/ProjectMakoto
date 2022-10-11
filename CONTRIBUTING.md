@@ -35,7 +35,7 @@
         - Remember the password you set up, you'll need it.
         - After installing MariaDB, create 2 new databases: One for the main tables (guilds, users, scam_urls, etc.) and one for server members.
 
-2. Create yourself accounts at:
+2. Create an account on the following sites:
     - [Discord](https://discord.com)
         - Create a new [Discord Team](https://discord.com/developers/teams) and add a new [Discord Application](https://discord.com/developers/applications/) to the previously created Team.
         - Add a Bot to the Application and note down the Bot Token.
