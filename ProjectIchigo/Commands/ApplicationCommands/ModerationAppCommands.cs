@@ -90,13 +90,28 @@ public class ModerationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommand("ban", "Bans the specified user.", (long)Permissions.BanMembers, dmPermission: false)]
-    public async Task Ban(InteractionContext ctx, [Option("user", "The user")] DiscordUser victim, [Option("reason", "The reason")] string reason = "")
+    public async Task Ban(InteractionContext ctx, [Option("user", "The user")] DiscordUser victim, [Option("days", "Days of messages to delete")] int days = 0,  [Option("reason", "The reason")] string reason = "")
     {
         Task.Run(async () =>
         {
             await new BanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "victim", victim },
+                { "days", days },
+                { "reason", reason },
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+
+    [SlashCommand("softban", "Soft bans the specified user.", (long)Permissions.BanMembers, dmPermission: false)]
+    public async Task SoftBan(InteractionContext ctx, [Option("user", "The user")] DiscordUser victim, [Option("days", "Days of messages to delete")] int days = 0, [Option("reason", "The reason")] string reason = "")
+    {
+        Task.Run(async () =>
+        {
+            await new SoftBanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "victim", victim },
+                { "days", days },
                 { "reason", reason },
             });
         }).Add(_bot.watcher, ctx);
