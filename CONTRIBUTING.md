@@ -31,9 +31,9 @@
     - [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate)
         - **The easiest way to set up a LibreTranslate instance is by using [Docker](https://www.docker.com/)**
         - After installing Docker, run: `docker run -ti --rm -p 5000:5000 libretranslate/libretranslate`
-    - [MariaDB](https://mariadb.com/kb/en/installing-mariadb-msi-packages-on-windows/)
+    - [MySQL Server](https://dev.mysql.com/downloads/mysql/)
         - Remember the password you set up, you'll need it.
-        - After installing MariaDB, create 2 new databases: One for the main tables (guilds, users, scam_urls, etc.) and one for server members.
+        - After installing the MySQL Server, create 2 new databases: One for the main tables (guilds, users, scam_urls, etc.) and one for server members.
 
 2. Create an account on the following sites:
     - [Discord](https://discord.com)
