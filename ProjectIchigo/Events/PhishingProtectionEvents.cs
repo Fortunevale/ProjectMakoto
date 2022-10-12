@@ -32,9 +32,6 @@ internal class PhishingProtectionEvents
         if (e.WebhookMessage || guild is null)
             return;
 
-        if (!_bot.guilds.ContainsKey(guild.Id))
-            _bot.guilds.Add(guild.Id, new Guild(guild.Id));
-
         if (!_bot.guilds[guild.Id].PhishingDetectionSettings.DetectPhishing)
             return;
 

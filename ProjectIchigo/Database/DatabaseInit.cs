@@ -26,7 +26,7 @@ internal class DatabaseInit
 
         foreach (var b in guilds)
         {
-            var DbGuild = new Guild(b.serverid);
+            var DbGuild = new Guild(b.serverid, _bot);
             _bot.guilds.Add(b.serverid, DbGuild);
 
             DbGuild.TokenLeakDetectionSettings = new(DbGuild)

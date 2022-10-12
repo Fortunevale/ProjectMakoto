@@ -14,9 +14,6 @@ internal class ActionlogEvents
         if (guild is null)
             return false;
 
-        if (!_bot.guilds.ContainsKey(guild.Id))
-            _bot.guilds.Add(guild.Id, new Guild(guild.Id));
-
         if (_bot.guilds[guild.Id].ActionLogSettings.Channel == 0)
             return false;
 

@@ -16,9 +16,6 @@ internal class CrosspostEvents
             if (e.Guild is null || e.Channel.IsPrivate)
                 return;
 
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             foreach (var b in _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
                 if (!e.Guild.Channels.ContainsKey(b))
                     _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);

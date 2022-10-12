@@ -13,9 +13,6 @@ internal class JoinEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             if (_bot.guilds[e.Guild.Id].JoinSettings.AutoBanGlobalBans)
             {
                 if (_bot.globalBans.ContainsKey(e.Member.Id))
@@ -60,9 +57,6 @@ internal class JoinEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             if (_bot.guilds[e.Guild.Id].JoinSettings.JoinlogChannelId != 0)
             {
                 if (e.Guild.Channels.ContainsKey(_bot.guilds[e.Guild.Id].JoinSettings.JoinlogChannelId))

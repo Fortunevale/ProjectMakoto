@@ -13,9 +13,6 @@ internal class GenericGuildEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
                 _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
 
@@ -93,9 +90,6 @@ internal class GenericGuildEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
                 _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
 
@@ -108,9 +102,6 @@ internal class GenericGuildEvents
         Task.Run(async () =>
         {
             await Task.Delay(5000);
-
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
                 _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
@@ -129,9 +120,6 @@ internal class GenericGuildEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
                 _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
 

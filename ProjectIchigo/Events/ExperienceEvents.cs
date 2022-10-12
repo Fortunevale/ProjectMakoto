@@ -16,9 +16,6 @@ internal class ExperienceEvents
             if (e.Message.WebhookMessage || e.Guild is null)
                 return;
 
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new(e.Guild.Id));
-
             if (!_bot.guilds[e.Guild.Id].ExperienceSettings.UseExperience)
                 return;
 

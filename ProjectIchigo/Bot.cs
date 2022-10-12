@@ -920,7 +920,7 @@ public class Bot
             foreach (var guild in e.Guilds)
             {
                 if (!guilds.ContainsKey(guild.Key))
-                    guilds.Add(guild.Key, new Guild(guild.Key));
+                    guilds.Add(guild.Key, new Guild(guild.Key, this));
 
                 if (guilds[guild.Key].BumpReminderSettings.Enabled)
                 {

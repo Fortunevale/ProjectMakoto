@@ -53,7 +53,7 @@ internal class DiscordEventHandler
         if (guild is not null)
         {
             if (!_bot.guilds.ContainsKey(guild.Id))
-                _bot.guilds.Add(guild.Id, new Guild(guild.Id));
+                _bot.guilds.Add(guild.Id, new Guild(guild.Id, _bot));
 
             if (guild.Members is not null && guild.Members.Count > 0)
                 foreach (var b in guild.Members)
