@@ -26,7 +26,6 @@ internal class AbuseIpDbClient
 
         while (_bot.status.LoadedConfig.Secrets.AbuseIpDbToken.IsNullOrWhiteSpace())
         {
-            _logger.LogWarn($"No AbuseIpDbToken provided.");
             await Task.Delay(5000);
         }
 
