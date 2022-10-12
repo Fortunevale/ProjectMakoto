@@ -29,7 +29,7 @@
         - **You need [Java](https://jdk.java.net/18/) to run Lavalink**
         - To learn how to setup Lavalink, you can check out **[this handy article](https://docs.dcs.aitsys.dev/articles/modules/audio/lavalink/setup.html)** made by the DisCatSharp Team.
     - [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate)
-        - **The easiest way of setting up an instance of LibreTranslate is to use [Docker](https://www.docker.com/)**
+        - **The easiest way to set up a LibreTranslate instance is by using [Docker](https://www.docker.com/)**
         - After installing Docker, run: `docker run -ti --rm -p 5000:5000 libretranslate/libretranslate`
     - [MariaDB](https://mariadb.com/kb/en/installing-mariadb-msi-packages-on-windows/)
         - Remember the password you set up, you'll need it.
