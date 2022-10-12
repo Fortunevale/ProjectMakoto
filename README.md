@@ -54,6 +54,8 @@ Ichigo has a lot of features, current notable features are:
 <br></br>
 ## Building, Debugging and Deployment
 
+We have a step by step guide you can follow to start contributing: [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ### Prerequisites
 
 - [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
