@@ -333,6 +333,8 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 
-.vscode/
+.vscode/*
 ProjectIchigo/Properties/launchSettings.json
 ProjectIchigo/Properties/
+
+!.vscode/Snippets.code-snippets

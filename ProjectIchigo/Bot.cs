@@ -912,7 +912,7 @@ public class Bot
                 }
             }).Add(watcher);
 
-            for (int i = 0; i < 251; i++)
+            for (int i = 0; i < 501; i++)
             {
                 experienceHandler.CalculateLevelRequirement(i);
             }
