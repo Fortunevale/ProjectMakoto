@@ -14,11 +14,19 @@ internal class PollCommand : BaseCommand
             DiscordRole SelectedRole = null;
             DiscordChannel SelectedChannel = null;
 
+            DateTime? selectedDueDate = null;
             string SelectedPrompt = null;
             List<DiscordSelectComponentOption> SelectedOptions = new();
 
             while (true)
             {
+                if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6)))
+                {
+                    selectedDueDate = null;
+                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 6 months.`").SetError(ctx));
+                    await Task.Delay(5000);
+                }
+
                 var SelectRoleButton = new DiscordButtonComponent((SelectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Role", false, DiscordEmoji.FromUnicode("👥").ToComponent());
                 var SelectChannelButton = new DiscordButtonComponent((SelectedChannel is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Channel", false, DiscordEmoji.FromUnicode("📢").ToComponent());
 
@@ -26,16 +34,19 @@ internal class PollCommand : BaseCommand
             
                 var AddOptionButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add new option", (SelectedOptions.Count >= 20), DiscordEmoji.FromUnicode("➕").ToComponent());
                 var RemoveOptionButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove option", (SelectedOptions.Count <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
-                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (SelectedChannel is null || SelectedPrompt.IsNullOrWhiteSpace() || !SelectedOptions.IsNotNullAndNotEmpty()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Due Date & Time", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+
+                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (SelectedChannel is null || SelectedPrompt.IsNullOrWhiteSpace() || !SelectedOptions.IsNotNullAndNotEmpty() || SelectedOptions.Count < 2 || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
             
                 var embed = new DiscordEmbedBuilder().WithDescription($"`Poll Content     `: {(SelectedPrompt.IsNullOrWhiteSpace() ? "`Not yet selected.`" : $"{SelectedPrompt.Sanitize()}")}\n" +
                                                                       $"`Available Options`: {(!SelectedOptions.IsNotNullAndNotEmpty() ? "`No options set.`" : $"{string.Join(", ", SelectedOptions.Select(x => $"`{x.Label.TruncateWithIndication(10)}`"))}")}\n\n" +
+                                                                      $"`Due Time & Time  `: {(selectedDueDate is null ? "`Not yet selected.`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}" +
                                                                       $"`Role to mention  `: {(SelectedRole is null ? "`No Role selected`" : SelectedRole.Mention)}\n" +
                                                                       $"`Selected Channel `: {(SelectedChannel is null ? "`Not yet selected.`" : SelectedChannel.Mention)}")
                                                      .SetAwaitingInput(ctx);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
-                    .AddComponents(SelectPromptButton, AddOptionButton, RemoveOptionButton)
+                    .AddComponents(SelectPromptButton, SelectDueDateButton, AddOptionButton, RemoveOptionButton)
                     .AddComponents(SelectRoleButton, SelectChannelButton, Finish)
                     .AddComponents(MessageComponents.CancelButton));
 
@@ -51,7 +62,7 @@ internal class PollCommand : BaseCommand
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                    var RoleResult = await PromptRoleSelection();
+                    var RoleResult = await PromptRoleSelection(new RolePromptConfiguration { DisableOption = "Do not ping anyone for this poll." });
 
                     if (RoleResult.TimedOut)
                     {
@@ -131,6 +142,34 @@ internal class PollCommand : BaseCommand
                     SelectedPrompt = ModalResult.Result.Interaction.GetModalValueByCustomId("prompt").Truncate(256);
                     continue;
                 }
+                else if (Menu.Result.GetCustomId() == SelectDueDateButton.CustomId)
+                {
+                    var ModalResult = await PromptModalForDateTime(Menu.Result.Interaction, false);
+
+                    if (ModalResult.TimedOut)
+                    {
+                        ModifyToTimedOut(true);
+                        return;
+                    }
+                    else if (ModalResult.Cancelled)
+                    {
+                        continue;
+                    }
+                    else if (ModalResult.Errored)
+                    {
+                        if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
+                        {
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").SetError(ctx));
+                            await Task.Delay(5000);
+                            continue;
+                        }
+
+                        throw ModalResult.Exception;
+                    }
+
+                    selectedDueDate = ModalResult.Result;
+                    continue;
+                }
                 else if (Menu.Result.GetCustomId() == AddOptionButton.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("New Poll", Guid.NewGuid().ToString())
@@ -190,6 +229,45 @@ internal class PollCommand : BaseCommand
 
                     SelectedOptions = SelectedOptions.Where(x => x.Value != SelectionResult.Result).ToList();
                     continue;
+                }
+                else if (Menu.Result.GetCustomId() == Finish.CustomId)
+                {
+                    _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                    if (!ctx.Guild.Channels.ContainsKey(SelectedChannel.Id))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The channel you selected no longer exists.`").SetError(ctx));
+                        await Task.Delay(1000);
+                        continue;
+                    }
+
+                    if (!ctx.Guild.Roles.ContainsKey(SelectedRole.Id))
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The role you selected no longer exists.`").SetError(ctx));
+                        await Task.Delay(1000);
+                        continue;
+                    }
+
+                    if (SelectedPrompt.IsNullOrWhiteSpace())
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The poll content you set is empty.`").SetError(ctx));
+                        await Task.Delay(1000);
+                        continue;
+                    }
+
+                    if (SelectedOptions?.Count < 2)
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please specify at least 2 options.`").SetError(ctx));
+                        await Task.Delay(1000);
+                        continue;
+                    }
+
+
+                }
+                else if (Menu.Result.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                {
+                    DeleteOrInvalidate();
+                    return;
                 }
             }
         });
