@@ -19,7 +19,8 @@ public class Guild
         EmbedMessageSettings = new(this);
         Lavalink = new(this);
 
-        ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated;
+        _ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated;
+        _RunningPolls.ItemsChanged += RunningPollsUpdated;
     }
 
     public ulong ServerId { get; set; }
@@ -36,23 +37,32 @@ public class Guild
     public NameNormalizerSettings NameNormalizerSettings { get; set; }
     public EmbedMessageSettings EmbedMessageSettings { get; set; }
 
-    public Lavalink Lavalink { get; set; }
-
-    private ObservableList<ulong> _ProcessedAuditLogs { get; set; } = new();
-    public ObservableList<ulong> ProcessedAuditLogs { get => _ProcessedAuditLogs; set { _ProcessedAuditLogs = value; _ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated; } }
-
     public List<ulong> AutoUnarchiveThreads { get; set; } = new();
-
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
-    public Dictionary<ulong, Member> Members { get; set; } = new();
     public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
+    public ObservableList<ulong> ProcessedAuditLogs { get => _ProcessedAuditLogs; set { _ProcessedAuditLogs = value; _ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated; } }
+    public ObservableList<PollEntry> RunningPolls { get => _RunningPolls; set { _RunningPolls = value; _RunningPolls.ItemsChanged += RunningPollsUpdated; } }
 
-    private void AuditLogCollectionUpdated(object sender, object e)
+    public Dictionary<ulong, Member> Members { get; set; } = new();
+
+    public Lavalink Lavalink { get; set; }
+    
+    private ObservableList<PollEntry> _RunningPolls { get; set; } = new();
+    private ObservableList<ulong> _ProcessedAuditLogs { get; set; } = new();
+
+    private void AuditLogCollectionUpdated(object? sender, ObservableListUpdate<ulong> e)
     {
         while (ProcessedAuditLogs.Count > 50)
         {
-            _logger.LogDebug($"Removing {ProcessedAuditLogs[0]}");
             ProcessedAuditLogs.RemoveAt(0);
+        }
+    }
+
+    private void RunningPollsUpdated(object? sender, ObservableListUpdate<PollEntry> e)
+    {
+        while (RunningPolls.Count > 10)
+        {
+            RunningPolls.RemoveAt(0);
         }
     }
 }
