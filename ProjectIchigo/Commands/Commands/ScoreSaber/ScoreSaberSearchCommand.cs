@@ -13,8 +13,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
 
             DiscordSelectComponent GetContinents(string default_code)
             {
-                List<DiscordSelectComponentOption> continents = new();
-                continents.Add(new DiscordSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")));
+                List<DiscordSelectComponentOption> continents = new() { new DiscordSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")) };
                 foreach (var b in ctx.Bot.countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
                 {
                     continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));

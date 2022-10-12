@@ -26,7 +26,7 @@ internal class UserInfoCommand : BaseCommand
             }
             catch { }
 
-            string GetStatusIcon(UserStatus? status)
+            static string GetStatusIcon(UserStatus? status)
             {
                 return status switch
                 {

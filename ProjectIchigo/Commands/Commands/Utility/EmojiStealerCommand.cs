@@ -411,10 +411,8 @@ internal class EmojiStealerCommand : BaseCommand
 
                                 try
                                 {
-                                    using (var fileStream = File.OpenRead($"Emotes-{guid}.zip"))
-                                    {
-                                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emojis.zip", fileStream).WithContent("Heyho! Here's the emojis you requested."));
-                                    }
+                                    using var fileStream = File.OpenRead($"Emotes-{guid}.zip");
+                                    await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emojis.zip", fileStream).WithContent("Heyho! Here's the emojis you requested."));
                                 }
                                 catch (DisCatSharp.Exceptions.UnauthorizedException)
                                 {
@@ -452,10 +450,8 @@ internal class EmojiStealerCommand : BaseCommand
 
                                 embed.Description = $"`Downloaded {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText}. Attached is a Zip File containing them.`";
 
-                                using (var fileStream = File.OpenRead($"Emotes-{guid}.zip"))
-                                {
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed.SetSuccess(ctx)));
-                                }
+                                using var fileStream = File.OpenRead($"Emotes-{guid}.zip");
+                                await RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed.SetSuccess(ctx)));
                             }
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
