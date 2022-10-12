@@ -244,6 +244,9 @@ public abstract class BaseCommand
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
                 FetchedRoles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
+            if (configuration.IncludeEveryone)
+                FetchedRoles.Add(new DiscordSelectComponentOption("@everyone", ctx.Guild.EveryoneRole.Id.ToString(), "", false, DiscordEmoji.FromUnicode("👥").ToComponent()));
+
             foreach (var b in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
             {
                 if (ctx.CurrentMember.GetRoleHighestPosition() > b.Value.Position && ctx.Member.GetRoleHighestPosition() > b.Value.Position && !b.Value.IsManaged && b.Value.Id != ctx.Guild.EveryoneRole.Id)
