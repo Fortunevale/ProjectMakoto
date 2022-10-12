@@ -1005,7 +1005,7 @@ public abstract class BaseCommand
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be <@411950662662881290> to use this command.",
+            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Ichigo Staff` to use this command.",
         }.SetError(ctx));
 
     public void SendAdminError()
