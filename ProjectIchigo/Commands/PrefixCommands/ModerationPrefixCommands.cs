@@ -3,6 +3,15 @@ public class ModerationPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
+    [Command("poll"), Description("Starts a poll.")]
+    public async Task Poll(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new PollCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
+
 
 
     [Command("purge"), Aliases("clear"),

@@ -213,7 +213,7 @@ public abstract class BaseCommand
     internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
-        timeOutOverride ??= TimeSpan.FromSeconds(60);
+        timeOutOverride ??= TimeSpan.FromSeconds(120);
 
         List<DiscordSelectComponentOption> FetchedRoles = new();
 
@@ -377,7 +377,7 @@ public abstract class BaseCommand
     internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
-        timeOutOverride ??= TimeSpan.FromSeconds(60);
+        timeOutOverride ??= TimeSpan.FromSeconds(120);
 
         List<DiscordSelectComponentOption> FetchedChannels = new();
 
@@ -540,7 +540,7 @@ public abstract class BaseCommand
 
     internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
     {
-        timeOutOverride ??= TimeSpan.FromSeconds(60);
+        timeOutOverride ??= TimeSpan.FromSeconds(120);
 
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
@@ -907,7 +907,7 @@ public abstract class BaseCommand
     #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0]?.Footer?.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
