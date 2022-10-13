@@ -332,6 +332,12 @@ internal class PollCommand : BaseCommand
                         continue;
                     }
 
+                    if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
+                    {
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`There's already 10 polls running on this guild.`").SetError(ctx));
+                        return;
+                    }
+
                     var select = new DiscordSelectComponent("Vote on this poll..", SelectedOptions.Take(20), Guid.NewGuid().ToString(), (SelectedMin >= SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() - 1 : SelectedMin), (SelectedMax > SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() : SelectedMax));
                     var endearly = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "End this poll early", false, DiscordEmoji.FromUnicode("🗑").ToComponent());
                     var polltxt = $"{SelectedPrompt.Sanitize()}";
