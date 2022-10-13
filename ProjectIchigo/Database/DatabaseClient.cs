@@ -1,3 +1,4 @@
+using ProjectIchigo.Entities.Database;
 using ProjectIchigo.Entities.Database.ColumnAttributes;
 using ProjectIchigo.Entities.Database.ColumnTypes;
 

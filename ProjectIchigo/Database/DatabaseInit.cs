@@ -1,3 +1,5 @@
+using ProjectIchigo.Entities.Database;
+
 namespace ProjectIchigo.Database;
 
 internal class DatabaseInit

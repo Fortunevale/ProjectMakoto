@@ -1,3 +1,5 @@
+using ProjectIchigo.PrefixCommands;
+
 namespace ProjectIchigo;
 
 public class Bot
