@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "WakaTime.vscode-wakatime",
+        "ms-dotnettools.csharp",
+        "anseki.vscode-color",
+        "GitHub.vscode-pull-request-github",
+        "GitHub.remotehub",
+        "patcx.vscode-nuget-gallery",
+        "LeonardSSH.vscord"
+    ]
+}

@@ -1,3 +1,5 @@
+using ProjectIchigo.Entities.Database;
+
 namespace ProjectIchigo.Database;
 
 internal class DatabaseInit
@@ -26,15 +28,15 @@ internal class DatabaseInit
 
         foreach (var b in guilds)
         {
-            var DbGuild = new Guild(b.serverid);
+            var DbGuild = new Guild(b.serverid, _bot);
             _bot.guilds.Add(b.serverid, DbGuild);
 
-            DbGuild.TokenLeakDetectionSettings = new(DbGuild)
+            DbGuild.TokenLeakDetection = new(DbGuild)
             {
                 DetectTokens = b.tokens_detect
             };
 
-            DbGuild.PhishingDetectionSettings = new(DbGuild)
+            DbGuild.PhishingDetection = new(DbGuild)
             {
                 DetectPhishing = b.phishing_detect,
                 WarnOnRedirect = b.phishing_warnonredirect,
@@ -44,7 +46,7 @@ internal class DatabaseInit
                 CustomPunishmentLength = TimeSpan.FromSeconds((long)b.phishing_time)
             };
 
-            DbGuild.BumpReminderSettings = new(DbGuild)
+            DbGuild.BumpReminder = new(DbGuild)
             {
                 Enabled = b.bump_enabled,
                 MessageId = b.bump_message,
@@ -57,7 +59,7 @@ internal class DatabaseInit
                 BumpsMissed = b.bump_missed
             };
 
-            DbGuild.JoinSettings = new(DbGuild)
+            DbGuild.Join = new(DbGuild)
             {
                 AutoAssignRoleId = b.auto_assign_role_id,
                 JoinlogChannelId = b.joinlog_channel_id,
@@ -66,13 +68,13 @@ internal class DatabaseInit
                 ReApplyNickname = b.reapplynickname,
             };
 
-            DbGuild.ExperienceSettings = new(DbGuild)
+            DbGuild.Experience = new(DbGuild)
             {
                 UseExperience = b.experience_use,
                 BoostXpForBumpReminder = b.experience_boost_bumpreminder
             };
 
-            DbGuild.CrosspostSettings = new(DbGuild)
+            DbGuild.Crosspost = new(DbGuild)
             {
                 CrosspostChannels = JsonConvert.DeserializeObject<List<ulong>>(b.crosspostchannels) ?? new(),
                 DelayBeforePosting = b.crosspostdelay,
@@ -80,7 +82,7 @@ internal class DatabaseInit
                 CrosspostRatelimits = JsonConvert.DeserializeObject<Dictionary<ulong, CrosspostRatelimit>>(b.crosspost_ratelimits) ?? new(),
             };
 
-            DbGuild.ActionLogSettings = new(DbGuild)
+            DbGuild.ActionLog = new(DbGuild)
             {
                 Channel = b.actionlog_channel,
                 AttemptGettingMoreDetails = b.actionlog_attempt_further_detail,
@@ -97,31 +99,31 @@ internal class DatabaseInit
                 VoiceStateUpdated = b.actionlog_log_voice_state,
             };
 
-            DbGuild.InviteTrackerSettings = new(DbGuild)
+            DbGuild.InviteTracker = new(DbGuild)
             {
                 Enabled = b.invitetracker_enabled,
                 Cache = JsonConvert.DeserializeObject<List<InviteTrackerCacheItem>>(b.invitetracker_cache) ?? new()
             };
 
-            DbGuild.InVoiceTextPrivacySettings = new(DbGuild)
+            DbGuild.InVoiceTextPrivacy = new(DbGuild)
             {
                 ClearTextEnabled = b.vc_privacy_clear,
                 SetPermissionsEnabled = b.vc_privacy_perms
             };
 
-            DbGuild.NameNormalizerSettings = new(DbGuild)
+            DbGuild.NameNormalizer = new(DbGuild)
             {
                 NameNormalizerEnabled = b.normalizenames
             };
             
-            DbGuild.EmbedMessageSettings = new(DbGuild)
+            DbGuild.EmbedMessage = new(DbGuild)
             {
                 UseEmbedding = b.embed_messages,
                 UseGithubEmbedding = b.embed_github
             };
 
             if (b.lavalink_channel != 0)
-                DbGuild.Lavalink = new(DbGuild)
+                DbGuild.MusicModule = new(DbGuild)
                 {
                     ChannelId = b.lavalink_channel,
                     CurrentVideoPosition = b.lavalink_currentposition,
@@ -132,10 +134,14 @@ internal class DatabaseInit
                     SongQueue = JsonConvert.DeserializeObject<List<Lavalink.QueueInfo>>(b.lavalink_queue) ?? new()
                 };
             else
-                DbGuild.Lavalink = new(DbGuild);
+                DbGuild.MusicModule = new(DbGuild);
+
+            DbGuild.Polls = new(DbGuild, _bot);
+            foreach (var c in JsonConvert.DeserializeObject<List<PollEntry>>(b.polls) ?? new())
+                DbGuild.Polls.RunningPolls.Add(c);
 
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelRewardEntry>>(b.levelrewards) ?? new();
-            DbGuild.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.auditlogcache) ?? new();
+            DbGuild.ActionLog.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.auditlogcache) ?? new();
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>(b.reactionroles) ?? new();
             DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<List<ulong>>(b.autounarchivelist) ?? new();
         }
@@ -207,14 +213,14 @@ internal class DatabaseInit
             {
                 Id = b.scoresaber_id
             };
-            DbUser.ExperienceUserSettings = new(DbUser)
+            DbUser.ExperienceUser = new(DbUser)
             {
                 DirectMessageOptOut = b.experience_directmessageoptout
             };
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>(b.playlists) ?? new();
 
             foreach (var c in JsonConvert.DeserializeObject<List<ReminderItem>>(b.reminders) ?? new())
-                DbUser.ReminderSettings.ScheduledReminders.Add(c);
+                DbUser.Reminders.ScheduledReminders.Add(c);
         }
         _logger.LogDebug($"Loaded {_bot.users.Count} users");
 

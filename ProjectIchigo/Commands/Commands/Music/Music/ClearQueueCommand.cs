@@ -33,7 +33,7 @@ internal class ClearQueueCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(ctx.User.Id))
+            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,12 +42,12 @@ internal class ClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(ctx.User.Id);
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Add(ctx.User.Id);
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Clear();
+                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Clear();
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -58,7 +58,7 @@ internal class ClearQueueCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`You voted to clear the current queue. ({ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`You voted to clear the current queue. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.SetAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -87,7 +87,7 @@ internal class ClearQueueCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Contains(e.User.Id))
+                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to clear the current queue.`").AsEphemeral());
                             return;
@@ -101,12 +101,12 @@ internal class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Add(e.User.Id);
+                        ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Add(e.User.Id);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
-                            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Clear();
+                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Clear();
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -115,7 +115,7 @@ internal class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`You voted to clear the current queue. ({ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`You voted to clear the current queue. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot.watcher);

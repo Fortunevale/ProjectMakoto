@@ -213,7 +213,7 @@ public abstract class BaseCommand
     internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
-        timeOutOverride ??= TimeSpan.FromSeconds(60);
+        timeOutOverride ??= TimeSpan.FromSeconds(120);
 
         List<DiscordSelectComponentOption> FetchedRoles = new();
 
@@ -243,6 +243,9 @@ public abstract class BaseCommand
 
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
                 FetchedRoles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+
+            if (configuration.IncludeEveryone)
+                FetchedRoles.Add(new DiscordSelectComponentOption("@everyone", ctx.Guild.EveryoneRole.Id.ToString(), "", false, DiscordEmoji.FromUnicode("👥").ToComponent()));
 
             foreach (var b in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
             {
@@ -377,7 +380,7 @@ public abstract class BaseCommand
     internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
-        timeOutOverride ??= TimeSpan.FromSeconds(60);
+        timeOutOverride ??= TimeSpan.FromSeconds(120);
 
         List<DiscordSelectComponentOption> FetchedChannels = new();
 
@@ -540,7 +543,7 @@ public abstract class BaseCommand
 
     internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
     {
-        timeOutOverride ??= TimeSpan.FromSeconds(60);
+        timeOutOverride ??= TimeSpan.FromSeconds(120);
 
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
@@ -907,7 +910,7 @@ public abstract class BaseCommand
     #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0].Footer.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0]?.Footer?.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
@@ -1005,7 +1008,7 @@ public abstract class BaseCommand
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be <@411950662662881290> to use this command.",
+            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Ichigo Staff` to use this command.",
         }.SetError(ctx));
 
     public void SendAdminError()

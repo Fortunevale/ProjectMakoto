@@ -33,7 +33,7 @@ internal class DisconnectCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Contains(ctx.User.Id))
+            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,12 +42,12 @@ internal class DisconnectCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Add(ctx.User.Id);
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Add(ctx.User.Id);
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink = new(ctx.Bot.guilds[ctx.Guild.Id]);
+                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
+                ctx.Bot.guilds[ctx.Guild.Id].MusicModule = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();
@@ -61,7 +61,7 @@ internal class DisconnectCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`You voted to disconnect the bot. ({ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`You voted to disconnect the bot. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.SetAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -90,7 +90,7 @@ internal class DisconnectCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Contains(e.User.Id))
+                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to disconnect the bot.`").AsEphemeral());
                             return;
@@ -104,12 +104,12 @@ internal class DisconnectCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Add(e.User.Id);
+                        ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Add(e.User.Id);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-                            ctx.Bot.guilds[ctx.Guild.Id].Lavalink = new(ctx.Bot.guilds[ctx.Guild.Id]);
+                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
+                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
                             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
                             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();
@@ -121,7 +121,7 @@ internal class DisconnectCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`You voted to disconnect the bot. ({ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`You voted to disconnect the bot. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot.watcher);

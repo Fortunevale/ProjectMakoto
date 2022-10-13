@@ -16,7 +16,7 @@ internal class ConfigCommand : BaseCommand
                 Description = TokenDetectionCommandAbstractions.GetCurrentConfiguration(ctx)
             }.SetAwaitingInput(ctx, "Token Detection");
 
-            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetectionSettings.DetectTokens? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Token Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Token Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -37,7 +37,7 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == Toggle.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetectionSettings.DetectTokens = !ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetectionSettings.DetectTokens;
+                ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens = !ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

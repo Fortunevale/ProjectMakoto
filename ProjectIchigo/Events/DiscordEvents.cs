@@ -23,15 +23,6 @@ internal class DiscordEvents
                 return;
             }
 
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
-            foreach (var guild in sender.Guilds)
-            {
-                if (!_bot.guilds.ContainsKey(guild.Key))
-                    _bot.guilds.Add(guild.Key, new Guild(guild.Key));
-            }
-
             if (sender.Guilds.Count >= 100 && (!sender.CurrentUser.IsVerifiedBot || !_bot.status.LoadedConfig.AllowMoreThan100Guilds))
             {
                 await e.Guild.Channels.Values.OrderBy(x => x.Position).First().SendMessageAsync($"Hi, thanks for adding me to your server.\n\n" +

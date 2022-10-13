@@ -38,20 +38,26 @@ internal class ScoreSaberCommandAbstractions
 
             DiscordLinkButtonComponent OpenProfileInBrowser = new($"https://scoresaber.com/u/{id}", "Open in browser", false);
 
-            List<DiscordComponent> ProfileInteractionRow = new();
-            ProfileInteractionRow.Add(OpenProfileInBrowser);
-            ProfileInteractionRow.Add(TopScoresButton);
-            ProfileInteractionRow.Add(RecentScoresButton);
+            List<DiscordComponent> ProfileInteractionRow = new()
+            {
+                OpenProfileInBrowser,
+                TopScoresButton,
+                RecentScoresButton
+            };
 
-            List<DiscordComponent> RecentScoreInteractionRow = new();
-            RecentScoreInteractionRow.Add(OpenProfileInBrowser);
-            RecentScoreInteractionRow.Add(ShowProfileButton);
-            RecentScoreInteractionRow.Add(TopScoresButton);
+            List<DiscordComponent> RecentScoreInteractionRow = new() 
+            {
+                OpenProfileInBrowser,
+                ShowProfileButton,
+                TopScoresButton
+            };
 
-            List<DiscordComponent> TopScoreInteractionRow = new();
-            TopScoreInteractionRow.Add(OpenProfileInBrowser);
-            TopScoreInteractionRow.Add(ShowProfileButton);
-            TopScoreInteractionRow.Add(RecentScoresButton);
+            List<DiscordComponent> TopScoreInteractionRow = new()
+            {
+                OpenProfileInBrowser,
+                ShowProfileButton,
+                RecentScoresButton
+            };
 
             PlayerScores CachedTopScores = null;
             PlayerScores CachedRecentScores = null;
@@ -317,18 +323,17 @@ internal class ScoreSaberCommandAbstractions
 
                         qc.ToFile(file);
 
-                        using (FileStream stream = File.Open(file, FileMode.Open))
-                        {
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
+                        using FileStream stream = File.Open(file, FileMode.Open);
 
-                            LoadedGraph = asset.Attachments[0].Url;
+                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
 
-                            embed = embed.SetInfo(ctx, "Score Saber");
-                            embed.ImageUrl = asset.Attachments[0].Url;
-                            builder = builder.WithEmbed(embed);
-                            builder.AddComponents(ProfileInteractionRow);
-                            await ctx.BaseCommand.RespondOrEdit(builder);
-                        }
+                        LoadedGraph = asset.Attachments[0].Url;
+
+                        embed = embed.SetInfo(ctx, "Score Saber");
+                        embed.ImageUrl = asset.Attachments[0].Url;
+                        builder = builder.WithEmbed(embed);
+                        builder.AddComponents(ProfileInteractionRow);
+                        await ctx.BaseCommand.RespondOrEdit(builder);
                     }
                     catch (Exception ex)
                     {

@@ -13,7 +13,7 @@ internal class NameNormalizerEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].NameNormalizerSettings.NameNormalizerEnabled)
+            if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
                 return;
 
             string PingableName = Regex.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), @"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", "");
@@ -30,7 +30,7 @@ internal class NameNormalizerEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].NameNormalizerSettings.NameNormalizerEnabled)
+            if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
                 return;
 
             if (e.NicknameBefore != e.NicknameAfter)
@@ -55,7 +55,7 @@ internal class NameNormalizerEvents
 
             foreach (var guild in sender.Guilds)
             {
-                if (!_bot.guilds[guild.Key].NameNormalizerSettings.NameNormalizerEnabled)
+                if (!_bot.guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
                     return;
 
                 var member = await e.UserAfter.ConvertToMember(guild.Value);

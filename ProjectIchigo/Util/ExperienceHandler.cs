@@ -70,7 +70,7 @@ internal class ExperienceHandler
         if (user.IsBot)
             return;
 
-        if (!_bot.guilds[guild.Id].ExperienceSettings.UseExperience)
+        if (!_bot.guilds[guild.Id].Experience.UseExperience)
             return;
 
         if (_bot.guilds[guild.Id].Members[user.Id].Experience.Points is > (long.MaxValue - 10000) or < (long.MinValue + 10000))
@@ -160,7 +160,7 @@ internal class ExperienceHandler
                             {
                                 _bot.discordClient.ComponentInteractionCreated -= RunInteraction;
 
-                                _bot.users[user.Id].ExperienceUserSettings.DirectMessageOptOut = true;
+                                _bot.users[user.Id].ExperienceUser.DirectMessageOptOut = true;
 
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 

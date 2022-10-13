@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Commands;
 
-internal class BanCommand : BaseCommand
+internal class SoftBanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
 
@@ -9,7 +9,8 @@ internal class BanCommand : BaseCommand
         return Task.Run(async () =>
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
-            int deleteMessageDays = (int)arguments["days"];
+            int deleteMessageDays = (int)arguments["days"] > 7 ? 7 : (int)arguments["days"];
+            if (deleteMessageDays < 0) deleteMessageDays = 0;
             string reason = (string)arguments["reason"];
 
             DiscordMember bMember = null;
@@ -22,7 +23,7 @@ internal class BanCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Banning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Soft banning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -35,14 +36,15 @@ internal class BanCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= (bMember?.GetRoleHighestPosition() ?? -1))
                     throw new Exception();
 
-                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.UsernameWithDiscriminator} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.UsernameWithDiscriminator} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await ctx.Guild.UnbanMemberAsync(victim.Id, $"{ctx.User.UsernameWithDiscriminator} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
-                embed.Description = $"{victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
+                embed.Description = $"{victim.Mention} `was soft banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
                 embed = embed.SetSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"{victim.Mention} `could not be banned.`";
+                embed.Description = $"{victim.Mention} `could not be soft banned.`";
                 embed = embed.SetError(ctx);
             }
 

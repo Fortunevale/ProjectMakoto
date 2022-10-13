@@ -3,6 +3,15 @@ public class ModerationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
+    [SlashCommand("poll", "Starts a poll.", (long)Permissions.ManageMessages, dmPermission: false)]
+    public async Task Poll(InteractionContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new PollCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
+
     [SlashCommand("purge", "Deletes the specified amount of messages.", (long)Permissions.ManageMessages, dmPermission: false)]
     public async Task Purge(InteractionContext ctx, [Option("number", "1-2000"), MinimumValue(1), MaximumValue(2000)] int number, [Option("user", "Only delete messages by this user")] DiscordUser victim = null)
     {
@@ -81,13 +90,28 @@ public class ModerationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommand("ban", "Bans the specified user.", (long)Permissions.BanMembers, dmPermission: false)]
-    public async Task Ban(InteractionContext ctx, [Option("user", "The user")] DiscordUser victim, [Option("reason", "The reason")] string reason = "")
+    public async Task Ban(InteractionContext ctx, [Option("user", "The user")] DiscordUser victim, [Option("days", "Days of messages to delete")] int days = 0,  [Option("reason", "The reason")] string reason = "")
     {
         Task.Run(async () =>
         {
             await new BanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "victim", victim },
+                { "days", days },
+                { "reason", reason },
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+
+    [SlashCommand("softban", "Soft bans the specified user.", (long)Permissions.BanMembers, dmPermission: false)]
+    public async Task SoftBan(InteractionContext ctx, [Option("user", "The user")] DiscordUser victim, [Option("days", "Days of messages to delete")] int days = 0, [Option("reason", "The reason")] string reason = "")
+    {
+        Task.Run(async () =>
+        {
+            await new SoftBanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "victim", victim },
+                { "days", days },
                 { "reason", reason },
             });
         }).Add(_bot.watcher, ctx);

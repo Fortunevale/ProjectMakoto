@@ -47,20 +47,20 @@ internal class RemoveQueueCommand : BaseCommand
             {
                 int Index = Convert.ToInt32(selection) - 1;
 
-                if (Index < 0 || Index >= ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count)
+                if (Index < 0 || Index >= ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = $"`Your value is out of range. Currently, the range is 1-{ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}.`",
+                        Description = $"`Your value is out of range. Currently, the range is 1-{ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}.`",
                     }.SetError(ctx));
                     return;
                 }
 
-                info = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue[Index];
+                info = ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue[Index];
             }
             else
             {
-                if (!ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
+                if (!ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
@@ -69,7 +69,7 @@ internal class RemoveQueueCommand : BaseCommand
                     return;
                 }
 
-                info = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.First(x => x.VideoTitle.ToLower() == selection.ToLower());
+                info = ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.First(x => x.VideoTitle.ToLower() == selection.ToLower());
             }
 
             if (info is null)
@@ -81,7 +81,7 @@ internal class RemoveQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Remove(info);
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Remove(info);
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {

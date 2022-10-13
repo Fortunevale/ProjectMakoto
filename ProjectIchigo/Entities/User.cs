@@ -13,8 +13,8 @@ public class User
         UrlSubmissions = new(this);
         AfkStatus = new(this);
         ScoreSaber = new(this);
-        ExperienceUserSettings = new(this);
-        ReminderSettings = new(this, _bot);
+        ExperienceUser = new(this);
+        Reminders = new(this, _bot);
     }
 
     [JsonIgnore]
@@ -23,8 +23,8 @@ public class User
     public UrlSubmissionSettings UrlSubmissions { get; set; }
     public AfkStatus AfkStatus { get; set; }
     public ScoreSaberSettings ScoreSaber { get; set; }
-    public ExperienceUserSettings ExperienceUserSettings { get; set; }
-    public ReminderSettings ReminderSettings { get; set; }
+    public ExperienceUserSettings ExperienceUser { get; set; }
+    public ReminderSettings Reminders { get; set; }
 
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 

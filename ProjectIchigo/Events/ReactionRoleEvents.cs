@@ -16,9 +16,6 @@ internal class ReactionRoleEvents
             if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate)
                 return;
 
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
             if (_bot.guilds[e.Guild.Id].ReactionRoles.Any(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
             {
                 var obj = _bot.guilds[ e.Guild.Id ].ReactionRoles.First(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
@@ -35,9 +32,6 @@ internal class ReactionRoleEvents
         {
             if (e.Guild == null || e.Channel.IsPrivate)
                 return;
-
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
 
             if (_bot.guilds[ e.Guild.Id ].ReactionRoles.Any(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
             {

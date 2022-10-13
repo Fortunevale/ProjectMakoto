@@ -2,6 +2,9 @@
 
 internal static class DiscordExtensions
 {
+    internal static string GetCustomId(this ComponentInteractionCreateEventArgs e)
+        => e.Interaction.Data.CustomId;
+
     internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
 

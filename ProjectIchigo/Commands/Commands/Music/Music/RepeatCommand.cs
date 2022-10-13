@@ -33,11 +33,11 @@ internal class RepeatCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat = !ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat;
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat = !ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat ? "`The queue now repeats itself.`" : "`The queue no longer repeats itself.`"),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? "`The queue now repeats itself.`" : "`The queue no longer repeats itself.`"),
             }.SetSuccess(ctx));
         });
     }

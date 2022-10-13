@@ -16,10 +16,7 @@ internal class ExperienceEvents
             if (e.Message.WebhookMessage || e.Guild is null)
                 return;
 
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new(e.Guild.Id));
-
-            if (!_bot.guilds[e.Guild.Id].ExperienceSettings.UseExperience)
+            if (!_bot.guilds[e.Guild.Id].Experience.UseExperience)
                 return;
 
             if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Author.Id))
@@ -29,9 +26,9 @@ internal class ExperienceEvents
             {
                 var exp = _bot.experienceHandler.CalculateMessageExperience(e.Message);
 
-                if (_bot.guilds[e.Guild.Id].ExperienceSettings.BoostXpForBumpReminder)
+                if (_bot.guilds[e.Guild.Id].Experience.BoostXpForBumpReminder)
                 {
-                    exp = (int)Math.Round(((await e.Author.ConvertToMember(e.Guild)).Roles.Any(x => x.Id == _bot.guilds[e.Guild.Id].BumpReminderSettings.RoleId) ? exp * 1.5 : exp), 0);
+                    exp = (int)Math.Round(((await e.Author.ConvertToMember(e.Guild)).Roles.Any(x => x.Id == _bot.guilds[e.Guild.Id].BumpReminder.RoleId) ? exp * 1.5 : exp), 0);
                 }
 
                 if (exp > 0)

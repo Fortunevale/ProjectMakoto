@@ -42,8 +42,8 @@ internal class ForceDisconnectCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink = new(ctx.Bot.guilds[ctx.Guild.Id]);
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();

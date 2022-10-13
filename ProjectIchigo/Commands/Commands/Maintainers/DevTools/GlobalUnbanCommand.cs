@@ -35,9 +35,9 @@ internal class GlobalUnbanCommand : BaseCommand
                 foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
                 {
                     if (!ctx.Bot.guilds.ContainsKey(b.Key))
-                        ctx.Bot.guilds.Add(b.Key, new Guild(b.Key));
+                        ctx.Bot.guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
 
-                    if (ctx.Bot.guilds[b.Key].JoinSettings.AutoBanGlobalBans)
+                    if (ctx.Bot.guilds[b.Key].Join.AutoBanGlobalBans)
                     {
                         try
                         {

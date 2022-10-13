@@ -16,14 +16,11 @@ internal class CrosspostEvents
             if (e.Guild is null || e.Channel.IsPrivate)
                 return;
 
-            if (!_bot.guilds.ContainsKey(e.Guild.Id))
-                _bot.guilds.Add(e.Guild.Id, new Guild(e.Guild.Id));
-
-            foreach (var b in _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
+            foreach (var b in _bot.guilds[e.Guild.Id].Crosspost.CrosspostChannels.ToList())
                 if (!e.Guild.Channels.ContainsKey(b))
-                    _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);
+                    _bot.guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
 
-            if (!_bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(e.Channel.Id))
+            if (!_bot.guilds[e.Guild.Id].Crosspost.CrosspostChannels.Contains(e.Channel.Id))
                 return;
 
             if (e.Message.Reference is not null || e.Message.MessageType is MessageType.ChannelPinnedMessage or MessageType.GuildMemberJoin or MessageType.ChannelFollowAdd or MessageType.ChatInputCommand or MessageType.ContextMenuCommand)
@@ -31,18 +28,18 @@ internal class CrosspostEvents
 
             if (e.Channel.Type == ChannelType.News)
             {
-                if (_bot.guilds[e.Guild.Id].CrosspostSettings.ExcludeBots)
+                if (_bot.guilds[e.Guild.Id].Crosspost.ExcludeBots)
                     if (e.Message.WebhookMessage || e.Message.Author.IsBot)
                         return;
 
                 ulong MessageId = e.Message.Id;
 
-                if (_bot.guilds[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
+                if (_bot.guilds[e.Guild.Id].Crosspost.DelayBeforePosting > 3)
                     _ = e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕒"));
 
-                await Task.Delay(TimeSpan.FromSeconds(_bot.guilds[e.Guild.Id].CrosspostSettings.DelayBeforePosting));
+                await Task.Delay(TimeSpan.FromSeconds(_bot.guilds[e.Guild.Id].Crosspost.DelayBeforePosting));
 
-                if (_bot.guilds[e.Guild.Id].CrosspostSettings.DelayBeforePosting > 3)
+                if (_bot.guilds[e.Guild.Id].Crosspost.DelayBeforePosting > 3)
                     _ = e.Message.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
                 DiscordMessage msg;
@@ -62,7 +59,7 @@ internal class CrosspostEvents
 
                 bool ReactionAdded = false;
 
-                var task = _bot.guilds[e.Guild.Id].CrosspostSettings.CrosspostWithRatelimit(e.Channel, e.Message).ContinueWith(s =>
+                var task = _bot.guilds[e.Guild.Id].Crosspost.CrosspostWithRatelimit(e.Channel, e.Message).ContinueWith(s =>
                 {
                     if (ReactionAdded)
                         _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));

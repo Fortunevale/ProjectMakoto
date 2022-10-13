@@ -27,9 +27,6 @@ internal class ClearBackupCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Bot.guilds.ContainsKey(ctx.Guild.Id))
-                ctx.Bot.guilds.Add(ctx.Guild.Id, new Guild(ctx.Guild.Id));
-
             if (!ctx.Bot.guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
                 ctx.Bot.guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot.guilds[ctx.Guild.Id], victim.Id));
 

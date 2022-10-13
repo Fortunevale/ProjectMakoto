@@ -42,8 +42,8 @@ internal class ForceClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Clear();
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.collectedClearQueueVotes.Clear();
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Clear();
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Clear();
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {

@@ -33,11 +33,11 @@ internal class ShuffleCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Shuffle = !ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Shuffle;
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle = !ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Shuffle ? "`The queue now shuffles.`" : "`The queue no longer shuffles.`"),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? "`The queue now shuffles.`" : "`The queue no longer shuffles.`"),
             }.SetSuccess(ctx));
         });
     }

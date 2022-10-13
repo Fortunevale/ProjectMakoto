@@ -70,7 +70,7 @@ We have a step by step guide you can follow to start contributing: [CONTRIBUTING
 <br></br>
 - [Lavalink](https://github.com/freyacodes/Lavalink)
 - [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) (Please set up your own instance.)
-- [A MySQL/MariaDB Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
+- [A MySQL Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
 
 ### Required APIs, Keys and Tokens
 

@@ -12,10 +12,10 @@ public class TableDefinitions
 
     public class scam_urls
     {
-        [Primary][Collation("utf8mb4_0900_ai_ci")][MaxValue(500)]
+        [Primary][Collation("utf8_unicode_ci")][MaxValue(500)]
         public VarChar url { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text origin { get; set; }
 
         public BigInt submitter { get; set; }
@@ -32,7 +32,7 @@ public class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -45,7 +45,7 @@ public class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -58,7 +58,7 @@ public class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -71,7 +71,7 @@ public class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public LongText notes { get; set; }
     }
 
@@ -80,7 +80,7 @@ public class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -91,7 +91,7 @@ public class TableDefinitions
         [Primary]
         public BigInt id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text reason { get; set; }
 
         public BigInt moderator { get; set; }
@@ -102,7 +102,7 @@ public class TableDefinitions
         [Primary]
         public BigInt messageid { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")][MaxValue(500)]
+        [Collation("utf8_unicode_ci")][MaxValue(500)]
         public VarChar url { get; set; }
 
         public BigInt submitter { get; set; }
@@ -118,10 +118,10 @@ public class TableDefinitions
 
         public BigInt afk_since { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text afk_reason { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text afk_pings { get; set; }
 
         public BigInt afk_pingamount { get; set; }
@@ -131,15 +131,15 @@ public class TableDefinitions
 
         public TinyInt submission_accepted_tos { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text submission_accepted_submissions { get; set; }
 
         public BigInt submission_last_datetime { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public LongText playlists { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public LongText reminders { get; set; }
     }
 
@@ -150,13 +150,13 @@ public class TableDefinitions
 
         public BigInt auto_assign_role_id { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text levelrewards { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text auditlogcache { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text reactionroles { get; set; }
 
         [MaxValue(1)]
@@ -165,7 +165,7 @@ public class TableDefinitions
         [Default("10")]
         public Int crosspostdelay { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text crosspostchannels { get; set; }
 
         [MaxValue(1)]
@@ -221,7 +221,7 @@ public class TableDefinitions
 
         public Int phishing_type { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text phishing_reason { get; set; }
 
         public BigInt phishing_time { get; set; }
@@ -273,10 +273,10 @@ public class TableDefinitions
         [MaxValue(1)]
         public TinyInt invitetracker_enabled { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text invitetracker_cache { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text autounarchivelist { get; set; }
 
         [MaxValue(1)]
@@ -287,7 +287,7 @@ public class TableDefinitions
 
         public BigInt lavalink_channel { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text lavalink_currentvideo { get; set; }
 
         public BigInt lavalink_currentposition { get; set; }
@@ -301,10 +301,13 @@ public class TableDefinitions
         [MaxValue(1)]
         public TinyInt lavalink_repeat { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public LongText lavalink_queue { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
+        public LongText polls { get; set; }
+
+        [Collation("utf8_unicode_ci")]
         public LongText crosspost_ratelimits { get; set; }
     }
 
@@ -313,15 +316,15 @@ public class TableDefinitions
         [Primary]
         public BigInt userid { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text saved_nickname { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text roles { get; set; }
 
         public BigInt invite_user { get; set; }
 
-        [Collation("utf8mb4_0900_ai_ci")]
+        [Collation("utf8_unicode_ci")]
         public Text invite_code { get; set; }
 
         public BigInt first_join { get; set; }
