@@ -53,21 +53,21 @@ internal class QueueCommand : BaseCommand
 
                 var TotalTimespan = TimeSpan.Zero;
 
-                for (int i = 0; i < ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count; i++)
+                for (int i = 0; i < ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count; i++)
                 {
-                    TotalTimespan = TotalTimespan.Add(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue[i].Length);
+                    TotalTimespan = TotalTimespan.Add(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue[i].Length);
                 }
 
-                var Description = $"**`There's currently {ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count} song(s) queued. This queue last for {TotalTimespan.GetHumanReadable()}.`**\n\n";
-                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` [`{x.VideoTitle}`]({x.Url}) requested by {x.user.Mention}"))}\n\n";
+                var Description = $"**`There's currently {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count} song(s) queued. This queue last for {TotalTimespan.GetHumanReadable()}.`**\n\n";
+                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` [`{x.VideoTitle}`]({x.Url}) requested by {x.user.Mention}"))}\n\n";
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count > 0)
-                    Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count / 10.0)}`\n\n";
+                if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count > 0)
+                    Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count / 10.0)}`\n\n";
 
                 Description += $"`Currently playing:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
-                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
-                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
-                Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
+                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
+                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
+                Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
 
                 if (conn.CurrentState.CurrentTrack is not null)
                 {
@@ -78,7 +78,7 @@ internal class QueueCommand : BaseCommand
                 if (CurrentPage <= 0)
                     PreviousPage = PreviousPage.Disable();
 
-                if ((CurrentPage * 10) + 10 >= ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count)
+                if ((CurrentPage * 10) + 10 >= ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)
                     NextPage = NextPage.Disable();
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder

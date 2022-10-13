@@ -16,8 +16,8 @@ internal class ConfigCommand : BaseCommand
                 Description = EmbedMessageCommandAbstractions.GetCurrentConfiguration(ctx)
             }.SetAwaitingInput(ctx, "Embed Messages");
 
-            var ToggleMsg = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Link Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var ToggleGithub = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Github Code Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
+            var ToggleMsg = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Link Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ToggleGithub = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Github Code Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -39,14 +39,14 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == ToggleMsg.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseEmbedding;
+                ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             if (e.Result.Interaction.Data.CustomId == ToggleGithub.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseGithubEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessageSettings.UseGithubEmbedding;
+                ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

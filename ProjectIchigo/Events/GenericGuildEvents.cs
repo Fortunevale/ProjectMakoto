@@ -20,13 +20,13 @@ internal class GenericGuildEvents
             if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate == DateTime.UnixEpoch)
                 _bot.guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate = e.Member.JoinedAt.UtcDateTime;
 
-            if (_bot.guilds[e.Guild.Id].JoinSettings.ReApplyNickname)
+            if (_bot.guilds[e.Guild.Id].Join.ReApplyNickname)
                 if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate.ToUniversalTime().GetTimespanSince().TotalDays < 60)
                     e.Member.ModifyAsync(x => x.Nickname = _bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname).Add(_bot.watcher);
 
             Task task = Task.Run(async () =>
             {
-                if (!_bot.guilds[e.Guild.Id].JoinSettings.ReApplyRoles)
+                if (!_bot.guilds[e.Guild.Id].Join.ReApplyRoles)
                     return;
 
                 if (e.Member.IsBot)

@@ -22,7 +22,7 @@ internal class EmbedMessagesEvents
             {
                 if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
                 {
-                    if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseEmbedding)
+                    if (!_bot.guilds[e.Guild.Id].EmbedMessage.UseEmbedding)
                         break;
 
                     if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot), true))
@@ -67,7 +67,7 @@ internal class EmbedMessagesEvents
 
             if (RegexTemplates.GitHubUrl.IsMatch(e.Message.Content))
             {
-                if (!_bot.guilds[e.Guild.Id].EmbedMessageSettings.UseGithubEmbedding)
+                if (!_bot.guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
                     return;
 
                 if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot), true))

@@ -110,7 +110,7 @@ internal class UserInfoCommand : BaseCommand
 
             bool InviterButtonAdded = false;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].InviteTrackerSettings.Enabled)
+            if (ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled)
             {
                 embed.AddField(new DiscordEmbedField("Invited by", $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? "`No inviter found.`" : $"<@{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
                 embed.AddField(new DiscordEmbedField("Users invited", $"`{(ctx.Bot.guilds[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));

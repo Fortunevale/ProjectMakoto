@@ -5,11 +5,14 @@ public class ActionLogSettings
     public ActionLogSettings(Guild guild)
     {
         Parent = guild;
+
+        _ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated;
     }
 
     private Guild Parent { get; set; }
 
-
+    public ObservableList<ulong> ProcessedAuditLogs { get => _ProcessedAuditLogs; set { _ProcessedAuditLogs = value; _ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated; } }
+    private ObservableList<ulong> _ProcessedAuditLogs { get; set; } = new();
 
     private ulong _Channel { get; set; } = 0;
     public ulong Channel 
@@ -151,5 +154,14 @@ public class ActionLogSettings
             _InvitesModified = value;
             _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "actionlog_log_invites_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         } 
+    }
+
+
+    private void AuditLogCollectionUpdated(object? sender, ObservableListUpdate<ulong> e)
+    {
+        while (ProcessedAuditLogs.Count > 50)
+        {
+            ProcessedAuditLogs.RemoveAt(0);
+        }
     }
 }

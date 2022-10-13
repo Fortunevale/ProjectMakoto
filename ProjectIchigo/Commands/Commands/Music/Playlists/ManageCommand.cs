@@ -109,11 +109,11 @@ internal class ManageCommand : BaseCommand
                 embed.SetLoading(ctx, "Playlists");
                 await RespondOrEdit(embed);
 
-                ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
+                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
 
                 embed.Description = $"`Queued {SelectedPlaylist.List.Count} songs from your personal playlist '{SelectedPlaylist.PlaylistName}'.`";
 
-                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Count}", true));
+                embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}", true));
 
                 await RespondOrEdit(embed.SetSuccess(ctx, "Playlists"));
                 return;
@@ -368,7 +368,7 @@ internal class ManageCommand : BaseCommand
                 }
 
                 string SelectedPlaylistName = "";
-                List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].Lavalink.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToList();
+                List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToList();
 
                 while (true)
                 {

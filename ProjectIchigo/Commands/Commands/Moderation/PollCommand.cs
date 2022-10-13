@@ -11,7 +11,7 @@ internal class PollCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].RunningPolls.Count >= 10)
+            if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`There's already 10 polls running on this guild.`").SetError(ctx));
                 return;
@@ -341,7 +341,7 @@ internal class PollCommand : BaseCommand
                             $"_This poll will end {selectedDueDate.Value.ToTimestamp()}._"))
                         .AddComponents(select));
 
-                    ctx.Bot.guilds[ctx.Guild.Id].RunningPolls.Add(new PollEntry
+                    ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Add(new PollEntry
                     {
                         ChannelId = SelectedChannel.Id,
                         MessageId = msg.Id,

@@ -811,7 +811,7 @@ public class Bot
                         guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                 }
 
-                if (guilds[guild.Key].InviteTrackerSettings.Enabled)
+                if (guilds[guild.Key].InviteTracker.Enabled)
                 {
                     await InviteTrackerEvents.UpdateCachedInvites(this, guild.Value);
                 }
@@ -922,7 +922,7 @@ public class Bot
                 if (!guilds.ContainsKey(guild.Key))
                     guilds.Add(guild.Key, new Guild(guild.Key, this));
 
-                if (guilds[guild.Key].BumpReminderSettings.Enabled)
+                if (guilds[guild.Key].BumpReminder.Enabled)
                 {
                     bumpReminder.ScheduleBump(sender, guild.Key);
                 }
@@ -937,16 +937,16 @@ public class Bot
                     experienceHandler.CheckExperience(member.Key, guild.Value);
                 }
 
-                if (guilds[guild.Key].CrosspostSettings.CrosspostChannels.Any())
+                if (guilds[guild.Key].Crosspost.CrosspostChannels.Any())
                 {
                     Task.Run(async () =>
                     {
-                        for (int i = 0; i < guilds[guild.Key].CrosspostSettings.CrosspostChannels.Count; i++)
+                        for (int i = 0; i < guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
                         {
                             if (guild.Value is null)
                                 return;
 
-                            var ChannelId = guilds[guild.Key].CrosspostSettings.CrosspostChannels[i];
+                            var ChannelId = guilds[guild.Key].Crosspost.CrosspostChannels[i];
 
                             _logger.LogDebug($"Checking channel '{ChannelId}' for missing crossposts..");
 
@@ -960,17 +960,17 @@ public class Bot
                                 {
                                     _logger.LogDebug($"Handling missing crosspost message '{msg.Id}' in '{msg.ChannelId}' for '{guild.Key}'..");
 
-                                    var WaitTime = guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting - msg.Id.GetSnowflakeTime().GetTotalSecondsSince();
+                                    var WaitTime = guilds[guild.Value.Id].Crosspost.DelayBeforePosting - msg.Id.GetSnowflakeTime().GetTotalSecondsSince();
 
                                     if (WaitTime > 0)
                                         await Task.Delay(TimeSpan.FromSeconds(WaitTime));
 
-                                    if (guilds[guild.Value.Id].CrosspostSettings.DelayBeforePosting > 3)
+                                    if (guilds[guild.Value.Id].Crosspost.DelayBeforePosting > 3)
                                         _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
                                     bool ReactionAdded = false;
 
-                                    var task = guilds[guild.Value.Id].CrosspostSettings.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
+                                    var task = guilds[guild.Value.Id].Crosspost.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
                                     {
                                         if (ReactionAdded)
                                             _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
@@ -1014,19 +1014,19 @@ public class Bot
                 {
                     try
                     {
-                        if (guilds[guild.Key].Lavalink.ChannelId != 0)
+                        if (guilds[guild.Key].MusicModule.ChannelId != 0)
                         {
-                            if (!guild.Value.Channels.ContainsKey(guilds[guild.Key].Lavalink.ChannelId))
+                            if (!guild.Value.Channels.ContainsKey(guilds[guild.Key].MusicModule.ChannelId))
                                 throw new Exception("Channel no longer exists");
 
-                            if (guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("localhost") || guilds[guild.Key].Lavalink.CurrentVideo.ToLower().Contains("127.0.0.1"))
+                            if (guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("localhost") || guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("127.0.0.1"))
                                 throw new Exception("Localhost?");
 
-                            if (guilds[guild.Key].Lavalink.SongQueue.Count > 0)
+                            if (guilds[guild.Key].MusicModule.SongQueue.Count > 0)
                             {
-                                for (var i = 0; i < guilds[guild.Key].Lavalink.SongQueue.Count; i++)
+                                for (var i = 0; i < guilds[guild.Key].MusicModule.SongQueue.Count; i++)
                                 {
-                                    Lavalink.QueueInfo b = guilds[guild.Key].Lavalink.SongQueue[i];
+                                    Lavalink.QueueInfo b = guilds[guild.Key].MusicModule.SongQueue[i];
 
                                     _logger.LogDebug($"Fixing queue info for {b.Url}");
 
@@ -1042,7 +1042,7 @@ public class Bot
                                 }
                             }
 
-                            var channel = guild.Value.GetChannel(guilds[guild.Key].Lavalink.ChannelId);
+                            var channel = guild.Value.GetChannel(guilds[guild.Key].MusicModule.ChannelId);
 
                             var lava = discordClient.GetLavalink();
 
@@ -1062,7 +1062,7 @@ public class Bot
                                 conn = await node.ConnectAsync(channel);
                             }
 
-                            var loadResult = await node.Rest.GetTracksAsync(guilds[guild.Key].Lavalink.CurrentVideo, LavalinkSearchType.Plain);
+                            var loadResult = await node.Rest.GetTracksAsync(guilds[guild.Key].MusicModule.CurrentVideo, LavalinkSearchType.Plain);
 
                             if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                                 return;
@@ -1070,15 +1070,15 @@ public class Bot
                             await conn.PlayAsync(loadResult.Tracks.First());
 
                             await Task.Delay(2000);
-                            await conn.SeekAsync(TimeSpan.FromSeconds(guilds[guild.Key].Lavalink.CurrentVideoPosition));
+                            await conn.SeekAsync(TimeSpan.FromSeconds(guilds[guild.Key].MusicModule.CurrentVideoPosition));
 
-                            guilds[guild.Key].Lavalink.QueueHandler(this, discordClient, node, conn);
+                            guilds[guild.Key].MusicModule.QueueHandler(this, discordClient, node, conn);
                         }
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError($"An exception occurred while trying to continue music playback for '{guild.Key}'", ex);
-                        guilds[guild.Key].Lavalink = new(guilds[guild.Key]);
+                        guilds[guild.Key].MusicModule = new(guilds[guild.Key]);
                     }
                 });
 

@@ -10,7 +10,7 @@ internal class LeaderboardCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
                 return;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.UseExperience)
+            if (!ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {

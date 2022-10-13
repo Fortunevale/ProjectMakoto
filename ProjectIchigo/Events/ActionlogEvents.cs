@@ -14,12 +14,12 @@ internal class ActionlogEvents
         if (guild is null)
             return false;
 
-        if (_bot.guilds[guild.Id].ActionLogSettings.Channel == 0)
+        if (_bot.guilds[guild.Id].ActionLog.Channel == 0)
             return false;
 
-        if (!guild.Channels.ContainsKey(_bot.guilds[guild.Id].ActionLogSettings.Channel))
+        if (!guild.Channels.ContainsKey(_bot.guilds[guild.Id].ActionLog.Channel))
         {
-            _bot.guilds[guild.Id].ActionLogSettings = new(_bot.guilds[guild.Id]);
+            _bot.guilds[guild.Id].ActionLog = new(_bot.guilds[guild.Id]);
             return false;
         }
 
@@ -27,13 +27,13 @@ internal class ActionlogEvents
     }
 
     private async Task<DiscordMessage> SendActionlog(DiscordGuild guild, DiscordMessageBuilder builder)
-        => await guild.GetChannel(_bot.guilds[guild.Id].ActionLogSettings.Channel).SendMessageAsync(builder);
+        => await guild.GetChannel(_bot.guilds[guild.Id].ActionLog.Channel).SendMessageAsync(builder);
 
     internal async Task UserJoined(DiscordClient sender, GuildMemberAddEventArgs e)
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.MembersModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MembersModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -54,7 +54,7 @@ internal class ActionlogEvents
 
             _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
             {
-                if (!x.IsCompletedSuccessfully || !_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)
+                if (!x.IsCompletedSuccessfully || !_bot.guilds[e.Guild.Id].InviteTracker.Enabled)
                     return;
 
                 await Task.Delay(5000);
@@ -82,7 +82,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.MembersModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MembersModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -106,11 +106,11 @@ internal class ActionlogEvents
                 var AuditKickLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Kick);
                 var AuditBanLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Ban);
 
-                if (AuditKickLogEntries.Count > 0 && AuditKickLogEntries.Any(x => ((DiscordAuditLogKickEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditKickLogEntries.Count > 0 && AuditKickLogEntries.Any(x => ((DiscordAuditLogKickEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogKickEntry)AuditKickLogEntries.First(x => ((DiscordAuditLogKickEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
+                    var Entry = (DiscordAuditLogKickEntry)AuditKickLogEntries.First(x => ((DiscordAuditLogKickEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
 
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Author.Name = "User kicked";
                     embed.Author.IconUrl = AuditLogIcons.UserKicked;
@@ -126,11 +126,11 @@ internal class ActionlogEvents
                     break;
                 }
 
-                if (_bot.guilds[e.Guild.Id].ActionLogSettings.BanlistModified && AuditBanLogEntries.Count > 0 && AuditBanLogEntries.Any(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (_bot.guilds[e.Guild.Id].ActionLog.BanlistModified && AuditBanLogEntries.Count > 0 && AuditBanLogEntries.Any(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogBanEntry)AuditBanLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
+                    var Entry = (DiscordAuditLogBanEntry)AuditBanLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
 
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     _ = msg.DeleteAsync();
                     break;
@@ -146,7 +146,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
                 return;
 
             if (!string.IsNullOrEmpty(e.Message.Content))
@@ -189,7 +189,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[ e.Guild.Id ].ActionLogSettings.VoiceStateUpdated)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[ e.Guild.Id ].ActionLog.VoiceStateUpdated)
                 return;
 
             DiscordChannel PreviousChannel = e.Before?.Channel;
@@ -209,7 +209,7 @@ internal class ActionlogEvents
                                       $"**Channel**: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
                     };
 
-                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 }
                 else if (PreviousChannel is not null && NewChannel is null)
                 {
@@ -224,7 +224,7 @@ internal class ActionlogEvents
                                       $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]`"
                     };
 
-                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 }
                 else if (PreviousChannel is not null && NewChannel is not null)
                 {
@@ -239,7 +239,7 @@ internal class ActionlogEvents
                                       $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]` :arrow_right: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
                     };
 
-                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 }
         }).Add(_bot.watcher);
     }
@@ -248,7 +248,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.MessageDeleted)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MessageDeleted)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -336,7 +336,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.MessageDeleted || e.Message is null || e.Message.WebhookMessage || e.Message.Author is null || e.Message.Author.IsBot)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message is null || e.Message.WebhookMessage || e.Message.Author is null || e.Message.Author.IsBot)
                 return;
 
             if (!string.IsNullOrEmpty(e.Message.Content))
@@ -379,7 +379,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.MemberModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MemberModified)
                 return;
 
             if (e.NicknameBefore != e.NicknameAfter)
@@ -533,7 +533,7 @@ internal class ActionlogEvents
                 catch { }
             }
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.MemberProfileModified)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.MemberProfileModified)
                 return;
 
             if (e.AvatarHashBefore != e.AvatarHashAfter)
@@ -573,7 +573,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.RolesModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.RolesModified)
                 return;
 
             string GeneratePermissions = string.Join(", ", e.Role.Permissions.ToString().Split(", ").Select(x => $"`{x}`"));
@@ -609,17 +609,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.RoleCreate);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
@@ -639,7 +639,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.RolesModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.RolesModified)
                 return;
 
             string GeneratePermissions = string.Join(", ", e.Role.Permissions.ToString().Split(", ").Select(x => $"`{x}`"));
@@ -675,17 +675,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.RoleDelete);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
@@ -705,7 +705,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.RolesModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.RolesModified)
                 return;
 
             string[] BeforePermissions = e.RoleBefore.Permissions.ToString().Split(", ");
@@ -789,17 +789,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.RoleUpdate);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.RoleAfter.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.RoleAfter.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.RoleAfter.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.RoleAfter.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
@@ -819,7 +819,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.BanlistModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.BanlistModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -837,17 +837,17 @@ internal class ActionlogEvents
             if (e.Member.Roles.Any())
                 embed.AddField(new DiscordEmbedField("Roles", $"{string.Join(", ", e.Member.Roles.Select(x => x.Mention))}".TruncateWithIndication(1000)));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Ban);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Banned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
@@ -869,7 +869,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.BanlistModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.BanlistModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -884,17 +884,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.Unban);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Unbanned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
@@ -913,7 +913,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.GuildAfter) || !_bot.guilds[e.GuildAfter.Id].ActionLogSettings.GuildModified)
+            if (!await ValidateServer(e.GuildAfter) || !_bot.guilds[e.GuildAfter.Id].ActionLog.GuildModified)
                 return;
 
             string Description = "";
@@ -959,19 +959,19 @@ internal class ActionlogEvents
             if (e.GuildBefore.IconHash != e.GuildAfter.IconHash)
                 embed.ImageUrl = e.GuildAfter.IconUrl;
 
-            var msg = await e.GuildAfter.GetChannel(_bot.guilds[e.GuildAfter.Id].ActionLogSettings.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+            var msg = await e.GuildAfter.GetChannel(_bot.guilds[e.GuildAfter.Id].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.GuildAfter.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.GuildAfter.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.GuildAfter.GetAuditLogsAsync(actionType: AuditLogActionType.GuildUpdate);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => (!_bot.guilds[e.GuildAfter.Id].ProcessedAuditLogs.Contains(x.Id))))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => (!_bot.guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id))))
                 {
-                    var Entry = (DiscordAuditLogGuildEntry)AuditLogEntries.First(x => !_bot.guilds[e.GuildAfter.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.GuildAfter.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogGuildEntry)AuditLogEntries.First(x => !_bot.guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
 
@@ -991,7 +991,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.ChannelsModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.ChannelsModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -1005,17 +1005,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.ChannelCreate);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
@@ -1035,7 +1035,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.ChannelsModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.ChannelsModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -1049,17 +1049,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.ChannelDelete);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
@@ -1079,7 +1079,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.ChannelsModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.ChannelsModified)
                 return;
 
             if (e.ChannelBefore?.Name == e.ChannelAfter?.Name && e.ChannelBefore?.IsNsfw == e.ChannelAfter?.IsNsfw)
@@ -1104,17 +1104,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.ChannelUpdate);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.ChannelAfter.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.ChannelAfter.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.ChannelAfter.Id && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.ChannelAfter.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
@@ -1134,7 +1134,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.InvitesModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.InvitesModified)
                 return;
 
             _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
@@ -1153,7 +1153,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLogSettings.InvitesModified)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.InvitesModified)
                 return;
 
             DiscordEmbedBuilder embed = new()
@@ -1168,17 +1168,17 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (!_bot.guilds[e.Guild.Id].ActionLogSettings.AttemptGettingMoreDetails)
+            if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
 
             for (int i = 0; i < 3; i++)
             {
                 var AuditLogEntries = await e.Guild.GetAuditLogsAsync(actionType: AuditLogActionType.InviteDelete);
 
-                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id)))
+                if (AuditLogEntries.Count > 0 && AuditLogEntries.Any(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id)))
                 {
-                    var Entry = (DiscordAuditLogInviteEntry)AuditLogEntries.First(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot.guilds[e.Guild.Id].ProcessedAuditLogs.Contains(x.Id));
-                    _bot.guilds[e.Guild.Id].ProcessedAuditLogs.Add(Entry.Id);
+                    var Entry = (DiscordAuditLogInviteEntry)AuditLogEntries.First(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
+                    _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
                     embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.UsernameWithDiscriminator}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };

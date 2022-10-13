@@ -33,16 +33,16 @@ internal class PauseCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused = !ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused;
+            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused = !ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused)
+            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused)
                 _ = conn.PauseAsync();
             else
                 _ = conn.ResumeAsync();
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].Lavalink.IsPaused ? "`Paused playback.`" : "`Resumed playback.`"),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? "`Paused playback.`" : "`Resumed playback.`"),
             }.SetSuccess(ctx));
         });
     }

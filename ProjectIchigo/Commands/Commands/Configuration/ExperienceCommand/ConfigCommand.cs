@@ -18,8 +18,8 @@ internal class ConfigCommand : BaseCommand
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            var ToggleExperienceSystem = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience System", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
-            var ToggleBumperBoost = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience Boost for Bumpers", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
+            var ToggleExperienceSystem = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience System", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
+            var ToggleBumperBoost = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Experience.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience Boost for Bumpers", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
 
             await RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent>
@@ -41,14 +41,14 @@ internal class ConfigCommand : BaseCommand
 
             if (e.Result.Interaction.Data.CustomId == ToggleExperienceSystem.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.UseExperience = !ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.UseExperience;
+                ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience = !ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.Result.Interaction.Data.CustomId == ToggleBumperBoost.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder = !ctx.Bot.guilds[ctx.Guild.Id].ExperienceSettings.BoostXpForBumpReminder;
+                ctx.Bot.guilds[ctx.Guild.Id].Experience.BoostXpForBumpReminder = !ctx.Bot.guilds[ctx.Guild.Id].Experience.BoostXpForBumpReminder;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

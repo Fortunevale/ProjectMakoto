@@ -30,7 +30,7 @@ internal class TokenLeakEvents
         if (e.WebhookMessage || guild is null)
             return;
 
-        if (!_bot.guilds[guild.Id].TokenLeakDetectionSettings.DetectTokens)
+        if (!_bot.guilds[guild.Id].TokenLeakDetection.DetectTokens)
             return;
 
         var matchCollection = RegexTemplates.Token.Matches(e.Content);

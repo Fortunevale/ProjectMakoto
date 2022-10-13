@@ -11,9 +11,9 @@ internal class ConfigCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.ToList())
+            foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.ToList())
                 if (!ctx.Guild.Channels.ContainsKey(b))
-                    ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(b);
+                    ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
@@ -21,7 +21,7 @@ internal class ConfigCommand : BaseCommand
             }.SetAwaitingInput(ctx, "Auto Crosspost");
 
             var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-            var ExcludeBots = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Exclude Bots", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
+            var ExcludeBots = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Exclude Bots", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
             var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
             var RemoveButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove channel", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
 
@@ -49,7 +49,7 @@ internal class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.ExcludeBots = !ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.ExcludeBots;
+                ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots = !ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -57,7 +57,7 @@ internal class ConfigCommand : BaseCommand
             else if (Button.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
             {
 
-                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting), false);
+                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.DelayBeforePosting), false);
 
                 if (ModalResult.TimedOut)
                 {
@@ -89,7 +89,7 @@ internal class ConfigCommand : BaseCommand
                     throw ModalResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.DelayBeforePosting = Convert.ToInt32(ModalResult.Result.TotalSeconds);
+                ctx.Bot.guilds[ctx.Guild.Id].Crosspost.DelayBeforePosting = Convert.ToInt32(ModalResult.Result.TotalSeconds);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -98,7 +98,7 @@ internal class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 50)
+                if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count >= 50)
                 {
                     embed.Description = $"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
                     embed = embed.SetError(ctx, "Auto Crosspost");
@@ -141,7 +141,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count >= 50)
+                if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count >= 50)
                 {
                     await RespondOrEdit(embed.WithDescription($"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}").SetError(ctx, "Auto Crosspost"));
                     await Task.Delay(5000);
@@ -149,8 +149,8 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                if (!ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelResult.Result.Id))
-                    ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Add(ChannelResult.Result.Id);
+                if (!ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Contains(ChannelResult.Result.Id))
+                    ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Add(ChannelResult.Result.Id);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -160,7 +160,7 @@ internal class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Count == 0)
+                if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count == 0)
                 {
                     await RespondOrEdit(embed.WithDescription($"`No Crosspost Channels are set up.`").SetError(ctx, "Auto Crosspost"));
                     await Task.Delay(5000);
@@ -168,7 +168,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                var ChannelResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels
+                var ChannelResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels
                         .Select(x => new DiscordSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                 if (ChannelResult.TimedOut)
@@ -188,8 +188,8 @@ internal class ConfigCommand : BaseCommand
 
                 ulong ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Contains(ChannelToRemove))
-                    ctx.Bot.guilds[ctx.Guild.Id].CrosspostSettings.CrosspostChannels.Remove(ChannelToRemove);
+                if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Contains(ChannelToRemove))
+                    ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Remove(ChannelToRemove);
 
                 await ExecuteCommand(ctx, arguments);
                 return;

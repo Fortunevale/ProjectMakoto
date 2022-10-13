@@ -15,9 +15,9 @@ internal class InviteTrackerEvents
 
         var Invites = await guild.GetInvitesAsync();
 
-        _bot.guilds[guild.Id].InviteTrackerSettings.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToList();
+        _bot.guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToList();
 
-        _logger.LogDebug($"Fetched {_bot.guilds[guild.Id].InviteTrackerSettings.Cache.Count} invites for {guild.Id}");
+        _logger.LogDebug($"Fetched {_bot.guilds[guild.Id].InviteTracker.Cache.Count} invites for {guild.Id}");
     }
 
 
@@ -26,7 +26,7 @@ internal class InviteTrackerEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)
+            if (!_bot.guilds[e.Guild.Id].InviteTracker.Enabled)
                 return;
 
             await UpdateCachedInvites(_bot, e.Guild);
@@ -37,7 +37,7 @@ internal class InviteTrackerEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)
+            if (!_bot.guilds[e.Guild.Id].InviteTracker.Enabled)
                 return;
 
             await UpdateCachedInvites(_bot, e.Guild);
@@ -48,7 +48,7 @@ internal class InviteTrackerEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)
+            if (!_bot.guilds[e.Guild.Id].InviteTracker.Enabled)
                 return;
 
             await UpdateCachedInvites(_bot, e.Guild);
@@ -59,7 +59,7 @@ internal class InviteTrackerEvents
     {
         Task.Run(async () =>
         {
-            if (!_bot.guilds[e.Guild.Id].InviteTrackerSettings.Enabled)
+            if (!_bot.guilds[e.Guild.Id].InviteTracker.Enabled)
                 return;
 
             _logger.LogDebug($"User {e.Member.Id} joined {e.Guild.Id}, trying to track invite used..");
@@ -67,12 +67,12 @@ internal class InviteTrackerEvents
             List<InviteTrackerCacheItem> InvitesBefore = new();
             List<InviteTrackerCacheItem> InvitesAfter = new();
 
-            foreach (var b in _bot.guilds[e.Guild.Id].InviteTrackerSettings.Cache)
+            foreach (var b in _bot.guilds[e.Guild.Id].InviteTracker.Cache)
                 InvitesBefore.Add(b);
 
             await UpdateCachedInvites(_bot, e.Guild);
 
-            foreach (var b in _bot.guilds[e.Guild.Id].InviteTrackerSettings.Cache)
+            foreach (var b in _bot.guilds[e.Guild.Id].InviteTracker.Cache)
                 InvitesAfter.Add(b);
 
             foreach (var b in InvitesBefore)
