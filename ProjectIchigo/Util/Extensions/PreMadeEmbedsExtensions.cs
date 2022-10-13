@@ -246,7 +246,7 @@ internal static class PreMadeEmbedsExtensions
                          .Replace("Int64", "Number")
                          .Replace("String", "Text");
         }
-        return Usage;
+        return Usage.SanitizeForCode();
     }
 
     public static string GenerateAliases(this IReadOnlyList<string> aliases) => $"{(aliases.Count > 0 ? $" (Aliases: `{string.Join("`, `", aliases)}`)" : "")}";
