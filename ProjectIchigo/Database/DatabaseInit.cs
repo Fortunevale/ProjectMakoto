@@ -136,6 +136,10 @@ internal class DatabaseInit
             else
                 DbGuild.MusicModule = new(DbGuild);
 
+            DbGuild.Polls = new(DbGuild, _bot);
+            foreach (var c in JsonConvert.DeserializeObject<List<PollEntry>>(b.polls) ?? new())
+                DbGuild.Polls.RunningPolls.Add(c);
+
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelRewardEntry>>(b.levelrewards) ?? new();
             DbGuild.ActionLog.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.auditlogcache) ?? new();
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>(b.reactionroles) ?? new();

@@ -305,6 +305,9 @@ public class TableDefinitions
         public LongText lavalink_queue { get; set; }
 
         [Collation("utf8_unicode_ci")]
+        public LongText polls { get; set; }
+
+        [Collation("utf8_unicode_ci")]
         public LongText crosspost_ratelimits { get; set; }
     }
 

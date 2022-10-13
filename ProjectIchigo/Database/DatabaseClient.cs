@@ -452,6 +452,7 @@ internal class DatabaseClient
                 lavalink_shuffle = x.Value.MusicModule.Shuffle,
                 lavalink_repeat = x.Value.MusicModule.Repeat,
                 lavalink_queue = JsonConvert.SerializeObject(x.Value.MusicModule.SongQueue),
+                polls = JsonConvert.SerializeObject(x.Value.Polls.RunningPolls),
             }).ToList()));
         }
         catch (Exception ex)
