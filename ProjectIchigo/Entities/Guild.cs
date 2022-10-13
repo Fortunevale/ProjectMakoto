@@ -171,7 +171,7 @@ public class Guild
                 if (!RunningPolls.Any(x => x.ComponentUUID == uuid))
                 {
                     DeleteScheduleTask(b.Key);
-                    _logger.LogDebug($"Deleted scheduled task for reminder by '{ServerId}'");
+                    _logger.LogDebug($"Deleted scheduled task for poll by '{ServerId}'");
                 }
             }
 
