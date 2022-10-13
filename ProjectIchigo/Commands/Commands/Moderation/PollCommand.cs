@@ -18,9 +18,9 @@ internal class PollCommand : BaseCommand
             }
 
             DiscordRole SelectedRole = null;
-            DiscordChannel SelectedChannel = null;
+            DiscordChannel SelectedChannel = ctx.Channel;
 
-            DateTime? selectedDueDate = null;
+            DateTime? selectedDueDate = DateTime.UtcNow.AddMinutes(5);
             string SelectedPrompt = null;
             List<DiscordSelectComponentOption> SelectedOptions = new();
 
@@ -36,7 +36,7 @@ internal class PollCommand : BaseCommand
                     await Task.Delay(5000);
                 }
 
-                if (SelectedMin < 1 || SelectedMax > 20)
+                if (SelectedMin < 1 || SelectedMax > 20 || SelectedMin > SelectedMax)
                 {
                     SelectedMin = 1;
                     SelectedMax = 20;
@@ -44,7 +44,7 @@ internal class PollCommand : BaseCommand
                     await Task.Delay(5000);
                 }
 
-                var SelectRoleButton = new DiscordButtonComponent((SelectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Role", false, DiscordEmoji.FromUnicode("👥").ToComponent());
+                var SelectRoleButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Select Role", false, DiscordEmoji.FromUnicode("👥").ToComponent());
                 var SelectChannelButton = new DiscordButtonComponent((SelectedChannel is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Channel", false, DiscordEmoji.FromUnicode("📢").ToComponent());
 
                 var SelectPromptButton = new DiscordButtonComponent((SelectedPrompt.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Poll Content", false, DiscordEmoji.FromUnicode("❓").ToComponent());
@@ -52,18 +52,18 @@ internal class PollCommand : BaseCommand
                 var AddOptionButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add new option", (SelectedOptions.Count >= 20), DiscordEmoji.FromUnicode("➕").ToComponent());
                 var RemoveOptionButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove option", (SelectedOptions.Count <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
                 var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Due Date & Time", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-                var SelectMultiSelectButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set Multi Select Limits", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💠")));
+                var SelectMultiSelectButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Set Multi Select Limits", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💠")));
 
                 var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (SelectedChannel is null || SelectedPrompt.IsNullOrWhiteSpace() || !SelectedOptions.IsNotNullAndNotEmpty() || SelectedOptions.Count < 2 || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
             
                 var embed = new DiscordEmbedBuilder()
                     .WithDescription($"`Poll Content     `: {(SelectedPrompt.IsNullOrWhiteSpace() ? "`Not yet selected.`" : $"{SelectedPrompt.Sanitize()}")}\n" +
                                      $"`Available Options`: {(!SelectedOptions.IsNotNullAndNotEmpty() ? "`No options set.`" : $"{string.Join(", ", SelectedOptions.Select(x => $"`{x.Label.TruncateWithIndication(10)}`"))}")}\n\n" +
-                                     $"`Minimum Votes    `: `{SelectedMin}`\n" +
-                                     $"`Maximum Votes    `: `{SelectedMax}`\n" +
+                                     $"`Selected Channel `: {(SelectedChannel is null ? "`Not yet selected.`" : SelectedChannel.Mention)}\n" +
                                      $"`Due Time & Time  `: {(selectedDueDate is null ? "`Not yet selected.`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}\n" +
                                      $"`Role to mention  `: {(SelectedRole is null ? "`No Role selected`" : SelectedRole.Mention)}\n" +
-                                     $"`Selected Channel `: {(SelectedChannel is null ? "`Not yet selected.`" : SelectedChannel.Mention)}")
+                                     $"`Minimum Votes    `: `{SelectedMin}`\n" +
+                                     $"`Maximum Votes    `: `{SelectedMax}`")
                     .SetAwaitingInput(ctx);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -333,19 +333,22 @@ internal class PollCommand : BaseCommand
                     }
 
                     var select = new DiscordSelectComponent("Vote on this poll..", SelectedOptions.Take(20), Guid.NewGuid().ToString(), (SelectedMin >= SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() - 1 : SelectedMin), (SelectedMax > SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() : SelectedMax));
+                    var endearly = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "End this poll early", false, DiscordEmoji.FromUnicode("🗑").ToComponent());
+                    var polltxt = $"{SelectedPrompt.Sanitize()}";
 
                     var msg = await SelectedChannel.SendMessageAsync(new DiscordMessageBuilder()
                         .WithContent(SelectedRole is null ? "" : SelectedRole.Mention)
                         .WithEmbed(new DiscordEmbedBuilder().SetAwaitingInput(ctx, "Poll")
-                            .WithDescription($"**{SelectedPrompt.Sanitize()}**\n\n" +
-                            $"_This poll will end {selectedDueDate.Value.ToTimestamp()}._"))
-                        .AddComponents(select));
+                            .WithDescription($"> **{polltxt}**\n\n_This poll will end {selectedDueDate.Value.ToTimestamp()}._\n\n`0 Total Votes`"))
+                        .AddComponents(select).AddComponents(endearly));
 
                     ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Add(new PollEntry
                     {
+                        PollText = polltxt,
                         ChannelId = SelectedChannel.Id,
                         MessageId = msg.Id,
-                        ComponentUUID = select.CustomId,
+                        SelectUUID = select.CustomId,
+                        EndEarlyUUID = endearly.CustomId,
                         Votes = new(),
                         DueTime = selectedDueDate.Value,
                         Options = SelectedOptions.ToDictionary(x => x.Value, y => y.Label)
