@@ -3,6 +3,19 @@ public class UtilityAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
+
+    [SlashCommand("help", "Sends you a list of all available commands, their usage and their description.")]
+    public async Task Help(InteractionContext ctx, [Option("command", "The command to show help for")] string command = "")
+    {
+        Task.Run(async () =>
+        {
+            await new HelpCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "command", command }
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+
     [SlashCommand("user-info", "Displays information the bot knows about you or the mentioned user.", dmPermission: false)]
     public async Task UserInfo(InteractionContext ctx, [Option("User", "The User")]DiscordUser victim = null)
     {
