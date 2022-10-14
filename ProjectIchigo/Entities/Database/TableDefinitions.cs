@@ -307,6 +307,11 @@ public class TableDefinitions
         [Collation("utf8_unicode_ci")]
         public LongText polls { get; set; }
 
+        public BigInt vccreator_channelid { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public LongText vccreator_channellist { get; set; }
+
         [Collation("utf8_unicode_ci")]
         public LongText crosspost_ratelimits { get; set; }
     }

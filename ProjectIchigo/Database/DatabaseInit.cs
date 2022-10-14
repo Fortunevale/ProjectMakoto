@@ -140,6 +140,14 @@ internal class DatabaseInit
             foreach (var c in JsonConvert.DeserializeObject<List<PollEntry>>(b.polls) ?? new())
                 DbGuild.Polls.RunningPolls.Add(c);
 
+            DbGuild.VcCreator = new(DbGuild, _bot)
+            {
+                Channel = b.vccreator_channelid
+            };
+
+            foreach (var c in JsonConvert.DeserializeObject<Dictionary<ulong, VcCreatorDetails>>(b.vccreator_channellist) ?? new())
+                DbGuild.VcCreator.CreatedChannels.Add(c);
+
             DbGuild.LevelRewards = JsonConvert.DeserializeObject<List<LevelRewardEntry>>(b.levelrewards) ?? new();
             DbGuild.ActionLog.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.auditlogcache) ?? new();
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>(b.reactionroles) ?? new();
