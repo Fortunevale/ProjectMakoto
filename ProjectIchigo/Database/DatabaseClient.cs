@@ -583,6 +583,19 @@ internal class DatabaseClient
 
         try
         {
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "invitenotes", _bot.globalNotes.Select(x => new TableDefinitions.invitenotes
+            {
+                id = x.Key,
+                notes = JsonConvert.SerializeObject(x.Value),
+            }).ToList()));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the invitenotes table", ex);
+        }
+
+        try
+        {
             syncs_running.Add(SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
             {
                 messageid = x.Key,

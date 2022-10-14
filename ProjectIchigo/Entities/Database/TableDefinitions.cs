@@ -75,6 +75,15 @@ public class TableDefinitions
         public LongText notes { get; set; }
     }
 
+    public class invitenotes
+    {
+        [Primary]
+        public BigInt id { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public LongText notes { get; set; }
+    }
+
     public class submission_user_bans
     {
         [Primary]

@@ -241,9 +241,15 @@ internal class DatabaseInit
         _logger.LogDebug($"Loaded {_bot.globalBans.Count} global bans");
 
 
-        IEnumerable<TableDefinitions.globalnotes> globalnotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalnotes>(_bot.databaseClient._helper.GetLoadCommand("globalnotes"));
+        IEnumerable<TableDefinitions.globalnotes> invitenotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalnotes>(_bot.databaseClient._helper.GetLoadCommand("globalnotes"));
 
-        foreach (var b in globalnotes)
+        foreach (var b in invitenotes)
+            _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<InviteNotesDetails>>(b.notes) ?? new());
+        _logger.LogDebug($"Loaded {_bot.globalBans.Count} global notes");
+
+        IEnumerable<TableDefinitions.invitenotes> invitenotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.invitenotes>(_bot.databaseClient._helper.GetLoadCommand("invitenotes"));
+
+        foreach (var b in invitenotes)
             _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<GlobalBanDetails>>(b.notes) ?? new());
         _logger.LogDebug($"Loaded {_bot.globalBans.Count} global notes");
 
