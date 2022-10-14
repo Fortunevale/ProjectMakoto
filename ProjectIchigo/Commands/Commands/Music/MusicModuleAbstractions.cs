@@ -46,7 +46,7 @@ internal class MusicModuleAbstractions
                 
             var AndIndex = load.IndexOf("&");
 
-            if (!load.Contains('?'))
+            if (!load.Contains('?') && AndIndex != -1)
             {
                 load = load.Remove(AndIndex, 1);
                 load = load.Insert(AndIndex, "?");
