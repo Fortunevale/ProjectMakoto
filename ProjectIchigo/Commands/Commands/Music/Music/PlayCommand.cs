@@ -19,6 +19,21 @@ internal class PlayCommand : BaseCommand
                 return;
             }
 
+            var embed = new DiscordEmbedBuilder
+            {
+                Description = $"`Preparing connection..`",
+            }.SetLoading(ctx);
+            await RespondOrEdit(embed);
+
+            try
+            {
+                await new JoinCommand().ExecuteCommand(ctx, null);
+            }
+            catch (CancelException)
+            {
+                return;
+            }
+
             var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
 
             var embed = new DiscordEmbedBuilder
