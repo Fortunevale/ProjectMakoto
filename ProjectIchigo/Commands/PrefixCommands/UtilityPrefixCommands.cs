@@ -8,95 +8,15 @@ public class UtilityPrefixCommands : BaseCommandModule
 
     [Command("help"),
     CommandModule("utility"),
-    Description("Sends you a list of all available commands, their usage and their description via Direct Messages.")]
-    public async Task Help(CommandContext ctx)
+    Description("Sends you a list of all available commands, their usage and their description.")]
+    public async Task Help(CommandContext ctx, [Description("Command")]string command = "")
     {
         Task.Run(async () =>
         {
-            if (await _bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-                return;
-
-            List<KeyValuePair<string, string>> Commands = new();
-
-
-            foreach (var command in ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()))
+            await new HelpCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
-                if (command.Value.CustomAttributes.OfType<CommandModuleAttribute>() is null)
-                    continue;
-
-                var module = command.Value.CustomAttributes.OfType<CommandModuleAttribute>().FirstOrDefault().ModuleString;
-
-                switch (module)
-                {
-                    case "admin":
-                        if (!ctx.Member.IsAdmin(_bot.status))
-                            continue;
-                        break;
-                    case "maintenance":
-                        if (!ctx.Member.IsMaintenance(_bot.status))
-                            continue;
-                        break;
-                    case "hidden":
-                        continue;
-                    default:
-                        break;
-                }
-
-                Commands.Add(new KeyValuePair<string, string>($"{module.FirstLetterToUpper()} Commands", $"`{ctx.Prefix}{command.Value.GenerateUsage()}` - _{command.Value.Description}{command.Value.Aliases.GenerateAliases()}_"));
-            }
-
-            var Fields = Commands.PrepareEmbedFields();
-            var Embeds = Fields.Select(x => new KeyValuePair<string, string>(x.Key, x.Value
-                .Replace("##Prefix##", ctx.Prefix)
-                .Replace("##n##", "\n")))
-                .ToList().PrepareEmbeds("", "All available commands will be listed below.\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n" +
-                                            "**Do not include the brackets when using commands, they're merely an indicator for requirement.**");
-
-            try
-            {
-                foreach (var b in Embeds)
-                    await ctx.Member.SendMessageAsync(embed: b.WithAuthor(ctx.Guild.Name, "", ctx.Guild.IconUrl).WithFooter(ctx.GenerateUsedByFooter().Text, ctx.GenerateUsedByFooter().IconUrl).WithTimestamp(DateTime.UtcNow).WithColor(EmbedColors.Info).Build());
-
-                var successembed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Description = ":mailbox_with_mail: `You got mail! Please check your dm's.`",
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Color = EmbedColors.Success
-                };
-
-                await ctx.Channel.SendMessageAsync(embed: successembed);
-            }
-            catch (DisCatSharp.Exceptions.UnauthorizedException)
-            {
-                var errorembed = new DiscordEmbedBuilder
-                {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor
-                    {
-                        Name = ctx.Guild.Name,
-                        IconUrl = ctx.Guild.IconUrl
-                    },
-                    Description = "`It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
-                    Footer = ctx.GenerateUsedByFooter(),
-                    Timestamp = DateTime.UtcNow,
-                    Color = EmbedColors.Error,
-                    ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
-                };
-
-                if (ctx.User.Presence.ClientStatus.Mobile.HasValue)
-                    errorembed.ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif";
-
-                await ctx.Channel.SendMessageAsync(embed: errorembed);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+                { "command", command }
+            });
         }).Add(_bot.watcher, ctx);
     }
 
@@ -120,7 +40,7 @@ public class UtilityPrefixCommands : BaseCommandModule
     [Command("guild-info"),
     CommandModule("utility"),
     Description("Displays information this or the mentioned guild.")]
-    public async Task GuildInfo(CommandContext ctx, ulong? guildId = null)
+    public async Task GuildInfo(CommandContext ctx, [Description("GuildId")] ulong? guildId = null)
     {
         Task.Run(async () =>
         {

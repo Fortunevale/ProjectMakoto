@@ -19,6 +19,8 @@ internal class PlayCommand : BaseCommand
                 return;
             }
 
+            var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
+
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Preparing connection..`",
@@ -46,7 +48,7 @@ internal class PlayCommand : BaseCommand
             {
                 return;
             }
-
+            
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
             if (!Continue || !Tracks.IsNotNullAndNotEmpty())
