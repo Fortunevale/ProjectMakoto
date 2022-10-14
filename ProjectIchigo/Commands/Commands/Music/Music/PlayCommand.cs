@@ -36,10 +36,6 @@ internal class PlayCommand : BaseCommand
 
             var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Preparing connection..`",
-            }.SetLoading(ctx);
             await RespondOrEdit(embed);
 
             try
