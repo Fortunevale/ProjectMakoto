@@ -4,7 +4,7 @@
     {
         internal static string GetCurrentConfiguration(SharedCommandContext ctx)
         {
-            return $"`Invite Notes Enabled: {ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.InviteNotesEnabled.ToEmote(ctx.Client)}";
+            return $"Invite Notes:\n{string.Join('\n', ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => $"{x.Key}: {x.Value.Note}"))}";
         }
     }
 }

@@ -10,8 +10,8 @@
         private Guild Parent { get; set; }
 
 
-        private List<InviteNotesDetails> _Notes { get; set; } = new();
-        public List<InviteNotesDetails> Notes
+        private Dictionary<string, InviteNotesDetails> _Notes { get; set; } = new();
+        public Dictionary<string, InviteNotesDetails> Notes
         {
             get => _Notes;
             set
