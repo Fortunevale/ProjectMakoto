@@ -78,6 +78,18 @@ public class VcCreatorSettings
                                     await (await e.User.ConvertToMember(cachedGuild)).DisconnectFromVoiceAsync();
                                     return;
                                 }
+
+                                if (e.Before?.Channel?.Id != e.After?.Channel?.Id)
+                                {
+                                    if (e.After?.Channel?.Id == b.Key)
+                                    {
+                                        await e.Channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"{e.User.Mention} `joined.`").WithColor(EmbedColors.Success).WithAuthor(AuditLogIcons.UserAdded));
+                                    }
+                                    else
+                                    {
+                                        await e.Channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"{e.User.Mention} `left.`").WithColor(EmbedColors.Error).WithAuthor(AuditLogIcons.UserLeft));
+                                    }
+                                }
                             }
                         }).Add(_bot.watcher);
                     }
