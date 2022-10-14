@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Entities
 {
-    internal class InviteNotesDetails
+    public class InviteNotesDetails
     {
         public string Invite { get; set; }
 

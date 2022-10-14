@@ -437,6 +437,7 @@ internal class DatabaseClient
 
                 invitetracker_enabled = x.Value.InviteTracker.Enabled,
                 invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTracker.Cache),
+                invitenotes = JsonConvert.SerializeObject(x.Value.InviteNotes.Notes),
 
                 autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
 
@@ -566,32 +567,6 @@ internal class DatabaseClient
         catch (Exception ex)
         {
             _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
-        }
-
-        try
-        {
-            syncs_running.Add(SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
-            {
-                id = x.Key,
-                notes = JsonConvert.SerializeObject(x.Value),
-            }).ToList()));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
-        }
-
-        try
-        {
-            syncs_running.Add(SyncTable(mainDatabaseConnection, "invitenotes", _bot.globalNotes.Select(x => new TableDefinitions.invitenotes
-            {
-                id = x.Key,
-                notes = JsonConvert.SerializeObject(x.Value),
-            }).ToList()));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"An exception occurred while trying to update the invitenotes table", ex);
         }
 
         try

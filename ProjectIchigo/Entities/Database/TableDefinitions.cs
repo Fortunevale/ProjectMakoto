@@ -66,15 +66,6 @@ public class TableDefinitions
         public BigInt timestamp { get; set; }
     }
 
-    public class globalnotes
-    {
-        [Primary]
-        public BigInt id { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public LongText notes { get; set; }
-    }
-
     public class invitenotes
     {
         [Primary]
@@ -317,6 +308,9 @@ public class TableDefinitions
         public LongText polls { get; set; }
 
         [Collation("utf8_unicode_ci")]
+        public LongText invitenotes { get; set; }
+
+        [Collation("utf8_unicode_ci")]
         public LongText crosspost_ratelimits { get; set; }
     }
 
@@ -360,7 +354,6 @@ public class TableDefinitions
         typeof(banned_guilds),
 
         typeof(globalbans),
-        typeof(globalnotes),
 
         typeof(submission_user_bans),
         typeof(submission_guild_bans),

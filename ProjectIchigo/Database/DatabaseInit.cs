@@ -105,6 +105,11 @@ internal class DatabaseInit
                 Cache = JsonConvert.DeserializeObject<List<InviteTrackerCacheItem>>(b.invitetracker_cache) ?? new()
             };
 
+            DbGuild.InviteNotes = new(DbGuild)
+            {
+                Notes = JsonConvert.DeserializeObject<List<InviteNotesDetails>>(b.invitenotes) ?? new()
+            };
+
             DbGuild.InVoiceTextPrivacy = new(DbGuild)
             {
                 ClearTextEnabled = b.vc_privacy_clear,
@@ -239,20 +244,6 @@ internal class DatabaseInit
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
         _logger.LogDebug($"Loaded {_bot.globalBans.Count} global bans");
-
-
-        IEnumerable<TableDefinitions.globalnotes> invitenotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalnotes>(_bot.databaseClient._helper.GetLoadCommand("globalnotes"));
-
-        foreach (var b in invitenotes)
-            _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<InviteNotesDetails>>(b.notes) ?? new());
-        _logger.LogDebug($"Loaded {_bot.globalBans.Count} global notes");
-
-        IEnumerable<TableDefinitions.invitenotes> invitenotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.invitenotes>(_bot.databaseClient._helper.GetLoadCommand("invitenotes"));
-
-        foreach (var b in invitenotes)
-            _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<GlobalBanDetails>>(b.notes) ?? new());
-        _logger.LogDebug($"Loaded {_bot.globalBans.Count} global notes");
-
 
         IEnumerable<TableDefinitions.banned_users> banned_users = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.banned_users>(_bot.databaseClient._helper.GetLoadCommand("banned_users"));
 

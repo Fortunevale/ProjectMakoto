@@ -10,15 +10,14 @@
         private Guild Parent { get; set; }
 
 
-
-        private bool _InviteNotesEnabled { get; set; } = false;
-        public bool InviteNotesEnabled
+        private List<InviteNotesDetails> _Notes { get; set; } = new();
+        public List<InviteNotesDetails> Notes
         {
-            get => _InviteNotesEnabled;
+            get => _Notes;
             set
             {
-                _InviteNotesEnabled = value;
-                _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "invitenotes", value, Bot.DatabaseClient.mainDatabaseConnection);
+                _Notes = value;
+                _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "invitenotes", JsonConvert.SerializeObject(value), Bot.DatabaseClient.mainDatabaseConnection);
             }
         }
     }

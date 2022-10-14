@@ -1,6 +1,4 @@
-﻿using ProjectIchigo.Entities.Guild;
-
-namespace ProjectIchigo.Entities;
+﻿namespace ProjectIchigo.Entities;
 
 public class Guild
 {
