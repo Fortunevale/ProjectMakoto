@@ -35,7 +35,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
         }
         
         [Command("raw-guild"), Description("RawGuild Entry")]
-        public async Task RawGuild(CommandContext ctx, [Description("GuildId")] ulong? guild = null)
+        public async Task RawGuild(CommandContext ctx, ulong? guild = null)
         {
             Task.Run(async () =>
             {
