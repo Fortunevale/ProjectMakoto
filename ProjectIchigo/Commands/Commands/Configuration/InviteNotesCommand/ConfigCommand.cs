@@ -137,7 +137,7 @@ internal class ConfigCommand : BaseCommand
             }
             else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
             {
-                var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordSelectComponentOption(x.Key, $"Note: {x.Value.Note.TruncateWithIndication(50)}")).ToList());
+                var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
