@@ -76,7 +76,10 @@ internal class ActionlogEvents
                 }
 
                 embed.Description += $"\n\n**Invited by**: <@{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
-                embed.Description += $"**Invited Code**: `{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
+                embed.Description += $"**Invite Code**: `{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
+
+                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code))
+                    embed.Description += $"**Invite Note**: `{_bot.guilds[e.Guild.Id].InviteNotes.Notes[_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code].Note.SanitizeForCode()}`";
 
                 _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
             });

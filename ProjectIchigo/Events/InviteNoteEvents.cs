@@ -11,7 +11,10 @@ internal class InviteNoteEvents
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(e.Invite.Code))
-            _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
+        Task.Run(async () =>
+        {
+            if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(e.Invite.Code))
+                _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
+        }).Add(_bot.watcher);
     }
 }
