@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectIchigo.Commands.Commands.Configuration.InviteNotesCommand;
+﻿namespace ProjectIchigo.Commands.InviteNotesCommand;
 
 internal class ReviewCommand : BaseCommand
 {

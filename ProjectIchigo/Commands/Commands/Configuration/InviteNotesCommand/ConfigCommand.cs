@@ -1,4 +1,4 @@
-﻿namespace ProjectIchigo.Commands.Commands.Configuration.InviteNotesCommand;
+﻿namespace ProjectIchigo.Commands.InviteNotesCommand;
 
 internal class ConfigCommand : BaseCommand
 {
