@@ -664,9 +664,9 @@ public class ConfigurationPrefixCommands : BaseCommandModule
                     return;
 
                 if (ctx.Command.Parent is not null)
-                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
                 else
-                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
             }).Add(_bot.watcher, ctx);
         }
 
