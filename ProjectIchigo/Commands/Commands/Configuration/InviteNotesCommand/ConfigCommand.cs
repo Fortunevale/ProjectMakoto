@@ -99,6 +99,8 @@ internal class ConfigCommand : BaseCommand
                     }
                     else if (Menu.Result.GetCustomId() == SelectInviteButton.CustomId)
                     {
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                         var invites = await ctx.Guild.GetInvitesAsync();
 
                         var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
@@ -123,6 +125,8 @@ internal class ConfigCommand : BaseCommand
                     }
                     else if (Menu.Result.GetCustomId() == Finish.CustomId)
                     {
+                        _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
                         ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Add(SelectedInvite.Code, new InviteNotesDetails()
                         {
                             Invite = SelectedInvite.Code,
