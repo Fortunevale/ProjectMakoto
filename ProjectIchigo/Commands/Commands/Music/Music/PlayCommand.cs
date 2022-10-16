@@ -36,6 +36,17 @@ internal class PlayCommand : BaseCommand
 
             var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
 
+            await RespondOrEdit(embed);
+
+            try
+            {
+                await new JoinCommand().ExecuteCommand(ctx, null);
+            }
+            catch (CancelException)
+            {
+                return;
+            }
+
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
             if (!Continue || !Tracks.IsNotNullAndNotEmpty())
