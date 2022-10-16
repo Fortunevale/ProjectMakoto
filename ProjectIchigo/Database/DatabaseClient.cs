@@ -571,6 +571,19 @@ internal class DatabaseClient
 
         try
         {
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
+            {
+                id = x.Key,
+                notes = JsonConvert.SerializeObject(x.Value),
+            }).ToList()));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"An exception occurred while trying to update the submission_guild_bans table", ex);
+        }
+
+        try
+        {
             syncs_running.Add(SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
             {
                 messageid = x.Key,

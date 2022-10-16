@@ -245,6 +245,12 @@ internal class DatabaseInit
             });
         _logger.LogDebug($"Loaded {_bot.globalBans.Count} global bans");
 
+        IEnumerable<TableDefinitions.globalnotes> globalnotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalnotes>(_bot.databaseClient._helper.GetLoadCommand("globalnotes"));
+
+        foreach (var b in globalnotes)
+            _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<GlobalBanDetails>>(b.notes) ?? new());
+        _logger.LogDebug($"Loaded {_bot.globalBans.Count} global notes");
+
         IEnumerable<TableDefinitions.banned_users> banned_users = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.banned_users>(_bot.databaseClient._helper.GetLoadCommand("banned_users"));
 
         foreach (var b in banned_users)
