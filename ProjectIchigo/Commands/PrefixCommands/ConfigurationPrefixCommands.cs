@@ -647,4 +647,45 @@ public class ConfigurationPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
     }
+
+    [Group("invitenotes"),
+    CommandModule("configuration"),
+    Description("Allows you to add notes to invite codes.")]
+    public class InviteNotes : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("review"), Description("Allows you to review currently set up invite notes.")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.InviteNotesCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("config"), Description("Allows you to add and remove currently set up invite notes.")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.InviteNotesCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
 }

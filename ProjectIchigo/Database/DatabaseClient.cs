@@ -437,6 +437,7 @@ internal class DatabaseClient
 
                 invitetracker_enabled = x.Value.InviteTracker.Enabled,
                 invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTracker.Cache),
+                invitenotes = JsonConvert.SerializeObject(x.Value.InviteNotes.Notes),
 
                 autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
 

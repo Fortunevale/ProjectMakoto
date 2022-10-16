@@ -313,6 +313,9 @@ public class TableDefinitions
         public LongText vccreator_channellist { get; set; }
 
         [Collation("utf8_unicode_ci")]
+        public LongText invitenotes { get; set; }
+
+        [Collation("utf8_unicode_ci")]
         public LongText crosspost_ratelimits { get; set; }
     }
 
