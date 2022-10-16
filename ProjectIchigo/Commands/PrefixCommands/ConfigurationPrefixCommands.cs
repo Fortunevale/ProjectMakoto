@@ -651,7 +651,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("invitenotes"),
     CommandModule("configuration"),
     Description("Allows you to add notes to invite codes.")]
-    public class InviteNotes : ApplicationCommandsModule
+    public class InviteNotes : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
