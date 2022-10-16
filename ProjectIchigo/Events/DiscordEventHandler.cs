@@ -326,6 +326,7 @@ internal class DiscordEventHandler
 
             _ = actionlogEvents.InviteDeleted(sender, e);
             _ = inviteTrackerEvents.InviteDeleted(sender, e);
+            _ = inviteNoteEvents.InviteDeleted(sender, e);
         });
     }
 

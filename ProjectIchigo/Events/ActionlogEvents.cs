@@ -1173,9 +1173,6 @@ internal class ActionlogEvents
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
-            if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(e.Invite.Code))
-                _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
-
 
             if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;
