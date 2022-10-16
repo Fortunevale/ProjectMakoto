@@ -94,7 +94,7 @@ internal class ManageCommand : BaseCommand
 
                 try
                 {
-                    await new Commands.Music.JoinCommand().ExecuteCommand(ctx, null);
+                    await new Music.JoinCommand().ExecuteCommand(ctx, null);
                 }
                 catch (CancelException)
                 {

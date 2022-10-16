@@ -15,6 +15,7 @@ public class Guild
         ActionLog = new(this);
         InVoiceTextPrivacy = new(this);
         InviteTracker = new(this);
+        InviteNotes = new(this);
         NameNormalizer = new(this);
         EmbedMessage = new(this);
         MusicModule = new(this);
@@ -32,6 +33,7 @@ public class Guild
     public ActionLogSettings ActionLog { get; set; }
     public InVoiceTextPrivacySettings InVoiceTextPrivacy { get; set; }
     public InviteTrackerSettings InviteTracker { get; set; }
+    public InviteNotesSettings InviteNotes { get; set; }
     public NameNormalizerSettings NameNormalizer { get; set; }
     public EmbedMessageSettings EmbedMessage { get; set; }
     public PollSettings Polls { get; set; }
