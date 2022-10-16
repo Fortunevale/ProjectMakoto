@@ -354,6 +354,7 @@ public class TableDefinitions
         typeof(banned_guilds),
 
         typeof(globalbans),
+        typeof(globalnotes),
 
         typeof(submission_user_bans),
         typeof(submission_guild_bans),
