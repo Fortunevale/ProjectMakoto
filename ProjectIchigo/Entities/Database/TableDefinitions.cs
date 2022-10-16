@@ -66,7 +66,7 @@ public class TableDefinitions
         public BigInt timestamp { get; set; }
     }
 
-    public class invitenotes
+    public class globalnotes
     {
         [Primary]
         public BigInt id { get; set; }

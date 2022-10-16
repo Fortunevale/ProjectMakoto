@@ -107,7 +107,7 @@ internal class DatabaseInit
 
             DbGuild.InviteNotes = new(DbGuild)
             {
-                Notes = JsonConvert.DeserializeObject<List<InviteNotesDetails>>(b.invitenotes) ?? new()
+                Notes = JsonConvert.DeserializeObject<Dictionary<string, InviteNotesDetails>>(b.invitenotes) ?? new()
             };
 
             DbGuild.InVoiceTextPrivacy = new(DbGuild)

@@ -1,11 +1,10 @@
-﻿namespace ProjectIchigo.Entities
+﻿namespace ProjectIchigo.Entities;
+
+public class InviteNotesDetails
 {
-    public class InviteNotesDetails
-    {
-        public string Invite { get; set; }
+    public string Invite { get; set; }
 
-        public string Note { get; set; }
+    public string Note { get; set; }
 
-        public ulong Moderator { get; set; }
-    }
+    public ulong Moderator { get; set; }
 }

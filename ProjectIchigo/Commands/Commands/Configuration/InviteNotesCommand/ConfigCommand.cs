@@ -1,131 +1,169 @@
-﻿namespace ProjectIchigo.Commands.Commands.Configuration.InviteNotesCommand
+﻿namespace ProjectIchigo.Commands.Commands.Configuration.InviteNotesCommand;
+
+internal class ConfigCommand : BaseCommand
 {
-    internal class ConfigCommand : BaseCommand
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+
+    public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
-        public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
-
-        public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
+        return Task.Run(async () =>
         {
-            return Task.Run(async () =>
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+                return;
+
+
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add Note", false, DiscordEmoji.FromUnicode("➕").ToComponent());
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove Note", false, DiscordEmoji.FromUnicode("➖").ToComponent());
+
+            var embed = new DiscordEmbedBuilder
             {
-                if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
-                    return;
+                Description = InviteNotesCommandAbstractions.GetCurrentConfiguration(ctx)
+            }.SetInfo(ctx, "Invite Notes");
 
-
-                var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add Note", false, DiscordEmoji.FromUnicode("➕").ToComponent());
-                var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove Note", false, DiscordEmoji.FromUnicode("➖").ToComponent());
-
-                var embed = new DiscordEmbedBuilder
+            if (!(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Count > 19))
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                .AddComponents(new List<DiscordComponent>
                 {
-                    Description = InviteNotesCommandAbstractions.GetCurrentConfiguration(ctx)
-                }.SetInfo(ctx, "Invite Notes");
-
-                if (!(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Count > 19))
-                {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
-                        .AddComponents(new List<DiscordComponent>
-                        {
                     AddButton,
                     RemoveButton,
-                        }).AddComponents(MessageComponents.CancelButton));
-                }
-                else
+                }).AddComponents(MessageComponents.CancelButton));
+            }
+            else
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                    .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.CancelButton));
+            }
+
+            var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
+
+            if (e.TimedOut)
+            {
+                ModifyToTimedOut(true);
+                return;
+            }
+
+            _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+            if (e.Result.Interaction.Data.CustomId == AddButton.CustomId)
+            {
+                string? SelectedText = null;
+                DiscordInvite SelectedInvite = null;
+
+                while (true)
                 {
+                    var SelectTextButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Note", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
+                    var SelectInviteButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Invite", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Create Invite Note", (SelectedText.IsNullOrWhiteSpace() || SelectedInvite is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+
+
+                    embed = new DiscordEmbedBuilder
+                    {
+                        Description = $"`Note  `: `{(SelectedText.IsNullOrWhiteSpace() ? "Not yet selected." : SelectedText).SanitizeForCode()}`\n" +
+                                      $"`Invite`: `{(SelectedInvite is null ? $"Not yet selected." : $"{SelectedInvite.Code}")}`"
+                    }.SetAwaitingInput(ctx, "Playlists");
+
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
-                        .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.CancelButton));
+                        .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })
+                        .AddComponents(MessageComponents.CancelButton));
+
+                    var Menu = await ctx.WaitForButtonAsync();
+
+                    if (Menu.TimedOut)
+                    {
+                        ModifyToTimedOut();
+                        return;
+                    }
+
+                    if (Menu.Result.GetCustomId() == SelectTextButton.CustomId)
+                    {
+                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, new DiscordInteractionModalBuilder()
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 128, true)), false);
+
+                        if (ModalResult.TimedOut)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
+                        }
+                        else if (ModalResult.Cancelled)
+                        {
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+                        else if (ModalResult.Errored)
+                        {
+                            throw ModalResult.Exception;
+                        }
+
+                        SelectedText = ModalResult.Result.Interaction.GetModalValueByCustomId("Note").Truncate(128);
+                    }
+                    else if (Menu.Result.GetCustomId() == SelectInviteButton.CustomId)
+                    {
+                        var invites = await ctx.Guild.GetInvitesAsync();
+
+                        var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
+                            .Select(x => new DiscordSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.UsernameWithDiscriminator}")).ToList());
+
+                        if (SelectionResult.TimedOut)
+                        {
+                            ModifyToTimedOut(true);
+                            return;
+                        }
+                        else if (SelectionResult.Cancelled)
+                        {
+                            await ExecuteCommand(ctx, arguments);
+                            return;
+                        }
+                        else if (SelectionResult.Errored)
+                        {
+                            throw SelectionResult.Exception;
+                        }
+
+                        SelectedInvite = invites.First(x => x.Code == SelectionResult.Result);
+                    }
+                    else if (Menu.Result.GetCustomId() == Finish.CustomId)
+                    {
+                        ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Add(SelectedInvite.Code, new InviteNotesDetails()
+                        {
+                            Invite = SelectedInvite.Code,
+                            Moderator = ctx.User.Id,
+                            Note = SelectedText
+                        });
+
+                        await ExecuteCommand(ctx, arguments);
+                        return;
+                    }
                 }
+            }
+            else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+            {
+                var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordSelectComponentOption(x.Key, $"Note: {x.Value.Note.TruncateWithIndication(50)}")).ToList());
 
-                var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
-
-                if (e.TimedOut)
+                if (SelectionResult.TimedOut)
                 {
                     ModifyToTimedOut(true);
                     return;
                 }
-
-                _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
-                if (e.Result.Interaction.Data.CustomId == AddButton.CustomId)
+                else if (SelectionResult.Cancelled)
                 {
-                    var ModalResult = await PromptModalWithRetry(e.Result.Interaction, new DiscordInteractionModalBuilder().
-                        AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 128, true)), false);
-
-                    if (ModalResult.TimedOut)
-                    {
-                        ModifyToTimedOut(true);
-                        return;
-                    }
-                    else if (ModalResult.Cancelled)
-                    {
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-                    else if (ModalResult.Errored)
-                    {
-                        throw ModalResult.Exception;
-                    }
-
-                    var note = ModalResult.Result.Interaction.GetModalValueByCustomId("Note");
-
-                    var SelectionResult = await PromptCustomSelection(ctx.Guild.GetInvitesAsync().Result.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
-                    .Select(x => new DiscordSelectComponentOption(x.Code, x.CreatedAt.Ticks.ToString(), $"Uses: {x.Uses}; Creator: {x.Inviter.UsernameWithDiscriminator}")).ToList());
-
-                    if (SelectionResult.TimedOut)
-                    {
-                        ModifyToTimedOut(true);
-                        return;
-                    }
-                    else if (SelectionResult.Cancelled)
-                    {
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-                    else if (SelectionResult.Errored)
-                    {
-                        throw SelectionResult.Exception;
-                    }
-
-                    if (!ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.TryGetValue(SelectionResult.Result, out var details))
-                    {
-                        ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Add(SelectionResult.Result, new InviteNotesDetails()
-                        { Invite = SelectionResult.Result, Moderator = ctx.Guild.GetInvite(SelectionResult.Result).Inviter.Id, Note = note });
-                    }
-
                     await ExecuteCommand(ctx, arguments);
                     return;
                 }
-
-                else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+                else if (SelectionResult.Errored)
                 {
-                    var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordSelectComponentOption(x.Key, $"Note: {x.Value.Note}")).ToList());
-
-                    if (SelectionResult.TimedOut)
-                    {
-                        ModifyToTimedOut(true);
-                        return;
-                    }
-                    else if (SelectionResult.Cancelled)
-                    {
-                        await ExecuteCommand(ctx, arguments);
-                        return;
-                    }
-                    else if (SelectionResult.Errored)
-                    {
-                        throw SelectionResult.Exception;
-                    }
-
-                    ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Remove(SelectionResult.Result);
-
-                    await ExecuteCommand(ctx, arguments);
-                    return;
+                    throw SelectionResult.Exception;
                 }
 
-                else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
-                {
-                    DeleteOrInvalidate();
-                    return;
-                }
-            });
-        }
+                ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Remove(SelectionResult.Result);
+
+                await ExecuteCommand(ctx, arguments);
+                return;
+            }
+            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            {
+                DeleteOrInvalidate();
+                return;
+            }
+        });
     }
 }

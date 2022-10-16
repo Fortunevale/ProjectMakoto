@@ -1,10 +1,9 @@
-﻿namespace ProjectIchigo.Commands.Commands.Configuration.InviteNotesCommand
+﻿namespace ProjectIchigo.Commands.Commands.Configuration.InviteNotesCommand;
+
+internal class InviteNotesCommandAbstractions
 {
-    internal class InviteNotesCommandAbstractions
+    internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        internal static string GetCurrentConfiguration(SharedCommandContext ctx)
-        {
-            return $"Invite Notes:\n{string.Join('\n', ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => $"{x.Key}: {x.Value.Note}"))}";
-        }
+        return $"Invite Notes:\n{string.Join('\n', ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => $"{x.Key}: {x.Value.Note.Sanitize()}"))}";
     }
 }
