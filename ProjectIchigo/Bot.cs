@@ -23,6 +23,7 @@ public class Bot
 
     internal CountryCodes countryCodes { get; set; }
     internal LanguageCodes languageCodes { get; set; }
+    internal IReadOnlyList<string> profanityList { get; set; }
 
     internal BumpReminder bumpReminder { get; set; }
     internal ExperienceHandler experienceHandler { get; set; }
@@ -166,6 +167,9 @@ public class Bot
                     });
                 }
                 _logger.LogDebug($"Loaded {languageCodes.List.Count} languages");
+
+                profanityList = JsonConvert.DeserializeObject<List<string>>(await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/zacanger/profane-words/master/words.json"));
+                _logger.LogDebug($"Loaded {profanityList.Count} profanity words");
 
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));

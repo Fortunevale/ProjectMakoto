@@ -281,4 +281,118 @@ public class UtilityPrefixCommands : BaseCommandModule
             await new CreditsCommand().ExecuteCommand(ctx, _bot);
         }).Add(_bot.watcher, ctx);
     }
+
+
+    [Group("vcc"),
+    CommandModule("utility"),
+    Description("Allows you to modify your own voice channel.")]
+    public class VcCreatorManagement : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("open"), Description("Opens your channel so new users can freely join.")]
+        public async Task Open(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.OpenCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("close"), Description("Closes your channel. You have to invite people for them to join.")]
+        public async Task Close(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.CloseCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("name"), Description("Changes the name of your channel.")]
+        public async Task Name(CommandContext ctx, [RemainingText]string newName)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.NameCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "newName", newName },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("limit"), Description("Changes the user limit of your channel.")]
+        public async Task Limit(CommandContext ctx, uint newLimit)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.LimitCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "newLimit", newLimit },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("invite"), Description("Invites a new person to your channel.")]
+        public async Task Invite(CommandContext ctx, DiscordMember victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.InviteCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("kick"), Description("Kicks person from your channel.")]
+        public async Task Kick(CommandContext ctx, DiscordMember victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.KickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("ban"), Description("Bans person from your channel.")]
+        public async Task Ban(CommandContext ctx, DiscordMember victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.BanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+        
+        [Command("unban"), Description("Unbans person from your channel.")]
+        public async Task Unban(CommandContext ctx, DiscordMember victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.UnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+    }
 }

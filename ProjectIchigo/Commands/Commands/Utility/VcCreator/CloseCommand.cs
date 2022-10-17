@@ -1,6 +1,6 @@
 ﻿namespace ProjectIchigo.Commands.VcCreator;
 
-internal class OpenCommand : BaseCommand
+internal class CloseCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -23,8 +23,8 @@ internal class OpenCommand : BaseCommand
                 return;
             }
 
-            await channel.ModifyAsync(x => x.PermissionOverwrites = channel.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.UseVoice, Permissions.None));
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel has been opened.`").AsSuccess(ctx));
+            await channel.ModifyAsync(x => x.PermissionOverwrites = channel.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.None, Permissions.UseVoice));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel has been closed.`").AsSuccess(ctx));
         });
     }
 }

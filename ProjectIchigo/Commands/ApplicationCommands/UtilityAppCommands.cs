@@ -191,6 +191,102 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
+    [SlashCommandGroup("vcc", "Allows you to modify your own voice channel.", dmPermission: false)]
+    public class VcCreatorManagement : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("open", "Opens your channel so new users can freely join.")]
+        public async Task Open(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.OpenCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("close", "Closes your channel. You have to invite people for them to join.")]
+        public async Task Close(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.CloseCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("name", "Changes the name of your channel.")]
+        public async Task Name(InteractionContext ctx, [Option("name", "Name")] string newName = "")
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.NameCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "newName", newName },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("limit", "Changes the user limit of your channel.")]
+        public async Task Limit(InteractionContext ctx, [Option("limit", "Limit"), MaximumValue(99), MinimumValue(0)]int newLimit)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.LimitCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "newLimit", newLimit.ToUInt32() },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("invite", "Invites a new person to your channel.")]
+        public async Task Invite(InteractionContext ctx, [Option("user", "User")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.InviteCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", await victim.ConvertToMember(ctx.Guild) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("kick", "Kicks person from your channel.")]
+        public async Task Kick(InteractionContext ctx, [Option("user", "User")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.KickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", await victim.ConvertToMember(ctx.Guild) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("ban", "Bans person from your channel.")]
+        public async Task Ban(InteractionContext ctx, [Option("user", "User")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.BanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", await victim.ConvertToMember(ctx.Guild) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("unban", "Unbans person from your channel.")]
+        public async Task Unban(InteractionContext ctx, [Option("user", "User")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.UnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", await victim.ConvertToMember(ctx.Guild) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+    }
+
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
     public async Task EmojiStealer(ContextMenuContext ctx)
     {

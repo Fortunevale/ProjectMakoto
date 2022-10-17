@@ -29,6 +29,8 @@ public class VcCreatorSettings
 
     private ObservableDictionary<ulong, VcCreatorDetails> _CreatedChannels { get; set; } = new();
 
+    public Dictionary<ulong, DateTime> LastCreatedChannel = new();
+
     private async void CreatedChannelsUpdated(object? sender, ObservableListUpdate<KeyValuePair<ulong, VcCreatorDetails>> e)
     {
         while (!_bot.status.DiscordGuildDownloadCompleted)
@@ -55,6 +57,7 @@ public class VcCreatorSettings
             {
                 Task.Run(async () =>
                 {
+                    b.Value.EventsRegistered = true;
                     async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
                     {
                         Task.Run(async () =>
@@ -114,11 +117,11 @@ public class VcCreatorSettings
                     {
                         await Task.Delay(5000);
 
-                        var channel = (await _bot.discordClient.GetChannelAsync(b.Key));
+                        var channel = await _bot.discordClient.GetChannelAsync(b.Key);
 
                         if (channel.Users.Count <= 0)
                         {
-                            _logger.LogDebug($"Channel '{b.Key}' is now empty, deleting.");
+                            _logger.LogDebug($"No one joined channel '{b.Key}', deleting.");
 
                             await channel.DeleteAsync();
                             CreatedChannels.Remove(b.Key);

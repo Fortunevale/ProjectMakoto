@@ -65,7 +65,7 @@ internal class ConfigCommand : BaseCommand
                 IReadOnlyList<DiscordOverwrite> present = ChannelResult.Result.Parent.PermissionOverwrites;
 
                 var Category = ChannelResult.Result?.Parent ?? await ctx.Guild.CreateChannelAsync("Voice Channel Creator", ChannelType.Category);
-                await ChannelResult.Result?.ModifyAsync(x => { x.Name = "➕ Create new Channel"; x.Parent = Category; x.PermissionOverwrites = new List<DiscordOverwriteBuilder>(present.Where(x => x.Id != ctx.Guild.EveryoneRole.Id).Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).ToList()) { new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) { Allowed = (present.First(x => x.Id == ctx.Guild.EveryoneRole.Id)?.Allowed ?? Permissions.None), Denied = (present.First(x => x.Id == ctx.Guild.EveryoneRole.Id)?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak } }; });
+                await ChannelResult.Result?.ModifyAsync(x => { x.Name = "➕ Create new Channel"; x.Parent = Category; x.PermissionOverwrites = ChannelResult.Result.Parent.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak); });
 
                 ctx.Bot.guilds[ctx.Guild.Id].VcCreator.Channel = ChannelResult.Result?.Id ?? 0;
 
