@@ -2,6 +2,15 @@
 
 internal static class DiscordExtensions
 {
+    internal static List<DiscordOverwriteBuilder> ConvertToBuilderWithNewOverwrites(this IReadOnlyList<DiscordOverwrite> overwrites, DiscordMember member, Permissions allowed, Permissions denied)
+        => overwrites.Where(x => x.Id != member.Id).Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).Append(new DiscordOverwriteBuilder(member) { Allowed = (overwrites.First(x => x.Id == member.Id)?.Allowed ?? Permissions.None) | allowed, Denied = (overwrites.First(x => x.Id == member.Id)?.Denied ?? Permissions.None) | denied }).ToList();
+    
+    internal static List<DiscordOverwriteBuilder> ConvertToBuilderWithNewOverwrites(this IReadOnlyList<DiscordOverwrite> overwrites, DiscordRole role, Permissions allowed, Permissions denied)
+        => overwrites.Where(x => x.Id != role.Id).Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).Append(new DiscordOverwriteBuilder(role) { Allowed = (overwrites.First(x => x.Id == role.Id)?.Allowed ?? Permissions.None) | allowed, Denied = (overwrites.First(x => x.Id == role.Id)?.Denied ?? Permissions.None) | denied }).ToList();
+
+    internal static List<DiscordOverwriteBuilder> ConvertToBuilder(this IReadOnlyList<DiscordOverwrite> overwrites)
+        => overwrites.Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).ToList();
+
     internal static string GetCustomId(this ComponentInteractionCreateEventArgs e)
         => e.Interaction.Data.CustomId;
 

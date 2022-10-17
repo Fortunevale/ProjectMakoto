@@ -20,6 +20,7 @@ public class Guild
         EmbedMessage = new(this);
         MusicModule = new(this);
         Polls = new(this, bot);
+        VcCreator = new(this, bot);
     }
 
     public ulong ServerId { get; set; }
@@ -37,6 +38,7 @@ public class Guild
     public NameNormalizerSettings NameNormalizer { get; set; }
     public EmbedMessageSettings EmbedMessage { get; set; }
     public PollSettings Polls { get; set; }
+    public VcCreatorSettings VcCreator { get; set; }
 
     public List<ulong> AutoUnarchiveThreads { get; set; } = new();
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
