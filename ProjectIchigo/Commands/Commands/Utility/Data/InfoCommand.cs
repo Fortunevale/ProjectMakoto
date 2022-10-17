@@ -29,7 +29,7 @@ internal class InfoCommand : BaseCommand
                     $"• Develop new products, services, features, and functionality\n" +
                     $"• Communicate with you, either directly or through one of our partners, including for customer service, to provide you with updates and other information relating to Ichigo, and for marketing and promotional purposes\n" +
                     $"• Find and prevent fraud\n\n"
-                }.SetBotInfo(ctx),
+                }.AsBotInfo(ctx),
                 new DiscordEmbedBuilder
                 {
                     Description = $"**Log Files**\n\n" +
@@ -37,7 +37,7 @@ internal class InfoCommand : BaseCommand
                     $"**Preferences**\n\n" +
                     $"Like most other Discord Bots, Ichigo will store your preferences.\n" +
                     $"You can choose to disable preferences stored by the bot via `{ctx.Prefix}data object`."
-                }.SetBotInfo(ctx),
+                }.AsBotInfo(ctx),
                 new DiscordEmbedBuilder
                 {
                     Description = $"**Advertising Partners Privacy Policies**\n\n" +
@@ -49,7 +49,7 @@ internal class InfoCommand : BaseCommand
                     $"List of Third Party Privacy Policies:\n" +
                     $"• https://discord.com/privacy\n" +
                     $"• https://aitsys.dev/w/privacy"
-                }.SetBotInfo(ctx),
+                }.AsBotInfo(ctx),
                 new DiscordEmbedBuilder
                 {
                     Description = $"**CCPA Privacy Rights (Do Not Sell My Personal Information)**\n\n" +
@@ -70,7 +70,7 @@ internal class InfoCommand : BaseCommand
                     $"**Children's Information**\n\n" +
                     $"Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.\n" +
                     $"**Ichigo does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our platform, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.**"
-                }.SetBotInfo(ctx)
+                }.AsBotInfo(ctx)
             };
 
             try
@@ -81,7 +81,7 @@ internal class InfoCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = ":mailbox_with_mail: `You got mail! Please check your DMs.`",
-                }.SetBotSuccess(ctx));
+                }.AsBotSuccess(ctx));
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
@@ -89,7 +89,7 @@ internal class InfoCommand : BaseCommand
                 {
                     Description = "`It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
-                }.SetBotError(ctx);
+                }.AsBotError(ctx);
 
                 if (ctx.User.Presence.ClientStatus.Mobile.HasValue)
                     errorembed.ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif";

@@ -16,7 +16,7 @@ internal class GlobalUnbanCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`'{victim.UsernameWithDiscriminator}' is not global banned.`"
-                }.SetError(ctx, "Global Ban"));
+                }.AsError(ctx, "Global Ban"));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class GlobalUnbanCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Removing global ban for '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
-            }.SetLoading(ctx, "Global Ban"));
+            }.AsLoading(ctx, "Global Ban"));
 
             if (UnbanFromGuilds)
                 foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
@@ -59,7 +59,7 @@ internal class GlobalUnbanCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
-            }.SetSuccess(ctx, "Global Ban"));
+            }.AsSuccess(ctx, "Global Ban"));
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
             await announceChannel.SendMessageAsync(new DiscordEmbedBuilder

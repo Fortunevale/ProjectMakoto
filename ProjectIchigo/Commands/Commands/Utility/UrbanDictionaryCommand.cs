@@ -16,7 +16,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`Urban Dictionary can potentionally contain Adult Content. Please run this command within a channel marked as Age-Restricted.`"
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -26,7 +26,7 @@ internal class UrbanDictionaryCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = $"`Urban Dictionary can potentionally contain Adult Content. Continue?`"
-            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+            }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
 
@@ -43,14 +43,14 @@ internal class UrbanDictionaryCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`Looking up '{term}'..`"
-                }.SetLoading(ctx));
+                }.AsLoading(ctx));
 
                 if (term.IsNullOrWhiteSpace())
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Failed to look up the term '{term}'`"
-                    }.SetError(ctx));
+                    }.AsError(ctx));
                     return;
                 }
 
@@ -73,7 +73,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Failed to look up the term '{term}': {Response.StatusCode}`"
-                    }.SetError(ctx));
+                    }.AsError(ctx));
                     return;
                 }
 
@@ -95,7 +95,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`The term '{term}' does not exist on Urban Dictionary.`"
-                    }.SetError(ctx));
+                    }.AsError(ctx));
                     return;
                 }
 
@@ -108,7 +108,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                                   $"{x.example.Replace("[", "").Replace("]", "")}\n\n" +
                                   $"👍 `{x.thumbs_up}` | 👎 `{x.thumbs_down}` | 🕒 {Formatter.Timestamp(x.written_on, TimestampFormat.LongDateTime)}",
                     Url = x.permalink
-                }.SetInfo(ctx).Build()).ToList();
+                }.AsInfo(ctx).Build()).ToList();
 
                 await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
             }

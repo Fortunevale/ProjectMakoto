@@ -15,7 +15,7 @@ internal class LeaderboardCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                }.SetError(ctx, "Experience"));
+                }.AsError(ctx, "Experience"));
                 return;
             }
 
@@ -28,7 +28,7 @@ internal class LeaderboardCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Loading Leaderboard, please wait..`",
-            }.SetLoading(ctx, "Experience Leaderboard");
+            }.AsLoading(ctx, "Experience Leaderboard");
 
             await RespondOrEdit(embed: embed);
 
@@ -84,12 +84,12 @@ internal class LeaderboardCommand : BaseCommand
             {
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.";
-                await RespondOrEdit(embed.SetInfo(ctx, "Experience Leaderboard"));
+                await RespondOrEdit(embed.AsInfo(ctx, "Experience Leaderboard"));
             }
             else
             {
                 embed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
-                await RespondOrEdit(embed.SetInfo(ctx, "Experience Leaderboard"));
+                await RespondOrEdit(embed.AsInfo(ctx, "Experience Leaderboard"));
             }
         });
     }

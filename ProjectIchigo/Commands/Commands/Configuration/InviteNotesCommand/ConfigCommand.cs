@@ -18,7 +18,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = InviteNotesCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Invite Notes");
+            }.AsInfo(ctx, "Invite Notes");
 
             if (!(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Count > 19))
             {
@@ -61,7 +61,7 @@ internal class ConfigCommand : BaseCommand
                     {
                         Description = $"`Note  `: `{(SelectedText.IsNullOrWhiteSpace() ? "Not yet selected." : SelectedText).SanitizeForCode()}`\n" +
                                       $"`Invite`: `{(SelectedInvite is null ? $"Not yet selected." : $"{SelectedInvite.Code}")}`"
-                    }.SetAwaitingInput(ctx, "Playlists");
+                    }.AsAwaitingInput(ctx, "Playlists");
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })

@@ -22,7 +22,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Looking for scoreboard..`"
-            }.SetLoading(ctx, "Score Saber");
+            }.AsLoading(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -47,19 +47,19 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
             {
                 embed.Description = $"`An internal server exception occurred. Please retry later.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
             catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
             {
                 embed.Description = $"`The requested scoreboard does not exist.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 throw;
             }
             catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
             {
                 embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
             catch (Exception)
@@ -132,7 +132,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 if (scoreSaberPage > TotalPages)
                 {
                     embed.Description = $"`Page {scoreSaberPage} doesn't exist.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
 
@@ -147,19 +147,19 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                 {
                     embed.Description = $"`An internal server exception occurred. Please retry later.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
                 catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                 {
                     embed.Description = $"`The requested scoreboard does not exist.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     throw;
                 }
                 catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
                 {
                     embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
                 catch (Exception)
@@ -167,7 +167,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                     throw;
                 }
 
-                embed = embed.SetInfo(ctx, "Score Saber");
+                embed = embed.AsInfo(ctx, "Score Saber");
                 embed.Title = $"{leaderboard.leaderboardInfo.songName.Sanitize()}{(!string.IsNullOrWhiteSpace(leaderboard.leaderboardInfo.songSubName) ? $" {leaderboard.leaderboardInfo.songSubName.Sanitize()}" : "")} - {leaderboard.leaderboardInfo.songAuthorName.Sanitize()} [{leaderboard.leaderboardInfo.levelAuthorName.Sanitize()}]".TruncateWithIndication(256);
                 embed.Description = "";
                 embed.Author.IconUrl = ctx.Guild.IconUrl;

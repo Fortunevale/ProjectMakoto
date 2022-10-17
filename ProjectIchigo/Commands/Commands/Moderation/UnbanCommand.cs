@@ -17,7 +17,7 @@ internal class UnbanCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 },
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -25,12 +25,12 @@ internal class UnbanCommand : BaseCommand
                 await ctx.Guild.UnbanMemberAsync(victim);
 
                 embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was unbanned.";
-                embed = embed.SetSuccess(ctx);
+                embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
                 embed.Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be unbanned.`";
-                embed = embed.SetError(ctx);
+                embed = embed.AsError(ctx);
             }
 
             await RespondOrEdit(embed);

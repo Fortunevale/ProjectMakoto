@@ -10,7 +10,7 @@ internal class BatchLookupCommand : BaseCommand
         {
             List<ulong> IDs = ((string)arguments["IDs"]).Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(x => x.ToUInt64()).ToList();
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{GenerateASCIIProgressbar(0d, IDs.Count)}`").SetLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{GenerateASCIIProgressbar(0d, IDs.Count)}`").AsLoading(ctx));
 
             Dictionary<ulong, DiscordUser> fetched = new();
 
@@ -25,10 +25,10 @@ internal class BatchLookupCommand : BaseCommand
                     fetched.Add(IDs[i], null);
                 }
 
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{GenerateASCIIProgressbar(i, IDs.Count)}`").SetLoading(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{GenerateASCIIProgressbar(i, IDs.Count)}`").AsLoading(ctx));
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.UsernameWithDiscriminator}` (`{x.Value.Id}`)")}"))).SetSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.UsernameWithDiscriminator}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
         });
     }
 }

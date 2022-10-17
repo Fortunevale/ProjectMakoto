@@ -14,7 +14,7 @@ internal class BanGuildCommand : BaseCommand
 
             if (ctx.Bot.bannedGuilds.ContainsKey(guild))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is already banned from using the bot.`").SetError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is already banned from using the bot.`").AsError(ctx));
                 return;
             }
 
@@ -26,7 +26,7 @@ internal class BanGuildCommand : BaseCommand
                 await b.Value.LeaveAsync();
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was banned from using the bot.`").SetSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was banned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

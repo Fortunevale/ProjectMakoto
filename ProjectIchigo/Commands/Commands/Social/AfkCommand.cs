@@ -23,7 +23,7 @@ internal class AfkCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"{ctx.User.Mention} `You're now set to be afk. Next time you send a message, your afk status will be removed.`"
-            }.SetSuccess(ctx, "Afk Status"));
+            }.AsSuccess(ctx, "Afk Status"));
             await Task.Delay(10000);
             _ = ctx.ResponseMessage.DeleteAsync();
         });

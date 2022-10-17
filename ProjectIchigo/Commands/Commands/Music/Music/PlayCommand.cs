@@ -22,7 +22,7 @@ internal class PlayCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Preparing connection..`",
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -66,7 +66,7 @@ internal class PlayCommand : BaseCommand
 
                 embed.AddField(new DiscordEmbedField($"📜 Queue positions", $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count - added + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}", true));
 
-                embed.SetSuccess(ctx);
+                embed.AsSuccess(ctx);
                 await ctx.BaseCommand.RespondOrEdit(embed);
             }
             else if (Tracks.Count == 1)
@@ -81,7 +81,7 @@ internal class PlayCommand : BaseCommand
                 embed.AddField(new DiscordEmbedField($"🔼 Uploaded by", $"{track.Author}", true));
                 embed.AddField(new DiscordEmbedField($"🕒 Duration", $"{track.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 
-                embed.SetSuccess(ctx);
+                embed.AsSuccess(ctx);
                 await ctx.BaseCommand.RespondOrEdit(embed.Build());
             }
         });

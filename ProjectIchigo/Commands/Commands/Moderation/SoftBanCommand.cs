@@ -28,7 +28,7 @@ internal class SoftBanCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 }
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -40,12 +40,12 @@ internal class SoftBanCommand : BaseCommand
                 await ctx.Guild.UnbanMemberAsync(victim.Id, $"{ctx.User.UsernameWithDiscriminator} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was soft banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
-                embed = embed.SetSuccess(ctx);
+                embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
                 embed.Description = $"{victim.Mention} `could not be soft banned.`";
-                embed = embed.SetError(ctx);
+                embed = embed.AsError(ctx);
             }
 
             await RespondOrEdit(embed);

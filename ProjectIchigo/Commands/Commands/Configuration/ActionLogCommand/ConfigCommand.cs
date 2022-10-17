@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = ActionLogAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Actionlog");
+            }.AsAwaitingInput(ctx, "Actionlog");
 
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), $"Disable Actionlog", (ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
             var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0 ? "Set Channel" : "Change Channel")}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
@@ -73,7 +73,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any text channels in your server.`"));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -130,7 +130,7 @@ internal class ConfigCommand : BaseCommand
                     if (!ctx.Bot.guilds[ctx.Guild.Id].ActionLog.AttemptGettingMoreDetails && selected.Contains("attempt_further_detail"))
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription($"`The option 'Attempt gathering more details' may sometimes be inaccurate. Please make sure to double check the audit log on serious concerns.`\n\n" +
-                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..").SetWarning(ctx, "Actionlog")));
+                                            $"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(5))}..").AsWarning(ctx, "Actionlog")));
                         await Task.Delay(5000);
                     }
 

@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = InviteTrackerCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Invite Tracker");
+            }.AsAwaitingInput(ctx, "Invite Tracker");
 
             var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Invite Tracking", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
 

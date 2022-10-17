@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = VcCreatorCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Voice Channel Creator"));
+            }.AsInfo(ctx, "Voice Channel Creator"));
         });
     }
 }

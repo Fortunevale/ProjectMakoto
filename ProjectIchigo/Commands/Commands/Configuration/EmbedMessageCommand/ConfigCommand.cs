@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = EmbedMessageCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Embed Messages");
+            }.AsAwaitingInput(ctx, "Embed Messages");
 
             var ToggleMsg = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Link Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ToggleGithub = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Github Code Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));

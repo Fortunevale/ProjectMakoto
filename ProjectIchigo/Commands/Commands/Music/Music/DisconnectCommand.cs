@@ -20,7 +20,7 @@ internal class DisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class DisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -38,7 +38,7 @@ internal class DisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You already voted to disconnect the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -55,14 +55,14 @@ internal class DisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot was disconnected.`",
-                }.SetSuccess(ctx));
+                }.AsSuccess(ctx));
                 return;
             }
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = $"`You voted to disconnect the bot. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
-            }.SetAwaitingInput(ctx);
+            }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -117,7 +117,7 @@ internal class DisconnectCommand : BaseCommand
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
                                 Description = $"`The bot was disconnected.`",
-                            }.SetSuccess(ctx)));
+                            }.AsSuccess(ctx)));
                             return;
                         }
 

@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = InviteTrackerCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Invite Tracker"));
+            }.AsInfo(ctx, "Invite Tracker"));
         });
     }
 }

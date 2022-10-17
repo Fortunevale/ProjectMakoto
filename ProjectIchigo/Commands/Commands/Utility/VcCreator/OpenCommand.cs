@@ -6,7 +6,11 @@ internal class OpenCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-
+            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(ctx.Member.VoiceState.Channel.Id))
+            {
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You're not in a Channel created by the Voice Channel Creator.`").AsError(ctx));
+                return;
+            }
         });
     }
 }

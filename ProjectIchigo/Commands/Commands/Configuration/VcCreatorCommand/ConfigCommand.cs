@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = VcCreatorCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Voice Channel Creator");
+            }.AsInfo(ctx, "Voice Channel Creator");
 
             var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set Voice Channel Creator", false, EmojiTemplates.GetChannel(ctx.Client, ctx.Bot).ToComponent());
 
@@ -53,7 +53,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any voice channels in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any voice channels in your server.`"));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;

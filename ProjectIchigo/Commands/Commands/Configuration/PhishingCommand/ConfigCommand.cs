@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = PhishingCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Phishing Protection");
+            }.AsAwaitingInput(ctx, "Phishing Protection");
 
             var ToggleDetectionButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
             var ToggleWarningButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
@@ -164,7 +164,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").SetError(ctx, "Phishing Protection")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 10 seconds and 28 days.`").AsError(ctx, "Phishing Protection")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;

@@ -10,13 +10,13 @@ internal class UnbanGuildCommand : BaseCommand
 
             if (!ctx.Bot.bannedGuilds.ContainsKey(guild))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is not banned from using the bot.`").SetError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is not banned from using the bot.`").AsError(ctx));
                 return;
             }
 
             ctx.Bot.bannedGuilds.Remove(guild);
             await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "banned_guilds", "id", $"{guild}");
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was unbanned from using the bot.`").SetSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was unbanned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

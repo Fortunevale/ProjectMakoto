@@ -20,7 +20,7 @@ internal class QueueCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class QueueCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -84,7 +84,7 @@ internal class QueueCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = Description
-                }.SetInfo(ctx)).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
+                }.AsInfo(ctx)).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
 
                 return;
             }

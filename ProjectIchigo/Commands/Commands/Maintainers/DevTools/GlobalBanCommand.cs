@@ -12,15 +12,15 @@ internal class GlobalBanCommand : BaseCommand
 
             if (reason.IsNullOrWhiteSpace())
             {
-                _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Please provide a reason for the global ban.`").SetError(ctx, "Global Ban"));
+                _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Please provide a reason for the global ban.`").AsError(ctx, "Global Ban"));
                 return;
             }
 
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.UsernameWithDiscriminator}'..`").SetLoading(ctx, "Global Ban"));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.UsernameWithDiscriminator}'..`").AsLoading(ctx, "Global Ban"));
                 ctx.Bot.globalBans[victim.Id] = new() { Reason = reason, Moderator = ctx.User.Id };
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.UsernameWithDiscriminator}' updated.`").SetSuccess(ctx, "Global Ban"));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.UsernameWithDiscriminator}' updated.`").AsSuccess(ctx, "Global Ban"));
 
                 var announceChannel1 = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
                 await announceChannel1.SendMessageAsync(new DiscordEmbedBuilder
@@ -42,14 +42,14 @@ internal class GlobalBanCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
-            }.SetLoading(ctx, "Global Ban");
+            }.AsLoading(ctx, "Global Ban");
 
             var msg = RespondOrEdit(embed);
 
             if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
                 embed.Description = $"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`";
-                msg = RespondOrEdit(embed.SetError(ctx, "Global Ban"));
+                msg = RespondOrEdit(embed.AsError(ctx, "Global Ban"));
                 return;
             }
 
@@ -79,7 +79,7 @@ internal class GlobalBanCommand : BaseCommand
             }
 
             embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
-            msg = RespondOrEdit(embed.SetSuccess(ctx, "Global Ban"));
+            msg = RespondOrEdit(embed.AsSuccess(ctx, "Global Ban"));
 
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);

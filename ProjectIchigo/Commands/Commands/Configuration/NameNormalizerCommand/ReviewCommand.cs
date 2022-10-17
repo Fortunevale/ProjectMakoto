@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = NameNormalizerCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Name Normalizer"));
+            }.AsInfo(ctx, "Name Normalizer"));
         });
     }
 }

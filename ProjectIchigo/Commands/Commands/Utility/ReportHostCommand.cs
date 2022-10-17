@@ -27,7 +27,7 @@ internal class ReportHostCommand : BaseCommand
                                   $"**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n" +
                                   $"**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**\n\n" +
                                   $"To accept these conditions, please click the button below. If you do not see a button, update your discord client."
-                }.SetAwaitingInput(ctx, "Malicious Host Submissions");
+                }.AsAwaitingInput(ctx, "Malicious Host Submissions");
 
                 if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != 0 && ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS < tos_version)
                 {
@@ -49,7 +49,7 @@ internal class ReportHostCommand : BaseCommand
                 ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS = tos_version;
 
                 var accepted_button = new DiscordButtonComponent(ButtonStyle.Success, "no_id", "Conditions accepted", true, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.SetSuccess(ctx, "Malicious Host Submissions").WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(tos_embed.AsSuccess(ctx, "Malicious Host Submissions").WithDescription($"Continuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(2))}..")).AddComponents(accepted_button));
 
                 await Task.Delay(2000);
             }
@@ -57,14 +57,14 @@ internal class ReportHostCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Processing your request..`"
-            }.SetLoading(ctx, "Malicious Host Submissions");
+            }.AsLoading(ctx, "Malicious Host Submissions");
 
             await RespondOrEdit(embed);
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
                 embed.Description = $"`You cannot submit a host for the next {ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).GetTimespanUntil().GetHumanReadable()}.`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
+                _ = RespondOrEdit(embed.AsError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
@@ -73,7 +73,7 @@ internal class ReportHostCommand : BaseCommand
                 if (ctx.Bot.submittedUrls.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
                 {
                     embed.Description = $"`You have 5 open host submissions. Please wait before trying to submit another host.`";
-                    _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
+                    _ = RespondOrEdit(embed.AsError(ctx, "Malicious Host Submissions"));
                     return;
                 }
             }
@@ -82,7 +82,7 @@ internal class ReportHostCommand : BaseCommand
             {
                 embed.Description = $"`You are banned from submitting hosts.`\n" +
                                     $"`Reason: {ctx.Bot.phishingUrlSubmissionUserBans[ctx.User.Id].Reason}`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
+                _ = RespondOrEdit(embed.AsError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
@@ -90,7 +90,7 @@ internal class ReportHostCommand : BaseCommand
             {
                 embed.Description = $"`This guild is banned from submitting hosts.`\n" +
                                     $"`Reason: {ctx.Bot.phishingUrlSubmissionGuildBans[ctx.Guild.Id].Reason}`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
+                _ = RespondOrEdit(embed.AsError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
@@ -103,12 +103,12 @@ internal class ReportHostCommand : BaseCommand
             catch (Exception)
             {
                 embed.Description = $"`The host ('{url.SanitizeForCode()}') you're trying to submit is invalid.`";
-                _ = RespondOrEdit(embed.SetError(ctx, "Malicious Host Submissions"));
+                _ = RespondOrEdit(embed.AsError(ctx, "Malicious Host Submissions"));
                 return;
             }
 
             embed.Description = $"`You are about to submit the host '{host.SanitizeForCode()}'. Do you want to proceed?`";
-            embed.SetAwaitingInput(ctx, "Malicious Host Submissions");
+            embed.AsAwaitingInput(ctx, "Malicious Host Submissions");
 
             var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit host", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
@@ -131,7 +131,7 @@ internal class ReportHostCommand : BaseCommand
             if (e.Result.Interaction.Data.CustomId == ContinueButton.CustomId)
             {
                 embed.Description = $"`Submitting your host..`";
-                embed.SetLoading(ctx, "Malicious Host Submissions");
+                embed.AsLoading(ctx, "Malicious Host Submissions");
                 await RespondOrEdit(embed);
 
                 embed.Description = $"`Checking if your host is already in the database..`";
@@ -142,7 +142,7 @@ internal class ReportHostCommand : BaseCommand
                     if (host.Contains(b.Key))
                     {
                         embed.Description = $"`The host ('{host.SanitizeForCode()}') is already present in the database. Thanks for trying to contribute regardless.`";
-                        embed.SetError(ctx, "Malicious Host Submissions");
+                        embed.AsError(ctx, "Malicious Host Submissions");
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
@@ -156,7 +156,7 @@ internal class ReportHostCommand : BaseCommand
                     if (b.Value.Url == host)
                     {
                         embed.Description = $"`The host ('{host.SanitizeForCode()}') has already been submitted. Thanks for trying to contribute regardless.`";
-                        embed.SetError(ctx, "Malicious Host Submissions");
+                        embed.AsError(ctx, "Malicious Host Submissions");
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
@@ -199,7 +199,7 @@ internal class ReportHostCommand : BaseCommand
                 ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
                 embed.Description = $"`Submission created. Thanks for your contribution.`";
-                embed.SetSuccess(ctx, "Malicious Host Submissions");
+                embed.AsSuccess(ctx, "Malicious Host Submissions");
                 await RespondOrEdit(embed);
             }
             else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)

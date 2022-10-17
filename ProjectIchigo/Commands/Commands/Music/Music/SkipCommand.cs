@@ -20,7 +20,7 @@ internal class SkipCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class SkipCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -38,7 +38,7 @@ internal class SkipCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You already voted to skip the current song.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -51,14 +51,14 @@ internal class SkipCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The song was skipped.`",
-                }.SetSuccess(ctx));
+                }.AsSuccess(ctx));
                 return;
             }
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = $"`You voted to skip the current song. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
-            }.SetAwaitingInput(ctx);
+            }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -109,7 +109,7 @@ internal class SkipCommand : BaseCommand
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
                                 Description = $"`The song was skipped.`",
-                            }.SetSuccess(ctx)));
+                            }.AsSuccess(ctx)));
                             return;
                         }
 

@@ -46,7 +46,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Please select a continent filter below.`"
-            }.SetAwaitingInput(ctx, "Score Saber");
+            }.AsAwaitingInput(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents("no_country")).AddComponents(start_search_button));
             CancellationTokenSource tokenSource = new();
@@ -104,7 +104,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                                 embed.Description = "`Searching for players with specified criteria..`";
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetLoading(ctx, "Score Saber")));
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx, "Score Saber")));
 
                                 if (currentFetchedPage != lastFetchedPage)
                                 {
@@ -118,7 +118,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
                                         embed.Description = $"`An internal server exception occurred. Please retry later.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
                                     catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
@@ -127,7 +127,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
                                         embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
                                     catch (Exception)
@@ -166,7 +166,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
                                 embed.Description = $"`Found {lastSearch.metadata.total} players. Fetched {lastSearch.players.Length} players. Showing {playerDropDownOptions.Count} players.`";
-                                await RespondOrEdit(builder.WithEmbed(embed.SetSuccess(ctx, "Score Saber")));
+                                await RespondOrEdit(builder.WithEmbed(embed.AsSuccess(ctx, "Score Saber")));
                             }
 
                             if (e.Interaction.Data.CustomId == "start_search")
@@ -274,7 +274,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                     catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                     {
                         embed.Description = $"`Couldn't find any player with the specified criteria.`";
-                        _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+                        _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     }
                     catch (Exception)
                     {

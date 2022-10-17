@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = JoinCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Join Settings");
+            }.AsAwaitingInput(ctx, "Join Settings");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
@@ -95,7 +95,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any text channels in your server.`"));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -127,7 +127,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
                         await Task.Delay(3000);
                         return;
                     }

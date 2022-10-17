@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = NameNormalizerCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Name Normalizer");
+            }.AsAwaitingInput(ctx, "Name Normalizer");
 
             var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Name Normalizer", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var SearchAllNames = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Normalize Everyone's Names", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
@@ -48,7 +48,7 @@ internal class ConfigCommand : BaseCommand
             {
                 if (ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning)
                 {
-                    embed = embed.SetError(ctx, "Name Normalizer");
+                    embed = embed.AsError(ctx, "Name Normalizer");
                     embed.Description = $"`A normalizer is already running.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
@@ -63,7 +63,7 @@ internal class ConfigCommand : BaseCommand
 
                 try
                 {
-                    embed = embed.SetLoading(ctx, "Name Normalizer");
+                    embed = embed.AsLoading(ctx, "Name Normalizer");
                     embed.Description = $"`Renaming all members. This might take a while..`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -87,7 +87,7 @@ internal class ConfigCommand : BaseCommand
                         }
                     }
 
-                    embed = embed.SetSuccess(ctx, "Name Normalizer");
+                    embed = embed.AsSuccess(ctx, "Name Normalizer");
                     embed.Description = $"`Renamed {Renamed} members.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
