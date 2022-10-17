@@ -285,6 +285,19 @@ public class UtilityAppCommands : ApplicationCommandsModule
                 });
             }).Add(_bot.watcher, ctx);
         }
+
+
+        [SlashCommand("change-owner", "Sets a new person to be the owner of your channel.")]
+        public async Task ChangeOwner(InteractionContext ctx, [Option("user", "User")] DiscordUser victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.ChangeOwnerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", await victim.ConvertToMember(ctx.Guild) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
     }
 
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]

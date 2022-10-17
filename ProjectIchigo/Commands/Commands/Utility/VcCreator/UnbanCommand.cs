@@ -26,7 +26,7 @@ internal class UnbanCommand : BaseCommand
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{ctx.User.Mention} `is not banned from your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `is not banned from your Voice Channel.`").AsError(ctx));
                 return;
             }
 

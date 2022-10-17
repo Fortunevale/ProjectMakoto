@@ -32,7 +32,7 @@ internal class KickCommand : BaseCommand
 
             if (!channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{ctx.User.Mention} `is not in your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `is not in your Voice Channel.`").AsError(ctx));
                 return;
             }
 

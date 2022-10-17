@@ -394,5 +394,17 @@ public class UtilityPrefixCommands : BaseCommandModule
                 });
             }).Add(_bot.watcher, ctx);
         }
+
+        [Command("change-owner"), Description("Sets a new person to be the owner of your channel.")]
+        public async Task ChangeOwner(CommandContext ctx, DiscordMember victim)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreator.ChangeOwnerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "victim", victim },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
     }
 }

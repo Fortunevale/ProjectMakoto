@@ -76,14 +76,14 @@ public class VcCreatorSettings
                                     return;
                                 }
 
-                                if (e.User.Id == b.Value.OwnerId && e.After.Channel.Id != b.Key)
+                                if (e.User.Id == b.Value.OwnerId && e.After?.Channel?.Id != b.Key)
                                 {
                                     _logger.LogDebug($"The owner of channel '{b.Key}' left, assigning new owner.");
                                     var newOwner = users.SelectRandom();
 
                                     b.Value.OwnerId = newOwner.Id;
 
-                                    await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"`The channel is now owned by `{newOwner.Mention}.").WithColor(EmbedColors.Info));
+                                    await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"`The channel is now owned by` {newOwner.Mention}.").WithColor(EmbedColors.Info));
                                     return;
                                 }
 

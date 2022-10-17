@@ -26,7 +26,7 @@ internal class BanCommand : BaseCommand
 
             if (!channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{ctx.User.Mention}` is not in your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention}` is not in your Voice Channel.`").AsError(ctx));
                 return;
             }
 
@@ -38,14 +38,14 @@ internal class BanCommand : BaseCommand
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{ctx.User.Mention}` has already been banned from your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `has already been banned from your Voice Channel.`").AsError(ctx));
                 return;
             }
 
             ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Add(victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.UseVoice);
             await victim.DisconnectFromVoiceAsync();
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention}` has been banned from this channel.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `has been banned from this channel.`").AsSuccess(ctx));
         });
     }
 }
