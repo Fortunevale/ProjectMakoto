@@ -65,7 +65,7 @@ public class VcCreatorSettings
                             if (e.Before?.Channel?.Id == b.Key || e.After?.Channel?.Id == b.Key)
                             {
                                 var channel = (e.After?.Channel?.Id != 0 ? e.After.Channel : null) ?? e.Before.Channel;
-                                var users = channel.Users.Where(x => !x.IsBot).ToList()
+                                var users = channel.Users.Where(x => !x.IsBot).ToList();
 
                                 if (users.Count <= 0)
                                 {
