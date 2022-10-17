@@ -49,7 +49,7 @@ internal class RemoveAllCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = "`Removing all reaction roles..`"
-            }.SetLoading(ctx, "Reaction Roles");
+            }.AsLoading(ctx, "Reaction Roles");
 
             await RespondOrEdit(embed);
             embed.Author.IconUrl = ctx.Guild.IconUrl;
@@ -57,7 +57,7 @@ internal class RemoveAllCommand : BaseCommand
             if (!ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id))
             {
                 embed.Description = $"`The specified message doesn't contain any reaction roles.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Reaction Roles")));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
                 return;
             }
 
@@ -67,7 +67,7 @@ internal class RemoveAllCommand : BaseCommand
             _ = message.DeleteAllReactionsAsync();
 
             embed.Description = $"`Removed all reaction roles from message sent by` {message.Author.Mention} `in` {message.Channel.Mention} `.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, "Reaction Roles")));
         });
     }
 }

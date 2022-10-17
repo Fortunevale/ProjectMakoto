@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = JoinCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Join Settings"));
+            }.AsInfo(ctx, "Join Settings"));
         });
     }
 }

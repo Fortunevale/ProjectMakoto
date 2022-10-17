@@ -20,7 +20,7 @@ internal class RepeatCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class RepeatCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -38,7 +38,7 @@ internal class RepeatCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? "`The queue now repeats itself.`" : "`The queue no longer repeats itself.`"),
-            }.SetSuccess(ctx));
+            }.AsSuccess(ctx));
         });
     }
 }

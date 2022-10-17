@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = TokenDetectionCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Token Detection");
+            }.AsAwaitingInput(ctx, "Token Detection");
 
             var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Token Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
 

@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = BumpReminderCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Bump Reminder");
+            }.AsAwaitingInput(ctx, "Bump Reminder");
 
             var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Set up Bump Reminder", ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
             var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Disable Bump Reminder", !ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
@@ -50,18 +50,18 @@ internal class ConfigCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`The Disboard bot is not on this server. Please create a guild listing on Disboard and invite the their bot.`"
-                    }.SetError(ctx, "Bump Reminder"));
+                    }.AsError(ctx, "Bump Reminder"));
                     return;
                 }
 
                 embed = new DiscordEmbedBuilder
                 {
                     Description = $"`Setting up Bump Reminder..`"
-                }.SetLoading(ctx, "Bump Reminder");
+                }.AsLoading(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
                 embed.Description = "`Please select a role to ping when the server can be bumped.`";
-                embed = embed.SetAwaitingInput(ctx, "Bump Reminder");
+                embed = embed.AsAwaitingInput(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
 
@@ -81,7 +81,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
                         await Task.Delay(3000);
                         return;
                     }
@@ -105,7 +105,7 @@ internal class ConfigCommand : BaseCommand
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled = true;
 
                 embed.Description = "`The Bump Reminder has been set up.`";
-                embed = embed.SetSuccess(ctx, "Bump Reminder");
+                embed = embed.AsSuccess(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
                 await Task.Delay(5000);
@@ -122,7 +122,7 @@ internal class ConfigCommand : BaseCommand
                         DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}").Key);
 
                 embed.Description = "`The Bump Reminder has been disabled.`";
-                embed = embed.SetSuccess(ctx, "Bump Reminder");
+                embed = embed.AsSuccess(ctx, "Bump Reminder");
                 await RespondOrEdit(embed);
 
                 await Task.Delay(5000);
@@ -147,7 +147,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any text channels in your server.`"));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -179,7 +179,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
                         await Task.Delay(3000);
                         return;
                     }

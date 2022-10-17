@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = ExperienceCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Experience"));
+            }.AsInfo(ctx, "Experience"));
         });
     }
 }

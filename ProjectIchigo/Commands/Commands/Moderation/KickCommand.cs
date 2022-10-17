@@ -32,7 +32,7 @@ internal class KickCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 },
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -43,12 +43,12 @@ internal class KickCommand : BaseCommand
                 await victim.RemoveAsync($"{ctx.User.UsernameWithDiscriminator} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
-                embed = embed.SetSuccess(ctx);
+                embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
                 embed.Description = $"{victim.Mention} `could not be kicked.`";
-                embed.SetError(ctx);
+                embed.AsError(ctx);
             }
 
             await RespondOrEdit(embed);

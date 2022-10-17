@@ -27,7 +27,7 @@ internal class BanCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 }
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
@@ -38,12 +38,12 @@ internal class BanCommand : BaseCommand
                 await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.UsernameWithDiscriminator} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
-                embed = embed.SetSuccess(ctx);
+                embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
                 embed.Description = $"{victim.Mention} `could not be banned.`";
-                embed = embed.SetError(ctx);
+                embed = embed.AsError(ctx);
             }
 
             await RespondOrEdit(embed);

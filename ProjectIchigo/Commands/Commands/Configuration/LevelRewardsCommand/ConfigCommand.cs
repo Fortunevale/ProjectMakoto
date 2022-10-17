@@ -16,11 +16,11 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = $"`Loading Level Rewards..`"
-            }.SetLoading(ctx, "Level Rewards");
+            }.AsLoading(ctx, "Level Rewards");
 
             await RespondOrEdit(embed);
 
-            embed = embed.SetAwaitingInput(ctx, "Level Rewards");
+            embed = embed.AsAwaitingInput(ctx, "Level Rewards");
 
             string selected = "";
 
@@ -68,7 +68,7 @@ internal class ConfigCommand : BaseCommand
                 var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "Delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
 
                 var Dropdown = new DiscordSelectComponent("Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
-                embed = embed.SetAwaitingInput(ctx, "Level Rewards");
+                embed = embed.AsAwaitingInput(ctx, "Level Rewards");
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                 if (DefinedRewards.Count > 0)
@@ -149,7 +149,7 @@ internal class ConfigCommand : BaseCommand
                                     Description = $"`Role   `: {(selectedRole is null ? "`Not yet selected.`" : selectedRole.Mention)}\n" +
                                                   $"`Level  `: {(selectedLevel is -1 ? "`Not yet selected.`" : selectedLevel.ToEmotes())}\n" +
                                                   $"`Message`: `{selectedCustomText}`"
-                                }.SetAwaitingInput(ctx, "Level Rewards");
+                                }.AsAwaitingInput(ctx, "Level Rewards");
 
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
@@ -185,7 +185,7 @@ internal class ConfigCommand : BaseCommand
                                     {
                                         if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                                         {
-                                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
                                             await Task.Delay(3000);
                                             return;
                                         }
@@ -233,7 +233,7 @@ internal class ConfigCommand : BaseCommand
                                     catch (Exception)
                                     {
                                         action_embed.Description = "`You must specify a valid level.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Level Rewards")));
                                         await Task.Delay(3000);
                                         continue;
                                     }
@@ -270,7 +270,7 @@ internal class ConfigCommand : BaseCommand
                                     if (newMessage.Length > 256)
                                     {
                                         action_embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Level Rewards")));
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Level Rewards")));
                                         await Task.Delay(3000);
                                         continue;
                                     }
@@ -288,7 +288,7 @@ internal class ConfigCommand : BaseCommand
                                     });
 
                                     action_embed.Description = $"`The role` <@&{selectedRole.Id}> `({selectedRole.Id}) will be assigned at Level {selectedLevel}.`";
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetSuccess(ctx, "Level Rewards")));
+                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, "Level Rewards")));
 
                                     await Task.Delay(5000);
                                     await RefreshMessage();
@@ -336,7 +336,7 @@ internal class ConfigCommand : BaseCommand
 
                             if (result.Length > 256)
                             {
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Your custom message can't contain more than 256 characters.`").SetError(ctx, "Level Rewards")));
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Your custom message can't contain more than 256 characters.`").AsError(ctx, "Level Rewards")));
                                 await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);
                                 return;
@@ -355,7 +355,7 @@ internal class ConfigCommand : BaseCommand
                             if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count == 0)
                             {
                                 embed.Description = $"`There are no more Level Rewards to display.`";
-                                embed = embed.SetSuccess(ctx, "Level Rewards");
+                                embed = embed.AsSuccess(ctx, "Level Rewards");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);

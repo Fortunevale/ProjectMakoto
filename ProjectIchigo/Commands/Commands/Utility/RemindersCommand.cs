@@ -19,7 +19,7 @@ internal class RemindersCommand : BaseCommand
                     .WithDescription($"`You have {rem.ScheduledReminders.Count} reminders.`\n\n" +
                      $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.Sanitize()}\nCreated on **{x.CreationPlace}**\nDue {x.DueTime.ToTimestamp()} ({x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)})").ToList())}\n\n" +
                      $"**⚠ For reminders to work, you need to enable Direct Messages on at least one server you share with {ctx.CurrentUser.Username}.**")
-                    .SetInfo(ctx, "Reminders"))
+                    .AsInfo(ctx, "Reminders"))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.CancelButton));
 
@@ -43,7 +43,7 @@ internal class RemindersCommand : BaseCommand
                     if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6)))
                     {
                         selectedDueDate = null;
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 6 months.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 6 months.`").AsError(ctx));
                         await Task.Delay(5000);
                     }
 
@@ -55,7 +55,7 @@ internal class RemindersCommand : BaseCommand
                     {
                         Description = $"`Description    `: {(selectedDescription.IsNullOrWhiteSpace() ? "`Not yet selected.`" : $"`{selectedDescription.Sanitize()}`")}\n" +
                                       $"`Due Date & Time`: {(selectedDueDate is null ? "`Not yet selected.`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}"
-                    }.SetAwaitingInput(ctx, "Reminders");
+                    }.AsAwaitingInput(ctx, "Reminders");
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectDescriptionButton, SelectDueDateButton, Finish })
@@ -111,7 +111,7 @@ internal class RemindersCommand : BaseCommand
                         {
                             if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").SetError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -127,7 +127,7 @@ internal class RemindersCommand : BaseCommand
 
                         if (selectedDueDate < DateTime.UtcNow)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The Due Time is in the past.`").SetError(ctx, "Reminders"));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The Due Time is in the past.`").AsError(ctx, "Reminders"));
                             await Task.Delay(2000);
                             continue;
                         }

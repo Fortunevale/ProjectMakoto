@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = PhishingCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Phishing Protection"));
+            }.AsInfo(ctx, "Phishing Protection"));
         });
     }
 }

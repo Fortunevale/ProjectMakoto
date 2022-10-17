@@ -185,7 +185,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an icon via '{ctx.Prefix}upload'.`\n\n" +
                             $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").SetAwaitingInput(ctx));
+                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
 
@@ -198,7 +198,7 @@ internal class CustomEmbedCommand : BaseCommand
                                 await RespondOrEdit(new DiscordEmbedBuilder
                                 {
                                     Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                                }.SetError(ctx));
+                                }.AsError(ctx));
                                 continue;
                             }
                             catch (ArgumentException)
@@ -207,11 +207,11 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").SetAwaitingInput(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
                             if (stream.fileSize > 8000000)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").SetError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -284,7 +284,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload a thumbnail via '{ctx.Prefix}upload'.`\n\n" +
                             $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").SetAwaitingInput(ctx));
+                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
 
@@ -297,7 +297,7 @@ internal class CustomEmbedCommand : BaseCommand
                             await RespondOrEdit(new DiscordEmbedBuilder
                             {
                                 Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                            }.SetError(ctx));
+                            }.AsError(ctx));
                             continue;
                         }
                         catch (ArgumentException)
@@ -306,11 +306,11 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").SetAwaitingInput(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
                         if (stream.fileSize > 8000000)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").SetError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -352,7 +352,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an image via '{ctx.Prefix}upload'.`\n\n" +
                             $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").SetAwaitingInput(ctx));
+                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
 
@@ -365,7 +365,7 @@ internal class CustomEmbedCommand : BaseCommand
                             await RespondOrEdit(new DiscordEmbedBuilder
                             {
                                 Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                            }.SetError(ctx));
+                            }.AsError(ctx));
                             continue;
                         }
                         catch (ArgumentException)
@@ -374,11 +374,11 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").SetAwaitingInput(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
                         if (stream.fileSize > 8000000)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").SetError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -471,7 +471,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an icon via '{ctx.Prefix}upload'.`\n\n" +
                             $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").SetAwaitingInput(ctx));
+                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
 
@@ -484,7 +484,7 @@ internal class CustomEmbedCommand : BaseCommand
                                 await RespondOrEdit(new DiscordEmbedBuilder
                                 {
                                     Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                                }.SetError(ctx));
+                                }.AsError(ctx));
                                 continue;
                             }
                             catch (ArgumentException)
@@ -493,11 +493,11 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").SetAwaitingInput(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
                             if (stream.fileSize > 8000000)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").SetError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -730,7 +730,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
+                                await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
                                 await Task.Delay(3000);
                                 continue;
                             }

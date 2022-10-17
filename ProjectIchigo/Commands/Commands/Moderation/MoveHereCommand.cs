@@ -12,24 +12,24 @@ internal class MoveHereCommand : BaseCommand
 
             if (oldChannel.Type != ChannelType.Voice)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is not a voice channel.`").SetError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is not a voice channel.`").AsError(ctx));
                 return;
             }
             
             if (!oldChannel.Users.IsNotNullAndNotEmpty())
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is empty.`").SetError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is empty.`").AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moving {oldChannel.Users.Count} users to` {ctx.Member.VoiceState.Channel.Mention}`..`").SetLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moving {oldChannel.Users.Count} users to` {ctx.Member.VoiceState.Channel.Mention}`..`").AsLoading(ctx));
 
             foreach (var b in oldChannel.Users)
             {
                 await b.ModifyAsync(x => x.VoiceChannel = ctx.Member.VoiceState.Channel);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moved {oldChannel.Users.Count} users to` {ctx.Member.VoiceState.Channel.Mention}`.`").SetSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moved {oldChannel.Users.Count} users to` {ctx.Member.VoiceState.Channel.Mention}`.`").AsSuccess(ctx));
         });
     }
 }

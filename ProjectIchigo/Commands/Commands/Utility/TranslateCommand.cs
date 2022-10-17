@@ -46,7 +46,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`There is no content to translate in the message you selected.`",
-                }.SetError(ctx)));
+                }.AsError(ctx)));
                 return;
             }
 
@@ -60,7 +60,7 @@ internal class TranslateCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = $"`What provider do you want to use?`",
-            }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(MessageComponents.CancelButton));
+            }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { GoogleButton, LibreTranslateButton }).AddComponents(MessageComponents.CancelButton));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
@@ -77,7 +77,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Please select the language to translate from.`",
-                }.SetAwaitingInput(ctx)));
+                }.AsAwaitingInput(ctx)));
 
                 var SourceResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
 
@@ -99,7 +99,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Okay! Translating from {SourceResult.Result}. Now select the language to translate to.`",
-                }.SetAwaitingInput(ctx)));
+                }.AsAwaitingInput(ctx)));
 
                 var TargetResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
 
@@ -121,7 +121,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Translating..`",
-                }.SetLoading(ctx)));
+                }.AsLoading(ctx)));
 
                 var TranslationTask = ctx.Bot.translationClient.Translate_a(SourceResult.Result, TargetResult.Result, transSource);
 
@@ -140,7 +140,7 @@ internal class TranslateCommand : BaseCommand
                         {
                             Description = $"`Your translation request is currently in queue at position {PosInQueue}. This might take a moment to finish..`\n" +
                                           $"`Your request will be executed, approximately,` {Formatter.Timestamp(DateTime.UtcNow.AddSeconds((PosInQueue * 20) - 3))}`.`",
-                        }.SetLoading(ctx)));
+                        }.AsLoading(ctx)));
                     }
 
                     Wait++;
@@ -152,7 +152,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"{Translation.Item1}",
-                }.SetInfo(ctx, "", $"Translated from {(SourceResult.Result == "auto" ? $"{ctx.Bot.languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot.languageCodes.List.First(x => x.Code == SourceResult.Result).Name)} to {ctx.Bot.languageCodes.List.First(x => x.Code == TargetResult.Result).Name} using Google")));
+                }.AsInfo(ctx, "", $"Translated from {(SourceResult.Result == "auto" ? $"{ctx.Bot.languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot.languageCodes.List.First(x => x.Code == SourceResult.Result).Name)} to {ctx.Bot.languageCodes.List.First(x => x.Code == TargetResult.Result).Name} using Google")));
             }
             else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
             {
@@ -166,7 +166,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Please select the language to translate from.`",
-                }.SetAwaitingInput(ctx)));
+                }.AsAwaitingInput(ctx)));
 
                 var SourceResult = await PromptCustomSelection(TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Source Language..");
 
@@ -188,7 +188,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Okay! Translating from {SourceResult.Result}. Now select the language to translate to.`",
-                }.SetAwaitingInput(ctx)));
+                }.AsAwaitingInput(ctx)));
 
                 var TargetResult = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Target Language..");
 
@@ -210,7 +210,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Translating..`",
-                }.SetLoading(ctx)));
+                }.AsLoading(ctx)));
 
                 string query;
 
@@ -230,7 +230,7 @@ internal class TranslateCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"{parsedTranslation.translatedText}",
-                }.SetInfo(ctx, "", $"Translated from {(SourceResult.Result == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == SourceResult.Result).name)} to {TranslationTargets.First(x => x.code == TargetResult.Result).name} using LibreTranslate")));
+                }.AsInfo(ctx, "", $"Translated from {(SourceResult.Result == "auto" ? $"{TranslationSources.First(x => x.code == parsedTranslation.detectedLanguage.language).name} ({parsedTranslation.detectedLanguage.confidence:N0}%)" : TranslationSources.First(x => x.code == SourceResult.Result).name)} to {TranslationTargets.First(x => x.code == TargetResult.Result).name} using LibreTranslate")));
             }
         });
     }

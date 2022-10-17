@@ -34,12 +34,12 @@ internal class HelpCommand : BaseCommand
                     }
                     catch { }
 
-                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(desc).SetBotInfo(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(desc).AsBotInfo(ctx));
                     return;
                 }
                 else
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No such command found.`").SetBotError(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No such command found.`").AsBotError(ctx));
                     return;
                 } 
             }
@@ -90,7 +90,7 @@ internal class HelpCommand : BaseCommand
             {
                 if (!discordEmbeds.ContainsKey(b.Key))
                     discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription("Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n" +
-                                            "**Do not include the brackets when using commands, they're merely an indicator for requirement.**").SetBotInfo(ctx));
+                                            "**Do not include the brackets when using commands, they're merely an indicator for requirement.**").AsBotInfo(ctx));
 
                 if (!discordEmbeds[b.Key].Fields.Any())
                     discordEmbeds[b.Key].AddField(new DiscordEmbedField($"{b.Key.FirstLetterToUpper()} Commands", b.Value));

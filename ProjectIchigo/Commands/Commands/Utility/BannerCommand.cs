@@ -17,7 +17,7 @@ internal class BannerCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.BannerUrl,
-            }.SetInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Banner");
+            }.AsInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Banner");
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 

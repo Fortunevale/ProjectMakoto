@@ -43,7 +43,7 @@ internal class EmojiStealerCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`Downloading emojis of this message..`",
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
             Dictionary<ulong, EmojiEntry> SanitizedEmoteList = new();
@@ -61,7 +61,7 @@ internal class EmojiStealerCommand : BaseCommand
             if (!Emotes.Any() && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
             {
                 embed.Description = $"`This message doesn't contain any emojis or stickers.`";
-                await RespondOrEdit(embed.SetError(ctx));
+                await RespondOrEdit(embed.AsError(ctx));
                 return;
             }
 
@@ -149,7 +149,7 @@ internal class EmojiStealerCommand : BaseCommand
             if (SanitizedEmoteList.Count == 0)
             {
                 embed.Description = $"`Couldn't download any emojis or stickers from this message.`";
-                await RespondOrEdit(embed.SetError(ctx));
+                await RespondOrEdit(embed.AsError(ctx));
 
                 return;
             }
@@ -163,7 +163,7 @@ internal class EmojiStealerCommand : BaseCommand
                 emojiText += $"{(emojiText.Length > 0 ? " and stickers" : "stickers")}";
 
             embed.Description = $"`Select how you want to receive the downloaded {emojiText}.`";
-            embed.SetAwaitingInput(ctx);
+            embed.AsAwaitingInput(ctx);
 
             bool IncludeStickers = false;
 
@@ -244,7 +244,7 @@ internal class EmojiStealerCommand : BaseCommand
                             if (IncludeStickers)
                             {
                                 embed.Description = $"`You cannot add any emoji(s) to the server while including stickers.`";
-                                embed.SetError(ctx);
+                                embed.AsError(ctx);
                                 await RespondOrEdit(embed);
 
                                 return;
@@ -253,7 +253,7 @@ internal class EmojiStealerCommand : BaseCommand
                             bool DiscordWarning = false;
 
                             embed.Description = $"`Added 0/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`";
-                            embed.SetLoading(ctx);
+                            embed.AsLoading(ctx);
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
                             for (int i = 0; i < SanitizedEmoteList.Count; i++)
@@ -292,7 +292,7 @@ internal class EmojiStealerCommand : BaseCommand
                                         throw task.Exception.InnerException;
 
                                     embed.Description = $"`Added {i}/{(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to this server..`";
-                                    embed.SetSuccess(ctx);
+                                    embed.AsSuccess(ctx);
                                     await RespondOrEdit(embed);
                                 }
                                 catch (DisCatSharp.Exceptions.BadRequestException ex)
@@ -302,7 +302,7 @@ internal class EmojiStealerCommand : BaseCommand
                                     if (regex.Groups[3].Value == "30008")
                                     {
                                         embed.Description = $"`Downloaded and added {i} emojis to the server. There is no more room for additional emojis.`";
-                                        embed.SetError(ctx);
+                                        embed.AsError(ctx);
                                         await RespondOrEdit(embed);
                                         _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                                         return;
@@ -313,7 +313,7 @@ internal class EmojiStealerCommand : BaseCommand
                             }
 
                             embed.Description = $"`Downloaded and added {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} emojis to the server.`";
-                            embed.SetSuccess(ctx);
+                            embed.AsSuccess(ctx);
                             await RespondOrEdit(embed);
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
@@ -324,7 +324,7 @@ internal class EmojiStealerCommand : BaseCommand
                             cancellationTokenSource.Cancel();
 
                             embed.Description = $"`Sending the {emojiText} in your DMs..`";
-                            embed.SetLoading(ctx);
+                            embed.AsLoading(ctx);
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
                             try
@@ -351,7 +351,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 {
                                     Description = "`It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
                                     ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
-                                }.SetError(ctx);
+                                }.AsError(ctx);
 
                                 if (ctx.User.Presence.ClientStatus.Mobile.HasValue)
                                     errorembed.ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif";
@@ -366,7 +366,7 @@ internal class EmojiStealerCommand : BaseCommand
                             }
 
                             embed.Description = $"`Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
-                            await RespondOrEdit(embed.SetSuccess(ctx));
+                            await RespondOrEdit(embed.AsSuccess(ctx));
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
                         }
@@ -376,7 +376,7 @@ internal class EmojiStealerCommand : BaseCommand
                             cancellationTokenSource.Cancel();
 
                             embed.Description = $"`Preparing your Zip File..`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetLoading(ctx)));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx)));
 
                             if (Directory.Exists($"zipfile-{guid}"))
                                 Directory.Delete($"zipfile-{guid}", true);
@@ -435,7 +435,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 }
 
                                 embed.Description = $"`Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
-                                await RespondOrEdit(embed.SetSuccess(ctx));
+                                await RespondOrEdit(embed.AsSuccess(ctx));
                             }
                             else if (e.Interaction.Data.CustomId == SendHereButton.CustomId)
                             {
@@ -451,7 +451,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 embed.Description = $"`Downloaded {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText}. Attached is a Zip File containing them.`";
 
                                 using var fileStream = File.OpenRead($"Emotes-{guid}.zip");
-                                await RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed.SetSuccess(ctx)));
+                                await RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed.AsSuccess(ctx)));
                             }
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;

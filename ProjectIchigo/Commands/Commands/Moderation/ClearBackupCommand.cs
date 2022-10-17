@@ -22,7 +22,7 @@ internal class ClearBackupCommand : BaseCommand
                     {
                         Url = victim.AvatarUrl
                     },
-                }.SetError(ctx));
+                }.AsError(ctx));
 
                 return;
             }
@@ -40,7 +40,7 @@ internal class ClearBackupCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 }
-            }.SetSuccess(ctx));
+            }.AsSuccess(ctx));
         });
     }
 }

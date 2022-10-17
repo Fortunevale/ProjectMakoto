@@ -13,7 +13,7 @@ internal class MusicModuleAbstractions
         var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
-        embed.SetLoading(ctx);
+        embed.AsLoading(ctx);
 
         embed.Description = $"`Looking for '{load}'..`";
         await ctx.BaseCommand.RespondOrEdit(embed.Build());
@@ -65,7 +65,7 @@ internal class MusicModuleAbstractions
         else
         {
             embed.Description = $"`On what platform do you want to search?`";
-            embed.SetAwaitingInput(ctx);
+            embed.AsAwaitingInput(ctx);
             
             var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Client, ctx.Bot)));
             var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Client, ctx.Bot)));
@@ -92,14 +92,14 @@ internal class MusicModuleAbstractions
         {
             _logger.LogError($"An exception occurred while trying to load lavalink track: {loadResult.Exception.Message} {loadResult.Exception.Severity}");
             embed.Description = $"`Failed to load '{load}'.`";
-            embed.SetError(ctx);
+            embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
         {
             embed.Description = $"`No matches found for '{load}'.`";
-            embed.SetError(ctx);
+            embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
@@ -116,7 +116,7 @@ internal class MusicModuleAbstractions
         else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
         {
             embed.Description = $"`Found {loadResult.Tracks.Count()} load result(s). Please select the song you want to add below.`";
-            embed.SetAwaitingInput(ctx);
+            embed.AsAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
             var UriResult = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks
