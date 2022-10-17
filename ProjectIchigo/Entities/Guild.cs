@@ -15,10 +15,12 @@ public class Guild
         ActionLog = new(this);
         InVoiceTextPrivacy = new(this);
         InviteTracker = new(this);
+        InviteNotes = new(this);
         NameNormalizer = new(this);
         EmbedMessage = new(this);
         MusicModule = new(this);
         Polls = new(this, bot);
+        VcCreator = new(this, bot);
     }
 
     public ulong ServerId { get; set; }
@@ -32,9 +34,11 @@ public class Guild
     public ActionLogSettings ActionLog { get; set; }
     public InVoiceTextPrivacySettings InVoiceTextPrivacy { get; set; }
     public InviteTrackerSettings InviteTracker { get; set; }
+    public InviteNotesSettings InviteNotes { get; set; }
     public NameNormalizerSettings NameNormalizer { get; set; }
     public EmbedMessageSettings EmbedMessage { get; set; }
     public PollSettings Polls { get; set; }
+    public VcCreatorSettings VcCreator { get; set; }
 
     public List<ulong> AutoUnarchiveThreads { get; set; } = new();
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();

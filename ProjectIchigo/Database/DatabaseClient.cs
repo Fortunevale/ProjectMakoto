@@ -437,6 +437,7 @@ internal class DatabaseClient
 
                 invitetracker_enabled = x.Value.InviteTracker.Enabled,
                 invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTracker.Cache),
+                invitenotes = JsonConvert.SerializeObject(x.Value.InviteNotes.Notes),
 
                 autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
 
@@ -452,7 +453,11 @@ internal class DatabaseClient
                 lavalink_shuffle = x.Value.MusicModule.Shuffle,
                 lavalink_repeat = x.Value.MusicModule.Repeat,
                 lavalink_queue = JsonConvert.SerializeObject(x.Value.MusicModule.SongQueue),
+
                 polls = JsonConvert.SerializeObject(x.Value.Polls.RunningPolls),
+
+                vccreator_channelid = x.Value.VcCreator.Channel,
+                vccreator_channellist = JsonConvert.SerializeObject(x.Value.VcCreator.CreatedChannels),
             }).ToList()));
         }
         catch (Exception ex)

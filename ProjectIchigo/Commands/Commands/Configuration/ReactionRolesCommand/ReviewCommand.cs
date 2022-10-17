@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = "`Loading Reaction Roles..`"
-            }.SetLoading(ctx, "Reaction Roles"));
+            }.AsLoading(ctx, "Reaction Roles"));
 
             var messageCache = await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
@@ -25,7 +25,7 @@ internal class ReviewCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = "`No reaction roles are set up.`"
-                }.SetInfo(ctx, "Reaction Roles"));
+                }.AsInfo(ctx, "Reaction Roles"));
                 return;
             }
 
@@ -64,7 +64,7 @@ internal class ReviewCommand : BaseCommand
             List<DiscordEmbed> embeds = Sections.Select(x => new DiscordEmbedBuilder
             {
                 Description = x
-            }.SetInfo(ctx, "Reaction Roles").Build()).ToList();
+            }.AsInfo(ctx, "Reaction Roles").Build()).ToList();
 
             await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(embeds));
             return;

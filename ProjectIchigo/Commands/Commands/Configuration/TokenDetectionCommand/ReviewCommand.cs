@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = TokenDetectionCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetInfo(ctx, "Token Detection"));
+            }.AsInfo(ctx, "Token Detection"));
         });
     }
 }

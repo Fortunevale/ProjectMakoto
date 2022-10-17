@@ -188,7 +188,7 @@ internal class UserInfoCommand : BaseCommand
                     catch (Exception)
                     {
                         _ = e.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
-                            .AddEmbed(new DiscordEmbedBuilder().WithDescription($"`Failed to fetch user '{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}'`").SetError(ctx)));
+                            .AddEmbed(new DiscordEmbedBuilder().WithDescription($"`Failed to fetch user '{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}'`").AsError(ctx)));
                         return;
                     }
 

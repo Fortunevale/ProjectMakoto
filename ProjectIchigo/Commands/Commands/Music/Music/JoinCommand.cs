@@ -36,7 +36,7 @@ internal class JoinCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`The bot joined your channel.`",
-                    }.SetSuccess(ctx));
+                    }.AsSuccess(ctx));
                 return;
             }
 
@@ -45,7 +45,7 @@ internal class JoinCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is already in use.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
 
                 throw new CancelException();
             }
@@ -60,7 +60,7 @@ internal class JoinCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`The bot joined your channel.`",
-                }.SetSuccess(ctx));
+                }.AsSuccess(ctx));
         });
     }
 }

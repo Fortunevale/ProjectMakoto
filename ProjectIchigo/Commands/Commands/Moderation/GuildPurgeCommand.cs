@@ -23,7 +23,7 @@ internal class GuildPurgeCommand : BaseCommand
             var status_embed = new DiscordEmbedBuilder
             {
                 Description = $"`Scanning all channels for messages sent by '{victim.UsernameWithDiscriminator}' ({victim.Id})..`"
-            }.SetLoading(ctx, "Server Purge");
+            }.AsLoading(ctx, "Server Purge");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
 
@@ -123,7 +123,7 @@ internal class GuildPurgeCommand : BaseCommand
             }
 
             status_embed.Description = $"`{allMsg} were found. {currentProg}/{maxProg} were deleted.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed.SetSuccess(ctx, "Server Purge")));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed.AsSuccess(ctx, "Server Purge")));
         });
     }
 }

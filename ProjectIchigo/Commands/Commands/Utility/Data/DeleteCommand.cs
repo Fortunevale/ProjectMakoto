@@ -17,7 +17,7 @@ internal class DeleteCommand : BaseCommand
                 Description = $"`This action will delete all data related to your user account. This includes, but is not limited to: Playlists, Settings, Url Submissions.`\n" +
                               $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
                               $"**`Are you sure you want to continue?`**"
-            }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+            }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
 
@@ -34,7 +34,7 @@ internal class DeleteCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"**`Please confirm again, are you sure?`**"
-                }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
+                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.WaitForButtonAsync();
 
@@ -51,7 +51,7 @@ internal class DeleteCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, deleting your profile..`"
-                    }.SetBotLoading(ctx));
+                    }.AsGenericLoading(ctx));
 
                     try
                     {
@@ -65,14 +65,14 @@ internal class DeleteCommand : BaseCommand
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
                             Description = $"`I'm sorry but something went wrong while deleting your profile. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
-                        }.SetBotError(ctx));
+                        }.AsBotError(ctx));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Successfully deleted your profile.`"
-                    }.SetSuccess(ctx));
+                    }.AsSuccess(ctx));
                 }
                 else
                 {

@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = ExperienceCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Experience");
+            }.AsAwaitingInput(ctx, "Experience");
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 

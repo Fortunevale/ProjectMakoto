@@ -18,7 +18,7 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = AutoCrosspostCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.SetAwaitingInput(ctx, "Auto Crosspost");
+            }.AsAwaitingInput(ctx, "Auto Crosspost");
 
             var SetDelayButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set delay", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
             var ExcludeBots = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Exclude Bots", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
@@ -73,14 +73,14 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").SetError(ctx, "Auto Crosspost")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The duration has to be between 1 second and 5 minutes.`").AsError(ctx, "Auto Crosspost")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
                     else if (ModalResult.Exception.GetType() == typeof(ArgumentException))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid Time Span`").SetError(ctx, "Auto Crosspost")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Invalid Time Span`").AsError(ctx, "Auto Crosspost")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -101,7 +101,7 @@ internal class ConfigCommand : BaseCommand
                 if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count >= 50)
                 {
                     embed.Description = $"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}";
-                    embed = embed.SetError(ctx, "Auto Crosspost");
+                    embed = embed.AsError(ctx, "Auto Crosspost");
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
@@ -124,7 +124,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any announcement channels in your server.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any announcement channels in your server.`"));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -135,7 +135,7 @@ internal class ConfigCommand : BaseCommand
 
                 if (ChannelResult.Result.Type != ChannelType.News)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The channel you selected is not an announcement channel.`").SetError(ctx, "Auto Crosspost")));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`The channel you selected is not an announcement channel.`").AsError(ctx, "Auto Crosspost")));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -143,7 +143,7 @@ internal class ConfigCommand : BaseCommand
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count >= 50)
                 {
-                    await RespondOrEdit(embed.WithDescription($"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}").SetError(ctx, "Auto Crosspost"));
+                    await RespondOrEdit(embed.WithDescription($"`You cannot add more than 50 channels to crosspost. Need more? Ask for approval on our development server:` {ctx.Bot.status.DevelopmentServerInvite}").AsError(ctx, "Auto Crosspost"));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -162,7 +162,7 @@ internal class ConfigCommand : BaseCommand
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count == 0)
                 {
-                    await RespondOrEdit(embed.WithDescription($"`No Crosspost Channels are set up.`").SetError(ctx, "Auto Crosspost"));
+                    await RespondOrEdit(embed.WithDescription($"`No Crosspost Channels are set up.`").AsError(ctx, "Auto Crosspost"));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;

@@ -20,7 +20,7 @@ internal class ScoreSaberCommandAbstractions
         var embed = new DiscordEmbedBuilder
         {
             Description = $"`Looking for player..`"
-        }.SetLoading(ctx, "Score Saber");
+        }.AsLoading(ctx, "Score Saber");
 
         await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -80,7 +80,7 @@ internal class ScoreSaberCommandAbstractions
                             {
                                 Description = $"{ctx.User.Mention} `Linked '{player.name.SanitizeForCode()}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
                                               $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
-                            }.SetSuccess(ctx, "Score Saber")));
+                            }.AsSuccess(ctx, "Score Saber")));
 
                             _ = Task.Delay(10000).ContinueWith(x =>
                             {
@@ -100,7 +100,7 @@ internal class ScoreSaberCommandAbstractions
                                 cancellationTokenSource.Cancel();
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                                embed = embed.SetError(ctx, "Score Saber");
+                                embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = $"`An internal server exception occurred. Please retry later.`";
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 
@@ -111,7 +111,7 @@ internal class ScoreSaberCommandAbstractions
                                 cancellationTokenSource.Cancel();
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                                embed = embed.SetError(ctx, "Score Saber");
+                                embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
@@ -134,7 +134,7 @@ internal class ScoreSaberCommandAbstractions
                                 cancellationTokenSource.Cancel();
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                                embed = embed.SetError(ctx, "Score Saber");
+                                embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = $"`An internal server exception occurred. Please retry later.`";
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
@@ -144,7 +144,7 @@ internal class ScoreSaberCommandAbstractions
                                 cancellationTokenSource.Cancel();
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                                embed = embed.SetError(ctx, "Score Saber");
+                                embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
@@ -208,7 +208,7 @@ internal class ScoreSaberCommandAbstractions
 
             async Task ShowProfile()
             {
-                embed = embed.SetInfo(ctx, "Score Saber");
+                embed = embed.AsInfo(ctx, "Score Saber");
 
                 embed.ClearFields();
                 embed.Title = $"{player.name.Sanitize()} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`";
@@ -228,7 +228,7 @@ internal class ScoreSaberCommandAbstractions
 
                 if (!string.IsNullOrWhiteSpace(LoadedGraph))
                 {
-                    embed = embed.SetInfo(ctx, "Score Saber");
+                    embed = embed.AsInfo(ctx, "Score Saber");
                     embed.ImageUrl = LoadedGraph;
                     builder.AddComponents(ProfileInteractionRow);
                 }
@@ -329,7 +329,7 @@ internal class ScoreSaberCommandAbstractions
 
                         LoadedGraph = asset.Attachments[0].Url;
 
-                        embed = embed.SetInfo(ctx, "Score Saber");
+                        embed = embed.AsInfo(ctx, "Score Saber");
                         embed.ImageUrl = asset.Attachments[0].Url;
                         builder = builder.WithEmbed(embed);
                         builder.AddComponents(ProfileInteractionRow);
@@ -337,7 +337,7 @@ internal class ScoreSaberCommandAbstractions
                     }
                     catch (Exception ex)
                     {
-                        embed = embed.SetInfo(ctx, "Score Saber");
+                        embed = embed.AsInfo(ctx, "Score Saber");
                         builder.AddComponents(ProfileInteractionRow);
                         await ctx.BaseCommand.RespondOrEdit(builder);
                         _logger.LogError(ex.ToString());
@@ -368,22 +368,22 @@ internal class ScoreSaberCommandAbstractions
         catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
         {
             embed.Description = $"`An internal server exception occurred. Please retry later.`";
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
         {
             embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
         {
             embed.Description = $"`Couldn't find the specified player.`";
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.UnprocessableEntity)
         {
             embed.Description = $"`Please provide an user id.`";
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetError(ctx, "Score Saber")));
+            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Exception)
         {

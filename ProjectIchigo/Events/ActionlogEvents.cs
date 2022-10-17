@@ -70,8 +70,16 @@ internal class ActionlogEvents
                 if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
                     return;
 
+                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code))
+                {
+                    embed.AddField(new DiscordEmbedField("Invite Notes", _bot.guilds[e.Guild.Id].InviteNotes.Notes[_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code].Note));
+                }
+
                 embed.Description += $"\n\n**Invited by**: <@{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
-                embed.Description += $"**Invited Code**: `{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
+                embed.Description += $"**Invite Code**: `{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
+
+                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code))
+                    embed.Description += $"**Invite Note**: `{_bot.guilds[e.Guild.Id].InviteNotes.Notes[_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code].Note.SanitizeForCode()}`";
 
                 _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
             });
@@ -189,7 +197,7 @@ internal class ActionlogEvents
     {
         Task.Run(async () =>
         {
-            if (!await ValidateServer(e.Guild) || !_bot.guilds[ e.Guild.Id ].ActionLog.VoiceStateUpdated)
+            if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.VoiceStateUpdated)
                 return;
 
             DiscordChannel PreviousChannel = e.Before?.Channel;
@@ -205,11 +213,11 @@ internal class ActionlogEvents
                         Color = EmbedColors.Success,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
-                        Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" + 
+                        Description = $"**User**: {e.User.Mention} `{e.User.UsernameWithDiscriminator}`\n" +
                                       $"**Channel**: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
                     };
 
-                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 }
                 else if (PreviousChannel is not null && NewChannel is null)
                 {
@@ -224,7 +232,7 @@ internal class ActionlogEvents
                                       $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]`"
                     };
 
-                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 }
                 else if (PreviousChannel is not null && NewChannel is not null)
                 {
@@ -239,7 +247,7 @@ internal class ActionlogEvents
                                       $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]` :arrow_right: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
                     };
 
-                    var msg = await e.Guild.GetChannel(_bot.guilds[ e.Guild.Id ].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                    var msg = await e.Guild.GetChannel(_bot.guilds[e.Guild.Id].ActionLog.Channel).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed));
                 }
         }).Add(_bot.watcher);
     }
@@ -1167,6 +1175,7 @@ internal class ActionlogEvents
             };
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+
 
             if (!_bot.guilds[e.Guild.Id].ActionLog.AttemptGettingMoreDetails)
                 return;

@@ -20,7 +20,7 @@ internal class ForceDisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class ForceDisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -38,7 +38,7 @@ internal class ForceDisconnectCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -51,7 +51,7 @@ internal class ForceDisconnectCommand : BaseCommand
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
                 Description = $"`The bot was force disconnected.`",
-            }.SetSuccess(ctx));
+            }.AsSuccess(ctx));
         });
     }
 }

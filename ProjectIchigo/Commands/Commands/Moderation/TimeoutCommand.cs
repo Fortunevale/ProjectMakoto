@@ -33,7 +33,7 @@ internal class TimeoutCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 },
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed: embed);
 
             if (string.IsNullOrWhiteSpace(duration))
@@ -59,7 +59,7 @@ internal class TimeoutCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`The Duration you specified is invalid.`",
-                    }.SetError(ctx));
+                    }.AsError(ctx));
                     return;
                 }
             }
@@ -69,7 +69,7 @@ internal class TimeoutCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"``The duration you specified is invalid.``",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -81,12 +81,12 @@ internal class TimeoutCommand : BaseCommand
                 await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
                 embed.Description = $"{victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`\n" +
                                     $"`The time out will end` {until.ToTimestamp()}`.`";
-                embed = embed.SetSuccess(ctx);
+                embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
                 embed.Description = $"{victim.Mention} `could not be timed out.`";
-                embed = embed.SetError(ctx);
+                embed = embed.AsError(ctx);
             }
 
             await RespondOrEdit(embed);

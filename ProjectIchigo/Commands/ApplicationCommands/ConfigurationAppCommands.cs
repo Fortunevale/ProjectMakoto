@@ -374,4 +374,52 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
     }
+
+    [SlashCommandGroup("invitenotes", "Allows you to add notes to invite codes.", dmPermission: false)]
+    public class InviteNotes : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review currently set up invite notes.", (long)Permissions.Administrator, dmPermission: false)]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.InviteNotesCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to add and remove currently set up invite notes.", (long)Permissions.Administrator, dmPermission: false)]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.InviteNotesCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
+
+    [SlashCommandGroup("vccreator", "Allows you to review and change settings related to the Voice Channel Creator.")]
+    public class VcCreator : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review currently used settings related to the Voice Channel Creator.")]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreatorCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to change currently used settings related to the Voice Channel Creator.")]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.VcCreatorCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
 }

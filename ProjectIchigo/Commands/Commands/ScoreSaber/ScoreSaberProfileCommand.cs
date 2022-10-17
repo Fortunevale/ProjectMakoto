@@ -28,7 +28,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
                                 Description = $"`Invalid input.`"
-                            }.SetError(ctx, "Score Saber")));
+                            }.AsError(ctx, "Score Saber")));
                             return;
                         }
                     }
@@ -40,7 +40,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Description = $"`The user you tagged does not exist.`"
-                    }.SetError(ctx, "Score Saber")));
+                    }.AsError(ctx, "Score Saber")));
                     return;
                 }
 
@@ -54,7 +54,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
                         Description = $"`This user has no Score Saber Profile linked to their Discord Account.`"
-                    }.SetError(ctx, "Score Saber")));
+                    }.AsError(ctx, "Score Saber")));
                     return;
                 }
             }

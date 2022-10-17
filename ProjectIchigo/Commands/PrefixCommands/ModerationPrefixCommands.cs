@@ -3,7 +3,9 @@ public class ModerationPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
-    [Command("poll"), Description("Starts a poll.")]
+    [Command("poll"),
+    CommandModule("moderation"),
+    Description("Starts a poll.")]
     public async Task Poll(CommandContext ctx)
     {
         Task.Run(async () =>

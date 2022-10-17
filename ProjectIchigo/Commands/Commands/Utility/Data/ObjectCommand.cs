@@ -17,7 +17,7 @@ internal class ObjectCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`You already objected to having your data get processed. Do you want to reverse that decision?`"
-                }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
 
@@ -34,7 +34,7 @@ internal class ObjectCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, removing you from the objection list..`"
-                    }.SetBotLoading(ctx));
+                    }.AsGenericLoading(ctx));
 
                     try
                     {
@@ -48,14 +48,14 @@ internal class ObjectCommand : BaseCommand
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
                             Description = $"`I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
-                        }.SetBotError(ctx));
+                        }.AsBotError(ctx));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Successfully removed you from the objection list.`"
-                    }.SetBotSuccess(ctx));
+                    }.AsBotSuccess(ctx));
                 }
                 else
                 {
@@ -72,7 +72,7 @@ internal class ObjectCommand : BaseCommand
                               $"`This will prevent you from using any commands of the bot.`\n" +
                               $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
                               $"**`Are you sure you want to continue?`**"
-            }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+            }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
 
@@ -89,7 +89,7 @@ internal class ObjectCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"**`Please confirm again, are you sure?`**"
-                }.SetBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
+                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.WaitForButtonAsync();
 
@@ -106,7 +106,7 @@ internal class ObjectCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, deleting your profile..`"
-                    }.SetBotLoading(ctx));
+                    }.AsGenericLoading(ctx));
 
                     try
                     {
@@ -120,21 +120,21 @@ internal class ObjectCommand : BaseCommand
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
                             Description = $"`I'm sorry but something went wrong while deleting your profile. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
-                        }.SetBotError(ctx));
+                        }.AsBotError(ctx));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Adding your account to objection list..`"
-                    }.SetBotLoading(ctx));
+                    }.AsGenericLoading(ctx));
 
                     ctx.Bot.objectedUsers.Add(ctx.User.Id);
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Successfully deleted your profile and added you to the objection list. You will no longer be able to run any commands. To re-allow user account creation, re-run this command.`"
-                    }.SetBotSuccess(ctx));
+                    }.AsBotSuccess(ctx));
 
                     foreach (var b in ctx.Client.Guilds.Where(x => x.Value.OwnerId == ctx.User.Id))
                     {

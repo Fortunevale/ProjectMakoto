@@ -12,18 +12,18 @@ internal class MoveAllCommand : BaseCommand
 
             if (newChannel.Type != ChannelType.Voice)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is not a voice channel.`").SetError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is not a voice channel.`").AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moving {ctx.Member.VoiceState.Channel.Users.Count} users to` {newChannel.Mention}`..`").SetLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moving {ctx.Member.VoiceState.Channel.Users.Count} users to` {newChannel.Mention}`..`").AsLoading(ctx));
 
             foreach (var b in ctx.Member.VoiceState.Channel.Users)
             {
                 await b.ModifyAsync(x => x.VoiceChannel = newChannel);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moved {ctx.Member.VoiceState.Channel.Users.Count} users to` {newChannel.Mention}`.`").SetSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moved {ctx.Member.VoiceState.Channel.Users.Count} users to` {newChannel.Mention}`.`").AsSuccess(ctx));
         });
     }
 }

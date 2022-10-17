@@ -12,7 +12,7 @@ internal class CreditsCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Fetching contributors..`"
-            }.SetBotLoading(ctx));
+            }.AsGenericLoading(ctx));
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
 
@@ -38,7 +38,7 @@ internal class CreditsCommand : BaseCommand
                               $"{ctx.CurrentUser.Username}'s Music Module uses [`Lavalink`](https://github.com/freyacodes/Lavalink), which was made by these people:\n" +
                               $"{string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})"))} and [{contributorslava.Count - 10} more](https://github.com/freyacodes/Lavalink/graphs/contributors).\n\n" +
                               $"Special thanks go to [`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) and [`Junortiz`](https://github.com/Junortiz) who publicly provide a list of phishing urls."
-            }.SetBotInfo(ctx));
+            }.AsBotInfo(ctx));
         });
     }
 }

@@ -15,7 +15,7 @@ internal class RankCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                }.SetError(ctx, "Experience"));
+                }.AsError(ctx, "Experience"));
                 return;
             }
 
@@ -33,7 +33,7 @@ internal class RankCommand : BaseCommand
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
-            }.SetInfo(ctx, "Experience"));
+            }.AsInfo(ctx, "Experience"));
         });
     }
 }

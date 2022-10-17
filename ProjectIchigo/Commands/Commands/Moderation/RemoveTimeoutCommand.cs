@@ -31,19 +31,19 @@ internal class RemoveTimeoutCommand : BaseCommand
                 {
                     Url = victim.AvatarUrl
                 },
-            }.SetLoading(ctx);
+            }.AsLoading(ctx);
             await RespondOrEdit(embed: embed);
 
             try
             {
                 await victim.RemoveTimeoutAsync();
                 embed.Description = $"`Removed timeout for {victim.UsernameWithDiscriminator} ({victim.Id}).`";
-                embed = embed.SetSuccess(ctx);
+                embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
                 embed.Description = $"`Couldn't remove timeout for {victim.UsernameWithDiscriminator} ({victim.Id}).`";
-                embed = embed.SetError(ctx);
+                embed = embed.AsError(ctx);
             }
 
             await RespondOrEdit(embed);

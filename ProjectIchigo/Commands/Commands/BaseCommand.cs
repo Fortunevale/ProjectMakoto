@@ -265,7 +265,7 @@ public abstract class BaseCommand
         async Task RefreshMessage()
         {
             var dropdown = new DiscordSelectComponent("Select a role..", FetchedRoles.Skip(CurrentPage * 25).Take(25), SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (!FetchedRoles.Skip(CurrentPage * 25).Any())
                 CurrentPage--;
@@ -433,7 +433,7 @@ public abstract class BaseCommand
         async Task RefreshMessage()
         {
             var dropdown = new DiscordSelectComponent("Select a channel..", FetchedChannels.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (!FetchedChannels.Skip(CurrentPage * 25).Any())
                 CurrentPage--;
@@ -565,7 +565,7 @@ public abstract class BaseCommand
         async Task RefreshMessage()
         {
             var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
-            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).SetAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
+            var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (options.Skip(CurrentPage * 25).Count() > 25)
                 builder.AddComponents(NextPageButton);
@@ -674,7 +674,7 @@ public abstract class BaseCommand
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
             Description = "`Waiting for a modal response..`"
-        }.SetAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.CancelButton }));
+        }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.CancelButton }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
@@ -1003,43 +1003,43 @@ public abstract class BaseCommand
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
         Description = "The user you tagged is required to be on this server for this command to run.",
-    }.SetError(ctx));
+    }.AsError(ctx));
 
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Ichigo Staff` to use this command.",
-        }.SetError(ctx));
+        }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Administrator` to use this command.",
-        }.SetError(ctx));
+        }.AsError(ctx));
 
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `{perms.ToPermissionString()}` to use this command.",
-        }.SetError(ctx));
+        }.AsError(ctx));
 
     public void SendVoiceStateError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You aren't in a voice channel.`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)).WithContent(ctx.User.Mention));
 
     public void SendUserBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)).WithContent(ctx.User.Mention));
 
     public void SendGuildBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)).WithContent(ctx.User.Mention));
 
     public void SendSourceError(Enums.CommandType commandType)
         => _ = commandType switch
@@ -1047,11 +1047,11 @@ public abstract class BaseCommand
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = $"This command is exclusive to application commands.",
-            }.SetError(ctx)),
+            }.AsError(ctx)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = $"This command is exclusive to prefixed commands."
-            }.SetError(ctx)),
+            }.AsError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
 
@@ -1059,7 +1059,7 @@ public abstract class BaseCommand
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
-        }.SetError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)).WithContent(ctx.User.Mention));
 
     public void SendOwnPermissionError(Permissions perms)
     {
@@ -1069,7 +1069,7 @@ public abstract class BaseCommand
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
             Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command."
-        }.SetError(ctx));
+        }.AsError(ctx));
     }
 
     public void SendSyntaxError()
@@ -1082,7 +1082,7 @@ public abstract class BaseCommand
         var embed = new DiscordEmbedBuilder
         {
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCode().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-        }.SetError(this.ctx);
+        }.AsError(this.ctx);
 
         _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
     }

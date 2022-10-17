@@ -13,7 +13,7 @@ internal class PollCommand : BaseCommand
 
             if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`There's already 10 polls running on this guild.`").SetError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`There's already 10 polls running on this guild.`").AsError(ctx));
                 return;
             }
 
@@ -32,7 +32,7 @@ internal class PollCommand : BaseCommand
                 if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 1)))
                 {
                     selectedDueDate = null;
-                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 1 month.`").SetError(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 1 month.`").AsError(ctx));
                     await Task.Delay(5000);
                 }
 
@@ -40,7 +40,7 @@ internal class PollCommand : BaseCommand
                 {
                     SelectedMin = 1;
                     SelectedMax = 20;
-                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid minimum or maximum.`").SetError(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid minimum or maximum.`").AsError(ctx));
                     await Task.Delay(5000);
                 }
 
@@ -64,7 +64,7 @@ internal class PollCommand : BaseCommand
                                      $"`Role to mention  `: {(SelectedRole is null ? "`No Role selected`" : SelectedRole.Mention)}\n" +
                                      $"`Minimum Votes    `: `{SelectedMin}`\n" +
                                      $"`Maximum Votes    `: `{SelectedMax}`")
-                    .SetAwaitingInput(ctx);
+                    .AsAwaitingInput(ctx);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                     .AddComponents(SelectPromptButton, SelectDueDateButton, SelectMultiSelectButton)
@@ -99,7 +99,7 @@ internal class PollCommand : BaseCommand
                     {
                         if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -129,7 +129,7 @@ internal class PollCommand : BaseCommand
                     {
                         if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any text channels in your server.`"));
+                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any text channels in your server.`"));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -181,7 +181,7 @@ internal class PollCommand : BaseCommand
                     {
                         if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").SetError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -218,7 +218,7 @@ internal class PollCommand : BaseCommand
                     {
                         if (!ModalResult.Result.Interaction.GetModalValueByCustomId("min").Truncate(2).IsDigitsOnly() || !ModalResult.Result.Interaction.GetModalValueByCustomId("max").Truncate(2).IsDigitsOnly())
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Invalid input.`"));
+                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Invalid input.`"));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -262,7 +262,7 @@ internal class PollCommand : BaseCommand
 
                     if (SelectedOptions.Any(x => x.Value == hash || x.Label.ToLower() == title.ToLower()))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`This option has already been added.`"));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`This option has already been added.`"));
                         await Task.Delay(3000);
                         continue;
                     }
@@ -299,42 +299,42 @@ internal class PollCommand : BaseCommand
 
                     if (!ctx.Guild.Channels.ContainsKey(SelectedChannel.Id))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The channel you selected no longer exists.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The channel you selected no longer exists.`").AsError(ctx));
                         await Task.Delay(1000);
                         continue;
                     }
 
                     if (SelectedRole is not null && !ctx.Guild.Roles.ContainsKey(SelectedRole.Id))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The role you selected no longer exists.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The role you selected no longer exists.`").AsError(ctx));
                         await Task.Delay(1000);
                         continue;
                     }
 
                     if (SelectedPrompt.IsNullOrWhiteSpace())
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The poll content you set is empty.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The poll content you set is empty.`").AsError(ctx));
                         await Task.Delay(1000);
                         continue;
                     }
 
                     if (SelectedOptions?.Count < 2)
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please specify at least 2 options.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please specify at least 2 options.`").AsError(ctx));
                         await Task.Delay(1000);
                         continue;
                     }
 
                     if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 1)))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Invalid Date & Time.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Invalid Date & Time.`").AsError(ctx));
                         await Task.Delay(1000);
                         continue;
                     }
 
                     if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`There's already 10 polls running on this guild.`").SetError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`There's already 10 polls running on this guild.`").AsError(ctx));
                         return;
                     }
 
@@ -344,7 +344,7 @@ internal class PollCommand : BaseCommand
 
                     var msg = await SelectedChannel.SendMessageAsync(new DiscordMessageBuilder()
                         .WithContent(SelectedRole is null ? "" : SelectedRole.Mention)
-                        .WithEmbed(new DiscordEmbedBuilder().SetAwaitingInput(ctx, "Poll")
+                        .WithEmbed(new DiscordEmbedBuilder().AsAwaitingInput(ctx, "Poll")
                             .WithDescription($"> **{polltxt}**\n\n_This poll will end {selectedDueDate.Value.ToTimestamp()}._\n\n`0 Total Votes`"))
                         .AddComponents(select).AddComponents(endearly));
 

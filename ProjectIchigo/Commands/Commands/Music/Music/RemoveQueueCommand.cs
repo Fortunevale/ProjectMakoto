@@ -28,7 +28,7 @@ internal class RemoveQueueCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -37,7 +37,7 @@ internal class RemoveQueueCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -52,7 +52,7 @@ internal class RemoveQueueCommand : BaseCommand
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
                         Description = $"`Your value is out of range. Currently, the range is 1-{ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}.`",
-                    }.SetError(ctx));
+                    }.AsError(ctx));
                     return;
                 }
 
@@ -65,7 +65,7 @@ internal class RemoveQueueCommand : BaseCommand
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
                         Description = $"`There is no such song queued.`",
-                    }.SetError(ctx));
+                    }.AsError(ctx));
                     return;
                 }
 
@@ -77,7 +77,7 @@ internal class RemoveQueueCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`There is no such song queued.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -86,7 +86,7 @@ internal class RemoveQueueCommand : BaseCommand
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
                 Description = $"`Removed` [`{info.VideoTitle}`]({info.Url}) `from the current queue.`",
-            }.SetSuccess(ctx));
+            }.AsSuccess(ctx));
         });
     }
 }

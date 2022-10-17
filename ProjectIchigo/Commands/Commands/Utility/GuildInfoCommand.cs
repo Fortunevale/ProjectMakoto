@@ -16,7 +16,7 @@ internal class GuildInfoCommand : BaseCommand
 			if (guildId == 0)
 				guildId = ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching guild info..`").SetBotLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching guild info..`").AsGenericLoading(ctx));
 
             try
 			{
@@ -31,7 +31,7 @@ internal class GuildInfoCommand : BaseCommand
 					},
 					ImageUrl = guild.DiscoverySplashUrl ?? guild.SplashUrl ?? "",
 					Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}",
-				}.SetBotInfo(ctx);
+				}.AsBotInfo(ctx);
 
                 embed.AddField(new DiscordEmbedField("Members", $"👥 `{guild.Members.Count}` **Members**\n" +
                                   $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **Online Members**\n" +
@@ -92,7 +92,7 @@ internal class GuildInfoCommand : BaseCommand
                         },
                         ImageUrl = preview.SplashUrl ?? preview.DiscoverySplashUrl ?? "",
 						Description = preview.Description ?? "",
-                    }.SetBotInfo(ctx, "", $"Info fetched via Discord Guild Preview");
+                    }.AsBotInfo(ctx, "", $"Info fetched via Discord Guild Preview");
 
                     embed.AddField(new DiscordEmbedField("Members", $"👥 `{preview.ApproximateMemberCount}` **Members**\n" +
                                   $"🟢 `{preview.ApproximatePresenceCount}` **Online Members**\n"));
@@ -124,7 +124,7 @@ internal class GuildInfoCommand : BaseCommand
                         var embed = new DiscordEmbedBuilder
 						{
                             Title = widget.name,
-                        }.SetBotInfo(ctx, "", $"Info fetched via Discord Guild Widget");
+                        }.AsBotInfo(ctx, "", $"Info fetched via Discord Guild Widget");
 
                         embed.AddField(new DiscordEmbedField("Members", $"🟢 `{widget.presence_count}` **Online Members**\n"));
 
@@ -149,7 +149,7 @@ internal class GuildInfoCommand : BaseCommand
                                     Url = $"https://cdn.discordapp.com/icons/{guildId}/{mee6.guild.icon}.webp?size=96",
                                 },
                                 ImageUrl = mee6.banner_url ?? "",
-                            }.SetBotInfo(ctx, "", $"Info fetched via Mee6 Leaderboard");
+                            }.AsBotInfo(ctx, "", $"Info fetched via Mee6 Leaderboard");
 
                             embed.AddField(new DiscordEmbedField("Members", $"👥 `{mee6.players.Length}` **Members**\n"));
 
@@ -160,7 +160,7 @@ internal class GuildInfoCommand : BaseCommand
                             var embed = new DiscordEmbedBuilder
                             {
                                 Description = $"`Could not fetch any information about the server you specified.`",
-                            }.SetBotError(ctx);
+                            }.AsBotError(ctx);
 
                             await RespondOrEdit(embed);
                         }

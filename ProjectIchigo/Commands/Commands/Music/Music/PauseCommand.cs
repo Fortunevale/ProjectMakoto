@@ -20,7 +20,7 @@ internal class PauseCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`The bot is not in a voice channel.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -29,7 +29,7 @@ internal class PauseCommand : BaseCommand
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
                     Description = $"`You aren't in the same channel as the bot.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
                 return;
             }
 
@@ -43,7 +43,7 @@ internal class PauseCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? "`Paused playback.`" : "`Resumed playback.`"),
-            }.SetSuccess(ctx));
+            }.AsSuccess(ctx));
         });
     }
 }

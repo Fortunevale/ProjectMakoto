@@ -14,7 +14,7 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = "`Loading Reaction Roles..`"
-            }.SetLoading(ctx, "Reaction Roles"));
+            }.AsLoading(ctx, "Reaction Roles"));
 
             await ReactionRolesCommandAbstractions.CheckForInvalid(ctx);
 
@@ -24,7 +24,7 @@ internal class ConfigCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = $"`{ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Count} reaction roles are set up.`"
-            }.SetAwaitingInput(ctx, "Reaction Roles");
+            }.AsAwaitingInput(ctx, "Reaction Roles");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -61,13 +61,13 @@ internal class ConfigCommand : BaseCommand
                         Description = $"`Message`: {(selectedMessage is null ? "`Not yet selected.`" : $"[`Jump to message`]({selectedMessage.JumpLink})")}\n" +
                                       $"`Emoji  `: {(selectedEmoji is null ? "`Not yet selected.`" : selectedEmoji.ToString())}\n" +
                                       $"`Role   `: {(selectedRole is null ? "`Not yet selected.`" : selectedRole.Mention)}"
-                    }.SetAwaitingInput(ctx, "Reaction Roles");
+                    }.AsAwaitingInput(ctx, "Reaction Roles");
 
 
                     if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
                     {
                         action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -94,7 +94,7 @@ internal class ConfigCommand : BaseCommand
                         {
                             Description = "`Please copy and paste the message link of the message you want the reaction role to be added to.`",
                             ImageUrl = "https://cdn.discordapp.com/attachments/906976602557145110/967753175241203712/unknown.png"
-                        }.SetAwaitingInput(ctx, "Reaction Roles"), false);
+                        }.AsAwaitingInput(ctx, "Reaction Roles"), false);
 
                         if (ModalResult.TimedOut)
                         {
@@ -119,7 +119,7 @@ internal class ConfigCommand : BaseCommand
                                                        $"`https://ptb.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`\n" +
                                                        $"`https://canary.discord.com/channels/012345678901234567/012345678901234567/012345678912345678`";
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -128,7 +128,7 @@ internal class ConfigCommand : BaseCommand
                         {
                             action_embed.Description = $"`The link you provided leads to another server.`";
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -137,7 +137,7 @@ internal class ConfigCommand : BaseCommand
                         {
                             action_embed.Description = $"`The link you provided leads to a channel that doesn't exist.`";
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -148,7 +148,7 @@ internal class ConfigCommand : BaseCommand
                         {
                             action_embed.Description = $"`The link you provided leads a message that doesn't exist or the bot has no access to.`";
                             action_embed.ImageUrl = "";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -162,7 +162,7 @@ internal class ConfigCommand : BaseCommand
 
                         action_embed.Description = "`Please react with the emoji you want to use for the reaction role to the target message.`";
                         action_embed.ImageUrl = "";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetAwaitingInput(ctx, "Reaction Roles")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsAwaitingInput(ctx, "Reaction Roles")));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == selectedMessage.Id, TimeSpan.FromMinutes(2));
 
@@ -181,7 +181,7 @@ internal class ConfigCommand : BaseCommand
                         if (emoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(emoji.Id))
                         {
                             action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -189,7 +189,7 @@ internal class ConfigCommand : BaseCommand
                         if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == emoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -201,7 +201,7 @@ internal class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await RespondOrEdit(action_embed.WithDescription("`Please select the role you want to use.`").SetAwaitingInput(ctx, "Reaction Roles"));
+                        await RespondOrEdit(action_embed.WithDescription("`Please select the role you want to use.`").AsAwaitingInput(ctx, "Reaction Roles"));
 
                         var RoleResult = await PromptRoleSelection();
 
@@ -218,7 +218,7 @@ internal class ConfigCommand : BaseCommand
                         {
                             if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().SetError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
                                 await Task.Delay(3000);
                                 continue;
                             }
@@ -229,7 +229,7 @@ internal class ConfigCommand : BaseCommand
                         if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == RoleResult.Result.Id))
                         {
                             action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -244,7 +244,7 @@ internal class ConfigCommand : BaseCommand
                         if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
                         {
                             action_embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(5000);
                             await ExecuteCommand(ctx, arguments);
                             return;
@@ -253,7 +253,7 @@ internal class ConfigCommand : BaseCommand
                         if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == selectedRole.Id))
                         {
                             action_embed.Description = $"`The specified role is already being used in another reaction role.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(5000);
                             await ExecuteCommand(ctx, arguments);
                             return;
@@ -262,7 +262,7 @@ internal class ConfigCommand : BaseCommand
                         if (selectedEmoji.Id != 0 && !ctx.Guild.Emojis.ContainsKey(selectedEmoji.Id))
                         {
                             action_embed.Description = $"`The bot has no access to this emoji. Any emoji of this server and built-in discord emojis should work.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(5000);
                             await ExecuteCommand(ctx, arguments);
                             return;
@@ -271,7 +271,7 @@ internal class ConfigCommand : BaseCommand
                         if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == selectedMessage.Id && x.Value.EmojiName == selectedEmoji.GetUniqueDiscordName())))
                         {
                             action_embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetError(ctx, "Reaction Roles")));
+                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Reaction Roles")));
                             await Task.Delay(5000);
                             await ExecuteCommand(ctx, arguments);
                             return;
@@ -288,7 +288,7 @@ internal class ConfigCommand : BaseCommand
                         await selectedMessage.CreateReactionAsync(selectedEmoji);
 
                         action_embed.Description = $"`Added role` {selectedRole.Mention} `to message sent by` {selectedMessage.Author?.Mention ?? "-"} `in` {selectedMessage.Channel.Mention} `with emoji` {selectedEmoji} `.`";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.SetSuccess(ctx, "Reaction Roles")));
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, "Reaction Roles")));
                         await Task.Delay(5000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -334,7 +334,7 @@ internal class ConfigCommand : BaseCommand
                 ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
                 embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage?.Author.Mention ?? "`/`"} `in` {reactionMessage?.Channel.Mention ?? "`/`"} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.SetSuccess(ctx, "Reaction Roles")));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, "Reaction Roles")));
                 await Task.Delay(5000);
                 await ExecuteCommand(ctx, arguments);
                 return;

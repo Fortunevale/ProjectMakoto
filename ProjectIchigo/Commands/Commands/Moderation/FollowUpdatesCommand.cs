@@ -37,14 +37,14 @@ internal class FollowUpdatesCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`Successfully followed {channel}.`",
-                }.SetSuccess(ctx));
+                }.AsSuccess(ctx));
             }
             catch (Exception)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`Could not follow {channel}.`",
-                }.SetError(ctx));
+                }.AsError(ctx));
             }
         });
     }

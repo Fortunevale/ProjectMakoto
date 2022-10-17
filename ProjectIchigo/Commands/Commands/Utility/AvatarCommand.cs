@@ -17,7 +17,7 @@ internal class AvatarCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.AvatarUrl,
-            }.SetInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Avatar");
+            }.AsInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Avatar");
 
             DiscordMember member = null;
 
