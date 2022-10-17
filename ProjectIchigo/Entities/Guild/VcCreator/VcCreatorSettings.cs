@@ -65,8 +65,9 @@ public class VcCreatorSettings
                             if (e.Before?.Channel?.Id == b.Key || e.After?.Channel?.Id == b.Key)
                             {
                                 var channel = (e.After?.Channel?.Id != 0 ? e.After.Channel : null) ?? e.Before.Channel;
+                                var users = channel.Users.Where(x => !x.IsBot).ToList()
 
-                                if (channel.Users.Count <= 0)
+                                if (users.Count <= 0)
                                 {
                                     _logger.LogDebug($"Channel '{b.Key}' is now empty, deleting.");
 
@@ -78,7 +79,7 @@ public class VcCreatorSettings
                                 if (e.User.Id == b.Value.OwnerId && e.After.Channel.Id != b.Key)
                                 {
                                     _logger.LogDebug($"The owner of channel '{b.Key}' left, assigning new owner.");
-                                    var newOwner = channel.Users.SelectRandom();
+                                    var newOwner = users.SelectRandom();
 
                                     b.Value.OwnerId = newOwner.Id;
 
