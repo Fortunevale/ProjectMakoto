@@ -7,6 +7,7 @@ public class VcCreatorSettings
         Parent = guild;
 
         this._bot = bot;
+        _CreatedChannels.ItemsChanged += CreatedChannelsUpdated;
     }
 
     private Guild Parent { get; set; }
@@ -30,14 +31,22 @@ public class VcCreatorSettings
 
     private async void CreatedChannelsUpdated(object? sender, ObservableListUpdate<KeyValuePair<ulong, VcCreatorDetails>> e)
     {
+        while (!_bot.status.DiscordGuildDownloadCompleted)
+            await Task.Delay(1000);
+
         cachedGuild ??= await _bot.discordClient.GetGuildAsync(Parent.ServerId);
 
-        foreach (var b in CreatedChannels.ToList())
+        await Task.Delay(5000);
+
+        for (int i = 0; i < CreatedChannels.Count; i++)
         {
+            var b = CreatedChannels.ElementAt(i);
+
             if (!cachedGuild.Channels.ContainsKey(b.Key))
             {
                 _logger.LogDebug($"Channel '{b.Key}' was deleted, deleting Vc Creator Entry.");
                 CreatedChannels.Remove(b.Key);
+                i--;
             }
         }
 
@@ -50,13 +59,15 @@ public class VcCreatorSettings
                     {
                         Task.Run(async () =>
                         {
-                            if (e.Channel.Id == b.Key)
+                            if (e.Before?.Channel?.Id == b.Key || e.After?.Channel?.Id == b.Key)
                             {
-                                if (e.Channel.Users.Count <= 0)
+                                var channel = (e.After?.Channel?.Id != 0 ? e.After.Channel : null) ?? e.Before.Channel;
+
+                                if (channel.Users.Count <= 0)
                                 {
                                     _logger.LogDebug($"Channel '{b.Key}' is now empty, deleting.");
 
-                                    await e.Channel.DeleteAsync();
+                                    await channel.DeleteAsync();
                                     CreatedChannels.Remove(b.Key);
                                     return;
                                 }
@@ -64,18 +75,23 @@ public class VcCreatorSettings
                                 if (e.User.Id == b.Value.OwnerId && e.After.Channel.Id != b.Key)
                                 {
                                     _logger.LogDebug($"The owner of channel '{b.Key}' left, assigning new owner.");
-                                    var newOwner = e.Channel.Users.SelectRandom();
+                                    var newOwner = channel.Users.SelectRandom();
 
                                     b.Value.OwnerId = newOwner.Id;
 
-                                    await e.Channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"`The channel is now owned by `{newOwner.Mention}.").WithColor(EmbedColors.Info));
+                                    await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"`The channel is now owned by `{newOwner.Mention}.").WithColor(EmbedColors.Info));
                                     return;
                                 }
 
                                 if (b.Value.BannedUsers.Contains(e.After?.User?.Id ?? 0))
                                 {
+                                    var u = (await e.User.ConvertToMember(cachedGuild));
+
                                     _logger.LogDebug($"Banned user in channel '{b.Key}' joined, disconnecting.");
-                                    await (await e.User.ConvertToMember(cachedGuild)).DisconnectFromVoiceAsync();
+                                    if (u.Permissions.HasPermission(Permissions.Administrator) || u.Permissions.HasPermission(Permissions.ManageChannels) || u.Permissions.HasPermission(Permissions.ModerateMembers) || u.Permissions.HasPermission(Permissions.KickMembers) || u.Permissions.HasPermission(Permissions.BanMembers) || u.Permissions.HasPermission(Permissions.MuteMembers) || u.Permissions.HasPermission(Permissions.DeafenMembers))
+                                        return;
+
+                                    await u.DisconnectFromVoiceAsync();
                                     return;
                                 }
 
@@ -83,16 +99,32 @@ public class VcCreatorSettings
                                 {
                                     if (e.After?.Channel?.Id == b.Key)
                                     {
-                                        await e.Channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"{e.User.Mention} `joined.`").WithColor(EmbedColors.Success).WithAuthor(AuditLogIcons.UserAdded));
+                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"{e.User.Mention} `joined.`").WithColor(EmbedColors.Success).WithAuthor("User joined", "", AuditLogIcons.UserAdded));
                                     }
                                     else
                                     {
-                                        await e.Channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"{e.User.Mention} `left.`").WithColor(EmbedColors.Error).WithAuthor(AuditLogIcons.UserLeft));
+                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription($"{e.User.Mention} `left.`").WithColor(EmbedColors.Error).WithAuthor("User left", "", AuditLogIcons.UserLeft));
                                     }
                                 }
                             }
                         }).Add(_bot.watcher);
                     }
+
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(5000);
+
+                        var channel = (await _bot.discordClient.GetChannelAsync(b.Key));
+
+                        if (channel.Users.Count <= 0)
+                        {
+                            _logger.LogDebug($"Channel '{b.Key}' is now empty, deleting.");
+
+                            await channel.DeleteAsync();
+                            CreatedChannels.Remove(b.Key);
+                            return;
+                        }
+                    }).Add(_bot.watcher);
 
                     _bot.discordClient.VoiceStateUpdated += VoiceStateUpdated;
                     _logger.LogDebug($"Created VcCreator Event for '{b.Key}'");

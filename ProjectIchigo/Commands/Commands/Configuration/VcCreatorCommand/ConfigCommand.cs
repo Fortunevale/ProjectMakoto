@@ -62,12 +62,10 @@ internal class ConfigCommand : BaseCommand
                     throw ChannelResult.Exception;
                 }
 
-                DiscordOverwrite present = null;
-                if (ChannelResult.Result?.Parent?.PermissionOverwrites.Any(x => (x.Type == OverwriteType.Role) && (x.Id == ctx.Guild.EveryoneRole.Id)) ?? false)
-                    present = ChannelResult.Result.Parent.PermissionOverwrites.First(x => (x.Type == OverwriteType.Role) && (x.Id == ctx.Guild.EveryoneRole.Id));
+                IReadOnlyList<DiscordOverwrite> present = ChannelResult.Result.Parent.PermissionOverwrites;
 
                 var Category = ChannelResult.Result?.Parent ?? await ctx.Guild.CreateChannelAsync("Voice Channel Creator", ChannelType.Category);
-                await ChannelResult.Result?.ModifyAsync(x => { x.Name = "➕ Create new Channel"; x.Parent = Category; x.PermissionOverwrites = new List<DiscordOverwriteBuilder>() { new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) { Allowed = (present?.Allowed ?? Permissions.None), Denied = (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak } }; });
+                await ChannelResult.Result?.ModifyAsync(x => { x.Name = "➕ Create new Channel"; x.Parent = Category; x.PermissionOverwrites = new List<DiscordOverwriteBuilder>(present.Where(x => x.Id != ctx.Guild.EveryoneRole.Id).Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).ToList()) { new DiscordOverwriteBuilder(ctx.Guild.EveryoneRole) { Allowed = (present.First(x => x.Id == ctx.Guild.EveryoneRole.Id)?.Allowed ?? Permissions.None), Denied = (present.First(x => x.Id == ctx.Guild.EveryoneRole.Id)?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak } }; });
 
                 ctx.Bot.guilds[ctx.Guild.Id].VcCreator.Channel = ChannelResult.Result?.Id ?? 0;
 

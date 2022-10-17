@@ -25,6 +25,7 @@ internal class DiscordEventHandler
         nameNormalizerEvents = new(_bot);
         embedMessagesEvents = new(_bot);
         tokenLeakEvents = new(_bot);
+        vcCreatorEvents = new(_bot);
     }
 
 
@@ -45,6 +46,7 @@ internal class DiscordEventHandler
     VoicePrivacyEvents voicePrivacyEvents { get; set; }
     InviteTrackerEvents inviteTrackerEvents { get; set; }
     InviteNoteEvents inviteNoteEvents { get; set; }
+    VcCreatorEvents vcCreatorEvents { get; set; }
     AutoUnarchiveEvents autoUnarchiveEvents { get; set; }
     NameNormalizerEvents nameNormalizerEvents { get; set; }
     EmbedMessagesEvents embedMessagesEvents { get; set; }
@@ -360,6 +362,7 @@ internal class DiscordEventHandler
 
             _ = actionlogEvents.VoiceStateUpdated(sender, e);
             _ = voicePrivacyEvents.VoiceStateUpdated(sender, e);
+            _ = vcCreatorEvents.VoiceStateUpdated(sender, e);
         });
     }
 
