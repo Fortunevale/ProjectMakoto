@@ -26,11 +26,11 @@ internal static class DiscordExtensions
     internal static string GetUniqueDiscordName(this DiscordEmoji emoji)
         => $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
 
-    internal static DiscordEmoji ToEmote(this bool b, DiscordClient client) 
-        => b ? DiscordEmoji.FromUnicode("✅") : DiscordEmoji.FromGuildEmote(client, 1005430134070841395);
+    internal static DiscordEmoji ToEmote(this bool b, Bot client) 
+        => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetWhiteXMark(client);
     
     internal static DiscordEmoji ToPillEmote(this bool b, Bot client) 
-        => b ? EmojiTemplates.GetPillOn(client.discordClient, client) : EmojiTemplates.GetPillOff(client.discordClient, client);
+        => b ? EmojiTemplates.GetPillOn(client) : EmojiTemplates.GetPillOff(client);
 
     internal static string ToEmotes(this long i) 
         => DigitsToEmotes(i.ToString());
@@ -89,38 +89,6 @@ internal static class DiscordExtensions
             return Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList();
         else
             return null;
-    }
-
-    internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> list, string title, string description = "")
-    {
-        List<DiscordEmbedBuilder> discordEmbeds = new();
-
-        int currentAmount = 0;
-        var currentEmbed = new DiscordEmbedBuilder() { Title = title };
-
-        foreach (var b in list)
-        {
-            if (currentAmount + b.Value.Length + b.Key.Length > (6000 - title.Length) - description.Length)
-            {
-                discordEmbeds.Add(currentEmbed);
-                currentEmbed = new DiscordEmbedBuilder() { Title = title };
-                currentAmount = 0;
-            }
-
-            currentEmbed.AddField(new DiscordEmbedField(b.Key, b.Value));
-
-            currentAmount += b.Key.Length;
-            currentAmount += b.Value.Length;
-        }
-
-        if (currentAmount > 0)
-        {
-            discordEmbeds.Add(currentEmbed);
-        }
-
-        discordEmbeds.First().Description = description;
-
-        return discordEmbeds;
     }
 
     internal static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")

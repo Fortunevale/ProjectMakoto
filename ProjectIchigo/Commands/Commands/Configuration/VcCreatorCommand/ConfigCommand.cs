@@ -16,7 +16,7 @@ internal class ConfigCommand : BaseCommand
                 Description = VcCreatorCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsInfo(ctx, "Voice Channel Creator");
 
-            var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set Voice Channel Creator", false, EmojiTemplates.GetChannel(ctx.Client, ctx.Bot).ToComponent());
+            var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set Voice Channel Creator", false, EmojiTemplates.GetChannel(ctx.Bot).ToComponent());
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
