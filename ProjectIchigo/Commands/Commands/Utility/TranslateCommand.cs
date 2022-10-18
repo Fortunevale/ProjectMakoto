@@ -72,7 +72,7 @@ internal class TranslateCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == GoogleButton.CustomId)
+            if (e.GetCustomId() == GoogleButton.CustomId)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -154,7 +154,7 @@ internal class TranslateCommand : BaseCommand
                     Description = $"{Translation.Item1}",
                 }.AsInfo(ctx, "", $"Translated from {(SourceResult.Result == "auto" ? $"{ctx.Bot.languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot.languageCodes.List.First(x => x.Code == SourceResult.Result).Name)} to {ctx.Bot.languageCodes.List.First(x => x.Code == TargetResult.Result).Name} using Google")));
             }
-            else if (e.Result.Interaction.Data.CustomId == LibreTranslateButton.CustomId)
+            else if (e.GetCustomId() == LibreTranslateButton.CustomId)
             {
                 var languagesResponse = await client.GetAsync($"http://{ctx.Bot.status.LoadedConfig.Secrets.LibreTranslateHost}/languages");
 

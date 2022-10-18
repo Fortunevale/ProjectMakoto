@@ -65,12 +65,12 @@ internal class AvatarCommand : BaseCommand
 
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Interaction.Data.CustomId == ServerProfilePictureButton.CustomId)
+                        if (e.GetCustomId() == ServerProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.GuildAvatarUrl;
                             _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ProfilePictureButton));
                         }
-                        else if (e.Interaction.Data.CustomId == ProfilePictureButton.CustomId)
+                        else if (e.GetCustomId() == ProfilePictureButton.CustomId)
                         {
                             embed.ImageUrl = member.AvatarUrl;
                             _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));

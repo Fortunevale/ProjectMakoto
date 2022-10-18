@@ -35,7 +35,7 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == SetChannel.CustomId)
+            if (e.GetCustomId() == SetChannel.CustomId)
             {
                 var ChannelResult = await PromptChannelSelection(ChannelType.Voice, new ChannelPromptConfiguration { DisableOption = "Disable Voice Channel Creator" });
 
@@ -72,7 +72,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

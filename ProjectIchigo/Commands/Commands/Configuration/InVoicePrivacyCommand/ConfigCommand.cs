@@ -37,14 +37,14 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == ToggleDeletion.CustomId)
+            if (e.GetCustomId() == ToggleDeletion.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled = !ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == TogglePermission.CustomId)
+            else if (e.GetCustomId() == TogglePermission.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled = !ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled;
 
@@ -75,7 +75,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

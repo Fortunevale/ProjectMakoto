@@ -150,7 +150,7 @@ internal class EmbedMessagesEvents
     {
         _ = Task.Run(async () =>
         {
-            if (e.Interaction.Data.CustomId == "DeleteEmbedMessage")
+            if (e.GetCustomId() == "DeleteEmbedMessage")
             {
                 var fullMsg = await e.Message.Refetch();
 

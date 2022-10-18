@@ -43,7 +43,7 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == AddButton.CustomId)
+            if (e.GetCustomId() == AddButton.CustomId)
             {
                 DiscordMessage selectedMessage = null;
                 DiscordEmoji selectedEmoji = null;
@@ -85,7 +85,7 @@ internal class ConfigCommand : BaseCommand
                         return;
                     }
 
-                    if (Menu.Result.Interaction.Data.CustomId == SelectMessage.CustomId)
+                    if (Menu.GetCustomId() == SelectMessage.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Input Message Url", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Message Url", "https://discord.com/channels/012345678901234567/012345678901234567/012345678912345678", null, null, true));
@@ -156,7 +156,7 @@ internal class ConfigCommand : BaseCommand
                         selectedMessage = reactionMessage;
                         continue;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == SelectEmoji.CustomId)
+                    else if (Menu.GetCustomId() == SelectEmoji.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -197,7 +197,7 @@ internal class ConfigCommand : BaseCommand
                         selectedEmoji = emoji;
                         continue;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == SelectRole.CustomId)
+                    else if (Menu.GetCustomId() == SelectRole.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -237,7 +237,7 @@ internal class ConfigCommand : BaseCommand
                         selectedRole = RoleResult.Result;
                         continue;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                    else if (Menu.GetCustomId() == Finish.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -293,7 +293,7 @@ internal class ConfigCommand : BaseCommand
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -304,7 +304,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+            else if (e.GetCustomId() == RemoveButton.CustomId)
             {
                 var RoleResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles
                     .Select(x => new DiscordSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
@@ -339,7 +339,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

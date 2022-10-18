@@ -45,7 +45,7 @@ internal class ConfigCommand : BaseCommand
                 return;
             }
 
-            if (Button.Result.Interaction.Data.CustomId == ExcludeBots.CustomId)
+            if (Button.GetCustomId() == ExcludeBots.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -54,7 +54,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == SetDelayButton.CustomId)
+            else if (Button.GetCustomId() == SetDelayButton.CustomId)
             {
 
                 var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromMinutes(5), TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.DelayBeforePosting), false);
@@ -94,7 +94,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == AddButton.CustomId)
+            else if (Button.GetCustomId() == AddButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -156,7 +156,7 @@ internal class ConfigCommand : BaseCommand
                 return;
 
             }
-            else if (Button.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+            else if (Button.GetCustomId() == RemoveButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -194,7 +194,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

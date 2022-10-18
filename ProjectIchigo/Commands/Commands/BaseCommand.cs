@@ -306,19 +306,19 @@ public abstract class BaseCommand
                         sw.Restart();
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Interaction.Data.CustomId == SelectionInteractionId)
+                        if (e.GetCustomId() == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
                             FetchedRoles = FetchedRoles.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == RefreshListButton.CustomId)
+                        else if (e.GetCustomId() == RefreshListButton.CustomId)
                         {
                             await RefreshList();
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
+                        else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
@@ -331,17 +331,17 @@ public abstract class BaseCommand
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
+                        else if (e.GetCustomId() == PrevPageButton.CustomId)
                         {
                             CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
+                        else if (e.GetCustomId() == NextPageButton.CustomId)
                         {
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                             throw new CancelException();
                     }
                 }
@@ -474,14 +474,14 @@ public abstract class BaseCommand
                         sw.Restart();
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Interaction.Data.CustomId == SelectionInteractionId)
+                        if (e.GetCustomId() == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
                             FetchedChannels = FetchedChannels.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
+                        else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
@@ -494,22 +494,22 @@ public abstract class BaseCommand
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == RefreshListButton.CustomId)
+                        else if (e.GetCustomId() == RefreshListButton.CustomId)
                         {
                             await RefreshList();
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
+                        else if (e.GetCustomId() == PrevPageButton.CustomId)
                         {
                             CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
+                        else if (e.GetCustomId() == NextPageButton.CustomId)
                         {
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                             throw new CancelException();
                     }
                 }
@@ -600,14 +600,14 @@ public abstract class BaseCommand
                         sw.Restart();
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Interaction.Data.CustomId == SelectionInteractionId)
+                        if (e.GetCustomId() == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
                             options = options.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == ConfirmSelectionButton.CustomId)
+                        else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
@@ -615,17 +615,17 @@ public abstract class BaseCommand
 
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == PrevPageButton.CustomId)
+                        else if (e.GetCustomId() == PrevPageButton.CustomId)
                         {
                             CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == NextPageButton.CustomId)
+                        else if (e.GetCustomId() == NextPageButton.CustomId)
                         {
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                             throw new CancelException();
                     }
                 }
@@ -696,7 +696,7 @@ public abstract class BaseCommand
                 {
                     if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
-                        if (e.Interaction.Data.CustomId == builder.CustomId)
+                        if (e.GetCustomId() == builder.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
@@ -705,11 +705,11 @@ public abstract class BaseCommand
                             FinishedInteraction = e;
                             FinishedSelection = true;
                         }
-                        else if (e.Interaction.Data.CustomId == ReOpen.CustomId)
+                        else if (e.GetCustomId() == ReOpen.CustomId)
                         {
                             await e.Interaction.CreateInteractionModalResponseAsync(builder);
                         }
-                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             throw new CancelException();

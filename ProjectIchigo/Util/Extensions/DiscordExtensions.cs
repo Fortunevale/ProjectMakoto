@@ -11,8 +11,11 @@ internal static class DiscordExtensions
     internal static List<DiscordOverwriteBuilder> ConvertToBuilder(this IReadOnlyList<DiscordOverwrite> overwrites)
         => overwrites.Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).ToList();
 
+    internal static string GetCustomId(this InteractivityResult<ComponentInteractionCreateEventArgs> e)
+        => e.GetCustomId();
+
     internal static string GetCustomId(this ComponentInteractionCreateEventArgs e)
-        => e.Interaction.Data.CustomId;
+        => e.GetCustomId();
 
     internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
@@ -64,13 +67,6 @@ internal static class DiscordExtensions
         ChannelType.Forum => "📄",
         _ => "❔",
     };
-
-    internal static DiscordEmbedField AddField(this DiscordEmbedBuilder builder, string name, string value, bool inline = false)
-    {
-        var field = new DiscordEmbedField(name, value, inline);
-        builder.AddField(field);
-        return field;
-    }
 
     internal static List<Tuple<ulong, string, bool>>? GetEmotes(this string content)
     {
@@ -135,15 +131,15 @@ internal static class DiscordExtensions
     {
         Dictionary<Color, string> colorArray = new()
         {
-            { Color.FromArgb(49, 55, 61) , ":black_circle:" },
-            { Color.FromArgb(85, 172, 238) , ":blue_circle:" },
-            { Color.FromArgb(192, 105, 79) , ":brown_circle:" },
-            { Color.FromArgb(120, 177, 89) , ":green_circle:" },
-            { Color.FromArgb(244, 144, 12) , ":orange_circle:" },
+            { Color.FromArgb(49, 55, 61)    , ":black_circle:" },
+            { Color.FromArgb(85, 172, 238)  , ":blue_circle:" },
+            { Color.FromArgb(192, 105, 79)  , ":brown_circle:" },
+            { Color.FromArgb(120, 177, 89)  , ":green_circle:" },
+            { Color.FromArgb(244, 144, 12)  , ":orange_circle:" },
             { Color.FromArgb(170, 142, 214) , ":purple_circle:" },
-            { Color.FromArgb(221, 46, 68) , ":red_circle:" },
+            { Color.FromArgb(221, 46, 68)   , ":red_circle:" },
             { Color.FromArgb(230, 231, 232) , ":white_circle:" },
-            { Color.FromArgb(253, 203, 88) , ":yellow_circle:" },
+            { Color.FromArgb(253, 203, 88)  , ":yellow_circle:" },
         };
 
         var color = GetClosestColor(colorArray.Select(x => x.Key).ToList(), Color.FromArgb(discordColor.R, discordColor.G, discordColor.B));

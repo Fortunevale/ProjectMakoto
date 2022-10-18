@@ -63,7 +63,7 @@ internal class ManageCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == AddToQueue.CustomId)
+            if (e.GetCustomId() == AddToQueue.CustomId)
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
@@ -118,7 +118,7 @@ internal class ManageCommand : BaseCommand
                 await RespondOrEdit(embed.AsSuccess(ctx, "Playlists"));
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == SharePlaylist.CustomId)
+            else if (e.GetCustomId() == SharePlaylist.CustomId)
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
@@ -158,7 +158,7 @@ internal class ManageCommand : BaseCommand
                 File.WriteAllText($"PlaylistShares/{ctx.User.Id}/{ShareCode}.json", JsonConvert.SerializeObject(SelectedPlaylist, Formatting.Indented));
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ExportPlaylist.CustomId)
+            else if (e.GetCustomId() == ExportPlaylist.CustomId)
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
@@ -206,7 +206,7 @@ internal class ManageCommand : BaseCommand
                 });
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == NewPlaylist.CustomId)
+            else if (e.GetCustomId() == NewPlaylist.CustomId)
             {
                 string SelectedPlaylistName = "";
                 List<PlaylistEntry> SelectedTracks = null;
@@ -247,7 +247,7 @@ internal class ManageCommand : BaseCommand
                         return;
                     }
 
-                    if (Menu.Result.Interaction.Data.CustomId == SelectName.CustomId)
+                    if (Menu.GetCustomId() == SelectName.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "" : SelectedPlaylistName)));
@@ -274,7 +274,7 @@ internal class ManageCommand : BaseCommand
                         SelectedPlaylistName = ModalResult.Result.Interaction.GetModalValueByCustomId("name");
                         continue;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == SelectFirstTracks.CustomId)
+                    else if (Menu.GetCustomId() == SelectFirstTracks.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Set first track(s) for your Playlist", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url, Playlist Url or Search Query", "", 1, 100, true));
@@ -311,7 +311,7 @@ internal class ManageCommand : BaseCommand
                         }).ToList();
                         continue;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                    else if (Menu.GetCustomId() == Finish.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -347,7 +347,7 @@ internal class ManageCommand : BaseCommand
                         await HandlePlaylistModify(v);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                     {
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -356,7 +356,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == SaveCurrent.CustomId)
+            else if (e.GetCustomId() == SaveCurrent.CustomId)
             {
                 if (ctx.Member.VoiceState is null || ctx.Member.VoiceState.Channel.Id != (await ctx.Client.CurrentUser.ConvertToMember(ctx.Guild)).VoiceState?.Channel?.Id)
                 {
@@ -405,7 +405,7 @@ internal class ManageCommand : BaseCommand
                         return;
                     }
 
-                    if (Menu.Result.Interaction.Data.CustomId == SelectName.CustomId)
+                    if (Menu.GetCustomId() == SelectName.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "" : SelectedPlaylistName)));
@@ -433,7 +433,7 @@ internal class ManageCommand : BaseCommand
                         SelectedPlaylistName = ModalResult.Result.Interaction.GetModalValueByCustomId("name");
                         continue;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                    else if (Menu.GetCustomId() == Finish.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -469,7 +469,7 @@ internal class ManageCommand : BaseCommand
                         await HandlePlaylistModify(v);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                     {
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -478,7 +478,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == ImportPlaylist.CustomId)
+            else if (e.GetCustomId() == ImportPlaylist.CustomId)
             {
                 if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                 {
@@ -507,7 +507,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
 
-                if (Menu.Result.Interaction.Data.CustomId == Link.CustomId)
+                if (Menu.GetCustomId() == Link.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("Import Playlist", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Playlist Url, Playlist Url", "", 1, 100, true));
@@ -588,7 +588,7 @@ internal class ManageCommand : BaseCommand
                         return;
                     }
                 }
-                else if (Menu.Result.Interaction.Data.CustomId == ExportedPlaylist.CustomId)
+                else if (Menu.GetCustomId() == ExportedPlaylist.CustomId)
                 {
                     try
                     {
@@ -676,7 +676,7 @@ internal class ManageCommand : BaseCommand
                         return;
                     }
                 }
-                else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -684,7 +684,7 @@ internal class ManageCommand : BaseCommand
                     return;
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == ModifyPlaylist.CustomId)
+            else if (e.GetCustomId() == ModifyPlaylist.CustomId)
             {
                 embed = new DiscordEmbedBuilder()
                 {
@@ -717,7 +717,7 @@ internal class ManageCommand : BaseCommand
                 await HandlePlaylistModify(SelectedPlaylist);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == DeletePlaylist.CustomId)
+            else if (e.GetCustomId() == DeletePlaylist.CustomId)
             {
                 List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
@@ -854,7 +854,7 @@ internal class ManageCommand : BaseCommand
                                 }
                             });
 
-                            switch (e.Interaction.Data.CustomId)
+                            switch (e.GetCustomId())
                             {
                                 case "AddSong":
                                 {

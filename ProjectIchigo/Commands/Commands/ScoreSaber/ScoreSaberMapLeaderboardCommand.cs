@@ -83,7 +83,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                         cancellationTokenSource.Cancel();
                         cancellationTokenSource = new();
 
-                        if (e.Interaction.Data.CustomId == NextPageId)
+                        if (e.GetCustomId() == NextPageId)
                         {
                             if (InternalPage == 1)
                             {
@@ -98,7 +98,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
 
                             await SendPage(InternalPage, scoreSaberPage);
                         }
-                        else if (e.Interaction.Data.CustomId == PrevPageId)
+                        else if (e.GetCustomId() == PrevPageId)
                         {
                             if (InternalPage == 1)
                             {

@@ -48,28 +48,28 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == ToggleGlobalban.CustomId)
+            if (e.GetCustomId() == ToggleGlobalban.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].Join.AutoBanGlobalBans = !ctx.Bot.guilds[ctx.Guild.Id].Join.AutoBanGlobalBans;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ToggleReApplyRoles.CustomId)
+            else if (e.GetCustomId() == ToggleReApplyRoles.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyRoles = !ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyRoles;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ToggleReApplyName.CustomId)
+            else if (e.GetCustomId() == ToggleReApplyName.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyNickname = !ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyNickname;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ChangeJoinlogChannel.CustomId)
+            else if (e.GetCustomId() == ChangeJoinlogChannel.CustomId)
             {
                 var ChannelResult = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
                 {
@@ -109,7 +109,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ChangeRoleOnJoin.CustomId)
+            else if (e.GetCustomId() == ChangeRoleOnJoin.CustomId)
             {
                 var RoleResult = await PromptRoleSelection(new RolePromptConfiguration { CreateRoleOption = "AutoAssignedRole", DisableOption = "Disable Role on join" });
 
@@ -140,7 +140,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
             }

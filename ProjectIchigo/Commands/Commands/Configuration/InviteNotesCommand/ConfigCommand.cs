@@ -45,7 +45,7 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == AddButton.CustomId)
+            if (e.GetCustomId() == AddButton.CustomId)
             {
                 string? SelectedText = null;
                 DiscordInvite SelectedInvite = null;
@@ -75,7 +75,7 @@ internal class ConfigCommand : BaseCommand
                         return;
                     }
 
-                    if (Menu.Result.GetCustomId() == SelectTextButton.CustomId)
+                    if (Menu.GetCustomId() == SelectTextButton.CustomId)
                     {
                         var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, new DiscordInteractionModalBuilder()
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 128, true)), false);
@@ -97,7 +97,7 @@ internal class ConfigCommand : BaseCommand
 
                         SelectedText = ModalResult.Result.Interaction.GetModalValueByCustomId("Note").Truncate(128);
                     }
-                    else if (Menu.Result.GetCustomId() == SelectInviteButton.CustomId)
+                    else if (Menu.GetCustomId() == SelectInviteButton.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -123,7 +123,7 @@ internal class ConfigCommand : BaseCommand
 
                         SelectedInvite = invites.First(x => x.Code == SelectionResult.Result);
                     }
-                    else if (Menu.Result.GetCustomId() == Finish.CustomId)
+                    else if (Menu.GetCustomId() == Finish.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -139,7 +139,7 @@ internal class ConfigCommand : BaseCommand
                     }
                 }
             }
-            else if (e.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+            else if (e.GetCustomId() == RemoveButton.CustomId)
             {
                 var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
 
@@ -163,7 +163,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

@@ -20,7 +20,7 @@ internal class PhishingSubmissionEvents
 
                 await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (e.Interaction.Data.CustomId == "accept_submission")
+                if (e.GetCustomId() == "accept_submission")
                 {
                     _bot.phishingUrls.Add(_bot.submittedUrls[e.Message.Id].Url, new PhishingUrlEntry
                     {
@@ -48,7 +48,7 @@ internal class PhishingSubmissionEvents
                         _logger.LogError($"Failed to update database", ex);
                     }
                 }
-                else if (e.Interaction.Data.CustomId == "deny_submission")
+                else if (e.GetCustomId() == "deny_submission")
                 {
                     _bot.submittedUrls.Remove(e.Message.Id);
 
@@ -60,7 +60,7 @@ internal class PhishingSubmissionEvents
 
                     _ = e.Message.DeleteAsync();
                 }
-                else if (e.Interaction.Data.CustomId == "ban_user")
+                else if (e.GetCustomId() == "ban_user")
                 {
                     _bot.phishingUrlSubmissionUserBans.Add(_bot.submittedUrls[e.Message.Id].Submitter, new PhishingSubmissionBanDetails
                     {
@@ -78,7 +78,7 @@ internal class PhishingSubmissionEvents
 
                     _ = e.Message.DeleteAsync();
                 }
-                else if (e.Interaction.Data.CustomId == "ban_guild")
+                else if (e.GetCustomId() == "ban_guild")
                 {
                     _bot.phishingUrlSubmissionGuildBans.Add(_bot.submittedUrls[e.Message.Id].GuildOrigin, new PhishingSubmissionBanDetails
                     {

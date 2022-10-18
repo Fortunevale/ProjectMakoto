@@ -41,14 +41,14 @@ internal class ConfigCommand : BaseCommand
 
             _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (Button.Result.Interaction.Data.CustomId == Disable.CustomId)
+            if (Button.GetCustomId() == Disable.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].ActionLog = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
+            else if (Button.GetCustomId() == ChangeChannel.CustomId)
             {
                 var ChannelResult = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
                 {
@@ -93,7 +93,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeFilter.CustomId)
+            else if (Button.GetCustomId() == ChangeFilter.CustomId)
             {
                 try
                 {
@@ -157,7 +157,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

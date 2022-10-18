@@ -82,10 +82,10 @@ internal class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            embed.Description = $"`Looking for '{load}' on {(Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`";
+            embed.Description = $"`Looking for '{load}' on {(Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`";
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
-            loadResult = await node.Rest.GetTracksAsync(load, (Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
+            loadResult = await node.Rest.GetTracksAsync(load, (Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
         }
 
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)

@@ -38,7 +38,7 @@ internal class UrbanDictionaryCommand : BaseCommand
 
             _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+            if (Menu.GetCustomId() == Yes.CustomId)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {

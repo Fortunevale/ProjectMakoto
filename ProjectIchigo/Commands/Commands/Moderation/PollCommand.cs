@@ -80,7 +80,7 @@ internal class PollCommand : BaseCommand
                     return;
                 }
 
-                if (Menu.Result.GetCustomId() == SelectRoleButton.CustomId)
+                if (Menu.GetCustomId() == SelectRoleButton.CustomId)
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -110,7 +110,7 @@ internal class PollCommand : BaseCommand
                     SelectedRole = RoleResult.Result;
                     continue;
                 }
-                else if (Menu.Result.GetCustomId() == SelectChannelButton.CustomId)
+                else if (Menu.GetCustomId() == SelectChannelButton.CustomId)
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -140,7 +140,7 @@ internal class PollCommand : BaseCommand
                     SelectedChannel = ChannelResult.Result;
                     continue;
                 }
-                else if (Menu.Result.GetCustomId() == SelectPromptButton.CustomId)
+                else if (Menu.GetCustomId() == SelectPromptButton.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("New Poll", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "prompt", "Poll Content", "", 1, 256, true));
@@ -164,7 +164,7 @@ internal class PollCommand : BaseCommand
                     SelectedPrompt = ModalResult.Result.Interaction.GetModalValueByCustomId("prompt").Truncate(256);
                     continue;
                 }
-                else if (Menu.Result.GetCustomId() == SelectDueDateButton.CustomId)
+                else if (Menu.GetCustomId() == SelectDueDateButton.CustomId)
                 {
                     var ModalResult = await PromptModalForDateTime(Menu.Result.Interaction, false);
 
@@ -192,7 +192,7 @@ internal class PollCommand : BaseCommand
                     selectedDueDate = ModalResult.Result;
                     continue;
                 }
-                else if (Menu.Result.GetCustomId() == SelectMultiSelectButton.CustomId)
+                else if (Menu.GetCustomId() == SelectMultiSelectButton.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("New Poll", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "min", "Minimum", null, 1, 2, true, "1"))
@@ -233,7 +233,7 @@ internal class PollCommand : BaseCommand
                         throw;
                     }
                 }
-                else if (Menu.Result.GetCustomId() == AddOptionButton.CustomId)
+                else if (Menu.GetCustomId() == AddOptionButton.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("New Poll", Guid.NewGuid().ToString())
                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 1, 20, true))
@@ -270,7 +270,7 @@ internal class PollCommand : BaseCommand
                     SelectedOptions.Add(new DiscordSelectComponentOption(title, hash, desc));
                     continue;
                 }
-                else if (Menu.Result.GetCustomId() == RemoveOptionButton.CustomId)
+                else if (Menu.GetCustomId() == RemoveOptionButton.CustomId)
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -293,7 +293,7 @@ internal class PollCommand : BaseCommand
                     SelectedOptions = SelectedOptions.Where(x => x.Value != SelectionResult.Result).ToList();
                     continue;
                 }
-                else if (Menu.Result.GetCustomId() == Finish.CustomId)
+                else if (Menu.GetCustomId() == Finish.CustomId)
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -363,7 +363,7 @@ internal class PollCommand : BaseCommand
                     DeleteOrInvalidate();
                     return;
                 }
-                else if (Menu.Result.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                 {
                     DeleteOrInvalidate();
                     return;

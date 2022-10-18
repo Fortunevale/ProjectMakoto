@@ -37,14 +37,14 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == Toggle.CustomId)
+            if (e.GetCustomId() == Toggle.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled = !ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == SearchAllNames.CustomId)
+            else if (e.GetCustomId() == SearchAllNames.CustomId)
             {
                 if (ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning)
                 {
@@ -102,7 +102,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

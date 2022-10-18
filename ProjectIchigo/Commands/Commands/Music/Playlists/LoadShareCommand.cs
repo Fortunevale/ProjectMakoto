@@ -57,7 +57,7 @@ internal class LoadShareCommand : BaseCommand
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
 
-            if (e.Result.Interaction.Data.CustomId == Confirm.CustomId)
+            if (e.GetCustomId() == Confirm.CustomId)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

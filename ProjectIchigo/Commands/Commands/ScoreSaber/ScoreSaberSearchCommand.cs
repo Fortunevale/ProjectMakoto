@@ -169,7 +169,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                 await RespondOrEdit(builder.WithEmbed(embed.AsSuccess(ctx, "Score Saber")));
                             }
 
-                            if (e.Interaction.Data.CustomId == "start_search")
+                            if (e.GetCustomId() == "start_search")
                             {
                                 tokenSource.Cancel();
                                 tokenSource = null;
@@ -180,7 +180,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
 
                                 tokenSource = new();
                             }
-                            else if (e.Interaction.Data.CustomId == "player_selection")
+                            else if (e.GetCustomId() == "player_selection")
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                                 tokenSource.Cancel();
@@ -189,17 +189,17 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                 await ScoreSaberCommandAbstractions.SendScoreSaberProfile(ctx, e.Values.First());
                                 return;
                             }
-                            else if (e.Interaction.Data.CustomId == "next_step")
+                            else if (e.GetCustomId() == "next_step")
                             {
                                 _ = RefreshCountryList();
                             }
-                            else if (e.Interaction.Data.CustomId == "country_selection")
+                            else if (e.GetCustomId() == "country_selection")
                             {
                                 selectedCountry = e.Values.First();
 
                                 _ = RefreshCountryList();
                             }
-                            else if (e.Interaction.Data.CustomId == "prev_page")
+                            else if (e.GetCustomId() == "prev_page")
                             {
                                 if (playerSelection)
                                 {
@@ -224,7 +224,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                     _ = RefreshCountryList();
                                 }
                             }
-                            else if (e.Interaction.Data.CustomId == "next_page")
+                            else if (e.GetCustomId() == "next_page")
                             {
                                 if (playerSelection)
                                 {
@@ -249,7 +249,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                     _ = RefreshCountryList();
                                 }
                             }
-                            else if (e.Interaction.Data.CustomId == "continent_selection")
+                            else if (e.GetCustomId() == "continent_selection")
                             {
                                 selectedContinent = e.Values.First();
 

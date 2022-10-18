@@ -29,7 +29,7 @@ internal class ObjectCommand : BaseCommand
 
                 _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (Menu1.Result.Interaction.Data.CustomId == Yes.CustomId)
+                if (Menu1.GetCustomId() == Yes.CustomId)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
@@ -84,7 +84,7 @@ internal class ObjectCommand : BaseCommand
 
             _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+            if (Menu.GetCustomId() == Yes.CustomId)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -101,7 +101,7 @@ internal class ObjectCommand : BaseCommand
 
                 _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+                if (Menu.GetCustomId() == Yes.CustomId)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {

@@ -70,7 +70,7 @@ internal class ScoreSaberCommandAbstractions
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Interaction.Data.CustomId == "thats_me")
+                        if (e.GetCustomId() == "thats_me")
                         {
                             AddLinkButton = false;
                             ShowProfile().Add(ctx.Bot.watcher, ctx);
@@ -87,7 +87,7 @@ internal class ScoreSaberCommandAbstractions
                                 _ = new_msg.DeleteAsync();
                             });
                         }
-                        else if (e.Interaction.Data.CustomId == "gettopscores")
+                        else if (e.GetCustomId() == "gettopscores")
                         {
                             try
                             {
@@ -121,7 +121,7 @@ internal class ScoreSaberCommandAbstractions
                                 throw;
                             }
                         }
-                        else if (e.Interaction.Data.CustomId == "getrecentscores")
+                        else if (e.GetCustomId() == "getrecentscores")
                         {
                             try
                             {
@@ -154,7 +154,7 @@ internal class ScoreSaberCommandAbstractions
                                 throw;
                             }
                         }
-                        else if (e.Interaction.Data.CustomId == "getmain")
+                        else if (e.GetCustomId() == "getmain")
                         {
                             ShowProfile().Add(ctx.Bot.watcher, ctx);
                         }

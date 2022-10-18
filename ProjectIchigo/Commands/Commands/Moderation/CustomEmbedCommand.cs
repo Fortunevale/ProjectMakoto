@@ -54,7 +54,7 @@ internal class CustomEmbedCommand : BaseCommand
                         return;
                     }
 
-                    if (Menu1.Result.Interaction.Data.CustomId == SetTitle.CustomId)
+                    if (Menu1.GetCustomId() == SetTitle.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Set title for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 0, 256, false, GeneratedEmbed.Title))
@@ -95,7 +95,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.Url = url;
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetAuthor.CustomId)
+                    else if (Menu1.GetCustomId() == SetAuthor.CustomId)
                     {
                         GeneratedEmbed.Author ??= new();
 
@@ -121,7 +121,7 @@ internal class CustomEmbedCommand : BaseCommand
                             return;
                         }
 
-                        if (Menu2.Result.Interaction.Data.CustomId == SetName.CustomId)
+                        if (Menu2.GetCustomId() == SetName.CustomId)
                         {
                             var modal = new DiscordInteractionModalBuilder("Set name for author field", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Name", "", 0, 256, false, GeneratedEmbed.Author.Name));
@@ -147,7 +147,7 @@ internal class CustomEmbedCommand : BaseCommand
                             GeneratedEmbed.Author.Name = Response.Interaction.GetModalValueByCustomId("name");
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetUrl.CustomId)
+                        else if (Menu2.GetCustomId() == SetUrl.CustomId)
                         {
                             var modal = new DiscordInteractionModalBuilder("Set url for author field", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Url", "", 0, 256, false, GeneratedEmbed.Author.Url));
@@ -179,7 +179,7 @@ internal class CustomEmbedCommand : BaseCommand
                             GeneratedEmbed.Author.Url = url;
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetIcon.CustomId)
+                        else if (Menu2.GetCustomId() == SetIcon.CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -221,7 +221,7 @@ internal class CustomEmbedCommand : BaseCommand
                             GeneratedEmbed.Author.IconUrl = asset.Attachments[0].Url;
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetByUser.CustomId)
+                        else if (Menu2.GetCustomId() == SetByUser.CustomId)
                         {
                             var modal = new DiscordInteractionModalBuilder("Select user by id", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", "User Id", "", 0, 20, false));
@@ -258,7 +258,7 @@ internal class CustomEmbedCommand : BaseCommand
                             catch { }
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetByGuild.CustomId)
+                        else if (Menu2.GetCustomId() == SetByGuild.CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             GeneratedEmbed.Author = new DiscordEmbedBuilder.EmbedAuthor
@@ -268,7 +268,7 @@ internal class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == MessageComponents.BackButton.CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.BackButton.CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -276,7 +276,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetThumbnail.CustomId)
+                    else if (Menu1.GetCustomId() == SetThumbnail.CustomId)
                     {
                         GeneratedEmbed.Thumbnail ??= new();
 
@@ -320,7 +320,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.Thumbnail.Url = asset.Attachments[0].Url;
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetDescription.CustomId)
+                    else if (Menu1.GetCustomId() == SetDescription.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Set description for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 0, 4000, false, GeneratedEmbed.Description));
@@ -346,7 +346,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.Description = Response.Interaction.GetModalValueByCustomId("description");
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetImage.CustomId)
+                    else if (Menu1.GetCustomId() == SetImage.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -388,7 +388,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.ImageUrl = asset.Attachments[0].Url;
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetColor.CustomId)
+                    else if (Menu1.GetCustomId() == SetColor.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Set color for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Color", "#FF0000", 1, 100, false));
@@ -414,7 +414,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.Color = new DiscordColor(Response.Interaction.GetModalValueByCustomId("color").Truncate(7).IsValidHexColor());
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetFooter.CustomId)
+                    else if (Menu1.GetCustomId() == SetFooter.CustomId)
                     {
                         GeneratedEmbed.Footer ??= new();
 
@@ -439,7 +439,7 @@ internal class CustomEmbedCommand : BaseCommand
                             return;
                         }
 
-                        if (Menu2.Result.Interaction.Data.CustomId == SetText.CustomId)
+                        if (Menu2.GetCustomId() == SetText.CustomId)
                         {
                             var modal = new DiscordInteractionModalBuilder("Set text for footer field", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "text", "Text", "", 0, 2048, false, GeneratedEmbed.Footer.Text));
@@ -465,7 +465,7 @@ internal class CustomEmbedCommand : BaseCommand
                             GeneratedEmbed.Footer.Text = Response.Interaction.GetModalValueByCustomId("text");
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetIcon.CustomId)
+                        else if (Menu2.GetCustomId() == SetIcon.CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -507,7 +507,7 @@ internal class CustomEmbedCommand : BaseCommand
                             GeneratedEmbed.Footer.IconUrl = asset.Attachments[0].Url;
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetByUser.CustomId)
+                        else if (Menu2.GetCustomId() == SetByUser.CustomId)
                         {
                             var modal = new DiscordInteractionModalBuilder("Select user by id", Guid.NewGuid().ToString())
                                 .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", "User Id", "", 0, 20, false));
@@ -543,7 +543,7 @@ internal class CustomEmbedCommand : BaseCommand
                             catch { }
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == SetByGuild.CustomId)
+                        else if (Menu2.GetCustomId() == SetByGuild.CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             GeneratedEmbed.Footer = new DiscordEmbedBuilder.EmbedFooter
@@ -553,7 +553,7 @@ internal class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.Result.Interaction.Data.CustomId == MessageComponents.BackButton.CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.BackButton.CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -561,7 +561,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == SetTimestamp.CustomId)
+                    else if (Menu1.GetCustomId() == SetTimestamp.CustomId)
                     {
                         var ModalResult = await PromptModalForDateTime(Menu1.Result.Interaction, false);
 
@@ -583,7 +583,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.Timestamp = ModalResult.Result;
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == AddField.CustomId)
+                    else if (Menu1.GetCustomId() == AddField.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("Add field for embed", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 0, 256, true))
@@ -615,7 +615,7 @@ internal class CustomEmbedCommand : BaseCommand
                         catch { }
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == ModifyField.CustomId)
+                    else if (Menu1.GetCustomId() == ModifyField.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -678,7 +678,7 @@ internal class CustomEmbedCommand : BaseCommand
                         catch { }
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == RemoveField.CustomId)
+                    else if (Menu1.GetCustomId() == RemoveField.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -710,7 +710,7 @@ internal class CustomEmbedCommand : BaseCommand
                         GeneratedEmbed.RemoveField(GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)]);
                         continue;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == FinishAndSend.CustomId)
+                    else if (Menu1.GetCustomId() == FinishAndSend.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -742,7 +742,7 @@ internal class CustomEmbedCommand : BaseCommand
                         DeleteOrInvalidate();
                         return;
                     }
-                    else if (Menu1.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                    else if (Menu1.GetCustomId() == MessageComponents.CancelButton.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         DeleteOrInvalidate();

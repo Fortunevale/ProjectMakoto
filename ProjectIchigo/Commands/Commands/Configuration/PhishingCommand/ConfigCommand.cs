@@ -45,7 +45,7 @@ internal class ConfigCommand : BaseCommand
                 return;
             }
 
-            if (Button.Result.Interaction.Data.CustomId == ToggleDetectionButton.CustomId)
+            if (Button.GetCustomId() == ToggleDetectionButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -53,7 +53,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ToggleWarningButton.CustomId)
+            else if (Button.GetCustomId() == ToggleWarningButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -61,7 +61,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ToggleAbuseIpDbButton.CustomId)
+            else if (Button.GetCustomId() == ToggleAbuseIpDbButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -69,7 +69,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
+            else if (Button.GetCustomId() == ChangePunishmentButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -110,7 +110,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
+            else if (Button.GetCustomId() == ChangeReasonButton.CustomId)
             {
                 var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
                     .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.CustomPunishmentReason));
@@ -137,7 +137,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeTimeoutLengthButton.CustomId)
+            else if (Button.GetCustomId() == ChangeTimeoutLengthButton.CustomId)
             {
                 if (ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType != PhishingPunishmentType.TIMEOUT)
                 {
@@ -178,7 +178,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
             }

@@ -121,14 +121,14 @@ internal class ConfigCommand : BaseCommand
                             }
                         });
 
-                        if (e.Interaction.Data.CustomId == "RewardSelection")
+                        if (e.GetCustomId() == "RewardSelection")
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             selected = e.Values.First();
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == "Add")
+                        else if (e.GetCustomId() == "Add")
                         {
                             ctx.Client.ComponentInteractionCreated -= SelectInteraction;
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
@@ -163,7 +163,7 @@ internal class ConfigCommand : BaseCommand
                                     return;
                                 }
 
-                                if (Menu.Result.Interaction.Data.CustomId == SelectRole.CustomId)
+                                if (Menu.GetCustomId() == SelectRole.CustomId)
                                 {
                                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -196,7 +196,7 @@ internal class ConfigCommand : BaseCommand
                                     selectedRole = RoleResult.Result;
                                     continue;
                                 }
-                                else if (Menu.Result.Interaction.Data.CustomId == SelectLevel.CustomId)
+                                else if (Menu.GetCustomId() == SelectLevel.CustomId)
                                 {
                                     var modal = new DiscordInteractionModalBuilder("Input Level", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "level", "Level", "2", 1, 3, true, (selectedLevel is -1 ? 2 : selectedLevel).ToString()));
@@ -241,7 +241,7 @@ internal class ConfigCommand : BaseCommand
                                     selectedLevel = (int)level;
                                     continue;
                                 }
-                                else if (Menu.Result.Interaction.Data.CustomId == SelectCustomText.CustomId)
+                                else if (Menu.GetCustomId() == SelectCustomText.CustomId)
                                 {
                                     var modal = new DiscordInteractionModalBuilder("Define new custom message", Guid.NewGuid().ToString())
                                         .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "message", "Custom Message", "You received ##Role##!", 1, 256, true, selectedCustomText));
@@ -278,7 +278,7 @@ internal class ConfigCommand : BaseCommand
                                     selectedCustomText = newMessage;
                                     continue;
                                 }
-                                else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                                else if (Menu.GetCustomId() == Finish.CustomId)
                                 {
                                     ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelRewardEntry
                                     {
@@ -295,7 +295,7 @@ internal class ConfigCommand : BaseCommand
                                     ctx.Client.ComponentInteractionCreated += SelectInteraction;
                                     return;
                                 }
-                                else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                                else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                                 {
                                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -307,7 +307,7 @@ internal class ConfigCommand : BaseCommand
                                 return;
                             }
                         }
-                        else if (e.Interaction.Data.CustomId == "Modify")
+                        else if (e.GetCustomId() == "Modify")
                         {
                             var modal = new DiscordInteractionModalBuilder()
                                 .WithTitle("Define a new custom message")
@@ -346,7 +346,7 @@ internal class ConfigCommand : BaseCommand
 
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == "Delete")
+                        else if (e.GetCustomId() == "Delete")
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -367,21 +367,21 @@ internal class ConfigCommand : BaseCommand
 
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == "PreviousPage")
+                        else if (e.GetCustomId() == "PreviousPage")
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             CurrentPage--;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == "NextPage")
+                        else if (e.GetCustomId() == "NextPage")
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 

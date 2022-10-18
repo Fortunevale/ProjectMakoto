@@ -42,7 +42,7 @@ internal class CreateIssueCommand : BaseCommand
             {
                 Task.Run(async () =>
                 {
-                    if (e.Interaction.Data.CustomId == modal.CustomId)
+                    if (e.GetCustomId() == modal.CustomId)
                     {
                         cancellationTokenSource.Cancel();
                         ctx.Client.ComponentInteractionCreated -= RunInteraction;
