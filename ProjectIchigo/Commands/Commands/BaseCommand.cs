@@ -217,6 +217,7 @@ public abstract class BaseCommand
 
         var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Create one for me", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
         var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? "Disable", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+        var EveryoneButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Select @everyone", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
 
@@ -247,6 +248,9 @@ public abstract class BaseCommand
             
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
                 components.Add(DisableButton);
+            
+            if (configuration.IncludeEveryone)
+                components.Add(EveryoneButton);
 
             if (components.Any())
                 builder.AddComponents(components);
@@ -299,6 +303,11 @@ public abstract class BaseCommand
                         if (e.GetCustomId() == CreateNewButton.CustomId)
                         {
                             FinalSelection = await this.ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
+                            FinishedSelection = true;
+                        }
+                        if (e.GetCustomId() == EveryoneButton.CustomId)
+                        {
+                            FinalSelection = ctx.Guild.EveryoneRole;
                             FinishedSelection = true;
                         }
                         else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)
