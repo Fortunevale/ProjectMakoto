@@ -12,10 +12,10 @@ internal static class DiscordExtensions
         => overwrites.Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).ToList();
 
     internal static string GetCustomId(this InteractivityResult<ComponentInteractionCreateEventArgs> e)
-        => e.GetCustomId();
+        => e.Result.GetCustomId();
 
     internal static string GetCustomId(this ComponentInteractionCreateEventArgs e)
-        => e.GetCustomId();
+        => e.Interaction.Data.CustomId;
 
     internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
