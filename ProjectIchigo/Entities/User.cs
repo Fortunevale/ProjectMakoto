@@ -15,6 +15,7 @@ public class User
         ScoreSaber = new(this);
         ExperienceUser = new(this);
         Reminders = new(this, _bot);
+        Translation = new(this);
     }
 
     [JsonIgnore]
@@ -25,6 +26,7 @@ public class User
     public ScoreSaberSettings ScoreSaber { get; set; }
     public ExperienceUserSettings ExperienceUser { get; set; }
     public ReminderSettings Reminders { get; set; }
+    public TranslationSettings Translation { get; set; }
 
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 

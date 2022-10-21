@@ -132,7 +132,7 @@ public class TableDefinitions
         public TinyInt submission_accepted_tos { get; set; }
 
         [Collation("utf8_unicode_ci")]
-        public Text submission_accepted_submissions { get; set; }
+        public LongText submission_accepted_submissions { get; set; }
 
         public BigInt submission_last_datetime { get; set; }
 
@@ -141,6 +141,18 @@ public class TableDefinitions
 
         [Collation("utf8_unicode_ci")]
         public LongText reminders { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text last_google_source { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text last_google_target { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text last_libretranslate_source { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text last_libretranslate_target { get; set; }
     }
 
     public class guilds

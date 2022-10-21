@@ -79,7 +79,7 @@ internal class TranslateCommand : BaseCommand
                     Description = $"`Please select the language to translate from.`",
                 }.AsAwaitingInput(ctx)));
 
-                var SourceResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Source Language..");
+                var SourceResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.Bot.users[ctx.User.Id].Translation.LastGoogleSource))).ToList(), "Select the Source Language..");
 
                 if (SourceResult.TimedOut)
                 {
@@ -96,12 +96,14 @@ internal class TranslateCommand : BaseCommand
                     throw SourceResult.Exception;
                 }
 
+                ctx.Bot.users[ctx.User.Id].Translation.LastGoogleSource = SourceResult.Result;
+
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Okay! Translating from {SourceResult.Result}. Now select the language to translate to.`",
                 }.AsAwaitingInput(ctx)));
 
-                var TargetResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code)).ToList(), "Select the Target Language..");
+                var TargetResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.Bot.users[ctx.User.Id].Translation.LastGoogleTarget))).ToList(), "Select the Target Language..");
 
                 if (TargetResult.TimedOut)
                 {
@@ -117,6 +119,8 @@ internal class TranslateCommand : BaseCommand
                 {
                     throw TargetResult.Exception;
                 }
+
+                ctx.Bot.users[ctx.User.Id].Translation.LastGoogleTarget = TargetResult.Result;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -168,7 +172,7 @@ internal class TranslateCommand : BaseCommand
                     Description = $"`Please select the language to translate from.`",
                 }.AsAwaitingInput(ctx)));
 
-                var SourceResult = await PromptCustomSelection(TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Source Language..");
+                var SourceResult = await PromptCustomSelection(TranslationSources.Select(x => new DiscordSelectComponentOption(x.name, x.code, null, (x.code == ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateSource))).ToList(), "Select the Source Language..");
 
                 if (SourceResult.TimedOut)
                 {
@@ -185,12 +189,14 @@ internal class TranslateCommand : BaseCommand
                     throw SourceResult.Exception;
                 }
 
+                ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateSource = SourceResult.Result;
+
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`Okay! Translating from {SourceResult.Result}. Now select the language to translate to.`",
                 }.AsAwaitingInput(ctx)));
 
-                var TargetResult = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordSelectComponentOption(x.name, x.code)).ToList(), "Select the Target Language..");
+                var TargetResult = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordSelectComponentOption(x.name, x.code, null, (x.code == ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateTarget))).ToList(), "Select the Target Language..");
 
                 if (TargetResult.TimedOut)
                 {
@@ -206,6 +212,8 @@ internal class TranslateCommand : BaseCommand
                 {
                     throw TargetResult.Exception;
                 }
+
+                ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateTarget = TargetResult.Result;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

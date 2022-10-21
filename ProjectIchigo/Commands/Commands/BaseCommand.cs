@@ -556,7 +556,7 @@ public abstract class BaseCommand
 
         string FinalSelection = null;
 
-        string Selected = "";
+        string Selected = options.FirstOrDefault(x => x.Default, null)?.Value ?? "";
 
         bool FinishedSelection = false;
         bool ExceptionOccurred = false;
@@ -564,7 +564,7 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
+            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25).Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (options.Skip(CurrentPage * 25).Count() > 25)
@@ -603,8 +603,6 @@ public abstract class BaseCommand
                         if (e.GetCustomId() == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
-                            options = options.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
-
                             await RefreshMessage();
                         }
                         else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)

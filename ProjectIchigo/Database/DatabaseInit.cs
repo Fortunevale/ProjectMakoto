@@ -230,6 +230,13 @@ internal class DatabaseInit
             {
                 DirectMessageOptOut = b.experience_directmessageoptout
             };
+            DbUser.Translation = new(DbUser)
+            {
+                LastGoogleSource = b.last_google_source,
+                LastGoogleTarget = b.last_google_target,
+                LastLibreTranslateSource = b.last_libretranslate_source,
+                LastLibreTranslateTarget = b.last_libretranslate_target
+            };
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>(b.playlists) ?? new();
 
             foreach (var c in JsonConvert.DeserializeObject<List<ReminderItem>>(b.reminders) ?? new())
