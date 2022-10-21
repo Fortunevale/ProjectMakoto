@@ -115,12 +115,12 @@ internal class MusicModuleAbstractions
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
         {
-            embed.Description = $"`Found {loadResult.Tracks.Count()} load result(s). Please select the song you want to add below.`";
+            embed.Description = $"`Found {loadResult.Tracks.Count} load result(s). Please select the song you want to add below.`";
             embed.AsAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
             var UriResult = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks
-                .Select(x => new DiscordSelectComponentOption(x.Title.TruncateWithIndication(100), x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
+                .Select(x => new DiscordStringSelectComponentOption(x.Title.TruncateWithIndication(100), x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
 
             if (UriResult.TimedOut)
             {

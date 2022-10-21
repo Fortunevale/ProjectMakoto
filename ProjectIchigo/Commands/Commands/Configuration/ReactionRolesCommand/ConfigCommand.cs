@@ -307,7 +307,7 @@ internal class ConfigCommand : BaseCommand
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
                 var RoleResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles
-                    .Select(x => new DiscordSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
+                    .Select(x => new DiscordStringSelectComponentOption($"@{ctx.Guild.GetRole(x.Value.RoleId).Name}", x.Value.UUID, $"in Channel #{ctx.Guild.GetChannel(x.Value.ChannelId).Name}", emoji: new DiscordComponentEmoji(x.Value.GetEmoji(ctx.Client)))).ToList());
 
                 if (RoleResult.TimedOut)
                 {

@@ -26,7 +26,7 @@ internal class ConfigCommand : BaseCommand
 
             async Task RefreshMessage()
             {
-                List<DiscordSelectComponentOption> DefinedRewards = new();
+                List<DiscordStringSelectComponentOption> DefinedRewards = new();
 
                 embed.Description = "";
 
@@ -40,7 +40,7 @@ internal class ConfigCommand : BaseCommand
 
                     var role = ctx.Guild.GetRole(reward.RoleId);
 
-                    DefinedRewards.Add(new DiscordSelectComponentOption($"Level {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message.TruncateWithIndication(100)}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
+                    DefinedRewards.Add(new DiscordStringSelectComponentOption($"Level {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message.TruncateWithIndication(100)}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
 
                     if (selected == role.Id.ToString())
                     {
@@ -67,7 +67,7 @@ internal class ConfigCommand : BaseCommand
                 var Modify = new DiscordButtonComponent(ButtonStyle.Primary, "Modify", "Modify Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
                 var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "Delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
 
-                var Dropdown = new DiscordSelectComponent("Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
+                var Dropdown = new DiscordStringSelectComponent("Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
                 embed = embed.AsAwaitingInput(ctx, "Level Rewards");
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 

@@ -11,19 +11,19 @@ internal class ScoreSaberSearchCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
                 return;
 
-            DiscordSelectComponent GetContinents(string default_code)
+            DiscordStringSelectComponent GetContinents(string default_code)
             {
-                List<DiscordSelectComponentOption> continents = new() { new DiscordSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")) };
+                List<DiscordStringSelectComponentOption> continents = new() { new DiscordStringSelectComponentOption($"No country filter (may load much longer)", "no_country", "", (default_code == "no_country")) };
                 foreach (var b in ctx.Bot.countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
                 {
-                    continents.Add(new DiscordSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
+                    continents.Add(new DiscordStringSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
                 }
-                return new DiscordSelectComponent("Select a continent..", continents as IEnumerable<DiscordSelectComponentOption>, "continent_selection");
+                return new DiscordStringSelectComponent("Select a continent..", continents as IEnumerable<DiscordStringSelectComponentOption>, "continent_selection");
             }
 
-            DiscordSelectComponent GetCountries(string continent_code, string default_country, int page)
+            DiscordStringSelectComponent GetCountries(string continent_code, string default_country, int page)
             {
-                List<DiscordSelectComponentOption> countries = new();
+                List<DiscordStringSelectComponentOption> countries = new();
                 var currentCountryList = ctx.Bot.countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == continent_code.ToLower()).Skip((page - 1) * 25).Take(25).ToList();
 
                 foreach (var b in currentCountryList)
@@ -32,9 +32,9 @@ internal class ScoreSaberSearchCommand : BaseCommand
                     try
                     { flag_emote = DiscordEmoji.FromName(ctx.Client, $":flag_{b.Key.ToLower()}:"); }
                     catch (Exception) { flag_emote = DiscordEmoji.FromUnicode("⬜"); }
-                    countries.Add(new DiscordSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country), new DiscordComponentEmoji(flag_emote)));
+                    countries.Add(new DiscordStringSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country), new DiscordComponentEmoji(flag_emote)));
                 }
-                return new DiscordSelectComponent("Select a country..", countries as IEnumerable<DiscordSelectComponentOption>, "country_selection");
+                return new DiscordStringSelectComponent("Select a country..", countries as IEnumerable<DiscordStringSelectComponentOption>, "country_selection");
             }
 
             var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", "Start Search", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔎")));
@@ -137,13 +137,13 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                     lastFetchedPage = currentFetchedPage;
                                 }
 
-                                List<DiscordSelectComponentOption> playerDropDownOptions = new();
+                                List<DiscordStringSelectComponentOption> playerDropDownOptions = new();
                                 var playerList = lastSearch.players.Skip((currentPage - 1) * 25).Take(25).ToList();
                                 foreach (var b in playerList)
                                 {
-                                    playerDropDownOptions.Add(new DiscordSelectComponentOption($"{b.name.Sanitize()} | {b.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
+                                    playerDropDownOptions.Add(new DiscordStringSelectComponentOption($"{b.name.Sanitize()} | {b.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
                                 }
-                                var player_dropdown = new DiscordSelectComponent("Select a player..", playerDropDownOptions as IEnumerable<DiscordSelectComponentOption>, "player_selection");
+                                var player_dropdown = new DiscordStringSelectComponent("Select a player..", playerDropDownOptions as IEnumerable<DiscordStringSelectComponentOption>, "player_selection");
 
                                 var builder = new DiscordMessageBuilder().AddComponents(player_dropdown);
 

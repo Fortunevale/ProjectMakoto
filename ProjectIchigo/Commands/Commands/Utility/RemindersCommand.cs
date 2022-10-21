@@ -154,7 +154,7 @@ internal class RemindersCommand : BaseCommand
             else if (Button.GetCustomId() == RemoveButton.CustomId)
             {
                 var UuidResult = await PromptCustomSelection(rem.ScheduledReminders
-                        .Select(x => new DiscordSelectComponentOption($"{x.Description}".TruncateWithIndication(100), x.UUID, $"in {x.DueTime.GetTotalSecondsUntil().GetHumanReadable()}")).ToList());
+                        .Select(x => new DiscordStringSelectComponentOption($"{x.Description}".TruncateWithIndication(100), x.UUID, $"in {x.DueTime.GetTotalSecondsUntil().GetHumanReadable()}")).ToList());
 
                 if (UuidResult.TimedOut)
                 {

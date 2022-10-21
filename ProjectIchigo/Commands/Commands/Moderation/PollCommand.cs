@@ -22,7 +22,7 @@ internal class PollCommand : BaseCommand
 
             DateTime? selectedDueDate = DateTime.UtcNow.AddMinutes(5);
             string SelectedPrompt = null;
-            List<DiscordSelectComponentOption> SelectedOptions = new();
+            List<DiscordStringSelectComponentOption> SelectedOptions = new();
 
             int SelectedMin = 1;
             int SelectedMax = 1;
@@ -267,7 +267,7 @@ internal class PollCommand : BaseCommand
                         continue;
                     }
 
-                    SelectedOptions.Add(new DiscordSelectComponentOption(title, hash, desc));
+                    SelectedOptions.Add(new DiscordStringSelectComponentOption(title, hash, desc));
                     continue;
                 }
                 else if (Menu.GetCustomId() == RemoveOptionButton.CustomId)
@@ -338,7 +338,7 @@ internal class PollCommand : BaseCommand
                         return;
                     }
 
-                    var select = new DiscordSelectComponent("Vote on this poll..", SelectedOptions.Take(20), Guid.NewGuid().ToString(), (SelectedMin >= SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() - 1 : SelectedMin), (SelectedMax > SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() : SelectedMax));
+                    var select = new DiscordStringSelectComponent("Vote on this poll..", SelectedOptions.Take(20), Guid.NewGuid().ToString(), (SelectedMin >= SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() - 1 : SelectedMin), (SelectedMax > SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() : SelectedMax));
                     var endearly = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "End this poll early", false, DiscordEmoji.FromUnicode("🗑").ToComponent());
                     var polltxt = $"{SelectedPrompt.Sanitize()}";
 

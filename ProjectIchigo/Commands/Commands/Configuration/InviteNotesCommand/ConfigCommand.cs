@@ -104,7 +104,7 @@ internal class ConfigCommand : BaseCommand
                         var invites = await ctx.Guild.GetInvitesAsync();
 
                         var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
-                            .Select(x => new DiscordSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.UsernameWithDiscriminator}")).ToList());
+                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.UsernameWithDiscriminator}")).ToList());
 
                         if (SelectionResult.TimedOut)
                         {
@@ -141,7 +141,7 @@ internal class ConfigCommand : BaseCommand
             }
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
-                var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
+                var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {

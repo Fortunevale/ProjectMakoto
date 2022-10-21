@@ -215,7 +215,7 @@ public abstract class BaseCommand
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
 
-        List<DiscordSelectComponentOption> FetchedRoles = new();
+        List<DiscordStringSelectComponentOption> FetchedRoles = new();
 
         var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
@@ -239,18 +239,18 @@ public abstract class BaseCommand
             FetchedRoles.Clear();
 
             if (!configuration.CreateRoleOption.IsNullOrWhiteSpace())
-                FetchedRoles.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
+                FetchedRoles.Add(new DiscordStringSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                FetchedRoles.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+                FetchedRoles.Add(new DiscordStringSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
             if (configuration.IncludeEveryone)
-                FetchedRoles.Add(new DiscordSelectComponentOption("@everyone", ctx.Guild.EveryoneRole.Id.ToString(), "", false, DiscordEmoji.FromUnicode("👥").ToComponent()));
+                FetchedRoles.Add(new DiscordStringSelectComponentOption("@everyone", ctx.Guild.EveryoneRole.Id.ToString(), "", false, DiscordEmoji.FromUnicode("👥").ToComponent()));
 
             foreach (var b in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
             {
                 if (ctx.CurrentMember.GetRoleHighestPosition() > b.Value.Position && ctx.Member.GetRoleHighestPosition() > b.Value.Position && !b.Value.IsManaged && b.Value.Id != ctx.Guild.EveryoneRole.Id)
-                    FetchedRoles.Add(new DiscordSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
+                    FetchedRoles.Add(new DiscordStringSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
             }
 
             if (!FetchedRoles.Any(x => x.Default))
@@ -264,7 +264,7 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent("Select a role..", FetchedRoles.Skip(CurrentPage * 25).Take(25), SelectionInteractionId);
+            var dropdown = new DiscordStringSelectComponent("Select a role..", FetchedRoles.Skip(CurrentPage * 25).Take(25), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (!FetchedRoles.Skip(CurrentPage * 25).Any())
@@ -309,7 +309,7 @@ public abstract class BaseCommand
                         if (e.GetCustomId() == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
-                            FetchedRoles = FetchedRoles.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+                            FetchedRoles = FetchedRoles.Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
@@ -382,7 +382,7 @@ public abstract class BaseCommand
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
 
-        List<DiscordSelectComponentOption> FetchedChannels = new();
+        List<DiscordStringSelectComponentOption> FetchedChannels = new();
 
         var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
@@ -406,16 +406,16 @@ public abstract class BaseCommand
             FetchedChannels.Clear();
 
             if (configuration.CreateChannelOption is not null)
-                FetchedChannels.Add(new DiscordSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
+                FetchedChannels.Add(new DiscordStringSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
 
             if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                FetchedChannels.Add(new DiscordSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
+                FetchedChannels.Add(new DiscordStringSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
 
             foreach (var category in ctx.Guild.GetOrderedChannels())
             {
                 foreach (var b in category.Value)
                     if (channelTypes is null || channelTypes.Contains(b.Type))
-                        FetchedChannels.Add(new DiscordSelectComponentOption(
+                        FetchedChannels.Add(new DiscordStringSelectComponentOption(
                         $"{b.GetIcon()}{b.Name} ({b.Id})",
                         b.Id.ToString(),
                         $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}", (b.Id.ToString() == Selected)));
@@ -432,7 +432,7 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent("Select a channel..", FetchedChannels.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordSelectComponentOption>, SelectionInteractionId);
+            var dropdown = new DiscordStringSelectComponent("Select a channel..", FetchedChannels.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordStringSelectComponentOption>, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (!FetchedChannels.Skip(CurrentPage * 25).Any())
@@ -477,7 +477,7 @@ public abstract class BaseCommand
                         if (e.GetCustomId() == SelectionInteractionId)
                         {
                             Selected = e.Values.First();
-                            FetchedChannels = FetchedChannels.Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+                            FetchedChannels = FetchedChannels.Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
 
                             await RefreshMessage();
                         }
@@ -541,7 +541,7 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
+    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromSeconds(120);
 
@@ -564,7 +564,7 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25).Select(x => new DiscordSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)), SelectionInteractionId);
+            var dropdown = new DiscordStringSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25).Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (options.Skip(CurrentPage * 25).Count() > 25)

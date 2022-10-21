@@ -65,7 +65,7 @@ internal class ManageCommand : BaseCommand
 
             if (e.GetCustomId() == AddToQueue.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordStringSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 var PlaylistResult = await PromptCustomSelection(Playlists);
 
@@ -120,7 +120,7 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.GetCustomId() == SharePlaylist.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordStringSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 var PlaylistResult = await PromptCustomSelection(Playlists);
 
@@ -160,7 +160,7 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.GetCustomId() == ExportPlaylist.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordStringSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 var PlaylistResult = await PromptCustomSelection(Playlists);
 
@@ -693,7 +693,7 @@ internal class ManageCommand : BaseCommand
 
                 await RespondOrEdit(embed.Build());
 
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordStringSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 var PlaylistResult = await PromptCustomSelection(Playlists);
 
@@ -719,7 +719,7 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.GetCustomId() == DeletePlaylist.CustomId)
             {
-                List<DiscordSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
+                List<DiscordStringSelectComponentOption> Playlists = ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} track(s)")).ToList();
 
                 var PlaylistResult = await PromptCustomSelection(Playlists);
 
@@ -1059,13 +1059,13 @@ internal class ManageCommand : BaseCommand
                                 {
                                     _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                                    List<DiscordSelectComponentOption> TrackList = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Select(x => new DiscordSelectComponentOption($"{x.Title}", x.Url.MakeValidFileName(), $"Added {x.AddedTime.GetTimespanSince().GetHumanReadable()} ago")).ToList();
+                                    List<DiscordStringSelectComponentOption> TrackList = SelectedPlaylist.List.Skip(CurrentPage * 10).Take(10).Select(x => new DiscordStringSelectComponentOption($"{x.Title}", x.Url.MakeValidFileName(), $"Added {x.AddedTime.GetTimespanSince().GetHumanReadable()} ago")).ToList();
 
-                                    DiscordSelectComponent Tracks = new("Select 1 or more songs to delete..", TrackList, Guid.NewGuid().ToString(), 1, TrackList.Count);
+                                    DiscordStringSelectComponent Tracks = new("Select 1 or more songs to delete..", TrackList, Guid.NewGuid().ToString(), 1, TrackList.Count);
 
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(Tracks));
 
-                                    var Response = await s.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id);
+                                    var Response = await s.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, ComponentType.StringSelect);
 
                                     if (Response.TimedOut)
                                     {

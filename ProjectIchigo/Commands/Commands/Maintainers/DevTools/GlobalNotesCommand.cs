@@ -87,7 +87,7 @@ internal class GlobalNotesCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 var SelectionResult = await PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
-                    .Select(x => new DiscordSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
+                    .Select(x => new DiscordStringSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {

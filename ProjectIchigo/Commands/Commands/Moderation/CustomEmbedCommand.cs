@@ -628,7 +628,7 @@ internal class CustomEmbedCommand : BaseCommand
                         }
 
                         var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
-                            .Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
+                            .Select(x => new DiscordStringSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
                         if (FieldResult.TimedOut)
                         {
@@ -691,7 +691,7 @@ internal class CustomEmbedCommand : BaseCommand
                         }
 
                         var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
-                            .Select(x => new DiscordSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
+                            .Select(x => new DiscordStringSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
                         if (FieldResult.TimedOut)
                         {
