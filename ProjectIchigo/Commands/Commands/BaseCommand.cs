@@ -351,75 +351,42 @@ public abstract class BaseCommand
 
         List<DiscordStringSelectComponentOption> FetchedChannels = new();
 
-        var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Create a new role", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? "Disable", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-
-        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
 
         DiscordChannel FinalSelection = null;
 
-        string Selected = "";
+        string Selected = "";   
 
         bool FinishedSelection = false;
         bool ExceptionOccurred = false;
         Exception ThrownException = null;
 
-        async Task RefreshList()
-        {
-            FetchedChannels.Clear();
-
-            if (configuration.CreateChannelOption is not null)
-                FetchedChannels.Add(new DiscordStringSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
-
-            if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                FetchedChannels.Add(new DiscordStringSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
-
-            foreach (var category in ctx.Guild.GetOrderedChannels())
-            {
-                foreach (var b in category.Value)
-                    if (channelTypes is null || channelTypes.Contains(b.Type))
-                        FetchedChannels.Add(new DiscordStringSelectComponentOption(
-                        $"{b.GetIcon()}{b.Name} ({b.Id})",
-                        b.Id.ToString(),
-                        $"{(category.Key != 0 ? $"{b.Parent.Name} " : "")}", (b.Id.ToString() == Selected)));
-            }
-
-            if (!FetchedChannels.Any(x => x.Default))
-                Selected = "";
-
-            if (!FetchedChannels.IsNotNullAndNotEmpty())
-                throw new NullReferenceException("No valid channel found.");
-        }
-
-        await RefreshList();
-
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordStringSelectComponent("Select a channel..", FetchedChannels.Skip(CurrentPage * 25).Take(25) as IEnumerable<DiscordStringSelectComponentOption>, SelectionInteractionId);
+            var dropdown = new DiscordChannelSelectComponent("Select a channel..", channelTypes, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
-
-            if (!FetchedChannels.Skip(CurrentPage * 25).Any())
-                CurrentPage--;
-
-            if (CurrentPage < 0)
-                CurrentPage = 0;
-
-            if (FetchedChannels.Skip(CurrentPage * 25).Count() > 25)
-                builder.AddComponents(NextPageButton);
-
-            if (CurrentPage != 0)
-                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
             else
                 ConfirmSelectionButton.Enable();
 
-            builder.AddComponents(new List<DiscordComponent> { RefreshListButton, ConfirmSelectionButton });
+            List<DiscordComponent> components = new();
+
+            if (configuration.CreateChannelOption is not null)
+                components.Add(CreateNewButton);
+
+            if (!configuration.DisableOption.IsNullOrWhiteSpace())
+                components.Add(DisableButton);
+
+            if (components.Any())
+                builder.AddComponents(components);
+
+            builder.AddComponents(new List<DiscordComponent> { ConfirmSelectionButton });
             builder.AddComponents(MessageComponents.CancelButton);
 
             await RespondOrEdit(builder);
@@ -448,33 +415,22 @@ public abstract class BaseCommand
 
                             await RefreshMessage();
                         }
+                        else if (e.GetCustomId() == CreateNewButton.CustomId)
+                        {
+                            FinalSelection = await ctx.Guild.CreateChannelAsync(configuration.CreateChannelOption.Name, configuration.CreateChannelOption.ChannelType);
+                            FinishedSelection = true;
+                        }
+                        else if (e.GetCustomId() == DisableButton.CustomId)
+                        {
+                            FinalSelection = null;
+                            FinishedSelection = true;
+                        }
                         else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                            if (Selected is "create_for_me")
-                                FinalSelection = await ctx.Guild.CreateChannelAsync(configuration.CreateChannelOption.Name, configuration.CreateChannelOption.ChannelType);
-                            else if (Selected is "disable")
-                                FinalSelection = null;
-                            else
-                                FinalSelection = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
-
+                            FinalSelection = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
                             FinishedSelection = true;
-                        }
-                        else if (e.GetCustomId() == RefreshListButton.CustomId)
-                        {
-                            await RefreshList();
-                            await RefreshMessage();
-                        }
-                        else if (e.GetCustomId() == PrevPageButton.CustomId)
-                        {
-                            CurrentPage--;
-                            await RefreshMessage();
-                        }
-                        else if (e.GetCustomId() == NextPageButton.CustomId)
-                        {
-                            CurrentPage++;
-                            await RefreshMessage();
                         }
                         else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                             throw new CancelException();
