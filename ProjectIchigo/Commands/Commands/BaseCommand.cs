@@ -215,15 +215,11 @@ public abstract class BaseCommand
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
 
-        List<DiscordStringSelectComponentOption> FetchedRoles = new();
-
-        var RefreshListButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Refresh List", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Create one for me", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? "Disable", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
         var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
 
         DiscordRole FinalSelection = null;
@@ -234,57 +230,28 @@ public abstract class BaseCommand
         bool ExceptionOccurred = false;
         Exception ThrownException = null;
 
-        async Task RefreshList()
-        {
-            FetchedRoles.Clear();
-
-            if (!configuration.CreateRoleOption.IsNullOrWhiteSpace())
-                FetchedRoles.Add(new DiscordStringSelectComponentOption($"Create one for me..", "create_for_me", "", ("create_for_me" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕"))));
-
-            if (!configuration.DisableOption.IsNullOrWhiteSpace())
-                FetchedRoles.Add(new DiscordStringSelectComponentOption(configuration.DisableOption, "disable", "", ("disable" == Selected), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌"))));
-
-            if (configuration.IncludeEveryone)
-                FetchedRoles.Add(new DiscordStringSelectComponentOption("@everyone", ctx.Guild.EveryoneRole.Id.ToString(), "", false, DiscordEmoji.FromUnicode("👥").ToComponent()));
-
-            foreach (var b in ctx.Guild.Roles.OrderByDescending(x => x.Value.Position))
-            {
-                if (ctx.CurrentMember.GetRoleHighestPosition() > b.Value.Position && ctx.Member.GetRoleHighestPosition() > b.Value.Position && !b.Value.IsManaged && b.Value.Id != ctx.Guild.EveryoneRole.Id)
-                    FetchedRoles.Add(new DiscordStringSelectComponentOption($"@{b.Value.Name} ({b.Value.Id})", b.Value.Id.ToString(), "", (b.Value.Id.ToString() == Selected), new DiscordComponentEmoji(b.Value.Color.GetClosestColorEmoji(ctx.Client))));
-            }
-
-            if (!FetchedRoles.Any(x => x.Default))
-                Selected = "";
-
-            if (!FetchedRoles.IsNotNullAndNotEmpty())
-                throw new NullReferenceException("No valid role found.");
-        }
-
-        await RefreshList();
-
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordStringSelectComponent("Select a role..", FetchedRoles.Skip(CurrentPage * 25).Take(25), SelectionInteractionId);
+            var dropdown = new DiscordRoleSelectComponent("Select a role..", SelectionInteractionId, 1, 1, false);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
-
-            if (!FetchedRoles.Skip(CurrentPage * 25).Any())
-                CurrentPage--;
-
-            if (CurrentPage < 0)
-                CurrentPage = 0;
-
-            if (FetchedRoles.Skip(CurrentPage * 25).Count() > 25)
-                builder.AddComponents(NextPageButton);
-
-            if (CurrentPage != 0)
-                builder.AddComponents(PrevPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
             else
                 ConfirmSelectionButton.Enable();
 
-            builder.AddComponents(new List<DiscordComponent> { RefreshListButton, ConfirmSelectionButton });
+            List<DiscordComponent> components = new();
+
+            if (!configuration.CreateRoleOption.IsNullOrWhiteSpace())
+                components.Add(CreateNewButton);
+            
+            if (!configuration.DisableOption.IsNullOrWhiteSpace())
+                components.Add(DisableButton);
+
+            if (components.Any())
+                builder.AddComponents(components);
+
+            builder.AddComponents(ConfirmSelectionButton);
             builder.AddComponents(MessageComponents.CancelButton);
 
             await RespondOrEdit(builder);
@@ -301,45 +268,45 @@ public abstract class BaseCommand
             {
                 try
                 {
-                    if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
+                    if (e.Message?.Id == this.ctx.ResponseMessage.Id && e.User.Id == this.ctx.User.Id)
                     {
                         sw.Restart();
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         if (e.GetCustomId() == SelectionInteractionId)
                         {
-                            Selected = e.Values.First();
-                            FetchedRoles = FetchedRoles.Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)).ToList();
+                            Selected = e.Values[0];
+
+                            try
+                            {
+                                DiscordRole role = ctx.Guild.GetRole(Convert.ToUInt64(Selected));
+
+                                if (role.IsManaged || ctx.Member.GetRoleHighestPosition() <= role.Position)
+                                {
+                                    Selected = "";
+                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent("❌ `The selected role is managed or unavailable to you. Please select another role.`"));
+                                }
+                            }
+                            catch { }
 
                             await RefreshMessage();
                         }
-                        else if (e.GetCustomId() == RefreshListButton.CustomId)
+                        if (e.GetCustomId() == DisableButton.CustomId)
                         {
-                            await RefreshList();
-                            await RefreshMessage();
+                            FinalSelection = null;
+                            FinishedSelection = true;
+                        }
+                        if (e.GetCustomId() == CreateNewButton.CustomId)
+                        {
+                            FinalSelection = await this.ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
+                            FinishedSelection = true;
                         }
                         else if (e.GetCustomId() == ConfirmSelectionButton.CustomId)
                         {
-                            ctx.Client.ComponentInteractionCreated -= RunInteraction;
+                            this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                            if (Selected is "create_for_me")
-                                FinalSelection = await ctx.Guild.CreateRoleAsync(configuration.CreateRoleOption);
-                            else if (Selected is "disable")
-                                FinalSelection = null;
-                            else
-                                FinalSelection = ctx.Guild.GetRole(Convert.ToUInt64(Selected));
-
+                            FinalSelection = this.ctx.Guild.GetRole(Convert.ToUInt64(Selected));
                             FinishedSelection = true;
-                        }
-                        else if (e.GetCustomId() == PrevPageButton.CustomId)
-                        {
-                            CurrentPage--;
-                            await RefreshMessage();
-                        }
-                        else if (e.GetCustomId() == NextPageButton.CustomId)
-                        {
-                            CurrentPage++;
-                            await RefreshMessage();
                         }
                         else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
                             throw new CancelException();
