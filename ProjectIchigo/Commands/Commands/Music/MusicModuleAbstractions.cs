@@ -13,10 +13,7 @@ internal class MusicModuleAbstractions
         var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
-        embed.AsLoading(ctx);
-
-        embed.Description = $"`Looking for '{load}'..`";
-        await ctx.BaseCommand.RespondOrEdit(embed.Build());
+        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription($"`Looking for '{load}'..`").AsLoading(ctx));
 
         LavalinkLoadResult loadResult;
 
@@ -82,8 +79,7 @@ internal class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            embed.Description = $"`Looking for '{load}' on {(Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`";
-            await ctx.BaseCommand.RespondOrEdit(embed.Build());
+            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription($"`Looking for '{load}' on {(Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`").AsLoading(ctx));
 
             loadResult = await node.Rest.GetTracksAsync(load, (Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
         }
