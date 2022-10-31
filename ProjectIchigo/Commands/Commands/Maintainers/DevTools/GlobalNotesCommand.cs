@@ -49,7 +49,7 @@ internal class GlobalNotesCommand : BaseCommand
                 return;
             }
 
-            if (Button.Result.Interaction.Data.CustomId == AddButton.CustomId)
+            if (Button.GetCustomId() == AddButton.CustomId)
             {
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction,
                         new DiscordInteractionModalBuilder().AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 256, true)), false);
@@ -82,12 +82,12 @@ internal class GlobalNotesCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+            else if (Button.GetCustomId() == RemoveButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 var SelectionResult = await PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
-                    .Select(x => new DiscordSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
+                    .Select(x => new DiscordStringSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
@@ -108,7 +108,7 @@ internal class GlobalNotesCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

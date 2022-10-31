@@ -18,7 +18,7 @@ internal class ConfigCommand : BaseCommand
 
             var ToggleDetectionButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
             var ToggleWarningButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
-            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle AbuseIPDB Reports", false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Client, ctx.Bot)));
+            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle AbuseIPDB Reports", false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Bot)));
             var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Punishment", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
             var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Reason", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Timeout Length", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
@@ -45,7 +45,7 @@ internal class ConfigCommand : BaseCommand
                 return;
             }
 
-            if (Button.Result.Interaction.Data.CustomId == ToggleDetectionButton.CustomId)
+            if (Button.GetCustomId() == ToggleDetectionButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -53,7 +53,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ToggleWarningButton.CustomId)
+            else if (Button.GetCustomId() == ToggleWarningButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -61,7 +61,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ToggleAbuseIpDbButton.CustomId)
+            else if (Button.GetCustomId() == ToggleAbuseIpDbButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -69,21 +69,21 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangePunishmentButton.CustomId)
+            else if (Button.GetCustomId() == ChangePunishmentButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                var dropdown = new DiscordSelectComponent("Select an action..", new List<DiscordSelectComponentOption>
+                var dropdown = new DiscordStringSelectComponent("Select an action..", new List<DiscordStringSelectComponentOption>
                     {
-                        { new DiscordSelectComponentOption("Ban", "Ban", "Bans the user if a scam link has been detected") },
-                        { new DiscordSelectComponentOption("Kick", "Kick", "Kicks the user if a scam link has been detected") },
-                        { new DiscordSelectComponentOption("Timeout", "Timeout", "Times the user out if a scam link has been detected") },
-                        { new DiscordSelectComponentOption("Delete", "Delete", "Only deletes the message containing the detected scam link") },
+                        { new DiscordStringSelectComponentOption("Ban", "Ban", "Bans the user if a scam link has been detected") },
+                        { new DiscordStringSelectComponentOption("Kick", "Kick", "Kicks the user if a scam link has been detected") },
+                        { new DiscordStringSelectComponentOption("Timeout", "Timeout", "Times the user out if a scam link has been detected") },
+                        { new DiscordStringSelectComponentOption("Delete", "Delete", "Only deletes the message containing the detected scam link") },
                     }, "selection");
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(dropdown));
 
-                var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, TimeSpan.FromMinutes(2));
+                var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, ComponentType.StringSelect, TimeSpan.FromMinutes(2));
 
                 if (e.TimedOut)
                 {
@@ -110,7 +110,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeReasonButton.CustomId)
+            else if (Button.GetCustomId() == ChangeReasonButton.CustomId)
             {
                 var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
                     .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.CustomPunishmentReason));
@@ -137,7 +137,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeTimeoutLengthButton.CustomId)
+            else if (Button.GetCustomId() == ChangeTimeoutLengthButton.CustomId)
             {
                 if (ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType != PhishingPunishmentType.TIMEOUT)
                 {
@@ -178,7 +178,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
             }

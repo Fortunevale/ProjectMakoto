@@ -47,8 +47,8 @@ internal class GuildInfoCommand : BaseCommand
                                   $"{(guild.IsCommunity).ToPillEmote(ctx.Bot)} **Community**", true));
                 
                 embed.AddField(new DiscordEmbedField("Security", $"{(guild.MfaLevel == MfaLevel.Enabled).ToPillEmote(ctx.Bot)} **2FA required for mods**\n" +
-                                  $"{(guild.Features.HasMembershipScreeningEnabled).ToPillEmote(ctx.Bot)} **Membership Screening**\n" +
-                                  $"{(guild.Features.HasWelcomeScreenEnabled).ToPillEmote(ctx.Bot)} **Welcome Screen**\n" +
+                                  $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasMembershipScreeningEnabled)).ToPillEmote(ctx.Bot)} **Membership Screening**\n" +
+                                  $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasWelcomeScreenEnabled)).ToPillEmote(ctx.Bot)} **Welcome Screen**\n" +
                                   $"🚪 **Verification Level**: `{guild.VerificationLevel}`\n" +
                                   $"🔍 **Scan for explicit content of**: `{guild.ExplicitContentFilter switch { ExplicitContentFilter.Disabled => "No members", ExplicitContentFilter.MembersWithoutRoles => "Members without roles", ExplicitContentFilter.AllMembers => "All members", _ => "?", }}`\n" +
                                   $"⚠ **NSFW Level**: `{guild.NsfwLevel switch { NsfwLevel.Default => "No Rating", NsfwLevel.Explicit => "Explicit, Only suitable for mature audiences", NsfwLevel.Safe => "Safe, Suitable for all age groups", NsfwLevel.Age_Restricted => "Questionable, May only be suitable for mature audiences", _ => "?", }}`\n" +

@@ -37,21 +37,21 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == ToggleMsg.CustomId)
+            if (e.GetCustomId() == ToggleMsg.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            if (e.Result.Interaction.Data.CustomId == ToggleGithub.CustomId)
+            if (e.GetCustomId() == ToggleGithub.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding = !ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

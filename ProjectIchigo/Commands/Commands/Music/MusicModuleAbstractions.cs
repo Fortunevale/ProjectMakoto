@@ -13,10 +13,7 @@ internal class MusicModuleAbstractions
         var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
-        embed.AsLoading(ctx);
-
-        embed.Description = $"`Looking for '{load}'..`";
-        await ctx.BaseCommand.RespondOrEdit(embed.Build());
+        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription($"`Looking for '{load}'..`").AsLoading(ctx));
 
         LavalinkLoadResult loadResult;
 
@@ -67,8 +64,8 @@ internal class MusicModuleAbstractions
             embed.Description = $"`On what platform do you want to search?`";
             embed.AsAwaitingInput(ctx);
             
-            var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Client, ctx.Bot)));
-            var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Client, ctx.Bot)));
+            var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Bot)));
+            var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Bot)));
 
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { YouTube, SoundCloud }));
 
@@ -82,10 +79,9 @@ internal class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            embed.Description = $"`Looking for '{load}' on {(Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`";
-            await ctx.BaseCommand.RespondOrEdit(embed.Build());
+            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription($"`Looking for '{load}' on {(Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`").AsLoading(ctx));
 
-            loadResult = await node.Rest.GetTracksAsync(load, (Menu1.Result.Interaction.Data.CustomId == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
+            loadResult = await node.Rest.GetTracksAsync(load, (Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
         }
 
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
@@ -115,12 +111,12 @@ internal class MusicModuleAbstractions
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
         {
-            embed.Description = $"`Found {loadResult.Tracks.Count()} load result(s). Please select the song you want to add below.`";
+            embed.Description = $"`Found {loadResult.Tracks.Count} load result(s). Please select the song you want to add below.`";
             embed.AsAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
             var UriResult = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks
-                .Select(x => new DiscordSelectComponentOption(x.Title.TruncateWithIndication(100), x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
+                .Select(x => new DiscordStringSelectComponentOption(x.Title.TruncateWithIndication(100), x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
 
             if (UriResult.TimedOut)
             {

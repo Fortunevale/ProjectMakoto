@@ -33,7 +33,7 @@ internal class RemindersCommand : BaseCommand
 
             _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (Button.Result.Interaction.Data.CustomId == AddButton.CustomId)
+            if (Button.GetCustomId() == AddButton.CustomId)
             {
                 string selectedDescription = "";
                 DateTime? selectedDueDate = null;
@@ -69,7 +69,7 @@ internal class RemindersCommand : BaseCommand
                         return;
                     }
 
-                    if (Menu.Result.Interaction.Data.CustomId == SelectDescriptionButton.CustomId)
+                    if (Menu.GetCustomId() == SelectDescriptionButton.CustomId)
                     {
                         var modal = new DiscordInteractionModalBuilder("New Reminder", Guid.NewGuid().ToString())
                             .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "desc", "Description", "Enter a reminder description..", 1, 512, true));
@@ -93,7 +93,7 @@ internal class RemindersCommand : BaseCommand
 
                         selectedDescription = ModalResult.Result.Interaction.GetModalValueByCustomId("desc");
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == SelectDueDateButton.CustomId)
+                    else if (Menu.GetCustomId() == SelectDueDateButton.CustomId)
                     {
 
                         var ModalResult = await PromptModalForDateTime(Menu.Result.Interaction, false);
@@ -121,7 +121,7 @@ internal class RemindersCommand : BaseCommand
 
                         selectedDueDate = ModalResult.Result;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == Finish.CustomId)
+                    else if (Menu.GetCustomId() == Finish.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -142,7 +142,7 @@ internal class RemindersCommand : BaseCommand
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    else if (Menu.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -151,10 +151,10 @@ internal class RemindersCommand : BaseCommand
                     }
                 }
             }
-            else if (Button.Result.Interaction.Data.CustomId == RemoveButton.CustomId)
+            else if (Button.GetCustomId() == RemoveButton.CustomId)
             {
                 var UuidResult = await PromptCustomSelection(rem.ScheduledReminders
-                        .Select(x => new DiscordSelectComponentOption($"{x.Description}".TruncateWithIndication(100), x.UUID, $"in {x.DueTime.GetTotalSecondsUntil().GetHumanReadable()}")).ToList());
+                        .Select(x => new DiscordStringSelectComponentOption($"{x.Description}".TruncateWithIndication(100), x.UUID, $"in {x.DueTime.GetTotalSecondsUntil().GetHumanReadable()}")).ToList());
 
                 if (UuidResult.TimedOut)
                 {
@@ -175,7 +175,7 @@ internal class RemindersCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

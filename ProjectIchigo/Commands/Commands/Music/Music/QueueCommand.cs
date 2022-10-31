@@ -109,7 +109,7 @@ internal class QueueCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        switch (e.Interaction.Data.CustomId)
+                        switch (e.GetCustomId())
                         {
                             case "Refresh":
                             {

@@ -117,7 +117,7 @@ internal class HelpCommand : BaseCommand
 
                 _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (Menu.Result.GetCustomId() == PreviousButton.CustomId)
+                if (Menu.GetCustomId() == PreviousButton.CustomId)
                 {
                     Page--;
                     continue;

@@ -6,6 +6,29 @@ public class MusicAppCommands : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
+        public class SongQueueAutocompleteProvider : IAutocompleteProvider
+        {
+            public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
+            {
+                try
+                {
+                    if ((ctx.Member?.VoiceState?.Channel?.Id ?? 0) != (ctx.Client.CurrentUser.ConvertToMember(ctx.Guild).Result.VoiceState?.Channel?.Id ?? 1))
+                        return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
+
+                    IEnumerable<Lavalink.QueueInfo> Queue = ((Bot)ctx.Services.GetService(typeof(Bot))).guilds[ctx.Guild.Id].MusicModule.SongQueue
+                        .Where(x => x.VideoTitle.StartsWith(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
+
+                    List<DiscordApplicationCommandAutocompleteChoice> options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.VideoTitle, x.VideoTitle)).ToList();
+                    return options.AsEnumerable();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Failed to provide autocomplete for song queue", ex);
+                    return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
+                }
+            }
+        }
+
         [SlashCommand("join", "The bot will join your channel if it's not already being used in this server.", dmPermission: false)]
         public async Task Join(InteractionContext ctx)
         {
@@ -67,7 +90,7 @@ public class MusicAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("removequeue", "Remove a song from the queue.", dmPermission: false)]
-        public async Task RemoveQueue(InteractionContext ctx, [Option("video", "The Index or Video Title")] string selection)
+        public async Task RemoveQueue(InteractionContext ctx, [Autocomplete(typeof(SongQueueAutocompleteProvider))] [Option("video", "The Index or Video Title", true)] string selection)
         {
             Task.Run(async () =>
             {

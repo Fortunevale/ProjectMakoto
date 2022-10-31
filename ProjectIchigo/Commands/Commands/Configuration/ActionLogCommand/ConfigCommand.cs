@@ -41,14 +41,14 @@ internal class ConfigCommand : BaseCommand
 
             _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (Button.Result.Interaction.Data.CustomId == Disable.CustomId)
+            if (Button.GetCustomId() == Disable.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].ActionLog = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
+            else if (Button.GetCustomId() == ChangeChannel.CustomId)
             {
                 var ChannelResult = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
                 {
@@ -93,29 +93,29 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.Result.Interaction.Data.CustomId == ChangeFilter.CustomId)
+            else if (Button.GetCustomId() == ChangeFilter.CustomId)
             {
                 try
                 {
-                    var Selections = new List<DiscordSelectComponentOption>
+                    var Selections = new List<DiscordStringSelectComponentOption>
                     {
-                        new DiscordSelectComponentOption("Attempt gathering more details", "attempt_further_detail", "This option may sometimes be inaccurate.", ctx.Bot.guilds[ctx.Guild.Id].ActionLog.AttemptGettingMoreDetails, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠"))),
-                        new DiscordSelectComponentOption("Join, Leaves & Kicks", "log_members_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MembersModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Nickname, Role Updates", "log_member_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("User Profile Updates", "log_memberprofile_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberProfileModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Message Deletions", "log_message_deleted", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageDeleted, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Message Modifications'", "log_message_updated", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageModified, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Role Updates", "log_roles_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.RolesModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Bans & Unbans", "log_banlist_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.BanlistModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Server Modifications", "log_guild_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.GuildModified, new DiscordComponentEmoji(EmojiTemplates.GetGuild(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Channel Modifications", "log_channels_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.ChannelsModified, new DiscordComponentEmoji(EmojiTemplates.GetChannel(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Voice Channel Updates", "log_voice_state", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.VoiceStateUpdated, new DiscordComponentEmoji(EmojiTemplates.GetVoiceState(ctx.Client, ctx.Bot))),
-                        new DiscordSelectComponentOption("Invite Modifications", "log_invites_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.InvitesModified, new DiscordComponentEmoji(EmojiTemplates.GetInvite(ctx.Client, ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Attempt gathering more details", "attempt_further_detail", "This option may sometimes be inaccurate.", ctx.Bot.guilds[ctx.Guild.Id].ActionLog.AttemptGettingMoreDetails, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠"))),
+                        new DiscordStringSelectComponentOption("Join, Leaves & Kicks", "log_members_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MembersModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Nickname, Role Updates", "log_member_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("User Profile Updates", "log_memberprofile_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberProfileModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Message Deletions", "log_message_deleted", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageDeleted, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Message Modifications'", "log_message_updated", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageModified, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Role Updates", "log_roles_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.RolesModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Bans & Unbans", "log_banlist_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.BanlistModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Server Modifications", "log_guild_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.GuildModified, new DiscordComponentEmoji(EmojiTemplates.GetGuild(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Channel Modifications", "log_channels_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.ChannelsModified, new DiscordComponentEmoji(EmojiTemplates.GetChannel(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Voice Channel Updates", "log_voice_state", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.VoiceStateUpdated, new DiscordComponentEmoji(EmojiTemplates.GetVoiceState(ctx.Bot))),
+                        new DiscordStringSelectComponentOption("Invite Modifications", "log_invites_modified", null, ctx.Bot.guilds[ctx.Guild.Id].ActionLog.InvitesModified, new DiscordComponentEmoji(EmojiTemplates.GetInvite(ctx.Bot))),
                     };
 
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordSelectComponent("No options selected.", Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordStringSelectComponent("No options selected.", Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
 
-                    var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, TimeSpan.FromMinutes(2));
+                    var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, ComponentType.StringSelect, TimeSpan.FromMinutes(2));
 
                     if (e.TimedOut)
                     {
@@ -157,7 +157,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
             }
-            else if (Button.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

@@ -28,7 +28,7 @@ internal class CreateIssueCommand : BaseCommand
                 .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", required: false));
 
             if (!UseOldTagsSelector)
-                modal.AddModalComponents(new DiscordSelectComponent("Select tags", labels.Select(x => new DiscordSelectComponentOption(x.Name, x.Name.ToLower().MakeValidFileName(), "", false, new DiscordComponentEmoji(new DiscordColor(x.Color).GetClosestColorEmoji(ctx.Client)))), "labels", 1, labels.Count));
+                modal.AddModalComponents(new DiscordStringSelectComponent("Select tags", labels.Select(x => new DiscordStringSelectComponentOption(x.Name, x.Name.ToLower().MakeValidFileName(), "", false, new DiscordComponentEmoji(new DiscordColor(x.Color).GetClosestColorEmoji(ctx.Client)))), "labels", 1, labels.Count));
             else
                 modal.AddModalComponents(new DiscordTextComponent(TextComponentStyle.Paragraph, "labels", "Labels", "", null, null, false, $"Put a # in front of every label you want to add.\n\n{string.Join("\n", labels.Select(x => x.Name))}"));
 
@@ -42,7 +42,7 @@ internal class CreateIssueCommand : BaseCommand
             {
                 Task.Run(async () =>
                 {
-                    if (e.Interaction.Data.CustomId == modal.CustomId)
+                    if (e.GetCustomId() == modal.CustomId)
                     {
                         cancellationTokenSource.Cancel();
                         ctx.Client.ComponentInteractionCreated -= RunInteraction;
@@ -56,7 +56,7 @@ internal class CreateIssueCommand : BaseCommand
                         string description = e.Interaction.Data.Components.Where(x => x.CustomId == "description").First().Value;
                         List<string> labels;
 
-                        if (labelComp.Type == ComponentType.Select)
+                        if (labelComp.Type == ComponentType.StringSelect)
                         {
                             labels = labelComp.Values.ToList();
                         }

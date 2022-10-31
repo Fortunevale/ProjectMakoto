@@ -224,7 +224,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (e.Interaction.Data.CustomId == AddToServerButton.CustomId)
+                        if (e.GetCustomId() == AddToServerButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
@@ -318,7 +318,7 @@ internal class EmojiStealerCommand : BaseCommand
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
                         }
-                        else if (e.Interaction.Data.CustomId == SinglePrivateMessageButton.CustomId)
+                        else if (e.GetCustomId() == SinglePrivateMessageButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
@@ -370,7 +370,7 @@ internal class EmojiStealerCommand : BaseCommand
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
                         }
-                        else if (e.Interaction.Data.CustomId == ZipPrivateMessageButton.CustomId || e.Interaction.Data.CustomId == SendHereButton.CustomId)
+                        else if (e.GetCustomId() == ZipPrivateMessageButton.CustomId || e.GetCustomId() == SendHereButton.CustomId)
                         {
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
@@ -404,7 +404,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                             ZipFile.CreateFromDirectory($"zipfile-{guid}", $"Emotes-{guid}.zip");
 
-                            if (e.Interaction.Data.CustomId == ZipPrivateMessageButton.CustomId)
+                            if (e.GetCustomId() == ZipPrivateMessageButton.CustomId)
                             {
                                 embed.Description = $"`Sending your Zip File in DMs..`";
                                 await RespondOrEdit(embed);
@@ -437,7 +437,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 embed.Description = $"`Downloaded and sent {(IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())} {emojiText} to your DMs.`";
                                 await RespondOrEdit(embed.AsSuccess(ctx));
                             }
-                            else if (e.Interaction.Data.CustomId == SendHereButton.CustomId)
+                            else if (e.GetCustomId() == SendHereButton.CustomId)
                             {
                                 if (!ctx.Member.Permissions.HasPermission(Permissions.AttachFiles))
                                 {
@@ -456,7 +456,7 @@ internal class EmojiStealerCommand : BaseCommand
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
                         }
-                        else if (e.Interaction.Data.CustomId == IncludeStickersButton.CustomId)
+                        else if (e.GetCustomId() == IncludeStickersButton.CustomId)
                         {
                             IncludeStickers = !IncludeStickers;
 

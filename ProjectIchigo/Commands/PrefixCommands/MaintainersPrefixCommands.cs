@@ -220,7 +220,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
         }
 
         [Command("create-issue"), Description("Create a new issue on Ichigo's Github Repository.")]
-        public async Task CreateIssue(CommandContext ctx, bool UseOldTagsSelector = false)
+        public async Task CreateIssue(CommandContext ctx, bool UseOldTagsSelector = true)
         {
             Task.Run(async () =>
             {

@@ -52,6 +52,8 @@ public class Config
         public string Proud = "🅿";
         public string Hug = "🅿";
 
+        public ulong WhiteXMark = 1005430134070841395;
+
         public ulong CheckboxTickedRedId = 970280327253725184;
         public ulong CheckboxUntickedRedId = 970280299466481745;
 

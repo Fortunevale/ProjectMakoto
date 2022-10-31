@@ -128,7 +128,7 @@ internal class ReportHostCommand : BaseCommand
 
             await e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == ContinueButton.CustomId)
+            if (e.GetCustomId() == ContinueButton.CustomId)
             {
                 embed.Description = $"`Submitting your host..`";
                 embed.AsLoading(ctx, "Malicious Host Submissions");
@@ -202,7 +202,7 @@ internal class ReportHostCommand : BaseCommand
                 embed.AsSuccess(ctx, "Malicious Host Submissions");
                 await RespondOrEdit(embed);
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
             }

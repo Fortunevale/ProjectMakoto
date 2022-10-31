@@ -9,8 +9,8 @@ internal class ObjectCommand : BaseCommand
             if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.ToEmote(ctx.Client)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.ToEmote(ctx.Client)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
 
             if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
             {
@@ -29,7 +29,7 @@ internal class ObjectCommand : BaseCommand
 
                 _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (Menu1.Result.Interaction.Data.CustomId == Yes.CustomId)
+                if (Menu1.GetCustomId() == Yes.CustomId)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
@@ -84,7 +84,7 @@ internal class ObjectCommand : BaseCommand
 
             _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+            if (Menu.GetCustomId() == Yes.CustomId)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -101,7 +101,7 @@ internal class ObjectCommand : BaseCommand
 
                 _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                if (Menu.Result.Interaction.Data.CustomId == Yes.CustomId)
+                if (Menu.GetCustomId() == Yes.CustomId)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {

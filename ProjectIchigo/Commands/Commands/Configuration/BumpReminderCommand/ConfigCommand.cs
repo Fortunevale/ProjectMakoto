@@ -43,7 +43,7 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == Setup.CustomId)
+            if (e.GetCustomId() == Setup.CustomId)
             {
                 if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == ctx.Bot.status.LoadedConfig.Accounts.Disboard))
                 {
@@ -113,7 +113,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == Disable.CustomId)
+            else if (e.GetCustomId() == Disable.CustomId)
             {
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminder = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
@@ -129,7 +129,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ChangeChannel.CustomId)
+            else if (e.GetCustomId() == ChangeChannel.CustomId)
             {
                 var ChannelResult = await PromptChannelSelection(ChannelType.Text);
 
@@ -160,7 +160,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == ChangeRole.CustomId)
+            else if (e.GetCustomId() == ChangeRole.CustomId)
             {
 
                 var RoleResult = await PromptRoleSelection();
@@ -191,7 +191,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;

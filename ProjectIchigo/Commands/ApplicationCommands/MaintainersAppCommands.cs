@@ -173,7 +173,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("create-issue", "Create a new issue on Ichigo's Github Repository.")]
-        public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")] bool UseOldTagsSelector = false)
+        public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")] bool UseOldTagsSelector = true)
         {
             Task.Run(async () =>
             {

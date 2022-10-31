@@ -66,25 +66,25 @@ public class ReminderSettings
                     await button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                     var newMsg = await button.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
                         .AddEmbed(new DiscordEmbedBuilder().WithDescription("`How long do you want to snooze for?`").AsBotAwaitingInput(_bot.discordClient, user))
-                        .AddComponents(new DiscordSelectComponent("Select a new due time..", new List<DiscordSelectComponentOption>
+                        .AddComponents(new DiscordStringSelectComponent("Select a new due time..", new List<DiscordStringSelectComponentOption>
                         {
-                            new DiscordSelectComponentOption("1 minute", "1m"),
-                            new DiscordSelectComponentOption("3 minutes", "3m"),
-                            new DiscordSelectComponentOption("5 minutes", "5m"),
-                            new DiscordSelectComponentOption("10 minutes", "10m"),
-                            new DiscordSelectComponentOption("20 minutes", "20m"),
-                            new DiscordSelectComponentOption("30 minutes", "30m"),
-                            new DiscordSelectComponentOption("1 hour", "1h"),
-                            new DiscordSelectComponentOption("2 hours", "2h"),
-                            new DiscordSelectComponentOption("6 hours", "6h"),
-                            new DiscordSelectComponentOption("12 hours", "12h"),
-                            new DiscordSelectComponentOption("1 day", "1d"),
-                            new DiscordSelectComponentOption("3 days", "3d"),
-                            new DiscordSelectComponentOption("7 days", "7d"),
-                            new DiscordSelectComponentOption("14 days", "14d"),
+                            new DiscordStringSelectComponentOption("1 minute", "1m"),
+                            new DiscordStringSelectComponentOption("3 minutes", "3m"),
+                            new DiscordStringSelectComponentOption("5 minutes", "5m"),
+                            new DiscordStringSelectComponentOption("10 minutes", "10m"),
+                            new DiscordStringSelectComponentOption("20 minutes", "20m"),
+                            new DiscordStringSelectComponentOption("30 minutes", "30m"),
+                            new DiscordStringSelectComponentOption("1 hour", "1h"),
+                            new DiscordStringSelectComponentOption("2 hours", "2h"),
+                            new DiscordStringSelectComponentOption("6 hours", "6h"),
+                            new DiscordStringSelectComponentOption("12 hours", "12h"),
+                            new DiscordStringSelectComponentOption("1 day", "1d"),
+                            new DiscordStringSelectComponentOption("3 days", "3d"),
+                            new DiscordStringSelectComponentOption("7 days", "7d"),
+                            new DiscordStringSelectComponentOption("14 days", "14d"),
                         })));
 
-                    var button2 = await newMsg.WaitForSelectAsync(x => x.User.Id == button.Result.User.Id, TimeSpan.FromMinutes(5));
+                    var button2 = await newMsg.WaitForSelectAsync(x => x.User.Id == button.Result.User.Id, ComponentType.StringSelect, TimeSpan.FromMinutes(5));
 
                     if (button.TimedOut)
                     {

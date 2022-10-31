@@ -16,7 +16,7 @@ internal class ConfigCommand : BaseCommand
                 Description = VcCreatorCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsInfo(ctx, "Voice Channel Creator");
 
-            var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set Voice Channel Creator", false, EmojiTemplates.GetChannel(ctx.Client, ctx.Bot).ToComponent());
+            var SetChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set Voice Channel Creator", false, EmojiTemplates.GetChannel(ctx.Bot).ToComponent());
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -35,7 +35,7 @@ internal class ConfigCommand : BaseCommand
 
             _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if (e.Result.Interaction.Data.CustomId == SetChannel.CustomId)
+            if (e.GetCustomId() == SetChannel.CustomId)
             {
                 var ChannelResult = await PromptChannelSelection(ChannelType.Voice, new ChannelPromptConfiguration { DisableOption = "Disable Voice Channel Creator" });
 
@@ -72,7 +72,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.Result.Interaction.Data.CustomId == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
             {
                 DeleteOrInvalidate();
                 return;
