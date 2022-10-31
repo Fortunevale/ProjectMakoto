@@ -957,19 +957,19 @@ public abstract class BaseCommand
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You aren't in a voice channel.`",
-        }.AsError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)));
 
     public void SendUserBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
-        }.AsError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)));
 
     public void SendGuildBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
-        }.AsError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)));
 
     public void SendSourceError(Enums.CommandType commandType)
         => _ = commandType switch
@@ -989,7 +989,7 @@ public abstract class BaseCommand
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
-        }.AsError(ctx)).WithContent(ctx.User.Mention));
+        }.AsError(ctx)));
 
     public void SendOwnPermissionError(Permissions perms)
     {
