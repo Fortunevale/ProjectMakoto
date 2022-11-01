@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Cleanup before build
-        run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
+        run: rm -rf ProjectIchigo/
       - name: Setup .NET Core SDK 6.x
         uses: actions/setup-dotnet@v3
         with:
@@ -17,23 +17,7 @@ jobs:
       - name: "Clone Repository"
         uses: actions/checkout@v3
         with:
-          path: ProjectIchigo
-      - name: "Clone Xorog.Logger"
-        uses: actions/checkout@v3
-        with:
-          repository: Fortunevale/Xorog.Logger
-          path: Xorog.Logger
-      - name: "Clone Xorog.UniversalExtensions"
-        uses: actions/checkout@v3
-        with:
-          repository: Fortunevale/Xorog.UniversalExtensions
-          path: Xorog.UniversalExtensions
-      - name: "Clone Xorog.ScoreSaber"
-        uses: actions/checkout@v3
-        with:
-          repository: Fortunevale/Xorog.ScoreSaber
-          path: Xorog.ScoreSaber
-          token: ${{ secrets.Access_token }}
+          submodules: recursive
       - name: Install dependencies
         run: dotnet restore
         working-directory: ProjectIchigo/ProjectIchigo/
@@ -44,7 +28,7 @@ jobs:
         run: git rev-parse --short HEAD > "/home/github-runner/build/LatestGitPush.cfg" && git branch --show-current >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> /home/github-runner/build/LatestGitPush.cfg
         working-directory: ProjectIchigo/
       - name: Cleanup
-        run: rm -rf ProjectIchigo/ Xorog.Logger/ Xorog.ScoreSaber/ Xorog.UniversalExtensions/
+        run: rm -rf ProjectIchigo/
       - name: Deleting old successful build
         run: rm -rf /home/github-runner/successful_build
       - name: Moving successful build
