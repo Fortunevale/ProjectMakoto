@@ -79,6 +79,8 @@ We have a step by step guide you can follow to start contributing: [CONTRIBUTING
    - The Application must be in previously mentioned Discord Team. The staff-check requires this.
 - [Kawaii API Key](https://kawaii.red/)
    - This is mainly for social commands like `hug`, `cuddle`, `pat` and so on.
+- [AbuseIPDB API Key](https://www.abuseipdb.com/account)
+    - This is required for the AbuseIPDB check.
 <br></br>
 - [Github Account](https://github.com/) with a [Personal Access Token](https://github.com/settings/tokens) for your Github Account
    - The personal access token should have the `repo` permissions.
