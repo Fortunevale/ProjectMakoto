@@ -15,11 +15,10 @@
     - [Github Desktop](https://desktop.github.com/)
     - [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
         - Select .NET desktop development
-2. Log into your Github Account on Github Desktop and clone the following repositories:
+2. Log into your Github Account on Github Desktop and clone the following repository:
     - `Fortunevale/ProjectIchigo`
-    - `Fortunevale/Xorog.ScoreSaber`
-    - `Fortunevale/Xorog.Logger`
-    - `Fortunevale/Xorog.UniversalExtensions`
+        - You'll also need the project's submodules.
+        - To clone `ProjectIchigo` with it's submodules run: `git clone --recurse-submodules "https://github.com/Fortunevale/ProjectIchigo.git"`
 3. With this completed, you can already start developing for Ichigo. To be able to debug Ichigo, follow the guide below.
 
 ## Running Ichigo with all necessary dependencies
@@ -37,11 +36,14 @@
 
 2. Create an account on the following sites:
     - [Discord](https://discord.com)
-        - Create a new [Discord Team](https://discord.com/developers/teams) and add a new [Discord Application](https://discord.com/developers/applications/) to the previously created Team.
-        - Add a Bot to the Application and note down the Bot Token.
-        - The Bot requires all Intents.
+        - Create a new [Discord Team](https://discord.com/developers/teams) and add a new [Discord Application](https://discord.com/developers/applications/) to the previously created team.
+        - Add a bot to the application and note down the bot token.
+        - Ichigo currently requires the `Presence`, `Server Members` and `Message Content` Intents.
+        - I recommend disabling the `Public Bot` Option so no one can add your development client to their server.
     - [kawaii.red](https://kawaii.red/)
-        - You'll find your Token on your User Dashboard.
+        - You'll find your api token on your user dashboard.
+    - [AbuseIPDB API Key](https://www.abuseipdb.com/account)
+        - After creating your account, you can create an api key [here](https://www.abuseipdb.com/account/api).
     - [Github](https://github.com/)
         - If you want to use `/dev_tools create-issue`, create a [Personal Access Token](https://github.com/settings/tokens) to your Github Account.
 3. Build and run Ichigo until the console says something like "Config reloaded".
