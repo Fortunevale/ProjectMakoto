@@ -1,0 +1,9 @@
+[submodule "Xorog.Logger"]
+	path = Xorog.Logger
+	url = https://github.com/Fortunevale/Xorog.Logger
+[submodule "Xorog.UniversalExtensions"]
+	path = Xorog.UniversalExtensions
+	url = https://github.com/Fortunevale/Xorog.UniversalExtensions
+[submodule "Xorog.ScoreSaber"]
+	path = Xorog.ScoreSaber
+	url = https://github.com/Fortunevale/Xorog.ScoreSaber
