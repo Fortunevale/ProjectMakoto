@@ -64,10 +64,6 @@ We have a step by step guide you can follow to start contributing: [CONTRIBUTING
 
 ### Required Dependencies that you can't get on nuget:
 
-- [Xorog.ScoreSaber](https://github.com/TheXorog/Xorog.ScoreSaber)
-- [Xorog.Logger](https://github.com/TheXorog/Xorog.Logger)
-- [Xorog.UniversalExtensions](https://github.com/TheXorog/Xorog.UniversalExtensions)
-<br></br>
 - [Lavalink](https://github.com/freyacodes/Lavalink)
 - [LibreTranslate](https://github.com/LibreTranslate/LibreTranslate) (Please set up your own instance.)
 - [A MySQL Database](https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/general-installation-issues.html)
