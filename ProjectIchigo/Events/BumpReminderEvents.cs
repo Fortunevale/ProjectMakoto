@@ -58,8 +58,8 @@ internal class BumpReminderEvents
 
                     _bot.guilds[e.Guild.Id].BumpReminder.LastUserId = _bumper.Id;
 
-                    e.Channel.SendMessageAsync($"**{_bumper.Mention} Thanks a lot for supporting the server!**\n\n" +
-                                               $"_**You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message!**_").Add(_bot.watcher);
+                    _ = e.Channel.SendMessageAsync($"**{_bumper.Mention} Thanks a lot for supporting the server!**\n\n" +
+                                               $"_**You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message!**_");
 
                     try
                     {
@@ -73,6 +73,8 @@ internal class BumpReminderEvents
                 catch (Exception)
                 {
                     _bot.guilds[e.Guild.Id].BumpReminder.LastUserId = 0;
+                    _bot.bumpReminder.ScheduleBump(sender, e.Guild.Id);
+
                     throw;
                 }
             }

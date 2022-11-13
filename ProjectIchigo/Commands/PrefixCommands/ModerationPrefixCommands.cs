@@ -273,4 +273,17 @@ public class ModerationPrefixCommands : BaseCommandModule
             await new CustomEmbedCommand().ExecuteCommand(ctx, _bot);
         }).Add(_bot.watcher, ctx);
     }
+
+
+
+    [Command("override-bump-time"),
+    CommandModule("moderation"),
+    Description("Allows fixing of the last bump in case Disboard did not properly post a message.")]
+    public async Task OverrideBumpTime(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new ManualBumpCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
 }
