@@ -1,4 +1,5 @@
 using ProjectIchigo.PrefixCommands;
+using System.Reflection;
 
 namespace ProjectIchigo;
 
@@ -110,6 +111,29 @@ public class Bot
         {
             _logger.LogError($"An exception occurred while to enable debug logs", ex);
         }
+
+        _logger.LogDebug("Loading all assemblies..");
+
+        var assemblyCount = 0;
+        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            LoadReferencedAssembly(assembly);
+        }
+
+        void LoadReferencedAssembly(Assembly assembly)
+        {
+            foreach (AssemblyName name in assembly.GetReferencedAssemblies())
+            {
+                if (!AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName == name.FullName))
+                {
+                    assemblyCount++;
+                    _logger.LogDebug($"Loading {name.Name}..");
+                    LoadReferencedAssembly(Assembly.Load(name));
+                }
+            }
+        }
+
+        _logger.LogInfo($"Loaded {assemblyCount} assemblies.");
 
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
         translationClient = GoogleTranslateClient.Initialize();
