@@ -1051,7 +1051,7 @@ public class Bot
 
                             var channel = guild.Value.GetChannel(guilds[guild.Key].MusicModule.ChannelId);
 
-                            if (channel.Users.Where(x => !x.IsBot).Any())
+                            if (!channel.Users.Where(x => !x.IsBot).Any())
                                 throw new Exception("Channel empty");
 
                             if (guilds[guild.Key].MusicModule.SongQueue.Count > 0)
