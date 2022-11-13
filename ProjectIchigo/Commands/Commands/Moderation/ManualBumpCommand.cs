@@ -29,11 +29,15 @@ internal class ManualBumpCommand : BaseCommand
                 return;
             }
 
+            DiscordChannel channel = ctx.Guild.GetChannel(ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId);
+
             ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastBump = DateTime.UtcNow;
             ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastReminder = DateTime.UtcNow;
             ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.BumpsMissed = 0;
             ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastUserId = 0;
             ctx.Bot.bumpReminder.ScheduleBump(ctx.Client, ctx.Guild.Id);
+
+            _ = channel.DeleteMessageAsync(await channel.GetMessageAsync(ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.PersistentMessageId));
             DeleteOrInvalidate();
         });
     }
