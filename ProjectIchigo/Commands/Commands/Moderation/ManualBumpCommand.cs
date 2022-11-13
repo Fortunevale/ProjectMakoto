@@ -17,7 +17,7 @@ internal class ManualBumpCommand : BaseCommand
             DiscordButtonComponent YesButton = new(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, DiscordEmoji.FromUnicode("✅").ToComponent());
 
             await RespondOrEdit(new DiscordMessageBuilder()
-                .WithEmbed(new DiscordEmbedBuilder().WithDescription("`Manually overwriting the last bump time will re-shedule the bump reminder as if the server was just bumped. Are you sure you want to continue?`").AsWarning(ctx))
+                .WithEmbed(new DiscordEmbedBuilder().WithDescription("`Manually overwriting the last bump time will re-schedule the bump reminder as if the server was just bumped. Are you sure you want to continue?`").AsWarning(ctx))
                 .AddComponents(YesButton)
                 .AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, DiscordEmoji.FromUnicode("❌").ToComponent())));
 
