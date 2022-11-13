@@ -3,6 +3,7 @@
   "extends": [
     "config:base"
   ],
+  "baseBranches": ["dev"],
   "prHourlyLimit": 9,
   "bumpVersion": "prerelease",
   "packageRules": [

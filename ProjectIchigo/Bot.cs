@@ -1,4 +1,5 @@
 using ProjectIchigo.PrefixCommands;
+using System.Reflection;
 
 namespace ProjectIchigo;
 
@@ -110,6 +111,29 @@ public class Bot
         {
             _logger.LogError($"An exception occurred while to enable debug logs", ex);
         }
+
+        _logger.LogDebug("Loading all assemblies..");
+
+        var assemblyCount = 0;
+        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            LoadReferencedAssembly(assembly);
+        }
+
+        void LoadReferencedAssembly(Assembly assembly)
+        {
+            foreach (AssemblyName name in assembly.GetReferencedAssemblies())
+            {
+                if (!AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName == name.FullName))
+                {
+                    assemblyCount++;
+                    _logger.LogDebug($"Loading {name.Name}..");
+                    LoadReferencedAssembly(Assembly.Load(name));
+                }
+            }
+        }
+
+        _logger.LogInfo($"Loaded {assemblyCount} assemblies.");
 
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
         translationClient = GoogleTranslateClient.Initialize();
@@ -733,7 +757,7 @@ public class Bot
         });
     }
 
-    private async Task SyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
+    private async Task ExecuteSyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
     {
         ObservableList<Task> runningTasks = new();
 
@@ -997,7 +1021,7 @@ public class Bot
 
             try
             {
-                await SyncTasks(discordClient.Guilds);
+                await ExecuteSyncTasks(discordClient.Guilds);
             }
             catch (Exception ex)
             {
@@ -1025,6 +1049,11 @@ public class Bot
                             if (guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("localhost") || guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("127.0.0.1"))
                                 throw new Exception("Localhost?");
 
+                            var channel = guild.Value.GetChannel(guilds[guild.Key].MusicModule.ChannelId);
+
+                            if (!channel.Users.Where(x => !x.IsBot).Any())
+                                throw new Exception("Channel empty");
+
                             if (guilds[guild.Key].MusicModule.SongQueue.Count > 0)
                             {
                                 for (var i = 0; i < guilds[guild.Key].MusicModule.SongQueue.Count; i++)
@@ -1044,8 +1073,6 @@ public class Bot
                                     b.user = UserCache.First(x => x.Id == b.UserId);
                                 }
                             }
-
-                            var channel = guild.Value.GetChannel(guilds[guild.Key].MusicModule.ChannelId);
 
                             var lava = discordClient.GetLavalink();
 
@@ -1120,7 +1147,7 @@ public class Bot
                 while (!status.DiscordCommandsRegistered && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                     await Task.Delay(500);
 
-                await SyncTasks(discordClient.Guilds);
+                await ExecuteSyncTasks(discordClient.Guilds);
             }
             catch (Exception ex)
             {
