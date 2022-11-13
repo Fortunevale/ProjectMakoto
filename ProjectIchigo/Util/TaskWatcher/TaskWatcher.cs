@@ -60,6 +60,27 @@ internal class TaskWatcher
                     try { _logger.LogError($"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)Exception).WebResponse.Response}"); } catch { }
                 }
 
+                if (SharedCommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
+                    try
+                    {
+                        _ = SharedCommandContext.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
+                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCode()}'`\n" +
+                        $"`The exception has been automatically reported.`\n\n" +
+                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        {
+                            if (!x.IsCompletedSuccessfully)
+                                return;
+
+                            _ = Task.Delay(10000).ContinueWith(_ =>
+                            {
+                                SharedCommandContext.BaseCommand.DeleteOrInvalidate();
+                            });
+                        });
+                    }
+                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
+
+                // Backup handling in case the exception isn't caused via a command
+
                 if (CommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
@@ -92,26 +113,7 @@ internal class TaskWatcher
 
                             _ = Task.Delay(10000).ContinueWith(_ =>
                             {
-                                _ = x.Result.DeleteAsync();
-                            });
-                        });
-                    }
-                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
-                
-                if (SharedCommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
-                    try
-                    {
-                        _ = SharedCommandContext.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCode()}'`\n" +
-                        $"`The exception has been automatically reported.`\n\n" +
-                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
-                        {
-                            if (!x.IsCompletedSuccessfully)
-                                return;
-
-                            _ = Task.Delay(10000).ContinueWith(_ =>
-                            {
-                                _ = x.Result.DeleteAsync();
+                                _ = InteractionContext.DeleteResponseAsync();
                             });
                         });
                     }
@@ -130,7 +132,7 @@ internal class TaskWatcher
 
                             _ = Task.Delay(10000).ContinueWith(_ =>
                             {
-                                _ = x.Result.DeleteAsync();
+                                _ = ContextMenuContext.DeleteResponseAsync();
                             });
                         });
                     }

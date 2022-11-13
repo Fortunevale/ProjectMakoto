@@ -733,7 +733,7 @@ public class Bot
         });
     }
 
-    private async Task SyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
+    private async Task ExecuteSyncTasks(IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
     {
         ObservableList<Task> runningTasks = new();
 
@@ -997,7 +997,7 @@ public class Bot
 
             try
             {
-                await SyncTasks(discordClient.Guilds);
+                await ExecuteSyncTasks(discordClient.Guilds);
             }
             catch (Exception ex)
             {
@@ -1120,7 +1120,7 @@ public class Bot
                 while (!status.DiscordCommandsRegistered && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                     await Task.Delay(500);
 
-                await SyncTasks(discordClient.Guilds);
+                await ExecuteSyncTasks(discordClient.Guilds);
             }
             catch (Exception ex)
             {
