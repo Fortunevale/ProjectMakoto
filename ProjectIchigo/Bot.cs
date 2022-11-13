@@ -1049,6 +1049,11 @@ public class Bot
                             if (guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("localhost") || guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("127.0.0.1"))
                                 throw new Exception("Localhost?");
 
+                            var channel = guild.Value.GetChannel(guilds[guild.Key].MusicModule.ChannelId);
+
+                            if (channel.Users.Where(x => !x.IsBot).Any())
+                                throw new Exception("Channel empty");
+
                             if (guilds[guild.Key].MusicModule.SongQueue.Count > 0)
                             {
                                 for (var i = 0; i < guilds[guild.Key].MusicModule.SongQueue.Count; i++)
@@ -1068,8 +1073,6 @@ public class Bot
                                     b.user = UserCache.First(x => x.Id == b.UserId);
                                 }
                             }
-
-                            var channel = guild.Value.GetChannel(guilds[guild.Key].MusicModule.ChannelId);
 
                             var lava = discordClient.GetLavalink();
 
