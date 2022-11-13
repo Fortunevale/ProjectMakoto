@@ -34,6 +34,7 @@ internal class ManualBumpCommand : BaseCommand
             ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.BumpsMissed = 0;
             ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastUserId = 0;
             ctx.Bot.bumpReminder.ScheduleBump(ctx.Client, ctx.Guild.Id);
+            DeleteOrInvalidate();
         });
     }
 }
