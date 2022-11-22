@@ -34,7 +34,7 @@ internal class ObjectCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, removing you from the objection list..`"
-                    }.AsGenericLoading(ctx));
+                    }.AsBotLoading(ctx));
 
                     try
                     {
@@ -106,7 +106,7 @@ internal class ObjectCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, deleting your profile..`"
-                    }.AsGenericLoading(ctx));
+                    }.AsBotLoading(ctx));
 
                     try
                     {
@@ -127,7 +127,7 @@ internal class ObjectCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Adding your account to objection list..`"
-                    }.AsGenericLoading(ctx));
+                    }.AsBotLoading(ctx));
 
                     ctx.Bot.objectedUsers.Add(ctx.User.Id);
 

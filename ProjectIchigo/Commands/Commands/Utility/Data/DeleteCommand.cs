@@ -51,7 +51,7 @@ internal class DeleteCommand : BaseCommand
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
                         Description = $"`Okay, deleting your profile..`"
-                    }.AsGenericLoading(ctx));
+                    }.AsBotLoading(ctx));
 
                     try
                     {

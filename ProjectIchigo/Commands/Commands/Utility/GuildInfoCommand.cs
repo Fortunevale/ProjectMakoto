@@ -16,7 +16,7 @@ internal class GuildInfoCommand : BaseCommand
 			if (guildId == 0)
 				guildId = ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching guild info..`").AsGenericLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching guild info..`").AsBotLoading(ctx));
 
             try
 			{

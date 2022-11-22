@@ -183,6 +183,18 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 }, InitiateInteraction: false);
             }).Add(_bot.watcher, ctx);
         }
+
+        [SlashCommand("evaluate", "Evaluates CScript.")]
+        public async Task Evaluate(InteractionContext ctx, [Option("message", "The message to evaluate")] string msg)
+        {
+            Task.Run(async () =>
+            {
+                await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "message", Convert.ToUInt64(msg) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
     }
 
 #if DEBUG
