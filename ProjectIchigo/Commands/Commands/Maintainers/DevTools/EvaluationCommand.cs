@@ -13,7 +13,28 @@ internal class EvaluationCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            if (ctx.CommandType is not Enums.CommandType.ApplicationCommand and not Enums.CommandType.ContextMenu)
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().WithDescription("Evaluating CScript has the potentional of leaking confidential information. Are you sure you want to run this command as Prefix Command?").AsBotWarning(ctx))
+                    .AddComponents(new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"))
+                    .AddComponents(new DiscordButtonComponent(ButtonStyle.Success, "no", "No")));
+
+                var result = await ctx.ResponseMessage.WaitForButtonAsync(ctx.User);
+
+                if (result.TimedOut || result.GetCustomId() != "yes")
+                {
+                    DeleteOrInvalidate();
+                    return;
+                }
+            }
+
             var msg = await ctx.Channel.GetMessageAsync((ulong)arguments["message"]);
+
+            if (msg.Author.Id != ctx.User.Id)
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You cannot evaluate other people's code.`").AsBotError(ctx));
+                return;
+            }
 
             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Evaluating..`").AsBotLoading(ctx));
 
@@ -25,6 +46,7 @@ internal class EvaluationCommand : BaseCommand
             if (cs1 == -1 || cs2 == -1)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No code block was found.`").AsBotError(ctx));
+                return;
             }    
 
             string cs = code[cs1..cs2];
@@ -32,7 +54,20 @@ internal class EvaluationCommand : BaseCommand
             try
             {
                 var sopts = ScriptOptions.Default;
-                sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Interactivity.Enums", "DisCatSharp.Enums", "Newtonsoft.Json");
+                sopts = sopts.WithImports(
+                    "System", 
+                    "System.Collections.Generic", 
+                    "System.Linq", 
+                    "System.Text", 
+                    "System.Threading.Tasks", 
+                    "DisCatSharp", 
+                    "DisCatSharp.Entities", 
+                    "DisCatSharp.Interactivity", 
+                    "DisCatSharp.Interactivity.Extensions", 
+                    "DisCatSharp.Interactivity.Enums", 
+                    "DisCatSharp.Enums", 
+                    "Newtonsoft.Json"
+                    );
                 sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
                 var script = CSharpScript.Create(cs, sopts, typeof(SharedCommandContext));
