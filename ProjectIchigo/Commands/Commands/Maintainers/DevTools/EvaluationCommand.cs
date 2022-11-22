@@ -7,7 +7,7 @@ namespace ProjectIchigo.Commands;
 
 internal class EvaluationCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckBotOwner() && await CheckSource(Enums.CommandType.ApplicationCommand));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckBotOwner();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -16,8 +16,8 @@ internal class EvaluationCommand : BaseCommand
             if (ctx.CommandType is not Enums.CommandType.ApplicationCommand and not Enums.CommandType.ContextMenu)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().WithDescription("Evaluating CScript has the potentional of leaking confidential information. Are you sure you want to run this command as Prefix Command?").AsBotWarning(ctx))
-                    .AddComponents(new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"))
-                    .AddComponents(new DiscordButtonComponent(ButtonStyle.Success, "no", "No")));
+                    .AddComponents(new List<DiscordComponent> { new DiscordButtonComponent(ButtonStyle.Success, "yes", "Yes"),
+                                                                new DiscordButtonComponent(ButtonStyle.Danger, "no", "No")}));
 
                 var result = await ctx.ResponseMessage.WaitForButtonAsync(ctx.User);
 
@@ -28,7 +28,17 @@ internal class EvaluationCommand : BaseCommand
                 }
             }
 
-            var msg = await ctx.Channel.GetMessageAsync((ulong)arguments["message"]);
+            DiscordMessage msg;
+
+            try
+            {
+                msg = await ctx.Channel.GetMessageAsync((ulong)arguments["message"]);
+            }
+            catch (Exception)
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to fetch specified message.`").AsBotError(ctx));
+                return;
+            }
 
             if (msg.Author.Id != ctx.User.Id)
             {

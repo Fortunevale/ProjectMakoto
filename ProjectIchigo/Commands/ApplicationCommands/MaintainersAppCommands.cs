@@ -185,13 +185,13 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("evaluate", "Evaluates CScript.")]
-        public async Task Evaluate(InteractionContext ctx, [Option("message", "The message to evaluate")] string msg)
+        public async Task Evaluate(InteractionContext ctx, [Option("message", "The message to evaluate, leave empty to use the last message.")] string msg = "")
         {
             Task.Run(async () =>
             {
                 await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "message", Convert.ToUInt64(msg) },
+                    { "message", (msg.IsNullOrWhiteSpace() ? (await ctx.Channel.GetMessagesAsync(1))[0].Id : Convert.ToUInt64(msg)) },
                 });
             }).Add(_bot.watcher, ctx);
         }

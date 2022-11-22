@@ -230,5 +230,17 @@ public class MaintainersPrefixCommands : BaseCommandModule
                 });
             }).Add(_bot.watcher, ctx);
         }
+
+        [Command("evaluate"), Aliases("eval"), Description("Evaluates CScript.")]
+        public async Task Evaluate(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "message", (ctx.Message.ReferencedMessage is null ? (await ctx.Channel.GetMessagesAsync(2))[1].Id : ctx.Message.ReferencedMessage?.Id) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
     }
 }
