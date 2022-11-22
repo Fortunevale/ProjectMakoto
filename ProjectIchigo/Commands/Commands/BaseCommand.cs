@@ -897,6 +897,17 @@ public abstract class BaseCommand
         return true;
     }
 
+    public async Task<bool> CheckBotOwner()
+    {
+        if (!ctx.User.IsMaintenance(ctx.Bot.status))
+        {
+            SendBotOwnerError();
+            return false;
+        }
+
+        return true;
+    }
+
     public async Task<bool> CheckAdmin()
     {
         if (!ctx.Member.IsAdmin(ctx.Bot.status))
@@ -954,6 +965,12 @@ public abstract class BaseCommand
         {
             Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Ichigo Staff` to use this command.",
         }.AsError(ctx));
+
+    public void SendBotOwnerError()
+    => _ = RespondOrEdit(new DiscordEmbedBuilder()
+    {
+        Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be <@{ctx.Bot.status.TeamOwner}> to use this command.",
+    }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()

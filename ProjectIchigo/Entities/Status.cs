@@ -11,6 +11,7 @@ internal class Status
     internal bool DatabaseInitialized { get; set; } = false;
     internal bool DatabaseInitialLoadCompleted { get; set; } = false;
 
+    internal ulong TeamOwner { get; set; } = new();
     internal List<ulong> TeamMembers { get; set; } = new();
 
     internal long DiscordDisconnections = 0;

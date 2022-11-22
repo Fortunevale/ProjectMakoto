@@ -80,7 +80,8 @@ internal class UserInfoCommand : BaseCommand
                 },
                 Description = $"{(bMember is null ? $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? "`User never joined this server.`" : $"{(isBanned ? "`User is currently banned from this server.`" : "`User is currently not in this server.`")}")}\n\n" : "")}" +
                         $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? "💀 **`User is globally banned.`**\n" : "")}" +
-                        $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? "🔏 **`Ichigo Staff`**\n\n" : "")}" +
+                        $"{(ctx.Bot.status.TeamOwner == victim.Id ? $"👑 **`{ctx.CurrentUser.Username} Owner`**\n" : "")}" +
+                        $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? $"🔏 **`{ctx.CurrentUser.Username} Staff`**\n\n" : "")}" +
                         $"{(bMember is not null && bMember.IsOwner ? "✨ `This user owns this guild`\n" : "")}" +
                         $"{(victim.IsStaff ? "📘 **`Discord Staff`**\n" : "")}" +
                         $"{(victim.IsMod ? "⚒ `Certified Content Moderator`\n" : "")}" +
@@ -92,7 +93,7 @@ internal class UserInfoCommand : BaseCommand
 
             if (ctx.Bot.globalNotes.ContainsKey(victim.Id) && ctx.Bot.globalNotes[victim.Id].Any())
             {
-                embed.AddField(new DiscordEmbedField("Ichigo Staff Notes", $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.Sanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+                embed.AddField(new DiscordEmbedField($"{ctx.CurrentUser.Username} Staff Notes", $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.Sanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))

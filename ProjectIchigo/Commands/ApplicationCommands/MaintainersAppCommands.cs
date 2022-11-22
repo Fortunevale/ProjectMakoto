@@ -183,6 +183,18 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 }, InitiateInteraction: false);
             }).Add(_bot.watcher, ctx);
         }
+
+        [SlashCommand("evaluate", "Evaluates CScript.")]
+        public async Task Evaluate(InteractionContext ctx, [Option("message", "The message to evaluate, leave empty to use the last message.")] string msg = "")
+        {
+            Task.Run(async () =>
+            {
+                await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "message", (msg.IsNullOrWhiteSpace() ? (await ctx.Channel.GetMessagesAsync(1))[0].Id : Convert.ToUInt64(msg)) },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
     }
 
 #if DEBUG

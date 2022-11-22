@@ -17,10 +17,10 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
 
-    public static DiscordEmbedBuilder AsGenericLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsGenericLoading(b, ctx.Client, ctx.User, CustomText, CustomFooterText);
+    public static DiscordEmbedBuilder AsBotLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
+        => AsBotLoading(b, ctx.Client, ctx.User, CustomText, CustomFooterText);
     
-    public static DiscordEmbedBuilder AsGenericLoading(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, string CustomText = "", string CustomFooterText = "")
+    public static DiscordEmbedBuilder AsBotLoading(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultBotAuthor(client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Loading;
@@ -124,6 +124,21 @@ internal static class PreMadeEmbedsExtensions
     public static DiscordEmbedBuilder AsWarning(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, string CustomText = "", string CustomFooterText = "")
     {
         b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author.IconUrl = StatusIndicatorIcons.Warning;
+
+        b.Color = EmbedColors.Warning;
+        b.Footer = user.GenerateUsedByFooter(CustomFooterText);
+        b.Timestamp = DateTime.UtcNow;
+
+        return b;
+    }
+
+    public static DiscordEmbedBuilder AsBotWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
+    => AsBotWarning(b, ctx.Client, ctx.User, CustomText, CustomFooterText);
+
+    public static DiscordEmbedBuilder AsBotWarning(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, string CustomText = "", string CustomFooterText = "")
+    {
+        b.Author = MakeDefaultBotAuthor(client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;

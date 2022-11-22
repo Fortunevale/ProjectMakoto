@@ -12,7 +12,7 @@ internal class CreditsCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Fetching contributors..`"
-            }.AsGenericLoading(ctx));
+            }.AsBotLoading(ctx));
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
 

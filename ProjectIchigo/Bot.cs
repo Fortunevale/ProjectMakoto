@@ -507,6 +507,9 @@ public class Bot
                 {
                     try
                     {
+                        status.TeamOwner = discordClient.CurrentApplication.Team.Owner.Id;
+                        _logger.LogInfo($"Set {status.TeamOwner} as owner of the bot");
+
                         status.TeamMembers.AddRange(discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
                         _logger.LogInfo($"Added {status.TeamMembers.Count} users to administrator list");
                     }
