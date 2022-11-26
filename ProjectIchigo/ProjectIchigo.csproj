@@ -48,7 +48,7 @@
     <PackageReference Include="MySql.Data" Version="8.0.31" />
     <PackageReference Include="Octokit" Version="4.0.1" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
   </ItemGroup>
 
   <ItemGroup>
