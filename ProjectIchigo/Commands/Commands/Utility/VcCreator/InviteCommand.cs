@@ -10,9 +10,9 @@ internal class InviteCommand : BaseCommand
                 return;
 
             DiscordMember victim = (DiscordMember)arguments["victim"];
-            DiscordChannel channel = ctx.Member.VoiceState.Channel;
+            DiscordChannel channel = ctx.Member.VoiceState?.Channel;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel.Id))
+            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You're not in a channel created by the Voice Channel Creator.`").AsError(ctx));
                 return;
