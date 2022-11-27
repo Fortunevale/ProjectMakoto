@@ -116,7 +116,7 @@ internal class PhishingUrlUpdater
             "https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json",
             "https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt",
             "https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt",
-            "https://fortunevale.dd-dns.de/discord-scam-urls.txt",
+            "https://fortunevale.line.pm/discord-scam-urls.txt",
             "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt",
             "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt",
             "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt",
@@ -143,15 +143,15 @@ internal class PhishingUrlUpdater
 
         try
         {
-            var urls = await DownloadList("https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt");
+            var urls = await DownloadList("https://fortunevale.line.pm/discord-scam-urls-whitelist.txt");
             WhitelistedDomains.AddRange(urls);
         }
-        catch (Exception ex) { throw new Exception($"An exception occurred while trying to download URLs from 'https://fortunevale.dd-dns.de/discord-scam-urls-whitelist.txt'", ex); }
+        catch (Exception ex) { throw new Exception($"An exception occurred while trying to download URLs from 'https://fortunevale.line.pm/discord-scam-urls-whitelist.txt'", ex); }
 
         try
         {
             if (WhitelistedDomains is null || WhitelistedDomains.Count == 0)
-                throw new Exception($"An exception occurred while trying to remove whitelisted URLs from blacklist: WhitelistedDomains is empty or null");
+                throw new Exception($"An exception occurred while trying to remove white listed URLs from blacklist: WhitelistedDomains is empty or null");
 
             foreach (var b in WhitelistedDomains)
                 if (SanitizedMatches.ContainsKey(b))
