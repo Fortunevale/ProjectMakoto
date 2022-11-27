@@ -58,7 +58,7 @@ internal class GoogleTranslateClient
             }
             finally
             {
-                await Task.Delay(20000);
+                await Task.Delay(10000);
             }
         }
     }
