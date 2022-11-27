@@ -143,7 +143,7 @@ internal class TranslateCommand : BaseCommand
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
                             Description = $"`Your translation request is currently in queue at position {PosInQueue}. This might take a moment to finish..`\n" +
-                                          $"`Your request will be executed, approximately,` {Formatter.Timestamp(DateTime.UtcNow.AddSeconds((PosInQueue * 20) - 3))}`.`",
+                                          $"`Your request will be executed, approximately,` {Formatter.Timestamp(ctx.Bot.translationClient.LastRequest.AddSeconds(PosInQueue * 10))}`.`",
                         }.AsLoading(ctx)));
                     }
 

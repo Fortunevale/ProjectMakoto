@@ -9,6 +9,7 @@ internal class GoogleTranslateClient
         return translationClient;
     }
 
+    internal DateTime LastRequest = DateTime.MinValue;
     internal readonly Dictionary<string, RequestItem> Queue = new();
 
     private async Task QueueHandler()
@@ -58,6 +59,7 @@ internal class GoogleTranslateClient
             }
             finally
             {
+                LastRequest = DateTime.UtcNow;
                 await Task.Delay(10000);
             }
         }
