@@ -1,4 +1,4 @@
-namespace ProjectIchigo;
+﻿namespace ProjectIchigo;
 internal class BumpReminder
 {
     internal BumpReminder(Bot _bot)
@@ -64,11 +64,37 @@ internal class BumpReminder
 
             if (!Guild.Channels.ContainsKey(_bot.guilds[ServerId].BumpReminder.ChannelId) || _bot.guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
+                _logger.LogDebug($"'{ServerId}' hasn't bumped 169 times. Disabling bump reminder..");
                 _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
                 return;
             }
 
             var Channel = Guild.GetChannel(_bot.guilds[ServerId].BumpReminder.ChannelId);
+
+            _logger.LogDebug($"Checking if Self Role Message still exists, has it's reaction and is pinned in '{ServerId}'");
+
+            try
+            {
+                var msg = await Channel.GetMessageAsync(_bot.guilds[ServerId].BumpReminder.MessageId);
+
+                if (!msg.Reactions.Any(x => x.Emoji.ToString() == "✅"))
+                    throw new CancelException("Self Role Message Reaction was removed.");
+
+                if (!msg.Pinned)
+                    throw new CancelException("Self Role Message is not pinned.");
+            }
+            catch (CancelException ex)
+            {
+                _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
+                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `The bump reminder was disabled for the following reason: {ex.Message}`"));
+                return;
+            }
+            catch (DisCatSharp.Exceptions.NotFoundException)
+            {
+                _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
+                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `The bump reminder was disabled for the following reason: Self Role Message was deleted.`"));
+                return;
+            }
 
             if (_bot.guilds[ServerId].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-3))
             {
