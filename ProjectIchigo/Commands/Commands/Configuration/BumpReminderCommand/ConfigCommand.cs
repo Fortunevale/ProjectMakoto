@@ -89,6 +89,13 @@ internal class ConfigCommand : BaseCommand
                     throw RoleResult.Exception;
                 }
 
+                if (RoleResult.Result.Id == ctx.Bot.guilds[ctx.Guild.Id].Join.AutoAssignRoleId || ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == RoleResult.Result.Id))
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`The role you selected is already being assigned on join or part of a level reward.`"));
+                    await Task.Delay(3000);
+                    return;
+                }
+
                 var bump_reaction_msg = await ctx.Channel.SendMessageAsync($"React to this message with ✅ to receive notifications as soon as the server can be bumped again.");
                 _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromUnicode("✅"));
                 _ = bump_reaction_msg.PinAsync();

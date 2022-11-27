@@ -135,6 +135,14 @@ internal class ConfigCommand : BaseCommand
                     throw RoleResult.Exception;
                 }
 
+                if (RoleResult.Result?.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned on join.`"));
+                    await Task.Delay(3000);
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+
                 ctx.Bot.guilds[ctx.Guild.Id].Join.AutoAssignRoleId = RoleResult.Result is null ? 0 : RoleResult.Result.Id;
 
                 await ExecuteCommand(ctx, arguments);

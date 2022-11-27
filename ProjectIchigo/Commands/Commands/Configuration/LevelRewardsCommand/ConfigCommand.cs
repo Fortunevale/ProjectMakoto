@@ -193,6 +193,13 @@ internal class ConfigCommand : BaseCommand
                                         throw RoleResult.Exception;
                                     }
 
+                                    if (RoleResult.Result.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                                    {
+                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned as reward.`"));
+                                        await Task.Delay(3000);
+                                        continue;
+                                    }
+
                                     selectedRole = RoleResult.Result;
                                     continue;
                                 }
@@ -280,6 +287,14 @@ internal class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.GetCustomId() == Finish.CustomId)
                                 {
+                                    if (selectedRole.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                                    {
+                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned as reward.`"));
+                                        await Task.Delay(3000);
+                                        await ExecuteCommand(ctx, arguments);
+                                        return;
+                                    }
+
                                     ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelRewardEntry
                                     {
                                         Level = selectedLevel,
