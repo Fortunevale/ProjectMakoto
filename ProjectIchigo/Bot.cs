@@ -454,28 +454,31 @@ public class Bot
                     ServiceProvider = new ServiceCollection()
                                         .AddSingleton(this)
                                         .BuildServiceProvider(),
-                    EnableDefaultHelp = false
+                    EnableDefaultHelp = false,
+                    EnableLocalization = true
                 });
+
+                Action<ApplicationCommandsTranslationContext> translations = x => { x.AddSingleTranslation(File.ReadAllText("Translations/single_commands.json")); x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); };
 
                 if (!status.LoadedConfig.IsDev)
                 {
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>(translations);
                 }
                 else
                 {
-                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets, translations);
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
