@@ -411,8 +411,9 @@ internal class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            foreach (var b in e.Threads)
-                _ = b.JoinAsync();
+            if (_bot.status.DiscordGuildDownloadCompleted)
+                foreach (var b in e.Threads)
+                    _ = b.JoinAsync();
         });
     }
 
