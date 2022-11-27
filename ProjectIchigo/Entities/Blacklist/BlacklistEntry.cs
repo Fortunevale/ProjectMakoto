@@ -2,14 +2,10 @@
 
 public class BlacklistEntry
 {
-    private string _Reason { get; set; }
-    public string Reason { get => _Reason; set { _Reason = value; _ = Bot.DatabaseClient.FullSyncDatabase(); } }
+    public string Reason { get; set; }
+
+    public ulong Moderator { get; set; }
 
 
-    private ulong _Moderator { get; set; }
-    public ulong Moderator { get => _Moderator; set { _Moderator = value; _ = Bot.DatabaseClient.FullSyncDatabase(); } }
-
-
-    private DateTime _Timestamp { get; set; } = DateTime.UtcNow;
-    public DateTime Timestamp { get => _Timestamp; set { _Timestamp = value; _ = Bot.DatabaseClient.FullSyncDatabase(); } }
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 }

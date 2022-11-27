@@ -178,7 +178,5 @@ public class PollSettings
                     _logger.LogDebug($"Deleted scheduled task for poll by '{Parent.ServerId}'");
                 }
             }
-
-        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 }

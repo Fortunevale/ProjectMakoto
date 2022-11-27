@@ -140,8 +140,6 @@ public class ReminderSettings
                     _logger.LogDebug($"Deleted scheduled task for reminder by '{Parent.UserId}'");
                 }
             }
-
-        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
     private User Parent { get; set; }
