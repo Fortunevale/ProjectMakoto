@@ -13,8 +13,12 @@
       {
         "name": "command",
         "description": "The command to show help for",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de":  "befehl"
+        },
+        "description_translations": {
+          "de": "Der Befehl für den die Hilfe angezeigt werden soll"
+        }
       }
     ]
   },
@@ -22,14 +26,22 @@
     "name": "user-info",
     "description": "Displays information the bot knows about you or the mentioned user.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "benutzer-info"
+    },
+    "description_translations": {
+      "de": "Zeigt Informationen über dich oder den gewählten Benutzer an."
+    },
     "options": [
       {
         "name": "user",
         "description": "The User",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -37,14 +49,22 @@
     "name": "guild-info",
     "description": "Displays information this or the mentioned guild.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "server-info"
+    },
+    "description_translations": {
+      "de": "Zeigt Informationen über diesen oder den gewählten Server an."
+    },
     "options": [
       {
         "name": "guild",
         "description": "The Guild",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "server"
+        },
+        "description_translations": {
+          "de": "Der Server"
+        }
       }
     ]
   },
@@ -52,21 +72,33 @@
     "name": "reminders",
     "description": "Allows you to manage your reminders.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null
+    "name_translations": {
+      "de": "erinnerungen"
+    },
+    "description_translations": {
+      "de": "Erlaubt es dir deine Erinnerungen zu verwalten."
+    }
   },
   {
     "name": "avatar",
     "description": "Displays your or the mentioned user's avatar as an embedded image.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "profilbild"
+    },
+    "description_translations": {
+      "de": "Zeigt das Profilbild von dir oder dem gewählten Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The User",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -74,14 +106,22 @@
     "name": "banner",
     "description": "Displays your or the mentioned user's banner as an embedded image.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "banner"
+    },
+    "description_translations": {
+      "de": "Zeigt das Banner von dir oder dem gewählten Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The User",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -89,14 +129,22 @@
     "name": "rank",
     "description": "Shows your or the mentioned user's rank and rank progress.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "rang"
+    },
+    "description_translations": {
+      "de": "Zeigt dir den Rang von dir oder dem gewählten Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The User",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -104,14 +152,22 @@
     "name": "leaderboard",
     "description": "Displays the current experience rankings on this server.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "rangliste"
+    },
+    "description_translations": {
+      "de": "Zeigt dir die aktuelle Rangliste auf diesem Server."
+    },
     "options": [
       {
         "name": "amount",
         "description": "The amount of rankings to show",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "menge"
+        },
+        "description_translations": {
+          "de": "Wie viele Plätze gezeigt werden sollen"
+        }
       }
     ]
   },
@@ -119,14 +175,22 @@
     "name": "report-host",
     "description": "Allows you to contribute a new malicious host to our database.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "host-melden"
+    },
+    "description_translations": {
+      "de": "Erlaubt es dir, einen neuen bösartigen Host zu melden."
+    },
     "options": [
       {
         "name": "url",
         "description": "The host",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "host"
+        },
+        "description_translations": {
+          "de": "Den Host den du melden möchtest"
+        }
       }
     ]
   },
@@ -134,14 +198,22 @@
     "name": "upload",
     "description": "Upload a file to the bot. Only use when instructed to.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "hochladen"
+    },
+    "description_translations": {
+      "de": "Lade eine Datei auf den Bot hoch. Nur verwenden wenn dazu aufgefordert."
+    },
     "options": [
       {
         "name": "file",
         "description": "The file you want to upload.",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "datei"
+        },
+        "description_translations": {
+          "de": "Die Datei, die du hochladen möchtest."
+        }
       }
     ]
   },
@@ -149,14 +221,22 @@
     "name": "urban-dictionary",
     "description": "Look up a term on Urban Dictionary.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "urban-dictionary"
+    },
+    "description_translations": {
+      "de": "Suche nach einem Wort oder einer Phrase auf Urban Dictionary."
+    },
     "options": [
       {
         "name": "term",
         "description": "The term you want to look up.",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "wort"
+        },
+        "description_translations": {
+          "de": "Das Wort oder die Phrase, nach der du suchen möchtest."
+        }
       }
     ]
   },
@@ -164,64 +244,92 @@
     "name": "credits",
     "description": "Allows you to view who contributed the bot.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null
+    "name_translations": {
+      "de": "credits"
+    },
+    "description_translations": {
+      "de": "Zeigt dir wer Ichigo unterstützt hat."
+    }
   },
   {
     "name": "Steal Emojis",
     "type": 3,
-    "name_translations": null,
+    "name_translations": {
+      "de": "Emojis klauen"
+    },
     "description_translations": null
   },
   {
     "name": "Translate Message",
     "type": 3,
-    "name_translations": null,
+    "name_translations": {
+      "de": "Nachricht übersetzen"
+    },
     "description_translations": null
   },
   {
     "name": "Add a Reaction Role",
     "type": 3,
-    "name_translations": null,
+    "name_translations": {
+      "de": "Eine Reaktionsrolle hinzufügen"
+    },
     "description_translations": null
   },
   {
     "name": "Remove a Reaction Role",
     "type": 3,
-    "name_translations": null,
+    "name_translations": {
+      "de": "Eine Reaktionsrolle entfernen"
+    },
     "description_translations": null
   },
   {
     "name": "Remove all Reaction Roles",
     "type": 3,
-    "name_translations": null,
+    "name_translations": {
+      "de": "Alle Reaktionsrollen entfernen"
+    },
     "description_translations": null
   },
   {
     "name": "poll",
     "description": "Starts a poll.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null
+    "name_translations": {
+      "de": "umfrage"
+    },
+    "description_translations": {
+      "de": "Startet eine Umfrage."
+    }
   },
   {
     "name": "purge",
     "description": "Deletes the specified amount of messages.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Löscht die angegebene Menge an Nachrichten."
+    },
     "options": [
       {
         "name": "number",
         "description": "1-2000",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "anzahl"
+        },
+        "description_translations": {
+          "de": "1-2000"
+        }
       },
       {
         "name": "user",
         "description": "Only delete messages by this user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Nachrichten nur von diesem Benutzer löschen"
+        }
       }
     ]
   },
@@ -230,19 +338,29 @@
     "description": "Scans all channels and deletes the specified user's messages.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Durchsucht alle Kanäle und löscht die Nachrichten von dem angegebenen Benutzer."
+    },
     "options": [
       {
         "name": "number",
         "description": "1-2000",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "anzahl"
+        },
+        "description_translations": {
+          "de": "1-2000"
+        }
       },
       {
         "name": "user",
         "description": "Only delete messages by this user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Nachrichten nur von diesem Benutzer löschen"
+        }
       }
     ]
   },
@@ -250,14 +368,22 @@
     "name": "clearbackup",
     "description": "Clears the stored roles and nickname of a user.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "backup-entfernen"
+    },
+    "description_translations": {
+      "de": "Löscht die gespeicherten Rollen und den Nutzernamen von einem Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -266,25 +392,39 @@
     "description": "Sets the specified user into a timeout.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Schickt den angegebenen Benutzer in den Timeout."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       },
       {
         "name": "duration",
         "description": "The duration",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "dauer"
+        },
+        "description_translations": {
+          "de": "Die Dauer"
+        }
       },
       {
         "name": "reason",
         "description": "The reason",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "grund"
+        },
+        "description_translations": {
+          "de": "Der Grund"
+        }
       }
     ]
   },
@@ -292,14 +432,22 @@
     "name": "remove-timeout",
     "description": "Removes a timeout from the specified user.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "timeout-entfernen"
+    },
+    "description_translations": {
+      "de": "Entfernt den Timeout von dem angegebenen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -308,19 +456,29 @@
     "description": "Kicks the specified user.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Kickt den angegebenen Benutzer vom Server."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       },
       {
         "name": "reason",
         "description": "The reason",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "grund"
+        },
+        "description_translations": {
+          "de": "Der Grund"
+        }
       }
     ]
   },
@@ -329,25 +487,39 @@
     "description": "Bans the specified user.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Bannt den angegebenen Benutzer vom Server."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       },
       {
         "name": "days",
         "description": "Days of messages to delete",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "tage"
+        },
+        "description_translations": {
+          "de": "Nachrichten löschen die jünger als X sind"
+        }
       },
       {
         "name": "reason",
         "description": "The reason",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "grund"
+        },
+        "description_translations": {
+          "de": "Der Grund"
+        }
       }
     ]
   },
@@ -356,25 +528,39 @@
     "description": "Soft bans the specified user.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Soft-bannt den angegebenen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       },
       {
         "name": "days",
         "description": "Days of messages to delete",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "tage"
+        },
+        "description_translations": {
+          "de": "Nachrichten löschen die jünger als X sind"
+        }
       },
       {
         "name": "reason",
         "description": "The reason",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "grund"
+        },
+        "description_translations": {
+          "de": "Der Grund"
+        }
       }
     ]
   },
@@ -383,13 +569,19 @@
     "description": "Unbans the specified user.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Entbannt den angegebenen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -397,14 +589,22 @@
     "name": "follow",
     "description": "Allows you to follow an announcement channel from our support server.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "folgen"
+    },
+    "description_translations": {
+      "de": "Erlaubt es dir verschiedenen Neuigkeitenkanälen zu folgen."
+    },
     "options": [
       {
         "name": "channel",
         "description": "The channel",
-        "name_translations": null,
-        "description_translations": null,
+        "name_translations": {
+          "de": "kanal"
+        },
+        "description_translations": {
+          "de": "Der Kanal"
+        },
         "choices": [
           {
             "name": "GithubUpdates",
@@ -427,13 +627,19 @@
     "description": "Move all users in your Voice Channel to another Voice Channel",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Verschiebt alle Benutzer in deinem Sprachkanal zu einem anderen Sprachkanal."
+    },
     "options": [
       {
         "name": "channel",
         "description": "The channel to move to.",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "kanal"
+        },
+        "description_translations": {
+          "de": "Der neue Sprachkanal."
+        }
       }
     ]
   },
@@ -442,13 +648,19 @@
     "description": "Move all users from another Voice Channel to your Voice Channel",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Verschiebt alle Benutzer von dem gewählten Kanal in deinen Sprachkanal."
+    },
     "options": [
       {
         "name": "channel",
         "description": "The channel to move from.",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "kanal"
+        },
+        "description_translations": {
+          "de": "Der Sprachkanal"
+        }
       }
     ]
   },
@@ -457,27 +669,39 @@
     "description": "Create an embedded message",
     "type": 1,
     "name_translations": null,
-    "description_translations": null
+    "description_translations": {
+      "de": "Erlaubt es dir eine eigene eingebettete Nachricht zu erstellen."
+    }
   },
   {
     "name": "override-bump-time",
     "description": "Allows fixing of the last bump in case Disboard did not properly post a message.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null
+    "name_translations": {
+      "de": "bump-zeit-überschreiben"
+    },
+    "description_translations": {
+      "de": "Erlaubt es dir die letzte Bump Zeit zu überschreiben."
+    }
   },
   {
     "name": "afk",
     "description": "Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Erlaubt es dir dich als AFK zu kennzeichnen. Benutzer, die dich pingen, werden benachrichtigt dass du aktuell nicht da bist."
+    },
     "options": [
       {
         "name": "reason",
         "description": "The reason",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "grund"
+        },
+        "description_translations": {
+          "de": "Der Grund"
+        }
       }
     ]
   },
@@ -485,14 +709,22 @@
     "name": "cuddle",
     "description": "Cuddle with another user.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "kuscheln"
+    },
+    "description_translations": {
+      "de": "Kuschle mit einem anderen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -500,14 +732,22 @@
     "name": "kiss",
     "description": "Kiss another user.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "küssen"
+    },
+    "description_translations": {
+      "de": "Küsse eine anderen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -515,14 +755,22 @@
     "name": "slap",
     "description": "Slap another user.",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "schlagen"
+    },
+    "description_translations": {
+      "de": "Schlage einen anderen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -530,14 +778,22 @@
     "name": "kill",
     "description": "Kill another user..?",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "töten"
+    },
+    "description_translations": {
+      "de": "Töte einen anderen Benutzer..?"
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -546,13 +802,19 @@
     "description": "Give another user a boop!",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Gib einem anderen Benutzer ein Boop!"
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -561,13 +823,19 @@
     "description": "Give a high five!",
     "type": 1,
     "name_translations": null,
-    "description_translations": null,
+    "description_translations": {
+      "de": "Gib einem anderen Benutzer hoch fünf!"
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -575,14 +843,22 @@
     "name": "hug",
     "description": "Hug another user!",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "umarmen"
+    },
+    "description_translations": {
+      "de": "Umarme einen anderen Benutzer."
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   },
@@ -590,14 +866,22 @@
     "name": "pat",
     "description": "Give someone some headpats!",
     "type": 1,
-    "name_translations": null,
-    "description_translations": null,
+    "name_translations": {
+      "de": "streicheln"
+    },
+    "description_translations": {
+      "de": "Streichle einen anderen Benutzer!"
+    },
     "options": [
       {
         "name": "user",
         "description": "The user",
-        "name_translations": null,
-        "description_translations": null
+        "name_translations": {
+          "de": "benutzer"
+        },
+        "description_translations": {
+          "de": "Der Benutzer"
+        }
       }
     ]
   }
