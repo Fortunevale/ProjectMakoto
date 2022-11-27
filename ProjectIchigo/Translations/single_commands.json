@@ -690,7 +690,7 @@
     "type": 1,
     "name_translations": null,
     "description_translations": {
-      "de": "Erlaubt es dir dich als AFK zu kennzeichnen. Benutzer, die dich pingen, werden benachrichtigt dass du aktuell nicht da bist."
+      "de": "Erlaubt es dir dich als AFK zu kennzeichnen."
     },
     "options": [
       {
