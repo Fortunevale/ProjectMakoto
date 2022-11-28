@@ -24,9 +24,8 @@ internal class HelpCommand : BaseCommand
                 {
                     var command = PrefixCommandsList.First(x => x.Value.Name.ToLower() == command_filter.ToLower());
 
-                    var desc = $"Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n" +
-                                            $"**Do not include the brackets when using commands, they're merely an indicator for requirement.**\n\n" +
-                                            $"`{ctx.Prefix}{command.Value.GenerateUsage()}` - _{command.Value.Description}{command.Value.Aliases.GenerateAliases()}_\n";
+                    var desc = $"{GetString(t.commands.help.disclaimer)}\n\n" +
+                                $"`{ctx.Prefix}{command.Value.GenerateUsage()}` - _{command.Value.Description}{command.Value.Aliases.GenerateAliases()}_\n";
 
                     try
                     {
@@ -39,7 +38,7 @@ internal class HelpCommand : BaseCommand
                 }
                 else
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No such command found.`").AsBotError(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.commands.help.nocmd)}`").AsBotError(ctx));
                     return;
                 } 
             }
@@ -89,8 +88,7 @@ internal class HelpCommand : BaseCommand
             foreach (var b in Fields)
             {
                 if (!discordEmbeds.ContainsKey(b.Key))
-                    discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription("Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n" +
-                                            "**Do not include the brackets when using commands, they're merely an indicator for requirement.**").AsBotInfo(ctx));
+                    discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription(GetString(t.commands.help.disclaimer)).AsBotInfo(ctx));
 
                 if (!discordEmbeds[b.Key].Fields.Any())
                     discordEmbeds[b.Key].AddField(new DiscordEmbedField($"{b.Key.FirstLetterToUpper()} Commands", b.Value));
@@ -102,8 +100,8 @@ internal class HelpCommand : BaseCommand
 
             while (true)
             {
-                var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous Page", (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
-                var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next Page", (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
+                var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.common.previous_page), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
+                var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.common.next_page), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page).Value).AddComponents(PreviousButton, NextButton));
 
