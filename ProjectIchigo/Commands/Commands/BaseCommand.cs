@@ -3,6 +3,7 @@
 public abstract class BaseCommand
 {
     internal SharedCommandContext ctx { private get; set; }
+    internal Translations t { get; set; }
 
     #region Execution
     public virtual async Task<bool> BeforeExecution(SharedCommandContext ctx)
@@ -54,6 +55,8 @@ public abstract class BaseCommand
 
     internal async Task<bool> BasePreExecutionCheck()
     {
+        t = Bot.loadedTranslations;
+
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return false;
 
@@ -208,6 +211,10 @@ public abstract class BaseCommand
     }
     #endregion
 
+    internal string GetString(TranslationKey key)
+    {
+        return key.Get(ctx.User);
+    }
 
     #region Selections
     internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)

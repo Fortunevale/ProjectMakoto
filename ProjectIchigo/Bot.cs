@@ -22,6 +22,8 @@ public class Bot
 
     #region Util
 
+    internal static Translations loadedTranslations { get; set; }
+
     internal CountryCodes countryCodes { get; set; }
     internal LanguageCodes languageCodes { get; set; }
     internal IReadOnlyList<string> profanityList { get; set; }
@@ -197,6 +199,9 @@ public class Bot
 
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+
+                loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
+                _logger.LogDebug("Loaded Translations");
 
                 Task.Run(async () =>
                 {
@@ -458,27 +463,31 @@ public class Bot
                     EnableLocalization = true
                 });
 
-                Action<ApplicationCommandsTranslationContext> translations = x => { x.AddSingleTranslation(File.ReadAllText("Translations/single_commands.json")); x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); };
+                void GetCommandTranslations(ApplicationCommandsTranslationContext x)
+                { 
+                    x.AddSingleTranslation(File.ReadAllText("Translations/single_commands.json")); 
+                    x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); 
+                }
 
                 if (!status.LoadedConfig.IsDev)
                 {
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(translations);
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(translations);
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>(translations);
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>(translations);
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(translations);
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(translations);
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>(translations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>(GetCommandTranslations);
                 }
                 else
                 {
-                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets, translations);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets, translations);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets, translations);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets, translations);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets, translations);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets, translations);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets, translations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");

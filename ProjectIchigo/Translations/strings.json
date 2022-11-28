@@ -1,0 +1,89 @@
+{
+  "available_locales": [
+    "en",
+    "de"
+  ],
+  "unavailable_locales": [
+    "da",
+    "es-ES",
+    "fr",
+    "hr",
+    "it",
+    "lt",
+    "hu",
+    "nl",
+    "no",
+    "pl",
+    "pt-BR",
+    "ro",
+    "fi",
+    "sv-SE",
+    "vi",
+    "tr",
+    "cs",
+    "el",
+    "bg",
+    "ru",
+    "uk",
+    "hi",
+    "th",
+    "zh-CN",
+    "ja",
+    "zh-TW",
+    "ko"
+  ],
+  "common": {
+    "yes": {
+      "t": {
+        "en": "Yes",
+        "de": "Ja"
+      }
+    },
+    "no": {
+      "t": {
+        "en": "No",
+        "de": "Nein"
+      }
+    },
+    "confirm": {
+      "t": {
+        "en": "Confirm",
+        "de": "Bestätigen"
+      }
+    },
+    "deny": {
+      "t": {
+        "en": "Deny",
+        "de": "Ablehnen"
+      }
+    },
+    "previous_page": {
+      "t": {
+        "en": "Previous Page",
+        "de": "Vorherige Seite"
+      }
+    },
+    "next_page": {
+      "t": {
+        "en": "Next Page",
+        "de": "Nächste Seite"
+      }
+    }
+  },
+  "commands": {
+    "help": {
+      "disclaimer": {
+        "t": {
+          "en": "Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+          "de": "Argumente in einem `[]` sind optional, Argumente in einem `<>` sind benötigt.\n**Dies sind nur Indikatoren, füge sie nicht hinzu wenn du einen Befehl benutzt.**"
+        }
+      },
+      "nocmd": {
+        "t": {
+          "en": "No such command found.",
+          "de": "Dieser Befehl existiert nicht."
+        }
+      }
+    }
+  }
+}
