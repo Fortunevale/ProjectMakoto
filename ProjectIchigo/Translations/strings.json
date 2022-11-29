@@ -71,7 +71,59 @@
     }
   },
   "commands": {
+    "common": {
+      "usedbyfoot": {
+        "t": {
+          "en": "Command used by {User}",
+          "de": "Befehl verwendet von {User}"
+        }
+      }
+    },
+    "modules": {
+      "utility": {
+        "t": {
+          "en": "Utility",
+          "de": "Allgemein"
+        }
+      },
+      "social": {
+        "t": {
+          "en": "Social",
+          "de": "Sozial"
+        }
+      },
+      "music": {
+        "t": {
+          "en": "Music",
+          "de": "Musik"
+        }
+      },
+      "moderation": {
+        "t": {
+          "en": "Moderation",
+          "de": "Moderation"
+        }
+      },
+      "configuration": {
+        "t": {
+          "en": "Configuration",
+          "de": "Konfiguration"
+        }
+      },
+      "unknown": {
+        "t": {
+          "en": "Unknown",
+          "de": "Unbekannt"
+        }
+      }
+    },
     "help": {
+      "module": {
+        "t": {
+          "en": "{Module} Commands",
+          "de": "{Module} Befehle"
+        }
+      },
       "disclaimer": {
         "t": {
           "en": "Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",

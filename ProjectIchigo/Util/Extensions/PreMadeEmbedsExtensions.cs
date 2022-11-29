@@ -197,17 +197,15 @@ internal static class PreMadeEmbedsExtensions
         => new()
         {
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : user.AvatarUrl),
-            Text = $"Command used by {user.UsernameWithDiscriminator}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            Text = $"{Bot.loadedTranslations.commands.common.usedbyfoot.Get(user).Replace("{User}", user.UsernameWithDiscriminator)}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
-    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "")
-    {
-        return new DiscordEmbedBuilder.EmbedFooter
+    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "", string customIcon = "")
+        => new()
         {
-            IconUrl = ctx.User.AvatarUrl,
-            Text = $"Command used by {ctx.User.UsernameWithDiscriminator}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
+            Text = $"{Bot.loadedTranslations.commands.common.usedbyfoot.Get(ctx.User).Replace("{User}", ctx.User.UsernameWithDiscriminator)}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
-    }
 
     public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
     {
@@ -294,6 +292,48 @@ internal static class PreMadeEmbedsExtensions
                          .Replace("Int32", "Number")
                          .Replace("Int64", "Number")
                          .Replace("String", "Text");
+        }
+        return Usage.SanitizeForCode();
+    }
+
+    public static string GenerateUsage(this DiscordApplicationCommand cmd, string? locale = null)
+    {
+        string Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
+
+        if (cmd.Options.Count > 0)
+        {
+            foreach (var b in cmd.Options.Where(x => x.Type is not ApplicationCommandOptionType.SubCommand and not ApplicationCommandOptionType.SubCommandGroup))
+            {
+                var localizedUsage = b.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedOption) ?? false ? localizedOption : b.Name;
+
+                Usage += " ";
+
+                if (!b.Required)
+                    Usage += $"[{localizedUsage}]";
+                else
+                    Usage += $"<{localizedUsage}>";
+            }
+        }
+        return Usage.SanitizeForCode();
+    }
+    
+    public static string GenerateUsage(this DiscordApplicationCommandOption cmd, string? locale = null)
+    {
+        string Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
+
+        if (cmd.Options?.Count > 0)
+        {
+            foreach (var b in cmd.Options.Where(x => x.Type is not ApplicationCommandOptionType.SubCommand and not ApplicationCommandOptionType.SubCommandGroup))
+            {
+                var localizedUsage = b.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedOption) ?? false ? localizedOption : b.Name;
+
+                Usage += " ";
+
+                if (!b.Required)
+                    Usage += $"[{localizedUsage}]";
+                else
+                    Usage += $"<{localizedUsage}>";
+            }
         }
         return Usage.SanitizeForCode();
     }

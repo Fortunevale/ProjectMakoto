@@ -16,9 +16,27 @@ public class Translations
     public _commands commands;
     public class _commands
     {
+        public _common common;
+        public class _common
+        {
+            public TranslationKey usedbyfoot;
+        }
+
+        public _modules modules;
+        public class _modules
+        {
+            public TranslationKey utility;
+            public TranslationKey social;
+            public TranslationKey music;
+            public TranslationKey moderation;
+            public TranslationKey configuration;
+            public TranslationKey unknown;
+        }
+
         public _help help;
         public class _help
         {
+            public TranslationKey module;
             public TranslationKey disclaimer;
             public TranslationKey nocmd;
         }
