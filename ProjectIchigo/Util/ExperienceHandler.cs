@@ -75,7 +75,7 @@ internal class ExperienceHandler
 
         if (_bot.guilds[guild.Id].Members[user.Id].Experience.Points is > (long.MaxValue - 10000) or < (long.MinValue + 10000))
         {
-            _logger.LogWarn($"Member '{user.Id}' on '{guild.Id}' is within 10000 points of the experience limit. Resetting.");
+            _logger.LogWarn("Member '{User}' on '{Guild}' is within 10000 points of the experience limit. Resetting.", user.Id, guild.Id);
             _bot.guilds[guild.Id].Members[user.Id].Experience.Points = 1;
         }
 

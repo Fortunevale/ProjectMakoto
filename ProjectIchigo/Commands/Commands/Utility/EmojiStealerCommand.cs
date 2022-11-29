@@ -108,7 +108,7 @@ internal class EmojiStealerCommand : BaseCommand
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Failed to download an emote", ex);
+                        _logger.LogError("Failed to download an emote", ex);
                         SanitizedEmoteList.Remove(b.Key);
                     }
                 }

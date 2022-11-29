@@ -142,7 +142,7 @@ public class Lavalink
     {
         this.Disposed = true;
 
-        _logger.LogDebug($"Disposed Player for {Id}. ({reason})");
+        _logger.LogDebug("Disposed Player for {Id}. ({reason})", Id, reason);
 
         _bot.guilds[Id].MusicModule = new(Parent);
     }
@@ -160,7 +160,7 @@ public class Lavalink
 
                 this.Guild = guildConnection.Guild;
 
-                _logger.LogDebug($"Initializing Player for {Guild.Id}..");
+                _logger.LogDebug("Initializing Player for {Guild}..", Guild.Id);
 
                 int UserAmount = guildConnection.Channel.Users.Count;
                 CancellationTokenSource VoiceUpdateTokenSource = new();
@@ -181,7 +181,7 @@ public class Lavalink
                             else
                                 UserAmount = e.Guild.Channels.First(x => x.Key == e.Before.Channel.Id).Value.Users.Count;
 
-                            _logger.LogTrace($"UserAmount updated to {UserAmount} for {Guild.Id}");
+                            _logger.LogTrace("UserAmount updated to {UserAmount} for {Guild}", UserAmount, Guild.Id);
 
                             if (UserAmount <= 1)
                                 _ = Task.Delay(30000, VoiceUpdateTokenSource.Token).ContinueWith(x =>
@@ -218,10 +218,10 @@ public class Lavalink
                     CurrentVideoPosition = (Convert.ToInt64(e.Player?.CurrentState?.PlaybackPosition.TotalSeconds ?? -1d));
                 }
 
-                _logger.LogDebug($"Initializing VoiceStateUpdated Event for {Guild.Id}..");
+                _logger.LogDebug("Initializing VoiceStateUpdated Event for {Guild}..", Guild.Id);
                 sender.VoiceStateUpdated += VoiceStateUpdated;
 
-                _logger.LogDebug($"Initializing PlayerUpdated Event for {Guild.Id}..");
+                _logger.LogDebug("Initializing PlayerUpdated Event for {Guild}..", Guild.Id);
                 guildConnection.PlayerUpdated += PlayerUpdated;
 
                 QueueInfo LastPlayedTrack = null;
@@ -248,7 +248,7 @@ public class Lavalink
 
                     if (Disposed)
                     {
-                        _logger.LogDebug($"Destroying Player for {Guild.Id}..");
+                        _logger.LogDebug("Destroying Player for {Guild}..", Guild.Id);
                         sender.VoiceStateUpdated -= VoiceStateUpdated;
                         guildConnection.PlayerUpdated -= PlayerUpdated;
 

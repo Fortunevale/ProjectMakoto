@@ -44,7 +44,7 @@ internal class BumpReminder
 
     internal void ScheduleBump(DiscordClient client, ulong ServerId)
     {
-        _logger.LogDebug($"Queuing Bump Message for '{ServerId}'");
+        _logger.LogDebug("Queuing Bump Message for '{Guild}'", ServerId);
 
         try
         {
@@ -54,24 +54,24 @@ internal class BumpReminder
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An exception occurred while trying to un-queue previous bump messages for '{ServerId}'", ex);
+            _logger.LogError("An exception occurred while trying to un-queue previous bump messages for '{Guild}'", ex, ServerId);
         }
 
         var task = new Task(new Action(async () =>
         {
-            _logger.LogDebug($"Executing Bump Message for '{ServerId}'");
+            _logger.LogDebug("Executing Bump Message for '{Guild}'", ServerId);
             var Guild = await client.GetGuildAsync(ServerId);
 
             if (!Guild.Channels.ContainsKey(_bot.guilds[ServerId].BumpReminder.ChannelId) || _bot.guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
-                _logger.LogDebug($"'{ServerId}' hasn't bumped 169 times. Disabling bump reminder..");
+                _logger.LogDebug("'{Guild}' hasn't bumped 169 times. Disabling bump reminder..", ServerId);
                 _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
                 return;
             }
 
             var Channel = Guild.GetChannel(_bot.guilds[ServerId].BumpReminder.ChannelId);
 
-            _logger.LogDebug($"Checking if Self Role Message still exists, has it's reaction and is pinned in '{ServerId}'");
+            _logger.LogDebug("Checking if Self Role Message still exists, has it's reaction and is pinned in '{Guild}'", ServerId);
 
             try
             {

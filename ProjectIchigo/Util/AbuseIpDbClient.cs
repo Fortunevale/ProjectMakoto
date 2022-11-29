@@ -39,13 +39,13 @@ internal class AbuseIpDbClient
                 var now = DateTimeOffset.UtcNow;
                 var tomorrow = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(1);
 
-                _logger.LogWarn($"Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..");
+                _logger.LogWarn("Daily Ratelimit reached for AbuseIPDB. Waiting until {tomorrow}..", tomorrow);
                 TimeSpan delay = tomorrow - DateTimeOffset.UtcNow;
 
                 if (delay > TimeSpan.Zero)
                     await Task.Delay(delay);
 
-                _logger.LogInfo($"Ratelimit cleared for AbuseIPDB.");
+                _logger.LogInfo("Ratelimit cleared for AbuseIPDB.");
                 RequestsRemaining = 1;
             }
 
@@ -77,7 +77,7 @@ internal class AbuseIpDbClient
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
                         RequestsRemaining = 0;
-                        _logger.LogError($"Daily Ratelimit hit for AbuseIPDB.");
+                        _logger.LogError("Daily Ratelimit hit for AbuseIPDB.");
                         continue;
                     }
 
@@ -85,7 +85,7 @@ internal class AbuseIpDbClient
                 }
 
                 RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
-                _logger.LogDebug($"{RequestsRemaining} AbuseIPDB requests remaining.");
+                _logger.LogDebug("{RequestsRemaining} AbuseIPDB requests remaining.", RequestsRemaining);
 
                 Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
                 Queue[b.Key].Resolved = true;

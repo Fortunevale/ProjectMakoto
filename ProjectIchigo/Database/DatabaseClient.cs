@@ -38,7 +38,7 @@ internal class DatabaseClient
             {
                 if (!MainTables.Contains(b.Name))
                 {
-                    _logger.LogWarn($"Missing table '{b.Name}'. Creating..");
+                    _logger.LogWarn("Missing table '{Name}'. Creating..", b.Name);
                     string sql = $"CREATE TABLE `{_bot.status.LoadedConfig.Secrets.Database.MainDatabaseName}`.`{b.Name}` ( {string.Join(", ", b.GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(b.GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{b.GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
 
                     var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -46,7 +46,7 @@ internal class DatabaseClient
                     cmd.Connection = databaseClient.mainDatabaseConnection;
 
                     await databaseClient._queue.RunCommand(cmd);
-                    _logger.LogInfo($"Created table '{b.Name}'.");
+                    _logger.LogInfo("Created table '{Name}'.", b.Name);
                 }
 
                 var Columns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, b.Name);
@@ -55,7 +55,7 @@ internal class DatabaseClient
                 {
                     if (!Columns.ContainsKey(col.Name.ToLower()))
                     {
-                        _logger.LogWarn($"Missing column '{col.Name}' in '{b.Name}'. Creating..");
+                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", col.Name, b.Name);
                         string sql = $"ALTER TABLE `{b.Name}` ADD `{col.Name}` {col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -64,13 +64,13 @@ internal class DatabaseClient
 
                         await databaseClient._queue.RunCommand(cmd);
 
-                        _logger.LogInfo($"Created column '{col.Name}' in '{b.Name}'.");
+                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", col.Name, b.Name);
                         Columns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, b.Name);
                     }
 
                     if (Columns[col.Name].ToLower() != col.PropertyType.Name.ToLower() + (col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
                     {
-                        _logger.LogWarn($"Wrong data type for column '{col.Name}' in '{b.Name}'");
+                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", col.Name, b.Name);
                         string sql = $"ALTER TABLE `{b.Name}` CHANGE `{col.Name}` `{col.Name}` {col.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
@@ -79,7 +79,7 @@ internal class DatabaseClient
 
                         await databaseClient._queue.RunCommand(cmd);
 
-                        _logger.LogInfo($"Changed column '{col.Name}' in '{b.Name}' to datatype '{col.PropertyType.Name.ToUpper()}'.");
+                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.", col.Name, b.Name, col.PropertyType.Name.ToUpper());
                         Columns = await databaseClient._helper.ListColumns(databaseClient.mainDatabaseConnection, b.Name);
                     }
                 }
@@ -88,7 +88,7 @@ internal class DatabaseClient
                 {
                     if (!b.GetProperties().Any(x => x.Name == col.Key))
                     {
-                        _logger.LogWarn($"Invalid column '{col.Key}' in '{b.Name}'");
+                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", col.Key, b.Name);
 
                         var cmd = databaseClient.mainDatabaseConnection.CreateCommand();
                         cmd.CommandText = $"ALTER TABLE `{b.Name}` DROP COLUMN `{col.Key}`";
@@ -139,7 +139,7 @@ internal class DatabaseClient
                     throw;
                 }
 
-                _logger.LogWarn($"Failed to get a list of guild tables. Retrying in 1000ms.. ({retries}/3)", ex);
+                _logger.LogWarn("Failed to get a list of guild tables. Retrying in 1000ms.. ({current}/{max})", ex, retries, 3);
                 retries++;
                 await Task.Delay(1000);
             }
@@ -149,7 +149,7 @@ internal class DatabaseClient
         {
             if (!GuildTables.Contains($"{b.Key}"))
             {
-                _logger.LogWarn($"Missing table '{b.Key}'. Creating..");
+                _logger.LogWarn("Missing table '{Guild}'. Creating..", b.Key);
                 string sql = $"CREATE TABLE `{_bot.status.LoadedConfig.Secrets.Database.GuildDatabaseName}`.`{b.Key}` ( {string.Join(", ", typeof(TableDefinitions.guild_users).GetProperties().Select(x => $"`{x.Name}` {x.PropertyType.Name.ToUpper()}{(x.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : "")}{(x.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(x.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out _) ? " NULL" : " NOT NULL")}"))}{(typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)) ? $", PRIMARY KEY (`{typeof(TableDefinitions.guild_users).GetProperties().First(x => x.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _)).Name}`)" : "")})";
 
                 var cmd = guildDatabaseConnection.CreateCommand();
@@ -157,7 +157,7 @@ internal class DatabaseClient
                 cmd.Connection = guildDatabaseConnection;
 
                 await _queue.RunCommand(cmd);
-                _logger.LogInfo($"Created table '{b.Key}'.");
+                _logger.LogInfo("Created table '{Guild}'.", b.Key);
             }
         }
 
@@ -173,7 +173,7 @@ internal class DatabaseClient
                 {
                     if (!Columns.ContainsKey(col.Name))
                     {
-                        _logger.LogWarn($"Missing column '{col.Name}' in '{b}'. Creating..");
+                        _logger.LogWarn("Missing column '{Column}' in '{Table}'. Creating..", col.Name, b);
                         string sql = $"ALTER TABLE `{b}` ADD `{col.Name}` {col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue1) ? $"({maxvalue1.MaxValue})" : "")}{col.PropertyType.Name.ToUpper()}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = guildDatabaseConnection.CreateCommand();
@@ -182,13 +182,13 @@ internal class DatabaseClient
 
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogInfo($"Created column '{col.Name}' in '{b}'.");
+                        _logger.LogInfo("Created column '{Column}' in '{Table}'.", col.Name, b);
                         Columns = await _helper.ListColumns(guildDatabaseConnection, b);
                     }
 
                     if (Columns[col.Name].ToLower() != col.PropertyType.Name.ToLower() + (col.TryGetCustomAttribute<MaxValueAttribute>(typeof(MaxValueAttribute), out var maxvalue) ? $"({maxvalue.MaxValue})" : ""))
                     {
-                        _logger.LogWarn($"Wrong data type for column '{col.Name}' in '{b}'");
+                        _logger.LogWarn("Wrong data type for column '{Column}' in '{Table}'", col.Name, b);
                         string sql = $"ALTER TABLE `{b}` CHANGE `{col.Name}` `{col.Name}` {col.PropertyType.Name.ToUpper()}{(maxvalue is not null ? $"({maxvalue.MaxValue})" : "")}{(col.TryGetCustomAttribute<CollationAttribute>(typeof(CollationAttribute), out var collation) ? $" CHARACTER SET {collation.Collation[..collation.Collation.IndexOf("_")]} COLLATE {collation.Collation}" : "")}{(col.TryGetCustomAttribute<NullableAttribute>(typeof(NullableAttribute), out var nullable) ? " NULL" : " NOT NULL")}{(nullable is not null && col.TryGetCustomAttribute<DefaultAttribute>(typeof(DefaultAttribute), out var defaultv) ? $" DEFAULT '{defaultv.Default}'" : "")}{(col.TryGetCustomAttribute<PrimaryAttribute>(typeof(PrimaryAttribute), out _) ? $", ADD PRIMARY KEY (`{col.Name}`)" : "")}";
 
                         var cmd = guildDatabaseConnection.CreateCommand();
@@ -197,7 +197,7 @@ internal class DatabaseClient
 
                         await _queue.RunCommand(cmd);
 
-                        _logger.LogInfo($"Changed column '{col.Name}' in '{b}' to datatype '{col.PropertyType.Name.ToUpper()}'.");
+                        _logger.LogInfo("Changed column '{Column}' in '{Table}' to datatype '{NewDataType}'.", col.Name, b, col.PropertyType.Name.ToUpper());
                         Columns = await _helper.ListColumns(guildDatabaseConnection, b);
                     }
                 }
@@ -206,7 +206,7 @@ internal class DatabaseClient
                 {
                     if (!typeof(TableDefinitions.guild_users).GetProperties().Any(x => x.Name == col.Key))
                     {
-                        _logger.LogWarn($"Invalid column '{col.Key}' in '{b}'");
+                        _logger.LogWarn("Invalid column '{Column}' in '{Table}'", col.Key, b);
 
                         var cmd = guildDatabaseConnection.CreateCommand();
                         cmd.CommandText = $"ALTER TABLE `{b}` DROP COLUMN `{col.Key}`";
@@ -238,11 +238,11 @@ internal class DatabaseClient
             {
                 _logger.LogWarn("Pinging the database failed, attempting reconnect.");
                 connection.Open();
-                _logger.LogInfo($"Reconnected to database.");
+                _logger.LogInfo("Reconnected to database.");
             }
             catch (Exception ex)
             {
-                _logger.LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex);
+                _logger.LogFatal("Reconnecting to the database failed. Cannot sync changes to database", ex);
                 return;
             }
         }
@@ -268,14 +268,14 @@ internal class DatabaseClient
         {
             try
             {
-                _logger.LogWarn($"Creating a test value in database failed, reconnecting to database", ex);
+                _logger.LogWarn("Creating a test value in database failed, reconnecting to database", ex);
                 connection.Close();
                 connection.Open();
-                _logger.LogInfo($"Reconnected to database.");
+                _logger.LogInfo("Reconnected to database.");
             }
             catch (Exception ex1)
             {
-                _logger.LogFatal($"Reconnecting to the database failed. Cannot sync changes to database", ex1);
+                _logger.LogFatal("Reconnecting to the database failed. Cannot sync changes to database", ex1);
                 return;
             }
         }
@@ -340,7 +340,7 @@ internal class DatabaseClient
 
             foreach (var chunk in DatabaseInserts.Chunk(3000))
             {
-                _logger.LogDebug($"Writing to table {table}/{propertyname} with {chunk.Length} inserts");
+                _logger.LogDebug("Writing to table {table}/{propertyname} with {chunk} inserts", table, propertyname, chunk.Length);
 
                 var cmd = conn.CreateCommand();
                 cmd.CommandText = _helper.GetSaveCommand(table, propertyname);

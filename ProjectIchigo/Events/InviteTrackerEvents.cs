@@ -11,13 +11,13 @@ internal class InviteTrackerEvents
 
     public static async Task UpdateCachedInvites(Bot _bot, DiscordGuild guild)
     {
-        _logger.LogDebug($"Fetching invites for {guild.Id}");
+        _logger.LogDebug("Fetching invites for {Guild}", guild.Id);
 
         var Invites = await guild.GetInvitesAsync();
 
         _bot.guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToList();
 
-        _logger.LogDebug($"Fetched {_bot.guilds[guild.Id].InviteTracker.Cache.Count} invites for {guild.Id}");
+        _logger.LogDebug("Fetched {Count} invites for {Guild}", _bot.guilds[guild.Id].InviteTracker.Cache.Count, guild.Id);
     }
 
 
@@ -62,7 +62,7 @@ internal class InviteTrackerEvents
             if (!_bot.guilds[e.Guild.Id].InviteTracker.Enabled)
                 return;
 
-            _logger.LogDebug($"User {e.Member.Id} joined {e.Guild.Id}, trying to track invite used..");
+            _logger.LogDebug("User '{User}' joined '{Guild}', trying to track invite used..", e.Member.Id, e.Guild.Id);
 
             List<InviteTrackerCacheItem> InvitesBefore = new();
             List<InviteTrackerCacheItem> InvitesAfter = new();
@@ -81,7 +81,7 @@ internal class InviteTrackerEvents
                 {
                     _bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
                     _bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
-                    _logger.LogDebug($"User {e.Member.Id} joined {e.Guild.Id} with now deleted {b.Code} created by {b.CreatorId}");
+                    _logger.LogDebug("User '{User}' joined '{Guild}' with now deleted '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
                     return;
                 }
 
@@ -89,12 +89,12 @@ internal class InviteTrackerEvents
                 {
                     _bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
                     _bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
-                    _logger.LogDebug($"User {e.Member.Id} joined {e.Guild.Id} with {b.Code} created by {b.CreatorId}");
+                    _logger.LogDebug("User '{User}' joined '{Guild}' with '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
                     return;
                 }
             }
 
-            _logger.LogDebug($"Could not track invite for user {e.Member.Id} who joined {e.Guild.Id}");
+            _logger.LogDebug("Could not track invite for user '{User}' who joined '{Guild}'", e.Member.Id, e.Guild.Id);
         }).Add(_bot.watcher);
     }
 }
