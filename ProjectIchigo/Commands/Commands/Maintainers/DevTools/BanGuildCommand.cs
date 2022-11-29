@@ -22,7 +22,7 @@ internal class BanGuildCommand : BaseCommand
 
             foreach (var b in ctx.Client.Guilds.Where(x => x.Key == guild))
             {
-                _logger.LogInfo($"Leaving guild '{b.Key}'..");
+                _logger.LogInfo("Leaving guild '{guild}'..", b.Key);
                 await b.Value.LeaveAsync();
             }
 

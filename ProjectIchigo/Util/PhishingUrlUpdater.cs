@@ -62,7 +62,7 @@ internal class PhishingUrlUpdater
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Failed to update database", ex);
+            _logger.LogError("Failed to update database", ex);
         }
     }
 
@@ -72,7 +72,7 @@ internal class PhishingUrlUpdater
     {
         if (UpdateRunning)
         {
-            _logger.LogWarn($"A database update is already running, cancelling");
+            _logger.LogWarn("A database update is already running, cancelling");
             return;
         }
 
@@ -87,7 +87,7 @@ internal class PhishingUrlUpdater
                 {
                     await _bot.databaseClient._helper.DeleteRow(_bot.databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
 
-                    _logger.LogDebug($"Dropped '{b}' from table 'scam_urls'.");
+                    _logger.LogDebug("Dropped '{host}' from table 'scam_urls'.", b);
                 }
         }
         catch (Exception)

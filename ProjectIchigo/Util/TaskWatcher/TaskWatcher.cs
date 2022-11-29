@@ -23,31 +23,59 @@ internal class TaskWatcher
 
                 if (b.task.IsCompletedSuccessfully)
                 {
-                    _logger.LogTrace($"Successfully executed task:{b.task.Id} '{b.uuid}' in {b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}ms");
+                    _logger.LogTrace("Successfully executed task:{Id} '{Uuid}' in {Elapsed}ms", b.task.Id, b.uuid, b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")));
 
-                    if (CommandContext is not null)
-                        _logger.LogInfo($"Successfully executed '{CommandContext.Prefix}{(CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "")}{CommandContext.Command.Name}' for '{CommandContext.User?.Id}' on '{CommandContext.Guild?.Id}'");
+                    if (SharedCommandContext is not null)
+                        _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
+                            SharedCommandContext.Prefix,
+                            SharedCommandContext.CommandName,
+                            SharedCommandContext.User?.Id,
+                            SharedCommandContext.Guild?.Id);
+                    else if (CommandContext is not null)
+                        _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
+                            CommandContext.Prefix,
+                            CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
+                            CommandContext.User?.Id,
+                            CommandContext.Guild?.Id);
                     else if (InteractionContext is not null)
-                        _logger.LogInfo($"Successfully executed '/{InteractionContext.CommandName}' for '{InteractionContext.User?.Id}'{(InteractionContext.Guild is not null ? $" on '{InteractionContext.Guild.Id}'" : "")}");
-                    else if (SharedCommandContext is not null)
-                        _logger.LogInfo($"Successfully executed '{SharedCommandContext.Prefix}{SharedCommandContext.CommandName}' for '{SharedCommandContext.User?.Id}'{(SharedCommandContext.Guild is not null ? $" on '{SharedCommandContext.Guild.Id})" : "")}");
+                        _logger.LogInfo("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
+                            InteractionContext.CommandName,
+                            InteractionContext.User?.Id,
+                            InteractionContext.Guild?.Id);
                     else if (ContextMenuContext is not null)
-                        _logger.LogInfo($"Successfully executed '{ContextMenuContext.CommandName}' for '{ContextMenuContext.User?.Id}'{(ContextMenuContext.Guild is not null ? $" on '{ContextMenuContext.Guild.Id}'" : "")}");
+                        _logger.LogInfo("Successfully executed '{Name}' for '{User}' on '{Guild}'",
+                            ContextMenuContext.CommandName,
+                            ContextMenuContext.User?.Id,
+                            ContextMenuContext.Guild?.Id);
 
                     tasks.Remove(b);
                     continue;
                 }
 
-                if (CommandContext != null)
-                    _logger.LogError($"Failed to execute '{CommandContext.Prefix}{(CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "")}{CommandContext.Command.Name}' on '{CommandContext.Guild.Id}'", b.task.Exception);
+                if (SharedCommandContext != null)
+                    _logger.LogError("Failed to execute '{Prefix}{Name}' for '{User}' on '{Guild}'", b.task.Exception,
+                        SharedCommandContext.Prefix,
+                        SharedCommandContext.CommandName,
+                        SharedCommandContext.User?.Id,
+                        SharedCommandContext.Guild?.Id);
+                else if (CommandContext != null)
+                    _logger.LogError("Failed to executed '{Prefix}{Name}' for '{User}' on '{Guild}'", b.task.Exception,
+                            CommandContext.Prefix,
+                            CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
+                            CommandContext.User?.Id,
+                            CommandContext.Guild?.Id);
                 else if (InteractionContext != null)
-                    _logger.LogError($"Failed to execute '/{InteractionContext.CommandName}'{(InteractionContext.Guild is not null ? $" on '{InteractionContext.Guild.Id}'" : "")}", b.task.Exception);
+                    _logger.LogError("Failed to execute '/{Name}' for '{User}' on '{Guild}'", b.task.Exception,
+                            InteractionContext.CommandName,
+                            InteractionContext.User?.Id,
+                            InteractionContext.Guild?.Id);
                 else if (ContextMenuContext != null)
-                    _logger.LogError($"Failed to execute '{ContextMenuContext.CommandName}'{(ContextMenuContext.Guild is not null ? $" on '{ContextMenuContext.Guild.Id}'" : "")}", b.task.Exception);
-                else if (SharedCommandContext != null)
-                    _logger.LogError($"Failed to execute '{SharedCommandContext.Prefix}{SharedCommandContext.CommandName}'{(SharedCommandContext.Guild is not null ? $" on '{SharedCommandContext.Guild.Id}'" : "")}", b.task.Exception);
+                    _logger.LogError("Failed to execute '{Name}' for '{User}' on '{Guild}'", b.task.Exception,
+                            ContextMenuContext.CommandName,
+                            ContextMenuContext.User?.Id,
+                            ContextMenuContext.Guild?.Id);
                 else
-                    _logger.LogError($"A task failed to execute", b.task.Exception);
+                    _logger.LogError("A task failed to execute", b.task.Exception);
 
                 var ExceptionType = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.GetType() : b.task.Exception.InnerException.GetType());
                 var Exception = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception : b.task.Exception.InnerException);
@@ -55,9 +83,9 @@ internal class TaskWatcher
 
                 if (ExceptionType == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {
-                    try { _logger.LogError($"WebRequestUrl: {((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest.Url}"); } catch { }
-                    try { _logger.LogError($"WebRequest: {JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest, Formatting.Indented).Replace("\\", "")}"); } catch { }
-                    try { _logger.LogError($"WebResponse: {((DisCatSharp.Exceptions.BadRequestException)Exception).WebResponse.Response}"); } catch { }
+                    try { _logger.LogError("WebRequestUrl: {Url}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest.Url); } catch { }
+                    try { _logger.LogError("WebRequest: {Request}", JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest, Formatting.Indented).Replace("\\", "")); } catch { }
+                    try { _logger.LogError("WebResponse: {Response}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebResponse.Response); } catch { }
                 }
 
                 if (SharedCommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))

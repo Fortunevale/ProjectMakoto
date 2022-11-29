@@ -81,7 +81,7 @@ internal class InfoCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to get cpu load", ex);
+                _logger.LogError("Failed to get cpu load", ex);
                 embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current CPU load**\n`Loading..`", $"**Current CPU load**\n`Error`");
             }
 
@@ -93,7 +93,7 @@ internal class InfoCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to get cpu load", ex);
+                _logger.LogError("Failed to get ram load", ex);
                 embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current RAM usage**\n`Loading..`", "**Current RAM usage**\n`Error`");
             }
 
@@ -129,7 +129,7 @@ internal class InfoCommand : BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Failed to get temps", ex);
+                    _logger.LogError("Failed to get temps", ex);
                     embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current temperature**\n`Loading..`", $"**Current temperature**\n`Error`");
                 }
 
@@ -155,7 +155,7 @@ internal class InfoCommand : BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Failed to get uptime", ex);
+                    _logger.LogError("Failed to get uptime", ex);
                     embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Server uptime**\n`Loading..`", $"**Server uptime**\n`Error`");
                 }
             }

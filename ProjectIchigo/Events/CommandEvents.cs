@@ -13,7 +13,12 @@ internal class CommandEvents
     {
         Task.Run(async () =>
         {
-            _logger.LogDebug($"Successfully started execution of '{e.Context.Prefix}{(e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "")}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild?.Name}' ({e.Context.Guild?.Id}) ({e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds}ms)");
+            _logger.LogDebug("Successfully started execution of '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)", 
+            e.Context.Prefix, 
+            (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name, 
+            e.Context.User.Id,
+            e.Context.Guild?.Id,
+            e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
 
             try
             {
@@ -40,7 +45,12 @@ internal class CommandEvents
                 Task.Run(async () =>
                 {
                     if (e.Command is not null)
-                        _logger.LogWarn($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name} on '{e.Context.Guild.Name}' ({e.Context.Guild.Id})", e.Exception);
+                        _logger.LogWarn("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+                            e.Context.Prefix,
+                            (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
+                            e.Context.User.Id,
+                            e.Context.Guild?.Id,
+                            e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
 
                     _ = e.Context.SendSyntaxError();
 
@@ -58,7 +68,12 @@ internal class CommandEvents
             {
                 Task.Run(async () =>
                 {
-                    _logger.LogError($"Failed to execute '{e.Context.Prefix}{e.Command.Name}{(string.IsNullOrWhiteSpace(e.Context.RawArgumentString) ? "" : e.Context.RawArgumentString.Insert(0, " "))}' for {e.Context.User.Username}#{e.Context.User.Discriminator} ({e.Context.User.Id}) in #{e.Context.Channel.Name}  on '{e.Context.Guild.Name}' ({e.Context.Guild.Id})", e.Exception);
+                    _logger.LogError("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+                        e.Context.Prefix,
+                        (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
+                        e.Context.User.Id,
+                        e.Context.Guild?.Id,
+                        e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
 
                     try
                     {

@@ -46,7 +46,7 @@ public class VcCreatorSettings
 
             if (!cachedGuild.Channels.ContainsKey(b.Key))
             {
-                _logger.LogDebug($"Channel '{b.Key}' was deleted, deleting Vc Creator Entry.");
+                _logger.LogDebug("Channel '{Channel}' was deleted, deleting Vc Creator Entry.", b.Key);
                 CreatedChannels.Remove(b.Key);
                 i--;
             }
@@ -69,7 +69,7 @@ public class VcCreatorSettings
 
                                 if (users.Count <= 0)
                                 {
-                                    _logger.LogDebug($"Channel '{b.Key}' is now empty, deleting.");
+                                    _logger.LogDebug("Channel '{Channel}' is now empty, deleting.", b.Key);
 
                                     await channel.DeleteAsync();
                                     CreatedChannels.Remove(b.Key);
@@ -78,7 +78,7 @@ public class VcCreatorSettings
 
                                 if (e.User.Id == b.Value.OwnerId && e.After?.Channel?.Id != b.Key)
                                 {
-                                    _logger.LogDebug($"The owner of channel '{b.Key}' left, assigning new owner.");
+                                    _logger.LogDebug("The owner of channel '{Channel}' left, assigning new owner.", b.Key);
                                     var newOwner = users.SelectRandom();
 
                                     b.Value.OwnerId = newOwner.Id;
@@ -91,7 +91,7 @@ public class VcCreatorSettings
                                 {
                                     var u = (await e.User.ConvertToMember(cachedGuild));
 
-                                    _logger.LogDebug($"Banned user in channel '{b.Key}' joined, disconnecting.");
+                                    _logger.LogDebug("Banned user in channel '{Channel}' joined, disconnecting.", b.Key);
                                     if (u.Permissions.HasPermission(Permissions.Administrator) || u.Permissions.HasPermission(Permissions.ManageChannels) || u.Permissions.HasPermission(Permissions.ModerateMembers) || u.Permissions.HasPermission(Permissions.KickMembers) || u.Permissions.HasPermission(Permissions.BanMembers) || u.Permissions.HasPermission(Permissions.MuteMembers) || u.Permissions.HasPermission(Permissions.DeafenMembers))
                                         return;
 
@@ -122,7 +122,7 @@ public class VcCreatorSettings
 
                         if (channel.Users.Count <= 0)
                         {
-                            _logger.LogDebug($"No one joined channel '{b.Key}', deleting.");
+                            _logger.LogDebug("No one joined channel '{Channel}', deleting.", b.Key);
 
                             await channel.DeleteAsync();
                             CreatedChannels.Remove(b.Key);
@@ -131,13 +131,13 @@ public class VcCreatorSettings
                     }).Add(_bot.watcher);
 
                     _bot.discordClient.VoiceStateUpdated += VoiceStateUpdated;
-                    _logger.LogDebug($"Created VcCreator Event for '{b.Key}'");
+                    _logger.LogDebug("Created VcCreator Event for '{Channel}'", b.Key);
 
                     while (CreatedChannels.ContainsKey(b.Key))
                         await Task.Delay(500);
 
                     _bot.discordClient.VoiceStateUpdated -= VoiceStateUpdated;
-                    _logger.LogDebug($"Deleted VcCreator Event for '{b.Key}'");
+                    _logger.LogDebug("Deleted VcCreator Event for '{Channel}'", b.Key);
                 }).Add(_bot.watcher);
             }
 

@@ -124,7 +124,7 @@ public class ReminderSettings
                 task.Add(_bot.watcher);
                 task.CreateScheduleTask(b.DueTime, $"{Parent.UserId}; {b.UUID}; reminder");
 
-                _logger.LogDebug($"Created scheduled task for reminder by '{Parent.UserId}'");
+                _logger.LogDebug("Created scheduled task for reminder by '{User}'", Parent.UserId);
             }
 
         foreach (var b in GetScheduleTasks().ToList())
@@ -137,7 +137,7 @@ public class ReminderSettings
                 {
                     DeleteScheduleTask(b.Key);
 
-                    _logger.LogDebug($"Deleted scheduled task for reminder by '{Parent.UserId}'");
+                    _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", Parent.UserId);
                 }
             }
     }

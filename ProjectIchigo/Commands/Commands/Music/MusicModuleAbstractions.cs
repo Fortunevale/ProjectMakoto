@@ -86,7 +86,7 @@ internal class MusicModuleAbstractions
 
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
         {
-            _logger.LogError($"An exception occurred while trying to load lavalink track: {loadResult.Exception.Message} {loadResult.Exception.Severity}");
+            _logger.LogError("An exception occurred while trying to load lavalink track: {Exception}", loadResult.Exception.Message);
             embed.Description = $"`Failed to load '{load}'.`";
             embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());

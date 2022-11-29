@@ -45,7 +45,7 @@ internal class PhishingSubmissionEvents
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Failed to update database", ex);
+                        _logger.LogError("Failed to update database", ex);
                     }
                 }
                 else if (e.GetCustomId() == "deny_submission")

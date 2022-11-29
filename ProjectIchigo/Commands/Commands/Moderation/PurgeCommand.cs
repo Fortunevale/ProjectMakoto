@@ -104,7 +104,7 @@ internal class PurgeCommand : BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Failed to delete messages", ex);
+                    _logger.LogError("Failed to delete messages", ex);
                     embed.Description = $"`An error occurred trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
                     await RespondOrEdit(embed.AsError(ctx));
                     return;
