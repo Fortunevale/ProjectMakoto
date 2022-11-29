@@ -165,6 +165,8 @@ internal class VoicePrivacyEvents
                         }
                     }
                 }
+                catch (DisCatSharp.Exceptions.NotFoundException) { }
+                catch (DisCatSharp.Exceptions.UnauthorizedException) { }
                 catch (Exception ex)
                 {
                     _logger.LogError("Failed to execute a In-Voice Text Privacy Cleaner", ex);
