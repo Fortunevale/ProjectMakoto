@@ -136,6 +136,22 @@
           "de": "Dieser Befehl existiert nicht."
         }
       }
+    },
+    "avatar": {
+      "avatar": {
+        "t": {
+          "en": "Avatar of {User}",
+          "de": "Profilbild von {User}"
+        }
+      },
+      "show_server_profile": {
+        "en": "Show Server Profile Picture",
+        "de": "Server Profilbild anzeigen"
+      },
+      "show_user_profile": {
+        "en": "Show Profile Picture",
+        "de": "Profilbild anzeigen"
+      }
     }
   }
 }

@@ -17,7 +17,7 @@ internal class AvatarCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.AvatarUrl,
-            }.AsInfo(ctx, $"{victim.UsernameWithDiscriminator}'s Avatar");
+            }.AsInfo(ctx, GetString(t.commands.avatar.avatar).Replace("{User}", victim.UsernameWithDiscriminator));
 
             DiscordMember member = null;
 
@@ -25,8 +25,8 @@ internal class AvatarCommand : BaseCommand
             { member = await victim.ConvertToMember(ctx.Guild); }
             catch { }
 
-            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", "Show Server Profile Picture", (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
-            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", "Show Profile Picture", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", GetString(t.commands.avatar.show_server_profile), (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", GetString(t.commands.avatar.show_user_profile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
 

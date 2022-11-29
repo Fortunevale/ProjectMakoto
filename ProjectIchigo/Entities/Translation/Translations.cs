@@ -40,5 +40,13 @@ public class Translations
             public TranslationKey disclaimer;
             public TranslationKey nocmd;
         }
+
+        public _avatar avatar;
+        public class _avatar
+        {
+            public TranslationKey avatar;
+            public TranslationKey show_server_profile;
+            public TranslationKey show_user_profile;
+        }
     }
 }
