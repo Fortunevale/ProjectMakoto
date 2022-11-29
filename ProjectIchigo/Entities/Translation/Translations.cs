@@ -19,7 +19,24 @@ public class Translations
         public _common common;
         public class _common
         {
+            public _errors errors;
+            public class _errors
+            {
+                public TranslationKey generic;
+                public TranslationKey nomember;
+                public TranslationKey botowner;
+                public TranslationKey voicechannel;
+                public TranslationKey userban;
+                public TranslationKey guildban;
+                public TranslationKey exclusiveprefix;
+                public TranslationKey exclusiveapp;
+                public TranslationKey data;
+                public TranslationKey botperms;
+            }
+
             public TranslationKey usedbyfoot;
+            public TranslationKey timeout;
+            public TranslationKey finished;
         }
 
         public _modules modules;

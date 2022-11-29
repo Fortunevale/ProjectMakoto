@@ -72,10 +72,84 @@
   },
   "commands": {
     "common": {
+      "errors": {
+        "generic": {
+          "t": {
+            "en": "You dont have permissions to use the command `{Command}`. You need to be `{Required}` to use this command.",
+            "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst `{Required}` sein."
+          }
+        },
+        "nomember": {
+          "t": {
+            "en": "The user you tagged is required to be on this server for this command to run.",
+            "de": "Der gewählte Benutzer muss auf dem Server sein um diesen Befehl zu verwenden."
+          }
+        },
+        "botowner": {
+          "t": {
+            "en": "You dont have permissions to use the command `{Command}`. You need to be {Required} to use this command.",
+            "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst {Required} sein."
+          }
+        },
+        "voicechannel": {
+          "t": {
+            "en": "You aren't in a voice channel.",
+            "de": "Du befindest dich nicht in einem Sprachkanal."
+          }
+        },
+        "userban": {
+          "t": {
+            "en": "You are currently banned from using this bot: {Reason}",
+            "de": "Die Nutzung des Bots ist aktuell gesperrt für dich: {Reason}"
+          }
+        },
+        "guildban": {
+          "t": {
+            "en": "This guild is currently banned from using this bot: {Reason}",
+            "de": "Die Nutzung des Bots ist gesperrt auf diesem Server: {Reason}"
+          }
+        },
+        "exclusiveprefix": {
+          "t": {
+            "en": "This command is exclusive to prefix commands.",
+            "de": "Dieser Befehl ist limitiert zur Verwendung als Prefixbefehl."
+          }
+        },
+        "exclusiveapp": {
+          "t": {
+            "en": "This command is exclusive to application commands.",
+            "de": "Dieser Befehl ist limitiert zur Verwendung als Applikationsbefehl."
+          }
+        },
+        "data": {
+          "t": {
+            "en": "You objected to having your data being processed. To run commands, please run '{Command}' again to re-allow data processing.",
+            "de": "Du hast Datenverarbeitung verweigert. Um Befehle erneut verwenden zu können, verwende '{Command}'."
+          }
+        },
+        "botperms": {
+          "t": {
+            "en": "The bot is missing permissions to run this command. Please assign the bot `{Required}` to use this command.",
+            "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung `{Required}` um diesen Befehl zu verwenden."
+          }
+        }
+      },
       "usedbyfoot": {
         "t": {
           "en": "Command used by {User}",
           "de": "Befehl verwendet von {User}"
+        }
+      },
+      "timeout": {
+        "t": {
+          "en": "Interaction timed out",
+          "de": "Interaktionszeit ist abgelaufen"
+        }
+      },
+      "finished": {
+        "t": {
+          "en": "Interaction finished",
+          "de": "Interaktion abgeschlossen"
         }
       }
     },

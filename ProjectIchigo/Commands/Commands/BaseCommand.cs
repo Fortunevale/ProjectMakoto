@@ -847,7 +847,7 @@ public abstract class BaseCommand
     #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0]?.Footer?.Text + " • Interaction timed out").WithColor(DiscordColor.Gray)));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {GetString(t.commands.common.timeout)}").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
@@ -859,7 +859,7 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = RespondOrEdit("✅ _`Interaction finished.`_");
+        _ = RespondOrEdit($"✅ _`{GetString(t.commands.common.finished)}`_");
         switch (ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -964,49 +964,49 @@ public abstract class BaseCommand
     public void SendNoMemberError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = "The user you tagged is required to be on this server for this command to run.",
+        Description = GetString(t.commands.common.errors.nomember)
     }.AsError(ctx));
 
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Ichigo Staff` to use this command.",
+            Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"{ctx.CurrentUser.Username} Staff")
         }.AsError(ctx));
 
     public void SendBotOwnerError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be <@{ctx.Bot.status.TeamOwner}> to use this command.",
+        Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"<@{ctx.Bot.status.TeamOwner}>"),
     }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `Administrator` to use this command.",
+            Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", "Administrator"),
         }.AsError(ctx));
 
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"You dont have permissions to use the command `{ctx.Prefix}{ctx.CommandName}`. You need to be `{perms.ToPermissionString()}` to use this command.",
+            Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", perms.ToPermissionString()),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`You aren't in a voice channel.`",
+            Description = $"`{GetString(t.commands.common.errors.voicechannel)}`",
         }.AsError(ctx)));
 
     public void SendUserBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`You are currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
+            Description = $"`{GetString(t.commands.common.errors.userban).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
         }.AsError(ctx)));
 
     public void SendGuildBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`This guild is currently banned from using this bot: {entry.Reason.SanitizeForCode()}`",
+            Description = $"`{GetString(t.commands.common.errors.guildban).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
         }.AsError(ctx)));
 
     public void SendSourceError(Enums.CommandType commandType)
@@ -1014,11 +1014,11 @@ public abstract class BaseCommand
         {
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"This command is exclusive to application commands.",
+                Description = $"`{GetString(t.commands.common.errors.exclusiveapp)}`",
             }.AsError(ctx)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"This command is exclusive to prefixed commands."
+                Description = $"`{GetString(t.commands.common.errors.exclusiveprefix)}`"
             }.AsError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
@@ -1026,7 +1026,7 @@ public abstract class BaseCommand
     public void SendDataError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`You objected to having your data being processed. To run commands, please run '{ctx.Prefix}data object' again to re-allow data processing.`",
+            Description = $"`{GetString(t.commands.common.errors.data).Replace("{Command}", $"{ctx.Prefix}data object")}`",
         }.AsError(ctx)));
 
     public void SendOwnPermissionError(Permissions perms)
@@ -1036,7 +1036,7 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = $"The bot is missing permissions to run this command. Please assign the bot `{perms.ToPermissionString()}` to use this command."
+            Description = GetString(t.commands.common.errors.botperms).Replace("{Required}", perms.ToPermissionString())
         }.AsError(ctx));
     }
 

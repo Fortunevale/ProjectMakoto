@@ -244,9 +244,7 @@
     "name": "credits",
     "description": "Allows you to view who contributed the bot.",
     "type": 1,
-    "name_translations": {
-      "de": "credits"
-    },
+    "name_translations": null,
     "description_translations": {
       "de": "Zeigt dir wer Ichigo unterstützt hat."
     }
