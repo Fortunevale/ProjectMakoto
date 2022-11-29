@@ -145,12 +145,16 @@
         }
       },
       "show_server_profile": {
-        "en": "Show Server Profile Picture",
-        "de": "Server Profilbild anzeigen"
+        "t": {
+          "en": "Show Server Profile Picture",
+          "de": "Server Profilbild anzeigen"
+        }
       },
       "show_user_profile": {
-        "en": "Show Profile Picture",
-        "de": "Profilbild anzeigen"
+        "t": {
+          "en": "Show Profile Picture",
+          "de": "Profilbild anzeigen"
+        }
       }
     }
   }
