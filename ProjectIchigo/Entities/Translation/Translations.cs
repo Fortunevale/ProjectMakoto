@@ -48,5 +48,12 @@ public class Translations
             public TranslationKey show_server_profile;
             public TranslationKey show_user_profile;
         }
+
+        public _banner banner;
+        public class _banner
+        {
+            public TranslationKey banner;
+            public TranslationKey nobanner;
+        }
     }
 }

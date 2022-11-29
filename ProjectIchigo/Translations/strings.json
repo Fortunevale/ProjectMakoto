@@ -156,6 +156,20 @@
           "de": "Profilbild anzeigen"
         }
       }
+    },
+    "banner": {
+      "banner": {
+        "t": {
+          "en": "Banner of {User}",
+          "de": "Banner von {User}"
+        }
+      },
+      "nobanner": {
+        "t": {
+          "en": "This user has no banner.",
+          "de": "Dieser Nutzer hat kein Banner."
+        }
+      }
     }
   }
 }
