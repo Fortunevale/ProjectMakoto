@@ -421,7 +421,15 @@ internal class ActionlogEvents
             {
                 if (!e.RolesAfter.Any(x => x.Id == role.Id))
                 {
+                    await Task.Delay(3000);
                     RolesUpdated = true;
+
+                    if (!e.Guild.Roles.ContainsKey(role.Id))
+                    {
+                        RolesUpdated = false;
+                        continue;
+                    }
+
                     break;
                 }
             }
@@ -431,7 +439,15 @@ internal class ActionlogEvents
                 {
                     if (!e.RolesBefore.Any(x => x.Id == role.Id))
                     {
+                        await Task.Delay(3000);
                         RolesUpdated = true;
+
+                        if (!e.Guild.Roles.ContainsKey(role.Id))
+                        {
+                            RolesUpdated = false;
+                            continue;
+                        }
+
                         break;
                     }
                 }
