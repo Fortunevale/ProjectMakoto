@@ -372,7 +372,7 @@ internal class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            _ = e.Thread.JoinAsync();
+            e.Thread.JoinWithQueue(_bot.threadJoinClient);
         });
     }
 
@@ -391,7 +391,7 @@ internal class DiscordEventHandler
             if (e.Thread.Guild is not null)
                 FillDatabase(e.Thread.Guild);
 
-            _ = e.Thread.JoinAsync();
+            e.Thread.JoinWithQueue(_bot.threadJoinClient);
         });
     }
 
@@ -401,7 +401,7 @@ internal class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            _ = e.Thread.JoinAsync();
+            e.Thread.JoinWithQueue(_bot.threadJoinClient);
         });
     }
 
@@ -413,7 +413,7 @@ internal class DiscordEventHandler
 
             if (_bot.status.DiscordGuildDownloadCompleted)
                 foreach (var b in e.Threads)
-                    _ = b.JoinAsync();
+                    b.JoinWithQueue(_bot.threadJoinClient);
         });
     }
 
