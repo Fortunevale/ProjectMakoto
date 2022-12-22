@@ -15,6 +15,7 @@ public class Bot
     internal DatabaseClient databaseClient { get; set; }
     internal ScoreSaberClient scoreSaberClient { get; set; }
     internal GoogleTranslateClient translationClient { get; set; }
+    internal ThreadJoinClient threadJoinClient { get; set; }
     internal AbuseIpDbClient abuseIpDbClient { get; set; }
 
     #endregion Clients
@@ -137,6 +138,7 @@ public class Bot
 
         scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
         translationClient = GoogleTranslateClient.Initialize();
+        threadJoinClient = ThreadJoinClient.Initialize();
 
         _logger.LogDebug($"Environment Details\n\n" +
                 $"Dotnet Version: {Environment.Version}\n" +
@@ -875,8 +877,7 @@ public class Bot
                 foreach (var b in Threads.Where(x => x.CurrentMember is null))
                 {
                     _logger.LogDebug($"Joining thread on '{guild.Key}': {b.Id}");
-                    await b.JoinAsync();
-                    await Task.Delay(2000);
+                    b.JoinWithQueue(threadJoinClient);
                 }
             }
             catch (Exception ex)
