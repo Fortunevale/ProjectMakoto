@@ -37,7 +37,7 @@ internal class GlobalNotesCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
                     .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var list) ? list.Count : 0)} global notes.`")
-                    .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.Sanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
+                    .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.CancelButton));
 

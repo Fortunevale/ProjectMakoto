@@ -42,7 +42,7 @@ internal static class GenericExtensions
     internal static string SanitizeForCode(this string str) 
         => str.Replace("`", "´");
 
-    internal static string Sanitize(this string str)
+    internal static string FullSanitize(this string str)
     {
         var proc = str;
 

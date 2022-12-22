@@ -57,7 +57,7 @@ internal class PollCommand : BaseCommand
                 var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (SelectedChannel is null || SelectedPrompt.IsNullOrWhiteSpace() || !SelectedOptions.IsNotNullAndNotEmpty() || SelectedOptions.Count < 2 || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
             
                 var embed = new DiscordEmbedBuilder()
-                    .WithDescription($"`Poll Content     `: {(SelectedPrompt.IsNullOrWhiteSpace() ? "`Not yet selected.`" : $"{SelectedPrompt.Sanitize()}")}\n" +
+                    .WithDescription($"`Poll Content     `: {(SelectedPrompt.IsNullOrWhiteSpace() ? "`Not yet selected.`" : $"{SelectedPrompt.FullSanitize()}")}\n" +
                                      $"`Available Options`: {(!SelectedOptions.IsNotNullAndNotEmpty() ? "`No options set.`" : $"{string.Join(", ", SelectedOptions.Select(x => $"`{x.Label.TruncateWithIndication(10)}`"))}")}\n\n" +
                                      $"`Selected Channel `: {(SelectedChannel is null ? "`Not yet selected.`" : SelectedChannel.Mention)}\n" +
                                      $"`Due Time & Time  `: {(selectedDueDate is null ? "`Not yet selected.`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}\n" +
@@ -340,7 +340,7 @@ internal class PollCommand : BaseCommand
 
                     var select = new DiscordStringSelectComponent("Vote on this poll..", SelectedOptions.Take(20), Guid.NewGuid().ToString(), (SelectedMin >= SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() - 1 : SelectedMin), (SelectedMax > SelectedOptions.Take(20).Count() ? SelectedOptions.Take(20).Count() : SelectedMax));
                     var endearly = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "End this poll early", false, DiscordEmoji.FromUnicode("🗑").ToComponent());
-                    var polltxt = $"{SelectedPrompt.Sanitize()}";
+                    var polltxt = $"{SelectedPrompt.FullSanitize()}";
 
                     var msg = await SelectedChannel.SendMessageAsync(new DiscordMessageBuilder()
                         .WithContent(SelectedRole is null ? "" : SelectedRole.Mention)

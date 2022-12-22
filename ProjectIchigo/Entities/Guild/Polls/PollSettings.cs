@@ -127,7 +127,7 @@ public class PollSettings
                     { _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(message.Embeds?.ElementAt(0))); }
                     catch { }
                     await message.RespondAsync(new DiscordEmbedBuilder()
-                        .WithDescription($"`Poll ended.`\n\n**Results**\n{(votes.Count <= 0 ? "`No one voted on this poll.`" : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].Sanitize()}**\n`{x.Value} Votes`")))}")
+                        .WithDescription($"`Poll ended.`\n\n**Results**\n{(votes.Count <= 0 ? "`No one voted on this poll.`" : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n`{x.Value} Votes`")))}")
                         .WithAuthor($"Poll • {channel.Guild.Name}", null, channel.Guild.IconUrl)
                         .WithColor(EmbedColors.Success));
                 });

@@ -17,7 +17,7 @@ internal class AfkCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.users[ctx.User.Id].AfkStatus.Reason = reason.Sanitize();
+            ctx.Bot.users[ctx.User.Id].AfkStatus.Reason = reason.FullSanitize();
             ctx.Bot.users[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
 
             await RespondOrEdit(new DiscordEmbedBuilder

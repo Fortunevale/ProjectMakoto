@@ -59,7 +59,7 @@ internal class PhishingProtectionEvents
 
             if (query.data.abuseConfidenceScore.HasValue && query.data.abuseConfidenceScore.Value > 60)
             {
-                var report_fields = query.data.reports.Select(x => new DiscordEmbedField($"{x.reporterCountryCode.IsoCountryCodeToFlagEmoji()} {x.reporterId}{(x.reportedAt.HasValue ? $" {x.reportedAt.Value.ToTimestamp()}" : "")}", (x.comment.IsNullOrWhiteSpace() ? "No comment provided." : x.comment).Sanitize().TruncateWithIndication(1000))).ToList();
+                var report_fields = query.data.reports.Select(x => new DiscordEmbedField($"{x.reporterCountryCode.IsoCountryCodeToFlagEmoji()} {x.reporterId}{(x.reportedAt.HasValue ? $" {x.reportedAt.Value.ToTimestamp()}" : "")}", (x.comment.IsNullOrWhiteSpace() ? "No comment provided." : x.comment).FullSanitize().TruncateWithIndication(1000))).ToList();
 
                 DiscordEmbedBuilder embed = new()
                 {
