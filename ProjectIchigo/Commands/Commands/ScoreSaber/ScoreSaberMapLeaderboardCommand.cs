@@ -168,7 +168,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 }
 
                 embed = embed.AsInfo(ctx, "Score Saber");
-                embed.Title = $"{leaderboard.leaderboardInfo.songName.Sanitize()}{(!string.IsNullOrWhiteSpace(leaderboard.leaderboardInfo.songSubName) ? $" {leaderboard.leaderboardInfo.songSubName.Sanitize()}" : "")} - {leaderboard.leaderboardInfo.songAuthorName.Sanitize()} [{leaderboard.leaderboardInfo.levelAuthorName.Sanitize()}]".TruncateWithIndication(256);
+                embed.Title = $"{leaderboard.leaderboardInfo.songName.FullSanitize()}{(!string.IsNullOrWhiteSpace(leaderboard.leaderboardInfo.songSubName) ? $" {leaderboard.leaderboardInfo.songSubName.FullSanitize()}" : "")} - {leaderboard.leaderboardInfo.songAuthorName.FullSanitize()} [{leaderboard.leaderboardInfo.levelAuthorName.FullSanitize()}]".TruncateWithIndication(256);
                 embed.Description = "";
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = leaderboard.leaderboardInfo.coverImage };

@@ -141,7 +141,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                 var playerList = lastSearch.players.Skip((currentPage - 1) * 25).Take(25).ToList();
                                 foreach (var b in playerList)
                                 {
-                                    playerDropDownOptions.Add(new DiscordStringSelectComponentOption($"{b.name.Sanitize()} | {b.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
+                                    playerDropDownOptions.Add(new DiscordStringSelectComponentOption($"{b.name.FullSanitize()} | {b.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
                                 }
                                 var player_dropdown = new DiscordStringSelectComponent("Select a player..", playerDropDownOptions as IEnumerable<DiscordStringSelectComponentOption>, "player_selection");
 

@@ -42,7 +42,7 @@ public class ReminderSettings
                     var user = await this._bot.discordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.UserId)).Value.GetMemberAsync(this.Parent.UserId);
 
                     DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                        .WithDescription($"> {b.Description.Sanitize()}\n" +
+                        .WithDescription($"> {b.Description.FullSanitize()}\n" +
                         $"Created on {b.CreationPlace}\n" +
                         $"Created at {b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})\n" +
                         $"Due {b.DueTime.ToTimestamp()} ({b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)})" +
