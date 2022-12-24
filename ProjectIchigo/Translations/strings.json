@@ -244,6 +244,20 @@
           "de": "Dieser Nutzer hat kein Banner."
         }
       }
+    },
+    "credits": {
+      "fetching": {
+        "t": {
+          "en": "Fetching contributors..",
+          "de": "Lade Unterstützer.."
+        }
+      },
+      "credits": {
+        "t": {
+          "en": "{BotName} is mainly being developed and maintained by {Developer}.\n\nThese people help me manage and/or test the bot: {DiscordStaffList}\n\n{BotName} had some help from the following people:\n\n{GitHubContList}\n\n{BotName} wouldn't be possible without {Library}, which was made by these people:\n{LibraryContList} and {LibraryContCount} more.\n\n{BotName}'s Music Module uses {MusicModule}, which was made by these people:\n{MusicContList} and {MusicContCount} more.\n\nSpecial thanks go to {PhishingListRepos} who publicly provide a list of phishing urls.",
+          "de": "{BotName} wird hauptsächlich von {Developer} entwickelt.\n\nDiese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}\n\n{BotName} hatte Hilfe von den folgenden Personen:\n\n{GitHubContList}\n\n{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:\n{LibraryContList} und {LibraryContCount} weitere.\n\n{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:\n{MusicContList} und {MusicContCount} weitere.\n\nEin dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
+        }
+      }
     }
   }
 }

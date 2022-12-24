@@ -72,5 +72,12 @@ public class Translations
             public TranslationKey banner;
             public TranslationKey nobanner;
         }
+
+        public _credits credits;
+        public class _credits
+        {
+            public TranslationKey fetching;
+            public TranslationKey credits;
+        }
     }
 }
