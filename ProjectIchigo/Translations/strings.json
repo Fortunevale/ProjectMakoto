@@ -132,6 +132,12 @@
             "en": "The bot is missing permissions to run this command. Please assign the bot `{Required}` to use this command.",
             "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung `{Required}` um diesen Befehl zu verwenden."
           }
+        },
+        "dmerror": {
+          "t": {
+            "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
+            "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
+          }
         }
       },
       "usedbyfoot": {
@@ -256,6 +262,158 @@
         "t": {
           "en": "{BotName} is mainly being developed and maintained by {Developer}.\n\nThese people help me manage and/or test the bot: {DiscordStaffList}\n\n{BotName} had some help from the following people:\n\n{GitHubContList}\n\n{BotName} wouldn't be possible without {Library}, which was made by these people:\n{LibraryContList} and {LibraryContCount} more.\n\n{BotName}'s Music Module uses {MusicModule}, which was made by these people:\n{MusicContList} and {MusicContCount} more.\n\nSpecial thanks go to {PhishingListRepos} who publicly provide a list of phishing urls.",
           "de": "{BotName} wird hauptsächlich von {Developer} entwickelt.\n\nDiese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}\n\n{BotName} hatte Hilfe von den folgenden Personen:\n\n{GitHubContList}\n\n{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:\n{LibraryContList} und {LibraryContCount} weitere.\n\n{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:\n{MusicContList} und {MusicContCount} weitere.\n\nEin dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
+        }
+      }
+    },
+    "emojistealer": {
+      "emoji": {
+        "t": {
+          "en": "emojis",
+          "de": "Emojis"
+        }
+      },
+      "sticker": {
+        "t": {
+          "en": "stickers",
+          "de": "Sticker"
+        }
+      },
+      "downloadingpre": {
+        "t": {
+          "en": "Downloading emojis of this message..",
+          "de": "Lade Emojis dieser Nachricht herunter.."
+        }
+      },
+      "noemojis": {
+        "t": {
+          "en": "This message doesn't contain any emojis or stickers.",
+          "de": "Diese Nachricht enthält keine Emojis oder Sticker."
+        }
+      },
+      "downloadingemojis": {
+        "t": {
+          "en": "Downloading {Count} emojis of this message..",
+          "de": "Lade {Count} Emojis herunter.."
+        }
+      },
+      "downloadingstickers": {
+        "t": {
+          "en": "Downloading {Count} stickers of this message..",
+          "de": "Lade {Count} Sticker herunter.."
+        }
+      },
+      "nosuccessfuldownload": {
+        "t": {
+          "en": "This message doesn't contain any emojis or stickers.",
+          "de": "Diese Nachricht enthält keine Emojis oder Sticker."
+        }
+      },
+      "receiveprompt": {
+        "t": {
+          "en": "Select how you want to receive the downloaded {Type}.",
+          "de": "Wähle wie die {Type} gesendet werden sollen."
+        }
+      },
+      "togglestickers": {
+        "t": {
+          "en": "Include Stickers",
+          "de": "Sticker beinhalten"
+        }
+      },
+      "addtoserver": {
+        "t": {
+          "en": "Add Emoji(s) to Server",
+          "de": "Emoji(s) zum Server hinzufügen"
+        }
+      },
+      "directmessagezip": {
+        "t": {
+          "en": "Direct Message as Zip File",
+          "de": "Direktnachricht, als Zip Datei"
+        }
+      },
+      "directmessagesingle": {
+        "t": {
+          "en": "Direct Message as Single Files",
+          "de": "Direktnachricht, als einzelne Dateien"
+        }
+      },
+      "currentchatzip": {
+        "t": {
+          "en": "This chat as Zip File",
+          "de": "Dieser Kanal, als Zip Datei"
+        }
+      },
+      "addtoserverstickererror": {
+        "t": {
+          "en": "You cannot add any emoji(s) to the server while including stickers.",
+          "de": "Du kannst keine Emojis zum Server hinzufügen wenn du Sticker beinhaltest."
+        }
+      },
+      "addtoserverloading": {
+        "t": {
+          "en": "Adding {Min}/{Max} emojis to this server..",
+          "de": "Füge {Min}/{Max} Emojis zum Server hinzu.."
+        }
+      },
+      "addtoserverloadingnotice": {
+        "t": {
+          "en": "_The bot most likely hit a rate limit. This can take up to an hour to continue._\n_If you want this to change, go scream at Discord. There's nothing i can do._",
+          "de": "_Der Bot hat wahrscheinlich ein Rate Limit überschritten._\n_Wenn du willst dass Emojis adden schneller geht, schrei Discord an. Es gibt nichts was ich tun kann._"
+        }
+      },
+      "nomoreroom": {
+        "t": {
+          "en": "Downloaded and added {Count} emojis to the server. There is no more room for additional emojis.",
+          "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt. Es gibt keinen Platz für weitere Emojis."
+        }
+      },
+      "addedtoserver": {
+        "t": {
+          "en": "Downloaded and added {Count} emojis to the server.",
+          "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt."
+        }
+      },
+      "sendingdm": {
+        "t": {
+          "en": "Sending the {Type} in your DMs..",
+          "de": "Sende die {Type} in deine Direktnachrichten.."
+        }
+      },
+      "successdm": {
+        "t": {
+          "en": "Heyho! Here's the {Type} you requested.",
+          "de": "Heyho! Hier sind die {Type} die du angefragt hast."
+        }
+      },
+      "successdmori": {
+        "t": {
+          "en": "Downloaded and sent {Count} {Type} to your DMs.",
+          "de": "{Count} {Type} heruntergeladen und per Direktnachricht an dich gesendet."
+        }
+      },
+      "preparingzip": {
+        "t": {
+          "en": "Preparing your Zip File..",
+          "de": "Deine Zip Datei wird vorbereitet.."
+        }
+      },
+      "sendingzipdm": {
+        "t": {
+          "en": "Sending your Zip File via DM..",
+          "de": "Deine Zip Datei wird per Direktnachricht gesendet.."
+        }
+      },
+      "sendingzipchat": {
+        "t": {
+          "en": "Sending your Zip File in this chat..",
+          "de": "Deine Zip Datei wird hier gesendet.."
+        }
+      },
+      "successchat": {
+        "t": {
+          "en": "Downloaded {Count} {Type}. Attached is a Zip File containing them.",
+          "de": "{Count} {Type} heruntergeladen und in diesem Chat gesendet."
         }
       }
     }

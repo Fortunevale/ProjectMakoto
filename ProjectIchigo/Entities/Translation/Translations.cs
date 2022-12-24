@@ -32,6 +32,7 @@ public class Translations
                 public TranslationKey exclusiveapp;
                 public TranslationKey data;
                 public TranslationKey botperms;
+                public TranslationKey dmerror;
             }
 
             public TranslationKey usedbyfoot;
@@ -78,6 +79,35 @@ public class Translations
         {
             public TranslationKey fetching;
             public TranslationKey credits;
+        }
+        public _emojistealer emojistealer;
+        public class _emojistealer
+        {
+            public TranslationKey emoji;
+            public TranslationKey sticker;
+            public TranslationKey downloadingpre;
+            public TranslationKey noemojis;
+            public TranslationKey downloadingemojis;
+            public TranslationKey downloadingstickers;
+            public TranslationKey nosuccessfuldownload;
+            public TranslationKey receiveprompt;
+            public TranslationKey addtoserver;
+            public TranslationKey directmessagezip;
+            public TranslationKey directmessagesingle;
+            public TranslationKey currentchatzip;
+            public TranslationKey togglestickers;
+            public TranslationKey addtoserverstickererror;
+            public TranslationKey addtoserverloading;
+            public TranslationKey addtoserverloadingnotice;
+            public TranslationKey nomoreroom;
+            public TranslationKey addedtoserver;
+            public TranslationKey sendingdm;
+            public TranslationKey successdm;
+            public TranslationKey successdmori;
+            public TranslationKey preparingzip;
+            public TranslationKey sendingzipdm;
+            public TranslationKey sendingzipchat;
+            public TranslationKey successchat;
         }
     }
 }

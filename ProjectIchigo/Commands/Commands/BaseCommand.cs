@@ -1029,6 +1029,13 @@ public abstract class BaseCommand
             Description = $"`{GetString(t.commands.common.errors.data).Replace("{Command}", $"{ctx.Prefix}data object")}`",
         }.AsError(ctx)));
 
+    public void SendDmError() 
+        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        {
+            Description = $"`{GetString(t.commands.common.errors.dmerror)}`",
+            ImageUrl = (ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
+        }.AsError(ctx)));
+
     public void SendOwnPermissionError(Permissions perms)
     {
         if (perms is Permissions.AccessChannels or Permissions.SendMessages or Permissions.EmbedLinks)
