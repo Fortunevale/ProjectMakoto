@@ -185,7 +185,6 @@ public class Bot
 
                 _logger.LogDebug("Loaded {Count} countries", countryCodes.List.Count);
 
-
                 languageCodes = new();
                 List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
                 foreach (var b in lc)
@@ -205,7 +204,21 @@ public class Bot
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
 
                 loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
-                _logger.LogDebug("Loaded Translations");
+                _logger.LogDebug("Loaded translations");
+
+                foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
+                    if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))
+                    {
+                        _logger.LogDebug("Deleting Directory \"{directory}\"..", directory.Name);
+                        await CleanupFilesAndDirectories(new List<string> { directory.Name }, new List<string>());
+                    }
+
+                foreach (FileInfo file in new DirectoryInfo(Environment.CurrentDirectory).GetFiles())
+                    if (file.Name.StartsWith("Emotes-"))
+                    {
+                        _logger.LogDebug("Deleting File \"{file}\"..", file.Name);
+                        await CleanupFilesAndDirectories(new List<string>(), new List<string> { file.Name });
+                    }
 
                 Task.Run(async () =>
                 {
