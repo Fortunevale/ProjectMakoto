@@ -76,7 +76,7 @@ internal class EmojiStealerCommand : BaseCommand
 
             if (SanitizedEmoteList.Count > 0)
             {
-                embed.Description = $"`{GetString(t.commands.emojistealer.downloadingemojis).Replace("{Count}", SanitizedEmoteList.Count.ToString())}`";
+                embed.Description = $"`{GetString(t.commands.emojistealer.downloadingemojis).Replace("{Count}", SanitizedEmoteList.Count)}`";
                 await RespondOrEdit(embed);
 
                 foreach (var b in SanitizedEmoteList.ToList())
@@ -116,7 +116,7 @@ internal class EmojiStealerCommand : BaseCommand
 
             if (ContainsStickers)
             {
-                embed.Description = $"`{GetString(t.commands.emojistealer.downloadingemojis).Replace("{Count}", bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()).Count().ToString())}`";
+                embed.Description = $"`{GetString(t.commands.emojistealer.downloadingemojis).Replace("{Count}", bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()).Count())}`";
                 await RespondOrEdit(embed);
 
                 foreach (var b in bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()))
@@ -252,7 +252,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                             bool DiscordWarning = false;
 
-                            embed.Description = $"`{GetString(t.commands.emojistealer.addtoserverloading).Replace("{Min}", "0").Replace("{Max}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString())}`";
+                            embed.Description = $"`{GetString(t.commands.emojistealer.addtoserverloading).Replace("{Min}", "0").Replace("{Max}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()))}`";
                             embed.AsLoading(ctx);
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -278,7 +278,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                                         if (WaitSeconds > 10 && !DiscordWarning)
                                         {
-                                            embed.Description = $"`{GetString(t.commands.emojistealer.addtoserverloading).Replace("{Min}", i.ToString()).Replace("{Max}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString())}`\n\n" +
+                                            embed.Description = $"`{GetString(t.commands.emojistealer.addtoserverloading).Replace("{Min}", i).Replace("{Max}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()))}`\n\n" +
                                                                 $"{GetString(t.commands.emojistealer.addtoserverloadingnotice)}";
                                             await RespondOrEdit(embed);
 
@@ -290,7 +290,7 @@ internal class EmojiStealerCommand : BaseCommand
                                     if (task.IsFaulted)
                                         throw task.Exception.InnerException;
 
-                                    embed.Description = $"`{GetString(t.commands.emojistealer.addtoserverloading).Replace("{Min}", i.ToString()).Replace("{Max}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString())}`";
+                                    embed.Description = $"`{GetString(t.commands.emojistealer.addtoserverloading).Replace("{Min}", i).Replace("{Max}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()))}`";
                                     embed.AsSuccess(ctx);
                                     await RespondOrEdit(embed);
                                 }
@@ -300,7 +300,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                                     if (regex.Groups[3].Value == "30008")
                                     {
-                                        embed.Description = $"`{GetString(t.commands.emojistealer.nomoreroom).Replace("{Count}", i.ToString())}`";
+                                        embed.Description = $"`{GetString(t.commands.emojistealer.nomoreroom).Replace("{Count}", i)}`";
                                         embed.AsError(ctx);
                                         await RespondOrEdit(embed);
                                         _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
@@ -311,7 +311,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 }
                             }
 
-                            embed.Description = $"`{GetString(t.commands.emojistealer.addedtoserver).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString())}`";
+                            embed.Description = $"`{GetString(t.commands.emojistealer.addedtoserver).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()))}`";
                             embed.AsSuccess(ctx);
                             await RespondOrEdit(embed);
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
@@ -355,7 +355,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 throw;
                             }
 
-                            embed.Description = $"`{GetString(t.commands.emojistealer.successdmori).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString()).Replace("{Type}", emojiText)}`";
+                            embed.Description = $"`{GetString(t.commands.emojistealer.successdmori).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())).Replace("{Type}", emojiText)}`";
                             await RespondOrEdit(embed.AsSuccess(ctx));
                             _ = CleanupFilesAndDirectories(new List<string> { $"emotes-{guid}", $"zipfile-{guid}" }, new List<string> { $"Emotes-{guid}.zip" });
                             return;
@@ -415,7 +415,7 @@ internal class EmojiStealerCommand : BaseCommand
                                     throw;
                                 }
 
-                                embed.Description = $"`{GetString(t.commands.emojistealer.successdmori).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString()).Replace("{Type}", emojiText)}`";
+                                embed.Description = $"`{GetString(t.commands.emojistealer.successdmori).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())).Replace("{Type}", emojiText)}`";
                                 await RespondOrEdit(embed.AsSuccess(ctx));
                             }
                             else if (e.GetCustomId() == SendHereButton.CustomId)
@@ -429,7 +429,7 @@ internal class EmojiStealerCommand : BaseCommand
                                 embed.Description = $"`{GetString(t.commands.emojistealer.sendingzipchat)}`";
                                 await RespondOrEdit(embed);
 
-                                embed.Description = $"`{GetString(t.commands.emojistealer.successchat).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()).ToString()).Replace("{Type}", emojiText)}`";
+                                embed.Description = $"`{GetString(t.commands.emojistealer.successchat).Replace("{Count}", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())).Replace("{Type}", emojiText)}`";
 
                                 using var fileStream = File.OpenRead($"Emotes-{guid}.zip");
                                 await RespondOrEdit(new DiscordMessageBuilder().WithFile($"Emotes.zip", fileStream).WithEmbed(embed.AsSuccess(ctx)));
