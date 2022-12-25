@@ -32,388 +32,450 @@
     "zh-TW",
     "ko"
   ],
-  "common": {
-    "yes": {
+  "Common": {
+    "Yes": {
       "t": {
         "en": "Yes",
         "de": "Ja"
       }
     },
-    "no": {
+    "No": {
       "t": {
         "en": "No",
         "de": "Nein"
       }
     },
-    "confirm": {
+    "Confirm": {
       "t": {
         "en": "Confirm",
         "de": "Bestätigen"
       }
     },
-    "deny": {
+    "Deny": {
       "t": {
         "en": "Deny",
         "de": "Ablehnen"
       }
     },
-    "previous_page": {
+    "PreviousPage": {
       "t": {
         "en": "Previous Page",
         "de": "Vorherige Seite"
       }
     },
-    "next_page": {
+    "NextPage": {
       "t": {
         "en": "Next Page",
         "de": "Nächste Seite"
       }
     }
   },
-  "commands": {
-    "common": {
-      "errors": {
-        "generic": {
+  "Commands": {
+    "Common": {
+      "Errors": {
+        "Generic": {
           "t": {
             "en": "You dont have permissions to use the command `{Command}`. You need to be `{Required}` to use this command.",
             "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst `{Required}` sein."
           }
         },
-        "nomember": {
+        "NoMember": {
           "t": {
             "en": "The user you tagged is required to be on this server for this command to run.",
             "de": "Der gewählte Benutzer muss auf dem Server sein um diesen Befehl zu verwenden."
           }
         },
-        "botowner": {
+        "BotOwner": {
           "t": {
             "en": "You dont have permissions to use the command `{Command}`. You need to be {Required} to use this command.",
             "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst {Required} sein."
           }
         },
-        "voicechannel": {
+        "VoiceChannel": {
           "t": {
             "en": "You aren't in a voice channel.",
             "de": "Du befindest dich nicht in einem Sprachkanal."
           }
         },
-        "userban": {
+        "UserBan": {
           "t": {
             "en": "You are currently banned from using this bot: {Reason}",
             "de": "Die Nutzung des Bots ist aktuell gesperrt für dich: {Reason}"
           }
         },
-        "guildban": {
+        "GuildBan": {
           "t": {
             "en": "This guild is currently banned from using this bot: {Reason}",
             "de": "Die Nutzung des Bots ist gesperrt auf diesem Server: {Reason}"
           }
         },
-        "exclusiveprefix": {
+        "ExclusivePrefix": {
           "t": {
             "en": "This command is exclusive to prefix commands.",
             "de": "Dieser Befehl ist limitiert zur Verwendung als Prefixbefehl."
           }
         },
-        "exclusiveapp": {
+        "ExclusiveApp": {
           "t": {
             "en": "This command is exclusive to application commands.",
             "de": "Dieser Befehl ist limitiert zur Verwendung als Applikationsbefehl."
           }
         },
-        "data": {
+        "Data": {
           "t": {
             "en": "You objected to having your data being processed. To run commands, please run '{Command}' again to re-allow data processing.",
             "de": "Du hast Datenverarbeitung verweigert. Um Befehle erneut verwenden zu können, verwende '{Command}'."
           }
         },
-        "botperms": {
+        "BotPermissions": {
           "t": {
             "en": "The bot is missing permissions to run this command. Please assign the bot `{Required}` to use this command.",
             "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung `{Required}` um diesen Befehl zu verwenden."
           }
         },
-        "dmerror": {
+        "DirectMessage": {
           "t": {
             "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
             "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
           }
         }
       },
-      "usedbyfoot": {
+      "UsedByFooter": {
         "t": {
           "en": "Command used by {User}",
           "de": "Befehl verwendet von {User}"
         }
       },
-      "timeout": {
+      "InteractionTimeout": {
         "t": {
           "en": "Interaction timed out",
           "de": "Interaktionszeit ist abgelaufen"
         }
       },
-      "finished": {
+      "InteractionFinished": {
         "t": {
           "en": "Interaction finished",
           "de": "Interaktion abgeschlossen"
         }
       }
     },
-    "modules": {
-      "utility": {
+    "ModuleNames": {
+      "Utility": {
         "t": {
           "en": "Utility",
           "de": "Allgemein"
         }
       },
-      "social": {
+      "Social": {
         "t": {
           "en": "Social",
           "de": "Sozial"
         }
       },
-      "music": {
+      "Music": {
         "t": {
           "en": "Music",
           "de": "Musik"
         }
       },
-      "moderation": {
+      "Moderation": {
         "t": {
           "en": "Moderation",
           "de": "Moderation"
         }
       },
-      "configuration": {
+      "Configuration": {
         "t": {
           "en": "Configuration",
           "de": "Konfiguration"
         }
       },
-      "unknown": {
+      "Unknown": {
         "t": {
           "en": "Unknown",
           "de": "Unbekannt"
         }
       }
     },
-    "help": {
-      "module": {
+    "Help": {
+      "Module": {
         "t": {
           "en": "{Module} Commands",
           "de": "{Module} Befehle"
         }
       },
-      "disclaimer": {
+      "Disclaimer": {
         "t": {
           "en": "Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
           "de": "Argumente in einem `[]` sind optional, Argumente in einem `<>` sind benötigt.\n**Dies sind nur Indikatoren, füge sie nicht hinzu wenn du einen Befehl benutzt.**"
         }
       },
-      "nocmd": {
+      "MissingCommand": {
         "t": {
           "en": "No such command found.",
           "de": "Dieser Befehl existiert nicht."
         }
       }
     },
-    "avatar": {
-      "avatar": {
+    "Avatar": {
+      "Avatar": {
         "t": {
           "en": "Avatar of {User}",
           "de": "Profilbild von {User}"
         }
       },
-      "show_server_profile": {
+      "ShowServerProfile": {
         "t": {
           "en": "Show Server Profile Picture",
           "de": "Server Profilbild anzeigen"
         }
       },
-      "show_user_profile": {
+      "ShowUserProfile": {
         "t": {
           "en": "Show Profile Picture",
           "de": "Profilbild anzeigen"
         }
       }
     },
-    "banner": {
-      "banner": {
+    "Banner": {
+      "Banner": {
         "t": {
           "en": "Banner of {User}",
           "de": "Banner von {User}"
         }
       },
-      "nobanner": {
+      "NoBanner": {
         "t": {
           "en": "This user has no banner.",
           "de": "Dieser Nutzer hat kein Banner."
         }
       }
     },
-    "credits": {
-      "fetching": {
+    "Credits": {
+      "Fetching": {
         "t": {
           "en": "Fetching contributors..",
           "de": "Lade Unterstützer.."
         }
       },
-      "credits": {
+      "Credits": {
         "t": {
           "en": "{BotName} is mainly being developed and maintained by {Developer}.\n\nThese people help me manage and/or test the bot: {DiscordStaffList}\n\n{BotName} had some help from the following people:\n\n{GitHubContList}\n\n{BotName} wouldn't be possible without {Library}, which was made by these people:\n{LibraryContList} and {LibraryContCount} more.\n\n{BotName}'s Music Module uses {MusicModule}, which was made by these people:\n{MusicContList} and {MusicContCount} more.\n\nSpecial thanks go to {PhishingListRepos} who publicly provide a list of phishing urls.",
           "de": "{BotName} wird hauptsächlich von {Developer} entwickelt.\n\nDiese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}\n\n{BotName} hatte Hilfe von den folgenden Personen:\n\n{GitHubContList}\n\n{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:\n{LibraryContList} und {LibraryContCount} weitere.\n\n{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:\n{MusicContList} und {MusicContCount} weitere.\n\nEin dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
         }
       }
     },
-    "emojistealer": {
-      "emoji": {
+    "EmojiStealer": {
+      "Emoji": {
         "t": {
           "en": "emojis",
           "de": "Emojis"
         }
       },
-      "sticker": {
+      "Sticker": {
         "t": {
           "en": "stickers",
           "de": "Sticker"
         }
       },
-      "downloadingpre": {
+      "DownloadingPre": {
         "t": {
           "en": "Downloading emojis of this message..",
           "de": "Lade Emojis dieser Nachricht herunter.."
         }
       },
-      "noemojis": {
+      "NoEmojis": {
         "t": {
           "en": "This message doesn't contain any emojis or stickers.",
           "de": "Diese Nachricht enthält keine Emojis oder Sticker."
         }
       },
-      "downloadingemojis": {
+      "DownloadingEmojis": {
         "t": {
           "en": "Downloading {Count} emojis of this message..",
           "de": "Lade {Count} Emojis herunter.."
         }
       },
-      "downloadingstickers": {
+      "DownloadingStickers": {
         "t": {
           "en": "Downloading {Count} stickers of this message..",
           "de": "Lade {Count} Sticker herunter.."
         }
       },
-      "nosuccessfuldownload": {
+      "NoSuccessfulDownload": {
         "t": {
           "en": "This message doesn't contain any emojis or stickers.",
           "de": "Diese Nachricht enthält keine Emojis oder Sticker."
         }
       },
-      "receiveprompt": {
+      "ReceivePrompt": {
         "t": {
           "en": "Select how you want to receive the downloaded {Type}.",
           "de": "Wähle wie die {Type} gesendet werden sollen."
         }
       },
-      "togglestickers": {
+      "ToggleStickers": {
         "t": {
           "en": "Include Stickers",
           "de": "Sticker beinhalten"
         }
       },
-      "addtoserver": {
+      "AddToServer": {
         "t": {
           "en": "Add Emoji(s) to Server",
           "de": "Emoji(s) zum Server hinzufügen"
         }
       },
-      "directmessagezip": {
+      "DirectMessageZip": {
         "t": {
           "en": "Direct Message as Zip File",
           "de": "Direktnachricht, als Zip Datei"
         }
       },
-      "directmessagesingle": {
+      "DirectMessageSingle": {
         "t": {
           "en": "Direct Message as Single Files",
           "de": "Direktnachricht, als einzelne Dateien"
         }
       },
-      "currentchatzip": {
+      "CurrentChatZip": {
         "t": {
           "en": "This chat as Zip File",
           "de": "Dieser Kanal, als Zip Datei"
         }
       },
-      "addtoserverstickererror": {
+      "AddToServerStickerError": {
         "t": {
           "en": "You cannot add any emoji(s) to the server while including stickers.",
           "de": "Du kannst keine Emojis zum Server hinzufügen wenn du Sticker beinhaltest."
         }
       },
-      "addtoserverloading": {
+      "AddToServerLoading": {
         "t": {
           "en": "Adding {Min}/{Max} emojis to this server..",
           "de": "Füge {Min}/{Max} Emojis zum Server hinzu.."
         }
       },
-      "addtoserverloadingnotice": {
+      "AddToServerLoadingNotice": {
         "t": {
           "en": "_The bot most likely hit a rate limit. This can take up to an hour to continue._\n_If you want this to change, go scream at Discord. There's nothing i can do._",
           "de": "_Der Bot hat wahrscheinlich ein Rate Limit überschritten._\n_Wenn du willst dass Emojis adden schneller geht, schrei Discord an. Es gibt nichts was ich tun kann._"
         }
       },
-      "nomoreroom": {
+      "NoMoreRoom": {
         "t": {
           "en": "Downloaded and added {Count} emojis to the server. There is no more room for additional emojis.",
           "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt. Es gibt keinen Platz für weitere Emojis."
         }
       },
-      "addedtoserver": {
+      "SuccessAdded": {
         "t": {
           "en": "Downloaded and added {Count} emojis to the server.",
           "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt."
         }
       },
-      "sendingdm": {
+      "SendingDm": {
         "t": {
           "en": "Sending the {Type} in your DMs..",
           "de": "Sende die {Type} in deine Direktnachrichten.."
         }
       },
-      "successdm": {
+      "SuccessDm": {
         "t": {
           "en": "Heyho! Here's the {Type} you requested.",
           "de": "Heyho! Hier sind die {Type} die du angefragt hast."
         }
       },
-      "successdmori": {
+      "SuccessDmMain": {
         "t": {
           "en": "Downloaded and sent {Count} {Type} to your DMs.",
           "de": "{Count} {Type} heruntergeladen und per Direktnachricht an dich gesendet."
         }
       },
-      "preparingzip": {
+      "PreparingZip": {
         "t": {
           "en": "Preparing your Zip File..",
           "de": "Deine Zip Datei wird vorbereitet.."
         }
       },
-      "sendingzipdm": {
+      "SendingZipDm": {
         "t": {
           "en": "Sending your Zip File via DM..",
           "de": "Deine Zip Datei wird per Direktnachricht gesendet.."
         }
       },
-      "sendingzipchat": {
+      "SendingZipChat": {
         "t": {
           "en": "Sending your Zip File in this chat..",
           "de": "Deine Zip Datei wird hier gesendet.."
         }
       },
-      "successchat": {
+      "SuccessChat": {
         "t": {
           "en": "Downloaded {Count} {Type}. Attached is a Zip File containing them.",
           "de": "{Count} {Type} heruntergeladen und in diesem Chat gesendet."
+        }
+      }
+    },
+    "GuildInfo": {
+      "MemberTitle": {
+        "t": {
+          "en": "Members",
+          "de": "Benutzer"
+        }
+      },
+      "OnlineMembers": {
+        "t": {
+          "en": "Online Members",
+          "de": "Online Benutzer"
+        }
+      },
+      "MaxMembers": {
+        "t": {
+          "en": "Max Members",
+          "de": "Maximale Anzahl an Benutzer"
+        }
+      },
+      "GuildTitle": {
+        "t": {
+          "en": "Guild Details",
+          "de": "Server Details"
+        }
+      },
+      "Owner": {
+        "t": {
+          "en": "Owner",
+          "de": "Besitzer"
+        }
+      },
+      "Creation": {
+        "t": {
+          "en": "Creation Date",
+          "de": "Erstellungsdatum"
+        }
+      },
+      "Locale": {
+        "t": {
+          "en": "Preferred Locale",
+          "de": "Bevorzugte Sprache"
+        }
+      },
+      "Boosts": {
+        "t": {
+          "en": "Preferred Locale",
+          "de": "Bevorzugte Sprache"
+        }
+      },
+      "Widget": {
+        "t": {
+          "en": "Widget",
+          "de": "Widget"
+        }
+      },
+      "Community": {
+        "t": {
+          "en": "Community",
+          "de": "Community"
         }
       }
     }

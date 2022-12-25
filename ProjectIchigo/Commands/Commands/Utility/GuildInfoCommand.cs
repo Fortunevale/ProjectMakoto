@@ -33,18 +33,18 @@ internal class GuildInfoCommand : BaseCommand
 					Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}",
 				}.AsBotInfo(ctx);
 
-                embed.AddField(new DiscordEmbedField("Members", $"👥 `{guild.Members.Count}` **Members**\n" +
-                                  $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **Online Members**\n" +
-                                  $"🛑 `{guild.MaxMembers}` **Max Members**\n"));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.MemberTitle), $"👥 `{guild.Members.Count}` **{GetString(t.Commands.GuildInfo.MemberTitle)}**\n" +
+                                  $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **{GetString(t.Commands.GuildInfo.OnlineMembers)}**\n" +
+                                  $"🛑 `{guild.MaxMembers}` **{GetString(t.Commands.GuildInfo.MaxMembers)}**\n"));
                 
-                embed.AddField(new DiscordEmbedField("Guild Details", $"👤 **Owner**: {guild.Owner.Mention} (`{guild.Owner.UsernameWithDiscriminator}`)\n" +
-                                  $"🕒 **Creation Date**: {guild.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({guild.CreationTimestamp.ToTimestamp()})\n" +
-                                  $"🗺 **Preferred Locale**: `{guild.PreferredLocale}`\n" +
-                                  $"🔮 `{guild.PremiumSubscriptionCount}` **Boosts (`{guild.PremiumTier}`)**\n\n" +
-                                  $"😀 `{guild.Emojis.Count}` **Emojis**\n" +
-                                  $"🖼 `{guild.Stickers.Count}` **Stickers**\n\n" +
-                                  $"{(guild.WidgetEnabled ?? false).ToPillEmote(ctx.Bot)} **Widget**\n" +
-                                  $"{(guild.IsCommunity).ToPillEmote(ctx.Bot)} **Community**", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.GuildTitle), $"👤 **{GetString(t.Commands.GuildInfo.Owner)}**: {guild.Owner.Mention} (`{guild.Owner.UsernameWithDiscriminator}`)\n" +
+                                  $"🕒 **{GetString(t.Commands.GuildInfo.Creation)}**: {guild.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({guild.CreationTimestamp.ToTimestamp()})\n" +
+                                  $"🗺 **{GetString(t.Commands.GuildInfo.Locale)}**: `{guild.PreferredLocale}`\n" +
+                                  $"🔮 `{guild.PremiumSubscriptionCount}` **{GetString(t.Commands.GuildInfo.Boosts)} (`{guild.PremiumTier}`)**\n\n" +
+                                  $"😀 `{guild.Emojis.Count}` **{GetString(t.Commands.EmojiStealer.Emoji)}**\n" +
+                                  $"🖼 `{guild.Stickers.Count}` **{GetString(t.Commands.EmojiStealer.Sticker)}**\n\n" +
+                                  $"{(guild.WidgetEnabled ?? false).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.Widget)}**\n" +
+                                  $"{(guild.IsCommunity).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.Community)}**", true));
                 
                 embed.AddField(new DiscordEmbedField("Security", $"{(guild.MfaLevel == MfaLevel.Enabled).ToPillEmote(ctx.Bot)} **2FA required for mods**\n" +
                                   $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasMembershipScreeningEnabled)).ToPillEmote(ctx.Bot)} **Membership Screening**\n" +

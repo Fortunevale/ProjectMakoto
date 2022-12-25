@@ -847,7 +847,7 @@ public abstract class BaseCommand
     #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {GetString(t.commands.common.timeout)}").WithColor(DiscordColor.Gray)));
+        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).WithFooter(ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {GetString(t.Commands.Common.InteractionTimeout)}").WithColor(DiscordColor.Gray)));
 
         if (Delete)
             Task.Delay(5000).ContinueWith(_ =>
@@ -859,7 +859,7 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = RespondOrEdit($"✅ _`{GetString(t.commands.common.finished)}`_");
+        _ = RespondOrEdit($"✅ _`{GetString(t.Commands.Common.InteractionFinished)}`_");
         switch (ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -964,49 +964,49 @@ public abstract class BaseCommand
     public void SendNoMemberError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(t.commands.common.errors.nomember)
+        Description = GetString(t.Commands.Common.Errors.NoMember)
     }.AsError(ctx));
 
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"{ctx.CurrentUser.Username} Staff")
+            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"{ctx.CurrentUser.Username} Staff")
         }.AsError(ctx));
 
     public void SendBotOwnerError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"<@{ctx.Bot.status.TeamOwner}>"),
+        Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"<@{ctx.Bot.status.TeamOwner}>"),
     }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", "Administrator"),
+            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", "Administrator"),
         }.AsError(ctx));
 
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.commands.common.errors.generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", perms.ToPermissionString()),
+            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", perms.ToPermissionString()),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.commands.common.errors.voicechannel)}`",
+            Description = $"`{GetString(t.Commands.Common.Errors.VoiceChannel)}`",
         }.AsError(ctx)));
 
     public void SendUserBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.commands.common.errors.userban).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
+            Description = $"`{GetString(t.Commands.Common.Errors.UserBan).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
         }.AsError(ctx)));
 
     public void SendGuildBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.commands.common.errors.guildban).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
+            Description = $"`{GetString(t.Commands.Common.Errors.GuildBan).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
         }.AsError(ctx)));
 
     public void SendSourceError(Enums.CommandType commandType)
@@ -1014,11 +1014,11 @@ public abstract class BaseCommand
         {
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.commands.common.errors.exclusiveapp)}`",
+                Description = $"`{GetString(t.Commands.Common.Errors.ExclusiveApp)}`",
             }.AsError(ctx)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.commands.common.errors.exclusiveprefix)}`"
+                Description = $"`{GetString(t.Commands.Common.Errors.ExclusivePrefix)}`"
             }.AsError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
@@ -1026,13 +1026,13 @@ public abstract class BaseCommand
     public void SendDataError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.commands.common.errors.data).Replace("{Command}", $"{ctx.Prefix}data object")}`",
+            Description = $"`{GetString(t.Commands.Common.Errors.Data).Replace("{Command}", $"{ctx.Prefix}data object")}`",
         }.AsError(ctx)));
 
     public void SendDmError() 
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.commands.common.errors.dmerror)}`",
+            Description = $"`{GetString(t.Commands.Common.Errors.DirectMessage)}`",
             ImageUrl = (ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
         }.AsError(ctx)));
 
@@ -1043,7 +1043,7 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.commands.common.errors.botperms).Replace("{Required}", perms.ToPermissionString())
+            Description = GetString(t.Commands.Common.Errors.BotPermissions).Replace("{Required}", perms.ToPermissionString())
         }.AsError(ctx));
     }
 

@@ -2,112 +2,128 @@
 
 public class Translations
 {
-    public _common common;
+    public _common Common;
     public class _common
     {
-        public TranslationKey yes;
-        public TranslationKey no;
-        public TranslationKey confirm;
-        public TranslationKey deny;
-        public TranslationKey previous_page;
-        public TranslationKey next_page;
+        public TranslationKey Yes;
+        public TranslationKey No;
+        public TranslationKey Confirm;
+        public TranslationKey Deny;
+        public TranslationKey PreviousPage;
+        public TranslationKey NextPage;
     }
 
-    public _commands commands;
+    public _commands Commands;
     public class _commands
     {
-        public _common common;
+        public _common Common;
         public class _common
         {
-            public _errors errors;
+            public _errors Errors;
             public class _errors
             {
-                public TranslationKey generic;
-                public TranslationKey nomember;
-                public TranslationKey botowner;
-                public TranslationKey voicechannel;
-                public TranslationKey userban;
-                public TranslationKey guildban;
-                public TranslationKey exclusiveprefix;
-                public TranslationKey exclusiveapp;
-                public TranslationKey data;
-                public TranslationKey botperms;
-                public TranslationKey dmerror;
+                public TranslationKey Generic;
+                public TranslationKey NoMember;
+                public TranslationKey BotOwner;
+                public TranslationKey VoiceChannel;
+                public TranslationKey UserBan;
+                public TranslationKey GuildBan;
+                public TranslationKey ExclusivePrefix;
+                public TranslationKey ExclusiveApp;
+                public TranslationKey Data;
+                public TranslationKey BotPermissions;
+                public TranslationKey DirectMessage;
             }
 
-            public TranslationKey usedbyfoot;
-            public TranslationKey timeout;
-            public TranslationKey finished;
+            public TranslationKey UsedByFooter;
+            public TranslationKey InteractionTimeout;
+            public TranslationKey InteractionFinished;
         }
 
-        public _modules modules;
+        public _modules ModuleNames;
         public class _modules
         {
-            public TranslationKey utility;
-            public TranslationKey social;
-            public TranslationKey music;
-            public TranslationKey moderation;
-            public TranslationKey configuration;
-            public TranslationKey unknown;
+            public TranslationKey Utility;
+            public TranslationKey Social;
+            public TranslationKey Music;
+            public TranslationKey Moderation;
+            public TranslationKey Configuration;
+            public TranslationKey Unknown;
         }
 
-        public _help help;
+        public _help Help;
         public class _help
         {
-            public TranslationKey module;
-            public TranslationKey disclaimer;
-            public TranslationKey nocmd;
+            public TranslationKey Module;
+            public TranslationKey Disclaimer;
+            public TranslationKey MissingCommand;
         }
 
-        public _avatar avatar;
+        public _avatar Avatar;
         public class _avatar
         {
-            public TranslationKey avatar;
-            public TranslationKey show_server_profile;
-            public TranslationKey show_user_profile;
+            public TranslationKey Avatar;
+            public TranslationKey ShowServerProfile;
+            public TranslationKey ShowUserProfile;
         }
 
-        public _banner banner;
+        public _banner Banner;
         public class _banner
         {
-            public TranslationKey banner;
-            public TranslationKey nobanner;
+            public TranslationKey Banner;
+            public TranslationKey NoBanner;
         }
 
-        public _credits credits;
+        public _credits Credits;
         public class _credits
         {
-            public TranslationKey fetching;
-            public TranslationKey credits;
+            public TranslationKey Fetching;
+            public TranslationKey Credits;
         }
-        public _emojistealer emojistealer;
+
+        public _emojistealer EmojiStealer;
         public class _emojistealer
         {
-            public TranslationKey emoji;
-            public TranslationKey sticker;
-            public TranslationKey downloadingpre;
-            public TranslationKey noemojis;
-            public TranslationKey downloadingemojis;
-            public TranslationKey downloadingstickers;
-            public TranslationKey nosuccessfuldownload;
-            public TranslationKey receiveprompt;
-            public TranslationKey addtoserver;
-            public TranslationKey directmessagezip;
-            public TranslationKey directmessagesingle;
-            public TranslationKey currentchatzip;
-            public TranslationKey togglestickers;
-            public TranslationKey addtoserverstickererror;
-            public TranslationKey addtoserverloading;
-            public TranslationKey addtoserverloadingnotice;
-            public TranslationKey nomoreroom;
-            public TranslationKey addedtoserver;
-            public TranslationKey sendingdm;
-            public TranslationKey successdm;
-            public TranslationKey successdmori;
-            public TranslationKey preparingzip;
-            public TranslationKey sendingzipdm;
-            public TranslationKey sendingzipchat;
-            public TranslationKey successchat;
+            public TranslationKey Emoji;
+            public TranslationKey Sticker;
+            public TranslationKey DownloadingPre;
+            public TranslationKey NoEmojis;
+            public TranslationKey DownloadingEmojis;
+            public TranslationKey DownloadingStickers;
+            public TranslationKey NoSuccessfulDownload;
+            public TranslationKey ReceivePrompt;
+            public TranslationKey AddToServer;
+            public TranslationKey ToggleStickers;
+            public TranslationKey DirectMessageZip;
+            public TranslationKey DirectMessageSingle;
+            public TranslationKey CurrentChatZip;
+            public TranslationKey AddToServerStickerError;
+            public TranslationKey AddToServerLoading;
+            public TranslationKey AddToServerLoadingNotice;
+            public TranslationKey NoMoreRoom;
+            public TranslationKey SuccessAdded;
+            public TranslationKey SendingDm;
+            public TranslationKey SuccessDm;
+            public TranslationKey SuccessDmMain;
+            public TranslationKey PreparingZip;
+            public TranslationKey SendingZipDm;
+            public TranslationKey SendingZipChat;
+            public TranslationKey SuccessChat;
+        }
+
+        public _guildinfo GuildInfo;
+        public class _guildinfo
+        {
+            public TranslationKey MemberTitle;
+            public TranslationKey OnlineMembers;
+            public TranslationKey MaxMembers;
+            public TranslationKey GuildTitle;
+            public TranslationKey Owner;
+            public TranslationKey Creation;
+            public TranslationKey Locale;
+            public TranslationKey Boosts;
+            public TranslationKey Widget;
+            public TranslationKey Community;
         }
     }
 }
