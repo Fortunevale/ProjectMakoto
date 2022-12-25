@@ -45,6 +45,18 @@
         "de": "Nein"
       }
     },
+    "On": {
+      "t": {
+        "en": "On",
+        "de": "An"
+      }
+    },
+    "Off": {
+      "t": {
+        "en": "Off",
+        "de": "Aus"
+      }
+    },
     "Confirm": {
       "t": {
         "en": "Confirm",
@@ -418,6 +430,12 @@
       }
     },
     "GuildInfo": {
+      "Fetching": {
+        "t": {
+          "en": "Fetching guild info..",
+          "de": "Lade Server Info.."
+        }
+      },
       "MemberTitle": {
         "t": {
           "en": "Members",
@@ -462,8 +480,32 @@
       },
       "Boosts": {
         "t": {
-          "en": "Preferred Locale",
-          "de": "Bevorzugte Sprache"
+          "en": "Boosts",
+          "de": "Boosts"
+        }
+      },
+      "BoostsNone": {
+        "t": {
+          "en": "None",
+          "de": "Level 0"
+        }
+      },
+      "BoostsTierOne": {
+        "t": {
+          "en": "Tier One",
+          "de": "Level 1"
+        }
+      },
+      "BoostsTierTwo": {
+        "t": {
+          "en": "Tier Two",
+          "de": "Level 2"
+        }
+      },
+      "BoostsTierThree": {
+        "t": {
+          "en": "Tier Three",
+          "de": "Level 3"
         }
       },
       "Widget": {
@@ -476,6 +518,246 @@
         "t": {
           "en": "Community",
           "de": "Community"
+        }
+      },
+      "Security": {
+        "t": {
+          "en": "Security",
+          "de": "Sicherheit"
+        }
+      },
+      "MultiFactor": {
+        "t": {
+          "en": "2FA required for mods",
+          "de": "2-Faktor Authentifizierung benötigt für Mods"
+        }
+      },
+      "Screening": {
+        "t": {
+          "en": "Membership Screening",
+          "de": "Benutzer Screening"
+        }
+      },
+      "WelcomeScreen": {
+        "t": {
+          "en": "Welcome Screen",
+          "de": "Willkommensbildschirm"
+        }
+      },
+      "Verification": {
+        "t": {
+          "en": "Verification Lever",
+          "de": "Verifikationslevel"
+        }
+      },
+      "VerificationNone": {
+        "t": {
+          "en": "None",
+          "de": "Aus"
+        }
+      },
+      "VerificationLow": {
+        "t": {
+          "en": "Low",
+          "de": "Niedrig"
+        }
+      },
+      "VerificationMedium": {
+        "t": {
+          "en": "Medium",
+          "de": "Mittel"
+        }
+      },
+      "VerificationHigh": {
+        "t": {
+          "en": "High",
+          "de": "Hoch"
+        }
+      },
+      "VerificationHighest": {
+        "t": {
+          "en": "Highest",
+          "de": "Am Höchsten"
+        }
+      },
+      "ExplicitContent": {
+        "t": {
+          "en": "Scan for explicit content of",
+          "de": "Suche nach explizitem Content von"
+        }
+      },
+      "ExplicitContentNone": {
+        "t": {
+          "en": "No members",
+          "de": "Niemanden"
+        }
+      },
+      "ExplicitContentNoRoles": {
+        "t": {
+          "en": "Members without roles",
+          "de": "Benutzer ohne Rollen"
+        }
+      },
+      "ExplicitContentEveryone": {
+        "t": {
+          "en": "All members",
+          "de": "Jedem"
+        }
+      },
+      "Nsfw": {
+        "t": {
+          "en": "NSFW Level",
+          "de": "NSFW Level"
+        }
+      },
+      "NsfwNoRating": {
+        "t": {
+          "en": "No Rating",
+          "de": "Keine Bewerting"
+        }
+      },
+      "NsfwExplicit": {
+        "t": {
+          "en": "Explicit, Only suitable for mature audiences",
+          "de": "Explizit, Nur geeignet für Erwachsene"
+        }
+      },
+      "NsfwSafe": {
+        "t": {
+          "en": "Safe, Suitable for all age groups",
+          "de": "Sicher, Geeignet für alle Altersgruppen"
+        }
+      },
+      "NsfwQuestionable": {
+        "t": {
+          "en": "Questionable, May only be suitable for mature audiences",
+          "de": "Fragwürdig, Möglicherweise nur geeignet für Erwachsene"
+        }
+      },
+      "DefaultNotifications": {
+        "t": {
+          "en": "Default Notifications",
+          "de": "Standard Nachrichten"
+        }
+      },
+      "DefaultNotificationsAll": {
+        "t": {
+          "en": "All messages",
+          "de": "Alle Nachrichten"
+        }
+      },
+      "DefaultNotificationsMentions": {
+        "t": {
+          "en": "Mentions only",
+          "de": "Nur Makierungen"
+        }
+      },
+      "SpecialChannels": {
+        "t": {
+          "en": "Special Channels",
+          "de": "Spezialkanäle"
+        }
+      },
+      "Rules": {
+        "t": {
+          "en": "Rules",
+          "de": "Regeln"
+        }
+      },
+      "CommunityUpdates": {
+        "t": {
+          "en": "Community Updates",
+          "de": "Community Updates"
+        }
+      },
+      "InactiveChannel": {
+        "t": {
+          "en": "Inactive Channel",
+          "de": "Inaktivitätskanal"
+        }
+      },
+      "InactiveTimeout": {
+        "t": {
+          "en": "Inactive Timeout",
+          "de": "Inaktivitätstimeout"
+        }
+      },
+      "SystemMessages": {
+        "t": {
+          "en": "System Messages",
+          "de": "System Nachrichten"
+        }
+      },
+      "SystemMessagesWelcome": {
+        "t": {
+          "en": "Welcome Messages",
+          "de": "Willkommensnachrichten"
+        }
+      },
+      "SystemMessagesWelcomeStickers": {
+        "t": {
+          "en": "Welcome Sticker Replies",
+          "de": "Stickerantworten für Willkommensnachrichten"
+        }
+      },
+      "SystemMessagesBoost": {
+        "t": {
+          "en": "Boost Messages",
+          "de": "Boost Nachrichten"
+        }
+      },
+      "SystemMessagesRole": {
+        "t": {
+          "en": "Role Purchase Message",
+          "de": "Rollenkaufnachrichten"
+        }
+      },
+      "SystemMessagesRoleSticker": {
+        "t": {
+          "en": "Role Purchase Sticker Replies",
+          "de": "Stickerantworten für Rollenkaufnachrichten"
+        }
+      },
+      "SystemMessagesSetupTips": {
+        "t": {
+          "en": "Server Setup Tips",
+          "de": "Servereinrichtungstipps"
+        }
+      },
+      "GuildFeatures": {
+        "t": {
+          "en": "Guild Features",
+          "de": "Server Features"
+        }
+      },
+      "JoinServer": {
+        "t": {
+          "en": "Join Guild",
+          "de": "Server beitreten"
+        }
+      },
+      "GuildPreviewNotice": {
+        "t": {
+          "en": "Info fetched via Discord Guild Preview",
+          "de": "Info abgerufen durch Discord Server Vorschau"
+        }
+      },
+      "GuildWidgetNotice": {
+        "t": {
+          "en": "Info fetched via Discord Guild Widget",
+          "de": "Info abgerufen durch Discord Server Widget"
+        }
+      },
+      "Mee6Notice": {
+        "t": {
+          "en": "Info fetched via Mee6 Leaderboard",
+          "de": "Info abgerufen durch Mee6 Rangliste"
+        }
+      },
+      "NoGuildFound": {
+        "t": {
+          "en": "Could not fetch any information about the server you specified.",
+          "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
         }
       }
     }

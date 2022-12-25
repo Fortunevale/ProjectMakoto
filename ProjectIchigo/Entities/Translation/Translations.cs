@@ -7,6 +7,8 @@ public class Translations
     {
         public TranslationKey Yes;
         public TranslationKey No;
+        public TranslationKey On;
+        public TranslationKey Off;
         public TranslationKey Confirm;
         public TranslationKey Deny;
         public TranslationKey PreviousPage;
@@ -114,6 +116,7 @@ public class Translations
         public _guildinfo GuildInfo;
         public class _guildinfo
         {
+            public TranslationKey Fetching;
             public TranslationKey MemberTitle;
             public TranslationKey OnlineMembers;
             public TranslationKey MaxMembers;
@@ -122,8 +125,52 @@ public class Translations
             public TranslationKey Creation;
             public TranslationKey Locale;
             public TranslationKey Boosts;
+            public TranslationKey BoostsNone;
+            public TranslationKey BoostsTierOne;
+            public TranslationKey BoostsTierTwo;
+            public TranslationKey BoostsTierThree;
             public TranslationKey Widget;
             public TranslationKey Community;
+            public TranslationKey Security;
+            public TranslationKey MultiFactor;
+            public TranslationKey Screening;
+            public TranslationKey WelcomeScreen;
+            public TranslationKey Verification;
+            public TranslationKey VerificationNone;
+            public TranslationKey VerificationLow;
+            public TranslationKey VerificationMedium;
+            public TranslationKey VerificationHigh;
+            public TranslationKey VerificationHighest;
+            public TranslationKey ExplicitContent;
+            public TranslationKey ExplicitContentNone;
+            public TranslationKey ExplicitContentNoRoles;
+            public TranslationKey ExplicitContentEveryone;
+            public TranslationKey Nsfw;
+            public TranslationKey NsfwNoRating;
+            public TranslationKey NsfwExplicit;
+            public TranslationKey NsfwSafe;
+            public TranslationKey NsfwQuestionable;
+            public TranslationKey DefaultNotifications;
+            public TranslationKey DefaultNotificationsAll;
+            public TranslationKey DefaultNotificationsMentions;
+            public TranslationKey SpecialChannels;
+            public TranslationKey Rules;
+            public TranslationKey CommunityUpdates;
+            public TranslationKey InactiveChannel;
+            public TranslationKey InactiveTimeout;
+            public TranslationKey SystemMessages;
+            public TranslationKey SystemMessagesWelcome;
+            public TranslationKey SystemMessagesWelcomeStickers;
+            public TranslationKey SystemMessagesBoost;
+            public TranslationKey SystemMessagesRole;
+            public TranslationKey SystemMessagesRoleSticker;
+            public TranslationKey SystemMessagesSetupTips;
+            public TranslationKey GuildFeatures;
+            public TranslationKey JoinServer;
+            public TranslationKey GuildPreviewNotice;
+            public TranslationKey GuildWidgetNotice;
+            public TranslationKey Mee6Notice;
+            public TranslationKey NoGuildFound;
         }
     }
 }
