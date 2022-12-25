@@ -56,6 +56,11 @@ public abstract class BaseCommand
     internal async Task<bool> BasePreExecutionCheck()
     {
         t = Bot.loadedTranslations;
+        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].Locale != ctx.User.Locale)
+        {
+            ctx.Bot.users[ctx.User.Id].Locale = ctx.User.Locale;
+            _logger.LogDebug("Updated language for '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
+        }
 
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
             return false;
@@ -211,10 +216,8 @@ public abstract class BaseCommand
     }
     #endregion
 
-    internal string GetString(TranslationKey key)
-    {
-        return key.Get(ctx.User);
-    }
+    internal string GetString(TranslationKey key) 
+        => key.Get(ctx.Bot.users[ctx.User.Id]);
 
     #region Selections
     internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
