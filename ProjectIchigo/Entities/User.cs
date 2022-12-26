@@ -30,7 +30,8 @@ public class User
 
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 
-    public string? Locale { get; set; } = null;
+    public string? CurrentLocale { get; set; } = null;
+    public string? OverrideLocale { get; set; } = null;
 
     [JsonIgnore]
     public Cooldown Cooldown { get; set; }

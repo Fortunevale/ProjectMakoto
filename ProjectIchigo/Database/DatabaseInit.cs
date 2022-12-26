@@ -238,7 +238,8 @@ internal class DatabaseInit
                 LastLibreTranslateTarget = b.last_libretranslate_target
             };
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>(b.playlists) ?? new();
-            DbUser.Locale = b.locale;
+            DbUser.CurrentLocale = b.current_locale;
+            DbUser.OverrideLocale = b.override_locale;
 
             foreach (var c in JsonConvert.DeserializeObject<List<ReminderItem>>(b.reminders) ?? new())
                 DbUser.Reminders.ScheduledReminders.Add(c);

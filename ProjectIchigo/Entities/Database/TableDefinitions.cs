@@ -155,7 +155,10 @@ public class TableDefinitions
         public Text last_libretranslate_target { get; set; }
         
         [Collation("utf8_unicode_ci")]
-        public Text locale { get; set; }
+        public Text current_locale { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text override_locale { get; set; }
     }
 
     public class guilds

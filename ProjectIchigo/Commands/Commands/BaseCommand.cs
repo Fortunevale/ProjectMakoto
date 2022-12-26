@@ -46,7 +46,6 @@ public abstract class BaseCommand
             });
 
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-
         this.ctx.RespondedToInitial = InitiateInteraction;
 
         if (await BasePreExecutionCheck())
@@ -56,9 +55,9 @@ public abstract class BaseCommand
     internal async Task<bool> BasePreExecutionCheck()
     {
         t = Bot.loadedTranslations;
-        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].Locale != ctx.User.Locale)
+        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].CurrentLocale != ctx.User.Locale)
         {
-            ctx.Bot.users[ctx.User.Id].Locale = ctx.User.Locale;
+            ctx.Bot.users[ctx.User.Id].CurrentLocale = ctx.User.Locale;
             _logger.LogDebug("Updated language for '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
         }
 

@@ -481,7 +481,8 @@ internal class DatabaseClient
             last_google_target = x.Value.Translation.LastGoogleTarget,
             last_libretranslate_source = x.Value.Translation.LastLibreTranslateSource,
             last_libretranslate_target = x.Value.Translation.LastLibreTranslateTarget,
-            locale = x.Value.Locale
+            current_locale = x.Value.CurrentLocale,
+            override_locale = x.Value.OverrideLocale
         }).ToList()));
 
         syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_user_bans", _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans

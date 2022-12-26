@@ -2,8 +2,8 @@
 
 public class Translations
 {
-    public _common Common;
-    public class _common
+    public common Common;
+    public class common
     {
         public TranslationKey Yes;
         public TranslationKey No;
@@ -18,11 +18,11 @@ public class Translations
     public _commands Commands;
     public class _commands
     {
-        public _common Common;
-        public class _common
+        public common Common;
+        public class common
         {
-            public _errors Errors;
-            public class _errors
+            public errors Errors;
+            public class errors
             {
                 public TranslationKey Generic;
                 public TranslationKey NoMember;
@@ -42,8 +42,8 @@ public class Translations
             public TranslationKey InteractionFinished;
         }
 
-        public _modules ModuleNames;
-        public class _modules
+        public modules ModuleNames;
+        public class modules
         {
             public TranslationKey Utility;
             public TranslationKey Social;
@@ -53,38 +53,38 @@ public class Translations
             public TranslationKey Unknown;
         }
 
-        public _help Help;
-        public class _help
+        public help Help;
+        public class help
         {
             public TranslationKey Module;
             public TranslationKey Disclaimer;
             public TranslationKey MissingCommand;
         }
 
-        public _avatar Avatar;
-        public class _avatar
+        public avatar Avatar;
+        public class avatar
         {
             public TranslationKey Avatar;
             public TranslationKey ShowServerProfile;
             public TranslationKey ShowUserProfile;
         }
 
-        public _banner Banner;
-        public class _banner
+        public banner Banner;
+        public class banner
         {
             public TranslationKey Banner;
             public TranslationKey NoBanner;
         }
 
-        public _credits Credits;
-        public class _credits
+        public credits Credits;
+        public class credits
         {
             public TranslationKey Fetching;
             public TranslationKey Credits;
         }
 
-        public _emojistealer EmojiStealer;
-        public class _emojistealer
+        public emojiStealer EmojiStealer;
+        public class emojiStealer
         {
             public TranslationKey Emoji;
             public TranslationKey Sticker;
@@ -113,8 +113,8 @@ public class Translations
             public TranslationKey SuccessChat;
         }
 
-        public _guildinfo GuildInfo;
-        public class _guildinfo
+        public guildInfo GuildInfo;
+        public class guildInfo
         {
             public TranslationKey Fetching;
             public TranslationKey MemberTitle;
