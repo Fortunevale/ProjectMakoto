@@ -48,7 +48,7 @@ internal class LanguageCommand : BaseCommand
 
             foreach (var b in options)
                 if (t.Progress.ContainsKey(b.Value))
-                    newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"({(decimal)t.Progress[b.Value] / (decimal)t.Progress["en"] * (decimal)100:N1}%) ")));
+                    newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"({(t.Progress[b.Value] / (decimal)t.Progress["en"] * 100).ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}%) ")));
 
             var SelectionResult = await PromptCustomSelection(newOptions, "Select a new language..");
 
