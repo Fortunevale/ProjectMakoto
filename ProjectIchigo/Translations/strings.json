@@ -752,7 +752,7 @@
       "Title": {
         "t": {
           "en": "Experience Leaderboard",
-          "de": "Erfahrungsleaderboard"
+          "de": "Erfahrungsrangliste"
         }
       },
       "Disabled": {
@@ -764,7 +764,7 @@
       "Fetching": {
         "t": {
           "en": "Loading Leaderboard, please wait..",
-          "de": "Lade Leaderboard, bitte warten.."
+          "de": "Lade Rangliste, bitte warten.."
         }
       },
       "Level": {
@@ -776,7 +776,7 @@
       "Placement": {
         "t": {
           "en": "You're currently on the **{Placement}.** spot on the leaderboard.",
-          "de": "Du bist aktuell auf Platz **{Placement}.** auf dem leaderboard."
+          "de": "Du bist aktuell auf **{Placement}.** Platz in der Rangliste."
         }
       },
       "NoPoints": {
