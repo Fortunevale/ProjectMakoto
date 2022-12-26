@@ -14,8 +14,8 @@ internal class RankCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                }.AsError(ctx, "Experience"));
+                    Description = $"`{GetString(t.Commands.Leaderboard.Disabled).Replace("{Command}", $"{ctx.Prefix}experiencesettings config")}`"
+                }.AsError(ctx, GetString(t.Commands.Rank.Title)));
                 return;
             }
 
@@ -28,12 +28,12 @@ internal class RankCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{(victim.Id == ctx.User.Id ? "You're" : $"{victim.Mention} is")} currently **Level {ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()} with `{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}` XP**\n\n" +
-                              $"**Level {(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()} Progress**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? GetString(t.Commands.Rank.Self) : GetString(t.Commands.Rank.Other)).Replace("{User}", victim.Mention).Replace("{Level}", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()).Replace("{Points}", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))}\n\n" +
+                              $"**{GetString(t.Commands.Rank.Progress).Replace("{Level}", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes())}**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
-            }.AsInfo(ctx, "Experience"));
+            }.AsInfo(ctx, GetString(t.Commands.Rank.Title)));
         });
     }
 }

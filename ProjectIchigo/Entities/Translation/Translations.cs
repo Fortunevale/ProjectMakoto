@@ -192,6 +192,14 @@ public class Translations
             public TranslationKey Level;
             public TranslationKey Placement;
             public TranslationKey NoPoints;
+        }        
+        public rank Rank;
+        public class rank
+        {
+            public TranslationKey Title;
+            public TranslationKey Self;
+            public TranslationKey Other;
+            public TranslationKey Progress;
         }
     }
 }

@@ -751,32 +751,64 @@
     "Leaderboard": {
       "Title": {
         "t": {
-          "en": "Experience Leaderboard"
+          "en": "Experience Leaderboard",
+          "de": "Erfahrungsleaderboard"
         }
       },
       "Disabled": {
         "t": {
-          "en": "Experience is disabled on this server. Please run '{Command}' to configure the experience system."
+          "en": "Experience is disabled on this server. Please run '{Command}' to configure the experience system.",
+          "de": "Erfahrung ist deaktiviert auf diesem Server. Bitte führe '{Command}' aus um das Erfahrungssystem zu konfigurieren."
         }
       },
       "Fetching": {
         "t": {
-          "en": "Loading Leaderboard, please wait.."
+          "en": "Loading Leaderboard, please wait..",
+          "de": "Lade Leaderboard, bitte warten.."
         }
       },
       "Level": {
         "t": {
-          "en": "Level {Level} with {Points} XP"
+          "en": "Level {Level} with {Points} XP",
+          "de": "Level {Level} mit {Points} XP"
         }
       },
       "Placement": {
         "t": {
-          "en": "You're currently on the **{Placement}.** spot on the leaderboard."
+          "en": "You're currently on the **{Placement}.** spot on the leaderboard.",
+          "de": "Du bist aktuell auf Platz **{Placement}.** auf dem leaderboard."
         }
       },
       "NoPoints": {
         "t": {
-          "en": "No one on this server has collected enough experience to show up on the leaderboard, get to typing!"
+          "en": "No one on this server has collected enough experience to show up on the leaderboard, get to typing!",
+          "de": "Niemand hat genug Erfahrung gesammelt. Fangt an zu schreiben! ^^"
+        }
+      }
+    },
+    "Rank": {
+      "Title": {
+        "t": {
+          "en": "Experience",
+          "de": "Erfahrung"
+        }
+      },
+      "Self": {
+        "t": {
+          "en": "You're currently **Level {Level} with `{Points}` XP**",
+          "de": "Du bist aktuell **Level {Level} mit `{Points}` XP**"
+        }
+      },
+      "Other": {
+        "t": {
+          "en": "{User} is currently **Level {Level} with `{Points}` XP**",
+          "de": "{User} ist aktuell **Level {Level} mit `{Points}` XP**"
+        }
+      },
+      "Progress": {
+        "t": {
+          "en": "Level {Level} Progress",
+          "de": "Level {Level} Fortschritt"
         }
       }
     }
