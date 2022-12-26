@@ -2,6 +2,8 @@
 
 public class Translations
 {
+    public Dictionary<string, int> Progress = new();
+
     public common Common;
     public class common
     {

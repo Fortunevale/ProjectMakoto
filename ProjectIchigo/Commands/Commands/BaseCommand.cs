@@ -264,8 +264,7 @@ public abstract class BaseCommand
             if (components.Any())
                 builder.AddComponents(components);
 
-            builder.AddComponents(ConfirmSelectionButton);
-            builder.AddComponents(MessageComponents.CancelButton);
+            builder.AddComponents(MessageComponents.CancelButton, ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -404,8 +403,7 @@ public abstract class BaseCommand
             if (components.Any())
                 builder.AddComponents(components);
 
-            builder.AddComponents(new List<DiscordComponent> { ConfirmSelectionButton });
-            builder.AddComponents(MessageComponents.CancelButton);
+            builder.AddComponents(MessageComponents.CancelButton, ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -519,8 +517,7 @@ public abstract class BaseCommand
             else
                 ConfirmSelectionButton.Enable();
 
-            builder.AddComponents(ConfirmSelectionButton);
-            builder.AddComponents(MessageComponents.CancelButton);
+            builder.AddComponents(MessageComponents.CancelButton, ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }

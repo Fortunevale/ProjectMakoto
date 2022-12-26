@@ -1,4 +1,5 @@
 using ProjectIchigo.PrefixCommands;
+using System.Collections;
 using System.Reflection;
 
 namespace ProjectIchigo;
@@ -205,6 +206,77 @@ public class Bot
 
                 loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
                 _logger.LogDebug("Loaded translations");
+
+                Dictionary<string, int> CalculateTranslationProgress(object obj)
+                {
+                    if (obj is null)
+                        return new Dictionary<string, int>();
+
+                    Dictionary<string, int> counts = new();
+
+                    Type objType = obj.GetType();
+                    FieldInfo[] fields = objType.GetFields();
+
+                    foreach (FieldInfo field in fields)
+                    {
+                        object fieldValue = field.GetValue(obj);
+                        var elems = fieldValue as IList;
+                        if (elems is not null)
+                        {
+                            foreach (var item in elems)
+                            {
+                                foreach (var b in CalculateTranslationProgress(item))
+                                {
+                                    if (!counts.ContainsKey(b.Key))
+                                        counts.Add(b.Key, 0);
+
+                                    counts[b.Key] += b.Value;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (field.FieldType.Assembly == objType.Assembly)
+                            {
+                                if (field.FieldType == typeof(TranslationKey))
+                                {
+                                    foreach (var b in ((TranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+
+                                foreach (var b in CalculateTranslationProgress(fieldValue))
+                                {
+                                    if (!counts.ContainsKey(b.Key))
+                                        counts.Add(b.Key, 0);
+
+                                    counts[b.Key] += b.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (field.FieldType == typeof(TranslationKey))
+                                {
+                                    foreach (var b in ((TranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                    return counts;
+                }
+                loadedTranslations.Progress = CalculateTranslationProgress(loadedTranslations);
 
                 foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
                     if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))

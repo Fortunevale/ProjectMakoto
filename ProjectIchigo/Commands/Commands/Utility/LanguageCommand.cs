@@ -12,6 +12,7 @@ internal class LanguageCommand : BaseCommand
             });
 
             List<DiscordStringSelectComponentOption> options = new();
+            List<DiscordStringSelectComponentOption> newOptions = new();
 
             options.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Language.DisableOverride)));
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
@@ -45,7 +46,11 @@ internal class LanguageCommand : BaseCommand
             options.Add(new DiscordStringSelectComponentOption("Chinese, Taiwan", "zh-TW", "繁體中文"));
             options.Add(new DiscordStringSelectComponentOption("Korean", "ko", "한국어"));
 
-            var SelectionResult = await PromptCustomSelection(options, "Select a new language");
+            foreach (var b in options)
+                if (t.Progress.ContainsKey(b.Value))
+                    newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"({(decimal)t.Progress[b.Value] / (decimal)t.Progress["en"] * (decimal)100:N1}%) ")));
+
+            var SelectionResult = await PromptCustomSelection(newOptions, "Select a new language..");
 
             if (SelectionResult.TimedOut)
             {
