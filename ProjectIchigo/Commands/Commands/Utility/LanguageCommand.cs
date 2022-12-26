@@ -14,7 +14,8 @@ internal class LanguageCommand : BaseCommand
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            options.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Language.DisableOverride)));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
             options.Add(new DiscordStringSelectComponentOption("Indonesian", "id", "Bahasa Indonesia"));
@@ -48,7 +49,19 @@ internal class LanguageCommand : BaseCommand
 
             foreach (var b in options)
                 if (t.Progress.ContainsKey(b.Value))
-                    newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"({(t.Progress[b.Value] / (decimal)t.Progress["en"] * 100).ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}%) ")));
+                {
+                    var perc = (t.Progress[b.Value] / (decimal)t.Progress["en"] * 100);
+                    DiscordComponentEmoji emoji = null;
+
+                    if (perc >= 100)
+                        emoji = DiscordEmoji.FromUnicode("🟢").ToComponent();
+                    else if (perc >= 85)
+                        emoji = DiscordEmoji.FromUnicode("🟡").ToComponent();
+                    else
+                        emoji = DiscordEmoji.FromUnicode("🔴").ToComponent();
+
+                    newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
+                }
 
             var SelectionResult = await PromptCustomSelection(newOptions, "Select a new language..");
 
