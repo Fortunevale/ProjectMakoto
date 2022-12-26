@@ -747,6 +747,38 @@
           "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
         }
       }
+    },
+    "Leaderboard": {
+      "Title": {
+        "t": {
+          "en": "Experience Leaderboard"
+        }
+      },
+      "Disabled": {
+        "t": {
+          "en": "Experience is disabled on this server. Please run '{Command}' to configure the experience system."
+        }
+      },
+      "Fetching": {
+        "t": {
+          "en": "Loading Leaderboard, please wait.."
+        }
+      },
+      "Level": {
+        "t": {
+          "en": "Level {Level} with {Points} XP"
+        }
+      },
+      "Placement": {
+        "t": {
+          "en": "You're currently on the **{Placement}.** spot on the leaderboard."
+        }
+      },
+      "NoPoints": {
+        "t": {
+          "en": "No one on this server has collected enough experience to show up on the leaderboard, get to typing!"
+        }
+      }
     }
   }
 }

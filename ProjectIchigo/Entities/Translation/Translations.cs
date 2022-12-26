@@ -182,5 +182,16 @@ public class Translations
             public TranslationKey Mee6Notice;
             public TranslationKey NoGuildFound;
         }
+        
+        public leaderboard Leaderboard;
+        public class leaderboard
+        {
+            public TranslationKey Title;
+            public TranslationKey Disabled;
+            public TranslationKey Fetching;
+            public TranslationKey Level;
+            public TranslationKey Placement;
+            public TranslationKey NoPoints;
+        }
     }
 }
