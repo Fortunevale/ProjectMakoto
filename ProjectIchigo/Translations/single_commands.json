@@ -241,6 +241,17 @@
     ]
   },
   {
+    "name": "language",
+    "description": "Change the language Ichigo uses.",
+    "type": 1,
+    "name_translations": {
+      "de": "sprache"
+    },
+    "description_translations": {
+      "de": "Erlaubt es dir die Sprache, die Ichigo verwendet, zu ändern."
+    }
+  },
+  {
     "name": "credits",
     "description": "Allows you to view who contributed the bot.",
     "type": 1,

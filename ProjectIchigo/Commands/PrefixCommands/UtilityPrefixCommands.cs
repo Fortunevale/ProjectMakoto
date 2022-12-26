@@ -271,6 +271,19 @@ public class UtilityPrefixCommands : BaseCommandModule
 
 
 
+    [Command("language"),
+    CommandModule("utility"),
+    Description("Change the language Ichigo uses.")]
+    public async Task Language(CommandContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new LanguageCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
+
+
+
     [Command("credits"),
     CommandModule("utility"),
     Description("Allows you to view who contributed the bot.")]

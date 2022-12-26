@@ -229,6 +229,26 @@
         }
       }
     },
+    "Language": {
+      "Disclaimer": {
+        "t": {
+          "en": "You can choose to override the chosen language on Discord.",
+          "de": "Du kannst dich dazu entscheiden die gewählte Sprache auf Discord zu überschreiben."
+        }
+      },
+      "Response": {
+        "t": {
+          "en": "Current Locale",
+          "de": "Aktuelle Sprache"
+        }
+      },
+      "DisableOverride": {
+        "t": {
+          "en": "Disable the current override",
+          "de": "Aktuelles Override deaktivieren"
+        }
+      }
+    },
     "Avatar": {
       "Avatar": {
         "t": {

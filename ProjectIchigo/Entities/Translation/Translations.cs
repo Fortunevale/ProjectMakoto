@@ -18,6 +18,14 @@ public class Translations
     public _commands Commands;
     public class _commands
     {
+        public language Language;
+        public class language
+        {
+            public TranslationKey Disclaimer;
+            public TranslationKey Response;
+            public TranslationKey DisableOverride;
+        }
+
         public common Common;
         public class common
         {

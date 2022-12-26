@@ -182,6 +182,15 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }
     }
 
+    [SlashCommand("language", "Change the language Ichigo uses.", dmPermission: false)]
+    public async Task Language(InteractionContext ctx)
+    {
+        Task.Run(async () =>
+        {
+            await new LanguageCommand().ExecuteCommand(ctx, _bot);
+        }).Add(_bot.watcher, ctx);
+    }
+
     [SlashCommand("credits", "Allows you to view who contributed the bot.", dmPermission: false)]
     public async Task Credits(InteractionContext ctx)
     {
