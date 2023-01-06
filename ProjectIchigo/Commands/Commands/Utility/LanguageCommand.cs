@@ -63,7 +63,7 @@ internal class LanguageCommand : BaseCommand
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, "Select a new language..");
+            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Language.Selector));
 
             if (SelectionResult.TimedOut)
             {

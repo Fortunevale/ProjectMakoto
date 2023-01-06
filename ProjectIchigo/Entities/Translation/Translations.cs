@@ -26,6 +26,7 @@ public class Translations
             public TranslationKey Disclaimer;
             public TranslationKey Response;
             public TranslationKey DisableOverride;
+            public TranslationKey Selector;
         }
 
         public common Common;
