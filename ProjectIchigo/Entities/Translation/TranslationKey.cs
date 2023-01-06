@@ -13,10 +13,11 @@ public class TranslationKey
         else
             Locale = user.CurrentLocale;
 
-        if (Locale is null && !t.ContainsKey("en"))
-            return "Missing Translation. Please report to the developer.";
+        if (Locale is null || !t.ContainsKey(Locale))
+            Locale = "en";
 
-        Locale ??= "en";
+        if (!t.ContainsKey(Locale))
+            return "Missing Translation. Please report to the developer.";
 
         return t[Locale];
     }
@@ -28,10 +29,11 @@ public class TranslationKey
         if (!guild.PreferredLocale.IsNullOrWhiteSpace())
             Locale = guild.PreferredLocale;
 
-        if (Locale is null && !t.ContainsKey("en"))
-            return "Missing Translation. Please report to the developer.";
+        if (Locale is null || !t.ContainsKey(Locale))
+            Locale = "en";
 
-        Locale ??= "en";
+        if (!t.ContainsKey(Locale))
+            return "Missing Translation. Please report to the developer.";
 
         return t[Locale];
     }
@@ -43,7 +45,11 @@ public class TranslationKey
         if (Locale is null && !t.ContainsKey("en"))
             return "Missing Translation. Please report to the developer.";
 
-        Locale ??= "en";
+        if (Locale is null || !t.ContainsKey(Locale))
+            Locale = "en";
+
+        if (!t.ContainsKey(Locale))
+            return "Missing Translation. Please report to the developer.";
 
         return t[Locale];
     }
