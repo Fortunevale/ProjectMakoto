@@ -27,26 +27,26 @@ internal class TaskWatcher
 
                     if (SharedCommandContext is not null)
                         _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
-                            SharedCommandContext.Prefix,
-                            SharedCommandContext.CommandName,
-                            SharedCommandContext.User?.Id,
-                            SharedCommandContext.Guild?.Id);
+                            SharedCommandContext?.Prefix,
+                            SharedCommandContext?.CommandName,
+                            SharedCommandContext?.User?.Id,
+                            SharedCommandContext?.Guild?.Id);
                     else if (CommandContext is not null)
                         _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
-                            CommandContext.Prefix,
-                            CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
-                            CommandContext.User?.Id,
-                            CommandContext.Guild?.Id);
+                            CommandContext?.Prefix,
+                            CommandContext?.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
+                            CommandContext?.User?.Id,
+                            CommandContext?.Guild?.Id);
                     else if (InteractionContext is not null)
                         _logger.LogInfo("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
-                            InteractionContext.CommandName,
-                            InteractionContext.User?.Id,
-                            InteractionContext.Guild?.Id);
+                            InteractionContext?.CommandName,
+                            InteractionContext?.User?.Id,
+                            InteractionContext?.Guild?.Id);
                     else if (ContextMenuContext is not null)
                         _logger.LogInfo("Successfully executed '{Name}' for '{User}' on '{Guild}'",
-                            ContextMenuContext.CommandName,
-                            ContextMenuContext.User?.Id,
-                            ContextMenuContext.Guild?.Id);
+                            ContextMenuContext?.CommandName,
+                            ContextMenuContext?.User?.Id,
+                            ContextMenuContext?.Guild?.Id);
 
                     tasks.Remove(b);
                     continue;
@@ -54,26 +54,26 @@ internal class TaskWatcher
 
                 if (SharedCommandContext != null)
                     _logger.LogError("Failed to execute '{Prefix}{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                        SharedCommandContext.Prefix,
-                        SharedCommandContext.CommandName,
-                        SharedCommandContext.User?.Id,
-                        SharedCommandContext.Guild?.Id);
+                        SharedCommandContext?.Prefix,
+                        SharedCommandContext?.CommandName,
+                        SharedCommandContext?.User?.Id,
+                        SharedCommandContext?.Guild?.Id);
                 else if (CommandContext != null)
                     _logger.LogError("Failed to executed '{Prefix}{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            CommandContext.Prefix,
-                            CommandContext.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
-                            CommandContext.User?.Id,
-                            CommandContext.Guild?.Id);
+                            CommandContext?.Prefix,
+                            CommandContext?.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
+                            CommandContext?.User?.Id,
+                            CommandContext?.Guild?.Id);
                 else if (InteractionContext != null)
                     _logger.LogError("Failed to execute '/{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            InteractionContext.CommandName,
-                            InteractionContext.User?.Id,
-                            InteractionContext.Guild?.Id);
+                            InteractionContext?.CommandName,
+                            InteractionContext?.User?.Id,
+                            InteractionContext?.Guild?.Id);
                 else if (ContextMenuContext != null)
                     _logger.LogError("Failed to execute '{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            ContextMenuContext.CommandName,
-                            ContextMenuContext.User?.Id,
-                            ContextMenuContext.Guild?.Id);
+                            ContextMenuContext?.CommandName,
+                            ContextMenuContext?.User?.Id,
+                            ContextMenuContext?.Guild?.Id);
                 else
                     _logger.LogError("A task failed to execute", b.task.Exception);
 
