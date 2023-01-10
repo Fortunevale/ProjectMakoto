@@ -1,822 +1,561 @@
 {
   "Common": {
     "Yes": {
-      "t": {
-        "en": "Yes",
-        "de": "Ja"
-      }
+      "en": "Yes",
+      "de": "Ja"
     },
     "No": {
-      "t": {
-        "en": "No",
-        "de": "Nein"
-      }
+      "en": "No",
+      "de": "Nein"
     },
     "On": {
-      "t": {
-        "en": "On",
-        "de": "An"
-      }
+      "en": "On",
+      "de": "An"
     },
     "Off": {
-      "t": {
-        "en": "Off",
-        "de": "Aus"
-      }
+      "en": "Off",
+      "de": "Aus"
     },
     "Confirm": {
-      "t": {
-        "en": "Confirm",
-        "de": "Bestätigen"
-      }
+      "en": "Confirm",
+      "de": "Bestätigen"
     },
     "Deny": {
-      "t": {
-        "en": "Deny",
-        "de": "Ablehnen"
-      }
+      "en": "Deny",
+      "de": "Ablehnen"
     },
     "PreviousPage": {
-      "t": {
-        "en": "Previous Page",
-        "de": "Vorherige Seite"
-      }
+      "en": "Previous Page",
+      "de": "Vorherige Seite"
     },
     "NextPage": {
-      "t": {
-        "en": "Next Page",
-        "de": "Nächste Seite"
-      }
+      "en": "Next Page",
+      "de": "Nächste Seite"
     }
   },
   "Commands": {
     "Common": {
       "Errors": {
         "Generic": {
-          "t": {
-            "en": "You dont have permissions to use the command `{Command}`. You need to be `{Required}` to use this command.",
-            "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst `{Required}` sein."
-          }
+          "en": "You dont have permissions to use the command `{Command}`. You need to be `{Required}` to use this command.",
+          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst `{Required}` sein."
         },
         "NoMember": {
-          "t": {
-            "en": "The user you tagged is required to be on this server for this command to run.",
-            "de": "Der gewählte Benutzer muss auf dem Server sein um diesen Befehl zu verwenden."
-          }
+          "en": "The user you tagged is required to be on this server for this command to run.",
+          "de": "Der gewählte Benutzer muss auf dem Server sein um diesen Befehl zu verwenden."
         },
         "BotOwner": {
-          "t": {
-            "en": "You dont have permissions to use the command `{Command}`. You need to be {Required} to use this command.",
-            "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst {Required} sein."
-          }
+          "en": "You dont have permissions to use the command `{Command}`. You need to be {Required} to use this command.",
+          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst {Required} sein."
         },
         "VoiceChannel": {
-          "t": {
-            "en": "You aren't in a voice channel.",
-            "de": "Du befindest dich nicht in einem Sprachkanal."
-          }
+          "en": "You aren't in a voice channel.",
+          "de": "Du befindest dich nicht in einem Sprachkanal."
         },
         "UserBan": {
-          "t": {
-            "en": "You are currently banned from using this bot: {Reason}",
-            "de": "Die Nutzung des Bots ist aktuell gesperrt für dich: {Reason}"
-          }
+          "en": "You are currently banned from using this bot: {Reason}",
+          "de": "Die Nutzung des Bots ist aktuell gesperrt für dich: {Reason}"
         },
         "GuildBan": {
-          "t": {
-            "en": "This guild is currently banned from using this bot: {Reason}",
-            "de": "Die Nutzung des Bots ist gesperrt auf diesem Server: {Reason}"
-          }
+          "en": "This guild is currently banned from using this bot: {Reason}",
+          "de": "Die Nutzung des Bots ist gesperrt auf diesem Server: {Reason}"
         },
         "ExclusivePrefix": {
-          "t": {
-            "en": "This command is exclusive to prefix commands.",
-            "de": "Dieser Befehl ist limitiert zur Verwendung als Prefixbefehl."
-          }
+          "en": "This command is exclusive to prefix commands.",
+          "de": "Dieser Befehl ist limitiert zur Verwendung als Prefixbefehl."
         },
         "ExclusiveApp": {
-          "t": {
-            "en": "This command is exclusive to application commands.",
-            "de": "Dieser Befehl ist limitiert zur Verwendung als Applikationsbefehl."
-          }
+          "en": "This command is exclusive to application commands.",
+          "de": "Dieser Befehl ist limitiert zur Verwendung als Applikationsbefehl."
         },
         "Data": {
-          "t": {
-            "en": "You objected to having your data being processed. To run commands, please run '{Command}' again to re-allow data processing.",
-            "de": "Du hast Datenverarbeitung verweigert. Um Befehle erneut verwenden zu können, verwende '{Command}'."
-          }
+          "en": "You objected to having your data being processed. To run commands, please run '{Command}' again to re-allow data processing.",
+          "de": "Du hast Datenverarbeitung verweigert. Um Befehle erneut verwenden zu können, verwende '{Command}'."
         },
         "BotPermissions": {
-          "t": {
-            "en": "The bot is missing permissions to run this command. Please assign the bot `{Required}` to use this command.",
-            "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung `{Required}` um diesen Befehl zu verwenden."
-          }
+          "en": "The bot is missing permissions to run this command. Please assign the bot `{Required}` to use this command.",
+          "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung `{Required}` um diesen Befehl zu verwenden."
         },
         "DirectMessage": {
-          "t": {
-            "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
-            "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
-          }
+          "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
+          "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
         }
       },
       "UsedByFooter": {
-        "t": {
-          "en": "Command used by {User}",
-          "de": "Befehl verwendet von {User}"
-        }
+        "en": "Command used by {User}",
+        "de": "Befehl verwendet von {User}"
       },
       "InteractionTimeout": {
-        "t": {
-          "en": "Interaction timed out",
-          "de": "Interaktionszeit ist abgelaufen"
-        }
+        "en": "Interaction timed out",
+        "de": "Interaktionszeit ist abgelaufen"
       },
       "InteractionFinished": {
-        "t": {
-          "en": "Interaction finished",
-          "de": "Interaktion abgeschlossen"
-        }
+        "en": "Interaction finished",
+        "de": "Interaktion abgeschlossen"
       }
     },
     "ModuleNames": {
       "Utility": {
-        "t": {
-          "en": "Utility",
-          "de": "Allgemein"
-        }
+        "en": "Utility",
+        "de": "Allgemein"
       },
       "Social": {
-        "t": {
-          "en": "Social",
-          "de": "Sozial"
-        }
+        "en": "Social",
+        "de": "Sozial"
       },
       "Music": {
-        "t": {
-          "en": "Music",
-          "de": "Musik"
-        }
+        "en": "Music",
+        "de": "Musik"
       },
       "Moderation": {
-        "t": {
-          "en": "Moderation",
-          "de": "Moderation"
-        }
+        "en": "Moderation",
+        "de": "Moderation"
       },
       "Configuration": {
-        "t": {
-          "en": "Configuration",
-          "de": "Konfiguration"
-        }
+        "en": "Configuration",
+        "de": "Konfiguration"
       },
       "Unknown": {
-        "t": {
-          "en": "Unknown",
-          "de": "Unbekannt"
-        }
+        "en": "Unknown",
+        "de": "Unbekannt"
       }
     },
     "Help": {
       "Module": {
-        "t": {
-          "en": "{Module} Commands",
-          "de": "{Module} Befehle"
-        }
+        "en": "{Module} Commands",
+        "de": "{Module} Befehle"
       },
       "Disclaimer": {
-        "t": {
-          "en": "Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
-          "de": "Argumente in einem `[]` sind optional, Argumente in einem `<>` sind benötigt.\n**Dies sind nur Indikatoren, füge sie nicht hinzu wenn du einen Befehl benutzt.**"
-        }
+        "en": "Arguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
+        "de": "Argumente in einem `[]` sind optional, Argumente in einem `<>` sind benötigt.\n**Dies sind nur Indikatoren, füge sie nicht hinzu wenn du einen Befehl benutzt.**"
       },
       "MissingCommand": {
-        "t": {
-          "en": "No such command found.",
-          "de": "Dieser Befehl existiert nicht."
-        }
+        "en": "No such command found.",
+        "de": "Dieser Befehl existiert nicht."
       }
     },
     "Language": {
       "Disclaimer": {
-        "t": {
-          "en": "You can choose to override the chosen language on Discord.",
-          "de": "Du kannst dich dazu entscheiden die gewählte Sprache auf Discord zu überschreiben."
-        }
+        "en": "You can choose to override the chosen language on Discord.",
+        "de": "Du kannst dich dazu entscheiden die gewählte Sprache auf Discord zu überschreiben."
       },
       "Response": {
-        "t": {
-          "en": "Current Locale",
-          "de": "Aktuelle Sprache"
-        }
+        "en": "Current Locale",
+        "de": "Aktuelle Sprache"
       },
       "DisableOverride": {
-        "t": {
-          "en": "Disable the current override",
-          "de": "Aktuelles Override deaktivieren"
-        }
+        "en": "Disable the current override",
+        "de": "Aktuelles Override deaktivieren"
       },
       "Selector": {
-        "t": {
-          "en": "Select a new language..",
-          "de": "Eine neue Sprache wählen.. "
-        }
+        "en": "Select a new language..",
+        "de": "Eine neue Sprache wählen.. "
       }
     },
     "Avatar": {
       "Avatar": {
-        "t": {
-          "en": "Avatar of {User}",
-          "de": "Profilbild von {User}"
-        }
+        "en": "Avatar of {User}",
+        "de": "Profilbild von {User}"
       },
       "ShowServerProfile": {
-        "t": {
-          "en": "Show Server Profile Picture",
-          "de": "Server Profilbild anzeigen"
-        }
+        "en": "Show Server Profile Picture",
+        "de": "Server Profilbild anzeigen"
       },
       "ShowUserProfile": {
-        "t": {
-          "en": "Show Profile Picture",
-          "de": "Profilbild anzeigen"
-        }
+        "en": "Show Profile Picture",
+        "de": "Profilbild anzeigen"
       }
     },
     "Banner": {
       "Banner": {
-        "t": {
-          "en": "Banner of {User}",
-          "de": "Banner von {User}"
-        }
+        "en": "Banner of {User}",
+        "de": "Banner von {User}"
       },
       "NoBanner": {
-        "t": {
-          "en": "This user has no banner.",
-          "de": "Dieser Nutzer hat kein Banner."
-        }
+        "en": "This user has no banner.",
+        "de": "Dieser Nutzer hat kein Banner."
       }
     },
     "Credits": {
       "Fetching": {
-        "t": {
-          "en": "Fetching contributors..",
-          "de": "Lade Unterstützer.."
-        }
+        "en": "Fetching contributors..",
+        "de": "Lade Unterstützer.."
       },
       "Credits": {
-        "t": {
-          "en": "{BotName} is mainly being developed and maintained by {Developer}.\n\nThese people help me manage and/or test the bot: {DiscordStaffList}\n\n{BotName} had some help from the following people:\n\n{GitHubContList}\n\n{BotName} wouldn't be possible without {Library}, which was made by these people:\n{LibraryContList} and {LibraryContCount} more.\n\n{BotName}'s Music Module uses {MusicModule}, which was made by these people:\n{MusicContList} and {MusicContCount} more.\n\nSpecial thanks go to {PhishingListRepos} who publicly provide a list of phishing urls.",
-          "de": "{BotName} wird hauptsächlich von {Developer} entwickelt.\n\nDiese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}\n\n{BotName} hatte Hilfe von den folgenden Personen:\n\n{GitHubContList}\n\n{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:\n{LibraryContList} und {LibraryContCount} weitere.\n\n{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:\n{MusicContList} und {MusicContCount} weitere.\n\nEin dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
-        }
+        "en": "{BotName} is mainly being developed and maintained by {Developer}.\n\nThese people help me manage and/or test the bot: {DiscordStaffList}\n\n{BotName} had some help from the following people:\n\n{GitHubContList}\n\n{BotName} wouldn't be possible without {Library}, which was made by these people:\n{LibraryContList} and {LibraryContCount} more.\n\n{BotName}'s Music Module uses {MusicModule}, which was made by these people:\n{MusicContList} and {MusicContCount} more.\n\nSpecial thanks go to {PhishingListRepos} who publicly provide a list of phishing urls.",
+        "de": "{BotName} wird hauptsächlich von {Developer} entwickelt.\n\nDiese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}\n\n{BotName} hatte Hilfe von den folgenden Personen:\n\n{GitHubContList}\n\n{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:\n{LibraryContList} und {LibraryContCount} weitere.\n\n{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:\n{MusicContList} und {MusicContCount} weitere.\n\nEin dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
       }
     },
     "EmojiStealer": {
       "Emoji": {
-        "t": {
-          "en": "emojis",
-          "de": "Emojis"
-        }
+        "en": "emojis",
+        "de": "Emojis"
       },
       "Sticker": {
-        "t": {
-          "en": "stickers",
-          "de": "Sticker"
-        }
+        "en": "stickers",
+        "de": "Sticker"
       },
       "DownloadingPre": {
-        "t": {
-          "en": "Downloading emojis of this message..",
-          "de": "Lade Emojis dieser Nachricht herunter.."
-        }
+        "en": "Downloading emojis of this message..",
+        "de": "Lade Emojis dieser Nachricht herunter.."
       },
       "NoEmojis": {
-        "t": {
-          "en": "This message doesn't contain any emojis or stickers.",
-          "de": "Diese Nachricht enthält keine Emojis oder Sticker."
-        }
+        "en": "This message doesn't contain any emojis or stickers.",
+        "de": "Diese Nachricht enthält keine Emojis oder Sticker."
       },
       "DownloadingEmojis": {
-        "t": {
-          "en": "Downloading {Count} emojis of this message..",
-          "de": "Lade {Count} Emojis herunter.."
-        }
+        "en": "Downloading {Count} emojis of this message..",
+        "de": "Lade {Count} Emojis herunter.."
       },
       "DownloadingStickers": {
-        "t": {
-          "en": "Downloading {Count} stickers of this message..",
-          "de": "Lade {Count} Sticker herunter.."
-        }
+        "en": "Downloading {Count} stickers of this message..",
+        "de": "Lade {Count} Sticker herunter.."
       },
       "NoSuccessfulDownload": {
-        "t": {
-          "en": "This message doesn't contain any emojis or stickers.",
-          "de": "Diese Nachricht enthält keine Emojis oder Sticker."
-        }
+        "en": "This message doesn't contain any emojis or stickers.",
+        "de": "Diese Nachricht enthält keine Emojis oder Sticker."
       },
       "ReceivePrompt": {
-        "t": {
-          "en": "Select how you want to receive the downloaded {Type}.",
-          "de": "Wähle wie die {Type} gesendet werden sollen."
-        }
+        "en": "Select how you want to receive the downloaded {Type}.",
+        "de": "Wähle wie die {Type} gesendet werden sollen."
       },
       "ToggleStickers": {
-        "t": {
-          "en": "Include Stickers",
-          "de": "Sticker beinhalten"
-        }
+        "en": "Include Stickers",
+        "de": "Sticker beinhalten"
       },
       "AddToServer": {
-        "t": {
-          "en": "Add Emoji(s) to Server",
-          "de": "Emoji(s) zum Server hinzufügen"
-        }
+        "en": "Add Emoji(s) to Server",
+        "de": "Emoji(s) zum Server hinzufügen"
       },
       "DirectMessageZip": {
-        "t": {
-          "en": "Direct Message as Zip File",
-          "de": "Direktnachricht, als Zip Datei"
-        }
+        "en": "Direct Message as Zip File",
+        "de": "Direktnachricht, als Zip Datei"
       },
       "DirectMessageSingle": {
-        "t": {
-          "en": "Direct Message as Single Files",
-          "de": "Direktnachricht, als einzelne Dateien"
-        }
+        "en": "Direct Message as Single Files",
+        "de": "Direktnachricht, als einzelne Dateien"
       },
       "CurrentChatZip": {
-        "t": {
-          "en": "This chat as Zip File",
-          "de": "Dieser Kanal, als Zip Datei"
-        }
+        "en": "This chat as Zip File",
+        "de": "Dieser Kanal, als Zip Datei"
       },
       "AddToServerStickerError": {
-        "t": {
-          "en": "You cannot add any emoji(s) to the server while including stickers.",
-          "de": "Du kannst keine Emojis zum Server hinzufügen wenn du Sticker beinhaltest."
-        }
+        "en": "You cannot add any emoji(s) to the server while including stickers.",
+        "de": "Du kannst keine Emojis zum Server hinzufügen wenn du Sticker beinhaltest."
       },
       "AddToServerLoading": {
-        "t": {
-          "en": "Adding {Min}/{Max} emojis to this server..",
-          "de": "Füge {Min}/{Max} Emojis zum Server hinzu.."
-        }
+        "en": "Adding {Min}/{Max} emojis to this server..",
+        "de": "Füge {Min}/{Max} Emojis zum Server hinzu.."
       },
       "AddToServerLoadingNotice": {
-        "t": {
-          "en": "_The bot most likely hit a rate limit. This can take up to an hour to continue._\n_If you want this to change, go scream at Discord. There's nothing i can do._",
-          "de": "_Der Bot hat wahrscheinlich ein Rate Limit überschritten._\n_Wenn du willst dass Emojis adden schneller geht, schrei Discord an. Es gibt nichts was ich tun kann._"
-        }
+        "en": "_The bot most likely hit a rate limit. This can take up to an hour to continue._\n_If you want this to change, go scream at Discord. There's nothing i can do._",
+        "de": "_Der Bot hat wahrscheinlich ein Rate Limit überschritten._\n_Wenn du willst dass Emojis adden schneller geht, schrei Discord an. Es gibt nichts was ich tun kann._"
       },
       "NoMoreRoom": {
-        "t": {
-          "en": "Downloaded and added {Count} emojis to the server. There is no more room for additional emojis.",
-          "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt. Es gibt keinen Platz für weitere Emojis."
-        }
+        "en": "Downloaded and added {Count} emojis to the server. There is no more room for additional emojis.",
+        "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt. Es gibt keinen Platz für weitere Emojis."
       },
       "SuccessAdded": {
-        "t": {
-          "en": "Downloaded and added {Count} emojis to the server.",
-          "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt."
-        }
+        "en": "Downloaded and added {Count} emojis to the server.",
+        "de": "{Count} Emojis heruntergeladen und zum Server hinzugefügt."
       },
       "SendingDm": {
-        "t": {
-          "en": "Sending the {Type} in your DMs..",
-          "de": "Sende die {Type} in deine Direktnachrichten.."
-        }
+        "en": "Sending the {Type} in your DMs..",
+        "de": "Sende die {Type} in deine Direktnachrichten.."
       },
       "SuccessDm": {
-        "t": {
-          "en": "Heyho! Here's the {Type} you requested.",
-          "de": "Heyho! Hier sind die {Type} die du angefragt hast."
-        }
+        "en": "Heyho! Here's the {Type} you requested.",
+        "de": "Heyho! Hier sind die {Type} die du angefragt hast."
       },
       "SuccessDmMain": {
-        "t": {
-          "en": "Downloaded and sent {Count} {Type} to your DMs.",
-          "de": "{Count} {Type} heruntergeladen und per Direktnachricht an dich gesendet."
-        }
+        "en": "Downloaded and sent {Count} {Type} to your DMs.",
+        "de": "{Count} {Type} heruntergeladen und per Direktnachricht an dich gesendet."
       },
       "PreparingZip": {
-        "t": {
-          "en": "Preparing your Zip File..",
-          "de": "Deine Zip Datei wird vorbereitet.."
-        }
+        "en": "Preparing your Zip File..",
+        "de": "Deine Zip Datei wird vorbereitet.."
       },
       "SendingZipDm": {
-        "t": {
-          "en": "Sending your Zip File via DM..",
-          "de": "Deine Zip Datei wird per Direktnachricht gesendet.."
-        }
+        "en": "Sending your Zip File via DM..",
+        "de": "Deine Zip Datei wird per Direktnachricht gesendet.."
       },
       "SendingZipChat": {
-        "t": {
-          "en": "Sending your Zip File in this chat..",
-          "de": "Deine Zip Datei wird hier gesendet.."
-        }
+        "en": "Sending your Zip File in this chat..",
+        "de": "Deine Zip Datei wird hier gesendet.."
       },
       "SuccessChat": {
-        "t": {
-          "en": "Downloaded {Count} {Type}. Attached is a Zip File containing them.",
-          "de": "{Count} {Type} heruntergeladen und in diesem Chat gesendet."
-        }
+        "en": "Downloaded {Count} {Type}. Attached is a Zip File containing them.",
+        "de": "{Count} {Type} heruntergeladen und in diesem Chat gesendet."
       }
     },
     "GuildInfo": {
       "Fetching": {
-        "t": {
-          "en": "Fetching guild info..",
-          "de": "Lade Server Info.."
-        }
+        "en": "Fetching guild info..",
+        "de": "Lade Server Info.."
       },
       "MemberTitle": {
-        "t": {
-          "en": "Members",
-          "de": "Benutzer"
-        }
+        "en": "Members",
+        "de": "Benutzer"
       },
       "OnlineMembers": {
-        "t": {
-          "en": "Online Members",
-          "de": "Online Benutzer"
-        }
+        "en": "Online Members",
+        "de": "Online Benutzer"
       },
       "MaxMembers": {
-        "t": {
-          "en": "Max Members",
-          "de": "Maximale Anzahl an Benutzer"
-        }
+        "en": "Max Members",
+        "de": "Maximale Anzahl an Benutzer"
       },
       "GuildTitle": {
-        "t": {
-          "en": "Guild Details",
-          "de": "Server Details"
-        }
+        "en": "Guild Details",
+        "de": "Server Details"
       },
       "Owner": {
-        "t": {
-          "en": "Owner",
-          "de": "Besitzer"
-        }
+        "en": "Owner",
+        "de": "Besitzer"
       },
       "Creation": {
-        "t": {
-          "en": "Creation Date",
-          "de": "Erstellungsdatum"
-        }
+        "en": "Creation Date",
+        "de": "Erstellungsdatum"
       },
       "Locale": {
-        "t": {
-          "en": "Preferred Locale",
-          "de": "Bevorzugte Sprache"
-        }
+        "en": "Preferred Locale",
+        "de": "Bevorzugte Sprache"
       },
       "Boosts": {
-        "t": {
-          "en": "Boosts",
-          "de": "Boosts"
-        }
+        "en": "Boosts",
+        "de": "Boosts"
       },
       "BoostsNone": {
-        "t": {
-          "en": "None",
-          "de": "Level 0"
-        }
+        "en": "None",
+        "de": "Level 0"
       },
       "BoostsTierOne": {
-        "t": {
-          "en": "Tier One",
-          "de": "Level 1"
-        }
+        "en": "Tier One",
+        "de": "Level 1"
       },
       "BoostsTierTwo": {
-        "t": {
-          "en": "Tier Two",
-          "de": "Level 2"
-        }
+        "en": "Tier Two",
+        "de": "Level 2"
       },
       "BoostsTierThree": {
-        "t": {
-          "en": "Tier Three",
-          "de": "Level 3"
-        }
+        "en": "Tier Three",
+        "de": "Level 3"
       },
       "Widget": {
-        "t": {
-          "en": "Widget",
-          "de": "Widget"
-        }
+        "en": "Widget",
+        "de": "Widget"
       },
       "Community": {
-        "t": {
-          "en": "Community",
-          "de": "Community"
-        }
+        "en": "Community",
+        "de": "Community"
       },
       "Security": {
-        "t": {
-          "en": "Security",
-          "de": "Sicherheit"
-        }
+        "en": "Security",
+        "de": "Sicherheit"
       },
       "MultiFactor": {
-        "t": {
-          "en": "2FA required for mods",
-          "de": "2-Faktor Authentifizierung benötigt für Mods"
-        }
+        "en": "2FA required for mods",
+        "de": "2-Faktor Authentifizierung benötigt für Mods"
       },
       "Screening": {
-        "t": {
-          "en": "Membership Screening",
-          "de": "Benutzer Screening"
-        }
+        "en": "Membership Screening",
+        "de": "Benutzer Screening"
       },
       "WelcomeScreen": {
-        "t": {
-          "en": "Welcome Screen",
-          "de": "Willkommensbildschirm"
-        }
+        "en": "Welcome Screen",
+        "de": "Willkommensbildschirm"
       },
       "Verification": {
-        "t": {
-          "en": "Verification Lever",
-          "de": "Verifikationslevel"
-        }
+        "en": "Verification Lever",
+        "de": "Verifikationslevel"
       },
       "VerificationNone": {
-        "t": {
-          "en": "None",
-          "de": "Aus"
-        }
+        "en": "None",
+        "de": "Aus"
       },
       "VerificationLow": {
-        "t": {
-          "en": "Low",
-          "de": "Niedrig"
-        }
+        "en": "Low",
+        "de": "Niedrig"
       },
       "VerificationMedium": {
-        "t": {
-          "en": "Medium",
-          "de": "Mittel"
-        }
+        "en": "Medium",
+        "de": "Mittel"
       },
       "VerificationHigh": {
-        "t": {
-          "en": "High",
-          "de": "Hoch"
-        }
+        "en": "High",
+        "de": "Hoch"
       },
       "VerificationHighest": {
-        "t": {
-          "en": "Highest",
-          "de": "Am Höchsten"
-        }
+        "en": "Highest",
+        "de": "Am Höchsten"
       },
       "ExplicitContent": {
-        "t": {
-          "en": "Scan for explicit content of",
-          "de": "Suche nach explizitem Content von"
-        }
+        "en": "Scan for explicit content of",
+        "de": "Suche nach explizitem Content von"
       },
       "ExplicitContentNone": {
-        "t": {
-          "en": "No members",
-          "de": "Niemanden"
-        }
+        "en": "No members",
+        "de": "Niemanden"
       },
       "ExplicitContentNoRoles": {
-        "t": {
-          "en": "Members without roles",
-          "de": "Benutzer ohne Rollen"
-        }
+        "en": "Members without roles",
+        "de": "Benutzer ohne Rollen"
       },
       "ExplicitContentEveryone": {
-        "t": {
-          "en": "All members",
-          "de": "Jedem"
-        }
+        "en": "All members",
+        "de": "Jedem"
       },
       "Nsfw": {
-        "t": {
-          "en": "NSFW Level",
-          "de": "NSFW Level"
-        }
+        "en": "NSFW Level",
+        "de": "NSFW Level"
       },
       "NsfwNoRating": {
-        "t": {
-          "en": "No Rating",
-          "de": "Keine Bewertung"
-        }
+        "en": "No Rating",
+        "de": "Keine Bewertung"
       },
       "NsfwExplicit": {
-        "t": {
-          "en": "Explicit, Only suitable for mature audiences",
-          "de": "Explizit, Nur geeignet für Erwachsene"
-        }
+        "en": "Explicit, Only suitable for mature audiences",
+        "de": "Explizit, Nur geeignet für Erwachsene"
       },
       "NsfwSafe": {
-        "t": {
-          "en": "Safe, Suitable for all age groups",
-          "de": "Sicher, Geeignet für alle Altersgruppen"
-        }
+        "en": "Safe, Suitable for all age groups",
+        "de": "Sicher, Geeignet für alle Altersgruppen"
       },
       "NsfwQuestionable": {
-        "t": {
-          "en": "Questionable, May only be suitable for mature audiences",
-          "de": "Fragwürdig, Möglicherweise nur geeignet für Erwachsene"
-        }
+        "en": "Questionable, May only be suitable for mature audiences",
+        "de": "Fragwürdig, Möglicherweise nur geeignet für Erwachsene"
       },
       "DefaultNotifications": {
-        "t": {
-          "en": "Default Notifications",
-          "de": "Standard Nachrichten"
-        }
+        "en": "Default Notifications",
+        "de": "Standard Nachrichten"
       },
       "DefaultNotificationsAll": {
-        "t": {
-          "en": "All messages",
-          "de": "Alle Nachrichten"
-        }
+        "en": "All messages",
+        "de": "Alle Nachrichten"
       },
       "DefaultNotificationsMentions": {
-        "t": {
-          "en": "Mentions only",
-          "de": "Nur Makierungen"
-        }
+        "en": "Mentions only",
+        "de": "Nur Makierungen"
       },
       "SpecialChannels": {
-        "t": {
-          "en": "Special Channels",
-          "de": "Spezialkanäle"
-        }
+        "en": "Special Channels",
+        "de": "Spezialkanäle"
       },
       "Rules": {
-        "t": {
-          "en": "Rules",
-          "de": "Regeln"
-        }
+        "en": "Rules",
+        "de": "Regeln"
       },
       "CommunityUpdates": {
-        "t": {
-          "en": "Community Updates",
-          "de": "Community Updates"
-        }
+        "en": "Community Updates",
+        "de": "Community Updates"
       },
       "InactiveChannel": {
-        "t": {
-          "en": "Inactive Channel",
-          "de": "Inaktivitätskanal"
-        }
+        "en": "Inactive Channel",
+        "de": "Inaktivitätskanal"
       },
       "InactiveTimeout": {
-        "t": {
-          "en": "Inactive Timeout",
-          "de": "Inaktivitätstimeout"
-        }
+        "en": "Inactive Timeout",
+        "de": "Inaktivitätstimeout"
       },
       "SystemMessages": {
-        "t": {
-          "en": "System Messages",
-          "de": "System Nachrichten"
-        }
+        "en": "System Messages",
+        "de": "System Nachrichten"
       },
       "SystemMessagesWelcome": {
-        "t": {
-          "en": "Welcome Messages",
-          "de": "Willkommensnachrichten"
-        }
+        "en": "Welcome Messages",
+        "de": "Willkommensnachrichten"
       },
       "SystemMessagesWelcomeStickers": {
-        "t": {
-          "en": "Welcome Sticker Replies",
-          "de": "Stickerantworten für Willkommensnachrichten"
-        }
+        "en": "Welcome Sticker Replies",
+        "de": "Stickerantworten für Willkommensnachrichten"
       },
       "SystemMessagesBoost": {
-        "t": {
-          "en": "Boost Messages",
-          "de": "Boost Nachrichten"
-        }
+        "en": "Boost Messages",
+        "de": "Boost Nachrichten"
       },
       "SystemMessagesRole": {
-        "t": {
-          "en": "Role Purchase Message",
-          "de": "Rollenkaufnachrichten"
-        }
+        "en": "Role Purchase Message",
+        "de": "Rollenkaufnachrichten"
       },
       "SystemMessagesRoleSticker": {
-        "t": {
-          "en": "Role Purchase Sticker Replies",
-          "de": "Stickerantworten für Rollenkaufnachrichten"
-        }
+        "en": "Role Purchase Sticker Replies",
+        "de": "Stickerantworten für Rollenkaufnachrichten"
       },
       "SystemMessagesSetupTips": {
-        "t": {
-          "en": "Server Setup Tips",
-          "de": "Servereinrichtungstipps"
-        }
+        "en": "Server Setup Tips",
+        "de": "Servereinrichtungstipps"
       },
       "GuildFeatures": {
-        "t": {
-          "en": "Guild Features",
-          "de": "Server Features"
-        }
+        "en": "Guild Features",
+        "de": "Server Features"
       },
       "JoinServer": {
-        "t": {
-          "en": "Join Guild",
-          "de": "Server beitreten"
-        }
+        "en": "Join Guild",
+        "de": "Server beitreten"
       },
       "GuildPreviewNotice": {
-        "t": {
-          "en": "Info fetched via Discord Guild Preview",
-          "de": "Info abgerufen durch Discord Server Vorschau"
-        }
+        "en": "Info fetched via Discord Guild Preview",
+        "de": "Info abgerufen durch Discord Server Vorschau"
       },
       "GuildWidgetNotice": {
-        "t": {
-          "en": "Info fetched via Discord Guild Widget",
-          "de": "Info abgerufen durch Discord Server Widget"
-        }
+        "en": "Info fetched via Discord Guild Widget",
+        "de": "Info abgerufen durch Discord Server Widget"
       },
       "Mee6Notice": {
-        "t": {
-          "en": "Info fetched via Mee6 Leaderboard",
-          "de": "Info abgerufen durch Mee6 Rangliste"
-        }
+        "en": "Info fetched via Mee6 Leaderboard",
+        "de": "Info abgerufen durch Mee6 Rangliste"
       },
       "NoGuildFound": {
-        "t": {
-          "en": "Could not fetch any information about the server you specified.",
-          "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
-        }
+        "en": "Could not fetch any information about the server you specified.",
+        "de": "Es konnten keine Informationen über den angegebenen Server gefunden werden."
       }
     },
     "Leaderboard": {
       "Title": {
-        "t": {
-          "en": "Experience Leaderboard",
-          "de": "Erfahrungsrangliste"
-        }
+        "en": "Experience Leaderboard",
+        "de": "Erfahrungsrangliste"
       },
       "Disabled": {
-        "t": {
-          "en": "Experience is disabled on this server. Please run '{Command}' to configure the experience system.",
-          "de": "Erfahrung ist deaktiviert auf diesem Server. Bitte führe '{Command}' aus um das Erfahrungssystem zu konfigurieren."
-        }
+        "en": "Experience is disabled on this server. Please run '{Command}' to configure the experience system.",
+        "de": "Erfahrung ist deaktiviert auf diesem Server. Bitte führe '{Command}' aus um das Erfahrungssystem zu konfigurieren."
       },
       "Fetching": {
-        "t": {
-          "en": "Loading Leaderboard, please wait..",
-          "de": "Lade Rangliste, bitte warten.."
-        }
+        "en": "Loading Leaderboard, please wait..",
+        "de": "Lade Rangliste, bitte warten.."
       },
       "Level": {
-        "t": {
-          "en": "Level {Level} with {Points} XP",
-          "de": "Level {Level} mit {Points} XP"
-        }
+        "en": "Level {Level} with {Points} XP",
+        "de": "Level {Level} mit {Points} XP"
       },
       "Placement": {
-        "t": {
-          "en": "You're currently on the **{Placement}.** spot on the leaderboard.",
-          "de": "Du bist aktuell auf **{Placement}.** Platz in der Rangliste."
-        }
+        "en": "You're currently on the **{Placement}.** spot on the leaderboard.",
+        "de": "Du bist aktuell auf **{Placement}.** Platz in der Rangliste."
       },
       "NoPoints": {
-        "t": {
-          "en": "No one on this server has collected enough experience to show up on the leaderboard, get to typing!",
-          "de": "Niemand hat genug Erfahrung gesammelt. Fangt an zu schreiben! ^^"
-        }
+        "en": "No one on this server has collected enough experience to show up on the leaderboard, get to typing!",
+        "de": "Niemand hat genug Erfahrung gesammelt. Fangt an zu schreiben! ^^"
       }
     },
     "Rank": {
       "Title": {
-        "t": {
-          "en": "Experience",
-          "de": "Erfahrung"
-        }
+        "en": "Experience",
+        "de": "Erfahrung"
       },
       "Self": {
-        "t": {
-          "en": "You're currently **Level {Level} with `{Points}` XP**",
-          "de": "Du bist aktuell **Level {Level} mit `{Points}` XP**"
-        }
+        "en": "You're currently **Level {Level} with `{Points}` XP**",
+        "de": "Du bist aktuell **Level {Level} mit `{Points}` XP**"
       },
       "Other": {
-        "t": {
-          "en": "{User} is currently **Level {Level} with `{Points}` XP**",
-          "de": "{User} ist aktuell **Level {Level} mit `{Points}` XP**"
-        }
+        "en": "{User} is currently **Level {Level} with `{Points}` XP**",
+        "de": "{User} ist aktuell **Level {Level} mit `{Points}` XP**"
       },
       "Progress": {
-        "t": {
-          "en": "Level {Level} Progress",
-          "de": "Level {Level} Fortschritt"
-        }
+        "en": "Level {Level} Progress",
+        "de": "Level {Level} Fortschritt"
       }
+    },
+    "Reminders": {
+      "Title": {}
     }
   }
 }

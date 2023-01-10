@@ -202,5 +202,10 @@ public class Translations
             public TranslationKey Other;
             public TranslationKey Progress;
         }
+        public reminders Reminders;
+        public class reminders
+        {
+            public TranslationKey Title;
+        }
     }
 }

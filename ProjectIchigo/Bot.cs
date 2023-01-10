@@ -207,7 +207,7 @@ public class Bot
                 loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
                 _logger.LogDebug("Loaded translations");
 
-                Dictionary<string, int> CalculateTranslationProgress(object obj)
+                Dictionary<string, int> CalculateTranslationProgress(object? obj)
                 {
                     if (obj is null)
                         return new Dictionary<string, int>();
