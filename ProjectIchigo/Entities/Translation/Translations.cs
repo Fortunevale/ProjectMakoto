@@ -13,6 +13,8 @@ public class Translations
         public TranslationKey Off;
         public TranslationKey Confirm;
         public TranslationKey Deny;
+        public TranslationKey Cancel;
+        public TranslationKey Back;
         public TranslationKey PreviousPage;
         public TranslationKey NextPage;
     }
@@ -46,6 +48,39 @@ public class Translations
                 public TranslationKey Data;
                 public TranslationKey BotPermissions;
                 public TranslationKey DirectMessage;
+            }
+
+            public prompts Prompts;
+            public class prompts
+            {
+                public TranslationKey ConfirmSelection;
+                public TranslationKey Disable;
+
+                public TranslationKey CreateRoleForMe;
+                public TranslationKey SelectEveryone;
+                public TranslationKey SelectARole;
+                public TranslationKey SelectedRoleUnavailable;
+
+                public TranslationKey CreateChannelForMe;
+                public TranslationKey SelectAChannel;
+
+                public TranslationKey SelectAnOption;
+
+                public TranslationKey ReOpenModal;
+                public TranslationKey WaitingForModalResponse;
+                
+                public TranslationKey SelectATimeSpan;
+                public TranslationKey TimespanSeconds;
+                public TranslationKey TimespanMinutes;
+                public TranslationKey TimespanHours;
+                public TranslationKey TimespanDays;
+
+                public TranslationKey SelectADateTime;
+                public TranslationKey DateTimeMinute;
+                public TranslationKey DateTimeHour;
+                public TranslationKey DateTimeDay;
+                public TranslationKey DateTimeMonth;
+                public TranslationKey DateTimeYear;
             }
 
             public TranslationKey UsedByFooter;

@@ -21,7 +21,7 @@ internal class RemindersCommand : BaseCommand
                      $"**⚠ For reminders to work, you need to enable Direct Messages on at least one server you share with {ctx.CurrentUser.Username}.**")
                     .AsInfo(ctx, "Reminders"))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
-                .AddComponents(MessageComponents.CancelButton));
+                .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -59,7 +59,7 @@ internal class RemindersCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectDescriptionButton, SelectDueDateButton, Finish })
-                        .AddComponents(MessageComponents.CancelButton));
+                        .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
                     var Menu = await ctx.WaitForButtonAsync();
 
@@ -142,7 +142,7 @@ internal class RemindersCommand : BaseCommand
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -175,7 +175,7 @@ internal class RemindersCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

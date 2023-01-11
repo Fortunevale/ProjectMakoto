@@ -24,6 +24,14 @@
       "en": "Deny",
       "de": "Ablehnen"
     },
+    "Cancel": {
+      "en": "Cancel",
+      "de": "Abbrechen"
+    },
+    "Back": {
+      "en": "Back",
+      "de": "Zurück"
+    },
     "PreviousPage": {
       "en": "Previous Page",
       "de": "Vorherige Seite"
@@ -79,6 +87,96 @@
         "DirectMessage": {
           "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
           "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
+        }
+      },
+      "Prompts": {
+        "ConfirmSelection": {
+          "en": "Confirm Selection",
+          "de": "Auswahl bestätigen"
+        },
+        "Disable": {
+          "en": "Disable",
+          "de": "Deaktivieren"
+        },
+        "CreateRoleForMe": {
+          "en": "Create one for me",
+          "de": "Erstelle Rolle für mich"
+        },
+        "SelectARole": {
+          "en": "Select a role..",
+          "de": "Eine Rolle auswählen.."
+        },
+        "SelectEveryone": {
+          "en": "Select @everyone",
+          "de": "@everyone auswählen"
+        },
+        "SelectedRoleUnavailable": {
+          "en": "The selected role is managed or unavailable to you. Please select another role.",
+          "de": "Die gewählte Rolle wird automatisch verwaltet oder ist nicht verfügbar für dich. Bitte wähle eine andere Rolle."
+        },
+        "CreateChannelForMe": {
+          "en": "Create a new channel",
+          "de": "Erstelle ein neuen Kanal"
+        },
+        "SelectAChannel": {
+          "en": "Select a channel..",
+          "de": "Einen Kanal auswählen.."
+        },
+        "SelectAnOption": {
+          "en": "Select an option..",
+          "de": "Eine Option auswählen.."
+        },
+        "ReOpenModal": {
+          "en": "Re-Open Modal",
+          "de": "Modal erneut öffnen.."
+        },
+        "WaitingForModalResponse": {
+          "en": "Waiting for a modal response..",
+          "de": "Warte auf Modalantwort.."
+        },
+        "SelectATimeSpan": {
+          "en": "Select a time span",
+          "de": "Wähle eine Zeitspanne"
+        },
+        "TimespanSeconds": {
+          "en": "Seconds (max. {Max})",
+          "de": "Sekunden (max. {Max})"
+        },
+        "TimespanMinutes": {
+          "en": "Minutes (max. {Max})",
+          "de": "Minuten (max. {Max})"
+        },
+        "TimespanHours": {
+          "en": "Hours (max. {Max})",
+          "de": "Stunden (max. {Max})"
+        },
+        "TimespanDays": {
+          "en": "Days  (max. {Max})",
+          "de": "Tage  (max. {Max})"
+        },
+        "SelectADateTime": {
+          "en": "Select a date and time",
+          "de": "Ein Datum auswählen"
+        },
+        "DateTimeMinute": {
+          "en": "Minute",
+          "de": "Minute"
+        },
+        "DateTimeHour": {
+          "en": "Hour",
+          "de": "Stunde"
+        },
+        "DateTimeDay": {
+          "en": "Day",
+          "de": "Tag"
+        },
+        "DateTimeMonth": {
+          "en": "Month",
+          "de": "Monat"
+        },
+        "DateTimeYear": {
+          "en": "Year",
+          "de": "Jahr"
         }
       },
       "UsedByFooter": {

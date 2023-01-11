@@ -115,7 +115,7 @@ internal class ReportHostCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
             {
                 { ContinueButton },
-                { MessageComponents.CancelButton }
+                { MessageComponents.GetCancelButton(ctx.DbUser) }
             }));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
@@ -202,7 +202,7 @@ internal class ReportHostCommand : BaseCommand
                 embed.AsSuccess(ctx, "Malicious Host Submissions");
                 await RespondOrEdit(embed);
             }
-            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
             {
                 DeleteOrInvalidate();
             }

@@ -224,10 +224,10 @@ public abstract class BaseCommand
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
 
-        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Create one for me", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? "Disable", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
-        var EveryoneButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Select @everyone", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.CreateRoleForMe), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? GetString(t.Commands.Common.Prompts.Disable), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+        var EveryoneButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.SelectEveryone), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
 
         string SelectionInteractionId = Guid.NewGuid().ToString();
@@ -242,7 +242,7 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordRoleSelectComponent("Select a role..", SelectionInteractionId, 1, 1, false);
+            var dropdown = new DiscordRoleSelectComponent(GetString(t.Commands.Common.Prompts.SelectARole), SelectionInteractionId, 1, 1, false);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (Selected.IsNullOrWhiteSpace())
@@ -264,7 +264,7 @@ public abstract class BaseCommand
             if (components.Any())
                 builder.AddComponents(components);
 
-            builder.AddComponents(MessageComponents.CancelButton, ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser), ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -296,7 +296,7 @@ public abstract class BaseCommand
                                 if (role.IsManaged || ctx.Member.GetRoleHighestPosition() <= role.Position)
                                 {
                                     Selected = "";
-                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent("❌ `The selected role is managed or unavailable to you. Please select another role.`"));
+                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ `{GetString(t.Commands.Common.Prompts.SelectedRoleUnavailable)}`"));
                                 }
                             }
                             catch { }
@@ -325,7 +325,7 @@ public abstract class BaseCommand
                             FinalSelection = this.ctx.Guild.GetRole(Convert.ToUInt64(Selected));
                             FinishedSelection = true;
                         }
-                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                             throw new CancelException();
                     }
                 }
@@ -368,9 +368,9 @@ public abstract class BaseCommand
 
         List<DiscordStringSelectComponentOption> FetchedChannels = new();
 
-        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Create a new role", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? "Disable", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.CreateChannelForMe), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? GetString(t.Commands.Common.Prompts.Disable), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
         string SelectionInteractionId = Guid.NewGuid().ToString();
 
@@ -384,7 +384,7 @@ public abstract class BaseCommand
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordChannelSelectComponent("Select a channel..", channelTypes, SelectionInteractionId);
+            var dropdown = new DiscordChannelSelectComponent(GetString(t.Commands.Common.Prompts.SelectAChannel), channelTypes, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(ctx)).AddComponents(dropdown).WithContent(ctx.ResponseMessage.Content);
 
             if (Selected.IsNullOrWhiteSpace())
@@ -403,7 +403,7 @@ public abstract class BaseCommand
             if (components.Any())
                 builder.AddComponents(components);
 
-            builder.AddComponents(MessageComponents.CancelButton, ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser), ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -448,7 +448,7 @@ public abstract class BaseCommand
                             FinalSelection = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
                             FinishedSelection = true;
                         }
-                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                             throw new CancelException();
                     }
                 }
@@ -480,14 +480,15 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string CustomPlaceHolder = "Select an option..", TimeSpan? timeOutOverride = null)
+    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromSeconds(120);
+        CustomPlaceHolder ??= GetString(t.Commands.Common.Prompts.SelectAnOption);
 
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Confirm Selection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
         int CurrentPage = 0;
         string SelectionInteractionId = Guid.NewGuid().ToString();
@@ -517,7 +518,7 @@ public abstract class BaseCommand
             else
                 ConfirmSelectionButton.Enable();
 
-            builder.AddComponents(MessageComponents.CancelButton, ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser), ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -561,7 +562,7 @@ public abstract class BaseCommand
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                             throw new CancelException();
                     }
                 }
@@ -605,12 +606,12 @@ public abstract class BaseCommand
 
         var oriEmbed = ctx.ResponseMessage.Embeds[0];
 
-        var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Re-Open Modal", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
+        var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Common.Prompts.ReOpenModal), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
-            Description = "`Waiting for a modal response..`"
-        }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.CancelButton }));
+            Description = $"`{GetString(t.Commands.Common.Prompts.WaitingForModalResponse)}`"
+        }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(ctx.DbUser) }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
@@ -645,7 +646,7 @@ public abstract class BaseCommand
                         {
                             await e.Interaction.CreateInteractionModalResponseAsync(builder);
                         }
-                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             throw new CancelException();
@@ -690,18 +691,18 @@ public abstract class BaseCommand
         MaxTime ??= TimeSpan.FromDays(356);
         DefaultTime ??= TimeSpan.FromSeconds(30);
 
-        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a time span").WithCustomId(Guid.NewGuid().ToString());
+        var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", "Seconds (max. 59)", "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", GetString(t.Commands.Common.Prompts.TimespanSeconds).Replace("{Max}", 59), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
 
         if (MaxTime.Value.TotalMinutes >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", $"Minutes (max. {(MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}")})", $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", GetString(t.Commands.Common.Prompts.TimespanMinutes).Replace("{Max}", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}")), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
 
         if (MaxTime.Value.TotalHours >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", $"Hours (max. {(MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}")})", "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", GetString(t.Commands.Common.Prompts.TimespanHours).Replace("{Max}", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}")), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
 
         if (MaxTime.Value.TotalDays >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", $"Days (max. {((int)MaxTime.Value.TotalDays)})", "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", GetString(t.Commands.Common.Prompts.TimespanDays).Replace("{Max}", ((int)MaxTime.Value.TotalDays)), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
         var ModalResult = await PromptModalWithRetry(interaction, modal, false);
 
@@ -753,13 +754,13 @@ public abstract class BaseCommand
 
     internal async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
-        var modal = new DiscordInteractionModalBuilder().WithTitle("Select a date and time").WithCustomId(Guid.NewGuid().ToString());
+        var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", "Minute", $"Minute", 1, 2, true, $"{DateTime.UtcNow.Minute}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", "Hour", $"Hour", 1, 2, true, $"{DateTime.UtcNow.Hour}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", "Day", $"Day", 1, 2, true, $"{DateTime.UtcNow.Day}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", "Month", $"Month", 1, 2, true, $"{DateTime.UtcNow.Month}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", "Year", $"Year", 1, 2, true, $"{DateTime.UtcNow.Year}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", GetString(t.Commands.Common.Prompts.DateTimeMinute), GetString(t.Commands.Common.Prompts.DateTimeMinute), 1, 2, true, $"{DateTime.UtcNow.Minute}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", GetString(t.Commands.Common.Prompts.DateTimeHour), GetString(t.Commands.Common.Prompts.DateTimeHour), 1, 2, true, $"{DateTime.UtcNow.Hour}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", GetString(t.Commands.Common.Prompts.DateTimeDay), GetString(t.Commands.Common.Prompts.DateTimeDay), 1, 2, true, $"{DateTime.UtcNow.Day}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", GetString(t.Commands.Common.Prompts.DateTimeMonth), GetString(t.Commands.Common.Prompts.DateTimeMonth), 1, 2, true, $"{DateTime.UtcNow.Month}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", GetString(t.Commands.Common.Prompts.DateTimeYear), GetString(t.Commands.Common.Prompts.DateTimeYear), 1, 4, true, $"{DateTime.UtcNow.Year}"));
 
 
         var ModalResult = await PromptModalWithRetry(interaction, modal, false);

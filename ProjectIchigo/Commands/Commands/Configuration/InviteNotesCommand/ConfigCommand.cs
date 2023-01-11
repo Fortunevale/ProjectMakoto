@@ -27,12 +27,12 @@ internal class ConfigCommand : BaseCommand
                 {
                     AddButton,
                     RemoveButton,
-                }).AddComponents(MessageComponents.CancelButton));
+                }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
-                    .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.CancelButton));
+                    .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
             }
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
@@ -65,7 +65,7 @@ internal class ConfigCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })
-                        .AddComponents(MessageComponents.CancelButton));
+                        .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
                     var Menu = await ctx.WaitForButtonAsync();
 
@@ -163,7 +163,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

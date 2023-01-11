@@ -39,7 +39,7 @@ internal class GlobalNotesCommand : BaseCommand
                     .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var list) ? list.Count : 0)} global notes.`")
                     .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
-                .AddComponents(MessageComponents.CancelButton));
+                .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -108,7 +108,7 @@ internal class GlobalNotesCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
             {
                 DeleteOrInvalidate();
                 return;
