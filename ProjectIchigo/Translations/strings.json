@@ -47,6 +47,10 @@
     "NotSelected": {
       "en": "Not yet selected.",
       "de": "Noch nicht ausgewählt."
+    },
+    "Reason": {
+      "en": "Reason",
+      "de": "Grund"
     }
   },
   "Commands": {
@@ -708,6 +712,76 @@
       "DateTime": {
         "en": "Due Date & Time",
         "de": "Erinnerungszeit"
+      }
+    },
+    "ReportHost": {
+      "Title": {
+        "en": "Malicious Host Submissions",
+        "de": "Böswillige Host Meldungen"
+      },
+      "AcceptTos": {
+        "en": "I accept these conditions",
+        "de": "Ich akzeptiere diese Regeln"
+      },
+      "Tos": {
+        "en": "{1}. You may not submit Hosts that are non-malicious.\n{2}. You may not spam submissions.\n{3}. You may not submit unregistered hosts.\n{4}. You accept that your user account and current server will be tracked and visible to Ichigo staff.\n\nWe reserve the right to ban you for any reason that may not be listed.\n**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**",
+        "de": "{1}. Du darfst keine unschädlichen Hosts melden.\n{2}. Du darfst Hosts nicht wiederholt melden.\n{3}. Hosts müssen registriert sein.\n{4}. Du akzeptierst dass dein Benutzer Account und aktueller Server der Einsendung beigelegt sind.\n\nWir behalten außerdem das Recht dich auch für jeden anderen Grund vom System auszuschließen.\n**Das Brechen oder Umgehen diesen Regeln wird dazu führen dass du oder dieser Server von der Verwendung des Bots ausgeschlossen wirst.**\n**Das beinhaltet, ist aber nicht limiert auf, bereits existierende Server die du besitzt und Server die du zukünftig erstellst.**"
+      },
+      "TosChangedNotice": {
+        "en": "The submission conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.",
+        "de": "Die Einsendungsbedingungen haben sich geändert. Bitte lese sie erneut und stimme ihnen zu um fortzufahren."
+      },
+      "Processing": {
+        "en": "Processing your request..",
+        "de": "Verarbeite deine Anfrage.."
+      },
+      "CooldownError": {
+        "en": "You're on cooldown. You submit another host {Timestamp}.",
+        "de": "Du hast erst einen Host gemeldet. Du kannst einen weiteren Host {Timestamp} melden."
+      },
+      "LimitError": {
+        "en": "You have 5 open host submissions. Please wait before trying to submit another host.",
+        "de": "Du hast 5 offene Host Meldungen. Bitte warte bis du weitere Hosts meldest."
+      },
+      "UserBan": {
+        "en": "You are banned from submitting hosts.",
+        "de": "Du bist gebannt vom weiteren Melden von Hosts."
+      },
+      "GuildBan": {
+        "en": "This server is banned from submitting hosts.",
+        "de": "Dieser Server ist vom Melden weiterer Hosts gebannt."
+      },
+      "InvalidHost": {
+        "en": "The host '{Host}' is invalid.",
+        "de": "Der Host '{Host}' ist ungültig."
+      },
+      "ConfirmHost": {
+        "en": "You are about to submit the host '{Host}'. Do you want to proceed?",
+        "de": "Du bist dabei den Host '{Host}' zu melden. Möchtest du fortfahren?"
+      },
+      "DatabaseCheck": {
+        "en": "Checking if your host is already in the datbase..",
+        "de": "Überprüfe ob sich der Host bereits in der Datenbank befindet.."
+      },
+      "DatabaseError": {
+        "en": "The host '{Host}' is already present in the database. Thanks for trying to contribute regardless.",
+        "de": "Der Host '{Host}' befindet sich bereits in der Datenbank. Wir danken allerdings trotzdem für den Versuch uns zu unterstützen."
+      },
+      "SubmissionCheck": {
+        "en": "Checking if your host has already been submitted..",
+        "de": "Überprüfe ob der Host bereits gemeldet wurde.."
+      },
+      "SubmissionError": {
+        "en": "The host '{Host}' has already been submitted. Thanks for trying to contribute regardless.",
+        "de": "Der Host '{Host}' wurde bereits gemeldet. Wir danken allerdings trotzdem für den Versuch uns zu unterstützen."
+      },
+      "CreatingSubmission": {
+        "en": "Creating submission..",
+        "de": "Erstelle Meldung.."
+      },
+      "SubmissionCreated": {
+        "en": "Submission created. Thank you for your contribution.",
+        "de": "Host gemeldet. Vielen Dank für deine Unterstützung."
       }
     }
   }

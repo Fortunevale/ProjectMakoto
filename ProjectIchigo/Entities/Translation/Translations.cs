@@ -19,6 +19,7 @@ public class Translations
         public TranslationKey PreviousPage;
         public TranslationKey NextPage;
         public TranslationKey NotSelected;
+        public TranslationKey Reason;
     }
 
     public _commands Commands;
@@ -254,6 +255,27 @@ public class Translations
             public TranslationKey SetDateTime;
             public TranslationKey Description;
             public TranslationKey DateTime;
+        }
+        public reportHost ReportHost;
+        public class reportHost
+        {
+            public TranslationKey Title;
+            public TranslationKey AcceptTos;
+            public TranslationKey Tos;
+            public TranslationKey TosChangedNotice;
+            public TranslationKey Processing;
+            public TranslationKey CooldownError;
+            public TranslationKey LimitError;
+            public TranslationKey UserBan;
+            public TranslationKey GuildBan;
+            public TranslationKey InvalidHost;
+            public TranslationKey ConfirmHost;
+            public TranslationKey DatabaseCheck;
+            public TranslationKey DatabaseError;
+            public TranslationKey SubmissionCheck;
+            public TranslationKey SubmissionError;
+            public TranslationKey CreatingSubmission;
+            public TranslationKey SubmissionCreated;
         }
     }
 }
