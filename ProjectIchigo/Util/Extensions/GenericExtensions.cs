@@ -70,4 +70,19 @@ internal static class GenericExtensions
         stream.Position = 0;
         return stream;
     }
+
+    internal static int CalculatePadding(User user, params TranslationKey[] pairs)
+    {
+        int pad = 0;
+
+        foreach (var b in pairs)
+        {
+            var length = b.Get(user).Length;
+
+            if (length > pad)
+                pad = length;
+        }
+
+        return pad;
+    }
 }

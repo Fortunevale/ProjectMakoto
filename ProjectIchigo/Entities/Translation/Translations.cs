@@ -13,10 +13,12 @@ public class Translations
         public TranslationKey Off;
         public TranslationKey Confirm;
         public TranslationKey Deny;
+        public TranslationKey Submit;
         public TranslationKey Cancel;
         public TranslationKey Back;
         public TranslationKey PreviousPage;
         public TranslationKey NextPage;
+        public TranslationKey NotSelected;
     }
 
     public _commands Commands;
@@ -241,6 +243,17 @@ public class Translations
         public class reminders
         {
             public TranslationKey Title;
+            public TranslationKey NewReminder;
+            public TranslationKey DeleteReminder;
+            public TranslationKey Count;
+            public TranslationKey Created;
+            public TranslationKey DueTime;
+            public TranslationKey Notice;
+            public TranslationKey InvalidDateTime;
+            public TranslationKey SetDescription;
+            public TranslationKey SetDateTime;
+            public TranslationKey Description;
+            public TranslationKey DateTime;
         }
     }
 }

@@ -24,6 +24,10 @@
       "en": "Deny",
       "de": "Ablehnen"
     },
+    "Submit": {
+      "en": "Submit",
+      "de": "Absenden"
+    },
     "Cancel": {
       "en": "Cancel",
       "de": "Abbrechen"
@@ -39,6 +43,10 @@
     "NextPage": {
       "en": "Next Page",
       "de": "Nächste Seite"
+    },
+    "NotSelected": {
+      "en": "Not yet selected.",
+      "de": "Noch nicht ausgewählt."
     }
   },
   "Commands": {
@@ -653,7 +661,54 @@
       }
     },
     "Reminders": {
-      "Title": {}
+      "Title": {
+        "en": "Reminders",
+        "de": "Erinnerungen"
+      },
+      "NewReminder": {
+        "en": "New Reminder",
+        "de": "Neue Erinnerung"
+      },
+      "DeleteReminder": {
+        "en": "Delete a Reminder",
+        "de": "Eine Erinnerung löschen"
+      },
+      "Count": {
+        "en": "You have {Count} reminders.",
+        "de": "Du hast {Count} Erinnerungen."
+      },
+      "Created": {
+        "en": "Created on {Guild}",
+        "de": "Erstellt auf {Guild}"
+      },
+      "DueTime": {
+        "en": "Due {Relative} ({DateTime})",
+        "de": "Fällig {Relative} ({DateTime})"
+      },
+      "Notice": {
+        "en": "For reminders to work, you need to enable Direct Messages on at least one server you share with {Bot}",
+        "de": "Um dass Erinnerungen funktionieren musst du auf einem Server mit {Bot} teilst, Direktnachrichten aktivieren."
+      },
+      "InvalidDateTime": {
+        "en": "You specified a date in the past or a date further away than 6 months.",
+        "de": "Du hast eine Zeit in der Vergangenheit oder länger als 6 Monate in der Zukunft liegt gewählt."
+      },
+      "SetDescription": {
+        "en": "Set Description",
+        "de": "Beschreibung auswählen"
+      },
+      "SetDateTime": {
+        "en": "Set Due Date & Time",
+        "de": "Erinnerungszeit festlegen"
+      },
+      "Description": {
+        "en": "Description",
+        "de": "Beschreibung"
+      },
+      "DateTime": {
+        "en": "Due Date & Time",
+        "de": "Erinnerungszeit"
+      }
     }
   }
 }

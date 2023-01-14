@@ -11,15 +11,15 @@ internal class RemindersCommand : BaseCommand
 
             var rem = ctx.Bot.users[ctx.User.Id].Reminders;
 
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "New Reminder", (rem.ScheduledReminders.Count >= 10), DiscordEmoji.FromUnicode("➕").ToComponent());
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Delete a Reminder", (rem.ScheduledReminders.Count <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Reminders.NewReminder), (rem.ScheduledReminders.Count >= 10), DiscordEmoji.FromUnicode("➕").ToComponent());
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Reminders.DeleteReminder), (rem.ScheduledReminders.Count <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
 
             await RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
-                    .WithDescription($"`You have {rem.ScheduledReminders.Count} reminders.`\n\n" +
-                     $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\nCreated on **{x.CreationPlace}**\nDue {x.DueTime.ToTimestamp()} ({x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)})").ToList())}\n\n" +
-                     $"**⚠ For reminders to work, you need to enable Direct Messages on at least one server you share with {ctx.CurrentUser.Username}.**")
-                    .AsInfo(ctx, "Reminders"))
+                    .WithDescription($"`{GetString(t.Commands.Reminders.Count).Replace("{Count}", rem.ScheduledReminders.Count)}`\n\n" +
+                     $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{GetString(t.Commands.Reminders.Created).Replace("{Guild}", $"**{x.CreationPlace}**")}\n{GetString(t.Commands.Reminders.DueTime).Replace("{Relative}", x.DueTime.ToTimestamp()).Replace("{DateTime}", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime))}").ToList())}\n\n" +
+                     $"**⚠ {GetString(t.Commands.Reminders.Notice).Replace("{Bot}", ctx.CurrentUser.Username)}**")
+                    .AsInfo(ctx, GetString(t.Commands.Reminders.Title)))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
@@ -43,19 +43,21 @@ internal class RemindersCommand : BaseCommand
                     if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6)))
                     {
                         selectedDueDate = null;
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified a date in the past or a date further away than 6 months.`").AsError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Reminders.InvalidDateTime)}`").AsError(ctx));
                         await Task.Delay(5000);
                     }
 
-                    var SelectDescriptionButton = new DiscordButtonComponent((selectedDescription.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Description", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✏")));
-                    var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Due Date & Time", (selectedDescription is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (selectedDescription.IsNullOrWhiteSpace() || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                    var SelectDescriptionButton = new DiscordButtonComponent((selectedDescription.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(t.Commands.Reminders.SetDescription), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✏")));
+                    var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(t.Commands.Reminders.SetDateTime), (selectedDescription is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Submit), (selectedDescription.IsNullOrWhiteSpace() || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+
+                    int padding = GenericExtensions.CalculatePadding(ctx.DbUser, t.Commands.Reminders.Description, t.Commands.Reminders.DateTime);
 
                     var action_embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`Description    `: {(selectedDescription.IsNullOrWhiteSpace() ? "`Not yet selected.`" : $"`{selectedDescription.FullSanitize()}`")}\n" +
-                                      $"`Due Date & Time`: {(selectedDueDate is null ? "`Not yet selected.`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}"
-                    }.AsAwaitingInput(ctx, "Reminders");
+                        Description = $"`{GetString(t.Commands.Reminders.Description).PadRight(padding)}`: {(selectedDescription.IsNullOrWhiteSpace() ? $"`{GetString(t.Common.NotSelected)}`" : $"`{selectedDescription.FullSanitize()}`")}\n" +
+                                      $"`{GetString(t.Commands.Reminders.DateTime).PadRight(padding)}`: {(selectedDueDate is null ? $"`{GetString(t.Common.NotSelected)}`" : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}"
+                    }.AsAwaitingInput(ctx, GetString(t.Commands.Reminders.Title));
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectDescriptionButton, SelectDueDateButton, Finish })
@@ -71,8 +73,8 @@ internal class RemindersCommand : BaseCommand
 
                     if (Menu.GetCustomId() == SelectDescriptionButton.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder("New Reminder", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "desc", "Description", "Enter a reminder description..", 1, 512, true));
+                        var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Reminders.NewReminder), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "desc", GetString(t.Commands.Reminders.Description), GetString(t.Commands.Reminders.SetDescription), 1, 512, true));
 
 
                         var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
@@ -111,7 +113,7 @@ internal class RemindersCommand : BaseCommand
                         {
                             if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You specified an invalid date time.`").AsError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Reminders.InvalidDateTime)}`").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -127,7 +129,7 @@ internal class RemindersCommand : BaseCommand
 
                         if (selectedDueDate < DateTime.UtcNow)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The Due Time is in the past.`").AsError(ctx, "Reminders"));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Reminders.InvalidDateTime)}`").AsError(ctx, GetString(t.Commands.Reminders.Title)));
                             await Task.Delay(2000);
                             continue;
                         }
