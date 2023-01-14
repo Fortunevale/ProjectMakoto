@@ -55,7 +55,7 @@ internal class ReportHostCommand : BaseCommand
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                embed.Description = $"`{GetString(t.Commands.ReportHost.CooldownError).Replace("{Timestamp}", $"`{ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45)}`")}`";
+                embed.Description = $"`{GetString(t.Commands.ReportHost.CooldownError).Replace("{Timestamp}", $"`{ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).ToTimestamp()}`")}`";
                 _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.ReportHost.Title)));
                 return;
             }
@@ -145,7 +145,7 @@ internal class ReportHostCommand : BaseCommand
                 {
                     if (b.Value.Url == host)
                     {
-                        embed.Description = $"`{GetString(t.Commands.ReportHost.SubmissionCheck).Replace("{Host}", host.SanitizeForCode())}`";
+                        embed.Description = $"`{GetString(t.Commands.ReportHost.SubmissionError).Replace("{Host}", host.SanitizeForCode())}`";
                         embed.AsError(ctx, GetString(t.Commands.ReportHost.Title));
                         _ = RespondOrEdit(embed.Build());
                         return;
