@@ -313,5 +313,60 @@ public class Translations
             public TranslationKey Definition;
             public TranslationKey Example;
         }
+
+        public userInfo UserInfo;
+        public class userInfo
+        {
+            public TranslationKey System;
+            public TranslationKey Bot;
+            public TranslationKey NeverJoined;
+            public TranslationKey IsBanned;
+            public TranslationKey JoinedBefore;
+            public TranslationKey GlobalBanned;
+            public TranslationKey BotOwner;
+            public TranslationKey BotStaff;
+            public TranslationKey Owner;
+            public TranslationKey DiscordStaff;
+            public TranslationKey CertifiedMod;
+            public TranslationKey VerifiedBotDeveloper;
+            public TranslationKey DiscordPartner;
+            public TranslationKey PendingMembership;
+            public TranslationKey Roles;
+            public TranslationKey Backup;
+            public TranslationKey BotNotes;
+            public TranslationKey NoReason;
+            public TranslationKey GlobalBanReason;
+            public TranslationKey GlobalBanMod;
+            public TranslationKey GlobalBanDate;
+            public TranslationKey BanDetails;
+            public TranslationKey InvitedBy;
+            public TranslationKey NoInviter;
+            public TranslationKey UsersInvited;
+            public TranslationKey ShowProfileInviter;
+            public TranslationKey ServerJoinDate;
+            public TranslationKey ServerLeaveDate;
+            public TranslationKey FirstJoinDate;
+            public TranslationKey AccountCreationDate;
+            public TranslationKey ServerBoosterSince;
+            public TranslationKey Pronouns;
+            public TranslationKey BannerColor;
+            public TranslationKey Presence;
+            public TranslationKey Desktop;
+            public TranslationKey Mobile;
+            public TranslationKey Web;
+            public TranslationKey Online;
+            public TranslationKey Offline;
+            public TranslationKey Idle;
+            public TranslationKey DoNotDisturb;
+            public TranslationKey Activities;
+            public TranslationKey Playing;
+            public TranslationKey Streaming;
+            public TranslationKey ListeningTo;
+            public TranslationKey Watching;
+            public TranslationKey Competing;
+            public TranslationKey Status;
+            public TranslationKey TimedOutUntil;
+            public TranslationKey FetchUserError;
+        }
     }
 }

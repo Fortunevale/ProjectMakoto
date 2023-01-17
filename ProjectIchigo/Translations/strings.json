@@ -852,6 +852,158 @@
       "Example": {
         "en": "Example"
       }
+    },
+    "UserInfo": {
+      "System": {
+        "en": "System"
+      },
+      "Bot": {
+        "en": "Bot"
+      },
+      "NeverJoined": {
+        "en": "User never joined this server."
+      },
+      "IsBanned": {
+        "en": "User is currently banned from this server."
+      },
+      "JoinedBefore": {
+        "en": "User is currently not in this server."
+      },
+      "GlobalBanned": {
+        "en": "User is globally banned."
+      },
+      "BotOwner": {
+        "en": "{Bot} Owner"
+      },
+      "BotStaff": {
+        "en": "{Bot} Staff"
+      },
+      "Owner": {
+        "en": "This user owns this guild"
+      },
+      "DiscordStaff": {
+        "en": "Discord Staff"
+      },
+      "CertifiedMod": {
+        "en": "Certified Content Moderator"
+      },
+      "VerifiedBotDeveloper": {
+        "en": "Verified Bot Developer"
+      },
+      "DiscordPartner": {
+        "en": "Discord Partner"
+      },
+      "PendingMembership": {
+        "en": "User's Membership pending"
+      },
+      "Roles": {
+        "en": "Roles"
+      },
+      "Backup": {
+        "en": "Backup"
+      },
+      "BotNotes": {
+        "en": "{Bot} Staff Notes"
+      },
+      "NoReason": {
+        "en": "No reason provided."
+      },
+      "GlobalBanReason": {
+        "en": "Global Ban Reason"
+      },
+      "GlobalBanMod": {
+        "en": "Global Ban Moderator"
+      },
+      "GlobalBanDate": {
+        "en": "Global Ban Date"
+      },
+      "BanDetails": {
+        "en": "Ban Details"
+      },
+      "InvitedBy": {
+        "en": "Invited By"
+      },
+      "NoInviter": {
+        "en": "No Inviter found."
+      },
+      "UsersInvited": {
+        "en": "Users invited"
+      },
+      "ShowProfileInviter": {
+        "en": "Show Profile of Inviter"
+      },
+      "ServerJoinDate": {
+        "en": "Server Join Date"
+      },
+      "ServerLeaveDate": {
+        "en": "Server Leave Date"
+      },
+      "FirstJoinDate": {
+        "en": "First Join Date"
+      },
+      "AccountCreationDate": {
+        "en": "Account Creation Date"
+      },
+      "ServerBoosterSince": {
+        "en": "Server Booster Since"
+      },
+      "Pronouns": {
+        "en": "Pronouns"
+      },
+      "BannerColor": {
+        "en": "Banner Color"
+      },
+      "Presence": {
+        "en": "Current Presence"
+      },
+      "Desktop": {
+        "en": "Desktop"
+      },
+      "Mobile": {
+        "en": "Mobile"
+      },
+      "Web": {
+        "en": "Web"
+      },
+      "Online": {
+        "en": "Online"
+      },
+      "Offline": {
+        "en": "Offline"
+      },
+      "Idle": {
+        "en": "Idle"
+      },
+      "DoNotDisturb": {
+        "en": "Do Not Disturb"
+      },
+      "Activities": {
+        "en": "Current Activities"
+      },
+      "Playing": {
+        "en": "Playing"
+      },
+      "Streaming": {
+        "en": "Streaming"
+      },
+      "ListeningTo": {
+        "en": "Listening to"
+      },
+      "Watching": {
+        "en": "Watching"
+      },
+      "Competing": {
+        "en": "Competing"
+      },
+      "Status": {
+        "en": "Status"
+      },
+      "TimedOutUntil": {
+        "en": "Current Activities"
+      },
+      "FetchUserError": {
+        "en": "Failed to fetch user '{User}'"
+      }
     }
   }
 }
