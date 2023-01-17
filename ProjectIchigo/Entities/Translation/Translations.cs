@@ -298,6 +298,20 @@ public class Translations
             public TranslationKey NoInteraction;
             public TranslationKey AlreadyUploaded;
             public TranslationKey TimedOut;
+            public TranslationKey Uploaded;
+        }
+
+        public urbanDictionary UrbanDictionary;
+        public class urbanDictionary
+        {
+            public TranslationKey AdultContentError;
+            public TranslationKey AdultContentWarning;
+            public TranslationKey LookingUp;
+            public TranslationKey LookupFail;
+            public TranslationKey NotExist;
+            public TranslationKey WrittenBy;
+            public TranslationKey Definition;
+            public TranslationKey Example;
         }
     }
 }

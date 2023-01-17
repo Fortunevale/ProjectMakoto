@@ -826,6 +826,32 @@
       "Uploaded": {
         "en": "Your file has been uploaded."
       }
+    },
+    "UrbanDictionary": {
+      "AdultContentError": {
+        "en": "Urban Dictionary can potentionally contain Adult Content. Please run this command within a channel marked as Age-Restricted."
+      },
+      "AdultContentWarning": {
+        "en": "Urban Dictionary can potentionally contain Adult Content. Continue?"
+      },
+      "LookingUp": {
+        "en": "Looking up '{Term}'.."
+      },
+      "LookupFail": {
+        "en": "Failed to look up '{Term}'."
+      },
+      "NotExist": {
+        "en": "'{Term}' was not found in the Urban Dictionary."
+      },
+      "WrittenBy": {
+        "en": "Written by {Author}"
+      },
+      "Definition": {
+        "en": "Definition"
+      },
+      "Example": {
+        "en": "Example"
+      }
     }
   }
 }
