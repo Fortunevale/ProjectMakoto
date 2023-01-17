@@ -1004,6 +1004,19 @@
       "FetchUserError": {
         "en": "Failed to fetch user '{User}'"
       }
+    },
+    "Data": {
+      "Request": {
+        "Fetching": {
+          "en": "Fetching all your user data. This might take a moment.."
+        },
+        "Confirm": {
+          "en": "Hello, {User}. Here's your user data you requested. This may contain sensitive information."
+        },
+        "DmNotice": {
+          "en": "I sent your data via direct messages."
+        }
+      }
     }
   }
 }

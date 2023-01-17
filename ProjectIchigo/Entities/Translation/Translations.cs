@@ -368,5 +368,17 @@ public class Translations
             public TranslationKey TimedOutUntil;
             public TranslationKey FetchUserError;
         }
+
+        public data Data;
+        public class data
+        {
+            public request Request;
+            public class request
+            {
+                public TranslationKey Fetching;
+                public TranslationKey Confirm;
+                public TranslationKey DmNotice;
+            }
+        }
     }
 }
