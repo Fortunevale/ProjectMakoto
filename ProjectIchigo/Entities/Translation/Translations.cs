@@ -277,5 +277,19 @@ public class Translations
             public TranslationKey CreatingSubmission;
             public TranslationKey SubmissionCreated;
         }
+
+        public translateMessage TranslateMessage;
+        public class translateMessage
+        {
+            public TranslationKey NoContent;
+            public TranslationKey SelectProvider;
+            public TranslationKey SelectSource;
+            public TranslationKey SelectSourceDropdown;
+            public TranslationKey SelectTarget;
+            public TranslationKey SelectTargetDropdown;
+            public TranslationKey Translating;
+            public TranslationKey Queue;
+            public TranslationKey Translated;
+        }
     }
 }

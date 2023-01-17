@@ -783,6 +783,35 @@
         "en": "Submission created. Thank you for your contribution.",
         "de": "Host gemeldet. Vielen Dank für deine Unterstützung."
       }
+    },
+    "TranslateMessage": {
+      "NoContent": {
+        "en": "There is no content to translate in the message you selected."
+      },
+      "SelectProvider": {
+        "en": "What provider do you want to use?"
+      },
+      "SelectSource": {
+        "en": "Please select the language to translate from."
+      },
+      "SelectSourceDropdown": {
+        "en": "Select the Source Language.."
+      },
+      "SelectTarget": {
+        "en": "Okay! Translating from {Source}. Now select the language to translate to."
+      },
+      "SelectTargetDropdown": {
+        "en": "Select the Target Language.."
+      },
+      "Translating": {
+        "en": "Translating.."
+      },
+      "Queue": {
+        "en": "Your translation request is currently in queue at position {Position}. This might take a moment to finish..`\n`Your request will be executed, approximately, {Timestamp}."
+      },
+      "Translated": {
+        "en": "Translated from {Source} to {Target} using {Provider}"
+      }
     }
   }
 }
