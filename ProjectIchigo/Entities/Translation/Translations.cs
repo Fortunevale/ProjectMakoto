@@ -291,5 +291,13 @@ public class Translations
             public TranslationKey Queue;
             public TranslationKey Translated;
         }
+
+        public upload Upload;
+        public class upload
+        {
+            public TranslationKey NoInteraction;
+            public TranslationKey AlreadyUploaded;
+            public TranslationKey TimedOut;
+        }
     }
 }

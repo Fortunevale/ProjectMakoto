@@ -812,6 +812,20 @@
       "Translated": {
         "en": "Translated from {Source} to {Target} using {Provider}"
       }
+    },
+    "Upload": {
+      "NoInteraction": {
+        "en": "You have not yet started an upload interactions. Please only run this command when instructed to by the bot."
+      },
+      "AlreadyUploaded": {
+        "en": "You already uploaded your file."
+      },
+      "TimedOut": {
+        "en": "Your upload interaction timed out {Timestamp}."
+      },
+      "Uploaded": {
+        "en": "Your file has been uploaded."
+      }
     }
   }
 }
