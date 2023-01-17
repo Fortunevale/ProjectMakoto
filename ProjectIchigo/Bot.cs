@@ -56,8 +56,8 @@ public class Bot
 
 
     internal Status status = new();
-    internal Dictionary<ulong, Guild> guilds = new();
-    internal Dictionary<ulong, User> users = new();
+    internal GuildDictionary guilds = null;
+    internal UserDictionary users = null;
 
     internal string Prefix { get; private set; } = ";;";
 
@@ -155,6 +155,9 @@ public class Bot
                 Environment.UserDomainName,
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
+
+        users = new(this);
+        guilds = new(this);
 
         bumpReminder = new(this);
 
