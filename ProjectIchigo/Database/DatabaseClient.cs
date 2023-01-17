@@ -374,192 +374,228 @@ internal class DatabaseClient
             GC.Collect();
         }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "guilds", _bot.guilds.Select(x => new TableDefinitions.guilds
+        lock (_bot.guilds)
         {
-            serverid = x.Key,
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "guilds", _bot.guilds.Select(x => new TableDefinitions.guilds
+            {
+                serverid = x.Key,
 
-            experience_use = x.Value.Experience.UseExperience,
-            experience_boost_bumpreminder = x.Value.Experience.BoostXpForBumpReminder,
+                experience_use = x.Value.Experience.UseExperience,
+                experience_boost_bumpreminder = x.Value.Experience.BoostXpForBumpReminder,
 
-            auto_assign_role_id = x.Value.Join.AutoAssignRoleId,
-            joinlog_channel_id = x.Value.Join.JoinlogChannelId,
-            autoban_global_ban = x.Value.Join.AutoBanGlobalBans,
-            reapplyroles = x.Value.Join.ReApplyRoles,
-            reapplynickname = x.Value.Join.ReApplyNickname,
+                auto_assign_role_id = x.Value.Join.AutoAssignRoleId,
+                joinlog_channel_id = x.Value.Join.JoinlogChannelId,
+                autoban_global_ban = x.Value.Join.AutoBanGlobalBans,
+                reapplyroles = x.Value.Join.ReApplyRoles,
+                reapplynickname = x.Value.Join.ReApplyNickname,
 
-            tokens_detect = x.Value.TokenLeakDetection.DetectTokens,
+                tokens_detect = x.Value.TokenLeakDetection.DetectTokens,
 
-            phishing_detect = x.Value.PhishingDetection.DetectPhishing,
-            phishing_warnonredirect = x.Value.PhishingDetection.AbuseIpDbReports,
-            phishing_abuseipdb = x.Value.PhishingDetection.WarnOnRedirect,
-            phishing_type = Convert.ToInt32(x.Value.PhishingDetection.PunishmentType),
-            phishing_reason = x.Value.PhishingDetection.CustomPunishmentReason,
-            phishing_time = Convert.ToInt64(x.Value.PhishingDetection.CustomPunishmentLength.TotalSeconds),
+                phishing_detect = x.Value.PhishingDetection.DetectPhishing,
+                phishing_warnonredirect = x.Value.PhishingDetection.AbuseIpDbReports,
+                phishing_abuseipdb = x.Value.PhishingDetection.WarnOnRedirect,
+                phishing_type = Convert.ToInt32(x.Value.PhishingDetection.PunishmentType),
+                phishing_reason = x.Value.PhishingDetection.CustomPunishmentReason,
+                phishing_time = Convert.ToInt64(x.Value.PhishingDetection.CustomPunishmentLength.TotalSeconds),
 
-            bump_enabled = x.Value.BumpReminder.Enabled,
-            bump_role = x.Value.BumpReminder.RoleId,
-            bump_channel = x.Value.BumpReminder.ChannelId,
-            bump_last_reminder = x.Value.BumpReminder.LastReminder.ToUniversalTime().Ticks,
-            bump_last_time = x.Value.BumpReminder.LastBump.ToUniversalTime().Ticks,
-            bump_last_user = x.Value.BumpReminder.LastUserId,
-            bump_message = x.Value.BumpReminder.MessageId,
-            bump_persistent_msg = x.Value.BumpReminder.PersistentMessageId,
-            bump_missed = x.Value.BumpReminder.BumpsMissed,
+                bump_enabled = x.Value.BumpReminder.Enabled,
+                bump_role = x.Value.BumpReminder.RoleId,
+                bump_channel = x.Value.BumpReminder.ChannelId,
+                bump_last_reminder = x.Value.BumpReminder.LastReminder.ToUniversalTime().Ticks,
+                bump_last_time = x.Value.BumpReminder.LastBump.ToUniversalTime().Ticks,
+                bump_last_user = x.Value.BumpReminder.LastUserId,
+                bump_message = x.Value.BumpReminder.MessageId,
+                bump_persistent_msg = x.Value.BumpReminder.PersistentMessageId,
+                bump_missed = x.Value.BumpReminder.BumpsMissed,
 
-            levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
-            auditlogcache = JsonConvert.SerializeObject(x.Value.ActionLog.ProcessedAuditLogs),
+                levelrewards = JsonConvert.SerializeObject(x.Value.LevelRewards),
+                auditlogcache = JsonConvert.SerializeObject(x.Value.ActionLog.ProcessedAuditLogs),
 
-            crosspostchannels = JsonConvert.SerializeObject(x.Value.Crosspost.CrosspostChannels),
-            crosspostdelay = x.Value.Crosspost.DelayBeforePosting,
-            crosspostexcludebots = x.Value.Crosspost.ExcludeBots,
-            crosspost_ratelimits = JsonConvert.SerializeObject(x.Value.Crosspost.CrosspostRatelimits),
+                crosspostchannels = JsonConvert.SerializeObject(x.Value.Crosspost.CrosspostChannels),
+                crosspostdelay = x.Value.Crosspost.DelayBeforePosting,
+                crosspostexcludebots = x.Value.Crosspost.ExcludeBots,
+                crosspost_ratelimits = JsonConvert.SerializeObject(x.Value.Crosspost.CrosspostRatelimits),
 
-            reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
+                reactionroles = JsonConvert.SerializeObject(x.Value.ReactionRoles),
 
-            actionlog_channel = x.Value.ActionLog.Channel,
-            actionlog_attempt_further_detail = x.Value.ActionLog.AttemptGettingMoreDetails,
-            actionlog_log_members_modified = x.Value.ActionLog.MembersModified,
-            actionlog_log_member_modified = x.Value.ActionLog.MemberModified,
-            actionlog_log_memberprofile_modified = x.Value.ActionLog.MemberProfileModified,
-            actionlog_log_message_deleted = x.Value.ActionLog.MessageDeleted,
-            actionlog_log_message_updated = x.Value.ActionLog.MessageModified,
-            actionlog_log_roles_modified = x.Value.ActionLog.RolesModified,
-            actionlog_log_banlist_modified = x.Value.ActionLog.BanlistModified,
-            actionlog_log_guild_modified = x.Value.ActionLog.GuildModified,
-            actionlog_log_invites_modified = x.Value.ActionLog.InvitesModified,
-            actionlog_log_voice_state = x.Value.ActionLog.VoiceStateUpdated,
-            actionlog_log_channels_modified = x.Value.ActionLog.ChannelsModified,
+                actionlog_channel = x.Value.ActionLog.Channel,
+                actionlog_attempt_further_detail = x.Value.ActionLog.AttemptGettingMoreDetails,
+                actionlog_log_members_modified = x.Value.ActionLog.MembersModified,
+                actionlog_log_member_modified = x.Value.ActionLog.MemberModified,
+                actionlog_log_memberprofile_modified = x.Value.ActionLog.MemberProfileModified,
+                actionlog_log_message_deleted = x.Value.ActionLog.MessageDeleted,
+                actionlog_log_message_updated = x.Value.ActionLog.MessageModified,
+                actionlog_log_roles_modified = x.Value.ActionLog.RolesModified,
+                actionlog_log_banlist_modified = x.Value.ActionLog.BanlistModified,
+                actionlog_log_guild_modified = x.Value.ActionLog.GuildModified,
+                actionlog_log_invites_modified = x.Value.ActionLog.InvitesModified,
+                actionlog_log_voice_state = x.Value.ActionLog.VoiceStateUpdated,
+                actionlog_log_channels_modified = x.Value.ActionLog.ChannelsModified,
 
-            vc_privacy_clear = x.Value.InVoiceTextPrivacy.ClearTextEnabled,
-            vc_privacy_perms = x.Value.InVoiceTextPrivacy.SetPermissionsEnabled,
+                vc_privacy_clear = x.Value.InVoiceTextPrivacy.ClearTextEnabled,
+                vc_privacy_perms = x.Value.InVoiceTextPrivacy.SetPermissionsEnabled,
 
-            invitetracker_enabled = x.Value.InviteTracker.Enabled,
-            invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTracker.Cache),
-            invitenotes = JsonConvert.SerializeObject(x.Value.InviteNotes.Notes),
+                invitetracker_enabled = x.Value.InviteTracker.Enabled,
+                invitetracker_cache = JsonConvert.SerializeObject(x.Value.InviteTracker.Cache),
+                invitenotes = JsonConvert.SerializeObject(x.Value.InviteNotes.Notes),
 
-            autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
+                autounarchivelist = JsonConvert.SerializeObject(x.Value.AutoUnarchiveThreads),
 
-            normalizenames = x.Value.NameNormalizer.NameNormalizerEnabled,
+                normalizenames = x.Value.NameNormalizer.NameNormalizerEnabled,
 
-            embed_messages = x.Value.EmbedMessage.UseEmbedding,
-            embed_github = x.Value.EmbedMessage.UseGithubEmbedding,
+                embed_messages = x.Value.EmbedMessage.UseEmbedding,
+                embed_github = x.Value.EmbedMessage.UseGithubEmbedding,
 
-            lavalink_channel = x.Value.MusicModule.ChannelId,
-            lavalink_currentposition = x.Value.MusicModule.CurrentVideoPosition,
-            lavalink_currentvideo = x.Value.MusicModule.CurrentVideo,
-            lavalink_paused = x.Value.MusicModule.IsPaused,
-            lavalink_shuffle = x.Value.MusicModule.Shuffle,
-            lavalink_repeat = x.Value.MusicModule.Repeat,
-            lavalink_queue = JsonConvert.SerializeObject(x.Value.MusicModule.SongQueue),
+                lavalink_channel = x.Value.MusicModule.ChannelId,
+                lavalink_currentposition = x.Value.MusicModule.CurrentVideoPosition,
+                lavalink_currentvideo = x.Value.MusicModule.CurrentVideo,
+                lavalink_paused = x.Value.MusicModule.IsPaused,
+                lavalink_shuffle = x.Value.MusicModule.Shuffle,
+                lavalink_repeat = x.Value.MusicModule.Repeat,
+                lavalink_queue = JsonConvert.SerializeObject(x.Value.MusicModule.SongQueue),
 
-            polls = JsonConvert.SerializeObject(x.Value.Polls.RunningPolls),
+                polls = JsonConvert.SerializeObject(x.Value.Polls.RunningPolls),
 
-            vccreator_channelid = x.Value.VcCreator.Channel,
-            vccreator_channellist = JsonConvert.SerializeObject(x.Value.VcCreator.CreatedChannels),
-        }).ToList()));
+                vccreator_channelid = x.Value.VcCreator.Channel,
+                vccreator_channellist = JsonConvert.SerializeObject(x.Value.VcCreator.CreatedChannels),
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "objected_users", _bot.objectedUsers.Select(x => new TableDefinitions.objected_users
+        lock (_bot.objectedUsers)
         {
-            id = x
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "objected_users", _bot.objectedUsers.Select(x => new TableDefinitions.objected_users
+            {
+                id = x
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "users", _bot.users.Select(x => new TableDefinitions.users
+        lock (_bot.users)
         {
-            userid = x.Key,
-            afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
-            afk_reason = x.Value.AfkStatus.Reason,
-            afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
-            afk_pingamount = x.Value.AfkStatus.MessagesAmount,
-            experience_directmessageoptout = x.Value.ExperienceUser.DirectMessageOptOut,
-            submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
-            submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
-            playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
-            reminders = JsonConvert.SerializeObject(x.Value.Reminders.ScheduledReminders),
-            submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
-            scoresaber_id = x.Value.ScoreSaber.Id,
-            last_google_source = x.Value.Translation.LastGoogleSource,
-            last_google_target = x.Value.Translation.LastGoogleTarget,
-            last_libretranslate_source = x.Value.Translation.LastLibreTranslateSource,
-            last_libretranslate_target = x.Value.Translation.LastLibreTranslateTarget,
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "users", _bot.users.Select(x => new TableDefinitions.users
+            {
+                userid = x.Key,
+                afk_since = x.Value.AfkStatus.TimeStamp.ToUniversalTime().Ticks,
+                afk_reason = x.Value.AfkStatus.Reason,
+                afk_pings = JsonConvert.SerializeObject(x.Value.AfkStatus.Messages),
+                afk_pingamount = x.Value.AfkStatus.MessagesAmount,
+                experience_directmessageoptout = x.Value.ExperienceUser.DirectMessageOptOut,
+                submission_accepted_tos = x.Value.UrlSubmissions.AcceptedTOS,
+                submission_accepted_submissions = JsonConvert.SerializeObject(x.Value.UrlSubmissions.AcceptedSubmissions),
+                playlists = JsonConvert.SerializeObject(x.Value.UserPlaylists),
+                reminders = JsonConvert.SerializeObject(x.Value.Reminders.ScheduledReminders),
+                submission_last_datetime = x.Value.UrlSubmissions.LastTime.Ticks,
+                scoresaber_id = x.Value.ScoreSaber.Id,
+                last_google_source = x.Value.Translation.LastGoogleSource,
+                last_google_target = x.Value.Translation.LastGoogleTarget,
+                last_libretranslate_source = x.Value.Translation.LastLibreTranslateSource,
+                last_libretranslate_target = x.Value.Translation.LastLibreTranslateTarget
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_user_bans", _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans
+        lock (_bot.phishingUrlSubmissionUserBans)
         {
-            id = x.Key,
-            reason = x.Value.Reason,
-            moderator = x.Value.Moderator
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_user_bans", _bot.phishingUrlSubmissionUserBans.Select(x => new TableDefinitions.submission_user_bans
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_guild_bans", _bot.phishingUrlSubmissionGuildBans.Select(x => new TableDefinitions.submission_guild_bans
+        lock (_bot.phishingUrlSubmissionGuildBans)
         {
-            id = x.Key,
-            reason = x.Value.Reason,
-            moderator = x.Value.Moderator
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "submission_guild_bans", _bot.phishingUrlSubmissionGuildBans.Select(x => new TableDefinitions.submission_guild_bans
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "banned_users", _bot.bannedUsers.Select(x => new TableDefinitions.banned_users
+        lock (_bot.bannedUsers)
         {
-            id = x.Key,
-            reason = x.Value.Reason,
-            moderator = x.Value.Moderator,
-            timestamp = x.Value.Timestamp.Ticks
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "banned_users", _bot.bannedUsers.Select(x => new TableDefinitions.banned_users
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator,
+                timestamp = x.Value.Timestamp.Ticks
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "banned_guilds", _bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
+        lock (_bot.bannedGuilds)
         {
-            id = x.Key,
-            reason = x.Value.Reason,
-            moderator = x.Value.Moderator,
-            timestamp = x.Value.Timestamp.Ticks
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "banned_guilds", _bot.bannedGuilds.Select(x => new TableDefinitions.banned_guilds
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator,
+                timestamp = x.Value.Timestamp.Ticks
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "globalbans", _bot.globalBans.Select(x => new TableDefinitions.globalbans
+        lock (_bot.globalBans)
         {
-            id = x.Key,
-            reason = x.Value.Reason,
-            moderator = x.Value.Moderator,
-            timestamp = x.Value.Timestamp.Ticks
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "globalbans", _bot.globalBans.Select(x => new TableDefinitions.globalbans
+            {
+                id = x.Key,
+                reason = x.Value.Reason,
+                moderator = x.Value.Moderator,
+                timestamp = x.Value.Timestamp.Ticks
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
+        lock (_bot.globalNotes)
         {
-            id = x.Key,
-            notes = JsonConvert.SerializeObject(x.Value),
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "globalnotes", _bot.globalNotes.Select(x => new TableDefinitions.globalnotes
+            {
+                id = x.Key,
+                notes = JsonConvert.SerializeObject(x.Value),
+            }).ToList())); 
+        }
 
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
+        lock (_bot.submittedUrls)
         {
-            messageid = x.Key,
-            url = x.Value.Url,
-            submitter = x.Value.Submitter,
-            guild = x.Value.GuildOrigin
-        }).ToList()));
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "active_url_submissions", _bot.submittedUrls.Select(x => new TableDefinitions.active_url_submissions
+            {
+                messageid = x.Key,
+                url = x.Value.Url,
+                submitter = x.Value.Submitter,
+                guild = x.Value.GuildOrigin
+            }).ToList())); 
+        }
 
         var check = CheckGuildTables();
         try { check.Add(_bot.watcher); await check.WaitAsync(TimeSpan.FromSeconds(120)); } catch { }
 
-        foreach (var guild in _bot.guilds.ToList())
-            syncs_running.Add(SyncTable(guildDatabaseConnection, $"{guild.Key}", guild.Value.Members.Select(x => new TableDefinitions.guild_users
-            {
-                userid = x.Key,
-
-                experience = x.Value.Experience.Points,
-                experience_level = x.Value.Experience.Level,
-                experience_last_message = x.Value.Experience.Last_Message.ToUniversalTime().Ticks,
-                first_join = x.Value.FirstJoinDate.ToUniversalTime().Ticks,
-                last_leave = x.Value.LastLeaveDate.ToUniversalTime().Ticks,
-                roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
-                saved_nickname = x.Value.SavedNickname,
-                invite_code = x.Value.InviteTracker.Code,
-                invite_user = x.Value.InviteTracker.UserId,
-            }).ToList(), "guild_users"));
-
-        syncs_running.Add(SyncTable(mainDatabaseConnection, "scam_urls", _bot.phishingUrls.Select(x => new TableDefinitions.scam_urls
+        lock (_bot.guilds)
         {
-            url = x.Value.Url,
-            origin = JsonConvert.SerializeObject(x.Value.Origin),
-            submitter = x.Value.Submitter
-        }).ToList()));
+            foreach (var guild in _bot.guilds)
+                syncs_running.Add(SyncTable(guildDatabaseConnection, $"{guild.Key}", guild.Value.Members.Select(x => new TableDefinitions.guild_users
+                {
+                    userid = x.Key,
+
+                    experience = x.Value.Experience.Points,
+                    experience_level = x.Value.Experience.Level,
+                    experience_last_message = x.Value.Experience.Last_Message.ToUniversalTime().Ticks,
+                    first_join = x.Value.FirstJoinDate.ToUniversalTime().Ticks,
+                    last_leave = x.Value.LastLeaveDate.ToUniversalTime().Ticks,
+                    roles = JsonConvert.SerializeObject(x.Value.MemberRoles),
+                    saved_nickname = x.Value.SavedNickname,
+                    invite_code = x.Value.InviteTracker.Code,
+                    invite_user = x.Value.InviteTracker.UserId,
+                }).ToList(), "guild_users"));
+        }
+
+        lock (_bot.phishingUrls)
+        {
+            syncs_running.Add(SyncTable(mainDatabaseConnection, "scam_urls", _bot.phishingUrls.Select(x => new TableDefinitions.scam_urls
+            {
+                url = x.Value.Url,
+                origin = JsonConvert.SerializeObject(x.Value.Origin),
+                submitter = x.Value.Submitter
+            }).ToList()));
+        }
 
         while (syncs_running.Any(x => !x.IsCompleted))
             await Task.Delay(100);
