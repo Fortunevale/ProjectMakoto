@@ -380,6 +380,12 @@ public class Translations
                 public TranslationKey Confirm;
                 public TranslationKey DmNotice;
             }
+
+            public policy Policy;
+            public class policy
+            {
+                public TranslationKey NoPolicy;
+            }
         }
     }
 }

@@ -61,6 +61,7 @@ public class Bot
 
     internal string Prefix { get; private set; } = ";;";
 
+    internal string RawFetchedPrivacyPolicy = "";
 
     internal async Task Init(string[] args)
     {
@@ -603,7 +604,7 @@ public class Bot
                     }
                 });
 
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
                     try
                     {
@@ -616,6 +617,18 @@ public class Bot
                     catch (Exception ex)
                     {
                         _logger.LogError("An exception occurred trying to add team members to administrator list. Is the current bot registered in a team?", ex);
+                    }
+
+                    try
+                    {
+                        if (discordClient.CurrentApplication.PrivacyPolicyUrl.IsNullOrWhiteSpace())
+                            throw new Exception("No privacy policy was defined.");
+
+                        RawFetchedPrivacyPolicy = await new HttpClient().GetStringAsync(discordClient.CurrentApplication.PrivacyPolicyUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("An exception occurred while trying to fetch the privacy policy", ex);
                     }
                 });
             }

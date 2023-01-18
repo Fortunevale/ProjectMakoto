@@ -1020,6 +1020,11 @@
         "DmNotice": {
           "en": "I sent your data via direct messages."
         }
+      },
+      "Policy": {
+        "NoPolicy": {
+          "en": "The privacy policy was not loaded. This is most likely unintended, please report to {Bot} Staff."
+        }
       }
     }
   }
