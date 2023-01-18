@@ -65,7 +65,7 @@ public class ReminderSettings
 
                     await button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                     var newMsg = await button.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
-                        .AddEmbed(new DiscordEmbedBuilder().WithDescription("`How long do you want to snooze for?`").AsBotAwaitingInput(_bot.discordClient, user))
+                        .AddEmbed(new DiscordEmbedBuilder().WithDescription("`How long do you want to snooze for?`").AsBotAwaitingInput(_bot.discordClient, user, _bot.users[user.Id]))
                         .AddComponents(new DiscordStringSelectComponent("Select a new due time..", new List<DiscordStringSelectComponentOption>
                         {
                             new DiscordStringSelectComponentOption("1 minute", "1m"),
