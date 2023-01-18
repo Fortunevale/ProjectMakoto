@@ -85,16 +85,7 @@ internal class InfoCommand : BaseCommand
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
-                var errorembed = new DiscordEmbedBuilder
-                {
-                    Description = "`It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
-                    ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
-                }.AsBotError(ctx);
-
-                if (ctx.User.Presence.ClientStatus.Mobile.HasValue)
-                    errorembed.ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif";
-
-                await RespondOrEdit(embed: errorembed);
+                SendDmError();
             }
         });
     }

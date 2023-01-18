@@ -89,6 +89,7 @@ public class Translations
             public TranslationKey UsedByFooter;
             public TranslationKey InteractionTimeout;
             public TranslationKey InteractionFinished;
+            public TranslationKey DirectMessageRedirect;
         }
 
         public modules ModuleNames;

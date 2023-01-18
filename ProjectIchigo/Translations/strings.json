@@ -202,6 +202,10 @@
       "InteractionFinished": {
         "en": "Interaction finished",
         "de": "Interaktion abgeschlossen"
+      },
+      "DirectMessageRedirect": {
+        "en": "I've sent you a message via direct messages.",
+        "de": "Ich habe dir eine Nachricht via Direktnachrichten gesendet."
       }
     },
     "ModuleNames": {

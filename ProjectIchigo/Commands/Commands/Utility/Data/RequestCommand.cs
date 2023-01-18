@@ -50,10 +50,7 @@ internal class RequestCommand : BaseCommand
                             Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));
 
-                        await RespondOrEdit(new DiscordEmbedBuilder
-                        {
-                            Description = $"`{GetString(t.Commands.Data.Request.DmNotice)}`"
-                        }.AsSuccess(ctx));
+                        SendDmRedirect();
                     }
                     catch (DisCatSharp.Exceptions.UnauthorizedException)
                     {
