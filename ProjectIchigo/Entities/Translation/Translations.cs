@@ -376,6 +376,7 @@ public class Translations
             public request Request;
             public class request
             {
+                public SingleTranslationKey TimeError;
                 public SingleTranslationKey Fetching;
                 public SingleTranslationKey Confirm;
                 public SingleTranslationKey DmNotice;
@@ -390,10 +391,15 @@ public class Translations
             public objectCmd Object;
             public class objectCmd
             {
-                public SingleTranslationKey Reverse;
-                public SingleTranslationKey ReverseProgress;
-                public SingleTranslationKey ReverseError;
-                public SingleTranslationKey ReverseSuccess;
+                public SingleTranslationKey ProfileAlreadyDeleted;
+                public SingleTranslationKey EnablingDataProcessing;
+                public SingleTranslationKey EnablingDataProcessingError;
+                public SingleTranslationKey EnablingDataProcessingSuccess;
+                public SingleTranslationKey DeletionAlreadyScheduled;
+                public SingleTranslationKey DeletionScheduleReversed;
+                public MultiTranslationKey ObjectionDisclaimer;
+                public SingleTranslationKey SecondaryConfirm;
+                public SingleTranslationKey ProfileDeletionScheduled;
             }
         }
     }

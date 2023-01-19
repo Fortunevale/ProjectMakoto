@@ -651,6 +651,8 @@ public class Bot
                         _logger.LogError("An exception occurred while trying to fetch the privacy policy", ex);
                     }
                 });
+
+                ProcessDeletionRequests().Add(watcher);
             }
             catch (Exception ex)
             {
@@ -1390,6 +1392,35 @@ public class Bot
             }
             default:
                 break;
+        }
+    }
+
+    private async Task ProcessDeletionRequests()
+    {
+        new Task(new Action(async () =>
+        {
+            ProcessDeletionRequests().Add(watcher);
+        })).CreateScheduleTask(DateTime.UtcNow.AddHours(24));
+
+        lock (users)
+        {
+            foreach (var b in users)
+            {
+                if ((b.Value?.Data?.DeletionRequested ?? false) && b.Value?.Data?.DeletionRequestDate.GetTimespanUntil() < TimeSpan.Zero)
+                {
+                    _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
+
+                    users.Remove(b.Key);
+                    databaseClient._helper.DeleteRow(databaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(watcher);
+                    objectedUsers.Add(b.Key);
+                    foreach (var c in discordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
+                    {
+                        try
+                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); c.Value.LeaveAsync().Add(watcher); }
+                        catch { }
+                    }
+                }
+            }
         }
     }
 }

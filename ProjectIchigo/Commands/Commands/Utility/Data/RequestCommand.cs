@@ -9,6 +9,15 @@ internal class RequestCommand : BaseCommand
             if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
+            if (ctx.DbUser.Data.LastDataRequest.GetTimespanSince() < TimeSpan.FromDays(14))
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder
+                {
+                    Description = $"`{GetString(t.Commands.Data.Request.TimeError).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)}`").Replace("{WaitTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)}`")}`"
+                }.AsError(ctx));
+                return;
+            }
+
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`{GetString(t.Commands.Data.Request.Fetching)}`"
@@ -39,6 +48,7 @@ internal class RequestCommand : BaseCommand
                     {
                         Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                     }.AsSuccess(ctx)).WithFile("userdata.json", stream));
+                    ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
                     break;
                 }
                 default:
@@ -49,6 +59,7 @@ internal class RequestCommand : BaseCommand
                         {
                             Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));
+                        ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
 
                         SendDmRedirect();
                     }

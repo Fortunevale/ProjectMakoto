@@ -21,6 +21,9 @@ public class User
     [JsonIgnore]
     public ulong UserId { get; set; }
 
+    [JsonIgnore]
+    public DataSettings Data { get; set; } = new();
+
     public UrlSubmissionSettings UrlSubmissions { get; set; }
     public AfkStatus AfkStatus { get; set; }
     public ScoreSaberSettings ScoreSaber { get; set; }

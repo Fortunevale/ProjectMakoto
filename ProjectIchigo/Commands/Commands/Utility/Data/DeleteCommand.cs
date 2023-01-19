@@ -9,14 +9,100 @@ internal class DeleteCommand : BaseCommand
             if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
+
+            if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`{GetString(t.Commands.Data.Object.ProfileAlreadyDeleted)}`"
+                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+
+                var Menu1 = await ctx.WaitForButtonAsync();
+
+                if (Menu1.TimedOut)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+
+                _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (Menu1.GetCustomId() == Yes.CustomId)
+                {
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`{GetString(t.Commands.Data.Object.EnablingDataProcessing)}`"
+                    }.AsBotLoading(ctx));
+
+                    try
+                    {
+                        ctx.Bot.objectedUsers.Remove(ctx.User.Id);
+                        await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "objected_users", "id", $"{ctx.User.Id}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("An exception occurred while trying to remove a user from the objection list", ex);
+
+                        await RespondOrEdit(new DiscordEmbedBuilder
+                        {
+                            Description = $"`{GetString(t.Commands.Data.Object.EnablingDataProcessingError)}`"
+                        }.AsBotError(ctx));
+                        return;
+                    }
+
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`{GetString(t.Commands.Data.Object.EnablingDataProcessingSuccess)}`"
+                    }.AsBotSuccess(ctx));
+                }
+                else
+                {
+                    DeleteOrInvalidate();
+                }
+
+                return;
+            }
+
+            if (ctx.DbUser.Data.DeletionRequested)
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`{GetString(t.Commands.Data.Object.DeletionAlreadyScheduled).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.DeletionRequestDate.AddDays(-14).ToTimestamp()}`").Replace("{ScheduleTimestamp}", $"`{ctx.DbUser.Data.DeletionRequestDate.ToTimestamp()}`")}`"
+                }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
+
+                var Menu1 = await ctx.WaitForButtonAsync();
+
+                if (Menu1.TimedOut)
+                {
+                    ModifyToTimedOut();
+                    return;
+                }
+
+                _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
+
+                if (Menu1.GetCustomId() == Yes.CustomId)
+                {
+                    ctx.DbUser.Data.DeletionRequested = false;
+                    ctx.DbUser.Data.DeletionRequestDate = DateTime.MinValue;
+
+                    await RespondOrEdit(new DiscordEmbedBuilder
+                    {
+                        Description = $"`{GetString(t.Commands.Data.Object.DeletionScheduleReversed)}`"
+                    }.AsBotSuccess(ctx));
+                }
+                else
+                {
+                    DeleteOrInvalidate();
+                }
+
+                return;
+            }
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`This action will delete all data related to your user account. This includes, but is not limited to: Playlists, Settings, Url Submissions.`\n" +
-                              $"`This will NOT delete data stored for guilds (see GuildData via '/data request').`\n\n" +
-                              $"**`Are you sure you want to continue?`**"
+                Description = GetString(t.Commands.Data.Object.ObjectionDisclaimer).Build(true, true)
             }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
@@ -33,7 +119,7 @@ internal class DeleteCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"**`Please confirm again, are you sure?`**"
+                    Description = $"**`{GetString(t.Commands.Data.Object.SecondaryConfirm)}`**"
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.WaitForButtonAsync();
@@ -48,31 +134,13 @@ internal class DeleteCommand : BaseCommand
 
                 if (Menu.GetCustomId() == Yes.CustomId)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder
-                    {
-                        Description = $"`Okay, deleting your profile..`"
-                    }.AsBotLoading(ctx));
-
-                    try
-                    {
-                        ctx.Bot.users.Remove(ctx.User.Id);
-                        await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "users", "userid", $"{ctx.User.Id}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError("An exception occurred while trying to delete a user profile", ex);
-
-                        await RespondOrEdit(new DiscordEmbedBuilder
-                        {
-                            Description = $"`I'm sorry but something went wrong while deleting your profile. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
-                        }.AsBotError(ctx));
-                        return;
-                    }
+                    ctx.DbUser.Data.DeletionRequestDate = DateTime.UtcNow.AddDays(14);
+                    ctx.DbUser.Data.DeletionRequested = true;
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`Successfully deleted your profile.`"
-                    }.AsSuccess(ctx));
+                        Description = $"`{GetString(t.Commands.Data.Object.ProfileDeletionScheduled)}`"
+                    }.AsBotSuccess(ctx));
                 }
                 else
                 {

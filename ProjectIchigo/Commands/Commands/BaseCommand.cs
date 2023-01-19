@@ -82,7 +82,7 @@ public abstract class BaseCommand
         if (!(await BeforeExecution(this.ctx)))
             return false;
 
-        if (this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) && this.ctx.CommandName != "data object" && this.ctx.CommandName != "object")
+        if ((this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) || ctx.DbUser.Data.DeletionRequested) && this.ctx.CommandName != "data" && this.ctx.CommandName != "delete")
         {
             SendDataError();
             return false;
@@ -1029,7 +1029,7 @@ public abstract class BaseCommand
     public void SendDataError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.Data).Replace("{Command}", $"{ctx.Prefix}data object")}`",
+            Description = $"`{GetString(t.Commands.Common.Errors.Data).Replace("{Command}", $"{ctx.Prefix}data delete")}`",
         }.AsError(ctx)));
 
     public void SendDmError() 

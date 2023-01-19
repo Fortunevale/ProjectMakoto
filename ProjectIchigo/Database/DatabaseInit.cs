@@ -237,6 +237,13 @@ internal class DatabaseInit
                 LastLibreTranslateSource = b.last_libretranslate_source,
                 LastLibreTranslateTarget = b.last_libretranslate_target
             };
+            DbUser.Data = new()
+            {
+                DeletionRequested = b.deletion_requested,
+                DeletionRequestDate = new DateTime().ToUniversalTime().AddTicks(b.data_deletion_date),
+                LastDataRequest = new DateTime().ToUniversalTime().AddTicks(b.last_data_request),
+            };
+
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>(b.playlists) ?? new();
             DbUser.CurrentLocale = b.current_locale;
             DbUser.OverrideLocale = b.override_locale;

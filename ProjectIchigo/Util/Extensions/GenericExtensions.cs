@@ -77,7 +77,7 @@ internal static class GenericExtensions
     /// <param name="array"></param>
     /// <param name="Code">Whether to prefix and suffix ` on non-empty lines.</param>
     /// <returns></returns>
-    internal static string Build(this string[] array, bool Code = false)
+    internal static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false)
         => string.Join("\n", array.Select(x => 
         {
             if (!Code)
@@ -86,7 +86,16 @@ internal static class GenericExtensions
             if (x.IsNullOrWhiteSpace())
                 return x;
 
-            return $"`{x}`";
+            bool boldLine = false;
+            var y = x;
+
+            if (y.StartsWith("**"))
+            {
+                boldLine = true;
+                y = y.Remove(0, 2);
+            }
+
+            return $"{(boldLine ? "**" : "")}`{y}`{(boldLine ? "**" : "")}";
         }));
 
     /// <summary>

@@ -1062,6 +1062,9 @@
     },
     "Data": {
       "Request": {
+        "TimeError": {
+          "en": "Your last request was {RequestTimestamp}, please wait until {WaitTimestamp} to request your user data again."
+        },
         "Fetching": {
           "en": "Fetching all your user data. This might take a moment.."
         },
@@ -1078,17 +1081,40 @@
         }
       },
       "Object": {
-        "Reverse": {
-          "en": "You already objected to having your data get processed. Do you want to reverse that decision?"
+        "ProfileAlreadyDeleted": {
+          "en": "You already objected to your data being processed and saved. Do you want to reverse that decision?"
         },
-        "ReverseProgress": {
+        "EnablingDataProcessing": {
           "en": "Okay, removing you from the objection list.."
         },
-        "ReverseError": {
+        "EnablingDataProcessingError": {
           "en": "I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours."
         },
-        "ReverseSuccess": {
-          "en": "Successfully removed you from the objection list."
+        "EnablingDataProcessingSuccess": {
+          "en": "You've been removed from our objection list. You're now able to run commands again."
+        },
+        "DeletionAlreadyScheduled": {
+          "en": "You objected to your data being processed {RequestTimestamp}, your data will be deleted {ScheduleTimestamp}. Do you want to cancel your account's deletion?"
+        },
+        "DeletionScheduleReversed": {
+          "en": "Your user data is no longer scheduled for deletion."
+        },
+        "ObjectionDisclaimer": {
+          "en": [
+            "This action will delete all data related to your user account and object to further creation of an user account.",
+            "",
+            "This will prevent you from using any commands of the bot.",
+            "This will NOT delete data stored for guilds (see GuildData via '/data request').",
+            "**Additionally, this action will make the bot leave every server you own.",
+            "",
+            "**Are you sure you want to continue?"
+          ]
+        },
+        "SecondaryConfirm": {
+          "en": "Please confirm again, are you sure?"
+        },
+        "ProfileDeletionScheduled": {
+          "en": "Okay, your data was scheduled for deletion in 14 days."
         }
       }
     }

@@ -241,21 +241,12 @@ public class UtilityPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [Command("delete"), Description("Allows you to delete your user data.")]
+        [Command("delete"), Description("Allows you to delete your user data and stop Ichigo from further processing of your user data.")]
         public async Task Delete(CommandContext ctx)
         {
             Task.Run(async () =>
             {
                 await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
-            }).Add(_bot.watcher, ctx);
-        }
-
-        [Command("object"), Description("Allows you to stop Ichigo from further processing of your user data.")]
-        public async Task Object(CommandContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await new Commands.Data.ObjectCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
 
