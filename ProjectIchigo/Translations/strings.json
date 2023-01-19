@@ -1117,6 +1117,28 @@
           "en": "Okay, your data was scheduled for deletion in 14 days."
         }
       }
+    },
+    "VoiceChannelCreator": {
+      "NotAVccChannel": {
+        "en": "You're not in a channel created by the Voice Channel Creator."
+      },
+      "NotAVccChannelOwner": {
+        "en": "You don't own this channel."
+      },
+      "VictimNotPresent": {
+        "en": "{User} is not in your Voice Channel."
+      },
+      "Ban": {
+        "CannotBanSelf": {
+          "en": "You cannot ban yourself."
+        },
+        "VictimAlreadyBanned": {
+          "en": "{User} has already been banned from your Voice Channel."
+        },
+        "VictimBanned": {
+          "en": "{User} has been banned from this channel."
+        }
+      }
     }
   }
 }

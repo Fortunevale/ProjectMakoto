@@ -402,5 +402,21 @@ public class Translations
                 public SingleTranslationKey ProfileDeletionScheduled;
             }
         }
+
+        public voiceChannelCreator VoiceChannelCreator;
+        public class voiceChannelCreator
+        {
+            public SingleTranslationKey NotAVccChannel;
+            public SingleTranslationKey NotAVccChannelOwner;
+            public SingleTranslationKey VictimNotPresent;
+
+            public ban Ban;
+            public class ban
+            {
+                public SingleTranslationKey CannotBanSelf;
+                public SingleTranslationKey VictimAlreadyBanned;
+                public SingleTranslationKey VictimBanned;
+            }
+        }
     }
 }
