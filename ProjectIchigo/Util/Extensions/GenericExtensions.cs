@@ -71,7 +71,7 @@ internal static class GenericExtensions
         return stream;
     }
 
-    internal static int CalculatePadding(User user, params TranslationKey[] pairs)
+    internal static int CalculatePadding(User user, params SingleTranslationKey[] pairs)
     {
         int pad = 0;
 

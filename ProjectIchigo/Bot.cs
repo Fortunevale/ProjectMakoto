@@ -242,9 +242,9 @@ public class Bot
                         {
                             if (field.FieldType.Assembly == objType.Assembly)
                             {
-                                if (field.FieldType == typeof(TranslationKey))
+                                if (field.FieldType == typeof(SingleTranslationKey))
                                 {
-                                    foreach (var b in ((TranslationKey)fieldValue).t)
+                                    foreach (var b in ((SingleTranslationKey)fieldValue).t)
                                     {
                                         if (!counts.ContainsKey(b.Key))
                                             counts.Add(b.Key, 0);
@@ -263,9 +263,9 @@ public class Bot
                             }
                             else
                             {
-                                if (field.FieldType == typeof(TranslationKey))
+                                if (field.FieldType == typeof(SingleTranslationKey))
                                 {
-                                    foreach (var b in ((TranslationKey)fieldValue).t)
+                                    foreach (var b in ((SingleTranslationKey)fieldValue).t)
                                     {
                                         if (!counts.ContainsKey(b.Key))
                                             counts.Add(b.Key, 0);

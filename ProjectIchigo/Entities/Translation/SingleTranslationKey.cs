@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectIchigo.Entities;
 
-public class TranslationKey : IDictionary<string, string>
+public class SingleTranslationKey : IDictionary<string, string>
 {
     public Dictionary<string, string> t { get; set; } = new();
 

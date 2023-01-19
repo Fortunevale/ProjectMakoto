@@ -7,19 +7,19 @@ public class Translations
     public common Common;
     public class common
     {
-        public TranslationKey Yes;
-        public TranslationKey No;
-        public TranslationKey On;
-        public TranslationKey Off;
-        public TranslationKey Confirm;
-        public TranslationKey Deny;
-        public TranslationKey Submit;
-        public TranslationKey Cancel;
-        public TranslationKey Back;
-        public TranslationKey PreviousPage;
-        public TranslationKey NextPage;
-        public TranslationKey NotSelected;
-        public TranslationKey Reason;
+        public SingleTranslationKey Yes;
+        public SingleTranslationKey No;
+        public SingleTranslationKey On;
+        public SingleTranslationKey Off;
+        public SingleTranslationKey Confirm;
+        public SingleTranslationKey Deny;
+        public SingleTranslationKey Submit;
+        public SingleTranslationKey Cancel;
+        public SingleTranslationKey Back;
+        public SingleTranslationKey PreviousPage;
+        public SingleTranslationKey NextPage;
+        public SingleTranslationKey NotSelected;
+        public SingleTranslationKey Reason;
     }
 
     public _commands Commands;
@@ -28,10 +28,10 @@ public class Translations
         public language Language;
         public class language
         {
-            public TranslationKey Disclaimer;
-            public TranslationKey Response;
-            public TranslationKey DisableOverride;
-            public TranslationKey Selector;
+            public SingleTranslationKey Disclaimer;
+            public SingleTranslationKey Response;
+            public SingleTranslationKey DisableOverride;
+            public SingleTranslationKey Selector;
         }
 
         public common Common;
@@ -40,334 +40,334 @@ public class Translations
             public errors Errors;
             public class errors
             {
-                public TranslationKey Generic;
-                public TranslationKey NoMember;
-                public TranslationKey BotOwner;
-                public TranslationKey VoiceChannel;
-                public TranslationKey UserBan;
-                public TranslationKey GuildBan;
-                public TranslationKey ExclusivePrefix;
-                public TranslationKey ExclusiveApp;
-                public TranslationKey Data;
-                public TranslationKey BotPermissions;
-                public TranslationKey DirectMessage;
+                public SingleTranslationKey Generic;
+                public SingleTranslationKey NoMember;
+                public SingleTranslationKey BotOwner;
+                public SingleTranslationKey VoiceChannel;
+                public SingleTranslationKey UserBan;
+                public SingleTranslationKey GuildBan;
+                public SingleTranslationKey ExclusivePrefix;
+                public SingleTranslationKey ExclusiveApp;
+                public SingleTranslationKey Data;
+                public SingleTranslationKey BotPermissions;
+                public SingleTranslationKey DirectMessage;
             }
 
             public prompts Prompts;
             public class prompts
             {
-                public TranslationKey ConfirmSelection;
-                public TranslationKey Disable;
+                public SingleTranslationKey ConfirmSelection;
+                public SingleTranslationKey Disable;
 
-                public TranslationKey CreateRoleForMe;
-                public TranslationKey SelectEveryone;
-                public TranslationKey SelectARole;
-                public TranslationKey SelectedRoleUnavailable;
+                public SingleTranslationKey CreateRoleForMe;
+                public SingleTranslationKey SelectEveryone;
+                public SingleTranslationKey SelectARole;
+                public SingleTranslationKey SelectedRoleUnavailable;
 
-                public TranslationKey CreateChannelForMe;
-                public TranslationKey SelectAChannel;
+                public SingleTranslationKey CreateChannelForMe;
+                public SingleTranslationKey SelectAChannel;
 
-                public TranslationKey SelectAnOption;
+                public SingleTranslationKey SelectAnOption;
 
-                public TranslationKey ReOpenModal;
-                public TranslationKey WaitingForModalResponse;
+                public SingleTranslationKey ReOpenModal;
+                public SingleTranslationKey WaitingForModalResponse;
                 
-                public TranslationKey SelectATimeSpan;
-                public TranslationKey TimespanSeconds;
-                public TranslationKey TimespanMinutes;
-                public TranslationKey TimespanHours;
-                public TranslationKey TimespanDays;
+                public SingleTranslationKey SelectATimeSpan;
+                public SingleTranslationKey TimespanSeconds;
+                public SingleTranslationKey TimespanMinutes;
+                public SingleTranslationKey TimespanHours;
+                public SingleTranslationKey TimespanDays;
 
-                public TranslationKey SelectADateTime;
-                public TranslationKey DateTimeMinute;
-                public TranslationKey DateTimeHour;
-                public TranslationKey DateTimeDay;
-                public TranslationKey DateTimeMonth;
-                public TranslationKey DateTimeYear;
+                public SingleTranslationKey SelectADateTime;
+                public SingleTranslationKey DateTimeMinute;
+                public SingleTranslationKey DateTimeHour;
+                public SingleTranslationKey DateTimeDay;
+                public SingleTranslationKey DateTimeMonth;
+                public SingleTranslationKey DateTimeYear;
             }
 
-            public TranslationKey UsedByFooter;
-            public TranslationKey InteractionTimeout;
-            public TranslationKey InteractionFinished;
-            public TranslationKey DirectMessageRedirect;
+            public SingleTranslationKey UsedByFooter;
+            public SingleTranslationKey InteractionTimeout;
+            public SingleTranslationKey InteractionFinished;
+            public SingleTranslationKey DirectMessageRedirect;
         }
 
         public modules ModuleNames;
         public class modules
         {
-            public TranslationKey Utility;
-            public TranslationKey Social;
-            public TranslationKey Music;
-            public TranslationKey Moderation;
-            public TranslationKey Configuration;
-            public TranslationKey Unknown;
+            public SingleTranslationKey Utility;
+            public SingleTranslationKey Social;
+            public SingleTranslationKey Music;
+            public SingleTranslationKey Moderation;
+            public SingleTranslationKey Configuration;
+            public SingleTranslationKey Unknown;
         }
 
         public help Help;
         public class help
         {
-            public TranslationKey Module;
-            public TranslationKey Disclaimer;
-            public TranslationKey MissingCommand;
+            public SingleTranslationKey Module;
+            public SingleTranslationKey Disclaimer;
+            public SingleTranslationKey MissingCommand;
         }
 
         public avatar Avatar;
         public class avatar
         {
-            public TranslationKey Avatar;
-            public TranslationKey ShowServerProfile;
-            public TranslationKey ShowUserProfile;
+            public SingleTranslationKey Avatar;
+            public SingleTranslationKey ShowServerProfile;
+            public SingleTranslationKey ShowUserProfile;
         }
 
         public banner Banner;
         public class banner
         {
-            public TranslationKey Banner;
-            public TranslationKey NoBanner;
+            public SingleTranslationKey Banner;
+            public SingleTranslationKey NoBanner;
         }
 
         public credits Credits;
         public class credits
         {
-            public TranslationKey Fetching;
-            public TranslationKey Credits;
+            public SingleTranslationKey Fetching;
+            public SingleTranslationKey Credits;
         }
 
         public emojiStealer EmojiStealer;
         public class emojiStealer
         {
-            public TranslationKey Emoji;
-            public TranslationKey Sticker;
-            public TranslationKey DownloadingPre;
-            public TranslationKey NoEmojis;
-            public TranslationKey DownloadingEmojis;
-            public TranslationKey DownloadingStickers;
-            public TranslationKey NoSuccessfulDownload;
-            public TranslationKey ReceivePrompt;
-            public TranslationKey AddToServer;
-            public TranslationKey ToggleStickers;
-            public TranslationKey DirectMessageZip;
-            public TranslationKey DirectMessageSingle;
-            public TranslationKey CurrentChatZip;
-            public TranslationKey AddToServerStickerError;
-            public TranslationKey AddToServerLoading;
-            public TranslationKey AddToServerLoadingNotice;
-            public TranslationKey NoMoreRoom;
-            public TranslationKey SuccessAdded;
-            public TranslationKey SendingDm;
-            public TranslationKey SuccessDm;
-            public TranslationKey SuccessDmMain;
-            public TranslationKey PreparingZip;
-            public TranslationKey SendingZipDm;
-            public TranslationKey SendingZipChat;
-            public TranslationKey SuccessChat;
+            public SingleTranslationKey Emoji;
+            public SingleTranslationKey Sticker;
+            public SingleTranslationKey DownloadingPre;
+            public SingleTranslationKey NoEmojis;
+            public SingleTranslationKey DownloadingEmojis;
+            public SingleTranslationKey DownloadingStickers;
+            public SingleTranslationKey NoSuccessfulDownload;
+            public SingleTranslationKey ReceivePrompt;
+            public SingleTranslationKey AddToServer;
+            public SingleTranslationKey ToggleStickers;
+            public SingleTranslationKey DirectMessageZip;
+            public SingleTranslationKey DirectMessageSingle;
+            public SingleTranslationKey CurrentChatZip;
+            public SingleTranslationKey AddToServerStickerError;
+            public SingleTranslationKey AddToServerLoading;
+            public SingleTranslationKey AddToServerLoadingNotice;
+            public SingleTranslationKey NoMoreRoom;
+            public SingleTranslationKey SuccessAdded;
+            public SingleTranslationKey SendingDm;
+            public SingleTranslationKey SuccessDm;
+            public SingleTranslationKey SuccessDmMain;
+            public SingleTranslationKey PreparingZip;
+            public SingleTranslationKey SendingZipDm;
+            public SingleTranslationKey SendingZipChat;
+            public SingleTranslationKey SuccessChat;
         }
 
         public guildInfo GuildInfo;
         public class guildInfo
         {
-            public TranslationKey Fetching;
-            public TranslationKey MemberTitle;
-            public TranslationKey OnlineMembers;
-            public TranslationKey MaxMembers;
-            public TranslationKey GuildTitle;
-            public TranslationKey Owner;
-            public TranslationKey Creation;
-            public TranslationKey Locale;
-            public TranslationKey Boosts;
-            public TranslationKey BoostsNone;
-            public TranslationKey BoostsTierOne;
-            public TranslationKey BoostsTierTwo;
-            public TranslationKey BoostsTierThree;
-            public TranslationKey Widget;
-            public TranslationKey Community;
-            public TranslationKey Security;
-            public TranslationKey MultiFactor;
-            public TranslationKey Screening;
-            public TranslationKey WelcomeScreen;
-            public TranslationKey Verification;
-            public TranslationKey VerificationNone;
-            public TranslationKey VerificationLow;
-            public TranslationKey VerificationMedium;
-            public TranslationKey VerificationHigh;
-            public TranslationKey VerificationHighest;
-            public TranslationKey ExplicitContent;
-            public TranslationKey ExplicitContentNone;
-            public TranslationKey ExplicitContentNoRoles;
-            public TranslationKey ExplicitContentEveryone;
-            public TranslationKey Nsfw;
-            public TranslationKey NsfwNoRating;
-            public TranslationKey NsfwExplicit;
-            public TranslationKey NsfwSafe;
-            public TranslationKey NsfwQuestionable;
-            public TranslationKey DefaultNotifications;
-            public TranslationKey DefaultNotificationsAll;
-            public TranslationKey DefaultNotificationsMentions;
-            public TranslationKey SpecialChannels;
-            public TranslationKey Rules;
-            public TranslationKey CommunityUpdates;
-            public TranslationKey InactiveChannel;
-            public TranslationKey InactiveTimeout;
-            public TranslationKey SystemMessages;
-            public TranslationKey SystemMessagesWelcome;
-            public TranslationKey SystemMessagesWelcomeStickers;
-            public TranslationKey SystemMessagesBoost;
-            public TranslationKey SystemMessagesRole;
-            public TranslationKey SystemMessagesRoleSticker;
-            public TranslationKey SystemMessagesSetupTips;
-            public TranslationKey GuildFeatures;
-            public TranslationKey JoinServer;
-            public TranslationKey GuildPreviewNotice;
-            public TranslationKey GuildWidgetNotice;
-            public TranslationKey Mee6Notice;
-            public TranslationKey NoGuildFound;
+            public SingleTranslationKey Fetching;
+            public SingleTranslationKey MemberTitle;
+            public SingleTranslationKey OnlineMembers;
+            public SingleTranslationKey MaxMembers;
+            public SingleTranslationKey GuildTitle;
+            public SingleTranslationKey Owner;
+            public SingleTranslationKey Creation;
+            public SingleTranslationKey Locale;
+            public SingleTranslationKey Boosts;
+            public SingleTranslationKey BoostsNone;
+            public SingleTranslationKey BoostsTierOne;
+            public SingleTranslationKey BoostsTierTwo;
+            public SingleTranslationKey BoostsTierThree;
+            public SingleTranslationKey Widget;
+            public SingleTranslationKey Community;
+            public SingleTranslationKey Security;
+            public SingleTranslationKey MultiFactor;
+            public SingleTranslationKey Screening;
+            public SingleTranslationKey WelcomeScreen;
+            public SingleTranslationKey Verification;
+            public SingleTranslationKey VerificationNone;
+            public SingleTranslationKey VerificationLow;
+            public SingleTranslationKey VerificationMedium;
+            public SingleTranslationKey VerificationHigh;
+            public SingleTranslationKey VerificationHighest;
+            public SingleTranslationKey ExplicitContent;
+            public SingleTranslationKey ExplicitContentNone;
+            public SingleTranslationKey ExplicitContentNoRoles;
+            public SingleTranslationKey ExplicitContentEveryone;
+            public SingleTranslationKey Nsfw;
+            public SingleTranslationKey NsfwNoRating;
+            public SingleTranslationKey NsfwExplicit;
+            public SingleTranslationKey NsfwSafe;
+            public SingleTranslationKey NsfwQuestionable;
+            public SingleTranslationKey DefaultNotifications;
+            public SingleTranslationKey DefaultNotificationsAll;
+            public SingleTranslationKey DefaultNotificationsMentions;
+            public SingleTranslationKey SpecialChannels;
+            public SingleTranslationKey Rules;
+            public SingleTranslationKey CommunityUpdates;
+            public SingleTranslationKey InactiveChannel;
+            public SingleTranslationKey InactiveTimeout;
+            public SingleTranslationKey SystemMessages;
+            public SingleTranslationKey SystemMessagesWelcome;
+            public SingleTranslationKey SystemMessagesWelcomeStickers;
+            public SingleTranslationKey SystemMessagesBoost;
+            public SingleTranslationKey SystemMessagesRole;
+            public SingleTranslationKey SystemMessagesRoleSticker;
+            public SingleTranslationKey SystemMessagesSetupTips;
+            public SingleTranslationKey GuildFeatures;
+            public SingleTranslationKey JoinServer;
+            public SingleTranslationKey GuildPreviewNotice;
+            public SingleTranslationKey GuildWidgetNotice;
+            public SingleTranslationKey Mee6Notice;
+            public SingleTranslationKey NoGuildFound;
         }
         
         public leaderboard Leaderboard;
         public class leaderboard
         {
-            public TranslationKey Title;
-            public TranslationKey Disabled;
-            public TranslationKey Fetching;
-            public TranslationKey Level;
-            public TranslationKey Placement;
-            public TranslationKey NoPoints;
+            public SingleTranslationKey Title;
+            public SingleTranslationKey Disabled;
+            public SingleTranslationKey Fetching;
+            public SingleTranslationKey Level;
+            public SingleTranslationKey Placement;
+            public SingleTranslationKey NoPoints;
         }        
         public rank Rank;
         public class rank
         {
-            public TranslationKey Title;
-            public TranslationKey Self;
-            public TranslationKey Other;
-            public TranslationKey Progress;
+            public SingleTranslationKey Title;
+            public SingleTranslationKey Self;
+            public SingleTranslationKey Other;
+            public SingleTranslationKey Progress;
         }
         public reminders Reminders;
         public class reminders
         {
-            public TranslationKey Title;
-            public TranslationKey NewReminder;
-            public TranslationKey DeleteReminder;
-            public TranslationKey Count;
-            public TranslationKey Created;
-            public TranslationKey DueTime;
-            public TranslationKey Notice;
-            public TranslationKey InvalidDateTime;
-            public TranslationKey SetDescription;
-            public TranslationKey SetDateTime;
-            public TranslationKey Description;
-            public TranslationKey DateTime;
+            public SingleTranslationKey Title;
+            public SingleTranslationKey NewReminder;
+            public SingleTranslationKey DeleteReminder;
+            public SingleTranslationKey Count;
+            public SingleTranslationKey Created;
+            public SingleTranslationKey DueTime;
+            public SingleTranslationKey Notice;
+            public SingleTranslationKey InvalidDateTime;
+            public SingleTranslationKey SetDescription;
+            public SingleTranslationKey SetDateTime;
+            public SingleTranslationKey Description;
+            public SingleTranslationKey DateTime;
         }
         public reportHost ReportHost;
         public class reportHost
         {
-            public TranslationKey Title;
-            public TranslationKey AcceptTos;
-            public TranslationKey Tos;
-            public TranslationKey TosChangedNotice;
-            public TranslationKey Processing;
-            public TranslationKey CooldownError;
-            public TranslationKey LimitError;
-            public TranslationKey UserBan;
-            public TranslationKey GuildBan;
-            public TranslationKey InvalidHost;
-            public TranslationKey ConfirmHost;
-            public TranslationKey DatabaseCheck;
-            public TranslationKey DatabaseError;
-            public TranslationKey SubmissionCheck;
-            public TranslationKey SubmissionError;
-            public TranslationKey CreatingSubmission;
-            public TranslationKey SubmissionCreated;
+            public SingleTranslationKey Title;
+            public SingleTranslationKey AcceptTos;
+            public SingleTranslationKey Tos;
+            public SingleTranslationKey TosChangedNotice;
+            public SingleTranslationKey Processing;
+            public SingleTranslationKey CooldownError;
+            public SingleTranslationKey LimitError;
+            public SingleTranslationKey UserBan;
+            public SingleTranslationKey GuildBan;
+            public SingleTranslationKey InvalidHost;
+            public SingleTranslationKey ConfirmHost;
+            public SingleTranslationKey DatabaseCheck;
+            public SingleTranslationKey DatabaseError;
+            public SingleTranslationKey SubmissionCheck;
+            public SingleTranslationKey SubmissionError;
+            public SingleTranslationKey CreatingSubmission;
+            public SingleTranslationKey SubmissionCreated;
         }
 
         public translateMessage TranslateMessage;
         public class translateMessage
         {
-            public TranslationKey NoContent;
-            public TranslationKey SelectProvider;
-            public TranslationKey SelectSource;
-            public TranslationKey SelectSourceDropdown;
-            public TranslationKey SelectTarget;
-            public TranslationKey SelectTargetDropdown;
-            public TranslationKey Translating;
-            public TranslationKey Queue;
-            public TranslationKey Translated;
+            public SingleTranslationKey NoContent;
+            public SingleTranslationKey SelectProvider;
+            public SingleTranslationKey SelectSource;
+            public SingleTranslationKey SelectSourceDropdown;
+            public SingleTranslationKey SelectTarget;
+            public SingleTranslationKey SelectTargetDropdown;
+            public SingleTranslationKey Translating;
+            public SingleTranslationKey Queue;
+            public SingleTranslationKey Translated;
         }
 
         public upload Upload;
         public class upload
         {
-            public TranslationKey NoInteraction;
-            public TranslationKey AlreadyUploaded;
-            public TranslationKey TimedOut;
-            public TranslationKey Uploaded;
+            public SingleTranslationKey NoInteraction;
+            public SingleTranslationKey AlreadyUploaded;
+            public SingleTranslationKey TimedOut;
+            public SingleTranslationKey Uploaded;
         }
 
         public urbanDictionary UrbanDictionary;
         public class urbanDictionary
         {
-            public TranslationKey AdultContentError;
-            public TranslationKey AdultContentWarning;
-            public TranslationKey LookingUp;
-            public TranslationKey LookupFail;
-            public TranslationKey NotExist;
-            public TranslationKey WrittenBy;
-            public TranslationKey Definition;
-            public TranslationKey Example;
+            public SingleTranslationKey AdultContentError;
+            public SingleTranslationKey AdultContentWarning;
+            public SingleTranslationKey LookingUp;
+            public SingleTranslationKey LookupFail;
+            public SingleTranslationKey NotExist;
+            public SingleTranslationKey WrittenBy;
+            public SingleTranslationKey Definition;
+            public SingleTranslationKey Example;
         }
 
         public userInfo UserInfo;
         public class userInfo
         {
-            public TranslationKey System;
-            public TranslationKey Bot;
-            public TranslationKey NeverJoined;
-            public TranslationKey IsBanned;
-            public TranslationKey JoinedBefore;
-            public TranslationKey GlobalBanned;
-            public TranslationKey BotOwner;
-            public TranslationKey BotStaff;
-            public TranslationKey Owner;
-            public TranslationKey DiscordStaff;
-            public TranslationKey CertifiedMod;
-            public TranslationKey VerifiedBotDeveloper;
-            public TranslationKey DiscordPartner;
-            public TranslationKey PendingMembership;
-            public TranslationKey Roles;
-            public TranslationKey Backup;
-            public TranslationKey BotNotes;
-            public TranslationKey NoReason;
-            public TranslationKey GlobalBanReason;
-            public TranslationKey GlobalBanMod;
-            public TranslationKey GlobalBanDate;
-            public TranslationKey BanDetails;
-            public TranslationKey InvitedBy;
-            public TranslationKey NoInviter;
-            public TranslationKey UsersInvited;
-            public TranslationKey ShowProfileInviter;
-            public TranslationKey ServerJoinDate;
-            public TranslationKey ServerLeaveDate;
-            public TranslationKey FirstJoinDate;
-            public TranslationKey AccountCreationDate;
-            public TranslationKey ServerBoosterSince;
-            public TranslationKey Pronouns;
-            public TranslationKey BannerColor;
-            public TranslationKey Presence;
-            public TranslationKey Desktop;
-            public TranslationKey Mobile;
-            public TranslationKey Web;
-            public TranslationKey Online;
-            public TranslationKey Offline;
-            public TranslationKey Idle;
-            public TranslationKey DoNotDisturb;
-            public TranslationKey Activities;
-            public TranslationKey Playing;
-            public TranslationKey Streaming;
-            public TranslationKey ListeningTo;
-            public TranslationKey Watching;
-            public TranslationKey Competing;
-            public TranslationKey Status;
-            public TranslationKey TimedOutUntil;
-            public TranslationKey FetchUserError;
+            public SingleTranslationKey System;
+            public SingleTranslationKey Bot;
+            public SingleTranslationKey NeverJoined;
+            public SingleTranslationKey IsBanned;
+            public SingleTranslationKey JoinedBefore;
+            public SingleTranslationKey GlobalBanned;
+            public SingleTranslationKey BotOwner;
+            public SingleTranslationKey BotStaff;
+            public SingleTranslationKey Owner;
+            public SingleTranslationKey DiscordStaff;
+            public SingleTranslationKey CertifiedMod;
+            public SingleTranslationKey VerifiedBotDeveloper;
+            public SingleTranslationKey DiscordPartner;
+            public SingleTranslationKey PendingMembership;
+            public SingleTranslationKey Roles;
+            public SingleTranslationKey Backup;
+            public SingleTranslationKey BotNotes;
+            public SingleTranslationKey NoReason;
+            public SingleTranslationKey GlobalBanReason;
+            public SingleTranslationKey GlobalBanMod;
+            public SingleTranslationKey GlobalBanDate;
+            public SingleTranslationKey BanDetails;
+            public SingleTranslationKey InvitedBy;
+            public SingleTranslationKey NoInviter;
+            public SingleTranslationKey UsersInvited;
+            public SingleTranslationKey ShowProfileInviter;
+            public SingleTranslationKey ServerJoinDate;
+            public SingleTranslationKey ServerLeaveDate;
+            public SingleTranslationKey FirstJoinDate;
+            public SingleTranslationKey AccountCreationDate;
+            public SingleTranslationKey ServerBoosterSince;
+            public SingleTranslationKey Pronouns;
+            public SingleTranslationKey BannerColor;
+            public SingleTranslationKey Presence;
+            public SingleTranslationKey Desktop;
+            public SingleTranslationKey Mobile;
+            public SingleTranslationKey Web;
+            public SingleTranslationKey Online;
+            public SingleTranslationKey Offline;
+            public SingleTranslationKey Idle;
+            public SingleTranslationKey DoNotDisturb;
+            public SingleTranslationKey Activities;
+            public SingleTranslationKey Playing;
+            public SingleTranslationKey Streaming;
+            public SingleTranslationKey ListeningTo;
+            public SingleTranslationKey Watching;
+            public SingleTranslationKey Competing;
+            public SingleTranslationKey Status;
+            public SingleTranslationKey TimedOutUntil;
+            public SingleTranslationKey FetchUserError;
         }
 
         public data Data;
@@ -376,24 +376,24 @@ public class Translations
             public request Request;
             public class request
             {
-                public TranslationKey Fetching;
-                public TranslationKey Confirm;
-                public TranslationKey DmNotice;
+                public SingleTranslationKey Fetching;
+                public SingleTranslationKey Confirm;
+                public SingleTranslationKey DmNotice;
             }
 
             public policy Policy;
             public class policy
             {
-                public TranslationKey NoPolicy;
+                public SingleTranslationKey NoPolicy;
             }
 
             public objectCmd Object;
             public class objectCmd
             {
-                public TranslationKey Reverse;
-                public TranslationKey ReverseProgress;
-                public TranslationKey ReverseError;
-                public TranslationKey ReverseSuccess;
+                public SingleTranslationKey Reverse;
+                public SingleTranslationKey ReverseProgress;
+                public SingleTranslationKey ReverseError;
+                public SingleTranslationKey ReverseSuccess;
             }
         }
     }

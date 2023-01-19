@@ -215,7 +215,7 @@ public abstract class BaseCommand
     }
     #endregion
 
-    internal string GetString(TranslationKey key) 
+    internal string GetString(SingleTranslationKey key) 
         => key.Get(ctx.Bot.users[ctx.User.Id]);
 
     #region Selections
