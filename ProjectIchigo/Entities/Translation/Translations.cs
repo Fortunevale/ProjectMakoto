@@ -386,6 +386,15 @@ public class Translations
             {
                 public TranslationKey NoPolicy;
             }
+
+            public objectCmd Object;
+            public class objectCmd
+            {
+                public TranslationKey Reverse;
+                public TranslationKey ReverseProgress;
+                public TranslationKey ReverseError;
+                public TranslationKey ReverseSuccess;
+            }
         }
     }
 }

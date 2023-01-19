@@ -1025,6 +1025,20 @@
         "NoPolicy": {
           "en": "The privacy policy was not loaded. This is most likely unintended, please report to {Bot} Staff."
         }
+      },
+      "Object": {
+        "Reverse": {
+          "en": "You already objected to having your data get processed. Do you want to reverse that decision?"
+        },
+        "ReverseProgress": {
+          "en": "Okay, removing you from the objection list.."
+        },
+        "ReverseError": {
+          "en": "I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours."
+        },
+        "ReverseSuccess": {
+          "en": "Successfully removed you from the objection list."
+        }
       }
     }
   }

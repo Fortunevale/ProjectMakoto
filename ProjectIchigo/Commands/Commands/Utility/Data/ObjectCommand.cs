@@ -9,14 +9,14 @@ internal class ObjectCommand : BaseCommand
             if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
 
             if (ctx.Bot.objectedUsers.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`You already objected to having your data get processed. Do you want to reverse that decision?`"
+                    Description = $"`{GetString(t.Commands.Data.Object.Reverse)}`"
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
@@ -33,7 +33,7 @@ internal class ObjectCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`Okay, removing you from the objection list..`"
+                        Description = $"`{GetString(t.Commands.Data.Object.ReverseProgress)}`"
                     }.AsBotLoading(ctx));
 
                     try
@@ -47,14 +47,14 @@ internal class ObjectCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
-                            Description = $"`I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours.`"
+                            Description = $"`{GetString(t.Commands.Data.Object.ReverseError)}`"
                         }.AsBotError(ctx));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`Successfully removed you from the objection list.`"
+                        Description = $"`{GetString(t.Commands.Data.Object.ReverseSuccess)}`"
                     }.AsBotSuccess(ctx));
                 }
                 else
