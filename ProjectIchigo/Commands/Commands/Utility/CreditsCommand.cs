@@ -42,6 +42,7 @@ internal class CreditsCommand : BaseCommand
                 .Replace("{MusicContList}", string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")))
                 .Replace("{MusicContCount}", $"[{contributorslava.Count - 10}](https://github.com/freyacodes/Lavalink/graphs/contributors)")
                 .Replace("{PhishingListRepos}", $"[`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) & [`Junortiz`](https://github.com/Junortiz)")
+                .Build()
             }.AsBotInfo(ctx));
         });
     }

@@ -296,8 +296,41 @@
         "de": "Lade Unterstützer.."
       },
       "Credits": {
-        "en": "{BotName} is mainly being developed and maintained by {Developer}.\n\nThese people help me manage and/or test the bot: {DiscordStaffList}\n\n{BotName} had some help from the following people:\n\n{GitHubContList}\n\n{BotName} wouldn't be possible without {Library}, which was made by these people:\n{LibraryContList} and {LibraryContCount} more.\n\n{BotName}'s Music Module uses {MusicModule}, which was made by these people:\n{MusicContList} and {MusicContCount} more.\n\nSpecial thanks go to {PhishingListRepos} who publicly provide a list of phishing urls.",
-        "de": "{BotName} wird hauptsächlich von {Developer} entwickelt.\n\nDiese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}\n\n{BotName} hatte Hilfe von den folgenden Personen:\n\n{GitHubContList}\n\n{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:\n{LibraryContList} und {LibraryContCount} weitere.\n\n{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:\n{MusicContList} und {MusicContCount} weitere.\n\nEin dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
+        "en": [
+          "{BotName} is mainly being developed and maintained by {Developer}.",
+          "",
+          "These people help me manage and/or test the bot: {DiscordStaffList}",
+          "",
+          "{BotName} had some help from the following people:",
+          "",
+          "{GitHubContList}",
+          "",
+          "{BotName} wouldn't be possible without {Library}, which was made by these people:",
+          "{LibraryContList} and {LibraryContCount} more.",
+          "",
+          "{BotName}'s Music Module uses {MusicModule}, which was made by these people:",
+          "{MusicContList} and {MusicContCount} more.",
+          "",
+          "Special thanks go to {PhishingListRepos} who publicly provide a list of phishing urls."
+        ],
+        "de": [
+          "{BotName} wird hauptsächlich von {Developer} entwickelt.",
+          "",
+          "Diese Leute helfen mir, den Bot zu verwalten und/oder zu testen: {DiscordStaffList}",
+          "",
+          "{BotName} hatte Hilfe von den folgenden Personen:",
+          "",
+          "{GitHubContList}",
+          "",
+          "{BotName} wäre nicht möglich ohne {Library}, was von diesen netten Leuten entwickelt wird:",
+          "{LibraryContList} und {LibraryContCount} weitere.",
+          "",
+          "{BotName}'s Musik Modul verwendet {MusicModule}, was von den folgenden Entwicklern erstellt wird:",
+          "{MusicContList} und {MusicContCount} weitere.",
+          "",
+          "",
+          "Ein dickes Danke geht an die, die öffentlich eine Liste von schädlichen Domains hosten: {PhishingListRepos}"
+        ]
       }
     },
     "EmojiStealer": {
@@ -728,8 +761,26 @@
         "de": "Ich akzeptiere diese Regeln"
       },
       "Tos": {
-        "en": "{1}. You may not submit Hosts that are non-malicious.\n{2}. You may not spam submissions.\n{3}. You may not submit unregistered hosts.\n{4}. You accept that your user account and current server will be tracked and visible to Ichigo staff.\n\nWe reserve the right to ban you for any reason that may not be listed.\n**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**\n**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**",
-        "de": "{1}. Du darfst keine unschädlichen Hosts melden.\n{2}. Du darfst Hosts nicht wiederholt melden.\n{3}. Hosts müssen registriert sein.\n{4}. Du akzeptierst dass dein Benutzer Account und aktueller Server der Einsendung beigelegt sind.\n\nWir behalten außerdem das Recht dich auch für jeden anderen Grund vom System auszuschließen.\n**Das Brechen oder Umgehen diesen Regeln wird dazu führen dass du oder dieser Server von der Verwendung des Bots ausgeschlossen wirst.**\n**Das beinhaltet, ist aber nicht limiert auf, bereits existierende Server die du besitzt und Server die du zukünftig erstellst.**"
+        "en": [
+          "{1}. You may not submit Hosts that are non-malicious.",
+          "{2}. You may not spam submissions.",
+          "{3}. You may not submit unregistered hosts.",
+          "{4}. You accept that your user account and current server will be tracked and visible to Ichigo staff.",
+          "",
+          "We reserve the right to ban you for any reason that may not be listed.",
+          "**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**",
+          "**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**"
+        ],
+        "de": [
+          "{1}. Du darfst keine unschädlichen Hosts melden.",
+          "{2}. Du darfst Hosts nicht wiederholt melden.",
+          "{3}. Hosts müssen registriert sein.",
+          "{4}. Du akzeptierst dass dein Benutzer Account und aktueller Server der Einsendung beigelegt sind.",
+          "",
+          "Wir behalten außerdem das Recht dich auch für jeden anderen Grund vom System auszuschließen.",
+          "**Das Brechen oder Umgehen diesen Regeln wird dazu führen dass du oder dieser Server von der Verwendung des Bots ausgeschlossen wirst.**",
+          "**Das beinhaltet, ist aber nicht limiert auf, bereits existierende Server die du besitzt und Server die du zukünftig erstellst.**"
+        ]
       },
       "TosChangedNotice": {
         "en": "The submission conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.",

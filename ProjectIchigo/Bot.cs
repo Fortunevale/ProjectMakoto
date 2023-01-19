@@ -252,6 +252,16 @@ public class Bot
                                         counts[b.Key]++;
                                     }
                                 }
+                                else if (field.FieldType == typeof(MultiTranslationKey))
+                                {
+                                    foreach (var b in ((MultiTranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
 
                                 foreach (var b in CalculateTranslationProgress(fieldValue))
                                 {
@@ -266,6 +276,16 @@ public class Bot
                                 if (field.FieldType == typeof(SingleTranslationKey))
                                 {
                                     foreach (var b in ((SingleTranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+                                else if (field.FieldType == typeof(MultiTranslationKey))
+                                {
+                                    foreach (var b in ((MultiTranslationKey)fieldValue).t)
                                     {
                                         if (!counts.ContainsKey(b.Key))
                                             counts.Add(b.Key, 0);

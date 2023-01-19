@@ -217,6 +217,9 @@ public abstract class BaseCommand
 
     internal string GetString(SingleTranslationKey key) 
         => key.Get(ctx.Bot.users[ctx.User.Id]);
+    
+    internal string[] GetString(MultiTranslationKey key) 
+        => key.Get(ctx.Bot.users[ctx.User.Id]);
 
     #region Selections
     internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)

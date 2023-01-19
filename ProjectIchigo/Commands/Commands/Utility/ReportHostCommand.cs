@@ -24,6 +24,7 @@ internal class ReportHostCommand : BaseCommand
                         .Replace("{2}", 2.ToEmotes())
                         .Replace("{3}", 3.ToEmotes())
                         .Replace("{4}", 4.ToEmotes())
+                        .Build()
                 }.AsAwaitingInput(ctx, GetString(t.Commands.ReportHost.Title));
 
                 if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != 0 && ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS < tos_version)

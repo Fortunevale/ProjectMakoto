@@ -130,7 +130,7 @@ public class Translations
         public class credits
         {
             public SingleTranslationKey Fetching;
-            public SingleTranslationKey Credits;
+            public MultiTranslationKey Credits;
         }
 
         public emojiStealer EmojiStealer;
@@ -262,7 +262,7 @@ public class Translations
         {
             public SingleTranslationKey Title;
             public SingleTranslationKey AcceptTos;
-            public SingleTranslationKey Tos;
+            public MultiTranslationKey Tos;
             public SingleTranslationKey TosChangedNotice;
             public SingleTranslationKey Processing;
             public SingleTranslationKey CooldownError;
