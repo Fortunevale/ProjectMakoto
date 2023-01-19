@@ -11,7 +11,7 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Fetching contributors..`"
+                Description = $"`{GetString(t.Commands.Credits.Fetching)}`"
             }.AsBotLoading(ctx));
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
@@ -30,14 +30,19 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{ctx.CurrentUser.Username} is mainly being developed and maintained by <@411950662662881290> ([`TheXorog`](https://github.com/TheXorog)).\n\n" +
-                              $"These people help me manage and/or test the bot: {string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.UsernameWithDiscriminator}`]({x.ProfileUrl})"))}\n\n" +
-                              $"{ctx.CurrentUser.Username} had some help from the following people:\n\n{string.Join("\n", contributors.Where(x => !x.Login.Contains("[bot]") && x.Login != "TheXorog").OrderByDescending(x => x.Contributions).Select(x => $"• [`{x.Login}`]({x.HtmlUrl})"))}\n\n" +
-                              $"{ctx.CurrentUser.Username} wouldn't be possible without [`DisCatSharp`](https://github.com/Aiko-IT-Systems/DisCatSharp), which was made by these people:\n" +
-                              $"{string.Join(", ", contributorsdcs.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})"))} and [{contributorsdcs.Count - 10} more](https://github.com/Aiko-IT-Systems/DisCatSharp/graphs/contributors).\n\n" +
-                              $"{ctx.CurrentUser.Username}'s Music Module uses [`Lavalink`](https://github.com/freyacodes/Lavalink), which was made by these people:\n" +
-                              $"{string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})"))} and [{contributorslava.Count - 10} more](https://github.com/freyacodes/Lavalink/graphs/contributors).\n\n" +
-                              $"Special thanks go to [`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) and [`Junortiz`](https://github.com/Junortiz) who publicly provide a list of phishing urls."
+                Description = GetString(t.Commands.Credits.Credits)
+                .Replace("{BotName}", ctx.CurrentUser.Username)
+                .Replace("{Developer}", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))")
+                .Replace("{DiscordStaffList}", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.UsernameWithDiscriminator}`]({x.ProfileUrl})")))
+                .Replace("{GitHubContList}", string.Join("\n", contributors.Where(x => !x.Login.Contains("[bot]") && x.Login != "TheXorog").OrderByDescending(x => x.Contributions).Select(x => $"• [`{x.Login}`]({x.HtmlUrl})")))
+                .Replace("{Library}", "[`DisCatSharp`](https://github.com/Aiko-IT-Systems/DisCatSharp)")
+                .Replace("{LibraryContList}", string.Join(", ", contributorsdcs.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")))
+                .Replace("{LibraryContCount}", $"[{contributorsdcs.Count - 10}](https://github.com/Aiko-IT-Systems/DisCatSharp/graphs/contributors)")
+                .Replace("{MusicModule}", $"[`Lavalink`](https://github.com/freyacodes/Lavalink)")
+                .Replace("{MusicContList}", string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")))
+                .Replace("{MusicContCount}", $"[{contributorslava.Count - 10}](https://github.com/freyacodes/Lavalink/graphs/contributors)")
+                .Replace("{PhishingListRepos}", $"[`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) & [`Junortiz`](https://github.com/Junortiz)")
+                .Build()
             }.AsBotInfo(ctx));
         });
     }

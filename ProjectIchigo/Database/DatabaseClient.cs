@@ -488,7 +488,12 @@ internal class DatabaseClient
                 last_google_source = x.Value.Translation.LastGoogleSource,
                 last_google_target = x.Value.Translation.LastGoogleTarget,
                 last_libretranslate_source = x.Value.Translation.LastLibreTranslateSource,
-                last_libretranslate_target = x.Value.Translation.LastLibreTranslateTarget
+                last_libretranslate_target = x.Value.Translation.LastLibreTranslateTarget,
+                current_locale = x.Value.CurrentLocale,
+                override_locale = x.Value.OverrideLocale,
+                data_deletion_date = x.Value.Data.DeletionRequestDate.Ticks,
+                deletion_requested = x.Value.Data.DeletionRequested,
+                last_data_request = x.Value.Data.LastDataRequest.Ticks
             }).ToList())); 
         }
 

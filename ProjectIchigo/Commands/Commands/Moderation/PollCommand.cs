@@ -70,7 +70,7 @@ internal class PollCommand : BaseCommand
                     .AddComponents(SelectPromptButton, SelectDueDateButton, SelectMultiSelectButton)
                     .AddComponents(AddOptionButton, RemoveOptionButton)
                     .AddComponents(SelectChannelButton, SelectRoleButton, Finish)
-                    .AddComponents(MessageComponents.CancelButton));
+                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
                 var Menu = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(10));
 
@@ -363,7 +363,7 @@ internal class PollCommand : BaseCommand
                     DeleteOrInvalidate();
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                 {
                     DeleteOrInvalidate();
                     return;

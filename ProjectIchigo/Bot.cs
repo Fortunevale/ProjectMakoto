@@ -1,4 +1,5 @@
 using ProjectIchigo.PrefixCommands;
+using System.Collections;
 using System.Reflection;
 
 namespace ProjectIchigo;
@@ -22,6 +23,8 @@ public class Bot
 
 
     #region Util
+
+    internal static Translations loadedTranslations { get; set; }
 
     internal CountryCodes countryCodes { get; set; }
     internal LanguageCodes languageCodes { get; set; }
@@ -58,6 +61,7 @@ public class Bot
 
     internal string Prefix { get; private set; } = ";;";
 
+    internal string RawFetchedPrivacyPolicy = "";
 
     internal async Task Init(string[] args)
     {
@@ -186,7 +190,6 @@ public class Bot
 
                 _logger.LogDebug("Loaded {Count} countries", countryCodes.List.Count);
 
-
                 languageCodes = new();
                 List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
                 foreach (var b in lc)
@@ -204,6 +207,114 @@ public class Bot
 
                 if (!File.Exists("config.json"))
                     File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+
+                loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
+                _logger.LogDebug("Loaded translations");
+
+                Dictionary<string, int> CalculateTranslationProgress(object? obj)
+                {
+                    if (obj is null)
+                        return new Dictionary<string, int>();
+
+                    Dictionary<string, int> counts = new();
+
+                    Type objType = obj.GetType();
+                    FieldInfo[] fields = objType.GetFields();
+
+                    foreach (FieldInfo field in fields)
+                    {
+                        object fieldValue = field.GetValue(obj);
+                        var elems = fieldValue as IList;
+                        if (elems is not null)
+                        {
+                            foreach (var item in elems)
+                            {
+                                foreach (var b in CalculateTranslationProgress(item))
+                                {
+                                    if (!counts.ContainsKey(b.Key))
+                                        counts.Add(b.Key, 0);
+
+                                    counts[b.Key] += b.Value;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (field.FieldType.Assembly == objType.Assembly)
+                            {
+                                if (field.FieldType == typeof(SingleTranslationKey))
+                                {
+                                    foreach (var b in ((SingleTranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+                                else if (field.FieldType == typeof(MultiTranslationKey))
+                                {
+                                    foreach (var b in ((MultiTranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+
+                                foreach (var b in CalculateTranslationProgress(fieldValue))
+                                {
+                                    if (!counts.ContainsKey(b.Key))
+                                        counts.Add(b.Key, 0);
+
+                                    counts[b.Key] += b.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (field.FieldType == typeof(SingleTranslationKey))
+                                {
+                                    foreach (var b in ((SingleTranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+                                else if (field.FieldType == typeof(MultiTranslationKey))
+                                {
+                                    foreach (var b in ((MultiTranslationKey)fieldValue).t)
+                                    {
+                                        if (!counts.ContainsKey(b.Key))
+                                            counts.Add(b.Key, 0);
+
+                                        counts[b.Key]++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                    return counts;
+                }
+                loadedTranslations.Progress = CalculateTranslationProgress(loadedTranslations);
+
+                foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
+                    if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))
+                    {
+                        _logger.LogDebug("Deleting Directory \"{directory}\"..", directory.Name);
+                        await CleanupFilesAndDirectories(new List<string> { directory.Name }, new List<string>());
+                    }
+
+                foreach (FileInfo file in new DirectoryInfo(Environment.CurrentDirectory).GetFiles())
+                    if (file.Name.StartsWith("Emotes-"))
+                    {
+                        _logger.LogDebug("Deleting File \"{file}\"..", file.Name);
+                        await CleanupFilesAndDirectories(new List<string>(), new List<string> { file.Name });
+                    }
 
                 Task.Run(async () =>
                 {
@@ -457,28 +568,35 @@ public class Bot
                     ServiceProvider = new ServiceCollection()
                                         .AddSingleton(this)
                                         .BuildServiceProvider(),
-                    EnableDefaultHelp = false
+                    EnableDefaultHelp = false,
+                    EnableLocalization = true
                 });
+
+                void GetCommandTranslations(ApplicationCommandsTranslationContext x)
+                { 
+                    x.AddSingleTranslation(File.ReadAllText("Translations/single_commands.json")); 
+                    x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); 
+                }
 
                 if (!status.LoadedConfig.IsDev)
                 {
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>();
-                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>();
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ConfigurationAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ModerationAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.SocialAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.ScoreSaberAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.MusicAppCommands>(GetCommandTranslations);
+                    appCommands.RegisterGlobalCommands<ApplicationCommands.UtilityAppCommands>(GetCommandTranslations);
                 }
                 else
                 {
-                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets);
-                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                    appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
@@ -506,7 +624,7 @@ public class Bot
                     }
                 });
 
-                _ = Task.Run(() =>
+                _ = Task.Run(async () =>
                 {
                     try
                     {
@@ -520,7 +638,21 @@ public class Bot
                     {
                         _logger.LogError("An exception occurred trying to add team members to administrator list. Is the current bot registered in a team?", ex);
                     }
+
+                    try
+                    {
+                        if (discordClient.CurrentApplication.PrivacyPolicyUrl.IsNullOrWhiteSpace())
+                            throw new Exception("No privacy policy was defined.");
+
+                        RawFetchedPrivacyPolicy = await new HttpClient().GetStringAsync(discordClient.CurrentApplication.PrivacyPolicyUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("An exception occurred while trying to fetch the privacy policy", ex);
+                    }
                 });
+
+                ProcessDeletionRequests().Add(watcher);
             }
             catch (Exception ex)
             {
@@ -1260,6 +1392,35 @@ public class Bot
             }
             default:
                 break;
+        }
+    }
+
+    private async Task ProcessDeletionRequests()
+    {
+        new Task(new Action(async () =>
+        {
+            ProcessDeletionRequests().Add(watcher);
+        })).CreateScheduleTask(DateTime.UtcNow.AddHours(24));
+
+        lock (users)
+        {
+            foreach (var b in users)
+            {
+                if ((b.Value?.Data?.DeletionRequested ?? false) && b.Value?.Data?.DeletionRequestDate.GetTimespanUntil() < TimeSpan.Zero)
+                {
+                    _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
+
+                    users.Remove(b.Key);
+                    databaseClient._helper.DeleteRow(databaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(watcher);
+                    objectedUsers.Add(b.Key);
+                    foreach (var c in discordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
+                    {
+                        try
+                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); c.Value.LeaveAsync().Add(watcher); }
+                        catch { }
+                    }
+                }
+            }
         }
     }
 }

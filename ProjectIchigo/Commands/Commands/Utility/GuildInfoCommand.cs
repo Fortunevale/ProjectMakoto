@@ -16,7 +16,7 @@ internal class GuildInfoCommand : BaseCommand
 			if (guildId == 0)
 				guildId = ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching guild info..`").AsBotLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.GuildInfo.Fetching)}`").AsBotLoading(ctx));
 
             try
 			{
@@ -33,45 +33,45 @@ internal class GuildInfoCommand : BaseCommand
 					Description = $"{(guild.Description.IsNullOrWhiteSpace() ? "" : $"{guild.Description}\n\n")}",
 				}.AsBotInfo(ctx);
 
-                embed.AddField(new DiscordEmbedField("Members", $"👥 `{guild.Members.Count}` **Members**\n" +
-                                  $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **Online Members**\n" +
-                                  $"🛑 `{guild.MaxMembers}` **Max Members**\n"));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.MemberTitle), $"👥 `{guild.Members.Count}` **{GetString(t.Commands.GuildInfo.MemberTitle)}**\n" +
+                                  $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **{GetString(t.Commands.GuildInfo.OnlineMembers)}**\n" +
+                                  $"🛑 `{guild.MaxMembers}` **{GetString(t.Commands.GuildInfo.MaxMembers)}**\n"));
                 
-                embed.AddField(new DiscordEmbedField("Guild Details", $"👤 **Owner**: {guild.Owner.Mention} (`{guild.Owner.UsernameWithDiscriminator}`)\n" +
-                                  $"🕒 **Creation Date**: {guild.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({guild.CreationTimestamp.ToTimestamp()})\n" +
-                                  $"🗺 **Preferred Locale**: `{guild.PreferredLocale}`\n" +
-                                  $"🔮 `{guild.PremiumSubscriptionCount}` **Boosts (`{guild.PremiumTier}`)**\n\n" +
-                                  $"😀 `{guild.Emojis.Count}` **Emojis**\n" +
-                                  $"🖼 `{guild.Stickers.Count}` **Stickers**\n\n" +
-                                  $"{(guild.WidgetEnabled ?? false).ToPillEmote(ctx.Bot)} **Widget**\n" +
-                                  $"{(guild.IsCommunity).ToPillEmote(ctx.Bot)} **Community**", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.GuildTitle), $"👤 **{GetString(t.Commands.GuildInfo.Owner)}**: {guild.Owner.Mention} (`{guild.Owner.UsernameWithDiscriminator}`)\n" +
+                                  $"🕒 **{GetString(t.Commands.GuildInfo.Creation)}**: {guild.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({guild.CreationTimestamp.ToTimestamp()})\n" +
+                                  $"🗺 **{GetString(t.Commands.GuildInfo.Locale)}**: `{guild.PreferredLocale}`\n" +
+                                  $"🔮 `{guild.PremiumSubscriptionCount}` **{GetString(t.Commands.GuildInfo.Boosts)} (`{guild.PremiumTier switch { PremiumTier.None => GetString(t.Commands.GuildInfo.BoostsNone), PremiumTier.TierOne => GetString(t.Commands.GuildInfo.BoostsTierOne), PremiumTier.TierTwo => GetString(t.Commands.GuildInfo.BoostsTierTwo), PremiumTier.TierThree => GetString(t.Commands.GuildInfo.BoostsTierThree), PremiumTier.Unknown => "?", _ => "?", }}`)**\n\n" +
+                                  $"😀 `{guild.Emojis.Count}` **{GetString(t.Commands.EmojiStealer.Emoji)}**\n" +
+                                  $"🖼 `{guild.Stickers.Count}` **{GetString(t.Commands.EmojiStealer.Sticker)}**\n\n" +
+                                  $"{(guild.WidgetEnabled ?? false).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.Widget)}**\n" +
+                                  $"{(guild.IsCommunity).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.Community)}**", true));
                 
-                embed.AddField(new DiscordEmbedField("Security", $"{(guild.MfaLevel == MfaLevel.Enabled).ToPillEmote(ctx.Bot)} **2FA required for mods**\n" +
-                                  $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasMembershipScreeningEnabled)).ToPillEmote(ctx.Bot)} **Membership Screening**\n" +
-                                  $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasWelcomeScreenEnabled)).ToPillEmote(ctx.Bot)} **Welcome Screen**\n" +
-                                  $"🚪 **Verification Level**: `{guild.VerificationLevel}`\n" +
-                                  $"🔍 **Scan for explicit content of**: `{guild.ExplicitContentFilter switch { ExplicitContentFilter.Disabled => "No members", ExplicitContentFilter.MembersWithoutRoles => "Members without roles", ExplicitContentFilter.AllMembers => "All members", _ => "?", }}`\n" +
-                                  $"⚠ **NSFW Level**: `{guild.NsfwLevel switch { NsfwLevel.Default => "No Rating", NsfwLevel.Explicit => "Explicit, Only suitable for mature audiences", NsfwLevel.Safe => "Safe, Suitable for all age groups", NsfwLevel.Age_Restricted => "Questionable, May only be suitable for mature audiences", _ => "?", }}`\n" +
-                                  $"💬 **Default Notifications**: `{guild.DefaultMessageNotifications switch { DefaultMessageNotifications.AllMessages => "All messages", DefaultMessageNotifications.MentionsOnly => "Mentions only", _ => "?", }}`\n", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.Security), $"{(guild.MfaLevel == MfaLevel.Enabled).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.MultiFactor)}**\n" +
+                                  $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasMembershipScreeningEnabled)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.Screening)}**\n" +
+                                  $"{(guild.Features.Features.Any(x => x == GuildFeaturesEnum.HasWelcomeScreenEnabled)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.WelcomeScreen)}**\n" +
+                                  $"🚪 **{GetString(t.Commands.GuildInfo.Verification)}**: `{guild.VerificationLevel switch { VerificationLevel.None => GetString(t.Commands.GuildInfo.VerificationNone), VerificationLevel.Low => GetString(t.Commands.GuildInfo.VerificationLow), VerificationLevel.Medium => GetString(t.Commands.GuildInfo.VerificationMedium), VerificationLevel.High => GetString(t.Commands.GuildInfo.VerificationHigh), VerificationLevel.Highest => GetString(t.Commands.GuildInfo.VerificationHighest), _ => "?", }}`\n" +
+                                  $"🔍 **{GetString(t.Commands.GuildInfo.ExplicitContent)}**: `{guild.ExplicitContentFilter switch { ExplicitContentFilter.Disabled => GetString(t.Commands.GuildInfo.ExplicitContentNone), ExplicitContentFilter.MembersWithoutRoles => GetString(t.Commands.GuildInfo.ExplicitContentNoRoles), ExplicitContentFilter.AllMembers => GetString(t.Commands.GuildInfo.ExplicitContentEveryone), _ => "?", }}`\n" +
+                                  $"⚠ **{GetString(t.Commands.GuildInfo.Nsfw)}**: `{guild.NsfwLevel switch { NsfwLevel.Default => GetString(t.Commands.GuildInfo.NsfwNoRating), NsfwLevel.Explicit => GetString(t.Commands.GuildInfo.NsfwExplicit), NsfwLevel.Safe => GetString(t.Commands.GuildInfo.NsfwSafe), NsfwLevel.Age_Restricted => GetString(t.Commands.GuildInfo.NsfwQuestionable), _ => "?", }}`\n" +
+                                  $"💬 **{GetString(t.Commands.GuildInfo.DefaultNotifications)}**: `{guild.DefaultMessageNotifications switch { DefaultMessageNotifications.AllMessages => GetString(t.Commands.GuildInfo.DefaultNotificationsAll), DefaultMessageNotifications.MentionsOnly => GetString(t.Commands.GuildInfo.DefaultNotificationsMentions), _ => "?", }}`\n", true));
 
-                embed.AddField(new DiscordEmbedField("Special Channels", $"📑 **Rules**: {guild.RulesChannel?.Mention ?? "`None`"}\n" +
-                                  $"📰 **Community Updates**: {guild.PublicUpdatesChannel?.Mention ?? "`None`"}\n\n" +
-                                  $"⌨ **Inactive Channel**: {guild.AfkChannel?.Mention ?? "`None`"}\n" +
-                                  $"> **Inactive Timeout**: `{((long)guild.AfkTimeout).GetHumanReadable()}`\n\n" +
-                                  $"🤖 **System Messages**: {guild.SystemChannel?.Mention ?? "`None`"}\n" +
-                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotifications)).ToPillEmote(ctx.Bot)} **Welcome Messages**\n" +
-                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotificationReplies)).ToPillEmote(ctx.Bot)} **Welcome Sticker Replies**\n" +
-                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressPremiumSubscriptions)).ToPillEmote(ctx.Bot)} **Boost Messages**\n" +
-                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotification)).ToPillEmote(ctx.Bot)} **Role Purchase Message**\n" +
-                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotificationReplies)).ToPillEmote(ctx.Bot)} **Role Purchase Message Replies**\n" +
-                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressGuildReminderNotifications)).ToPillEmote(ctx.Bot)} **Server Setup Tips**\n"));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.SpecialChannels), $"📑 **{GetString(t.Commands.GuildInfo.Rules)}**: {guild.RulesChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n" +
+                                  $"📰 **{GetString(t.Commands.GuildInfo.CommunityUpdates)}**: {guild.PublicUpdatesChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n\n" +
+                                  $"⌨ **{GetString(t.Commands.GuildInfo.InactiveChannel)}**: {guild.AfkChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n" +
+                                  $"> **{GetString(t.Commands.GuildInfo.InactiveTimeout)}**: `{((long)guild.AfkTimeout).GetHumanReadable()}`\n\n" +
+                                  $"🤖 **{GetString(t.Commands.GuildInfo.SystemMessages)}**: {guild.SystemChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotifications)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.SystemMessagesWelcome)}**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotificationReplies)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.SystemMessagesWelcomeStickers)}**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressPremiumSubscriptions)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.SystemMessagesBoost)}**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotification)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.SystemMessagesRole)}**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressRoleSubbscriptionPurchaseNotificationReplies)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.SystemMessagesRoleSticker)}**\n" +
+                                  $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressGuildReminderNotifications)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.GuildInfo.SystemMessagesSetupTips)}**\n"));
 
-                embed.AddField(new DiscordEmbedField("Guild Features", $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.GuildFeatures), $"{string.Join(", ", guild.RawFeatures.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 
                 DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                 if (!guild.VanityUrlCode.IsNullOrWhiteSpace())
-                    builder.AddComponents(new DiscordLinkButtonComponent($"https://discord.gg/{guild.VanityUrlCode}", "Join Server", false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
+                    builder.AddComponents(new DiscordLinkButtonComponent($"https://discord.gg/{guild.VanityUrlCode}", GetString(t.Commands.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
                 await RespondOrEdit(embed);
 			}
@@ -92,16 +92,16 @@ internal class GuildInfoCommand : BaseCommand
                         },
                         ImageUrl = preview.SplashUrl ?? preview.DiscoverySplashUrl ?? "",
 						Description = preview.Description ?? "",
-                    }.AsBotInfo(ctx, "", $"Info fetched via Discord Guild Preview");
+                    }.AsBotInfo(ctx, "", GetString(t.Commands.GuildInfo.GuildPreviewNotice));
 
-                    embed.AddField(new DiscordEmbedField("Members", $"👥 `{preview.ApproximateMemberCount}` **Members**\n" +
-                                  $"🟢 `{preview.ApproximatePresenceCount}` **Online Members**\n"));
+                    embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.MemberTitle), $"👥 `{preview.ApproximateMemberCount}` **{GetString(t.Commands.GuildInfo.MemberTitle)}**\n" +
+                                  $"🟢 `{preview.ApproximatePresenceCount}` **{GetString(t.Commands.GuildInfo.OnlineMembers)}**\n"));
 
-                    embed.AddField(new DiscordEmbedField("Guild Details", $"🕒 **Creation Date**: {preview.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({preview.CreationTimestamp.ToTimestamp()})\n" +
-                                  $"😀 `{preview.Emojis.Count}` **Emojis**\n" +
-                                  $"🖼 `0` **Stickers**\n", true));
+                    embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.GuildTitle), $"🕒 **{GetString(t.Commands.GuildInfo.Creation)}**: {preview.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({preview.CreationTimestamp.ToTimestamp()})\n" +
+                                  $"😀 `{preview.Emojis.Count}` **{GetString(t.Commands.EmojiStealer.Emoji)}**\n" +
+                                  $"🖼 `{preview.Stickers.Count}` **{GetString(t.Commands.EmojiStealer.Sticker)}**\n", true));
 
-                    embed.AddField(new DiscordEmbedField("Guild Features", $"{string.Join(", ", preview.Features.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
+                    embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.GuildFeatures), $"{string.Join(", ", preview.Features.Select(x => $"`{string.Join(" ", x.Replace("_", " ").ToLower().Split(" ").Select(x => x.FirstLetterToUpper()))}`"))}"));
 
 
                     DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -111,7 +111,7 @@ internal class GuildInfoCommand : BaseCommand
 					try { invite = JsonConvert.DeserializeObject<Entities.DiscordWidget>(await client.GetStringAsync($"https://discord.com/api/guilds/{guildId}/widget.json")).instant_invite; } catch { }
 
                     if (!invite.IsNullOrWhiteSpace())
-                        builder.AddComponents(new DiscordLinkButtonComponent(invite, "Join Server", false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
+                        builder.AddComponents(new DiscordLinkButtonComponent(invite, GetString(t.Commands.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
                     await RespondOrEdit(builder);
                 }
@@ -124,14 +124,14 @@ internal class GuildInfoCommand : BaseCommand
                         var embed = new DiscordEmbedBuilder
 						{
                             Title = widget.name,
-                        }.AsBotInfo(ctx, "", $"Info fetched via Discord Guild Widget");
+                        }.AsBotInfo(ctx, "", GetString(t.Commands.GuildInfo.GuildWidgetNotice));
 
-                        embed.AddField(new DiscordEmbedField("Members", $"🟢 `{widget.presence_count}` **Online Members**\n"));
+                        embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.MemberTitle), $"🟢 `{widget.presence_count}` **{GetString(t.Commands.GuildInfo.OnlineMembers)}**\n"));
 
                         DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
 						if (!widget.instant_invite.IsNullOrWhiteSpace())
-							builder.AddComponents(new DiscordLinkButtonComponent(widget.instant_invite, "Join Server", false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
+							builder.AddComponents(new DiscordLinkButtonComponent(widget.instant_invite, GetString(t.Commands.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
 						await RespondOrEdit(builder);
                     }
@@ -149,9 +149,9 @@ internal class GuildInfoCommand : BaseCommand
                                     Url = $"https://cdn.discordapp.com/icons/{guildId}/{mee6.guild.icon}.webp?size=96",
                                 },
                                 ImageUrl = mee6.banner_url ?? "",
-                            }.AsBotInfo(ctx, "", $"Info fetched via Mee6 Leaderboard");
+                            }.AsBotInfo(ctx, "", GetString(t.Commands.GuildInfo.Mee6Notice));
 
-                            embed.AddField(new DiscordEmbedField("Members", $"👥 `{mee6.players.Length}` **Members**\n"));
+                            embed.AddField(new DiscordEmbedField(GetString(t.Commands.GuildInfo.MemberTitle), $"👥 `{mee6.players.Length}` **{GetString(t.Commands.GuildInfo.MemberTitle)}**\n"));
 
                             await RespondOrEdit(embed);
                         }
@@ -159,7 +159,7 @@ internal class GuildInfoCommand : BaseCommand
 						{
                             var embed = new DiscordEmbedBuilder
                             {
-                                Description = $"`Could not fetch any information about the server you specified.`",
+                                Description = $"`{GetString(t.Commands.GuildInfo.NoGuildFound)}`",
                             }.AsBotError(ctx);
 
                             await RespondOrEdit(embed);

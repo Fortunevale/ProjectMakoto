@@ -29,7 +29,7 @@ internal class ConfigCommand : BaseCommand
             {
                 { ChangeChannel },
                 { ChangeFilter }
-            }).AddComponents(MessageComponents.CancelButton));
+            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -157,7 +157,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
             }
-            else if (Button.GetCustomId() == MessageComponents.CancelButton.CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

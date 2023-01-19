@@ -21,6 +21,9 @@ public class User
     [JsonIgnore]
     public ulong UserId { get; set; }
 
+    [JsonIgnore]
+    public DataSettings Data { get; set; } = new();
+
     public UrlSubmissionSettings UrlSubmissions { get; set; }
     public AfkStatus AfkStatus { get; set; }
     public ScoreSaberSettings ScoreSaber { get; set; }
@@ -29,6 +32,9 @@ public class User
     public TranslationSettings Translation { get; set; }
 
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
+
+    public string? CurrentLocale { get; set; } = null;
+    public string? OverrideLocale { get; set; } = null;
 
     [JsonIgnore]
     public Cooldown Cooldown { get; set; }

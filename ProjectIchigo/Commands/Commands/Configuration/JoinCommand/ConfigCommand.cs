@@ -36,7 +36,7 @@ internal class ConfigCommand : BaseCommand
                 ChangeJoinlogChannel,
                 ChangeRoleOnJoin,
             })
-            .AddComponents(MessageComponents.CancelButton));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -148,7 +148,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
             {
                 DeleteOrInvalidate();
             }

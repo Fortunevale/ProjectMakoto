@@ -13,7 +13,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`You have not yet started an upload interactions. Please only run this command when instructed to by the bot.`"
+                    Description = $"`{GetString(t.Commands.Upload.NoInteraction)}`"
                 }.AsError(ctx));
                 return;
             }
@@ -22,7 +22,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`You already uploaded your file.`"
+                    Description = $"`{GetString(t.Commands.Upload.AlreadyUploaded)}`"
                 }.AsError(ctx));
                 return;
             }
@@ -31,7 +31,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Your upload interactions timed out {ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTimespanSince().GetHumanReadable()} ago.`"
+                    Description = $"`{GetString(t.Commands.Upload.TimedOut).Replace("{Timestamp}", $"`{ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()}`")}`"
                 }.AsError(ctx));
                 ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
                 return;
@@ -43,7 +43,7 @@ internal class UploadCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Your file has been uploaded.`"
+                Description = $"`{GetString(t.Commands.Upload.Uploaded)}`"
             }.AsSuccess(ctx));
 
             await Task.Delay(5000);

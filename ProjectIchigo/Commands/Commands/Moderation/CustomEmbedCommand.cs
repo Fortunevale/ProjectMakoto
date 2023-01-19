@@ -38,7 +38,7 @@ internal class CustomEmbedCommand : BaseCommand
                                         .AddComponents(new List<DiscordComponent> { SetDescription, SetImage, SetColor })
                                         .AddComponents(new List<DiscordComponent> { SetFooter, SetTimestamp })
                                         .AddComponents(new List<DiscordComponent> { AddField, ModifyField, RemoveField })
-                                        .AddComponents(new List<DiscordComponent> { FinishAndSend, MessageComponents.CancelButton }));
+                                        .AddComponents(new List<DiscordComponent> { FinishAndSend, MessageComponents.GetCancelButton(ctx.DbUser) }));
                     }
                     catch (Exception)
                     {
@@ -111,7 +111,7 @@ internal class CustomEmbedCommand : BaseCommand
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetName, SetUrl, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
-                            .AddComponents(new List<DiscordComponent> { MessageComponents.BackButton }));
+                            .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser) }));
 
                         var Menu2 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
@@ -268,7 +268,7 @@ internal class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.GetCustomId() == MessageComponents.BackButton.CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser).CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -429,7 +429,7 @@ internal class CustomEmbedCommand : BaseCommand
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetText, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
-                            .AddComponents(new List<DiscordComponent> { MessageComponents.BackButton }));
+                            .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser) }));
 
                         var Menu2 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
@@ -553,7 +553,7 @@ internal class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.GetCustomId() == MessageComponents.BackButton.CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser).CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -742,7 +742,7 @@ internal class CustomEmbedCommand : BaseCommand
                         DeleteOrInvalidate();
                         return;
                     }
-                    else if (Menu1.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                    else if (Menu1.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         DeleteOrInvalidate();
