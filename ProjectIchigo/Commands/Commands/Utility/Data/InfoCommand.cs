@@ -45,10 +45,7 @@ internal class InfoCommand : BaseCommand
                 foreach (var b in embeds)
                     await ctx.Member.SendMessageAsync(b);
 
-                await RespondOrEdit(new DiscordEmbedBuilder
-                {
-                    Description = ":mailbox_with_mail: `You got mail! Please check your DMs.`",
-                }.AsBotSuccess(ctx));
+                SendDmRedirect();
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
