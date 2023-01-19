@@ -11,21 +11,21 @@ internal class UrbanDictionaryCommand : BaseCommand
 
             string term = (string)arguments["term"];
 
-            if (!ctx.Channel.IsNsfw)
+            if (!ctx.Channel.IsNsfw && ctx.CommandType != Enums.CommandType.ApplicationCommand)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Urban Dictionary can potentionally contain Adult Content. Please run this command within a channel marked as Age-Restricted.`"
+                    Description = $"`{GetString(t.Commands.UrbanDictionary.AdultContentError)}`"
                 }.AsError(ctx));
                 return;
             }
 
-            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
-            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
+            var Yes = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Yes), false, new DiscordComponentEmoji(true.ToEmote(ctx.Bot)));
+            var No = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Common.No), false, new DiscordComponentEmoji(false.ToEmote(ctx.Bot)));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`Urban Dictionary can potentionally contain Adult Content. Continue?`"
+                Description = $"`{GetString(t.Commands.UrbanDictionary.AdultContentWarning)}`"
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
@@ -42,14 +42,14 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Looking up '{term}'..`"
+                    Description = $"`{GetString(t.Commands.UrbanDictionary.LookingUp).Replace("{Term}", term)}`"
                 }.AsLoading(ctx));
 
                 if (term.IsNullOrWhiteSpace())
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`Failed to look up the term '{term}'`"
+                        Description = $"`{GetString(t.Commands.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
                     }.AsError(ctx));
                     return;
                 }
@@ -72,7 +72,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`Failed to look up the term '{term}': {Response.StatusCode}`"
+                        Description = $"`{GetString(t.Commands.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
                     }.AsError(ctx));
                     return;
                 }
@@ -94,17 +94,17 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`The term '{term}' does not exist on Urban Dictionary.`"
+                        Description = $"`{GetString(t.Commands.UrbanDictionary.NotExist).Replace("{Term}", term)}`"
                     }.AsError(ctx));
                     return;
                 }
 
                 var embeds = Definitions.Take(3).Select(x => new DiscordEmbedBuilder
                 {
-                    Title = $"**{x.word.Replace("**", "")}** - Written by {x.author}",
-                    Description = $"**Definition**\n\n" +
+                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.UrbanDictionary.WrittenBy).Replace("{Author}", x.author)}",
+                    Description = $"**{GetString(t.Commands.UrbanDictionary.Definition)}**\n\n" +
                                   $"{x.definition.Replace("[", "").Replace("]", "")}\n\n" +
-                                  $"**Example**\n\n" +
+                                  $"**{GetString(t.Commands.UrbanDictionary.Example)}**\n\n" +
                                   $"{x.example.Replace("[", "").Replace("]", "")}\n\n" +
                                   $"👍 `{x.thumbs_up}` | 👎 `{x.thumbs_down}` | 🕒 {Formatter.Timestamp(x.written_on, TimestampFormat.LongDateTime)}",
                     Url = x.permalink

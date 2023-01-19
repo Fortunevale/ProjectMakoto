@@ -23,7 +23,7 @@ public class MusicAppCommands : ApplicationCommandsModule
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Failed to provide autocomplete for song queue", ex);
+                    _logger.LogError("Failed to provide autocomplete for song queue", ex);
                     return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
                 }
             }

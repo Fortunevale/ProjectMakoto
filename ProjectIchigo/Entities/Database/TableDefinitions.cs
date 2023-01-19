@@ -153,6 +153,18 @@ public class TableDefinitions
 
         [Collation("utf8_unicode_ci")]
         public Text last_libretranslate_target { get; set; }
+        
+        [Collation("utf8_unicode_ci")]
+        public Text current_locale { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text override_locale { get; set; }
+
+        [MaxValue(1)]
+        public TinyInt deletion_requested { get; set; }
+        public BigInt data_deletion_date { get; set; }
+
+        public BigInt last_data_request { get; set; }
     }
 
     public class guilds

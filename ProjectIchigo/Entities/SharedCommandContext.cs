@@ -28,6 +28,24 @@ public class SharedCommandContext
             CommandName = CommandName.Insert(0, $"{ctx.Command.Parent.Name} ");
 
         BaseCommand = cmd;
+
+        try
+        {
+            DbUser = _bot.users[ctx.User.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
+        }
+        
+        try
+        {
+            DbGuild = _bot.guilds[ctx.Guild.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", ctx.User.Id, ex);
+        }
     }
 
     public SharedCommandContext(DiscordMessage message, Bot _bot)
@@ -47,6 +65,24 @@ public class SharedCommandContext
         {
             ctx = this
         };
+
+        try
+        {
+            DbUser = _bot.users[message.Author.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", message.Author.Id, ex);
+        }
+
+        try
+        {
+            DbGuild = _bot.guilds[message.Channel.Guild.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", message.Channel.Guild.Id, ex);
+        }
     }
 
     public SharedCommandContext(BaseCommand cmd, InteractionContext ctx, Bot _bot)
@@ -70,6 +106,24 @@ public class SharedCommandContext
         Bot = _bot;
 
         BaseCommand = cmd;
+
+        try
+        {
+            DbUser = _bot.users[ctx.User.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
+        }
+
+        try
+        {
+            DbGuild = _bot.guilds[ctx.Guild.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", ctx.User.Id, ex);
+        }
     }
 
     public SharedCommandContext(BaseCommand cmd, ContextMenuContext ctx, Bot _bot)
@@ -93,6 +147,24 @@ public class SharedCommandContext
         Bot = _bot;
 
         BaseCommand = cmd;
+
+        try
+        {
+            DbUser = _bot.users[ctx.User.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
+        }
+
+        try
+        {
+            DbGuild = _bot.guilds[ctx.Guild.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database guild entry for '{User}'\n{ex}", ctx.User.Id, ex);
+        }
     }
 
     /// <summary>
@@ -137,6 +209,11 @@ public class SharedCommandContext
     public DiscordUser User { get; set; }
 
     /// <summary>
+    /// The user's database entry that executed this command.
+    /// </summary>
+    public User DbUser { get; set; }
+
+    /// <summary>
     /// The current member the bot uses.
     /// </summary>
     public DiscordMember CurrentMember { get; set; }
@@ -150,6 +227,11 @@ public class SharedCommandContext
     /// The guild this command was executed on.
     /// </summary>
     public DiscordGuild Guild { get; set; }
+
+    /// <summary>
+    /// The guild's database entry the command was executed on.
+    /// </summary>
+    public Guild DbGuild { get; set; }
 
     /// <summary>
     /// The channel this command was executed in.

@@ -66,7 +66,7 @@ internal class DatabaseQueue
                             {
                                 try
                                 {
-                                    _logger.LogTrace($"Executing command on Database '{b.Command.Connection.Database}': '{b.Command.CommandText.TruncateWithIndication(100)}' with Priority {b.Priority}");
+                                    _logger.LogTrace("Executing command on Database '{Database}': '{Command}' with Priority {Priority}", b.Command.Connection.Database, b.Command.CommandText.TruncateWithIndication(100), b.Priority);
                                 }
                                 catch { }
 
@@ -79,7 +79,7 @@ internal class DatabaseQueue
                             {
                                 try
                                 {
-                                    _logger.LogTrace($"Executing ping on Database '{b.Connection.Database}' with Priority {b.Priority}");
+                                    _logger.LogTrace("Executing ping on Database '{Database}' with Priority {Priority}", b.Connection.Database, b.Priority);
                                 }
                                 catch { }
 
@@ -101,7 +101,7 @@ internal class DatabaseQueue
                         {
                             if (ex.Message.ToLower().Contains("connection must be valid and open."))
                             {
-                                _logger.LogWarn($"Connection with Database broken, attempting to reconnect..");
+                                _logger.LogWarn("Connection with Database broken, attempting to reconnect..");
 
                                 switch (b.RequestType)
                                 {
@@ -121,7 +121,7 @@ internal class DatabaseQueue
                         }
                         catch (Exception)
                         {
-                            _logger.LogFatal($"Connection with Database broken, reconnecting failed.");
+                            _logger.LogFatal("Connection with Database broken, reconnecting failed.");
                         }
 
                         b.Failed = true;

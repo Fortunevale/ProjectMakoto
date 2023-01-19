@@ -9,9 +9,18 @@ internal class RequestCommand : BaseCommand
             if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
                 return;
 
+            if (ctx.DbUser.Data.LastDataRequest.GetTimespanSince() < TimeSpan.FromDays(14))
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder
+                {
+                    Description = $"`{GetString(t.Commands.Data.Request.TimeError).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)}`").Replace("{WaitTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)}`")}`"
+                }.AsError(ctx));
+                return;
+            }
+
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = "`Fetching all your user data. This might take a moment..`"
+                Description = $"`{GetString(t.Commands.Data.Request.Fetching)}`"
             }.AsLoading(ctx));
 
             RequestData requestData = new();
@@ -37,8 +46,9 @@ internal class RequestCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Hello, {ctx.User.UsernameWithDiscriminator}. Here's your user data you requested. This may contain sensitive information.`"
+                        Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                     }.AsSuccess(ctx)).WithFile("userdata.json", stream));
+                    ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
                     break;
                 }
                 default:
@@ -47,26 +57,15 @@ internal class RequestCommand : BaseCommand
                     {
                         await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = $"`Hello, {ctx.User.UsernameWithDiscriminator}. Here's your user data you requested. This may contain sensitive information.`"
+                            Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));
+                        ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
 
-                        await RespondOrEdit(new DiscordEmbedBuilder
-                        {
-                            Description = "`I sent your data via direct messages.`"
-                        }.AsSuccess(ctx));
+                        SendDmRedirect();
                     }
                     catch (DisCatSharp.Exceptions.UnauthorizedException)
                     {
-                        var errorembed = new DiscordEmbedBuilder
-                        {
-                            Description = "`It seems i can't dm you. Please make sure you have the server's direct messages on and you don't have me blocked.`",
-                            ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif"
-                        }.AsError(ctx);
-
-                        if (ctx.User.Presence.ClientStatus.Mobile.HasValue)
-                            errorembed.ImageUrl = "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif";
-
-                        await RespondOrEdit(errorembed);
+                        SendDmError();
                     }
                     break;
                 }

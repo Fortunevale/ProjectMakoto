@@ -48,23 +48,18 @@ internal class EvaluationCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Evaluating..`").AsBotLoading(ctx));
 
-            var code = msg.Content;
-            var cs1 = code.IndexOf("```") + 3;
-            cs1 = code.IndexOf('\n', cs1) + 1;
-            var cs2 = code.LastIndexOf("```");
+            var code = RegexTemplates.Code.Match(msg.Content).Groups[1]?.Value?.Trim() ?? "";
 
-            if (cs1 == -1 || cs2 == -1)
+            if (code.IsNullOrWhiteSpace())
             {
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No code block was found.`").AsBotError(ctx));
                 return;
             }    
 
-            string cs = code[cs1..cs2];
-
             try
             {
-                var sopts = ScriptOptions.Default;
-                sopts = sopts.WithImports(
+                var options = ScriptOptions.Default;
+                options = options.WithImports(
                     "System", 
                     "System.Collections.Generic", 
                     "System.Linq", 
@@ -78,9 +73,9 @@ internal class EvaluationCommand : BaseCommand
                     "DisCatSharp.Enums", 
                     "Newtonsoft.Json"
                     );
-                sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
+                options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
-                var script = CSharpScript.Create(cs, sopts, typeof(SharedCommandContext));
+                var script = CSharpScript.Create(code, options, typeof(SharedCommandContext));
                 script.Compile();
                 var result = await script.RunAsync(ctx).ConfigureAwait(false);
 

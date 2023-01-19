@@ -1,4 +1,4 @@
-namespace ProjectIchigo;
+﻿namespace ProjectIchigo;
 internal class BumpReminder
 {
     internal BumpReminder(Bot _bot)
@@ -44,7 +44,7 @@ internal class BumpReminder
 
     internal void ScheduleBump(DiscordClient client, ulong ServerId)
     {
-        _logger.LogDebug($"Queuing Bump Message for '{ServerId}'");
+        _logger.LogDebug("Queuing Bump Message for '{Guild}'", ServerId);
 
         try
         {
@@ -54,21 +54,47 @@ internal class BumpReminder
         }
         catch (Exception ex)
         {
-            _logger.LogError($"An exception occurred while trying to un-queue previous bump messages for '{ServerId}'", ex);
+            _logger.LogError("An exception occurred while trying to un-queue previous bump messages for '{Guild}'", ex, ServerId);
         }
 
         var task = new Task(new Action(async () =>
         {
-            _logger.LogDebug($"Executing Bump Message for '{ServerId}'");
+            _logger.LogDebug("Executing Bump Message for '{Guild}'", ServerId);
             var Guild = await client.GetGuildAsync(ServerId);
 
             if (!Guild.Channels.ContainsKey(_bot.guilds[ServerId].BumpReminder.ChannelId) || _bot.guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
+                _logger.LogDebug("'{Guild}' hasn't bumped 169 times. Disabling bump reminder..", ServerId);
                 _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
                 return;
             }
 
             var Channel = Guild.GetChannel(_bot.guilds[ServerId].BumpReminder.ChannelId);
+
+            _logger.LogDebug("Checking if Self Role Message still exists, has it's reaction and is pinned in '{Guild}'", ServerId);
+
+            try
+            {
+                var msg = await Channel.GetMessageAsync(_bot.guilds[ServerId].BumpReminder.MessageId);
+
+                if (!msg.Reactions.Any(x => x.Emoji.ToString() == "✅"))
+                    throw new CancelException("Self Role Message Reaction was removed.");
+
+                if (!msg.Pinned)
+                    throw new CancelException("Self Role Message is not pinned.");
+            }
+            catch (CancelException ex)
+            {
+                _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
+                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `The bump reminder was disabled for the following reason: {ex.Message}`"));
+                return;
+            }
+            catch (DisCatSharp.Exceptions.NotFoundException)
+            {
+                _bot.guilds[ServerId].BumpReminder = new(_bot.guilds[ServerId]);
+                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `The bump reminder was disabled for the following reason: Self Role Message was deleted.`"));
+                return;
+            }
 
             if (_bot.guilds[ServerId].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-3))
             {

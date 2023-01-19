@@ -15,4 +15,6 @@ internal class RegexTemplates
 
     public static readonly Regex GitHubUrl = new(@"https:\/\/github\.com\/([^ \/]*)\/([^ \/]*)(\/blob\/([^ \/]*))?\/([^ #]*)#(L\d*)(-(L\d*))?", RegexOptions.IgnoreCase);
     public static readonly Regex Ip = new(@"^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$");
+
+    public static readonly Regex Code = new(@"(?:```)(?:cs)?((.|\n)*)(?:```)", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 }

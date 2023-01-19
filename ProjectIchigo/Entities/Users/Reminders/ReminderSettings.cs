@@ -65,7 +65,7 @@ public class ReminderSettings
 
                     await button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                     var newMsg = await button.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
-                        .AddEmbed(new DiscordEmbedBuilder().WithDescription("`How long do you want to snooze for?`").AsBotAwaitingInput(_bot.discordClient, user))
+                        .AddEmbed(new DiscordEmbedBuilder().WithDescription("`How long do you want to snooze for?`").AsBotAwaitingInput(_bot.discordClient, user, _bot.users[user.Id]))
                         .AddComponents(new DiscordStringSelectComponent("Select a new due time..", new List<DiscordStringSelectComponentOption>
                         {
                             new DiscordStringSelectComponentOption("1 minute", "1m"),
@@ -124,7 +124,7 @@ public class ReminderSettings
                 task.Add(_bot.watcher);
                 task.CreateScheduleTask(b.DueTime, $"{Parent.UserId}; {b.UUID}; reminder");
 
-                _logger.LogDebug($"Created scheduled task for reminder by '{Parent.UserId}'");
+                _logger.LogDebug("Created scheduled task for reminder by '{User}'", Parent.UserId);
             }
 
         foreach (var b in GetScheduleTasks().ToList())
@@ -137,11 +137,9 @@ public class ReminderSettings
                 {
                     DeleteScheduleTask(b.Key);
 
-                    _logger.LogDebug($"Deleted scheduled task for reminder by '{Parent.UserId}'");
+                    _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", Parent.UserId);
                 }
             }
-
-        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 
     private User Parent { get; set; }

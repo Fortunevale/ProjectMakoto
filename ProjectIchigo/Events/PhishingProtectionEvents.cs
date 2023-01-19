@@ -178,7 +178,7 @@ internal class PhishingProtectionEvents
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"An exception occurred while trying to unshorten url '{match}'", ex);
+                    _logger.LogError("An exception occurred while trying to unshorten url '{url}'", ex, match);
 
                     if (_bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder

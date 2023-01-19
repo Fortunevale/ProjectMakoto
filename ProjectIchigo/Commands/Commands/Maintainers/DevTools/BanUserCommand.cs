@@ -28,7 +28,7 @@ internal class BanUserCommand : BaseCommand
 
             foreach (var b in ctx.Client.Guilds.Where(x => x.Value.OwnerId == victim.Id))
             {
-                _logger.LogInfo($"Leaving guild '{b.Key}'..");
+                _logger.LogInfo("Leaving guild '{guild}'..", b.Key);
                 await b.Value.LeaveAsync();
             }
 

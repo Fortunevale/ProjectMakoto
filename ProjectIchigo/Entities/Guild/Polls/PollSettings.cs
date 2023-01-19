@@ -163,7 +163,7 @@ public class PollSettings
                 _bot.discordClient.MessageDeleted += MessageDeletionHandling;
                 _bot.discordClient.ChannelDeleted += ChannelDeletionHandling;
 
-                _logger.LogDebug($"Created scheduled task for poll by '{Parent.ServerId}'");
+                _logger.LogDebug("Created scheduled task for poll by '{Guild}'", Parent.ServerId);
             }
 
         foreach (var b in GetScheduleTasks().ToList())
@@ -175,10 +175,8 @@ public class PollSettings
                 if (!RunningPolls.Any(x => x.SelectUUID == uuid))
                 {
                     DeleteScheduleTask(b.Key);
-                    _logger.LogDebug($"Deleted scheduled task for poll by '{Parent.ServerId}'");
+                    _logger.LogDebug("Deleted scheduled task for poll by '{Guild}'", Parent.ServerId);
                 }
             }
-
-        _ = Bot.DatabaseClient.FullSyncDatabase();
     }
 }

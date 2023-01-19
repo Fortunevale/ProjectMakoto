@@ -14,8 +14,8 @@ internal class LeaderboardCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Experience is disabled on this server. Please run '{ctx.Prefix}experiencesettings config' to configure the experience system.`"
-                }.AsError(ctx, "Experience"));
+                    Description = $"`{GetString(t.Commands.Leaderboard.Disabled).Replace("{Command}", $"{ctx.Prefix}experiencesettings config")}`"
+                }.AsError(ctx, GetString(t.Commands.Leaderboard.Title)));
                 return;
             }
 
@@ -27,8 +27,8 @@ internal class LeaderboardCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Loading Leaderboard, please wait..`",
-            }.AsLoading(ctx, "Experience Leaderboard");
+                Description = $"`{GetString(t.Commands.Leaderboard.Fetching)}`",
+            }.AsLoading(ctx, GetString(t.Commands.Leaderboard.Title));
 
             await RespondOrEdit(embed: embed);
 
@@ -67,7 +67,7 @@ internal class LeaderboardCommand : BaseCommand
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`Level {b.Value.Experience.Level} with {b.Value.Experience.Points} XP`)"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`{GetString(t.Commands.Leaderboard.Level).Replace("{Level}", b.Value.Experience.Level).Replace("{Points}", b.Value.Experience.Points)}`)"));
 
                     if (count >= ShowAmount)
                         break;
@@ -83,13 +83,13 @@ internal class LeaderboardCommand : BaseCommand
             if (count != 0)
             {
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = $"You're currently on the **{currentuserplacement}.** spot on the leaderboard.";
-                await RespondOrEdit(embed.AsInfo(ctx, "Experience Leaderboard"));
+                embed.Description = GetString(t.Commands.Leaderboard.Placement).Replace("{Placement}", currentuserplacement);
+                await RespondOrEdit(embed.AsInfo(ctx, GetString(t.Commands.Leaderboard.Title)));
             }
             else
             {
-                embed.Description = $":no_entry_sign: `No one on this server has collected enough experience to show up on the leaderboard, get to typing!`";
-                await RespondOrEdit(embed.AsInfo(ctx, "Experience Leaderboard"));
+                embed.Description = $":no_entry_sign: `{GetString(t.Commands.Leaderboard.NoPoints)}`";
+                await RespondOrEdit(embed.AsInfo(ctx, GetString(t.Commands.Leaderboard.Title)));
             }
         });
     }

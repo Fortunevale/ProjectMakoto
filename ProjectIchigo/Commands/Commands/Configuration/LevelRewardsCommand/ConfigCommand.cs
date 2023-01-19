@@ -96,7 +96,7 @@ internal class ConfigCommand : BaseCommand
 
                 builder.AddComponents(Row2);
 
-                builder.AddComponents(MessageComponents.CancelButton);
+                builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser));
 
                 await RespondOrEdit(builder);
             }
@@ -153,7 +153,7 @@ internal class ConfigCommand : BaseCommand
 
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
-                                    .AddComponents(MessageComponents.CancelButton));
+                                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
                                 var Menu = await ctx.WaitForButtonAsync();
 
@@ -191,6 +191,13 @@ internal class ConfigCommand : BaseCommand
                                         }
 
                                         throw RoleResult.Exception;
+                                    }
+
+                                    if (RoleResult.Result.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                                    {
+                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned as reward.`"));
+                                        await Task.Delay(3000);
+                                        continue;
                                     }
 
                                     selectedRole = RoleResult.Result;
@@ -280,6 +287,14 @@ internal class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.GetCustomId() == Finish.CustomId)
                                 {
+                                    if (selectedRole.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                                    {
+                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned as reward.`"));
+                                        await Task.Delay(3000);
+                                        await ExecuteCommand(ctx, arguments);
+                                        return;
+                                    }
+
                                     ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelRewardEntry
                                     {
                                         Level = selectedLevel,
@@ -295,7 +310,7 @@ internal class ConfigCommand : BaseCommand
                                     ctx.Client.ComponentInteractionCreated += SelectInteraction;
                                     return;
                                 }
-                                else if (Menu.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                                 {
                                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -381,7 +396,7 @@ internal class ConfigCommand : BaseCommand
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.GetCustomId() == MessageComponents.CancelButton.CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
