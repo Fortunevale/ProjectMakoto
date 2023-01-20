@@ -11,8 +11,6 @@ internal class PatCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "pat");
-
             string[] phrases =
             {
                     "%1 gives %2 headpats!",
@@ -31,17 +29,19 @@ internal class PatCommand : BaseCommand
                 {
                     Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
                     Color = EmbedColors.HiddenSidebar,
-                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
+                    Footer = ctx.GenerateUsedByFooter(),
                 }));
                 return;
             }
 
+            var response = await SocialCommandAbstractions.GetGif(ctx.Bot, "pat");
+
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
-                ImageUrl = gif,
+                ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
-                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
+                Footer = ctx.GenerateUsedByFooter(response.Item1),
             }).WithAllowedMention(UserMention.All));
         });
     }

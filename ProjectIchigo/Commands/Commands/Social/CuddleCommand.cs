@@ -11,8 +11,6 @@ internal class CuddleCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
                 return;
 
-            string gif = await SocialCommandAbstractions.GetGif(ctx.Bot, "cuddle");
-
             string[] phrases =
             {
                 $"%1 cuddles with %2! {ctx.Bot.status.LoadedConfig.Emojis.Cuddle}",
@@ -29,17 +27,19 @@ internal class CuddleCommand : BaseCommand
                 {
                     Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
                     Color = EmbedColors.HiddenSidebar,
-                    Footer = ctx.GenerateUsedByFooter("kawaii.red"),
+                    Footer = ctx.GenerateUsedByFooter(),
                 }));
                 return;
             }
 
+            var response = await SocialCommandAbstractions.GetGif(ctx.Bot, "cuddle");
+
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
-                ImageUrl = gif,
+                ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
-                Footer = ctx.GenerateUsedByFooter("kawaii.red"),
+                Footer = ctx.GenerateUsedByFooter(response.Item1),
             }).WithAllowedMention(UserMention.All));
         });
     }
