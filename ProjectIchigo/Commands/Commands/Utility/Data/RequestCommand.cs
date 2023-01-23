@@ -6,7 +6,7 @@ internal class RequestCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx, true))
                 return;
 
             if (ctx.DbUser.Data.LastDataRequest.GetTimespanSince() < TimeSpan.FromDays(14))

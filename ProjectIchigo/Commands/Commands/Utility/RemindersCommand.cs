@@ -6,7 +6,7 @@ internal class RemindersCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             var rem = ctx.Bot.users[ctx.User.Id].Reminders;

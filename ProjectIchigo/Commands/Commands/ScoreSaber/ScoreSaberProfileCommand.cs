@@ -8,7 +8,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
         {
             string id = (string)arguments["id"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
                 return;
 
             bool AddLinkButton = true;

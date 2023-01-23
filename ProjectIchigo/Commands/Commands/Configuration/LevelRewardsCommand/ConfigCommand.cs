@@ -8,7 +8,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             int CurrentPage = 0;

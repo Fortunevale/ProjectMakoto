@@ -8,7 +8,7 @@ internal class ReportHostCommand : BaseCommand
         {
             string url = (string)arguments["url"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
                 return;
 
             int tos_version = 3;

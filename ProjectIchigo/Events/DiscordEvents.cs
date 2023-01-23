@@ -46,7 +46,7 @@ internal class DiscordEvents
             }
 
             var msg = await channel.SendMessageAsync(
-                $"Hi! I'm Ichigo. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type `/help`.\n\n" +
+                $"Hi! I'm Ichigo. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type {sender.GetCommandMention(_bot, "help")}.\n\n" +
                 $"**Important Notes**\n\n" +
                 $"• **Phishing Protection** is **enabled** by default. To change this run: {sender.GetCommandMention(_bot, "phishing")}.\n" +
                 $"• **Automatic User/Bot Token invalidation** is **turned on** by default. If you don't know what this means, just leave it on. If you do know what this means and you don't want it to happen, run {sender.GetCommandMention(_bot, "tokendetection")}.\n" +

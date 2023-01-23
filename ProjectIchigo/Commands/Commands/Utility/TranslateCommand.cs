@@ -35,7 +35,7 @@ internal class TranslateCommand : BaseCommand
                 }
             }
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             var transSource = bMessage.Content;

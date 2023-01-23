@@ -8,7 +8,7 @@ internal class GlobalNotesCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx, true))
                 return;
 
             DiscordUser victim = (DiscordUser)arguments["victim"];

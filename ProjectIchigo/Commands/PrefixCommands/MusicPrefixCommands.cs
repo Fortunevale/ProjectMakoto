@@ -17,7 +17,7 @@ public class MusicPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "music")))
                     return;
 
                 if (ctx.Command.Parent is not null)

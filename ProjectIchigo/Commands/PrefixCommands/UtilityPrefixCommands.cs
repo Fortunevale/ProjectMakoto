@@ -222,7 +222,7 @@ public class UtilityPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "data")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -299,7 +299,7 @@ public class UtilityPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vcc")))
                     return;
 
                 if (ctx.Command.Parent is not null)
