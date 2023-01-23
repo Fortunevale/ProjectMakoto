@@ -29,7 +29,7 @@ internal class PhishingProtectionEvents
                 if (e.Content.StartsWith($";;{command.Key}"))
                     return;
 
-        if (e.WebhookMessage || guild is null)
+        if (e.WebhookMessage || guild is null || e.Author?.Id == sender.CurrentUser.Id)
             return;
 
         if (!_bot.guilds[guild.Id].PhishingDetection.DetectPhishing)
