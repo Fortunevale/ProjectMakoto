@@ -133,6 +133,22 @@ public class ModerationPrefixCommands : BaseCommandModule
         }).Add(_bot.watcher, ctx);
     }
 
+    [Command("ban"),
+    CommandModule("moderation"),
+    Description("Bans the specified user.")]
+    public async Task Ban(CommandContext ctx, DiscordUser victim, [Description("Reason")][RemainingText] string reason)
+    {
+        Task.Run(async () =>
+        {
+            await new BanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+            {
+                { "victim", victim },
+                { "days", 0 },
+                { "reason", reason },
+            });
+        }).Add(_bot.watcher, ctx);
+    }
+
     [Command("softban"),
     CommandModule("moderation"),
     Description("Soft bans the specified user.")]
