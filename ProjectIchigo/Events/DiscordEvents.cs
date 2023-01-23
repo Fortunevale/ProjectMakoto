@@ -23,9 +23,20 @@ internal class DiscordEvents
                 return;
             }
 
+            DiscordChannel channel;
+
+            try
+            {
+                if (e.Guild.SystemChannel is null)
+                    channel = e.Guild.Channels.Values.OrderBy(x => x.Position).First(x => x.Type == ChannelType.Text && x.Id != x.Guild.RulesChannel?.Id);
+                else
+                    channel = e.Guild.SystemChannel;
+            }
+            catch (Exception) { return; }
+
             if (sender.Guilds.Count >= 100 && (!sender.CurrentUser.IsVerifiedBot || !_bot.status.LoadedConfig.AllowMoreThan100Guilds))
             {
-                await e.Guild.Channels.Values.OrderBy(x => x.Position).First().SendMessageAsync($"Hi, thanks for adding me to your server.\n\n" +
+                await channel.SendMessageAsync($"Hi, thanks for adding me to your server.\n\n" +
                     $"Unfortunately, I am not yet verified.\n\nBecause i need several intents (read more about that here: <https://support.discord.com/hc/en-us/articles/360040720412>) like the server members and message content, " +
                     $"i am unable to operate in more than 99 servers.\nTo see how my verification is going, check our development and support server: <{_bot.status.DevelopmentServerInvite}>.");
                 
@@ -34,8 +45,8 @@ internal class DiscordEvents
                 return;
             }
 
-            var msg = await e.Guild.Channels.Values.OrderBy(x => x.Position).First().SendMessageAsync(
-                $"Hi! I'm Ichigo. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type `;;help` or do a `/` and filter by me.\n\n" +
+            var msg = await channel.SendMessageAsync(
+                $"Hi! I'm Ichigo. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type `/help`.\n\n" +
                 $"**Important Notes**\n\n" +
                 $"• **Phishing Protection** is **enabled** by default. To change this run: {sender.GetCommandMention(_bot, "phishing")}.\n" +
                 $"• **Automatic User/Bot Token invalidation** is **turned on** by default. If you don't know what this means, just leave it on. If you do know what this means and you don't want it to happen, run {sender.GetCommandMention(_bot, "tokendetection")}.\n" +
