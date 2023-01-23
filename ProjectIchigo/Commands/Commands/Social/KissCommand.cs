@@ -8,7 +8,7 @@ internal class KissCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             string[] phrases =

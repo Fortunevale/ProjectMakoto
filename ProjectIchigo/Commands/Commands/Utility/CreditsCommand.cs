@@ -6,7 +6,7 @@ internal class CreditsCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx.Client, ctx, true))
+            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx, true))
                 return;
 
             await RespondOrEdit(new DiscordEmbedBuilder

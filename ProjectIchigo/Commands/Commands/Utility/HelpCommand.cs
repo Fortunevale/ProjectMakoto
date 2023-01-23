@@ -10,7 +10,7 @@ internal class HelpCommand : BaseCommand
         {
             var command_filter = (string)arguments["command"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             List<KeyValuePair<string, string>> Commands = new();

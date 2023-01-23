@@ -25,7 +25,7 @@ internal class EmbedMessagesEvents
                     if (!_bot.guilds[e.Guild.Id].EmbedMessage.UseEmbedding)
                         break;
 
-                    if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot), true))
+                    if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, _bot, "message_embed"), true))
                         break;
 
                     var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
@@ -70,7 +70,7 @@ internal class EmbedMessagesEvents
                 if (!_bot.guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
                     return;
 
-                if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(sender, new SharedCommandContext(e.Message, _bot), true))
+                if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, _bot, "github_embed"), true))
                     return;
 
                 var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);

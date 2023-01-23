@@ -9,7 +9,7 @@ internal class LoadShareCommand : BaseCommand
             ulong userid = (ulong)arguments["userid"];
             string id = (string)arguments["id"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()

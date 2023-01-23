@@ -8,7 +8,7 @@ internal class AfkCommand : BaseCommand
         {
             string reason = (string)arguments["reason"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             if (reason.Length > 128)

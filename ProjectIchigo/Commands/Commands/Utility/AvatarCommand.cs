@@ -7,7 +7,7 @@ internal class AvatarCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             victim ??= ctx.User;

@@ -48,7 +48,7 @@ public class SharedCommandContext
         }
     }
 
-    public SharedCommandContext(DiscordMessage message, Bot _bot)
+    public SharedCommandContext(DiscordMessage message, Bot _bot, string CommandIdentifier)
     {
         CommandType = CommandType.Custom;
 

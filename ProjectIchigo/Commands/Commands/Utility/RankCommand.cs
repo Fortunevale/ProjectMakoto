@@ -7,7 +7,7 @@ internal class RankCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, ctx))
+            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience)

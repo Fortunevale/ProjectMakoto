@@ -15,7 +15,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "dev_tools")))
                     return;
 
                 if (ctx.Command.Parent is not null)
