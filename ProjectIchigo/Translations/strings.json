@@ -893,16 +893,20 @@
     },
     "Upload": {
       "NoInteraction": {
-        "en": "You have not yet started an upload interactions. Please only run this command when instructed to by the bot."
+        "en": "You have not yet started an upload interactions. Please only run this command when instructed to by the bot.",
+        "de": "Du hast keine Upload Interaktion gestartet. Bitte führe diesen Befehl nur aus wenn du dazu aufgefordert wirst vom Bot."
       },
       "AlreadyUploaded": {
-        "en": "You already uploaded your file."
+        "en": "You already uploaded your file.",
+        "de": "Du hast bereits eine Datei hochgeladen."
       },
       "TimedOut": {
-        "en": "Your upload interaction timed out {Timestamp}."
+        "en": "Your upload interaction timed out {Timestamp}.",
+        "de": "Deine Upload Interakation ist {Timestamp} abgelaufen."
       },
       "Uploaded": {
-        "en": "Your file has been uploaded."
+        "en": "Your file has been uploaded.",
+        "de": "Deine Datei wurde hochgeladen."
       }
     },
     "UrbanDictionary": {
