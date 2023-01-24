@@ -214,7 +214,10 @@ public class Bot
                 Dictionary<string, int> CalculateTranslationProgress(object? obj)
                 {
                     if (obj is null)
+                    {
+                        _logger.LogWarn("A Translation Group was not loaded.");
                         return new Dictionary<string, int>();
+                    }
 
                     Dictionary<string, int> counts = new();
 
