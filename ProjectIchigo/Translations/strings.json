@@ -191,6 +191,20 @@
           "de": "Jahr"
         }
       },
+      "Cooldown": {
+        "SlowDown": {
+          "en": "Please slow down. Your previous command is still queued.",
+          "de": "Bitte warte einen Moment. Dein vorheriger Befehl ist noch in der Warteschlange."
+        },
+        "CancelCommand": {
+          "en": "Cancel Command",
+          "de": "Befehl abbrechen"
+        },
+        "WaitingForCooldown": {
+          "en": "You're still on cooldown for this command. Your command will be executed {Timestamp}.",
+          "de": "Dein Befehl befindet sich in der Warteschlange. Dein Befehl wird {Timestamp} ausgeführt."
+        }
+      },
       "UsedByFooter": {
         "en": "Command used by {User}",
         "de": "Befehl verwendet von {User}"

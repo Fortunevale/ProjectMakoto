@@ -86,6 +86,14 @@ public class Translations
                 public SingleTranslationKey DateTimeYear;
             }
 
+            public cooldown Cooldown;
+            public class cooldown
+            {
+                public SingleTranslationKey SlowDown;
+                public SingleTranslationKey CancelCommand;
+                public SingleTranslationKey WaitingForCooldown;
+            }
+
             public SingleTranslationKey UsedByFooter;
             public SingleTranslationKey InteractionTimeout;
             public SingleTranslationKey InteractionFinished;
