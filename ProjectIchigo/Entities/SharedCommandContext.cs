@@ -61,6 +61,8 @@ public class SharedCommandContext
 
         Bot = _bot;
 
+        CommandName = CommandIdentifier;
+
         BaseCommand = new DummyCommand()
         {
             ctx = this
