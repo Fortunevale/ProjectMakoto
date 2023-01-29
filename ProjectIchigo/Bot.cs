@@ -889,9 +889,14 @@ public class Bot
             //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
             //        return -1;
 
-            var CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, Prefix);
+            string currentPrefix = guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.Prefix : Prefix;
 
-            if (CommandStart == -1 && (message.Content.StartsWith($"<@{discordClient.CurrentUser.Id}>") || message.Content.StartsWith($"<@!{discordClient.CurrentUser.Id}>")))
+            int CommandStart = -1;
+
+            if (!(guild?.PrefixDisabled ?? false))
+                CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, currentPrefix);
+
+            if (CommandStart == -1)
                 CommandStart = CommandsNextUtilities.GetMentionPrefixLength(message, discordClient.CurrentUser);
 
             return CommandStart;

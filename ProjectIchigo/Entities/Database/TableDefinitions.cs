@@ -174,6 +174,12 @@ public class TableDefinitions
 
         public BigInt auto_assign_role_id { get; set; }
 
+        [Collation("utf8_unicode_ci")] [Default(";;")]
+        public Text prefix { get; set; }
+
+        [MaxValue(1)]
+        public TinyInt prefix_disabled { get; set; }
+
         [Collation("utf8_unicode_ci")]
         public Text levelrewards { get; set; }
 

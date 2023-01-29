@@ -1174,6 +1174,36 @@
           "en": "{User} has been banned from this channel."
         }
       }
+    },
+    "PrefixConfigCommand": {
+      "Title": {
+        "en": "Prefix Commands",
+        "de": "Text Befehle"
+      },
+      "PrefixDisabled": {
+        "en": "Prefix Commands disabled",
+        "de": "Text Befehle deaktiviert"
+      },
+      "CurrentPrefix": {
+        "en": "Current Command Prefix",
+        "de": "Aktuelles Text Befehl Prefix"
+      },
+      "TogglePrefixCommands": {
+        "en": "Toggle Prefix Commands",
+        "de": "Text Befehle ein-/ausschalten"
+      },
+      "ChangePrefix": {
+        "en": "Change Prefix",
+        "de": "Prefix ändern"
+      },
+      "NewPrefixModalTitle": {
+        "en": "Select new Prefix",
+        "de": "Wähle ein neues Prefix"
+      },
+      "NewPrefix": {
+        "en": "New Prefix",
+        "de": "Neues Prefix"
+      }
     }
   }
 }

@@ -426,5 +426,17 @@ public class Translations
                 public SingleTranslationKey VictimBanned;
             }
         }
+
+        public prefixConfig PrefixConfigCommand;
+        public class prefixConfig
+        {
+            public SingleTranslationKey Title;
+            public SingleTranslationKey PrefixDisabled;
+            public SingleTranslationKey CurrentPrefix;
+            public SingleTranslationKey TogglePrefixCommands;
+            public SingleTranslationKey ChangePrefix;
+            public SingleTranslationKey NewPrefixModalTitle;
+            public SingleTranslationKey NewPrefix;
+        }
     }
 }

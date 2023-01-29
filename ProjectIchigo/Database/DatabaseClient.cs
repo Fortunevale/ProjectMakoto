@@ -380,6 +380,9 @@ internal class DatabaseClient
             {
                 serverid = x.Key,
 
+                prefix = x.Value.Prefix,
+                prefix_disabled = x.Value.PrefixDisabled,
+
                 experience_use = x.Value.Experience.UseExperience,
                 experience_boost_bumpreminder = x.Value.Experience.BoostXpForBumpReminder,
 
