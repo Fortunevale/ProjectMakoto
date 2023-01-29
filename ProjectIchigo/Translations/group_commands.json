@@ -1014,6 +1014,37 @@
     ]
   },
   {
+    "name": "guild-prefix",
+    "description": "Allows you to review and change settings related to the guild's prefix.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": {
+      "de": "Erlaubt es dir die aktuelle Konfiguration für das Server Prefix anzusehen oder zu bearbeiten."
+    },
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently used settings related to the guild's prefix.",
+        "name_translations": {
+          "de": "ansehen"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir die aktuelle Konfiguration für das Server Prefix anzusehen."
+        }
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to the guild's prefix.",
+        "name_translations": {
+          "de": "bearbeiten"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir die aktuelle Konfiguration für das Server Prefix zu bearbeiten."
+        }
+      }
+    ]
+  },
+  {
     "name": "scoresaber",
     "description": "Interact with the ScoreSaber API.",
     "type": 1,

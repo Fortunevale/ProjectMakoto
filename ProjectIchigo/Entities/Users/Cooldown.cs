@@ -19,7 +19,7 @@ public class Cooldown
 
         if (WaitingList.Contains(ctx.CommandName))
         {
-            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} 🛑 `Please slow down. Your previous command is still queued.`"));
+            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} 🛑 `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.SlowDown)}`"));
             await Task.Delay(3000);
             _ = stop_warn.DeleteAsync();
             return true;
@@ -34,12 +34,12 @@ public class Cooldown
             return false;
         }
 
-        var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Cancel Command", false, EmojiTemplates.GetWhiteXMark(ctx.Bot).ToComponent());
+        var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.CancelCommand), false, EmojiTemplates.GetWhiteXMark(ctx.Bot).ToComponent());
         var cancellationTokenSource = new CancellationTokenSource();
         var Cancelled = false;
 
         var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ `You're still cooldown for this command. Your cooldown will end `{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`. As soon as your cool down is over, your command will be executed.`")
+            .WithContent($"{ctx.User.Mention} ⏳ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown).Replace("{Timestamp}", $"`{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`")}`")
             .AddComponents(cancelButton));
 
         Task.Run(async () =>
@@ -74,7 +74,7 @@ public class Cooldown
         try
         {
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ `You're still cooldown for this command. Your cooldown will end `{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`. As soon as your cool down is over, your command will be executed.`")
+            .WithContent($"{ctx.User.Mention} ⏳ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown).Replace("{Timestamp}", $"`{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`")}`")
             .AddComponents(cancelButton.Disable()));
         }
         catch { }

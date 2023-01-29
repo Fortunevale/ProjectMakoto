@@ -191,6 +191,20 @@
           "de": "Jahr"
         }
       },
+      "Cooldown": {
+        "SlowDown": {
+          "en": "Please slow down. Your previous command is still queued.",
+          "de": "Bitte warte einen Moment. Dein vorheriger Befehl ist noch in der Warteschlange."
+        },
+        "CancelCommand": {
+          "en": "Cancel Command",
+          "de": "Befehl abbrechen"
+        },
+        "WaitingForCooldown": {
+          "en": "You're still on cooldown for this command. Your command will be executed {Timestamp}.",
+          "de": "Dein Befehl befindet sich in der Warteschlange. Dein Befehl wird {Timestamp} ausgeführt."
+        }
+      },
       "UsedByFooter": {
         "en": "Command used by {User}",
         "de": "Befehl verwendet von {User}"
@@ -841,71 +855,92 @@
     },
     "TranslateMessage": {
       "NoContent": {
-        "en": "There is no content to translate in the message you selected."
+        "en": "There is no content to translate in the message you selected.",
+        "de": "In der gewählten Nachricht gibt es keinen Text zum übersetzen."
       },
       "SelectProvider": {
-        "en": "What provider do you want to use?"
+        "en": "What provider do you want to use?",
+        "de": "Welchen Anbieter möchtest du verwenden?"
       },
       "SelectSource": {
-        "en": "Please select the language to translate from."
+        "en": "Please select the language to translate from.",
+        "de": "Bitte wähle die Sprache aus der du übersetzen möchtest."
       },
       "SelectSourceDropdown": {
-        "en": "Select the Source Language.."
+        "en": "Select the Source Language..",
+        "de": "Sprache auswählen.."
       },
       "SelectTarget": {
-        "en": "Okay! Translating from {Source}. Now select the language to translate to."
+        "en": "Okay! Translating from {Source}. Now select the language to translate to.",
+        "de": "Okay! Übersetze aus {Source}. Wähle nun die Sprache zu der du übersetzen möchtest."
       },
       "SelectTargetDropdown": {
-        "en": "Select the Target Language.."
+        "en": "Select the Target Language..",
+        "de": "Sprache auswählen.."
       },
       "Translating": {
-        "en": "Translating.."
+        "en": "Translating..",
+        "de": "Übersetze.."
       },
       "Queue": {
-        "en": "Your translation request is currently in queue at position {Position}. This might take a moment to finish..`\n`Your request will be executed, approximately, {Timestamp}."
+        "en": "Your translation request is currently in queue at position {Position}. This might take a moment to finish..`\n`Your request will be executed, approximately, {Timestamp}.",
+        "de": "Deine Übersetzungsanfrage ist aktuell in der Warteschlange an Position {Position}. Bitte warte einen Moment.. `\n`Deine Anfrage wird ungefähr {Timestamp} ausgeführt."
       },
       "Translated": {
-        "en": "Translated from {Source} to {Target} using {Provider}"
+        "en": "Translated from {Source} to {Target} using {Provider}",
+        "de": "Übersetzt aus {Source} zu {Target} durch {Provider}"
       }
     },
     "Upload": {
       "NoInteraction": {
-        "en": "You have not yet started an upload interactions. Please only run this command when instructed to by the bot."
+        "en": "You have not yet started an upload interactions. Please only run this command when instructed to by the bot.",
+        "de": "Du hast keine Upload Interaktion gestartet. Bitte führe diesen Befehl nur aus wenn du dazu aufgefordert wirst vom Bot."
       },
       "AlreadyUploaded": {
-        "en": "You already uploaded your file."
+        "en": "You already uploaded your file.",
+        "de": "Du hast bereits eine Datei hochgeladen."
       },
       "TimedOut": {
-        "en": "Your upload interaction timed out {Timestamp}."
+        "en": "Your upload interaction timed out {Timestamp}.",
+        "de": "Deine Upload Interakation ist {Timestamp} abgelaufen."
       },
       "Uploaded": {
-        "en": "Your file has been uploaded."
+        "en": "Your file has been uploaded.",
+        "de": "Deine Datei wurde hochgeladen."
       }
     },
     "UrbanDictionary": {
       "AdultContentError": {
-        "en": "Urban Dictionary can potentionally contain Adult Content. Please run this command within a channel marked as Age-Restricted."
+        "en": "Urban Dictionary can potentionally contain Adult Content. Please run this command within a channel marked as Age-Restricted.",
+        "de": "Urban Dictionary kann möglicherweise Inhalte nur für Erwachsene enthalten. Bitte führe diesen Befehl innerhalb eines Kanals aus welcher als altersbegrenzt makiert ist."
       },
       "AdultContentWarning": {
-        "en": "Urban Dictionary can potentionally contain Adult Content. Continue?"
+        "en": "Urban Dictionary can potentionally contain Adult Content. Continue?",
+        "de": "Urban Dictionary kann möglicherwise Inhalte nur für Erwachsene enthalten. Möchtest du fortfahren?"
       },
       "LookingUp": {
-        "en": "Looking up '{Term}'.."
+        "en": "Looking up '{Term}'..",
+        "de": "Suche nach '{Term}'.."
       },
       "LookupFail": {
-        "en": "Failed to look up '{Term}'."
+        "en": "Failed to look up '{Term}'.",
+        "de": "Die Suche nach '{Term}' ist fehlgeschlagen."
       },
       "NotExist": {
-        "en": "'{Term}' was not found in the Urban Dictionary."
+        "en": "'{Term}' was not found in the Urban Dictionary.",
+        "de": "'{Term}' wurde nicht im Urban Dictionary gefunden."
       },
       "WrittenBy": {
-        "en": "Written by {Author}"
+        "en": "Written by {Author}",
+        "de": "Geschrieben von {Author}"
       },
       "Definition": {
-        "en": "Definition"
+        "en": "Definition",
+        "de": "Definition"
       },
       "Example": {
-        "en": "Example"
+        "en": "Example",
+        "de": "Beispiel"
       }
     },
     "UserInfo": {
@@ -1138,6 +1173,36 @@
         "VictimBanned": {
           "en": "{User} has been banned from this channel."
         }
+      }
+    },
+    "PrefixConfigCommand": {
+      "Title": {
+        "en": "Prefix Commands",
+        "de": "Text Befehle"
+      },
+      "PrefixDisabled": {
+        "en": "Prefix Commands disabled",
+        "de": "Text Befehle deaktiviert"
+      },
+      "CurrentPrefix": {
+        "en": "Current Command Prefix",
+        "de": "Aktuelles Text Befehl Prefix"
+      },
+      "TogglePrefixCommands": {
+        "en": "Toggle Prefix Commands",
+        "de": "Text Befehle ein-/ausschalten"
+      },
+      "ChangePrefix": {
+        "en": "Change Prefix",
+        "de": "Prefix ändern"
+      },
+      "NewPrefixModalTitle": {
+        "en": "Select new Prefix",
+        "de": "Wähle ein neues Prefix"
+      },
+      "NewPrefix": {
+        "en": "New Prefix",
+        "de": "Neues Prefix"
       }
     }
   }

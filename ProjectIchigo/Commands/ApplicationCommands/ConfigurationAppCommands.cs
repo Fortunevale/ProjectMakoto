@@ -422,4 +422,28 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
     }
+
+    [SlashCommandGroup("guild-prefix", "Allows you to review and change settings related to the guild's prefix.")]
+    public class GuildPrefix : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review settings related to the guild's prefix.")]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.PrefixCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to change settings related to the guild's prefix.")]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.PrefixCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
 }

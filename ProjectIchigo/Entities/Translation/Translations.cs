@@ -86,6 +86,14 @@ public class Translations
                 public SingleTranslationKey DateTimeYear;
             }
 
+            public cooldown Cooldown;
+            public class cooldown
+            {
+                public SingleTranslationKey SlowDown;
+                public SingleTranslationKey CancelCommand;
+                public SingleTranslationKey WaitingForCooldown;
+            }
+
             public SingleTranslationKey UsedByFooter;
             public SingleTranslationKey InteractionTimeout;
             public SingleTranslationKey InteractionFinished;
@@ -417,6 +425,18 @@ public class Translations
                 public SingleTranslationKey VictimAlreadyBanned;
                 public SingleTranslationKey VictimBanned;
             }
+        }
+
+        public prefixConfig PrefixConfigCommand;
+        public class prefixConfig
+        {
+            public SingleTranslationKey Title;
+            public SingleTranslationKey PrefixDisabled;
+            public SingleTranslationKey CurrentPrefix;
+            public SingleTranslationKey TogglePrefixCommands;
+            public SingleTranslationKey ChangePrefix;
+            public SingleTranslationKey NewPrefixModalTitle;
+            public SingleTranslationKey NewPrefix;
         }
     }
 }

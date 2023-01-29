@@ -31,6 +31,9 @@ internal class DatabaseInit
             var DbGuild = new Guild(b.serverid, _bot);
             _bot.guilds.Add(b.serverid, DbGuild);
 
+            DbGuild.Prefix = b.prefix;
+            DbGuild.PrefixDisabled = b.prefix_disabled;
+
             DbGuild.TokenLeakDetection = new(DbGuild)
             {
                 DetectTokens = b.tokens_detect
