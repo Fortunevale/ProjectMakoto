@@ -49,7 +49,7 @@ internal class ActionlogEvents
 
             if (_bot.globalNotes.ContainsKey(e.Member.Id) && _bot.globalNotes[e.Member.Id].Any())
             {
-                embed.AddField(new DiscordEmbedField("Ichigo Staff Notes", $"{string.Join("\n\n", _bot.globalNotes[e.Member.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+                embed.AddField(new DiscordEmbedField("Makoto Staff Notes", $"{string.Join("\n\n", _bot.globalNotes[e.Member.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
             _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>

@@ -4,7 +4,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Ichigo.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
+    [SlashCommandGroup("dev_tools", "Developer Tools used to develop/manage Makoto.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
     public class DevTools : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
@@ -172,7 +172,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("create-issue", "Create a new issue on Ichigo's Github Repository.")]
+        [SlashCommand("create-issue", "Create a new issue on Makoto's Github Repository.")]
         public async Task CreateIssue(InteractionContext ctx, [Option("use_old_tag_selector", "Allows the use of the legacy tag selector.")] bool UseOldTagsSelector = true)
         {
             Task.Run(async () =>

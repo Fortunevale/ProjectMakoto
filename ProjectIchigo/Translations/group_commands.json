@@ -22,30 +22,20 @@
       },
       {
         "name": "delete",
-        "description": "Allows you to delete your user data.",
+        "description": "Allows you to delete your user data and stop Makoto from further processing of your user data.",
         "name_translations": {
           "de": "löschen"
         },
         "description_translations": {
-          "de": "Erlaubt es dir deine Nutzerdaten zu löschen."
-        }
-      },
-      {
-        "name": "object",
-        "description": "Allows you to stop Ichigo from further processing of your user data.",
-        "name_translations": {
-          "de": "ablehnen"
-        },
-        "description_translations": {
-          "de": "Erlaubt es dir alle weiterigen Daten verarbeitung zu verweigern."
+          "de": "Erlaubt es dir deine Nutzerdaten zu löschen und Makoto die weitere Datenverbeitung zu verbieten."
         }
       },
       {
         "name": "policy",
-        "description": "Allows you to view how Ichigo processes your data.",
+        "description": "Allows you to view how Makoto processes your data.",
         "name_translations": null,
         "description_translations": {
-          "de": "Erklärt wie Ichigo deine Daten behandelt und verarbeitet."
+          "de": "Erklärt wie Makoto deine Daten behandelt und verarbeitet."
         }
       }
     ]
@@ -215,7 +205,7 @@
   },
   {
     "name": "dev_tools",
-    "description": "Developer Tools used to develop/manage Ichigo.",
+    "description": "Developer Tools used to develop/manage Makoto.",
     "type": 1,
     "name_translations": null,
     "description_translations": null,
@@ -456,7 +446,7 @@
       },
       {
         "name": "create-issue",
-        "description": "Create a new issue on Ichigo's Github Repository.",
+        "description": "Create a new issue on Makoto's Github Repository.",
         "name_translations": null,
         "description_translations": null,
         "options": [

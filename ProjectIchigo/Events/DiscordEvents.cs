@@ -46,13 +46,13 @@ internal class DiscordEvents
             }
 
             var msg = await channel.SendMessageAsync(
-                $"Hi! I'm Ichigo. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type {sender.GetCommandMention(_bot, "help")}.\n\n" +
+                $"Hi! I'm Makoto. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type {sender.GetCommandMention(_bot, "help")}.\n\n" +
                 $"**Important Notes**\n\n" +
                 $"• **Phishing Protection** is **enabled** by default. To change this run: {sender.GetCommandMention(_bot, "phishing")}.\n" +
                 $"• **Automatic User/Bot Token invalidation** is **turned on** by default. If you don't know what this means, just leave it on. If you do know what this means and you don't want it to happen, run {sender.GetCommandMention(_bot, "tokendetection")}.\n" +
                 $"• Every server is opted into a global ban system. When someone is known to break Discord's TOS, us bot staff can quickly scoop them up and ban them even before their account gets terminated by Discord. You can opt out via {sender.GetCommandMention(_bot, "join")}.\n\n" +
                 $"If you need help, feel free to join our Support and Development Server: <{_bot.status.DevelopmentServerInvite}>\n" +
-                $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/ichigo>.\n\n" +
+                $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/makoto>.\n\n" +
                 $"_This message will automatically be deleted {DateTime.UtcNow.AddMinutes(60).ToTimestamp()}._");
 
             new Task(async () =>

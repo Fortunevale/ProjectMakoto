@@ -154,7 +154,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
         
-        [SlashCommand("delete", "Allows you to delete your user data and stop Ichigo from further processing of your user data.", dmPermission: false)]
+        [SlashCommand("delete", "Allows you to delete your user data and stop Makoto from further processing of your user data.", dmPermission: false)]
         public async Task Delete(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -163,7 +163,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
         
-        [SlashCommand("policy", "Allows you to view how Ichigo processes your data.", dmPermission: false)]
+        [SlashCommand("policy", "Allows you to view how Makoto processes your data.", dmPermission: false)]
         public async Task Info(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -173,7 +173,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommand("language", "Change the language Ichigo uses.", dmPermission: false)]
+    [SlashCommand("language", "Change the language Makoto uses.", dmPermission: false)]
     public async Task Language(InteractionContext ctx)
     {
         Task.Run(async () =>

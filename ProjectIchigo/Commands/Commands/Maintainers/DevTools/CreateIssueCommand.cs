@@ -16,7 +16,7 @@ internal class CreateIssueCommand : BaseCommand
                 return;
             }
 
-            var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
+            var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
 
             var tokenAuth = new Credentials(ctx.Bot.status.LoadedConfig.Secrets.Github.Token);
             client.Credentials = tokenAuth;

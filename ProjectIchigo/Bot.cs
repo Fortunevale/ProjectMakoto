@@ -103,7 +103,7 @@ public class Bot
 
         string RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
 
-        _logger.LogInfo("Starting up Ichigo {RunningVersion}..\n", RunningVersion);
+        _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", RunningVersion);
 
         if (args.Contains("--debug"))
         {
@@ -690,7 +690,7 @@ public class Bot
                                 InstalledVersion = File.ReadAllText(VersionFile);
                             }
 
-                            var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
+                            var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
 
                             var releases = await client.Repository.Release.GetAll("freyacodes", "Lavalink");
 
@@ -1277,7 +1277,7 @@ public class Bot
 
         ExitCalled = true;
 
-        _logger.LogInfo("Preparing to shut down Ichigo..");
+        _logger.LogInfo("Preparing to shut down Makoto..");
 
         if (status.DiscordInitialized && !Immediate)
         {

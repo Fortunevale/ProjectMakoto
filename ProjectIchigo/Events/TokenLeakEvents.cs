@@ -42,7 +42,7 @@ internal class TokenLeakEvents
 
         _ = e.DeleteAsync();
 
-        var client = new GitHubClient(new ProductHeaderValue("Project-Ichigo"));
+        var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
 
         var tokenAuth = new Credentials(_bot.status.LoadedConfig.Secrets.Github.Token);
         client.Credentials = tokenAuth;

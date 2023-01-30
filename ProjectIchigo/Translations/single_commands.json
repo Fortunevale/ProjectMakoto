@@ -242,13 +242,13 @@
   },
   {
     "name": "language",
-    "description": "Change the language Ichigo uses.",
+    "description": "Change the language Makoto uses.",
     "type": 1,
     "name_translations": {
       "de": "sprache"
     },
     "description_translations": {
-      "de": "Erlaubt es dir die Sprache, die Ichigo verwendet, zu ändern."
+      "de": "Erlaubt es dir die Sprache, die Makoto verwendet, zu ändern."
     }
   },
   {
@@ -257,7 +257,7 @@
     "type": 1,
     "name_translations": null,
     "description_translations": {
-      "de": "Zeigt dir wer Ichigo unterstützt hat."
+      "de": "Zeigt dir wer Makoto unterstützt hat."
     }
   },
   {
