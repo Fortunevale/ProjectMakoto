@@ -184,7 +184,7 @@ internal class CustomEmbedCommand : BaseCommand
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an icon via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
+                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
                             $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
@@ -283,7 +283,7 @@ internal class CustomEmbedCommand : BaseCommand
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload a thumbnail via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
+                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
                             $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
@@ -351,7 +351,7 @@ internal class CustomEmbedCommand : BaseCommand
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an image via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
+                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
                             $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
@@ -470,7 +470,7 @@ internal class CustomEmbedCommand : BaseCommand
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an icon via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. " +
+                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
                             $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;

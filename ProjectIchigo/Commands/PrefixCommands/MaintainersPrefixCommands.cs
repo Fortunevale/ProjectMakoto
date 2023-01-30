@@ -5,7 +5,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
 
     [Group("dev_tools"),
     CommandModule("maintenance"),
-    Description("Developer Tools used to develop/manage Ichigo.")]
+    Description("Developer Tools used to develop/manage Makoto.")]
     public class DevTools : BaseCommandModule
     {
         public Bot _bot { private get; set; }
@@ -219,7 +219,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [Command("create-issue"), Description("Create a new issue on Ichigo's Github Repository.")]
+        [Command("create-issue"), Description("Create a new issue on Makoto's Github Repository.")]
         public async Task CreateIssue(CommandContext ctx, bool UseOldTagsSelector = true)
         {
             Task.Run(async () =>

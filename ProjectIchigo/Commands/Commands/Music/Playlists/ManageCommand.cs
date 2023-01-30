@@ -254,7 +254,7 @@ internal class ManageCommand : BaseCommand
 
                         var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                         {
-                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                         }.AsAwaitingInput(ctx, "Playlists"), false);
 
                         if (ModalResult.TimedOut)
@@ -413,7 +413,7 @@ internal class ManageCommand : BaseCommand
 
                         var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                         {
-                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                            Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                         }.AsAwaitingInput(ctx, "Playlists"), false);
 
                         if (ModalResult.TimedOut)
@@ -924,7 +924,7 @@ internal class ManageCommand : BaseCommand
                                         embed = new DiscordEmbedBuilder
                                         {
                                             Description = $"`Please upload a thumbnail via '{ctx.Prefix}upload'.`\n\n" +
-                                                $"⚠ `Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                                                $"⚠ `Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                                         }.AsAwaitingInput(ctx, "Playlists");
 
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -1023,7 +1023,7 @@ internal class ManageCommand : BaseCommand
 
                                     var ModalResult = await PromptModalWithRetry(e.Interaction, modal, new DiscordEmbedBuilder
                                     {
-                                        Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Project Ichigo. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                                        Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
                                     }.AsAwaitingInput(ctx, "Playlists"), false);
 
                                     if (ModalResult.TimedOut)
