@@ -1,20 +1,20 @@
-<h1 align="center">Ichigo</h1>
-<p align="center"><img src="ProjectIchigo/Assets/Prod.png" width=250 align="center"></p>
+<h1 align="center">Makoto</h1>
+<p align="center"><img src="ProjectMakoto/Assets/Prod.png" width=250 align="center"></p>
 <p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
-<a href="#getting-ichigo" ><p align="center"><img src="ProjectIchigo/Assets/AddToServer.png" width=350 align="center"></p></a>
+<a href="#getting-makoto" ><p align="center"><img src="ProjectMakoto/Assets/AddToServer.png" width=350 align="center"></p></a>
 
-<p align="center"><img src="https://github.com/Fortunevale/ProjectIchigo/actions/workflows/build.yml/badge.svg" align="center"> <img src="https://github.com/Fortunevale/ProjectIchigo/actions/workflows/typos.yml/badge.svg" align="center"></p>
-<p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectIchigo" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectIchigo" align="center"></p>
-<p align="center"><img src="https://wakatime.com/badge/github/Fortunevale/ProjectIchigo.svg" align="center"></p>
+<p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/build.yml/badge.svg" align="center"> <img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/typos.yml/badge.svg" align="center"></p>
+<p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectMakoto" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectMakoto" align="center"></p>
+<p align="center"><img src="https://wakatime.com/badge/github/Fortunevale/ProjectMakoto.svg" align="center"></p>
 
-<p align="center"><img src="https://img.shields.io/github/stars/Fortunevale/ProjectIchigo?style=social" align="center"> <img src="https://img.shields.io/github/watchers/Fortunevale/ProjectIchigo?style=social" align="center"></p>
+<p align="center"><img src="https://img.shields.io/github/stars/Fortunevale/ProjectMakoto?style=social" align="center"> <img src="https://img.shields.io/github/watchers/Fortunevale/ProjectMakoto?style=social" align="center"></p>
 
-## What is Ichigo?
+## What is Makoto?
 
-**Ichigo is a multi-purpose Discord Bot written in C# using .NET 6.**
+**Makoto is a multi-purpose Discord Bot written in C# using .NET 6.**
 <br></br>
-Ichigo has a lot of features, current notable features are:
-- **No premium features**. (This may change in the future, it'll depend on how viable a hosting this bot is without them. The source code itself will always stay available and you could simply host your own Ichigo instance.)
+Makoto has a lot of features, current notable features are:
+- **No premium features**. (This may change in the future, it'll depend on how viable a hosting this bot is without them. The source code itself will always stay available and you could simply host your own Makoto instance.)
 <br></br>
 - **Music Playback**
 - Customizable **protection against phishing** and other malicious websites, with little to no false positives.
@@ -43,14 +43,14 @@ Ichigo has a lot of features, current notable features are:
 
 ##### \*** This depends on how users can join your server. If they join through invites by, for example, Disboard or through the Vanity Invite, it won't be as easy to track them down.
 <br></br>
-## Getting Ichigo
+## Getting Makoto
 
 ## [Click here to invite the bot](https://discord.com/api/oauth2/authorize?client_id=947716263394824213&permissions=8&scope=bot%20applications.commands)
 
 - Phishing Protection is enabled by default, people will be banned if they send a link known to be malicious. To change this, run `/phishing config`.
 - Automatic User/Bot Token invalidation is turned on by default. If you don't know what this means, just leave it on. If you know what this means and you don't want this happen, run `/tokendetection config` to disable it.
 - Every new server is automatically opted into a global ban system. When someone is known to break Discord's TOS or Community Guidelines, they'll be banned on join or when the ban happens. They will not be banned when the bot is freshly added to your server. To change this behaviour you can use `/join config`.
-- You can join a support server [here](https://s.aitsys.dev/ichigoguild).
+- You can join a support server [here](https://s.aitsys.dev/makotoguild).
 <br></br>
 ## Building, Debugging and Deployment
 

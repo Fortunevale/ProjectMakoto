@@ -1,0 +1,13 @@
+namespace ProjectMakoto.Entities;
+
+public class CountryCodes
+{
+    public Dictionary<string, CountryInfo> List = new();
+
+    public class CountryInfo
+    {
+        public string Name { get; set; }
+        public string ContinentCode { get; set; }
+        public string ContinentName { get; set; }
+    }
+}

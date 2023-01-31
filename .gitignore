@@ -334,8 +334,8 @@ ASALocalRun/
 .localhistory/
 
 .vscode/*
-ProjectIchigo/Properties/launchSettings.json
-ProjectIchigo/Properties/
+ProjectMakoto/Properties/launchSettings.json
+ProjectMakoto/Properties/
 
 !.vscode/Snippets.code-snippets
 !.vscode/tasks.json
