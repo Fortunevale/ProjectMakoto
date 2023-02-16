@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "ProjectMakoto": {
-      "commandName": "Project",
-      "commandLineArgs": "--debug --token OTI5MzczODA2NDM3NDcwMjYw.GNXaxP.C0LN0yW0ApP9GpquQ95eLR3qKzDIBpmtNliwRk --teltoken 5412240810:AAGNPZxGQZhM2OyVYtXuwib_UUEqGa3JTvs",
-      "nativeDebugging": false
-    }
-  }
-}
