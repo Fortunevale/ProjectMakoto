@@ -336,6 +336,7 @@ ASALocalRun/
 .vscode/*
 ProjectMakoto/Properties/launchSettings.json
 ProjectMakoto/Properties/
+launchSettings.json
 
 !.vscode/Snippets.code-snippets
 !.vscode/tasks.json

@@ -11,162 +11,278 @@ internal class InfoCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Author = new DiscordEmbedBuilder.EmbedAuthor
-                {
-                    IconUrl = StatusIndicatorIcons.Loading,
-                    Name = "Information about this server and bot"
-                },
-                Color = EmbedColors.Info,
-                Description = "",
-                Footer = ctx.GenerateUsedByFooter(),
-                Timestamp = DateTime.UtcNow
-            };
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsBotLoading(ctx));
 
-            embed.AddField(new DiscordEmbedField("General info", "󠂪 󠂪", true));
-            embed.Fields.First(x => x.Name == "General info").Value = "\n_All dates follow `DD.MM.YYYY` while the time zone is set to the `Coordinated Universal Time (UTC), +00:00`._\n";
+            var currentSystemStats = await ctx.Bot.monitorClient.GetCurrent();
+            var history = ctx.Bot.monitorClient.GetHistory();
 
-            embed.AddField(new DiscordEmbedField("Guild", "󠂪 󠂪", true));
-            embed.Fields.First(x => x.Name == "Guild").Value = "**Guild name**\n`Loading..`\n" +
-                                                                "**Guild created at**\n`Loading..`\n" +
-                                                                "**Owner of this guild**\n`Loading..`\n" +
-                                                                "**Current member count**\n`Loading..`";
-
-            embed.AddField(new DiscordEmbedField("Bot", "󠂪 󠂪", true));
-            embed.Fields.First(x => x.Name == "Bot").Value = "**Currently running as**\n`Loading..`\n" +
-                                                                "**Currently running software**\n`Loading..`\n" +
-                                                                "**Currently running on**\n`Loading..`\n" +
-                                                                "**Current bot lib and version**\n`Loading..`\n" +
-                                                                "**Bot uptime**\n`Loading..`\n" +
-                                                                "**Current API Latency**\n`Loading..`";
-
-            embed.AddField(new DiscordEmbedField("Host", "󠂪 󠂪", true));
-            embed.Fields.First(x => x.Name == "Host").Value = "**Current CPU load**\n`Loading..`\n" +
-                                                                "**Current RAM usage**\n`Loading..`\n" +
-                                                                "**Current temperature**\n`Loading..`\n" +
-                                                                "**Server uptime**\n`Loading..`";
-
-            var msg = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-            DateTime Age = new DateTime().AddSeconds((DateTime.UtcNow - ctx.Guild.CreationTimestamp).TotalSeconds);
-
-            embed.Fields.First(x => x.Name == "Guild").Value = embed.Fields.First(x => x.Name == "Guild").Value.Replace("**Guild name**\n`Loading..`", $"**Guild name**\n`{ctx.Guild.Name}`");
-            embed.Fields.First(x => x.Name == "Guild").Value = embed.Fields.First(x => x.Name == "Guild").Value.Replace("**Guild created at**\n`Loading..`", $"**Guild created at**\n`{ctx.Guild.CreationTimestamp.ToUniversalTime():dd.MM.yyyy HH:mm:ss}` ({Math.Round(TimeSpan.FromTicks(Age.Ticks).TotalDays, 0)} days ago)");
-            embed.Fields.First(x => x.Name == "Guild").Value = embed.Fields.First(x => x.Name == "Guild").Value.Replace("**Owner of this guild**\n`Loading..`", $"**Owner of this guild**\n{ctx.Guild.Owner.Mention} `{ctx.Guild.Owner.Username}#{ctx.Guild.Owner.Discriminator}`");
-            embed.Fields.First(x => x.Name == "Guild").Value = embed.Fields.First(x => x.Name == "Guild").Value.Replace("**Current member count**\n`Loading..`", $"**Current member count**\n`{ctx.Guild.MemberCount}/{ctx.Guild.MaxMembers}`");
-
-            msg = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running as**\n`Loading..`", $"**Currently running as**\n`{ctx.Client.CurrentUser.Username}#{ctx.Client.CurrentUser.Discriminator}`");
-
-            if (File.Exists("LatestGitPush.cfg"))
-            {
-                var bFile = File.ReadLines("LatestGitPush.cfg");
-                embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running software**\n`Loading..`", $"**Currently running software**\n`Project Makoto by Mira#2000 (GH-{bFile.First().Trim().Replace("/", ".")} ({bFile.Skip(1).First().Trim()}) built on the {bFile.Skip(2).First().Trim().Replace("/", ".")} at {bFile.Skip(3).First().Trim().Remove(bFile.Skip(3).First().Trim().IndexOf(","), bFile.Skip(3).First().Trim().Length - bFile.Skip(3).First().Trim().IndexOf(","))})`");
-            }
-            else
-                embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running software**\n`Loading..`", $"**Currently running software**\n`Project Makoto by Mira#2000 (GH-UNIDENTIFIED)`");
-
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Currently running on**\n`Loading..`", $"**Currently running on**\n`{Environment.OSVersion.Platform} with DOTNET-{Environment.Version}`");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current bot lib and version**\n`Loading..`", $"**Current bot lib and version**\n[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Bot uptime**\n`Loading..`", $"**Bot uptime**\n`{Math.Round((DateTime.UtcNow - ctx.Bot.status.startupTime).TotalHours, 2)} hours`");
-            embed.Fields.First(x => x.Name == "Bot").Value = embed.Fields.First(x => x.Name == "Bot").Value.Replace("**Current API Latency**\n`Loading..`", $"**Current API Latency**\n`{ctx.Client.Ping}ms`");
-
-            msg = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-
-            try
-            {
-                embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current CPU load**\n`Loading..`", $"**Current CPU load**\n`{Math.Round(await GetCpuUsageForProcess(), 2).ToString().Replace(",", ".")}%`");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Failed to get cpu load", ex);
-                embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current CPU load**\n`Loading..`", $"**Current CPU load**\n`Error`");
-            }
-
-            try
-            {
-                var metrics = MemoryMetricsClient.GetMetrics();
-
-                embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current RAM usage**\n`Loading..`", $"**Current RAM usage**\n`{Math.Round(metrics.Used, 2)}/{Math.Round(metrics.Total, 2)}MB`");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Failed to get ram load", ex);
-                embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current RAM usage**\n`Loading..`", "**Current RAM usage**\n`Error`");
-            }
-
+            string ServerUptime = "";
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                try
+                ProcessStartInfo info = new()
                 {
-                    ProcessStartInfo info = new()
-                    {
-                        FileName = "bash",
-                        Arguments = $"-c sensors",
-                        RedirectStandardError = true,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    };
+                    FileName = "bash",
+                    Arguments = $"-c uptime",
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                };
 
-                    var b = Process.Start(info);
+                var b = Process.Start(info);
 
-                    b.WaitForExit();
+                b.WaitForExit();
 
-                    var matches = Regex.Matches(b.StandardOutput.ReadToEnd(), "(\\+*[0-9]*.[0-9]*°C(?!,|\\)))");
-
-                    int _temp = 0;
-                    decimal[] temps = new decimal[matches.Count];
-
-                    foreach (var c in matches)
-                    {
-                        temps[_temp] = Convert.ToDecimal(c.ToString().Replace("°C", "").Replace("+", ""));
-                        _temp++;
-                    }
-
-                    embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current temperature**\n`Loading..`", $"**Current temperature**\n`Avg: {temps.Average()}°C Max: {temps.Max()}°C Min: {temps.Min()}°C`");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to get temps", ex);
-                    embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current temperature**\n`Loading..`", $"**Current temperature**\n`Error`");
-                }
-
-                try
-                {
-                    ProcessStartInfo info = new()
-                    {
-                        FileName = "bash",
-                        Arguments = $"-c uptime",
-                        RedirectStandardError = true,
-                        RedirectStandardOutput = true,
-                        UseShellExecute = false
-                    };
-
-                    var b = Process.Start(info);
-
-                    b.WaitForExit();
-
-                    string Output = b.StandardOutput.ReadToEnd();
-                    Output = Output.Remove(Output.IndexOf(','), Output.Length - Output.IndexOf(',')).TrimStart();
-
-                    embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Server uptime**\n`Loading..`", $"**Server uptime**\n`{Output}`");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to get uptime", ex);
-                    embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Server uptime**\n`Loading..`", $"**Server uptime**\n`Error`");
-                }
+                string Output = b.StandardOutput.ReadToEnd();
+                ServerUptime = Output.Remove(Output.IndexOf(','), Output.Length - Output.IndexOf(',')).TrimStart();
             }
-            else
+
+            IEnumerable<string> bFile;
+
+            try
             {
-                embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Current temperature**\n`Loading..`", $"**Current temperature**\n`Currently unavailable`");
-                embed.Fields.First(x => x.Name == "Host").Value = embed.Fields.First(x => x.Name == "Host").Value.Replace("**Server uptime**\n`Loading..`", $"**Server uptime**\n`Currently unavailable`");
+                bFile = File.ReadLines("LatestGitPush.cfg");
+            }
+            catch (Exception)
+            {
+                bFile = new List<string>
+                {
+                     "Developer Version",
+                     "dev",
+                    $"{DateTime.UtcNow:dd.MM.yy}",
+                    $"{DateTime.UtcNow:HH:mm:ss},00"
+                };
             }
 
-            embed.Author.IconUrl = ctx.Guild.IconUrl;
-            msg = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+            var Version = bFile.First().Trim();
+            var Branch = bFile.Skip(1).First().Trim();
+            var Date = bFile.Skip(2).First().Trim().Replace("/", ".");
+
+            var Time = bFile.Skip(3).First().Trim();
+            Time = Time[..Time.IndexOf(",")];
+
+            var miscEmbed = new DiscordEmbedBuilder().WithTitle($"{ctx.CurrentUser.Username} Details")
+                .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.UsernameWithDiscriminator}`"))
+                .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).UsernameWithDiscriminator} ({Version} ({Branch}) built on the {Date} at {Time})`"))
+                .AddField(new DiscordEmbedField("Current bot library and version", $"[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)"))
+                .AddField(new DiscordEmbedField("Bot uptime", $"`{Math.Round((DateTime.UtcNow - ctx.Bot.status.startupTime).TotalHours, 2)} hours`"))
+                .AddField(new DiscordEmbedField("Discord API Latency", $"`{ctx.Client.Ping}ms`"))
+                .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`"))
+                .AsBotInfo(ctx).WithFooter().WithTimestamp(null);
+
+            var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{currentSystemStats.Cpu.Load,3:N0}%`\n" +
+                                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(15).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
+                                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(30).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
+                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(60).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`").AsBotLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+
+            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{currentSystemStats.Cpu.Temperature,2:N0}°C`\n" +
+                                                                      $"`  (15m avg.)`: `{history.Reverse().Take(15).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
+                                                                      $"`  (30m avg.)`: `{history.Reverse().Take(30).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
+                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(60).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n").AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+
+
+            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used:N0}/{currentSystemStats.Memory.Total:N0} GB`").AsBotLoading(ctx);
+
+            await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
+
+            try
+            {
+                Chart qc = new()
+                {
+                    Width = 1000,
+                    Height = 500,
+                    Config = $@"{{
+                            type: 'line',
+                            data: 
+                            {{
+                                labels: 
+                                [
+                                    {string.Join(",", history.Select(x => $"'{x.Key.GetTimespanSince().TotalMinutes:N0}m ago'"))}
+                                ],
+                                datasets: 
+                                [
+                                    {{
+                                        label: 'Usage (%)',
+                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Load:N0}"))}],
+                                        fill: false,
+                                        borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
+                                        id: ""yaxis2""
+                                    }}
+                                ]
+
+                            }},
+                            options:
+                            {{
+                                legend:
+                                {{
+                                    display: true,
+                                }},
+                                elements:
+                                {{
+                                    point:
+                                    {{
+                                        radius: 0
+                                    }}
+                                }},
+                                scales: {{
+                                    yAxes: [{{
+                                    ticks: {{
+                                        max: 100,
+                                        min: 0
+                                        }}
+                                    }}]
+                                }}
+                            }}
+                        }}"
+                };
+
+                var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets))
+                    .SendMessageAsync(new DiscordMessageBuilder().WithFile($"{Guid.NewGuid()}.png", new MemoryStream(qc.ToByteArray())));
+                cpuEmbed1.ImageUrl = asset.Attachments[0].Url;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to generate cpu graph", ex);
+            }
+            finally
+            {
+                cpuEmbed1.AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            }
+
+            //if (currentSystemStats.Cpu.Temperature != 0)
+                try
+                {
+                    Chart qc = new()
+                    {
+                        Width = 1000,
+                        Height = 500,
+                        Config = $@"{{
+                                type: 'line',
+                                data: 
+                                {{
+                                    labels: 
+                                    [
+                                        {string.Join(",", history.Select(x => $"'{x.Key.GetTimespanSince().TotalMinutes:N0}m ago'"))}
+                                    ],
+                                    datasets: 
+                                    [
+                                        {{
+                                            label: 'Temperature (°C)',
+                                            data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Temperature:N0}"))}],
+                                            fill: false,
+                                            borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
+                                            id: ""yaxis2""
+                                        }}
+                                    ]
+
+                                }},
+                                options:
+                                {{
+                                    legend:
+                                    {{
+                                        display: true,
+                                    }},
+                                    elements:
+                                    {{
+                                        point:
+                                        {{
+                                            radius: 0
+                                        }}
+                                    }},
+                                    scales: {{
+                                        yAxes: [{{
+                                        ticks: {{
+                                            max: 100,
+                                            min: 0
+                                            }}
+                                        }}]
+                                    }}
+                                }}
+                            }}"
+                    };
+
+                    var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets))
+                        .SendMessageAsync(new DiscordMessageBuilder().WithFile($"{Guid.NewGuid()}.png", new MemoryStream(qc.ToByteArray())));
+                    cpuEmbed2.ImageUrl = asset.Attachments[0].Url;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to generate cpu graph", ex);
+                }
+
+            try
+            {
+                Chart qc = new()
+                {
+                    Width = 1000,
+                    Height = 500,
+                    Config = $@"{{
+                            type: 'line',
+                            data: 
+                            {{
+                                labels: 
+                                [
+                                    {string.Join(",", history.Select(x => $"'{x.Key.GetTimespanSince().TotalMinutes:N0}m ago'"))}
+                                ],
+                                datasets: 
+                                [
+                                    {{
+                                        label: 'Usage (GB)',
+                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Memory.Used:N0}"))}],
+                                        fill: false,
+                                        borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
+                                        id: ""yaxis2""
+                                    }}
+                                ]
+
+                            }},
+                            options:
+                            {{
+                                legend:
+                                {{
+                                    display: true,
+                                }},
+                                elements:
+                                {{
+                                    point:
+                                    {{
+                                        radius: 0
+                                    }}
+                                }},
+                                scales: {{
+                                    yAxes: [{{
+                                    ticks: {{
+                                        max: {currentSystemStats.Memory.Total:N0},
+                                        min: 0
+                                        }}
+                                    }}]
+                                }}
+                            }}
+                        }}"
+                };
+
+                var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets))
+                    .SendMessageAsync(new DiscordMessageBuilder().WithFile($"{Guid.NewGuid()}.png", new MemoryStream(qc.ToByteArray())));
+                memoryEmbed.ImageUrl = asset.Attachments[0].Url;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to generate cpu graph", ex);
+            }
+            finally
+            {
+                memoryEmbed.AsBotInfo(ctx).WithAuthor();
+            }
+
+            var list = new List<DiscordEmbed>();
+            list.Add(miscEmbed);
+            list.Add(cpuEmbed1);
+
+            if (!cpuEmbed2.ImageUrl.IsNullOrWhiteSpace())
+                list.Add(cpuEmbed2);
+
+            list.Add(memoryEmbed);
+
+            await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list));
         });
     }
 }

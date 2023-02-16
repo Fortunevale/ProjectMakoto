@@ -5,6 +5,8 @@ public class Config
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
+    public bool MonitorSystemStatus = true;
+
     public string SupportServerInvite = "";
 
     public ChannelsConfig Channels = new();
