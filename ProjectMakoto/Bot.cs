@@ -159,8 +159,6 @@ public class Bot
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
 
-        monitorClient = new MonitorClient(this);
-
         users = new(this);
         guilds = new(this);
 
@@ -364,6 +362,7 @@ public class Bot
                 }).Add(watcher);
                 await Task.Delay(1000);
 
+                monitorClient = new MonitorClient(this);
                 abuseIpDbClient = AbuseIpDbClient.Initialize(this);
 
                 _logger.LogInfo("Connecting to database..");
