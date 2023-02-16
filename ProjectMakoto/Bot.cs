@@ -1,4 +1,5 @@
 using ProjectMakoto.PrefixCommands;
+using ProjectMakoto.Util.SystemMonitor;
 using System.Collections;
 using System.Reflection;
 
@@ -18,6 +19,7 @@ public class Bot
     internal GoogleTranslateClient translationClient { get; set; }
     internal ThreadJoinClient threadJoinClient { get; set; }
     internal AbuseIpDbClient abuseIpDbClient { get; set; }
+    internal MonitorClient monitorClient { get; set; }
 
     #endregion Clients
 
@@ -156,6 +158,8 @@ public class Bot
                 Environment.UserDomainName,
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
+
+        monitorClient = new MonitorClient();
 
         users = new(this);
         guilds = new(this);
