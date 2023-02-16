@@ -159,7 +159,7 @@ public class Bot
                 Environment.CurrentDirectory,
                 Regex.Replace(Environment.CommandLine, @"(--token \S*)", ""));
 
-        monitorClient = new MonitorClient();
+        monitorClient = new MonitorClient(this);
 
         users = new(this);
         guilds = new(this);
