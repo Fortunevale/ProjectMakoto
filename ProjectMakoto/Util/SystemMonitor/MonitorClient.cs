@@ -47,7 +47,7 @@ internal class MonitorClient
 
                     _logger.LogDebug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
 
-                    if (this.History.Count >= 60)
+                    if (this.History.Count >= 180)
                         this.History.Remove(this.History.Min(x => x.Key));
 
                     
@@ -61,7 +61,7 @@ internal class MonitorClient
                     this.History.Add(DateTime.UtcNow, null);
                 }
 
-                var waitTime = LastScanStart.AddSeconds(60).GetTimespanUntil();
+                var waitTime = LastScanStart.AddSeconds(20).GetTimespanUntil();
 
                 if (waitTime < TimeSpan.FromSeconds(1))
                     waitTime = TimeSpan.FromSeconds(1);
