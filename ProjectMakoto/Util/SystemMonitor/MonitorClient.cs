@@ -15,7 +15,7 @@ internal class MonitorClient
 
     internal IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
-        return new Dictionary<DateTime, SystemInfo>(History);
+        return History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
     
     internal async Task<SystemInfo> GetCurrent()
