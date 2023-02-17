@@ -91,6 +91,8 @@ internal class MonitorClient
 
                 computer.Accept(updateVisitor);
 
+                _logger.LogTrace(JsonConvert.SerializeObject(computer.Hardware, Formatting.Indented));
+
                 foreach (IHardware hw in computer.Hardware)
                 {
                     foreach (ISensor sensor in hw.Sensors)
