@@ -47,8 +47,8 @@ internal class MonitorClient
 
                     _logger.LogDebug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
 
-                    if (this.History.Count > 60)
-                        this.History.Remove(this.History.First<KeyValuePair<DateTime, SystemInfo>>().Key);
+                    if (this.History.Count >= 60)
+                        this.History.Remove(this.History.Min(x => x.Key));
 
                     
                     this.History.Add(DateTime.UtcNow, sensors);
@@ -73,88 +73,160 @@ internal class MonitorClient
 
     private static async Task<SystemInfo> ReadSystemInfoAsync()
     {
-        return await Task.Run(() =>
+        return await Task.Run<SystemInfo>(() =>
         {
+
+
             SystemInfo systemInfo = new();
 
-            UpdateVisitor updateVisitor = new();
-            Computer computer = new()
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
-                IsCpuEnabled = true,
-                IsMemoryEnabled = true,
-                IsNetworkEnabled = true,
-            };
-
-            try
-            {
-                computer.Open();
-
-                computer.Accept(updateVisitor);
-
-                _logger.LogTrace(JsonConvert.SerializeObject(computer.Hardware, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
-
-                foreach (IHardware hw in computer.Hardware)
+                UpdateVisitor updateVisitor = new();
+                Computer computer = new()
                 {
-                    foreach (ISensor sensor in hw.Sensors)
+                    IsCpuEnabled = true,
+                    IsMemoryEnabled = true,
+                    IsNetworkEnabled = true,
+                };
+
+                try
+                {
+                    computer.Open();
+
+                    computer.Accept(updateVisitor);
+
+                    _logger.LogTrace(JsonConvert.SerializeObject(computer.Hardware, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+
+                    foreach (IHardware hw in computer.Hardware)
                     {
-                        if (hw.HardwareType == HardwareType.Cpu)
-                            if (sensor.Name is "CPU Total" or "Core (Tctl/Tdie)")
-                                switch (sensor.SensorType)
-                                {
-                                    case SensorType.Load:
-                                        systemInfo.Cpu.Load = sensor.Value.GetValueOrDefault(0);
+                        foreach (ISensor sensor in hw.Sensors)
+                        {
+                            if (hw.HardwareType == HardwareType.Cpu)
+                                if (sensor.Name is "CPU Total" or "Core (Tctl/Tdie)")
+                                    switch (sensor.SensorType)
+                                    {
+                                        case SensorType.Load:
+                                            systemInfo.Cpu.Load = sensor.Value.GetValueOrDefault(0);
 
-                                        break;
-                                    case SensorType.Temperature:
-                                        systemInfo.Cpu.Temperature = sensor.Value.GetValueOrDefault(0);
+                                            break;
+                                        case SensorType.Temperature:
+                                            systemInfo.Cpu.Temperature = sensor.Value.GetValueOrDefault(0);
 
-                                        break;
-                                }
+                                            break;
+                                    }
 
-                        if (hw.HardwareType == HardwareType.Memory)
+                            if (hw.HardwareType == HardwareType.Memory)
                                 switch (sensor.Name)
                                 {
                                     case "Memory Available":
                                         systemInfo.Memory.Available = sensor.Value.GetValueOrDefault(0);
                                         break;
-                                
+
                                     case "Memory Used":
                                         systemInfo.Memory.Used = sensor.Value.GetValueOrDefault(0);
                                         break;
                                 }
-                        
-                        if (hw.HardwareType == HardwareType.Network && hw.Name == "Ethernet")
+
+                            if (hw.HardwareType == HardwareType.Network && hw.Name == "Ethernet")
                                 switch (sensor.Name)
                                 {
                                     case "Data Uploaded":
                                         systemInfo.Network.TotalUploaded = sensor.Value.GetValueOrDefault(0);
                                         break;
-                                
+
                                     case "Data Downloaded":
-                                            systemInfo.Network.TotalDownloaded = sensor.Value.GetValueOrDefault(0);
-                                            break;
+                                        systemInfo.Network.TotalDownloaded = sensor.Value.GetValueOrDefault(0);
+                                        break;
 
                                     case "Upload Speed":
-                                            systemInfo.Network.CurrentUploadSpeed = sensor.Value.GetValueOrDefault(0);
-                                            break;
+                                        systemInfo.Network.CurrentUploadSpeed = sensor.Value.GetValueOrDefault(0);
+                                        break;
 
                                     case "Download Speed":
-                                            systemInfo.Network.CurrentDownloadSpeed = sensor.Value.GetValueOrDefault(0);
-                                            break;
+                                        systemInfo.Network.CurrentDownloadSpeed = sensor.Value.GetValueOrDefault(0);
+                                        break;
 
                                     case "Network Utilization":
-                                                systemInfo.Network.TotalUtilization = sensor.Value.GetValueOrDefault(0);
-                                                break;
+                                        systemInfo.Network.TotalUtilization = sensor.Value.GetValueOrDefault(0);
+                                        break;
                                 }
+                        }
                     }
                 }
-            }
-            finally
-            {
-                computer.Close();
-            }
+                finally
+                {
+                    computer.Close();
+                }
 
-            return systemInfo;
+                return systemInfo;
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                try
+                {
+                    ProcessStartInfo info = new()
+                    {
+                        FileName = "bash",
+                        Arguments = $"-c sensors",
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
+
+                    var process = Process.Start(info);
+
+                    process.WaitForExit();
+
+                    var output = process.StandardOutput.ReadToEnd();
+                    _logger.LogTrace("Executed sensors: {0}", output);
+
+                    var matches = Regex.Matches(output, @"(((\w| )*): *(\+*[0-9]*.[0-9]*°C)(?!,|\)))");
+                    Dictionary<string, float> tempsDict = new();
+
+                    foreach (Match b in matches.Cast<Match>())
+                    {
+                        tempsDict.Add(b.Groups[2].Value, float.Parse(b.Groups[4].Value.Replace("+", "").Replace("°C", "")));
+                    }
+
+                    systemInfo.Cpu.Temperature = tempsDict.FirstOrDefault<KeyValuePair<string, float>>(x => x.Key.StartsWith("Package id"), new KeyValuePair<string, float>("", 0)).Value;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarn("Failed to execute sensors", ex);
+                }
+
+                try
+                {
+                    ProcessStartInfo info = new()
+                    {
+                        FileName = "bash",
+                        Arguments = $"-c \"awk '{{u=$2+$4; t=$2+$4+$5; if (NR==1){{u1=u; t1=t;}} else print ($2+$4-u1) * 100 / (t-t1); }}' <(grep 'cpu ' /proc/stat) <(sleep 1;grep 'cpu ' /proc/stat)\"",
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false
+                    };
+
+                    var process = Process.Start(info);
+
+                    process.WaitForExit();
+
+                    var output = process.StandardOutput.ReadToEnd();
+
+                    _logger.LogTrace("Executed cpu usage: {0}", output);
+                    systemInfo.Cpu.Load = float.Parse(output);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarn("Failed to execute cpu usage", ex);
+                }
+
+                return systemInfo;
+            }
+            else
+            {
+                _logger.LogWarn("Running on unknown operating system, system monitor not supported.");
+                return systemInfo;
+            }
         });
     }
 
