@@ -70,14 +70,14 @@ internal class InfoCommand : BaseCommand
                 .AsBotInfo(ctx).WithFooter().WithTimestamp(null);
 
             var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{currentSystemStats.Cpu.Load,3:N0}%`\n" +
-                                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(15).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
-                                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(30).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
-                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(60).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`").AsBotLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+                                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
+                                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
+                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`").AsBotLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
             var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{currentSystemStats.Cpu.Temperature,2:N0}°C`\n" +
-                                                                      $"`  (15m avg.)`: `{history.Reverse().Take(15).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
-                                                                      $"`  (30m avg.)`: `{history.Reverse().Take(30).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
-                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(60).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n").AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+                                                                      $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
+                                                                      $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
+                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n").AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
 
             var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used:N0}/{currentSystemStats.Memory.Total:N0} GB`").AsBotLoading(ctx);
