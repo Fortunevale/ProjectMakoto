@@ -79,7 +79,7 @@ internal class ConfigCommand : BaseCommand
                         if (PingableName.IsNullOrWhiteSpace())
                             PingableName = "Pingable Name";
 
-                        if (PingableName != b.DisplayName)
+                        if (PingableName != b.PreferredDisplayName)
                         {
                             _ = b.ModifyAsync(x => x.Nickname = PingableName);
                             Renamed++;

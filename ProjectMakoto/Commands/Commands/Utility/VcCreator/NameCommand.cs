@@ -12,7 +12,7 @@ internal class NameCommand : BaseCommand
             string newName = (string)arguments["newName"];
             DiscordChannel channel = ctx.Member.VoiceState?.Channel;
 
-            newName = (newName.IsNullOrWhiteSpace() ? $"{ctx.Member.DisplayName}'s Channel" : newName);
+            newName = (newName.IsNullOrWhiteSpace() ? $"{ctx.Member.PreferredDisplayName}'s Channel" : newName);
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
