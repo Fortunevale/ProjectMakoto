@@ -74,7 +74,7 @@ internal class ConfigCommand : BaseCommand
                     {
                         var b = members.ElementAt(i);
 
-                        string PingableName = Regex.Replace(b.DisplayName.Normalize(NormalizationForm.FormKC), @"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", "");
+                        string PingableName = RegexTemplates.AllowedNickname.Replace(b.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
 
                         if (PingableName.IsNullOrWhiteSpace())
                             PingableName = "Pingable Name";
@@ -83,7 +83,7 @@ internal class ConfigCommand : BaseCommand
                         {
                             _ = b.ModifyAsync(x => x.Nickname = PingableName);
                             Renamed++;
-                            await Task.Delay(5000);
+                            await Task.Delay(2000);
                         }
                     }
 
