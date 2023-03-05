@@ -130,9 +130,9 @@ internal class AbuseIpDbClient
         while (Cache.ContainsKey(Ip) && Cache[Ip] is null)
             await Task.Delay(100);
 
-        if (Cache.ContainsKey(Ip) && Cache[Ip].Item2.AddHours(4).GetTotalSecondsUntil() > 0 && !bypassCache)
+        if (Cache.TryGetValue(Ip, out Tuple<AbuseIpDbQuery, DateTime> value) && value.Item2.AddHours(4).GetTotalSecondsUntil() > 0 && !bypassCache)
             return Cache[Ip].Item1;
-        else if (Cache.ContainsKey(Ip))
+        else
             Cache.Remove(Ip);
 
         Cache.Add(Ip, null);

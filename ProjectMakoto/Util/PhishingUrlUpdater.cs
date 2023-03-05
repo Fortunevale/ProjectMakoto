@@ -154,8 +154,7 @@ internal class PhishingUrlUpdater
                 throw new Exception($"An exception occurred while trying to remove white listed URLs from blacklist: WhitelistedDomains is empty or null");
 
             foreach (var b in WhitelistedDomains)
-                if (SanitizedMatches.ContainsKey(b))
-                    SanitizedMatches.Remove(b);
+                SanitizedMatches.Remove(b);
         }
         catch (Exception ex) { throw new Exception($"Failed to remove whitelisted domains from blacklist", ex); }
 

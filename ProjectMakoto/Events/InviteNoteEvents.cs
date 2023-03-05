@@ -13,8 +13,7 @@ internal class InviteNoteEvents
     {
         Task.Run(async () =>
         {
-            if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(e.Invite.Code))
-                _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
+            _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
         }).Add(_bot.watcher);
     }
 }

@@ -48,9 +48,9 @@ internal class LanguageCommand : BaseCommand
             options.Add(new DiscordStringSelectComponentOption("Korean", "ko", "한국어"));
 
             foreach (var b in options)
-                if (t.Progress.ContainsKey(b.Value))
+                if (t.Progress.TryGetValue(b.Value, out var value))
                 {
-                    var perc = (t.Progress[b.Value] / (decimal)t.Progress["en"] * 100);
+                    var perc = (value / (decimal)t.Progress["en"] * 100);
                     DiscordComponentEmoji emoji = null;
 
                     if (perc >= 100)
