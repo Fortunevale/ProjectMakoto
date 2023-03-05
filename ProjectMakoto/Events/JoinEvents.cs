@@ -15,9 +15,9 @@ internal class JoinEvents
         {
             if (_bot.guilds[e.Guild.Id].Join.AutoBanGlobalBans)
             {
-                if (_bot.globalBans.ContainsKey(e.Member.Id))
+                if (_bot.globalBans.TryGetValue(e.Member.Id, out GlobalBanDetails globalBanDetails))
                 {
-                    _ = e.Member.BanAsync(7, $"Globalban: {_bot.globalBans[e.Member.Id].Reason}");
+                    _ = e.Member.BanAsync(7, $"Globalban: {globalBanDetails.Reason}");
                     return;
                 }
             }

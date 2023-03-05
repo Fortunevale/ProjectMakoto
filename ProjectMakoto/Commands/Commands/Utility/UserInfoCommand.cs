@@ -91,19 +91,18 @@ internal class UserInfoCommand : BaseCommand
                         $"\n**{(bMember is null ? $"{GetString(t.Commands.UserInfo.Roles)} ({GetString(t.Commands.UserInfo.Backup)})" : GetString(t.Commands.UserInfo.Roles))}**\n{GenerateRoles}"
             };
 
-            if (ctx.Bot.globalNotes.ContainsKey(victim.Id) && ctx.Bot.globalNotes[victim.Id].Any())
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<GlobalBanDetails> globalNotes) && globalNotes.Any())
             {
                 embed.AddField(new DiscordEmbedField(GetString(t.Commands.UserInfo.BotNotes).Replace("{Bot}", ctx.CurrentUser.Username), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
-            if (ctx.Bot.globalBans.ContainsKey(victim.Id))
+            if (ctx.Bot.globalBans.TryGetValue(victim.Id, out GlobalBanDetails globalBanDetails))
             {
-                var gBanDetails = ctx.Bot.globalBans[victim.Id];
                 var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot.globalBans[victim.Id].Moderator);
 
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.UserInfo.GlobalBanReason), $"`{((string.IsNullOrWhiteSpace(gBanDetails.Reason) || gBanDetails.Reason == "-") ? GetString(t.Commands.UserInfo.NoReason) : gBanDetails.Reason).SanitizeForCode()}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.UserInfo.GlobalBanReason), $"`{((string.IsNullOrWhiteSpace(globalBanDetails.Reason) || globalBanDetails.Reason == "-") ? GetString(t.Commands.UserInfo.NoReason) : globalBanDetails.Reason).SanitizeForCode()}`", true));
                 embed.AddField(new DiscordEmbedField(GetString(t.Commands.UserInfo.GlobalBanMod), $"`{gBanMod.UsernameWithDiscriminator}`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.UserInfo.GlobalBanDate), $"{Formatter.Timestamp(gBanDetails.Timestamp)} ({Formatter.Timestamp(gBanDetails.Timestamp, TimestampFormat.LongDateTime)})", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.UserInfo.GlobalBanDate), $"{Formatter.Timestamp(globalBanDetails.Timestamp)} ({Formatter.Timestamp(globalBanDetails.Timestamp, TimestampFormat.LongDateTime)})", true));
             }
 
             if (isBanned)

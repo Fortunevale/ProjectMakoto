@@ -88,15 +88,15 @@ public abstract class BaseCommand
             return false;
         }
 
-        if (this.ctx.Bot.bannedUsers.ContainsKey(ctx.User.Id))
+        if (this.ctx.Bot.bannedUsers.TryGetValue(ctx.User.Id, out BlacklistEntry blacklistedUserDetails))
         {
-            SendUserBanError(this.ctx.Bot.bannedUsers[ctx.User.Id]);
+            SendUserBanError(blacklistedUserDetails);
             return false;
         }
 
-        if (this.ctx.Bot.bannedGuilds.ContainsKey(ctx.Guild?.Id ?? 0))
+        if (this.ctx.Bot.bannedGuilds.TryGetValue(ctx.Guild?.Id ?? 0, out BlacklistEntry blacklistedGuildDetails))
         {
-            SendGuildBanError(this.ctx.Bot.bannedGuilds[ctx.Guild?.Id ?? 0]);
+            SendGuildBanError(blacklistedGuildDetails);
             return false;
         }
 
