@@ -230,7 +230,7 @@ internal class InfoCommand : BaseCommand
                                 [
                                     {{
                                         label: 'Usage (MB)',
-                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(".", "")}"))}],
+                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")}"))}],
                                         fill: false,
                                         borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
                                         id: ""yaxis2""
