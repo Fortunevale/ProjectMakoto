@@ -69,23 +69,24 @@ internal class InfoCommand : BaseCommand
                 .AddField(new DiscordEmbedField("Server uptime", $"`{(ServerUptime.IsNullOrWhiteSpace() ? "Currently unavailable" : ServerUptime)}`"))
                 .AsBotInfo(ctx).WithFooter().WithTimestamp(null);
 
-            var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{currentSystemStats.Cpu.Load,3:N0}%`\n" +
-                                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
-                                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`\n" +
-                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Load).Average(),3:N0}%`").AsBotLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            var cpuEmbed1 = new DiscordEmbedBuilder().WithTitle("CPU").WithDescription($"`Load        `: `{currentSystemStats.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                                                                       $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                                                                       $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`\n" +
+                                                                                       $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Load).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),3}%`").AsBotLoading(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
-            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{currentSystemStats.Cpu.Temperature,2:N0}°C`\n" +
-                                                                      $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
-                                                                      $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n" +
-                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Temperature).Average(),2:N0}°C`\n").AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+            var cpuEmbed2 = new DiscordEmbedBuilder().WithDescription($"`Temperature `: `{currentSystemStats.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"`  (15m avg.)`: `{history.Reverse().Take(45).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"`  (30m avg.)`: `{history.Reverse().Take(90).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n" +
+                                                                      $"`  (60m avg.)`: `{history.Reverse().Take(180).Select(x => x.Value.Cpu.Temperature).Average().ToString("N0", CultureInfo.CreateSpecificCulture("en-US")),2}°C`\n").AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
 
 
-            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used:N0}/{currentSystemStats.Memory.Total:N0} GB`").AsBotLoading(ctx);
+            var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsBotLoading(ctx);
 
             await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
 
             try
             {
+                string prev = "";
                 Chart qc = new()
                 {
                     Width = 1000,
@@ -96,13 +97,13 @@ internal class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => $"'{x.Key.GetTimespanSince().TotalMinutes:N0}m ago'"))}
+                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                 ],
                                 datasets: 
                                 [
                                     {{
                                         label: 'Usage (%)',
-                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Load:N0}"))}],
+                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Load.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
                                         fill: false,
                                         borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
                                         id: ""yaxis2""
@@ -141,16 +142,17 @@ internal class InfoCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to generate cpu graph", ex);
+                _logger.LogError("Failed to generate cpu usage graph", ex);
             }
             finally
             {
                 cpuEmbed1.AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
             }
 
-            //if (currentSystemStats.Cpu.Temperature != 0)
+            if (currentSystemStats.Cpu.Temperature != 0)
                 try
                 {
+                    string prev = "";
                     Chart qc = new()
                     {
                         Width = 1000,
@@ -161,13 +163,13 @@ internal class InfoCommand : BaseCommand
                                 {{
                                     labels: 
                                     [
-                                        {string.Join(",", history.Select(x => $"'{x.Key.GetTimespanSince().TotalMinutes:N0}m ago'"))}
+                                        {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                     ],
                                     datasets: 
                                     [
                                         {{
                                             label: 'Temperature (°C)',
-                                            data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Temperature:N0}"))}],
+                                            data: [{string.Join(",", history.Select(x => $"{x.Value.Cpu.Temperature.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}"))}],
                                             fill: false,
                                             borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
                                             id: ""yaxis2""
@@ -206,11 +208,12 @@ internal class InfoCommand : BaseCommand
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Failed to generate cpu graph", ex);
+                    _logger.LogError("Failed to generate cpu temp graph", ex);
                 }
 
             try
             {
+                string prev = "";
                 Chart qc = new()
                 {
                     Width = 1000,
@@ -221,13 +224,13 @@ internal class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => $"'{x.Key.GetTimespanSince().TotalMinutes:N0}m ago'"))}
+                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));  if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                 ],
                                 datasets: 
                                 [
                                     {{
-                                        label: 'Usage (GB)',
-                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Memory.Used:N0}"))}],
+                                        label: 'Usage (MB)',
+                                        data: [{string.Join(",", history.Select(x => $"{x.Value.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(".", "")}"))}],
                                         fill: false,
                                         borderColor: getGradientFillHelper('vertical', ['#ff0000', '#00ff00']),
                                         id: ""yaxis2""
@@ -251,7 +254,7 @@ internal class InfoCommand : BaseCommand
                                 scales: {{
                                     yAxes: [{{
                                     ticks: {{
-                                        max: {currentSystemStats.Memory.Total:N0},
+                                        max: {currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))},
                                         min: 0
                                         }}
                                     }}]
@@ -266,7 +269,7 @@ internal class InfoCommand : BaseCommand
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to generate cpu graph", ex);
+                _logger.LogError("Failed to generate memory graph", ex);
             }
             finally
             {
