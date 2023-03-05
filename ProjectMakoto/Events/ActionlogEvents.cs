@@ -47,9 +47,9 @@ internal class ActionlogEvents
                               $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
             };
 
-            if (_bot.globalNotes.ContainsKey(e.Member.Id) && _bot.globalNotes[e.Member.Id].Any())
+            if (_bot.globalNotes.TryGetValue(e.Member.Id, out List<GlobalBanDetails> globalNote) && globalNote.Any())
             {
-                embed.AddField(new DiscordEmbedField("Makoto Staff Notes", $"{string.Join("\n\n", _bot.globalNotes[e.Member.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+                embed.AddField(new DiscordEmbedField("Makoto Staff Notes", $"{string.Join("\n\n", globalNote.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
             _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
@@ -70,16 +70,16 @@ internal class ActionlogEvents
                 if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
                     return;
 
-                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code))
+                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.TryGetValue(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code, out var inviteNoteDetails))
                 {
-                    embed.AddField(new DiscordEmbedField("Invite Notes", _bot.guilds[e.Guild.Id].InviteNotes.Notes[_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code].Note));
+                    embed.AddField(new DiscordEmbedField("Invite Notes", inviteNoteDetails.Note));
                 }
 
                 embed.Description += $"\n\n**Invited by**: <@{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
                 embed.Description += $"**Invite Code**: `{_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
 
-                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.ContainsKey(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code))
-                    embed.Description += $"**Invite Note**: `{_bot.guilds[e.Guild.Id].InviteNotes.Notes[_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code].Note.SanitizeForCode()}`";
+                if (_bot.guilds[e.Guild.Id].InviteNotes.Notes.TryGetValue(_bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code, out var inviteNote))
+                    embed.Description += $"**Invite Note**: `{inviteNote.Note.SanitizeForCode()}`";
 
                 _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
             });

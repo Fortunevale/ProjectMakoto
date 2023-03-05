@@ -32,9 +32,9 @@ internal class RequestCommand : BaseCommand
 
             foreach (var guild in ctx.Bot.guilds)
             {
-                if (guild.Value.Members.ContainsKey(ctx.User.Id))
+                if (guild.Value.Members.TryGetValue(ctx.User.Id, out Member member))
                 {
-                    requestData.GuildData.Add(guild.Key, guild.Value.Members[ctx.User.Id]);
+                    requestData.GuildData.Add(guild.Key, member);
                 }
             }
 

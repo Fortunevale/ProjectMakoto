@@ -222,42 +222,9 @@ internal class MonitorClient
 
                 try
                 {
-                    UpdateVisitor updateVisitor = new();
-                    Computer computer = new()
-                    {
-                        IsMemoryEnabled = true,
-                    };
-
-                    try
-                    {
-                        computer.Open();
-
-                        computer.Accept(updateVisitor);
-
-                        _logger.LogTrace(JsonConvert.SerializeObject(computer.Hardware, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
-
-                        foreach (IHardware hw in computer.Hardware)
-                        {
-                            foreach (ISensor sensor in hw.Sensors)
-                            {
-                                if (hw.HardwareType == HardwareType.Memory)
-                                    switch (sensor.Name)
-                                    {
-                                        case "Memory Available":
-                                            systemInfo.Memory.Available = sensor.Value.GetValueOrDefault(0);
-                                            break;
-
-                                        case "Memory Used":
-                                            systemInfo.Memory.Used = sensor.Value.GetValueOrDefault(0);
-                                            break;
-                                    }
-                            }
-                        }
-                    }
-                    finally
-                    {
-                        computer.Close();
-                    }
+                    var metrics = MemoryMetricsClient.GetMetrics();
+                    systemInfo.Memory.Used = (float)metrics.Used;
+                    systemInfo.Memory.Total = (float)metrics.Total;
                 }
                 catch (Exception ex)
                 {

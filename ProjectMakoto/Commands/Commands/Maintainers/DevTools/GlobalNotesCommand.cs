@@ -15,8 +15,8 @@ internal class GlobalNotesCommand : BaseCommand
 
             var ModeratorCache = new Dictionary<ulong, DiscordUser>();
 
-            if (ctx.Bot.globalNotes.ContainsKey(victim.Id))
-                foreach (var b in ctx.Bot.globalNotes[victim.Id])
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<GlobalBanDetails> globalNotes))
+                foreach (var b in globalNotes)
                 {
                     if (ModeratorCache.ContainsKey(b.Moderator))
                         continue;

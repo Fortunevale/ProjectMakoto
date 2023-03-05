@@ -40,10 +40,10 @@ public class PollSettings
                             if (e.GetCustomId() == b.SelectUUID)
                             {
 
-                                if (b.Votes.ContainsKey(e.User.Id))
+                                if (b.Votes.TryGetValue(e.User.Id, out List<string> currentVotes))
                                 {
                                     b.Votes[e.User.Id] = new List<string>(e.Values);
-                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 `Updated your vote to {string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))}.`"));
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 `Updated your vote to {string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))}.`"));
                                     return;
                                 }
 

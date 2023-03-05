@@ -71,18 +71,18 @@ internal class ReportHostCommand : BaseCommand
                 }
             }
 
-            if (ctx.Bot.phishingUrlSubmissionUserBans.ContainsKey(ctx.User.Id))
+            if (ctx.Bot.phishingUrlSubmissionUserBans.TryGetValue(ctx.User.Id, out PhishingSubmissionBanDetails userBan))
             {
                 embed.Description = $"`{GetString(t.Commands.ReportHost.UserBan)}`\n" +
-                                    $"`{GetString(t.Common.Reason)}: {ctx.Bot.phishingUrlSubmissionUserBans[ctx.User.Id].Reason}`";
+                                    $"`{GetString(t.Common.Reason)}: {userBan.Reason}`";
                 _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.ReportHost.Title)));
                 return;
             }
 
-            if (ctx.Bot.phishingUrlSubmissionGuildBans.ContainsKey(ctx.Guild.Id))
+            if (ctx.Bot.phishingUrlSubmissionGuildBans.TryGetValue(ctx.Guild.Id, out PhishingSubmissionBanDetails guildBan))
             {
                 embed.Description = $"`{GetString(t.Commands.ReportHost.GuildBan)}`\n" +
-                                    $"`{GetString(t.Common.Reason)}: {ctx.Bot.phishingUrlSubmissionGuildBans[ctx.Guild.Id].Reason}`";
+                                    $"`{GetString(t.Common.Reason)}: {guildBan.Reason}`";
                 _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.ReportHost.Title)));
                 return;
             }

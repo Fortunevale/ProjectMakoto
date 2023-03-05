@@ -16,12 +16,12 @@ internal class NameNormalizerEvents
             if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
                 return;
 
-            string PingableName = Regex.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), @"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", "");
+            string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
                 PingableName = "Pingable Name";
 
-            if (PingableName != e.Member.DisplayName)
+            if (PingableName != e.Member.PreferredDisplayName)
                 _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
         }).Add(_bot.watcher);
     }
@@ -35,12 +35,12 @@ internal class NameNormalizerEvents
 
             if (e.NicknameBefore != e.NicknameAfter)
             {
-                string PingableName = Regex.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), @"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", "");
+                string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
 
                 if (PingableName.IsNullOrWhiteSpace())
                     PingableName = "Pingable Name";
 
-                if (PingableName != e.Member.DisplayName)
+                if (PingableName != e.Member.PreferredDisplayName)
                     _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
             }
         }).Add(_bot.watcher);
@@ -60,12 +60,12 @@ internal class NameNormalizerEvents
 
                 var member = await e.UserAfter.ConvertToMember(guild.Value);
 
-                string PingableName = Regex.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), @"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", "");
+                string PingableName = RegexTemplates.AllowedNickname.Replace(member.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
 
                 if (PingableName.IsNullOrWhiteSpace())
                     PingableName = "Pingable Name";
 
-                if (PingableName != member.DisplayName)
+                if (PingableName != member.PreferredDisplayName)
                     _ = member.ModifyAsync(x => x.Nickname = PingableName);
             }
         }).Add(_bot.watcher);
