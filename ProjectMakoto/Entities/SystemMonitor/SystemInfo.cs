@@ -20,6 +20,7 @@ public class SystemInfo
         public float Total
         {
             get { return Available + Used; }
+            set { Available = value - Used; }
         }
     }
 
