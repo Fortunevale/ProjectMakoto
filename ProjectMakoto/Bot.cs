@@ -122,14 +122,21 @@ public class Bot
 
         void LoadReferencedAssembly(Assembly assembly)
         {
-            foreach (AssemblyName name in assembly.GetReferencedAssemblies())
+            try
             {
-                if (!AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName == name.FullName))
+                foreach (AssemblyName name in assembly.GetReferencedAssemblies())
                 {
-                    assemblyCount++;
-                    _logger.LogDebug("Loading {Name}..", name.Name);
-                    LoadReferencedAssembly(Assembly.Load(name));
+                    if (!AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName == name.FullName))
+                    {
+                        assemblyCount++;
+                        _logger.LogDebug("Loading {Name}..", name.Name);
+                        LoadReferencedAssembly(Assembly.Load(name));
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to load an assembly", ex);
             }
         }
 
