@@ -417,7 +417,7 @@ public class Translations
             public SingleTranslationKey NotAVccChannel;
             public SingleTranslationKey NotAVccChannelOwner;
             public SingleTranslationKey VictimNotPresent;
-
+            
             public ban Ban;
             public class ban
             {
