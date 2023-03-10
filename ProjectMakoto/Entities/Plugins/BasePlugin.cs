@@ -61,7 +61,7 @@ public abstract class BasePlugin
     }
 
     public object GetConfig(string configName)
-        => _bot.status.LoadedConfig.PluginData[configName];
+        => (_bot.status.LoadedConfig.PluginData.TryGetValue(configName, out var val) ? val : null);
 
     public void WriteConfig(string configName, object configObject)
     {
@@ -72,11 +72,6 @@ public abstract class BasePlugin
         _bot.status.LoadedConfig.Save();
     }
 
-    public async Task<bool> CheckIfConfigExists(string configName)
-    {
-        while (_bot.status.LoadedConfig is null)
-            await Task.Delay(1000);
-
-        return _bot.status.LoadedConfig.PluginData.ContainsKey(configName);
-    }
+    public bool CheckIfConfigExists(string configName) 
+        => _bot.status.LoadedConfig.PluginData.ContainsKey(configName);
 }

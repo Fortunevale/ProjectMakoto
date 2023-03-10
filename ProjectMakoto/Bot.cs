@@ -145,45 +145,6 @@ public class Bot
 
         _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
 
-        foreach (var b in Plugins)
-        {
-            if (b.Value.Name.IsNullOrWhiteSpace())
-            {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Name.", b.Key);
-                continue;
-            }
-            
-            if (b.Value.Description.IsNullOrWhiteSpace())
-            {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Description.", b.Key);
-                continue;
-            }
-            
-            if (b.Value.Author.IsNullOrWhiteSpace())
-            {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Author.", b.Key);
-                continue;
-            }
-            
-            if (b.Value.AuthorId is null)
-            {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing AuthorId.", b.Key);
-                continue;
-            }
-            
-            if (b.Value.Version is null)
-            {
-                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
-                continue;
-            }
-
-            _logger.LogDebug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
-
-            b.Value.Load(this);
-
-            _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
-        }
-
         _logger.LogDebug("Loading all assemblies..");
 
         var assemblyCount = 0;
@@ -441,6 +402,52 @@ public class Bot
                 }).Add(watcher);
                 await Task.Delay(1000);
 
+                foreach (var b in Plugins)
+                {
+                    if (b.Value.Name.IsNullOrWhiteSpace())
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Name.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.Description.IsNullOrWhiteSpace())
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Description.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.Author.IsNullOrWhiteSpace())
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Author.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.AuthorId is null)
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing AuthorId.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.Version is null)
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
+                        continue;
+                    }
+
+                    _logger.LogDebug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
+
+                    try
+                    {
+                        b.Value.Load(this);
+                        _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Failed to load Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
+                        _logger.LogError("Exception", ex);
+                    }
+                }
+
                 monitorClient = new MonitorClient(this);
                 abuseIpDbClient = AbuseIpDbClient.Initialize(this);
 
@@ -681,6 +688,7 @@ public class Bot
                 foreach (var b in Plugins)
                 {
                     _logger.LogInfo("Adding Commands from Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
+                    await b.Value.RegisterCommands();
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");

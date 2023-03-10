@@ -2,8 +2,21 @@
 
 public class Config
 {
-    public void Save() 
-        => File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+    public void Save(int retry = 0)
+    {
+        try
+        {
+            File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+        }
+        catch (Exception)
+        {
+            if (retry > 10)
+                return;
+
+            Thread.Sleep(500);
+            Save(retry + 1);
+        }
+    }
 
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
