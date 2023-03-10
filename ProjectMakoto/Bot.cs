@@ -216,7 +216,7 @@ public class Bot
                 _logger.LogDebug("Loaded {Count} profanity words", profanityList.Count);
 
                 if (!File.Exists("config.json"))
-                    File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                    new Config().Save();
 
                 loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
                 _logger.LogDebug("Loaded translations");
@@ -335,7 +335,7 @@ public class Bot
 
                     status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
                     await Task.Delay(500);
-                    File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented));
+                    status.LoadedConfig.Save();
 
                     while (true)
                     {
@@ -374,8 +374,7 @@ public class Bot
                 abuseIpDbClient = AbuseIpDbClient.Initialize(this);
                 epicGamesClient = EpicGamesClient.Initialize(this);
 
-                var test = await epicGamesClient.GetOAuthToken();
-                test = test;
+                await epicGamesClient.ClaimDailyRewards();
 
                 _logger.LogInfo("Connecting to database..");
 
@@ -631,7 +630,7 @@ public class Bot
                     if (status.LoadedConfig.DontModify.LastStartedVersion != RunningVersion)
                     {
                         status.LoadedConfig.DontModify.LastStartedVersion = RunningVersion;
-                        File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                        status.LoadedConfig.Save();
 
                         var channel = await discordClient.GetChannelAsync(status.LoadedConfig.Channels.GithubLog);
                         await channel.SendMessageAsync(new DiscordEmbedBuilder

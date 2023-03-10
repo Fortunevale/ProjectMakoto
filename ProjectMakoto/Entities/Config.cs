@@ -2,6 +2,9 @@
 
 public class Config
 {
+    public void Save() 
+        => File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
@@ -129,6 +132,7 @@ public class Config
         public class EpicGamesSecrets
         {
             public string EpicClient = "";
+            public DateTime LastDailyClaim = DateTime.MinValue;
 
             public EpicCookies Cookies = new();
             public class EpicCookies

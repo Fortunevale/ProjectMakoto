@@ -1,5 +1,6 @@
 ﻿using ProjectMakoto.Entities.EpicGames;
 using System.Net.Http.Headers;
+using ProjectMakoto.Util.EpicGames;
 
 namespace ProjectMakoto.Util;
 
@@ -7,7 +8,7 @@ public class EpicGamesClient
 {
     private EpicGamesClient() { }
     
-    private Bot _bot { get; set; }
+    internal Bot _bot { get; private set; }
     private Config.SecretsConfig.EpicGamesSecrets EpicGamesSecrets 
         => _bot.status.LoadedConfig.Secrets.EpicGames;
 
@@ -16,18 +17,15 @@ public class EpicGamesClient
     
     private string ClientId
         => ClientIdAndSecret[..(ClientIdAndSecret.IndexOf(":"))];
-    
-    private string ClientSecret
-        => ClientIdAndSecret[(ClientIdAndSecret.IndexOf(":") + 1)..];
 
     public static EpicGamesClient Initialize(Bot bot)
     {
-        EpicGamesClient epicGamesClient = new()
+        EpicGamesClient client = new()
         {
             _bot = bot
         };
 
-        return epicGamesClient;
+        return client;
     }
 
     public async Task UpdateCookie(string EpicDevice, string EpicSession)
@@ -36,6 +34,8 @@ public class EpicGamesClient
         {
             EpicGamesSecrets.Cookies.EPIC_DEVICE = EpicDevice;
             EpicGamesSecrets.Cookies.EPIC_SESSION_AP = EpicSession;
+
+            _bot.status.LoadedConfig.Save();
         }
         else
             throw new ArgumentException("The entered cookies are not functional.");
@@ -47,8 +47,9 @@ public class EpicGamesClient
 
         HttpClient testClient = new HttpClient(new HttpClientHandler
         {
-            CookieContainer = testContainer
-        });
+            CookieContainer = testContainer,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        }).InitializeClientWithDefaultHeaders(this);
 
         testContainer.Add(new Uri("https://www.epicgames.com"), new Cookie("EPIC_DEVICE", EpicDevice));
         testContainer.Add(new Uri("https://www.epicgames.com"), new Cookie("EPIC_SESSION_AP", EpicSession));
@@ -59,7 +60,8 @@ public class EpicGamesClient
 
         try
         {
-            parsedResponse = JsonConvert.DeserializeObject<AuthorizationCode>(await rawResponse.Content.ReadAsStringAsync());
+            var value = await rawResponse.Content.ReadAsStringAsync();
+            parsedResponse = JsonConvert.DeserializeObject<AuthorizationCode>(value);
 
             if (parsedResponse is null)
                 throw new Exception("Invalid Json");
@@ -95,25 +97,25 @@ public class EpicGamesClient
             new KeyValuePair<string, string>("code", AuthCode),
         });
 
-        HttpClient client = new();
+        HttpClient client = new HttpClient(new HttpClientHandler()
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        }).InitializeClientWithDefaultHeaders(this);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", EpicGamesSecrets.EpicClient);
-        client.DefaultRequestHeaders.Add("User-Agent", $"ProjectMakoto/{_bot.status.LoadedConfig.DontModify.LastStartedVersion}");
-        client.DefaultRequestHeaders.Add("Accept", "*/*");
-        client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
-
-
+        
         var rawResponse = await client.PostAsync("https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token", content);
 
         OAuthToken oAuthToken;
         try
         {
+            var value = await rawResponse.Content.ReadAsStringAsync();
             if (!rawResponse.IsSuccessStatusCode)
             {
-                ErrorMessage errorMessage = JsonConvert.DeserializeObject<ErrorMessage>(await rawResponse.Content.ReadAsStringAsync());
+                ErrorMessage errorMessage = JsonConvert.DeserializeObject<ErrorMessage>(value);
                 throw new Exception(errorMessage?.errorMessage ?? "Unknown Error occured.");
             }
 
-            oAuthToken = JsonConvert.DeserializeObject<OAuthToken>(await rawResponse.Content.ReadAsStringAsync());
+            oAuthToken = JsonConvert.DeserializeObject<OAuthToken>(value);
         }
         catch (Exception ex)
         {
@@ -125,5 +127,50 @@ public class EpicGamesClient
         return oAuthToken;
     }
 
-    public async Task
+    public async Task ClaimDailyRewards()
+    {
+        if (EpicGamesSecrets.LastDailyClaim.ToString("dd.MM.yyyy") == DateTime.UtcNow.ToString("dd.MM.yyyy"))
+        {
+            return;
+        }
+
+        var oAuthCode = await GetOAuthToken();
+
+        HttpClient client = new HttpClient(new HttpClientHandler()
+        {
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+        }).InitializeClientWithDefaultHeaders(this);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", oAuthCode.access_token);
+
+        var content = new StringContent("{}");
+
+        var rawResponse = await client.PostAsync($"https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{oAuthCode.account_id}/client/ClaimLoginReward?profileId=campaign", content);
+
+        object Response;
+        try
+        {
+            if (!rawResponse.IsSuccessStatusCode)
+            {
+                if ((int)rawResponse.StatusCode == 415)
+                {
+                    _logger.LogError("Daily Rewards were already claimed.");
+
+                    EpicGamesSecrets.LastDailyClaim = DateTime.UtcNow;
+                    _bot.status.LoadedConfig.Save();
+                    return;
+                }
+
+                throw new Exception($"Non-Success Status Code: {rawResponse.StatusCode}");
+            }
+
+            EpicGamesSecrets.LastDailyClaim = DateTime.UtcNow;
+            _bot.status.LoadedConfig.Save();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to claim daily rewards", ex);
+            _logger.LogError("{0}", JsonConvert.SerializeObject(rawResponse, Formatting.Indented));
+            throw;
+        }
+    }
 }
