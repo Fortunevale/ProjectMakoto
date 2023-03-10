@@ -90,9 +90,13 @@
     <None Update="Translations\*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	<Content Include="Plugins\**">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Plugins\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

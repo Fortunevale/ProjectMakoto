@@ -1,8 +1,3 @@
-using ProjectMakoto.PrefixCommands;
-using ProjectMakoto.Util.SystemMonitor;
-using System.Collections;
-using System.Reflection;
-
 namespace ProjectMakoto;
 
 public class Bot
@@ -112,6 +107,81 @@ public class Bot
         if (args.Contains("--debug"))
         {
             _logger.ChangeLogLevel(LogLevel.DEBUG);
+        }
+
+        _logger.LogDebug("Loading Plugins..");
+        List<string> pluginsToLoad = new();
+
+        if (Directory.Exists("Plugins"))
+            pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
+
+        foreach (var pluginPath in pluginsToLoad)
+        {
+            int count = 0;
+            _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+
+            PluginLoadContext pluginLoadContext = new(pluginPath);
+            var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
+
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (typeof(BasePlugin).IsAssignableFrom(type))
+                {
+                    count++;
+                    BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
+                    Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                }
+            }
+
+            if (count == 0)
+            {
+                string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+                _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
+            }
+
+
+            _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
+        }
+
+        _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
+
+        foreach (var b in Plugins)
+        {
+            if (b.Value.Name.IsNullOrWhiteSpace())
+            {
+                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Name.", b.Key);
+                continue;
+            }
+            
+            if (b.Value.Description.IsNullOrWhiteSpace())
+            {
+                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Description.", b.Key);
+                continue;
+            }
+            
+            if (b.Value.Author.IsNullOrWhiteSpace())
+            {
+                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Author.", b.Key);
+                continue;
+            }
+            
+            if (b.Value.AuthorId is null)
+            {
+                _logger.LogWarn("Skipped loading Plugin '{0}': Missing AuthorId.", b.Key);
+                continue;
+            }
+            
+            if (b.Value.Version is null)
+            {
+                _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
+                continue;
+            }
+
+            _logger.LogDebug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
+
+            b.Value.Load(this);
+
+            _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
         }
 
         _logger.LogDebug("Loading all assemblies..");
@@ -485,26 +555,6 @@ public class Bot
             discordClient.UseLavalink();
 
 
-
-            _logger.LogDebug("Registering Commands..");
-
-            cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
-            
-            cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
-
-
-
-            _logger.LogDebug("Registering Command Converters..");
-
-            cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
-
-
-
             _logger.LogDebug("Registering DisCatSharp EventHandler..");
 
             DiscordEventHandler discordEventHandler = new(this);
@@ -593,6 +643,8 @@ public class Bot
                     x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); 
                 }
 
+                Dictionary<string, BaseCommand> PluginCommands = new();
+
                 if (!status.LoadedConfig.IsDev)
                 {
                     appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
@@ -612,6 +664,23 @@ public class Bot
                     appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
                     appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
                     appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+                }
+
+                _logger.LogDebug("Registering Commands..");
+                cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
+
+                _logger.LogDebug("Registering Command Converters..");
+                cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
+
+                foreach (var b in Plugins)
+                {
+                    _logger.LogInfo("Adding Commands from Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
@@ -1290,6 +1359,12 @@ public class Bot
         ExitCalled = true;
 
         _logger.LogInfo("Preparing to shut down Makoto..");
+
+        foreach (var b in Plugins)
+        {
+            _logger.LogInfo("Shutting down '{0}'..", b.Value.Name);
+            await b.Value.Shutdown();
+        }
 
         if (status.DiscordInitialized && !Immediate)
         {

@@ -58,3 +58,8 @@ global using User = ProjectMakoto.Entities.User;
 global using FileMode = System.IO.FileMode;
 global using LogLevel = Xorog.Logger.Enums.LogLevel;
 global using RequestParameters = Xorog.ScoreSaber.Objects.RequestParameters;
+global using ProjectMakoto.Plugins;
+global using ProjectMakoto.PrefixCommands;
+global using ProjectMakoto.Util.SystemMonitor;
+global using System.Collections;
+global using System.Reflection;
