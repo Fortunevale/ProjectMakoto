@@ -20,7 +20,8 @@ public class Bot
     internal ThreadJoinClient threadJoinClient { get; set; }
     internal AbuseIpDbClient abuseIpDbClient { get; set; }
     internal MonitorClient monitorClient { get; set; }
-    internal EpicGamesClient epicGamesClient { get; set; }
+
+    public Dictionary<string, BasePlugin> Plugins { get; set; } = new();
 
     #endregion Clients
 
@@ -372,9 +373,6 @@ public class Bot
 
                 monitorClient = new MonitorClient(this);
                 abuseIpDbClient = AbuseIpDbClient.Initialize(this);
-                epicGamesClient = EpicGamesClient.Initialize(this);
-
-                await epicGamesClient.ClaimDailyRewards();
 
                 _logger.LogInfo("Connecting to database..");
 

@@ -19,6 +19,8 @@ public class Config
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
 
+    public Dictionary<string, object> PluginData = new();
+
     public class ChannelsConfig
     {
         public ulong GlobalBanAnnouncements = 0;
@@ -99,7 +101,6 @@ public class Config
         public GithubSecrets Github = new();
         public DatabaseSecrets Database = new();
         public LavalinkSecrets Lavalink = new();
-        public EpicGamesSecrets EpicGames = new();
 
         public class GithubSecrets
         {
@@ -127,20 +128,6 @@ public class Config
             public string Host = "127.0.0.1";
             public int Port = 2333;
             public string Password = "";
-        }
-
-        public class EpicGamesSecrets
-        {
-            public string EpicClient = "";
-            public DateTime LastDailyClaim = DateTime.MinValue;
-
-            public EpicCookies Cookies = new();
-            public class EpicCookies
-            {
-                public string EPIC_DEVICE = "";
-                public string EPIC_SESSION_AP = "";
-                public DateTime Expiration = DateTime.MinValue;
-            }
         }
     }
 
