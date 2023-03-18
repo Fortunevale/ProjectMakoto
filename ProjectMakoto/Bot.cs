@@ -687,8 +687,12 @@ public class Bot
 
                 foreach (var b in Plugins)
                 {
-                    _logger.LogInfo("Adding Commands from Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
-                    await b.Value.RegisterCommands();
+                    var pluginCommands = await b.Value.RegisterCommands();
+
+                    if (pluginCommands.IsNotNullAndNotEmpty())
+                    {
+                        _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, b.Value.Name, b.Value.Version.ToString());
+                    }
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");

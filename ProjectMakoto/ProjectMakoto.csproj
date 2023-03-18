@@ -91,7 +91,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
 	<Content Include="Plugins\**">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
   </ItemGroup>
 
