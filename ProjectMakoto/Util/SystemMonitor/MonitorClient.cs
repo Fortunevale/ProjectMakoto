@@ -1,5 +1,4 @@
-﻿using LibreHardwareMonitor.Hardware;
-using ProjectMakoto.Entities.SystemMonitor;
+﻿using ProjectMakoto.Entities.SystemMonitor;
 
 namespace ProjectMakoto.Util.SystemMonitor;
 
@@ -32,7 +31,8 @@ internal class MonitorClient
         {
             if (!new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()).IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator))
             {
-                _logger.LogWarn("Running under windows, system monitor partially unavailable unless running as administrator.");
+                _logger.LogWarn("Running under windows, system monitor unavailable.");
+                return;
             }
         }
 
@@ -75,92 +75,9 @@ internal class MonitorClient
     {
         return await Task.Run<SystemInfo>(() =>
         {
-
-
             SystemInfo systemInfo = new();
-
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                UpdateVisitor updateVisitor = new();
-                Computer computer = new()
-                {
-                    IsCpuEnabled = true,
-                    IsMemoryEnabled = true,
-                    IsNetworkEnabled = true,
-                };
-
-                try
-                {
-                    computer.Open();
-
-                    computer.Accept(updateVisitor);
-
-                    _logger.LogTrace(JsonConvert.SerializeObject(computer.Hardware, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
-
-                    foreach (IHardware hw in computer.Hardware)
-                    {
-                        foreach (ISensor sensor in hw.Sensors)
-                        {
-                            if (hw.HardwareType == HardwareType.Cpu)
-                                if (sensor.Name is "CPU Total" or "Core (Tctl/Tdie)")
-                                    switch (sensor.SensorType)
-                                    {
-                                        case SensorType.Load:
-                                            systemInfo.Cpu.Load = sensor.Value.GetValueOrDefault(0);
-
-                                            break;
-                                        case SensorType.Temperature:
-                                            systemInfo.Cpu.Temperature = sensor.Value.GetValueOrDefault(0);
-
-                                            break;
-                                    }
-
-                            if (hw.HardwareType == HardwareType.Memory)
-                                switch (sensor.Name)
-                                {
-                                    case "Memory Available":
-                                        systemInfo.Memory.Available = sensor.Value.GetValueOrDefault(0);
-                                        break;
-
-                                    case "Memory Used":
-                                        systemInfo.Memory.Used = sensor.Value.GetValueOrDefault(0);
-                                        break;
-                                }
-
-                            if (hw.HardwareType == HardwareType.Network && hw.Name == "Ethernet")
-                                switch (sensor.Name)
-                                {
-                                    case "Data Uploaded":
-                                        systemInfo.Network.TotalUploaded = sensor.Value.GetValueOrDefault(0);
-                                        break;
-
-                                    case "Data Downloaded":
-                                        systemInfo.Network.TotalDownloaded = sensor.Value.GetValueOrDefault(0);
-                                        break;
-
-                                    case "Upload Speed":
-                                        systemInfo.Network.CurrentUploadSpeed = sensor.Value.GetValueOrDefault(0);
-                                        break;
-
-                                    case "Download Speed":
-                                        systemInfo.Network.CurrentDownloadSpeed = sensor.Value.GetValueOrDefault(0);
-                                        break;
-
-                                    case "Network Utilization":
-                                        systemInfo.Network.TotalUtilization = sensor.Value.GetValueOrDefault(0);
-                                        break;
-                                }
-                        }
-                    }
-                }
-                finally
-                {
-                    computer.Close();
-                }
-
-                return systemInfo;
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
+            
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
                 try
                 {
@@ -239,22 +156,6 @@ internal class MonitorClient
                 return systemInfo;
             }
         });
-    }
-
-    private class UpdateVisitor : IVisitor
-    {
-        public void VisitComputer(IComputer computer)
-        {
-            computer.Traverse(this);
-        }
-        public void VisitHardware(IHardware hardware)
-        {
-            hardware.Update();
-            foreach (IHardware subHardware in hardware.SubHardware)
-                subHardware.Accept(this);
-        }
-        public void VisitSensor(ISensor sensor) { }
-        public void VisitParameter(IParameter parameter) { }
     }
 }
 
