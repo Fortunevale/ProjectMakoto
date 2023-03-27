@@ -1,4 +1,6 @@
-﻿namespace ProjectMakoto.Plugins;
+﻿using ProjectMakoto.Entities.Plugins.Commands;
+
+namespace ProjectMakoto.Plugins;
 
 public abstract class BasePlugin
 {
@@ -50,9 +52,9 @@ public abstract class BasePlugin
 
     public abstract BasePlugin Initialize();
 
-    public virtual async Task<List<BaseCommand>> RegisterCommands()
+    public virtual async Task<List<BasePluginCommand>> RegisterCommands()
     {
-        return new List<BaseCommand>();
+        return new List<BasePluginCommand>();
     }
 
     public virtual async Task Shutdown()

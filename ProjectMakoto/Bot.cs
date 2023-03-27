@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+
 namespace ProjectMakoto;
 
 public class Bot
@@ -685,13 +687,83 @@ public class Bot
                 _logger.LogDebug("Registering Command Converters..");
                 cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
 
-                foreach (var b in Plugins)
-                {
-                    var pluginCommands = await b.Value.RegisterCommands();
+                var commandsNextTypes = new List<Type>();
+                var applicationCommandTypes = new List<Type>();
 
-                    if (pluginCommands.IsNotNullAndNotEmpty())
+                foreach (var plugin in Plugins)
+                {
+                    try
                     {
-                        _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, b.Value.Name, b.Value.Version.ToString());
+                        var pluginCommands = await plugin.Value.RegisterCommands();
+
+                        if (pluginCommands.IsNotNullAndNotEmpty())
+                        {
+                            _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+
+                            try
+                            {
+                                var typeSignature = Guid.NewGuid().ToString();
+                                var an = new AssemblyName(typeSignature);
+                                AssemblyBuilder assembly = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
+                                ModuleBuilder moduleBuilder = assembly.DefineDynamicModule("MainModule");
+                                TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature,
+                                    TypeAttributes.Public |
+                                    TypeAttributes.Class |
+                                    TypeAttributes.AutoClass |
+                                    TypeAttributes.AnsiClass |
+                                    TypeAttributes.BeforeFieldInit |
+                                    TypeAttributes.AutoLayout,
+                                    null);
+
+                                typeBuilder.AddInterfaceImplementation(typeof(BaseCommandModule));
+
+                                foreach (var rawCommand in pluginCommands)
+                                {
+                                    _logger.LogDebug("Found Command '{0}'", rawCommand.Name);
+
+                                    var overloadList = new List<Type>();
+
+                                    overloadList.Insert(0, typeof(CommandContext));
+                                    overloadList.AddRange(rawCommand.Overloads.Select(x => x.Type));
+
+                                    var methodBuilder = typeBuilder.DefineMethod(rawCommand.Name, MethodAttributes.Public, typeof(Task), null);
+
+                                    var methodParams = methodBuilder.DefineGenericParameters(rawCommand.Overloads.Select(x => x.Name).Prepend("ctx").ToArray());
+
+                                    methodParams[0].SetBaseTypeConstraint(typeof(CommandContext));
+
+                                    for (int i = 1; i < rawCommand.Overloads.Length; i++)
+                                        methodParams[i].SetBaseTypeConstraint(rawCommand.Overloads[i].Type);
+
+                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                                        typeof(CommandAttribute).GetConstructor(new[] { typeof(System.Runtime.CompilerServices.MethodImplOptions) }),
+                                        new List<string> { rawCommand.Name }.ToArray()));
+
+                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                                        typeof(DescriptionAttribute).GetConstructor(new[] { typeof(System.Runtime.CompilerServices.MethodImplOptions) }),
+                                        new List<string> { rawCommand.Description }.ToArray()));
+                                    
+                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                                        typeof(CommandModuleAttribute).GetConstructor(new[] { typeof(System.Runtime.CompilerServices.MethodImplOptions) }),
+                                        new List<string> { rawCommand.Module }.ToArray()));
+
+                                    methodBuilder.SetParameters(methodParams);
+
+                                    methodBuilder.SetReturnType(typeof(Task));
+
+                                    var newDelegate = methodBuilder.CreateDelegate(typeof(Task));
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("Failed to generate CommandsNext Command", ex);
+                                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+
                     }
                 }
 
