@@ -172,7 +172,7 @@ internal class EmojiStealerCommand : BaseCommand
 
             var IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", GetString(t.Commands.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
 
-            var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(t.Commands.EmojiStealer.AddToServer), (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || !ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(t.Commands.EmojiStealer.AddToServer), (!ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions) || !ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageGuildExpressions) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
             var ZipPrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "ZipPrivateMessage", GetString(t.Commands.EmojiStealer.DirectMessageZip), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
             var SinglePrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "SinglePrivateMessage", GetString(t.Commands.EmojiStealer.DirectMessageSingle), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📱")));
 
@@ -229,15 +229,15 @@ internal class EmojiStealerCommand : BaseCommand
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
                             cancellationTokenSource.Cancel();
 
-                            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers))
+                            if (!ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions))
                             {
-                                SendPermissionError(Permissions.ManageEmojisAndStickers);
+                                SendPermissionError(Permissions.ManageGuildExpressions);
                                 return;
                             }
                             
-                            if (!ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageEmojisAndStickers))
+                            if (!ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageGuildExpressions))
                             {
-                                SendOwnPermissionError(Permissions.ManageEmojisAndStickers);
+                                SendOwnPermissionError(Permissions.ManageGuildExpressions);
                                 return;
                             }
 
@@ -448,7 +448,7 @@ internal class EmojiStealerCommand : BaseCommand
                             }
 
                             IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", GetString(t.Commands.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
-                            AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(t.Commands.EmojiStealer.AddToServer), (!ctx.Member.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || !ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageEmojisAndStickers) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                            AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(t.Commands.EmojiStealer.AddToServer), (!ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions) || !ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageGuildExpressions) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
 
                             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 

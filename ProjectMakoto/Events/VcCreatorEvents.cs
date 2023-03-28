@@ -28,7 +28,7 @@ internal class VcCreatorEvents
 
                 _bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id] = DateTime.UtcNow;
 
-                var name = $"{member.PreferredDisplayName.SanitizeForCode()}'s Channel";
+                var name = $"{member.DisplayName.SanitizeForCode()}'s Channel";
 
                 foreach (var b in _bot.profanityList)
                     name = name.Replace(b, new String('*', b.Length));

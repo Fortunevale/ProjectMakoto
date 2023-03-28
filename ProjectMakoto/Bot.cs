@@ -758,7 +758,7 @@ public class Bot
                                     var delegateType = Expression.GetFuncType(overloadList.ToArray());
 
                                     Delegate commandDelegate = null;
-                                    commandDelegate = Delegate.CreateDelegate(delegateType, (CommandContext ctx, params object[] rawArgs) =>
+                                    commandDelegate = Delegate.CreateDelegate(delegateType, (CommandContext ctx) =>
                                     {
                                         var parsedArgs = new Dictionary<string, object>();
 

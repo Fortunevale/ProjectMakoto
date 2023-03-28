@@ -74,12 +74,12 @@ internal class ConfigCommand : BaseCommand
                     {
                         var b = members.ElementAt(i);
 
-                        string PingableName = RegexTemplates.AllowedNickname.Replace(b.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
+                        string PingableName = RegexTemplates.AllowedNickname.Replace(b.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
                         if (PingableName.IsNullOrWhiteSpace())
                             PingableName = "Pingable Name";
 
-                        if (PingableName != b.PreferredDisplayName)
+                        if (PingableName != b.DisplayName)
                         {
                             _ = b.ModifyAsync(x => x.Nickname = PingableName);
                             Renamed++;
