@@ -486,6 +486,18 @@
         "description": "Throw.",
         "name_translations": null,
         "description_translations": null
+      },
+      {
+        "name": "tfa-register",
+        "description": "test",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "tfa-test",
+        "description": "test",
+        "name_translations": null,
+        "description_translations": null
       }
     ]
   },

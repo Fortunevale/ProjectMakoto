@@ -564,7 +564,7 @@ public class Bot
             };
 
             discordClient.UseLavalink();
-
+            // var tfa = discordClient.UseTwoFactor();
 
             _logger.LogDebug("Registering DisCatSharp EventHandler..");
 
