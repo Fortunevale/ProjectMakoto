@@ -2,8 +2,8 @@
 
 public abstract class BaseCommand
 {
-    internal SharedCommandContext ctx { private get; set; }
-    internal Translations t { get; set; }
+    public SharedCommandContext ctx { private get; set; }
+    public Translations t { get; set; }
 
     #region Execution
     public virtual async Task<bool> BeforeExecution(SharedCommandContext ctx)
@@ -109,16 +109,16 @@ public abstract class BaseCommand
     #endregion
 
     #region RespondOrEdit
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
+    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
         => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
+    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
         => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
 
-    internal async Task<DiscordMessage> RespondOrEdit(string content)
+    public async Task<DiscordMessage> RespondOrEdit(string content)
         => await RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
 
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
+    public async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
     {
         switch (ctx.CommandType)
         {
@@ -215,14 +215,14 @@ public abstract class BaseCommand
     }
     #endregion
 
-    internal string GetString(SingleTranslationKey key) 
+    public string GetString(SingleTranslationKey key) 
         => key.Get(ctx.Bot.users[ctx.User.Id]);
-    
-    internal string[] GetString(MultiTranslationKey key) 
+
+    public string[] GetString(MultiTranslationKey key) 
         => key.Get(ctx.Bot.users[ctx.User.Id]);
 
     #region Selections
-    internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
@@ -361,10 +361,10 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordRole>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
         => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
 
-    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
@@ -483,7 +483,7 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromSeconds(120);
         CustomPlaceHolder ??= GetString(t.Commands.Common.Prompts.SelectAnOption);
@@ -600,10 +600,10 @@ public abstract class BaseCommand
     #endregion
 
     #region Modals
-    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null) 
+    public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null) 
         => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
-    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
+    public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
@@ -688,7 +688,7 @@ public abstract class BaseCommand
     }
 
 
-    internal async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
@@ -755,7 +755,7 @@ public abstract class BaseCommand
         return new InteractionResult<TimeSpan>(length);
     }
 
-    internal async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
 
@@ -812,10 +812,10 @@ public abstract class BaseCommand
         }
 
         return new InteractionResult<DateTime>(dateTime);
-    } 
+    }
     #endregion
 
-    internal async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
+    public async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 

@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace ProjectMakoto;
 
@@ -736,23 +738,57 @@ public class Bot
                                         methodParams[i].SetBaseTypeConstraint(rawCommand.Overloads[i].Type);
 
                                     methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(CommandAttribute).GetConstructor(new[] { typeof(System.Runtime.CompilerServices.MethodImplOptions) }),
+                                        typeof(CommandAttribute).GetConstructor(new[] { typeof(string) }),
                                         new List<string> { rawCommand.Name }.ToArray()));
 
                                     methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(DescriptionAttribute).GetConstructor(new[] { typeof(System.Runtime.CompilerServices.MethodImplOptions) }),
+                                        typeof(DescriptionAttribute).GetConstructor(new[] { typeof(string) }),
                                         new List<string> { rawCommand.Description }.ToArray()));
                                     
                                     methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(CommandModuleAttribute).GetConstructor(new[] { typeof(System.Runtime.CompilerServices.MethodImplOptions) }),
+                                        typeof(CommandModuleAttribute).GetConstructor(new[] { typeof(string) }),
                                         new List<string> { rawCommand.Module }.ToArray()));
 
                                     methodBuilder.SetParameters(methodParams);
 
                                     methodBuilder.SetReturnType(typeof(Task));
 
-                                    var newDelegate = methodBuilder.CreateDelegate(typeof(Task));
+                                    methodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
+
+                                    var delegateType = Expression.GetFuncType(overloadList.ToArray());
+
+                                    Delegate commandDelegate = null;
+                                    commandDelegate = Delegate.CreateDelegate(delegateType, (CommandContext ctx, params object[] rawArgs) =>
+                                    {
+                                        var parsedArgs = new Dictionary<string, object>();
+
+                                        MethodInfo method = commandDelegate.GetType().GetMethod("Invoke");
+                                        ParameterInfo[] parameters = method.GetParameters();
+
+                                        for (int i = 1; i < parameters.Length; i++)
+                                        {
+                                            if (i == 0)
+                                                continue;
+
+                                            ParameterInfo parameter = parameters[i];
+                                            object value = null;
+
+                                            PropertyInfo property = typeof(object).GetProperty(parameter.Name, BindingFlags.Public | BindingFlags.Instance);
+                                            if (property != null)
+                                            {
+                                                value = property.GetValue(ctx);
+                                            }
+
+                                            parsedArgs.Add(parameter.Name, value);
+                                        }
+
+                                        return Task.CompletedTask;
+                                    }, rawCommand.Name);
+
+                                    var newDelegate = methodBuilder.CreateDelegate(commandDelegate.GetType(), commandDelegate);
                                 }
+
+                                cNext.RegisterCommands(typeBuilder);
                             }
                             catch (Exception ex)
                             {

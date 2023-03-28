@@ -1,10 +1,10 @@
 ﻿namespace ProjectMakoto.Entities;
 
-internal class RolePromptConfiguration
+public class RolePromptConfiguration
 {
-    internal string? CreateRoleOption { get; set; } = null;
+    public string? CreateRoleOption { get; set; } = null;
 
-    internal string? DisableOption { get; set; } = null;
+    public string? DisableOption { get; set; } = null;
 
-    internal bool IncludeEveryone { get; set; } = false;
+    public bool IncludeEveryone { get; set; } = false;
 }

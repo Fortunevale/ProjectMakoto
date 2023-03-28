@@ -1,14 +1,14 @@
 ﻿namespace ProjectMakoto.Entities;
 
-internal class ChannelPromptConfiguration
+public class ChannelPromptConfiguration
 {
-    internal ChannelConfig CreateChannelOption { get; set; } = null;
+    public ChannelConfig CreateChannelOption { get; set; } = null;
 
-    internal string? DisableOption { get; set; } = null;
+    public string? DisableOption { get; set; } = null;
 
-    internal class ChannelConfig
+    public class ChannelConfig
     {
-        internal string Name { get; set; }
-        internal ChannelType ChannelType { get; set; }
+        public string Name { get; set; }
+        public ChannelType ChannelType { get; set; }
     }
 }
