@@ -212,37 +212,6 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 throw new InvalidCastException();
             }).Add(_bot.watcher, ctx);
         }
-
-        [SlashCommand("tfa-register", "test")]
-        [ApplicationCommandRequireTwoFactor]
-        public async Task TfaTest1(InteractionContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-                var (Secret, QrCode) = ctx.Client.EnrollTwoFactor(ctx.User);
-                DiscordWebhookBuilder builder = new();
-                builder.AddFile("2fa_setup.png", QrCode);
-                builder.WithContent($"Register your 2FA in Authy or a similar app.\n\nIf you can't scan the QR Code, please enter the secret manually: {Formatter.InlineCode(Secret)}");
-                await ctx.EditResponseAsync(builder);
-                QrCode.Close();
-            }).Add(_bot.watcher, ctx);
-        }
-
-        [SlashCommand("tfa-test", "test")]
-        [ApplicationCommandRequireTwoFactor]
-        public async Task TfaTest2(InteractionContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                var response = await ctx.AskForTwoFactorAsync();
-
-                if (response != DisCatSharp.Extensions.TwoFactorCommands.Enums.TwoFactorResponse.ValidCode)
-                    return;
-
-                await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent("hi"));
-            }).Add(_bot.watcher, ctx);
-        }
     }
 #endif
 }
