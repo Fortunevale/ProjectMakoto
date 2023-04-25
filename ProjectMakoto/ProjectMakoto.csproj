@@ -29,17 +29,17 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="10.3.3-nightly-031" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-031" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-031" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.3.3-nightly-031" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-003" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-031" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-031" />
+    <PackageReference Include="DisCatSharp" Version="10.3.3-nightly-033" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-033" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-033" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.3.3-nightly-033" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-006" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-033" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-033" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0-1.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.6.0-1.final" />
-    <PackageReference Include="MySql.Data" Version="8.0.32.1" />
-    <PackageReference Include="Octokit" Version="5.0.2" />
+    <PackageReference Include="MySql.Data" Version="8.0.33" />
+    <PackageReference Include="Octokit" Version="5.0.4" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
   </ItemGroup>
