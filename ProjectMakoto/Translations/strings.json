@@ -1166,6 +1166,11 @@
       "VictimIsBot": {
         "en": "{User} is a bot."
       },
+      "Events": {
+        "DefaultChannelName": {
+          "en": "{User}'s Channel'"
+        }
+      },
       "Ban": {
         "CannotBanSelf": {
           "en": "You cannot ban yourself."
@@ -1224,6 +1229,14 @@
         },
         "Success": {
           "en": "The channel's user limit has been changed to {Count}."
+        }
+      },
+      "Name": {
+        "Cooldown": {
+          "en": "You're on cooldown for renaming this channel. You can rename it again {Timestamp}."
+        },
+        "Success": {
+          "en": "The channel has been renamed to {Name}."
         }
       }
     },

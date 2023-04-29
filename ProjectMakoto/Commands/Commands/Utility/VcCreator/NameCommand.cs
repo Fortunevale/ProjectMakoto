@@ -12,7 +12,7 @@ internal class NameCommand : BaseCommand
             string newName = (string)arguments["newName"];
             DiscordChannel channel = ctx.Member.VoiceState?.Channel;
 
-            newName = (newName.IsNullOrWhiteSpace() ? $"{ctx.Member.DisplayName}'s Channel" : newName);
+            newName = (newName.IsNullOrWhiteSpace() ? GetGuildString(t.Commands.VoiceChannelCreator.Events.DefaultChannelName).Replace("{User}", ctx.Member.DisplayName) : newName);
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
@@ -28,7 +28,7 @@ internal class NameCommand : BaseCommand
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename.GetTimespanSince() < TimeSpan.FromMinutes(5))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`You're on cooldown for renaming this channel. You can rename it again` {ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename.AddMinutes(5).ToTimestamp()}`.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Name.Cooldown).Replace("{Timestamp}", $"`{ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename.AddMinutes(5).ToTimestamp()}`")}`").AsError(ctx));
                 return;
             }
 
@@ -37,7 +37,7 @@ internal class NameCommand : BaseCommand
 
             ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename = DateTime.UtcNow;
             await channel.ModifyAsync(x => x.Name = newName.TruncateWithIndication(25));
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The channel has renamed to {newName.SanitizeForCode()}.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Name.Success).Replace("{Name}", $"`{newName.SanitizeForCode()}`")}`").AsSuccess(ctx));
         });
     }
 }

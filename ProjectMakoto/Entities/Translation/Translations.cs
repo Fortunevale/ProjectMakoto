@@ -418,7 +418,13 @@ public class Translations
             public SingleTranslationKey NotAVccChannelOwner;
             public SingleTranslationKey VictimNotPresent;
             public SingleTranslationKey VictimIsBot;
-            
+
+            public events Events;
+            public class events
+            {
+                public SingleTranslationKey DefaultChannelName;
+            }
+
             public ban Ban;
             public class ban
             {
@@ -462,6 +468,13 @@ public class Translations
             public class limit
             {
                 public SingleTranslationKey OutsideRange;
+                public SingleTranslationKey Success;
+            }
+
+            public name Name;
+            public class name
+            {
+                public SingleTranslationKey Cooldown;
                 public SingleTranslationKey Success;
             }
         }
