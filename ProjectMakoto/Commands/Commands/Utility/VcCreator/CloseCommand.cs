@@ -24,7 +24,7 @@ internal class CloseCommand : BaseCommand
             }
 
             await channel.ModifyAsync(x => x.PermissionOverwrites = channel.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.None, Permissions.UseVoice));
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel has been closed.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Close.Success)}`").AsSuccess(ctx));
         });
     }
 }

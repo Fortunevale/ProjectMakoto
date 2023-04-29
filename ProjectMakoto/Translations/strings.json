@@ -1187,6 +1187,11 @@
         "Success": {
           "en": "{User} now owns this channel."
         }
+      },
+      "Close": {
+        "Success": {
+          "en": "The channel has been closed."
+        }
       }
     },
     "PrefixConfigCommand": {

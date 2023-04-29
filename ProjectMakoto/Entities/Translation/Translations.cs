@@ -432,6 +432,13 @@ public class Translations
             {
                 public SingleTranslationKey AlreadyOwner;
                 public SingleTranslationKey ForceAssign;
+                public SingleTranslationKey Success;
+            }
+            
+            public close Close;
+            public class close
+            {
+                public SingleTranslationKey Success;
             }
         }
 
