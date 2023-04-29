@@ -24,7 +24,7 @@ internal class OpenCommand : BaseCommand
             }
 
             await channel.ModifyAsync(x => x.PermissionOverwrites = channel.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.UseVoice, Permissions.None));
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel has been opened.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Open.Success)}`").AsSuccess(ctx));
         });
     }
 }

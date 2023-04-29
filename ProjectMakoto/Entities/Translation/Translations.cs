@@ -477,6 +477,12 @@ public class Translations
                 public SingleTranslationKey Cooldown;
                 public SingleTranslationKey Success;
             }
+
+            public open Open;
+            public class open
+            {
+                public SingleTranslationKey Success;
+            }
         }
 
         public prefixConfig PrefixConfigCommand;

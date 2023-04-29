@@ -1238,6 +1238,11 @@
         "Success": {
           "en": "The channel has been renamed to {Name}."
         }
+      },
+      "Open": {
+        "Success": {
+          "en": "The channel has been opened."
+        }
       }
     },
     "PrefixConfigCommand": {
