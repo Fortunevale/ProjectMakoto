@@ -457,6 +457,13 @@ public class Translations
                 public SingleTranslationKey CannotKickSelf;
                 public SingleTranslationKey Success;
             }
+            
+            public limit Limit;
+            public class limit
+            {
+                public SingleTranslationKey OutsideRange;
+                public SingleTranslationKey Success;
+            }
         }
 
         public prefixConfig PrefixConfigCommand;

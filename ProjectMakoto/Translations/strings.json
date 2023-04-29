@@ -1217,6 +1217,14 @@
         "Success": {
           "en": "{User} has been kicked from this channel."
         }
+      },
+      "Limit": {
+        "OutsideRange": {
+          "en": "Input outside of range."
+        },
+        "Success": {
+          "en": "The channel's user limit has been changed to {Count}."
+        }
       }
     },
     "PrefixConfigCommand": {

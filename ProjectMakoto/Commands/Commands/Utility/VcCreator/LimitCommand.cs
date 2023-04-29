@@ -26,12 +26,12 @@ internal class LimitCommand : BaseCommand
 
             if (newLimit > 99)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Input outside of range.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Limit.OutsideRange)}`").AsError(ctx));
                 return;
             }
 
             await channel.ModifyAsync(x => x.UserLimit = newLimit.ToInt32());
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The channel's user limit has been changed to {newLimit}.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Limit.Success).Replace("{Count}", newLimit)}`").AsSuccess(ctx));
         });
     }
 }
