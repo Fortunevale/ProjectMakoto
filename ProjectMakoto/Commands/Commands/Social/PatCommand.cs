@@ -11,23 +11,14 @@ internal class PatCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases =
-            {
-                    "%1 gives %2 headpats!",
-                };
-
-            string[] self_phrases =
-            {
-                    "There, there.. I'll give you some headpats, %1 😢",
-                    "I'll give you some headpats, %1.. 😢",
-                    "You look lonely there, %1..",
-                };
+            string[] phrases = GetGuildString(t.Commands.Pat.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Pat.Self);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Replace("{User1}", ctx.User.Username).Replace("{Emoji}", "😢"),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -38,7 +29,7 @@ internal class PatCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = Formatter.Bold(phrases.SelectRandom().Replace("{User1}", ctx.User.Mention).Replace("{User2}", user.Mention)),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

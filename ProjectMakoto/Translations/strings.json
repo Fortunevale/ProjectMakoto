@@ -1253,6 +1253,121 @@
         }
       }
     },
+    "Afk": {
+      "Title": {
+        "en": "Afk Status"
+      },
+      "SetAfk": {
+        "en": "You're now marked as afk. Next time you send a message, your afk status will be removed."
+      }
+    },
+    "Boop": {
+      "Other": {
+        "en": [
+          "{User1} boops {User2}! Adorable..",
+          "{User1} boops {User2}! So cute!"
+        ]
+      },
+      "Self": {
+        "en": [
+          "{User1}, i don't think thats how it works.."
+        ]
+      }
+    },
+    "Cuddle": {
+      "Other": {
+        "en": [
+          "{User1} cuddles with {User2}! {Emoji}"
+        ]
+      },
+      "Self": {
+        "en": [
+          "{User1}, i don't think thats how it works.."
+        ]
+      }
+    },
+    "HighFive": {
+      "Other": {
+        "en": [
+          "{User1} highfives {User2} That's the spirit. {Emoji}"
+        ]
+      },
+      "Self": {
+        "en": [
+          "{User1}, are you trying to clap..?"
+        ]
+      }
+    },
+    "Hug": {
+      "Other": {
+        "en": [
+          "{User1} hugs {User2}! How sweet! {Emoji}",
+          "{User1} gives {User2} a big fat hug! {Emoji}",
+          "{User2}, watch out! {User1} is coming to squeeze you tight! {Emoji}"
+        ]
+      },
+      "Self": {
+        "en": [
+          "There, there.. I'll hug you {User1} {Emoji}",
+          "Does no one else hug you, {User1}? There, there.. I'll hug you.. {Emoji}",
+          "There, there.. I'll hug you {User1}. {Emoji} Sorry if i'm a bit cold, i'm not human y'know.. {Emoji}",
+          "You look lonely there, {User1}.."
+        ]
+      }
+    },
+    "Kill": {
+      "Other": {
+        "en": [
+          "{User1} kills {User2}! That looks like it hurt.. {Emoji}",
+          "{User1} kills {User2}! Ouch.. {Emoji}"
+        ]
+      },
+      "Self": {
+        "en": [
+          "Come on, {User1}. There's no need to be so hard on yourself!",
+          "Come on, {User1}.. This isn't a solution is it?"
+        ]
+      }
+    },
+    "Kiss": {
+      "Other": {
+        "en": [
+          "{User1} kisses {User2}! {Emoji}"
+        ]
+      },
+      "Self": {
+        "en": [
+          "{User1}, i don't think that's how it works.."
+        ]
+      }
+    },
+    "Pat": {
+      "Other": {
+        "en": [
+          "{User1} gives {User2} headpats!"
+        ]
+      },
+      "Self": {
+        "en": [
+          "There, there.. I'll give you some headpats, {User1} {Emoji}",
+          "I'll give you some headpats, {User1}.. {Emoji}",
+          "You look lonely there, {User1}.."
+        ]
+      }
+    },
+    "Slap": {
+      "Other": {
+        "en": [
+          "{User1} slaps {User2}! That looks like it hurt.. {Emoji}"
+        ]
+      },
+      "Self": {
+        "en": [
+          "Come on, {User1}. There's no need to be so hard on yourself!",
+          "Bad {User1}! I don't know what you did but bad!"
+        ]
+      }
+    },
     "PrefixConfigCommand": {
       "Title": {
         "en": "Prefix Commands",

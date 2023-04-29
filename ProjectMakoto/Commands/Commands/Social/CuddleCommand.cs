@@ -11,21 +11,14 @@ internal class CuddleCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases =
-            {
-                $"%1 cuddles with %2! {ctx.Bot.status.LoadedConfig.Emojis.Cuddle}",
-            };
-
-            string[] self_phrases =
-            {
-                "%1, i don't think that's how it works..",
-            };
+            string[] phrases = GetGuildString(t.Commands.Cuddle.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Cuddle.Self);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Replace("{User1}", ctx.User.Username),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -36,7 +29,7 @@ internal class CuddleCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = phrases.SelectRandom().Replace("{User1}", ctx.User.Mention).Replace("{User2}", user.Mention).Replace("{Emoji}", ctx.Bot.status.LoadedConfig.Emojis.Cuddle).Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

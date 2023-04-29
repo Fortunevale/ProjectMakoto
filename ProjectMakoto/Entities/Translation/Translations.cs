@@ -492,6 +492,69 @@ public class Translations
             }
         }
 
+        public afk Afk;
+        public class afk
+        {
+            public SingleTranslationKey Title;
+            public SingleTranslationKey SetAfk;
+        }
+
+        public boop Boop;
+        public class boop
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+        
+        public cuddle Cuddle;
+        public class cuddle
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+
+        public highFive HighFive;
+        public class highFive
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+
+        public hug Hug;
+        public class hug
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+
+        public kill Kill;
+        public class kill
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+
+        public kiss Kiss;
+        public class kiss
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+
+        public pat Pat;
+        public class pat
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+        
+        public slap Slap;
+        public class slap
+        {
+            public MultiTranslationKey Other;
+            public MultiTranslationKey Self;
+        }
+
         public prefixConfig PrefixConfigCommand;
         public class prefixConfig
         {
