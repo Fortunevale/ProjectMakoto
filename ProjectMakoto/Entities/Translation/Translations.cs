@@ -450,6 +450,13 @@ public class Translations
                 public SingleTranslationKey Success;
                 public SingleTranslationKey VictimMessage;
             }
+
+            public kick Kick;
+            public class kick
+            {
+                public SingleTranslationKey CannotKickSelf;
+                public SingleTranslationKey Success;
+            }
         }
 
         public prefixConfig PrefixConfigCommand;

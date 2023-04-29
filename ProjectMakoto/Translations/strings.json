@@ -1209,6 +1209,14 @@
         "VictimMessage": {
           "en": "{User} has invited you to join {Channel}."
         }
+      },
+      "Kick": {
+        "CannotKickSelf": {
+          "en": "You cannot kick yourself."
+        },
+        "Success": {
+          "en": "{User} has been kicked from this channel."
+        }
       }
     },
     "PrefixConfigCommand": {
