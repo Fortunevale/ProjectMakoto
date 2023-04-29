@@ -1163,6 +1163,9 @@
       "VictimNotPresent": {
         "en": "{User} is not in your Voice Channel."
       },
+      "VictimIsBot": {
+        "en": "{User} is a bot."
+      },
       "Ban": {
         "CannotBanSelf": {
           "en": "You cannot ban yourself."
@@ -1172,6 +1175,17 @@
         },
         "VictimBanned": {
           "en": "{User} has been banned from this channel."
+        }
+      },
+      "ChangeOwner": {
+        "AlreadyOwner": {
+          "en": "{User} is already the owner."
+        },
+        "ForceAssign": {
+          "en": "{User} was forcefully assigned as the new owner of this channel."
+        },
+        "Success": {
+          "en": "{User} now owns this channel."
         }
       }
     },

@@ -417,6 +417,7 @@ public class Translations
             public SingleTranslationKey NotAVccChannel;
             public SingleTranslationKey NotAVccChannelOwner;
             public SingleTranslationKey VictimNotPresent;
+            public SingleTranslationKey VictimIsBot;
             
             public ban Ban;
             public class ban
@@ -424,6 +425,13 @@ public class Translations
                 public SingleTranslationKey CannotBanSelf;
                 public SingleTranslationKey VictimAlreadyBanned;
                 public SingleTranslationKey VictimBanned;
+            }
+
+            public changeOwner ChangeOwner;
+            public class changeOwner
+            {
+                public SingleTranslationKey AlreadyOwner;
+                public SingleTranslationKey ForceAssign;
             }
         }
 

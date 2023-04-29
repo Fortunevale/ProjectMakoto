@@ -26,13 +26,13 @@ internal class ChangeOwnerCommand : BaseCommand
 
             if (victim.IsBot)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `is a bot.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.VictimIsBot).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention}  `is already the owner.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.ChangeOwner.AlreadyOwner).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
@@ -41,16 +41,16 @@ internal class ChangeOwnerCommand : BaseCommand
                 if (ctx.Member.Permissions.HasPermission(Permissions.ManageChannels))
                 {
                     ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId = victim.Id;
-                    _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Forcefully assigned` {victim.Mention} `as the new owner of this channel.`").AsSuccess(ctx));
+                    _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.ChangeOwner.ForceAssign).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
                     return;
                 }
 
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You don't own this channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
                 return;
             }
 
             ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId = victim.Id;
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `now owns this channel.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.ChangeOwner.Success).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
         });
     }
 }
