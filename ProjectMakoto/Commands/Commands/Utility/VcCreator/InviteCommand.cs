@@ -36,6 +36,12 @@ internal class InviteCommand : BaseCommand
                 return;
             }
 
+            if (victim.IsBot)
+            {
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.VictimIsBot).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
+                return;
+            }
+
             await channel.AddOverwriteAsync(victim, Permissions.UseVoice);
 
             try
