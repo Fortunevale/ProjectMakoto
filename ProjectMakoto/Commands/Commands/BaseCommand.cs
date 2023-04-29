@@ -58,7 +58,13 @@ public abstract class BaseCommand
         if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].CurrentLocale != ctx.User.Locale)
         {
             ctx.Bot.users[ctx.User.Id].CurrentLocale = ctx.User.Locale;
-            _logger.LogDebug("Updated language for '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
+            _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
+        }
+
+        if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
+        {
+            ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale = ctx.Guild.PreferredLocale;
+            _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", ctx.Guild.Id, ctx.Guild.PreferredLocale);
         }
 
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))

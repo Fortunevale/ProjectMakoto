@@ -731,4 +731,90 @@ public class ConfigurationPrefixCommands : BaseCommandModule
             }).Add(_bot.watcher, ctx);
         }
     }
+
+    [Group("guild-prefix"),
+    CommandModule("configuration"),
+    Description("Allows you to review and change settings related to the guild's prefix.")]
+    public class GuildPrefix : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "", "", "");
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "", "", "");
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"), 
+        Description("Allows you to review settings related to the guild's prefix.")]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.PrefixCommand.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows you to change settings related to the guild's prefix.")]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.PrefixCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
+
+    [Group("guild-language"),
+    CommandModule("configuration"),
+    Description("Allows you to review and change settings related to the guild's selected language.")]
+    public class GuildLanguage : BaseCommandModule
+    {
+        public Bot _bot { private get; set; }
+
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
+                    return;
+
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "", "", "");
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, "", "", "");
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("review"), Aliases("list"),
+        Description("Allows you to review currently used settings related to the guild's selected language.")]
+        public async Task Review(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.GuildLanguage.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("config"), Aliases("configure", "settings", "list", "modify"),
+        Description("Allows you to change currently used settings related to the guild's selected language.")]
+        public async Task Config(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.GuildLanguage.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
 }

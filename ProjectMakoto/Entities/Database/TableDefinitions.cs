@@ -347,6 +347,12 @@ public class TableDefinitions
 
         [Collation("utf8_unicode_ci")]
         public LongText crosspost_ratelimits { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text current_locale { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text override_locale { get; set; }
     }
 
     public class guild_users

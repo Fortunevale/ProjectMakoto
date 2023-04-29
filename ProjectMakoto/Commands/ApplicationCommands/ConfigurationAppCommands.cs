@@ -423,6 +423,30 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
+    [SlashCommandGroup("guild-language", "Allows you to review and change settings related to the guild's selected language.")]
+    public class GuildLanguage : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review currently used settings related to the guild's selected language.")]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.GuildLanguage.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to change currently used settings related to the guild's selected language.")]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.GuildLanguage.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
+
     [SlashCommandGroup("guild-prefix", "Allows you to review and change settings related to the guild's prefix.")]
     public class GuildPrefix : ApplicationCommandsModule
     {

@@ -31,8 +31,11 @@ internal class DatabaseInit
             var DbGuild = new Guild(b.serverid, _bot);
             _bot.guilds.Add(b.serverid, DbGuild);
 
-            DbGuild.Prefix = b.prefix;
-            DbGuild.PrefixDisabled = b.prefix_disabled;
+            DbGuild.PrefixSettings = new(DbGuild)
+            {
+                Prefix = b.prefix,
+                PrefixDisabled = b.prefix_disabled
+            };
 
             DbGuild.TokenLeakDetection = new(DbGuild)
             {
@@ -160,6 +163,9 @@ internal class DatabaseInit
             DbGuild.ActionLog.ProcessedAuditLogs = JsonConvert.DeserializeObject<ObservableList<ulong>>(b.auditlogcache) ?? new();
             DbGuild.ReactionRoles = JsonConvert.DeserializeObject<List<KeyValuePair<ulong, ReactionRoleEntry>>>(b.reactionroles) ?? new();
             DbGuild.AutoUnarchiveThreads = JsonConvert.DeserializeObject<List<ulong>>(b.autounarchivelist) ?? new();
+
+            DbGuild.CurrentLocale = b.current_locale;
+            DbGuild.OverrideLocale = b.override_locale;
         }
         _logger.LogDebug("Loaded {Count} guilds", _bot.guilds.Count);
 

@@ -23,9 +23,10 @@ public class Guild
         MusicModule = new(this);
         Polls = new(this, bot);
         VcCreator = new(this, bot);
+        PrefixSettings = new(this);
     }
 
-    private Bot _bot { get; set; }
+    public Bot _bot { get; set; }
     public ulong ServerId { get; set; }
 
     public TokenLeakDetectionSettings TokenLeakDetection { get; set; }
@@ -42,6 +43,7 @@ public class Guild
     public EmbedMessageSettings EmbedMessage { get; set; }
     public PollSettings Polls { get; set; }
     public VcCreatorSettings VcCreator { get; set; }
+    public PrefixSettings PrefixSettings { get; set; }
 
     public List<ulong> AutoUnarchiveThreads { get; set; } = new();
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
@@ -51,23 +53,6 @@ public class Guild
 
     public Lavalink MusicModule { get; set; }
 
-    private string _Prefix { get; set; } = "";
-    public string Prefix
-    {
-        get => _Prefix.IsNullOrWhiteSpace() ? _bot.Prefix : _Prefix; set
-        {
-            _Prefix = value.IsNullOrWhiteSpace() ? _bot.Prefix : value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", ServerId, "prefix", value, Bot.DatabaseClient.mainDatabaseConnection);
-        }
-    }
-    
-    private bool _PrefixDisabled { get; set; } = false;
-    public bool PrefixDisabled
-    {
-        get => _PrefixDisabled; set
-        {
-            _PrefixDisabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", ServerId, "prefix_disabled", value, Bot.DatabaseClient.mainDatabaseConnection);
-        }
-    }
+    public string? CurrentLocale { get; set; } = null;
+    public string? OverrideLocale { get; set; } = null;
 }

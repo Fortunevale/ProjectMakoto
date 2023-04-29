@@ -1090,11 +1090,11 @@ public class Bot
             //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
             //        return -1;
 
-            string currentPrefix = guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.Prefix : Prefix;
+            string currentPrefix = guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.PrefixSettings.Prefix : Prefix;
 
             int CommandStart = -1;
 
-            if (!(guild?.PrefixDisabled ?? false))
+            if (!(guild?.PrefixSettings.PrefixDisabled ?? false))
                 CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, currentPrefix);
 
             if (CommandStart == -1)

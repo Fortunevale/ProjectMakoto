@@ -16,7 +16,7 @@ internal class ConfigCommand : BaseCommand
                 Description = PrefixCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, GetString(t.Commands.PrefixConfigCommand.Title));
 
-            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
+            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
             var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -38,7 +38,7 @@ internal class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].PrefixDisabled = !ctx.Bot.guilds[ctx.Guild.Id].PrefixDisabled;
+                ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled = !ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -46,7 +46,7 @@ internal class ConfigCommand : BaseCommand
             {
                 var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
 
-                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.Prefix));
+                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
 
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
@@ -73,7 +73,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].Prefix = newPrefix;
+                ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.Prefix = newPrefix;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }

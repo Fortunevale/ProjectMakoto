@@ -380,8 +380,11 @@ internal class DatabaseClient
             {
                 serverid = x.Key,
 
-                prefix = x.Value.Prefix,
-                prefix_disabled = x.Value.PrefixDisabled,
+                current_locale = x.Value.CurrentLocale,
+                override_locale = x.Value.OverrideLocale,
+
+                prefix = x.Value.PrefixSettings.Prefix,
+                prefix_disabled = x.Value.PrefixSettings.PrefixDisabled,
 
                 experience_use = x.Value.Experience.UseExperience,
                 experience_boost_bumpreminder = x.Value.Experience.BoostXpForBumpReminder,

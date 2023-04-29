@@ -24,6 +24,24 @@ public class MultiTranslationKey : IDictionary<string, string[]>
 
         return t[Locale];
     }
+    
+    public string[] Get(Guild user)
+    {
+        string? Locale;
+
+        if (!user.OverrideLocale.IsNullOrWhiteSpace())
+            Locale = user.OverrideLocale;
+        else
+            Locale = user.CurrentLocale;
+
+        if (Locale is null || !t.ContainsKey(Locale))
+            Locale = "en";
+
+        if (!t.ContainsKey(Locale))
+            return new string[] { "Missing Translation. Please report to the developer." };
+
+        return t[Locale];
+    }
 
     public string[] Get(DiscordGuild guild)
     {

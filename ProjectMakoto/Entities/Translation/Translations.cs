@@ -503,5 +503,15 @@ public class Translations
             public SingleTranslationKey NewPrefixModalTitle;
             public SingleTranslationKey NewPrefix;
         }
+
+        public guildlanguage GuildLanguage;
+        public class guildlanguage
+        {
+            public SingleTranslationKey Title;
+            public SingleTranslationKey Disclaimer;
+            public SingleTranslationKey Response;
+            public SingleTranslationKey DisableOverride;
+            public SingleTranslationKey Selector;
+        }
     }
 }

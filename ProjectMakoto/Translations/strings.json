@@ -1282,6 +1282,28 @@
         "en": "New Prefix",
         "de": "Neues Prefix"
       }
+    },
+    "GuildLanguage": {
+      "Title": {
+        "en": "Guild Language",
+        "de": "Serversprache"
+      },
+      "Disclaimer": {
+        "en": "You can choose to override the chosen language on this Discord server.",
+        "de": "Du kannst dich dazu entscheiden die gewählte Sprache auf diesem Discordserver zu überschreiben."
+      },
+      "Response": {
+        "en": "Current Locale",
+        "de": "Aktuelle Sprache"
+      },
+      "DisableOverride": {
+        "en": "Disable the current override",
+        "de": "Aktuelles Override deaktivieren"
+      },
+      "Selector": {
+        "en": "Select a new language..",
+        "de": "Eine neue Sprache wählen.. "
+      }
     }
   }
 }

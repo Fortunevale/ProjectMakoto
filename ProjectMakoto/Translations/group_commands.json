@@ -1047,6 +1047,37 @@
     ]
   },
   {
+    "name": "guild-language",
+    "description": "Allows you to review and change settings related to the guild's selected language.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": {
+      "de": "Erlaubt es dir die aktuelle Konfiguration für die Serversprache anzusehen oder zu bearbeiten."
+    },
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently used settings related to the guild's selected language.",
+        "name_translations": {
+          "de": "ansehen"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir die aktuelle Konfiguration der Serversprache anzusehen."
+        }
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to the guild's selected language.",
+        "name_translations": {
+          "de": "bearbeiten"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir die aktuelle Konfiguration der Serversprache zu bearbeiten."
+        }
+      }
+    ]
+  },
+  {
     "name": "scoresaber",
     "description": "Interact with the ScoreSaber API.",
     "type": 1,
