@@ -26,13 +26,13 @@ internal class UnbanCommand : BaseCommand
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `is not banned from your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Unban.VictimNotBanned).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
             ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Remove(victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.None);
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `has been unbanned from this channel.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Unban.VictimUnbanned).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
         });
     }
 }

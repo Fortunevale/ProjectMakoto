@@ -483,6 +483,13 @@ public class Translations
             {
                 public SingleTranslationKey Success;
             }
+
+            public unban Unban;
+            public class unban
+            {
+                public SingleTranslationKey VictimNotBanned;
+                public SingleTranslationKey VictimUnbanned;
+            }
         }
 
         public prefixConfig PrefixConfigCommand;

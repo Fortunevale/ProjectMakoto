@@ -1243,6 +1243,14 @@
         "Success": {
           "en": "The channel has been opened."
         }
+      },
+      "Unban": {
+        "VictimNotBanned": {
+          "en": "{User} is not banned from your Voice Channel."
+        },
+        "VictimUnbanned": {
+          "en": "{User} has been unbanned from this channel."
+        }
       }
     },
     "PrefixConfigCommand": {
