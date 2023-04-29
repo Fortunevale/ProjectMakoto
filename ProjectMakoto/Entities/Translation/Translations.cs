@@ -440,6 +440,16 @@ public class Translations
             {
                 public SingleTranslationKey Success;
             }
+
+            public invite Invite;
+            public class invite
+            {
+                public SingleTranslationKey CannotInviteSelf;
+                public SingleTranslationKey AlreadyPresent;
+                public SingleTranslationKey PartialSuccess;
+                public SingleTranslationKey Success;
+                public SingleTranslationKey VictimMessage;
+            }
         }
 
         public prefixConfig PrefixConfigCommand;

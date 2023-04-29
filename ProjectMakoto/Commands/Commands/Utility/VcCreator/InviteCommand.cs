@@ -26,13 +26,13 @@ internal class InviteCommand : BaseCommand
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You cannot invite yourself.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Invite.CannotInviteSelf)}`").AsError(ctx));
                 return;
             }
 
             if (channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `is already in your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Invite.AlreadyPresent).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
@@ -40,15 +40,15 @@ internal class InviteCommand : BaseCommand
 
             try
             {
-                await victim.SendMessageAsync($"{ctx.User.Mention} has invited you to join {channel.Mention}.");
+                await victim.SendMessageAsync($"{t.Commands.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.users[victim.Id]).Replace("{User}", $"{ctx.User.Mention}`").Replace("{Channel}", $"`{channel.Mention}`")}`");
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `can now join this channel. However, i was unable to send a Direct Message to them.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Invite.PartialSuccess).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `has been invited to this channel.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Invite.Success).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
         });
     }
 }

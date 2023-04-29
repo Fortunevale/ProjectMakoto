@@ -1192,6 +1192,23 @@
         "Success": {
           "en": "The channel has been closed."
         }
+      },
+      "Invite": {
+        "CannotInviteSelf": {
+          "en": "You cannot invite yourself."
+        },
+        "AlreadyPresent": {
+          "en": "{User} is already in your Voice Channel."
+        },
+        "PartialSuccess": {
+          "en": "{User} can now join this channel. However, i was unable to send a Direct Message to them."
+        },
+        "Success": {
+          "en": "{User} has been invited to this channel."
+        },
+        "VictimMessage": {
+          "en": "{User} has invited you to join {Channel}."
+        }
       }
     },
     "PrefixConfigCommand": {
