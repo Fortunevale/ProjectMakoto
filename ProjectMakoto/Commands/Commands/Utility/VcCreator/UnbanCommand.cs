@@ -14,25 +14,25 @@ internal class UnbanCommand : BaseCommand
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannel)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannel)}`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
                 return;
             }
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Unban.VictimNotBanned).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.Utility.VoiceChannelCreator.Unban.VictimNotBanned).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
             ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Remove(victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.None);
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Unban.VictimUnbanned).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.Utility.VoiceChannelCreator.Unban.VictimUnbanned).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
         });
     }
 }

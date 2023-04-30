@@ -11,8 +11,8 @@ internal class CuddleCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = GetGuildString(t.Commands.Cuddle.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Cuddle.Self);
+            string[] phrases = GetGuildString(t.Commands.Social.Cuddle.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Social.Cuddle.Self);
 
             if (ctx.Member.Id == user.Id)
             {

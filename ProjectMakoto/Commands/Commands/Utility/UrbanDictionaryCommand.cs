@@ -15,7 +15,7 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.UrbanDictionary.AdultContentError)}`"
+                    Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.AdultContentError)}`"
                 }.AsError(ctx));
                 return;
             }
@@ -25,7 +25,7 @@ internal class UrbanDictionaryCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.UrbanDictionary.AdultContentWarning)}`"
+                Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.AdultContentWarning)}`"
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
@@ -42,14 +42,14 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.UrbanDictionary.LookingUp).Replace("{Term}", term)}`"
+                    Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.LookingUp).Replace("{Term}", term)}`"
                 }.AsLoading(ctx));
 
                 if (term.IsNullOrWhiteSpace())
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
+                        Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
                     }.AsError(ctx));
                     return;
                 }
@@ -72,7 +72,7 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
+                        Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
                     }.AsError(ctx));
                     return;
                 }
@@ -94,17 +94,17 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.UrbanDictionary.NotExist).Replace("{Term}", term)}`"
+                        Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.NotExist).Replace("{Term}", term)}`"
                     }.AsError(ctx));
                     return;
                 }
 
                 var embeds = Definitions.Take(3).Select(x => new DiscordEmbedBuilder
                 {
-                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.UrbanDictionary.WrittenBy).Replace("{Author}", x.author)}",
-                    Description = $"**{GetString(t.Commands.UrbanDictionary.Definition)}**\n\n" +
+                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.Utility.UrbanDictionary.WrittenBy).Replace("{Author}", x.author)}",
+                    Description = $"**{GetString(t.Commands.Utility.UrbanDictionary.Definition)}**\n\n" +
                                   $"{x.definition.Replace("[", "").Replace("]", "")}\n\n" +
-                                  $"**{GetString(t.Commands.UrbanDictionary.Example)}**\n\n" +
+                                  $"**{GetString(t.Commands.Utility.UrbanDictionary.Example)}**\n\n" +
                                   $"{x.example.Replace("[", "").Replace("]", "")}\n\n" +
                                   $"👍 `{x.thumbs_up}` | 👎 `{x.thumbs_down}` | 🕒 {Formatter.Timestamp(x.written_on, TimestampFormat.LongDateTime)}",
                     Url = x.permalink

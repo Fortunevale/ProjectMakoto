@@ -14,31 +14,31 @@ internal class InviteCommand : BaseCommand
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannel)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannel)}`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.Invite.CannotInviteSelf)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.VoiceChannelCreator.Invite.CannotInviteSelf)}`").AsError(ctx));
                 return;
             }
 
             if (channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Invite.AlreadyPresent).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.Utility.VoiceChannelCreator.Invite.AlreadyPresent).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
             if (victim.IsBot)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.VictimIsBot).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.Utility.VoiceChannelCreator.VictimIsBot).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
@@ -46,15 +46,15 @@ internal class InviteCommand : BaseCommand
 
             try
             {
-                await victim.SendMessageAsync($"{t.Commands.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.users[victim.Id]).Replace("{User}", $"{ctx.User.Mention}`").Replace("{Channel}", $"`{channel.Mention}`")}`");
+                await victim.SendMessageAsync($"{t.Commands.Utility.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.users[victim.Id]).Replace("{User}", $"{ctx.User.Mention}`").Replace("{Channel}", $"`{channel.Mention}`")}`");
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Invite.PartialSuccess).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.Utility.VoiceChannelCreator.Invite.PartialSuccess).Replace("{User}", $"{victim.Mention}`")}`").AsError(ctx));
                 return;
             }
 
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.VoiceChannelCreator.Invite.Success).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(t.Commands.Utility.VoiceChannelCreator.Invite.Success).Replace("{User}", $"{victim.Mention}`")}`").AsSuccess(ctx));
         });
     }
 }

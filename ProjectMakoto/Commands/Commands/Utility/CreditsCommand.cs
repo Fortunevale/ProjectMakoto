@@ -11,7 +11,7 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Credits.Fetching)}`"
+                Description = $"`{GetString(t.Commands.Utility.Credits.Fetching)}`"
             }.AsBotLoading(ctx));
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
@@ -30,7 +30,7 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Credits.Credits)
+                Description = GetString(t.Commands.Utility.Credits.Credits)
                 .Replace("{BotName}", ctx.CurrentUser.Username)
                 .Replace("{Developer}", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))")
                 .Replace("{DiscordStaffList}", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.UsernameWithDiscriminator}`]({x.ProfileUrl})")))

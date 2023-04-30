@@ -22,8 +22,8 @@ internal class AfkCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{ctx.User.Mention} `{GetString(t.Commands.Afk.SetAfk)}`"
-            }.AsSuccess(ctx, GetString(t.Commands.Afk.Title)));
+                Description = $"{ctx.User.Mention} `{GetString(t.Commands.Social.Afk.SetAfk)}`"
+            }.AsSuccess(ctx, GetString(t.Commands.Social.Afk.Title)));
             await Task.Delay(10000);
             _ = ctx.ResponseMessage.DeleteAsync();
         });

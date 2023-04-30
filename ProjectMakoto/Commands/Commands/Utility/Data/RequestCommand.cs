@@ -13,14 +13,14 @@ internal class RequestCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Data.Request.TimeError).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)}`").Replace("{WaitTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)}`")}`"
+                    Description = $"`{GetString(t.Commands.Utility.Data.Request.TimeError).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)}`").Replace("{WaitTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)}`")}`"
                 }.AsError(ctx));
                 return;
             }
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Data.Request.Fetching)}`"
+                Description = $"`{GetString(t.Commands.Utility.Data.Request.Fetching)}`"
             }.AsLoading(ctx));
 
             RequestData requestData = new();
@@ -46,7 +46,7 @@ internal class RequestCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
+                        Description = $"`{GetString(t.Commands.Utility.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                     }.AsSuccess(ctx)).WithFile("userdata.json", stream));
                     ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
                     break;
@@ -57,7 +57,7 @@ internal class RequestCommand : BaseCommand
                     {
                         await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
+                            Description = $"`{GetString(t.Commands.Utility.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));
                         ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
 

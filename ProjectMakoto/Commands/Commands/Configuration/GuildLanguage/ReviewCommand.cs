@@ -14,7 +14,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = GuildLanguageCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.GuildLanguage.Title)));
+            }.AsInfo(ctx, GetString(t.Commands.Config.GuildLanguage.Title)));
         });
     }
 }

@@ -14,8 +14,8 @@ internal class HugCommand : BaseCommand
             string[] PositiveEmojis = { "♥", ctx.Bot.status.LoadedConfig.Emojis.Hug };
             string[] NegativeEmojis = { "😢", "😓" };
 
-            string[] phrases = GetGuildString(t.Commands.Hug.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Hug.Self);
+            string[] phrases = GetGuildString(t.Commands.Social.Hug.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Social.Hug.Self);
 
             if (ctx.Member.Id == user.Id)
             {

@@ -11,8 +11,8 @@ internal class BoopCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = GetGuildString(t.Commands.Boop.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Boop.Self);
+            string[] phrases = GetGuildString(t.Commands.Social.Boop.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Social.Boop.Self);
 
             if (ctx.Member.Id == user.Id)
             {

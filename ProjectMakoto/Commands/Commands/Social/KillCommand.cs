@@ -11,8 +11,8 @@ internal class KillCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = GetGuildString(t.Commands.Kill.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Kill.Self);
+            string[] phrases = GetGuildString(t.Commands.Social.Kill.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Social.Kill.Self);
 
             if (ctx.Member.Id == user.Id)
             {

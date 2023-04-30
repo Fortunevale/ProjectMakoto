@@ -14,10 +14,10 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = PrefixCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(t.Commands.PrefixConfigCommand.Title));
+            }.AsAwaitingInput(ctx, GetString(t.Commands.Config.PrefixConfigCommand.Title));
 
-            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
-            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
+            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
+            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -44,9 +44,9 @@ internal class ConfigCommand : BaseCommand
             }
             else if (Button.GetCustomId() == ChangePrefix.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
+                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
 
-                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
+                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.Config.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
 
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 

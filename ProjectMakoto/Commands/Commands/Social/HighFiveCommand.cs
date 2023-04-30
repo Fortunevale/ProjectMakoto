@@ -11,8 +11,8 @@ internal class HighFiveCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = GetGuildString(t.Commands.HighFive.Other);
-            string[] self_phrases = GetGuildString(t.Commands.HighFive.Self);
+            string[] phrases = GetGuildString(t.Commands.Social.HighFive.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Social.HighFive.Self);
 
             if (ctx.Member.Id == user.Id)
             {

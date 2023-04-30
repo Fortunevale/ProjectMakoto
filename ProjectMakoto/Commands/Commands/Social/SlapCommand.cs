@@ -11,8 +11,8 @@ internal class SlapCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = GetGuildString(t.Commands.Slap.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Slap.Self);
+            string[] phrases = GetGuildString(t.Commands.Social.Slap.Other);
+            string[] self_phrases = GetGuildString(t.Commands.Social.Slap.Self);
 
             if (ctx.Member.Id == user.Id)
             {

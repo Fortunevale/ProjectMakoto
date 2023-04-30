@@ -11,12 +11,12 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit((new DiscordEmbedBuilder()
             {
                 Description = GuildLanguageCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(t.Commands.GuildLanguage.Title))));
+            }.AsAwaitingInput(ctx, GetString(t.Commands.Config.GuildLanguage.Title))));
 
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.GuildLanguage.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Config.GuildLanguage.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
 
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
@@ -65,7 +65,7 @@ internal class ConfigCommand : BaseCommand
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.GuildLanguage.Selector));
+            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Config.GuildLanguage.Selector));
 
             if (SelectionResult.TimedOut)
             {
