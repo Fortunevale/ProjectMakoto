@@ -1461,6 +1461,9 @@
         "GraphDays": {
           "en": "{Count} days ago"
         },
+        "GraphToday": {
+          "en": "Today"
+        },
         "Placement": {
           "en": "Placement"
         },
