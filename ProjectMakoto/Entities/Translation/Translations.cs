@@ -111,17 +111,17 @@ public class Translations
             public SingleTranslationKey Unknown;
         }
 
-        public help Help;
-        public class help
-        {
-            public SingleTranslationKey Module;
-            public SingleTranslationKey Disclaimer;
-            public SingleTranslationKey MissingCommand;
-        }
-
         public utilityCommands Utility;
         public class utilityCommands
         {
+            public help Help;
+            public class help
+            {
+                public SingleTranslationKey Module;
+                public SingleTranslationKey Disclaimer;
+                public SingleTranslationKey MissingCommand;
+            }
+
             public avatar Avatar;
             public class avatar
             {
