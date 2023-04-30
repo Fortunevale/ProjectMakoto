@@ -15,14 +15,14 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"{ctx.User.Mention} `Unlinked your Score Saber Profile from your Discord Account`"
+                    Description = $"`{GetString(t.Commands.ScoreSaber.Unlink.Unlinked)}`"
                 }.AsSuccess(ctx, "Score Saber")));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"{ctx.User.Mention} `There is no Score Saber Profile linked to your Discord Account.`"
+                    Description = $"`{GetString(t.Commands.ScoreSaber.Unlink.NoLink)}`"
                 }.AsError(ctx, "Score Saber")));
             }
         });

@@ -1511,6 +1511,14 @@
         "NoSearchResult": {
           "en": "Couldn't find any player with the specified criteria."
         }
+      },
+      "Unlink": {
+        "Unlinked": {
+          "en": "Unlinked your Score Saber Profile from your Discord Account."
+        },
+        "NoLink": {
+          "en": "There is no Score Saber Profile linked to your Discord Account."
+        }
       }
     },
     "Config": {

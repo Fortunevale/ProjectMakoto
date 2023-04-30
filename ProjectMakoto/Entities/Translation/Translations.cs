@@ -624,6 +624,13 @@ public class Translations
                 public SingleTranslationKey FoundCount;
                 public SingleTranslationKey NoSearchResult;
             }
+
+            public unlink Unlink;
+            public class unlink
+            {
+                public SingleTranslationKey Unlinked;
+                public SingleTranslationKey NoLink;
+            }
         }
 
         public configurationCommands Config;
