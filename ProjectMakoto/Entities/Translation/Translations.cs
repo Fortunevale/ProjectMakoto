@@ -578,6 +578,35 @@ public class Translations
                 public SingleTranslationKey PageNotExist;
                 public SingleTranslationKey Profile;
             }
+
+            public profile Profile;
+            public class profile
+            {
+                public SingleTranslationKey InvalidInput;
+                public SingleTranslationKey NoUser;
+                public SingleTranslationKey NoProfile;
+                public SingleTranslationKey LoadingPlayer;
+                public SingleTranslationKey ShowProfile;
+                public SingleTranslationKey ShowTopScores;
+                public SingleTranslationKey ShowRecentScores;
+                public SingleTranslationKey LinkProfileToAccount;
+                public SingleTranslationKey OpenInBrowser;
+                public MultiTranslationKey LinkSuccessful;
+                public SingleTranslationKey TopScores;
+                public SingleTranslationKey RecentScores;
+                public SingleTranslationKey MapLeaderboard;
+                public SingleTranslationKey RankedPlayCount;
+                public SingleTranslationKey TotalRankedScore;
+                public SingleTranslationKey AverageRankedAccuracy;
+                public SingleTranslationKey TotalPlayCount;
+                public SingleTranslationKey TotalScore;
+                public SingleTranslationKey ReplaysWatched;
+                public SingleTranslationKey GraphDays;
+                public SingleTranslationKey GraphToday;
+                public SingleTranslationKey Placement;
+                public SingleTranslationKey UserDoesNotExist;
+                public SingleTranslationKey InvalidId;
+            }
         }
 
         public configurationCommands Config;

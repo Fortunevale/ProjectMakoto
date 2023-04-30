@@ -22,12 +22,12 @@ internal class ScoreSaberProfileCommand : BaseCommand
                     if (!string.IsNullOrWhiteSpace(id))
                     {
                         if (Regex.IsMatch(id, @"<@((!?)(\d*))>", RegexOptions.ExplicitCapture))
-                            user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@((!?)(\d*))>", RegexOptions.ExplicitCapture).Groups[3].Value));
+                            user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@((!?)(\d*))>").Groups[3].Value));
                         else
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = $"`Invalid input.`"
+                                Description = $"`{GetString(t.Commands.ScoreSaber.Profile.InvalidInput)}`"
                             }.AsError(ctx, "Score Saber")));
                             return;
                         }
@@ -39,7 +39,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`The user you tagged does not exist.`"
+                        Description = $"`{GetString(t.Commands.ScoreSaber.Profile.NoUser)}`"
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -53,7 +53,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`This user has no Score Saber Profile linked to their Discord Account.`"
+                        Description = $"`{GetString(t.Commands.ScoreSaber.Profile.NoProfile)}`"
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }

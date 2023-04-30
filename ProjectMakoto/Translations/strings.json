@@ -1396,6 +1396,80 @@
         "Profile": {
           "en": "Profile"
         }
+      },
+      "Profile": {
+        "InvalidInput": {
+          "en": "Input must be a scoresaber id or @user."
+        },
+        "NoUser": {
+          "en": "The user you tagged does not exist."
+        },
+        "NoProfile": {
+          "en": "This user has no Score Saber Profile linked to their Discord Account."
+        },
+        "LoadingPlayer": {
+          "en": "Loading player profile.."
+        },
+        "ShowProfile": {
+          "en": "Show Profile"
+        },
+        "ShowTopScores": {
+          "en": "Show Top Scores"
+        },
+        "ShowRecentScores": {
+          "en": "Show Recent Scores"
+        },
+        "LinkProfileToAccount": {
+          "en": "Link Score Saber Profile to Discord Account"
+        },
+        "OpenInBrowser": {
+          "en": "Open in browser"
+        },
+        "LinkSuccessful": {
+          "en": [
+            "Linked '{ProfileName}' ({ProfileId}) to your account. You can now run '{ProfileCommand}' without an argument to get your profile in an instant.",
+            "To remove the link, run '{UnlinkCommand}'."
+          ]
+        },
+        "TopScores": {
+          "en": "Top Scores"
+        },
+        "RecentScores": {
+          "en": "Recent Scores"
+        },
+        "MapLeaderboard": {
+          "en": "Map Leaderboard"
+        },
+        "RankedPlayCount": {
+          "en": "Ranked Play Count"
+        },
+        "TotalRankedScore": {
+          "en": "Total Ranked Score"
+        },
+        "AverageRankedAccuracy": {
+          "en": "Average Ranked Accuracy"
+        },
+        "TotalPlayCount": {
+          "en": "Total Play Count"
+        },
+        "TotalScore": {
+          "en": "Total Score"
+        },
+        "ReplaysWatched": {
+          "en": "Replays Watched By Others"
+        },
+        "GraphDays": {
+          "en": "{Count} days ago"
+        },
+        "Placement": {
+          "en": "Placement"
+        },
+        "UserDoesNotExist": {
+          "en": "Couldn't find the specified player."
+        },
+        "InvalidId": {
+          "en": "Please provide a scoresaber profile id."
+        }
       }
     },
     "Config": {
