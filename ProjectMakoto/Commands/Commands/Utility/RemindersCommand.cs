@@ -51,7 +51,7 @@ internal class RemindersCommand : BaseCommand
                     var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(t.Commands.Utility.Reminders.SetDateTime), (selectedDescription is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
                     var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Submit), (selectedDescription.IsNullOrWhiteSpace() || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-                    int padding = GenericExtensions.CalculatePadding(ctx.DbUser, t.Commands.Utility.Reminders.Description, t.Commands.Utility.Reminders.DateTime);
+                    int padding = TranslationUtil.CalculatePadding(ctx.DbUser, t.Commands.Utility.Reminders.Description, t.Commands.Utility.Reminders.DateTime);
 
                     var action_embed = new DiscordEmbedBuilder
                     {
