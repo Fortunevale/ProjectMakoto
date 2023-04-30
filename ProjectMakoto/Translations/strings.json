@@ -36,6 +36,10 @@
       "en": "Back",
       "de": "Zurück"
     },
+    "Page": {
+      "en": "Page",
+      "de": "Seite"
+    },
     "PreviousPage": {
       "en": "Previous Page",
       "de": "Vorherige Seite"
@@ -248,7 +252,7 @@
         "de": "Unbekannt"
       }
     },
-    "UtilityCommands": {
+    "Utility": {
       "Help": {
         "Module": {
           "en": "{Module} Commands",
@@ -1255,7 +1259,7 @@
         }
       }
     },
-    "SocialCommands": {
+    "Social": {
       "Afk": {
         "Title": {
           "en": "Afk Status"
@@ -1372,7 +1376,29 @@
         }
       }
     },
-    "ConfigurationCommands": {
+    "ScoreSaber": {
+      "InternalServerError": {
+        "en": "An internal server exception occurred. Please retry later."
+      },
+      "ForbiddenError": {
+        "en": "The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled."
+      },
+      "MapLeaderboard": {
+        "LoadingScoreboard": {
+          "en": "Looking for scoreboard.."
+        },
+        "ScoreboardNotExist": {
+          "en": "The requested scoreboard does not exist."
+        },
+        "PageNotExist": {
+          "en": "Page {Page} doesn't exist."
+        },
+        "Profile": {
+          "en": "Profile"
+        }
+      }
+    },
+    "Config": {
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

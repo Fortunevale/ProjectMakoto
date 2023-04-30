@@ -16,6 +16,7 @@ public class Translations
         public SingleTranslationKey Submit;
         public SingleTranslationKey Cancel;
         public SingleTranslationKey Back;
+        public SingleTranslationKey Page;
         public SingleTranslationKey PreviousPage;
         public SingleTranslationKey NextPage;
         public SingleTranslationKey NotSelected;
@@ -560,6 +561,22 @@ public class Translations
             {
                 public MultiTranslationKey Other;
                 public MultiTranslationKey Self;
+            }
+        }
+
+        public scoreSaberCommands ScoreSaber;
+        public class scoreSaberCommands
+        {
+            public SingleTranslationKey InternalServerError;
+            public SingleTranslationKey ForbiddenError;
+
+            public mapLeaderboard MapLeaderboard;
+            public class mapLeaderboard
+            {
+                public SingleTranslationKey LoadingScoreboard;
+                public SingleTranslationKey ScoreboardNotExist;
+                public SingleTranslationKey PageNotExist;
+                public SingleTranslationKey Profile;
             }
         }
 
