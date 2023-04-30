@@ -6,11 +6,15 @@ public static class TranslationUtil
 {
     /// <inheritdoc cref="Build(string, bool, TVar[])">/>
     internal static string Build(this string str)
-        => str.Build(false, null);
+        => str.Build(false, true, null);
 
     /// <inheritdoc cref="Build(string, bool, TVar[])">/>
     internal static string Build(this string str, params TVar[] vars)
-        => str.Build(false, vars);
+        => str.Build(false, true, vars);
+
+    /// <inheritdoc cref="Build(string, bool, TVar[])">/>
+    internal static string Build(this string str, bool Code = false, params TVar[] vars)
+        => str.Build(Code, true, vars);
 
     /// <summary>
     /// Build a translation string.
@@ -19,7 +23,7 @@ public static class TranslationUtil
     /// <param name="Code">Whether to embed the string as inline code</param>
     /// <param name="vars">A list of variables to replace.</param>
     /// <returns></returns>
-    internal static string Build(this string str, bool Code = false, params TVar[] vars)
+    internal static string Build(this string str, bool Code = false, bool Sanitize = true, params TVar[] vars)
     {
         if (str.IsNullOrEmpty())
             return str;
@@ -33,11 +37,17 @@ public static class TranslationUtil
 
             if (newText.StartsWith("<") && newText.EndsWith(">") && Code)
             {
-                str = str.Replace($"{{{b.ValName}}}", $"`{b.Replacement}`");
+                if (Sanitize)
+                    newText = newText.SanitizeForCode();
+
+                str = str.Replace($"{{{b.ValName}}}", $"`{newText}`");
                 continue;
             }
 
-            str = str.Replace($"{{{b.ValName}}}", b.Replacement);
+            if (Sanitize)
+                newText = newText.Sanitize();
+
+            str = str.Replace($"{{{b.ValName}}}", newText);
         }
 
         return str;
@@ -45,11 +55,11 @@ public static class TranslationUtil
 
     /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
     internal static string Build(this string[] array)
-        => array.Build(false, false, null);
+        => array.Build(false, false, true, null);
 
     /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
     internal static string Build(this string[] array, bool Code = false, params TVar[] Tvars)
-        => array.Build(Code, false, Tvars);
+        => array.Build(Code, false, true, Tvars);
 
     /// <summary>
     /// Builds a string array into a string, used for MultiTranslationKeys.
@@ -58,10 +68,10 @@ public static class TranslationUtil
     /// <param name="Code">Whether to prefix and suffix ` on non-empty lines.</param>
     /// <param name="UseBoldMarker">Whether to make lines prefixing ** bold.</param>
     /// <returns></returns>
-    internal static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false, params TVar[] Tvars)
+    internal static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false, bool Sanitize = true, params TVar[] Tvars)
         => string.Join("\n", array.Select(x =>
         {
-            var y = x.Build(Code, Tvars);
+            var y = x.Build(Code, Sanitize, Tvars);
 
             if (x.IsNullOrWhiteSpace())
                 return x;

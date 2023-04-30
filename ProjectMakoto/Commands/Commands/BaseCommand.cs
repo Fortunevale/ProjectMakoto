@@ -221,17 +221,67 @@ public abstract class BaseCommand
     }
     #endregion
 
-    public string GetString(SingleTranslationKey key) 
-        => key.Get(ctx.Bot.users[ctx.User.Id]);
+    #region GetString
+    public string GetString(SingleTranslationKey key)
+        => GetString(key, false, true, null);
 
-    public string[] GetString(MultiTranslationKey key) 
-        => key.Get(ctx.Bot.users[ctx.User.Id]);
+    public string GetString(SingleTranslationKey key, params TVar[] vars)
+        => GetString(key, false, true, vars);
+
+    public string GetString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
+        => GetString(key, Code, true, vars);
     
-    public string GetGuildString(SingleTranslationKey key) 
-        => key.Get(ctx.Guild);
+    public string GetString(SingleTranslationKey key, bool Code = false, bool Sanitize = true, params TVar[] vars)
+        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, Sanitize, vars);
 
-    public string[] GetGuildString(MultiTranslationKey key) 
-        => key.Get(ctx.Guild);
+
+
+    public string GetString(MultiTranslationKey key)
+        => GetString(key, false, false, true, null);
+
+    public string GetString(MultiTranslationKey key, params TVar[] vars)
+        => GetString(key, false, false, true, vars);
+
+    public string GetString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
+        => GetString(key, true, false, true, vars);
+
+    public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
+        => GetString(key, Code, UseBoldMarker, true, vars);
+
+    public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, bool Sanitize = true, params TVar[] vars)
+        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, UseBoldMarker, Sanitize, vars);
+
+
+
+    public string GetGuildString(SingleTranslationKey key)
+        => GetGuildString(key, false, true, null);
+
+    public string GetGuildString(SingleTranslationKey key, params TVar[] vars)
+        => GetGuildString(key, false, true, vars);
+
+    public string GetGuildString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
+        => GetGuildString(key, Code, true, vars);
+
+    public string GetGuildString(SingleTranslationKey key, bool Code = false, bool Sanitize = true, params TVar[] vars)
+        => key.Get(ctx.DbGuild).Build(Code, true, vars);
+
+
+
+    public string GetGuildString(MultiTranslationKey key)
+        => GetGuildString(key, false, false, true, null);
+
+    public string GetGuildString(MultiTranslationKey key, params TVar[] vars)
+        => GetGuildString(key, false, false, true, vars);
+
+    public string GetGuildString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
+        => GetGuildString(key, Code, false, true, vars);
+
+    public string GetGuildString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
+        => GetGuildString(key, Code, UseBoldMarker, true, vars);
+
+    public string GetGuildString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, bool Sanitize = true, params TVar[] vars)
+        => key.Get(ctx.DbGuild).Build(Code, UseBoldMarker, Sanitize, vars); 
+    #endregion
 
     #region Selections
     public async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
@@ -708,16 +758,16 @@ public abstract class BaseCommand
 
         var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", GetString(t.Commands.Common.Prompts.TimespanSeconds).Replace("{Max}", 59), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", GetString(t.Commands.Common.Prompts.TimespanSeconds).Build(new TVar("Max", 59)), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
 
         if (MaxTime.Value.TotalMinutes >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", GetString(t.Commands.Common.Prompts.TimespanMinutes).Replace("{Max}", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}")), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", GetString(t.Commands.Common.Prompts.TimespanMinutes).Build(new TVar("Max", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}"))), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
 
         if (MaxTime.Value.TotalHours >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", GetString(t.Commands.Common.Prompts.TimespanHours).Replace("{Max}", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}")), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", GetString(t.Commands.Common.Prompts.TimespanHours).Build(new TVar("Max", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}"))), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
 
         if (MaxTime.Value.TotalDays >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", GetString(t.Commands.Common.Prompts.TimespanDays).Replace("{Max}", ((int)MaxTime.Value.TotalDays)), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", GetString(t.Commands.Common.Prompts.TimespanDays).Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
         var ModalResult = await PromptModalWithRetry(interaction, modal, false);
 
@@ -985,43 +1035,43 @@ public abstract class BaseCommand
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"{ctx.CurrentUser.Username} Staff")
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", $"{ctx.CurrentUser.Username} Staff"))
         }.AsError(ctx));
 
     public void SendBotOwnerError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"<@{ctx.Bot.status.TeamOwner}>"),
+        Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", $"<@{ctx.Bot.status.TeamOwner}")),
     }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", "Administrator"),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", "Administrator")),
         }.AsError(ctx));
 
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", perms.ToPermissionString()),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", perms.ToPermissionString())),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.VoiceChannel)}`",
+            Description = GetString(t.Commands.Common.Errors.VoiceChannel).Build(true),
         }.AsError(ctx)));
 
     public void SendUserBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.UserBan).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
+            Description = GetString(t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(ctx)));
 
     public void SendGuildBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.GuildBan).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
+            Description = GetString(t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(ctx)));
 
     public void SendSourceError(Enums.CommandType commandType)
@@ -1029,11 +1079,11 @@ public abstract class BaseCommand
         {
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Common.Errors.ExclusiveApp)}`",
+                Description = GetString(t.Commands.Common.Errors.ExclusiveApp).Build(true),
             }.AsError(ctx)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Common.Errors.ExclusivePrefix)}`"
+                Description = GetString(t.Commands.Common.Errors.ExclusivePrefix).Build(true)
             }.AsError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
@@ -1041,7 +1091,7 @@ public abstract class BaseCommand
     public void SendDataError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.Data).Replace("{Command}", $"{ctx.Prefix}data delete")}`",
+            Description = GetString(t.Commands.Common.Errors.Data, true, new TVar("Command", $"{ctx.Prefix}data delete")),
         }.AsError(ctx)));
 
     public void SendDmError() 
@@ -1064,7 +1114,7 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.BotPermissions).Replace("{Required}", perms.ToPermissionString())
+            Description = GetString(t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToPermissionString()))
         }.AsError(ctx));
     }
 
