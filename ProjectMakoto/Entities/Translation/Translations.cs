@@ -607,6 +607,23 @@ public class Translations
                 public SingleTranslationKey UserDoesNotExist;
                 public SingleTranslationKey InvalidId;
             }
+
+            public search Search;
+            public class search
+            {
+                public SingleTranslationKey NoCountryFilter;
+                public SingleTranslationKey SelectContinentDropdown;
+                public SingleTranslationKey SelectCountryDropdown;
+                public SingleTranslationKey StartSearch;
+                public SingleTranslationKey NextStep;
+                public SingleTranslationKey SelectContinent;
+                public SingleTranslationKey SelectCountry;
+                public SingleTranslationKey SelectedCountry;
+                public SingleTranslationKey Searching;
+                public SingleTranslationKey SelectPlayer;
+                public SingleTranslationKey FoundCount;
+                public SingleTranslationKey NoSearchResult;
+            }
         }
 
         public configurationCommands Config;

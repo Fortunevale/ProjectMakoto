@@ -1473,6 +1473,44 @@
         "InvalidId": {
           "en": "Please provide a scoresaber profile id."
         }
+      },
+      "Search": {
+        "NoCountryFilter": {
+          "en": "No country filter (may load much longer)"
+        },
+        "SelectContinentDropdown": {
+          "en": "Select a continent.."
+        },
+        "SelectCountryDropdown": {
+          "en": "Select a country.."
+        },
+        "StartSearch": {
+          "en": "Select a country.."
+        },
+        "NextStep": {
+          "en": "Next step.."
+        },
+        "SelectContinent": {
+          "en": "Please select a continent filter below."
+        },
+        "SelectCountry": {
+          "en": "Please select a country filter below."
+        },
+        "SelectedCountry": {
+          "en": "Selected country"
+        },
+        "Searching": {
+          "en": "Searching for players with specified criteria.."
+        },
+        "SelectPlayer": {
+          "en": "Select a player.."
+        },
+        "FoundCount": {
+          "en": "Found {TotalCount} players."
+        },
+        "NoSearchResult": {
+          "en": "Couldn't find any player with the specified criteria."
+        }
       }
     },
     "Config": {
