@@ -6,7 +6,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Cleanup before build
-        run: rm -rf ProjectMakoto/
+        run: rm -rf ProjectMakotoTest/
       - name: Setup .NET Core SDK 6.x
         uses: actions/setup-dotnet@v3
         with:
