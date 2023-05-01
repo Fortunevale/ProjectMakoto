@@ -24,10 +24,10 @@ jobs:
         run: dotnet restore
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "ProjectMakoto/build"
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build"
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Writing current version to file
-        run: git rev-parse --short HEAD > "/home/github-runner/build/LatestGitPush.cfg" && git branch --show-current >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> /home/github-runner/build/LatestGitPush.cfg
+        run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakoto/
   deploy:
     name: Deploy Build to Server
@@ -38,15 +38,17 @@ jobs:
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_TOKEN }}
-          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_SERVER }}{% endraw%} >> ~/.ssh/known_hosts
+          known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
+      - name: Creating .ssh/ Folder
+        run: mkdir -p ~/.ssh
       - name: Deploy with rsync
-        run: rsync -avz -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/xorog/Bots/latestProjectIchigo/
-        working-directory: ProjectMakoto/build/
+        run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigo/
+        working-directory: ProjectMakoto/ProjectMakoto/build/
   cleanup:
     name: Cleanup
+    needs: [ "build", "deploy" ]
+    if: success() || failure()
     runs-on: self-hosted
     steps:
-      - name: Cleanup
+      - name: Cleanup Source Code
         run: rm -rf ProjectMakoto/
