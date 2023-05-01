@@ -1544,6 +1544,20 @@
         "VoteButton": {
           "en": "Vote to clear the current queue"
         }
+      },
+      "Disconnect": {
+        "AlreadyVoted": {
+          "en": "You already voted to clear the current queue."
+        },
+        "Disconnected": {
+          "en": "The queue was cleared."
+        },
+        "VoteStarted": {
+          "en": "You voted to clear the current queue."
+        },
+        "VoteButton": {
+          "en": "Vote to clear the current queue"
+        }
       }
     },
     "Config": {

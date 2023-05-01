@@ -644,6 +644,16 @@ public class Translations
                 public SingleTranslationKey AlreadyVoted;
                 public SingleTranslationKey Cleared;
                 public SingleTranslationKey VoteStarted;
+                public SingleTranslationKey VoteButton;
+            }
+
+            public disconnect Disconnect;
+            public class disconnect
+            {
+                public SingleTranslationKey AlreadyVoted;
+                public SingleTranslationKey Disconnected;
+                public SingleTranslationKey VoteStarted;
+                public SingleTranslationKey VoteButton;
             }
         }
 
