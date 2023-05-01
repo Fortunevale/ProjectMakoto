@@ -42,8 +42,8 @@ jobs:
       - name: Creating .ssh/ Folder
         run: mkdir -p ~/.ssh
       - name: Deploy with rsync
-        run: rsync -avzn --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/xorog/Bots/latestProjectIchigo/
-        working-directory: build/
+        run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/xorog/Bots/latestProjectIchigo/
+        working-directory: ProjectMakoto/ProjectMakoto/build/
   cleanup:
     name: Cleanup
     needs: [ "build", "deploy" ]
@@ -52,5 +52,3 @@ jobs:
     steps:
       - name: Cleanup Source Code
         run: rm -rf ProjectMakoto/
-      - name: Cleanup Build
-        run: rm -rf build/
