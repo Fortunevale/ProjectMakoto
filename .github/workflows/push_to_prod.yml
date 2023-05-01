@@ -52,3 +52,10 @@ jobs:
     steps:
       - name: Cleanup Source Code
         run: rm -rf ProjectMakoto/
+  restartprod:
+    name: Send Restart Signal
+    needs: deploy
+    runs-on: self-hosted
+    steps:
+      - name: Touch updated file
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigo/updated
