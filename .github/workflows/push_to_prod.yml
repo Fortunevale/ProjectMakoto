@@ -29,11 +29,6 @@ jobs:
       - name: Writing current version to file
         run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakoto/
-  deploy:
-    name: Deploy Build to Server
-    needs: build
-    runs-on: self-hosted
-    steps:
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -44,6 +39,8 @@ jobs:
       - name: Deploy with rsync
         run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigo/
         working-directory: ProjectMakoto/ProjectMakoto/build/
+      - name: Touch updated file
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigo/updated
   cleanup:
     name: Cleanup
     needs: [ "build", "deploy" ]
@@ -52,10 +49,4 @@ jobs:
     steps:
       - name: Cleanup Source Code
         run: rm -rf ProjectMakoto/
-  restartprod:
-    name: Send Restart Signal
-    needs: deploy
-    runs-on: self-hosted
-    steps:
-      - name: Touch updated file
-        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigo/updated
+
