@@ -663,6 +663,13 @@ public class Translations
             {
                 public SingleTranslationKey Cleared;
             }
+
+            public forceDisconnect ForceDisconnect;
+
+            public class forceDisconnect
+            {
+                public SingleTranslationKey Disconnected;
+            }
         }
 
         public configurationCommands Config;

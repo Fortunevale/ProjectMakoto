@@ -1561,6 +1561,16 @@
         "VoteButton": {
           "en": "Vote to disconnect"
         }
+      },
+      "ForceClearQueue": {
+        "Cleared": {
+          "en": "The queue was force cleared."
+        }
+      },
+      "ForceDisconnect": {
+        "Disconnected": {
+          "en": "The bot was force disconnected."
+        }
       }
     },
     "Config": {
