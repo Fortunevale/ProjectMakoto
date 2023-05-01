@@ -78,22 +78,22 @@ internal class UserInfoCommand : BaseCommand
                 {
                     Text = $"User-Id: {victim.Id}"
                 },
-                Description = $"{(bMember is null ? $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? $"`{GetString(t.Commands.Utility.UserInfo.NeverJoined)}`" : $"{(isBanned ? $"`{GetString(t.Commands.Utility.UserInfo.IsBanned)}`" : $"`{GetString(t.Commands.Utility.UserInfo.JoinedBefore)}`")}")}\n\n" : "")}" +
-                        $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? $"💀 **`{GetString(t.Commands.Utility.UserInfo.GlobalBanned)}`**\n" : "")}" +
-                        $"{(ctx.Bot.status.TeamOwner == victim.Id ? $"👑 **`{GetString(t.Commands.Utility.UserInfo.BotOwner).Replace("{Bot}", ctx.CurrentUser.Username)}`**\n" : "")}" +
-                        $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? $"🔏 **`{GetString(t.Commands.Utility.UserInfo.BotStaff).Replace("{Bot}", ctx.CurrentUser.Username)}`**\n\n" : "")}" +
-                        $"{(bMember is not null && bMember.IsOwner ? $"✨ `{GetString(t.Commands.Utility.UserInfo.Owner)}`\n" : "")}" +
-                        $"{(victim.IsStaff ? $"📘 **`{GetString(t.Commands.Utility.UserInfo.DiscordStaff)}`**\n" : "")}" +
-                        $"{(victim.IsMod ? $"⚒ `{GetString(t.Commands.Utility.UserInfo.CertifiedMod)}`\n" : "")}" +
-                        $"{(victim.IsBotDev ? $"⌨ `{GetString(t.Commands.Utility.UserInfo.VerifiedBotDeveloper)}`\n" : "")}" +
-                        $"{(victim.IsPartner ? $"👥 `{GetString(t.Commands.Utility.UserInfo.DiscordPartner)}`\n" : "")}" +
-                        $"{(bMember is not null && bMember.IsPending.HasValue && bMember.IsPending.Value ? $"❗ `{GetString(t.Commands.Utility.UserInfo.PendingMembership)}`\n" : "")}" +
+                Description = $"{(bMember is null ? $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? GetString(t.Commands.Utility.UserInfo.NeverJoined, true) : $"{(isBanned ? GetString(t.Commands.Utility.UserInfo.IsBanned, true) : GetString(t.Commands.Utility.UserInfo.JoinedBefore, true))}")}\n\n" : "")}" +
+                        $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? $"💀 **{GetString(t.Commands.Utility.UserInfo.GlobalBanned, true)}**\n" : "")}" +
+                        $"{(ctx.Bot.status.TeamOwner == victim.Id ? $"👑 **{GetString(t.Commands.Utility.UserInfo.BotOwner, true)}**\n" : "")}" +
+                        $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? $"🔏 **{GetString(t.Commands.Utility.UserInfo.BotStaff, true)}**\n\n" : "")}" +
+                        $"{(bMember is not null && bMember.IsOwner ? $"✨ {GetString(t.Commands.Utility.UserInfo.Owner, true)}\n" : "")}" +
+                        $"{(victim.IsStaff ? $"📘 **{GetString(t.Commands.Utility.UserInfo.DiscordStaff, true)}**\n" : "")}" +
+                        $"{(victim.IsMod ? $"⚒ {GetString(t.Commands.Utility.UserInfo.CertifiedMod, true)}\n" : "")}" +
+                        $"{(victim.IsBotDev ? $"⌨ {GetString(t.Commands.Utility.UserInfo.VerifiedBotDeveloper, true)}\n" : "")}" +
+                        $"{(victim.IsPartner ? $"👥 {GetString(t.Commands.Utility.UserInfo.DiscordPartner, true)}\n" : "")}" +
+                        $"{(bMember is not null && bMember.IsPending.HasValue && bMember.IsPending.Value ? $"❗ {GetString(t.Commands.Utility.UserInfo.PendingMembership, true)}\n" : "")}" +
                         $"\n**{(bMember is null ? $"{GetString(t.Commands.Utility.UserInfo.Roles)} ({GetString(t.Commands.Utility.UserInfo.Backup)})" : GetString(t.Commands.Utility.UserInfo.Roles))}**\n{GenerateRoles}"
             };
 
             if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<GlobalBanDetails> globalNotes) && globalNotes.Any())
             {
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.BotNotes).Replace("{Bot}", ctx.CurrentUser.Username), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.BotNotes), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
             if (ctx.Bot.globalBans.TryGetValue(victim.Id, out GlobalBanDetails globalBanDetails))
@@ -112,7 +112,7 @@ internal class UserInfoCommand : BaseCommand
 
             if (ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled)
             {
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.InvitedBy), $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? $"`{GetString(t.Commands.Utility.UserInfo.NoInviter)}`" : $"<@{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.InvitedBy), $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? GetString(t.Commands.Utility.UserInfo.NoInviter, true) : $"<@{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
                 embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.UsersInvited), $"`{(ctx.Bot.guilds[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
 
                 if (!ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace())
@@ -158,9 +158,9 @@ internal class UserInfoCommand : BaseCommand
             {
                 if (victim.Presence is not null)
                     embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.Presence), $"{GetStatusIcon(victim.Presence.Status)} `{TranslatePresence(victim.Presence.Status)}`\n" +
-                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Desktop.HasValue ? victim.Presence.ClientStatus.Desktop.Value : UserStatus.Offline)} `{GetString(t.Commands.Utility.UserInfo.Desktop)}`\n" +
-                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Mobile.HasValue ? victim.Presence.ClientStatus.Mobile.Value : UserStatus.Offline)} `{GetString(t.Commands.Utility.UserInfo.Mobile)}`\n" +
-                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} `{GetString(t.Commands.Utility.UserInfo.Web)}`\n\n", true));
+                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Desktop.HasValue ? victim.Presence.ClientStatus.Desktop.Value : UserStatus.Offline)} {GetString(t.Commands.Utility.UserInfo.Desktop, true)}\n" +
+                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Mobile.HasValue ? victim.Presence.ClientStatus.Mobile.Value : UserStatus.Offline)} {GetString(t.Commands.Utility.UserInfo.Mobile, true)}\n" +
+                                                                    $"󠂪 󠂪 󠂪 󠂪{GetStatusIcon(victim.Presence.ClientStatus.Web.HasValue ? victim.Presence.ClientStatus.Web.Value : UserStatus.Offline)} {GetString(t.Commands.Utility.UserInfo.Web, true)}\n\n", true));
             }
             catch { }
 
@@ -215,7 +215,7 @@ internal class UserInfoCommand : BaseCommand
                     catch (Exception)
                     {
                         _ = e.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
-                            .AddEmbed(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.UserInfo.FetchUserError).Replace("{User}", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId)}`").AsError(ctx)));
+                            .AddEmbed(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.UserInfo.FetchUserError, true, new TVar("User", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId))).AsError(ctx)));
                         return;
                     }
 

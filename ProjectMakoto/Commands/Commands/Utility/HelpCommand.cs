@@ -48,7 +48,7 @@ internal class HelpCommand : BaseCommand
                         }
                         else
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.Help.MissingCommand)}`").AsBotError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
                             return;
                         }
                     case CommandType.PrefixCommand:
@@ -70,7 +70,7 @@ internal class HelpCommand : BaseCommand
                         }
                         else
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.Help.MissingCommand)}`").AsBotError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
                             return;
                         }
                 }
@@ -127,7 +127,7 @@ internal class HelpCommand : BaseCommand
                     discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx));
 
                 if (!discordEmbeds[b.Key].Fields.Any())
-                    discordEmbeds[b.Key].AddField(new DiscordEmbedField(GetString(t.Commands.Utility.Help.Module).Replace("{Module}", b.Key), b.Value));
+                    discordEmbeds[b.Key].AddField(new DiscordEmbedField(GetString(t.Commands.Utility.Help.Module, new TVar("Module", b.Key)), b.Value));
                 else
                     discordEmbeds[b.Key].AddField(new DiscordEmbedField("󠂪 󠂪", b.Value));
             }

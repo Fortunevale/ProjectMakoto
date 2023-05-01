@@ -15,7 +15,7 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.AdultContentError)}`"
+                    Description = GetString(t.Commands.Utility.UrbanDictionary.AdultContentError, true)
                 }.AsError(ctx));
                 return;
             }
@@ -25,7 +25,7 @@ internal class UrbanDictionaryCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.AdultContentWarning)}`"
+                Description = GetString(t.Commands.Utility.UrbanDictionary.AdultContentWarning, true)
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
@@ -42,14 +42,16 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.LookingUp).Replace("{Term}", term)}`"
+                    Description = GetString(t.Commands.Utility.UrbanDictionary.LookingUp, true,
+                        new TVar("Term", term))
                 }.AsLoading(ctx));
 
                 if (term.IsNullOrWhiteSpace())
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
+                        Description = GetString(t.Commands.Utility.UrbanDictionary.LookupFail, true,
+                            new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
@@ -72,7 +74,8 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
+                        Description = GetString(t.Commands.Utility.UrbanDictionary.LookupFail, true, 
+                            new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
@@ -94,14 +97,14 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Utility.UrbanDictionary.NotExist).Replace("{Term}", term)}`"
+                        Description = GetString(t.Commands.Utility.UrbanDictionary.NotExist, true, new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
 
                 var embeds = Definitions.Take(3).Select(x => new DiscordEmbedBuilder
                 {
-                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.Utility.UrbanDictionary.WrittenBy).Replace("{Author}", x.author)}",
+                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.Utility.UrbanDictionary.WrittenBy, new TVar("Author", x.author))}",
                     Description = $"**{GetString(t.Commands.Utility.UrbanDictionary.Definition)}**\n\n" +
                                   $"{x.definition.Replace("[", "").Replace("]", "")}\n\n" +
                                   $"**{GetString(t.Commands.Utility.UrbanDictionary.Example)}**\n\n" +

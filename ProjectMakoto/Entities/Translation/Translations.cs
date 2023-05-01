@@ -301,7 +301,7 @@ public class Translations
                 public SingleTranslationKey SelectTarget;
                 public SingleTranslationKey SelectTargetDropdown;
                 public SingleTranslationKey Translating;
-                public SingleTranslationKey Queue;
+                public MultiTranslationKey Queue;
                 public SingleTranslationKey Translated;
             }
 
@@ -630,6 +630,19 @@ public class Translations
             {
                 public SingleTranslationKey Unlinked;
                 public SingleTranslationKey NoLink;
+            }
+        }
+
+        public musicCommands Music;
+        public class musicCommands
+        {
+            public SingleTranslationKey BotNotInVc;
+            public SingleTranslationKey NotSameChannel;
+
+            public clearQueue ClearQueue;
+            public class clearQueue
+            {
+                
             }
         }
 

@@ -15,14 +15,14 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.ScoreSaber.Unlink.Unlinked)}`"
+                    Description = GetString(t.Commands.ScoreSaber.Unlink.Unlinked, true)
                 }.AsSuccess(ctx, "Score Saber")));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.ScoreSaber.Unlink.NoLink)}`"
+                    Description = GetString(t.Commands.ScoreSaber.Unlink.NoLink, true)
                 }.AsError(ctx, "Score Saber")));
             }
         });

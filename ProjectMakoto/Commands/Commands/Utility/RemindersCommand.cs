@@ -16,9 +16,9 @@ internal class RemindersCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
-                    .WithDescription($"`{GetString(t.Commands.Utility.Reminders.Count).Replace("{Count}", rem.ScheduledReminders.Count)}`\n\n" +
-                     $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{GetString(t.Commands.Utility.Reminders.Created).Replace("{Guild}", $"**{x.CreationPlace}**")}\n{GetString(t.Commands.Utility.Reminders.DueTime).Replace("{Relative}", x.DueTime.ToTimestamp()).Replace("{DateTime}", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime))}").ToList())}\n\n" +
-                     $"**⚠ {GetString(t.Commands.Utility.Reminders.Notice).Replace("{Bot}", ctx.CurrentUser.Username)}**")
+                    .WithDescription($"{GetString(t.Commands.Utility.Reminders.Count, true, new TVar("Count", rem.ScheduledReminders.Count))}\n\n" +
+                     $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{GetString(t.Commands.Utility.Reminders.Created, new TVar("Guild", $"**{x.CreationPlace}**"))}\n{GetString(t.Commands.Utility.Reminders.DueTime, new TVar("Relative", x.DueTime.ToTimestamp()), new TVar("DateTime", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}").ToList())}\n\n" +
+                     $"**⚠ {GetString(t.Commands.Utility.Reminders.Notice)}**")
                     .AsInfo(ctx, GetString(t.Commands.Utility.Reminders.Title)))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
@@ -43,7 +43,7 @@ internal class RemindersCommand : BaseCommand
                     if (selectedDueDate.HasValue && (selectedDueDate.Value.Ticks < DateTime.UtcNow.Ticks || selectedDueDate.Value.GetTimespanUntil() > TimeSpan.FromDays(30 * 6)))
                     {
                         selectedDueDate = null;
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.Reminders.InvalidDateTime)}`").AsError(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Reminders.InvalidDateTime, true)).AsError(ctx));
                         await Task.Delay(5000);
                     }
 
@@ -113,7 +113,7 @@ internal class RemindersCommand : BaseCommand
                         {
                             if (ModalResult.Exception.GetType() == typeof(ArgumentException) || ModalResult.Exception.GetType() == typeof(ArgumentOutOfRangeException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.Reminders.InvalidDateTime)}`").AsError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Reminders.InvalidDateTime, true)).AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -129,7 +129,7 @@ internal class RemindersCommand : BaseCommand
 
                         if (selectedDueDate < DateTime.UtcNow)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.Reminders.InvalidDateTime)}`").AsError(ctx, GetString(t.Commands.Utility.Reminders.Title)));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Reminders.InvalidDateTime, true)).AsError(ctx, GetString(t.Commands.Utility.Reminders.Title)));
                             await Task.Delay(2000);
                             continue;
                         }

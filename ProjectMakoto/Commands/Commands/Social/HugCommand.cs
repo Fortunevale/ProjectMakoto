@@ -14,14 +14,16 @@ internal class HugCommand : BaseCommand
             string[] PositiveEmojis = { "♥", ctx.Bot.status.LoadedConfig.Emojis.Hug };
             string[] NegativeEmojis = { "😢", "😓" };
 
-            string[] phrases = GetGuildString(t.Commands.Social.Hug.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Social.Hug.Self);
+            string[] phrases = t.Commands.Social.Hug.Other.Get(ctx.DbGuild);
+            string[] self_phrases = t.Commands.Social.Hug.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("{User1}", ctx.User.Username).Replace("{Emoji}", NegativeEmojis.SelectRandom()),
+                    Title = self_phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.Member.DisplayName),
+                    new TVar("Emoji", NegativeEmojis.SelectRandom())),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -32,7 +34,11 @@ internal class HugCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("{User1}", ctx.User.Mention).Replace("{User2}", user.Mention).Replace("{Emoji}", PositiveEmojis.SelectRandom())),
+                Description = phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false),
+                    new TVar("Emoji", PositiveEmojis.SelectRandom(), false))
+                    .Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

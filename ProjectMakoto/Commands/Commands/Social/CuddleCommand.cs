@@ -11,14 +11,15 @@ internal class CuddleCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = GetGuildString(t.Commands.Social.Cuddle.Other);
-            string[] self_phrases = GetGuildString(t.Commands.Social.Cuddle.Self);
+            string[] phrases = t.Commands.Social.Cuddle.Other.Get(ctx.DbGuild);
+            string[] self_phrases = t.Commands.Social.Cuddle.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("{User1}", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.Member.DisplayName)),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -29,7 +30,11 @@ internal class CuddleCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = phrases.SelectRandom().Replace("{User1}", ctx.User.Mention).Replace("{User2}", user.Mention).Replace("{Emoji}", ctx.Bot.status.LoadedConfig.Emojis.Cuddle).Bold(),
+                Description = phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false),
+                    new TVar("Emoji", ctx.Bot.status.LoadedConfig.Emojis.Cuddle, false))
+                    .Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

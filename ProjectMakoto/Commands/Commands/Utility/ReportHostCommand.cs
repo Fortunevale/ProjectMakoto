@@ -19,12 +19,11 @@ internal class ReportHostCommand : BaseCommand
 
                 var tos_embed = new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.ReportHost.Tos)
-                        .Replace("{1}", 1.ToEmotes())
-                        .Replace("{2}", 2.ToEmotes())
-                        .Replace("{3}", 3.ToEmotes())
-                        .Replace("{4}", 4.ToEmotes())
-                        .Build()
+                    Description = GetString(t.Commands.Utility.ReportHost.Tos,
+                        new TVar("1", 1.ToEmotes()),
+                        new TVar("2", 2.ToEmotes()),
+                        new TVar("3", 3.ToEmotes()),
+                        new TVar("4", 4.ToEmotes()))
                 }.AsAwaitingInput(ctx, GetString(t.Commands.Utility.ReportHost.Title));
 
                 if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != 0 && ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS < tos_version)
@@ -49,14 +48,15 @@ internal class ReportHostCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Utility.ReportHost.Processing)}`"
+                Description = GetString(t.Commands.Utility.ReportHost.Processing, true)
             }.AsLoading(ctx, GetString(t.Commands.Utility.ReportHost.Title));
 
             await RespondOrEdit(embed);
 
             if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.CooldownError).Replace("{Timestamp}", $"`{ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).ToTimestamp()}`")}`";
+                embed.Description = GetString(t.Commands.Utility.ReportHost.CooldownError, true,
+                    new TVar("Timestamp", ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).ToTimestamp()));
                 _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.Utility.ReportHost.Title)));
                 return;
             }
@@ -65,7 +65,7 @@ internal class ReportHostCommand : BaseCommand
             {
                 if (ctx.Bot.submittedUrls.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
                 {
-                    embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.LimitError)}`";
+                    embed.Description = GetString(t.Commands.Utility.ReportHost.LimitError, true);
                     _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.Utility.ReportHost.Title)));
                     return;
                 }
@@ -95,12 +95,14 @@ internal class ReportHostCommand : BaseCommand
             }
             catch (Exception)
             {
-                embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.InvalidHost).Replace("{Host}", url.SanitizeForCode())}.`";
+                embed.Description = GetString(t.Commands.Utility.ReportHost.InvalidHost, true, 
+                    new TVar("Host", url, true));
                 _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.Utility.ReportHost.Title)));
                 return;
             }
 
-            embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.ConfirmHost).Replace("{Host}", host.SanitizeForCode())}`";
+            embed.Description = GetString(t.Commands.Utility.ReportHost.ConfirmHost, true,
+                new TVar("Host", host, true));
             embed.AsAwaitingInput(ctx, GetString(t.Commands.Utility.ReportHost.Title));
 
             var ContinueButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Confirm), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
@@ -125,35 +127,35 @@ internal class ReportHostCommand : BaseCommand
             {
                 embed.AsLoading(ctx, GetString(t.Commands.Utility.ReportHost.Title));
 
-                embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.DatabaseCheck)}`";
+                embed.Description = GetString(t.Commands.Utility.ReportHost.DatabaseCheck, true);
                 await RespondOrEdit(embed);
 
                 foreach (var b in ctx.Bot.phishingUrls)
                 {
                     if (host.Contains(b.Key))
                     {
-                        embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.DatabaseError).Replace("{Host}", host.SanitizeForCode())}`";
+                        embed.Description = GetString(t.Commands.Utility.ReportHost.DatabaseError, true, new TVar("Host", host, true));
                         embed.AsError(ctx, GetString(t.Commands.Utility.ReportHost.Title));
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
                 }
 
-                embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.SubmissionCheck)}`";
+                embed.Description = GetString(t.Commands.Utility.ReportHost.SubmissionCheck, true);
                 await RespondOrEdit(embed);
 
                 foreach (var b in ctx.Bot.submittedUrls)
                 {
                     if (b.Value.Url == host)
                     {
-                        embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.SubmissionError).Replace("{Host}", host.SanitizeForCode())}`";
+                        embed.Description = GetString(t.Commands.Utility.ReportHost.SubmissionError, true, new TVar("Host", host, true));
                         embed.AsError(ctx, GetString(t.Commands.Utility.ReportHost.Title));
                         _ = RespondOrEdit(embed.Build());
                         return;
                     }
                 }
 
-                embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.CreatingSubmission)}`";
+                embed.Description = GetString(t.Commands.Utility.ReportHost.CreatingSubmission, true);
                 await RespondOrEdit(embed);
 
                 var channel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.UrlSubmissions);
@@ -189,7 +191,7 @@ internal class ReportHostCommand : BaseCommand
 
                 ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
 
-                embed.Description = $"`{GetString(t.Commands.Utility.ReportHost.SubmissionCreated)}`";
+                embed.Description = GetString(t.Commands.Utility.ReportHost.SubmissionCreated, true);
                 embed.AsSuccess(ctx, GetString(t.Commands.Utility.ReportHost.Title));
                 await RespondOrEdit(embed);
             }

@@ -39,7 +39,7 @@ public class Cooldown
         var Cancelled = false;
 
         var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown).Replace("{Timestamp}", $"`{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`")}`")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton));
 
         Task.Run(async () =>
@@ -74,7 +74,7 @@ public class Cooldown
         try
         {
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown).Replace("{Timestamp}", $"`{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`")}`")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton.Disable()));
         }
         catch { }

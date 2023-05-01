@@ -61,16 +61,16 @@
     "Common": {
       "Errors": {
         "Generic": {
-          "en": "You dont have permissions to use the command `{Command}`. You need to be `{Required}` to use this command.",
-          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst `{Required}` sein."
+          "en": "You dont have permissions to use the command '{CurrentCommand}'. You need to be {Required} to use this command.",
+          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl '{CurrentCommand}' zu verwenden. Du musst '{Required}' sein."
         },
         "NoMember": {
           "en": "The user you tagged is required to be on this server for this command to run.",
           "de": "Der gewählte Benutzer muss auf dem Server sein um diesen Befehl zu verwenden."
         },
         "BotOwner": {
-          "en": "You dont have permissions to use the command `{Command}`. You need to be {Required} to use this command.",
-          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl `{Command}` zu verwenden. Du musst {Required} sein."
+          "en": "You dont have permissions to use the command '{CurrentCommand}'. You need to be {Required} to use this command.",
+          "de": "Du hast nicht die benötigten Berechtigungen um den Befehl '{CurrentCommand}' zu verwenden. Du musst {Required} sein."
         },
         "VoiceChannel": {
           "en": "You aren't in a voice channel.",
@@ -97,8 +97,8 @@
           "de": "Du hast Datenverarbeitung verweigert. Um Befehle erneut verwenden zu können, verwende '{Command}'."
         },
         "BotPermissions": {
-          "en": "The bot is missing permissions to run this command. Please assign the bot `{Required}` to use this command.",
-          "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung `{Required}` um diesen Befehl zu verwenden."
+          "en": "The bot is missing permissions to run this command. Please assign the bot '{Required}' to use this command.",
+          "de": "Dem Bot fehlen benötigte Berechtigungen. Bitte erteile die Berechtigung '{Required}' um diesen Befehl zu verwenden."
         },
         "DirectMessage": {
           "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
@@ -708,12 +708,12 @@
           "de": "Erfahrung"
         },
         "Self": {
-          "en": "You're currently **Level {Level} with `{Points}` XP**",
-          "de": "Du bist aktuell **Level {Level} mit `{Points}` XP**"
+          "en": "You're currently **Level {Level} with {Points} XP**",
+          "de": "Du bist aktuell **Level {Level} mit {Points} XP**"
         },
         "Other": {
-          "en": "{User} is currently **Level {Level} with `{Points}` XP**",
-          "de": "{User} ist aktuell **Level {Level} mit `{Points}` XP**"
+          "en": "{User} is currently **Level {Level} with {Points} XP**",
+          "de": "{User} ist aktuell **Level {Level} mit {Points} XP**"
         },
         "Progress": {
           "en": "Level {Level} Progress",
@@ -888,8 +888,14 @@
           "de": "Übersetze.."
         },
         "Queue": {
-          "en": "Your translation request is currently in queue at position {Position}. This might take a moment to finish..`\n`Your request will be executed, approximately, {Timestamp}.",
-          "de": "Deine Übersetzungsanfrage ist aktuell in der Warteschlange an Position {Position}. Bitte warte einen Moment.. `\n`Deine Anfrage wird ungefähr {Timestamp} ausgeführt."
+          "en": [
+            "Your translation request is currently in queue at position {Position}. This might take a moment to finish..",
+            "Your request will be executed, approximately, {Timestamp}."
+          ],
+          "de": [
+            "Deine Übersetzungsanfrage ist aktuell in der Warteschlange an Position {Position}. Bitte warte einen Moment..",
+            "Deine Anfrage wird ungefähr {Timestamp} ausgeführt."
+          ]
         },
         "Translated": {
           "en": "Translated from {Source} to {Target} using {Provider}",
@@ -1519,6 +1525,17 @@
         "NoLink": {
           "en": "There is no Score Saber Profile linked to your Discord Account."
         }
+      }
+    },
+    "Music": {
+      "BotNotInVc": {
+        "en": ""
+      },
+      "NotSameChannel": {
+        "en": ""
+      },
+      "ClearQueue": {
+
       }
     },
     "Config": {

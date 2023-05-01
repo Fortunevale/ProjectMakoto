@@ -14,7 +14,8 @@ internal class LeaderboardCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Utility.Leaderboard.Disabled).Replace("{Command}", $"{ctx.Prefix}experiencesettings config")}`"
+                    Description = GetString(t.Commands.Utility.Leaderboard.Disabled, true,
+                        new TVar("Command", $"{ctx.Prefix}experiencesettings config"))
                 }.AsError(ctx, GetString(t.Commands.Utility.Leaderboard.Title)));
                 return;
             }
@@ -27,7 +28,7 @@ internal class LeaderboardCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Utility.Leaderboard.Fetching)}`",
+                Description = GetString(t.Commands.Utility.Leaderboard.Fetching, true),
             }.AsLoading(ctx, GetString(t.Commands.Utility.Leaderboard.Title));
 
             await RespondOrEdit(embed: embed);
@@ -67,7 +68,7 @@ internal class LeaderboardCommand : BaseCommand
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` (`{GetString(t.Commands.Utility.Leaderboard.Level).Replace("{Level}", b.Value.Experience.Level).Replace("{Points}", b.Value.Experience.Points)}`)"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.UsernameWithDiscriminator}` ({GetString(t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
 
                     if (count >= ShowAmount)
                         break;
@@ -83,12 +84,12 @@ internal class LeaderboardCommand : BaseCommand
             if (count != 0)
             {
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = GetString(t.Commands.Utility.Leaderboard.Placement).Replace("{Placement}", currentuserplacement);
+                embed.Description = GetString(t.Commands.Utility.Leaderboard.Placement, new TVar("Placement", currentuserplacement));
                 await RespondOrEdit(embed.AsInfo(ctx, GetString(t.Commands.Utility.Leaderboard.Title)));
             }
             else
             {
-                embed.Description = $":no_entry_sign: `{GetString(t.Commands.Utility.Leaderboard.NoPoints)}`";
+                embed.Description = $":no_entry_sign: {GetString(t.Commands.Utility.Leaderboard.NoPoints, true)}";
                 await RespondOrEdit(embed.AsInfo(ctx, GetString(t.Commands.Utility.Leaderboard.Title)));
             }
         });

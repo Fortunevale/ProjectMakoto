@@ -21,7 +21,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.ScoreSaber.MapLeaderboard.LoadingScoreboard)}`"
+                Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.LoadingScoreboard, true)
             }.AsLoading(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -46,19 +46,19 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             }
             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
             {
-                embed.Description = $"`{GetString(t.Commands.ScoreSaber.InternalServerError)}`";
+                embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
             catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
             {
-                embed.Description = $"`{GetString(t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist)}`";
+                embed.Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 throw;
             }
             catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
             {
-                embed.Description = $"`{GetString(t.Commands.ScoreSaber.ForbiddenError)}`";
+                embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
@@ -131,7 +131,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             {
                 if (scoreSaberPage > TotalPages)
                 {
-                    embed.Description = $"` {GetString(t.Commands.ScoreSaber.MapLeaderboard.PageNotExist).Replace("{Page}", scoreSaberPage)} `";
+                    embed.Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.PageNotExist, true, new TVar("Page", scoreSaberPage));
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -146,19 +146,19 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 }
                 catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                 {
-                    embed.Description = $"`{GetString(t.Commands.ScoreSaber.InternalServerError)}`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
                 catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                 {
-                    embed.Description = $"`{GetString(t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist)}`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     throw;
                 }
                 catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
                 {
-                    embed.Description = $"`{GetString(t.Commands.ScoreSaber.ForbiddenError)}`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }

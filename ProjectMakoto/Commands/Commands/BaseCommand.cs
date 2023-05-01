@@ -222,65 +222,67 @@ public abstract class BaseCommand
     #endregion
 
     #region GetString
+    TVar[] GetDefaultVars() 
+        => new TVar[]
+        {
+            new TVar("CurrentCommand", ctx.Prefix + ctx.CommandName, false),
+            new TVar("Bot", ctx.CurrentUser.Mention, false),
+            new TVar("BotName", ctx.CurrentUser.Username, false),
+            new TVar("FullBot", ctx.CurrentUser.UsernameWithDiscriminator, false),
+            new TVar("BotDisplayName", ctx.CurrentUser.UsernameWithDiscriminator, false),
+            new TVar("User", ctx.User.Mention, false),
+            new TVar("UserName", ctx.User.Username, false),
+            new TVar("FullUser", ctx.User.UsernameWithDiscriminator, false),
+            new TVar("UserDisplayName", ctx.Member?.DisplayName ?? ctx.User.Username, false),
+        };
+
     public string GetString(SingleTranslationKey key)
-        => GetString(key, false, true, null);
+        => GetString(key, false, Array.Empty<TVar>());
 
     public string GetString(SingleTranslationKey key, params TVar[] vars)
-        => GetString(key, false, true, vars);
+        => GetString(key, false, vars);
 
     public string GetString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
-        => GetString(key, Code, true, vars);
-    
-    public string GetString(SingleTranslationKey key, bool Code = false, bool Sanitize = true, params TVar[] vars)
-        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, Sanitize, vars);
+        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
 
 
 
     public string GetString(MultiTranslationKey key)
-        => GetString(key, false, false, true, null);
+        => GetString(key, false, false, Array.Empty<TVar>());
 
     public string GetString(MultiTranslationKey key, params TVar[] vars)
-        => GetString(key, false, false, true, vars);
+        => GetString(key, false, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
-        => GetString(key, true, false, true, vars);
+        => GetString(key, true, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
-        => GetString(key, Code, UseBoldMarker, true, vars);
-
-    public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, bool Sanitize = true, params TVar[] vars)
-        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, UseBoldMarker, Sanitize, vars);
+        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
 
 
 
     public string GetGuildString(SingleTranslationKey key)
-        => GetGuildString(key, false, true, null);
+        => GetGuildString(key, false, Array.Empty<TVar>());
 
     public string GetGuildString(SingleTranslationKey key, params TVar[] vars)
-        => GetGuildString(key, false, true, vars);
+        => GetGuildString(key, false, vars);
 
     public string GetGuildString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
-        => GetGuildString(key, Code, true, vars);
-
-    public string GetGuildString(SingleTranslationKey key, bool Code = false, bool Sanitize = true, params TVar[] vars)
-        => key.Get(ctx.DbGuild).Build(Code, true, vars);
+        => key.Get(ctx.DbGuild).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
 
 
 
     public string GetGuildString(MultiTranslationKey key)
-        => GetGuildString(key, false, false, true, null);
+        => GetGuildString(key, false, false, Array.Empty<TVar>());
 
     public string GetGuildString(MultiTranslationKey key, params TVar[] vars)
-        => GetGuildString(key, false, false, true, vars);
+        => GetGuildString(key, false, false, vars);
 
     public string GetGuildString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
-        => GetGuildString(key, Code, false, true, vars);
+        => GetGuildString(key, Code, false, vars);
 
     public string GetGuildString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
-        => GetGuildString(key, Code, UseBoldMarker, true, vars);
-
-    public string GetGuildString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, bool Sanitize = true, params TVar[] vars)
-        => key.Get(ctx.DbGuild).Build(Code, UseBoldMarker, Sanitize, vars); 
+        => key.Get(ctx.DbGuild).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray()); 
     #endregion
 
     #region Selections
@@ -361,7 +363,7 @@ public abstract class BaseCommand
                                 if (role.IsManaged || ctx.Member.GetRoleHighestPosition() <= role.Position)
                                 {
                                     Selected = "";
-                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ `{GetString(t.Commands.Common.Prompts.SelectedRoleUnavailable)}`"));
+                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ {GetString(t.Commands.Common.Prompts.SelectedRoleUnavailable, true)}"));
                                 }
                             }
                             catch { }
@@ -675,7 +677,7 @@ public abstract class BaseCommand
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Prompts.WaitingForModalResponse)}`"
+            Description = GetString(t.Commands.Common.Prompts.WaitingForModalResponse, true)
         }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(ctx.DbUser) }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
@@ -924,7 +926,7 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = RespondOrEdit($"✅ _`{GetString(t.Commands.Common.InteractionFinished)}`_");
+        _ = RespondOrEdit($"✅ _{GetString(t.Commands.Common.InteractionFinished, true)}_");
         switch (ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -1035,25 +1037,25 @@ public abstract class BaseCommand
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", $"{ctx.CurrentUser.Username} Staff"))
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"{ctx.CurrentUser.Username} Staff"))
         }.AsError(ctx));
 
     public void SendBotOwnerError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", $"<@{ctx.Bot.status.TeamOwner}")),
+        Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"<@{ctx.Bot.status.TeamOwner}>", false)),
     }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", "Administrator")),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", "Administrator")),
         }.AsError(ctx));
 
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Build(new TVar("Command", ctx.Prefix + ctx.CommandName), new TVar("Required", perms.ToPermissionString())),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToPermissionString())),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
@@ -1097,14 +1099,14 @@ public abstract class BaseCommand
     public void SendDmError() 
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"📩 `{GetString(t.Commands.Common.Errors.DirectMessage)}`",
+            Description = $"📩 {GetString(t.Commands.Common.Errors.DirectMessage, true)}",
             ImageUrl = (ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
         }.AsError(ctx)));
     
     public void SendDmRedirect() 
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"📩 `{GetString(t.Commands.Common.DirectMessageRedirect)}`",
+            Description = $"📩 {GetString(t.Commands.Common.DirectMessageRedirect, true)}",
         }.AsSuccess(ctx)));
 
     public void SendOwnPermissionError(Permissions perms)

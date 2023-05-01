@@ -8,7 +8,8 @@ internal class LanguageCommand : BaseCommand
         {
             await RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Language.Disclaimer)}`\n`{GetString(t.Commands.Language.Response)}`: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
+                Description = $"{GetString(t.Commands.Language.Disclaimer, true)}\n" +
+                              $"{GetString(t.Commands.Language.Response, true)}: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
             });
 
             List<DiscordStringSelectComponentOption> options = new();

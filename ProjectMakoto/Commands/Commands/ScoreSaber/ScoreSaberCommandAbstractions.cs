@@ -5,9 +5,9 @@ internal class ScoreSaberCommandAbstractions
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
         var t = ctx.BaseCommand.t;
-        string GetString(SingleTranslationKey v)
-            => ctx.BaseCommand.GetString(v);
-        string[] GetMString(MultiTranslationKey v)
+        string GetString(SingleTranslationKey v, bool Code = false, params TVar[] vars)
+            => ctx.BaseCommand.GetString(v, Code, vars);
+        string GetMString(MultiTranslationKey v)
             => ctx.BaseCommand.GetString(v);
 
         if (string.IsNullOrWhiteSpace(id))
@@ -25,7 +25,7 @@ internal class ScoreSaberCommandAbstractions
 
         var embed = new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.ScoreSaber.Profile.LoadingPlayer)}`"
+            Description = GetString(t.Commands.ScoreSaber.Profile.LoadingPlayer, true)
         }.AsLoading(ctx, "Score Saber");
 
         await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -84,12 +84,11 @@ internal class ScoreSaberCommandAbstractions
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetMString(t.Commands.ScoreSaber.Profile.LinkSuccessful)
-                                    .Replace("{ProfileName}", player.name.SanitizeForCode())
-                                    .Replace("{ProfileId}", player.id)
-                                    .Replace("{ProfileCommand}", $"{ctx.Prefix}scoresaber profile")
-                                    .Replace("{UnlinkCommand}", $"{ctx.Prefix}scoresaber unlink")
-                                    .Build(true)
+                                Description = GetMString(t.Commands.ScoreSaber.Profile.LinkSuccessful).Build(
+                                    new TVar("ProfileName", player.name),
+                                    new TVar("ProfileId", player.id),
+                                    new TVar("ProfileCommand", $"{ctx.Prefix}scoresaber profile"),
+                                    new TVar("UnlinkCommand", $"{ctx.Prefix}scoresaber unlink"))
                             }.AsSuccess(ctx, "Score Saber")));
 
                             _ = Task.Delay(10000).ContinueWith(x =>
@@ -111,7 +110,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.InternalServerError)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 
                                 return;
@@ -122,7 +121,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.ForbiddenError)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -145,7 +144,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.InternalServerError)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -155,7 +154,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.ForbiddenError)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -258,11 +257,11 @@ internal class ScoreSaberCommandAbstractions
                     }
                     if (i == 2)
                     {
-                        labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Replace("{Count}", i)}',\n";
+                        labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}',\n";
                         continue;
                     }
 
-                    labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Replace("{Count}", i)}','',\n";
+                    labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}','',\n";
                 }
 
                 if (string.IsNullOrWhiteSpace(LoadedGraph))
@@ -370,22 +369,22 @@ internal class ScoreSaberCommandAbstractions
         }
         catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
         {
-            embed.Description = $"`{GetString(t.Commands.ScoreSaber.InternalServerError)}`";
+            embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
         {
-            embed.Description = $"`{GetString(t.Commands.ScoreSaber.ForbiddenError)}`";
+            embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
         {
-            embed.Description = $"`{GetString(t.Commands.ScoreSaber.Profile.InvalidId)}`";
+            embed.Description = GetString(t.Commands.ScoreSaber.Profile.InvalidId, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.UnprocessableEntity)
         {
-            embed.Description = $"`{GetString(t.Commands.ScoreSaber.Profile.InvalidId)}`";
+            embed.Description = GetString(t.Commands.ScoreSaber.Profile.InvalidId, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Exception)

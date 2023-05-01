@@ -27,7 +27,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = $"`{GetString(t.Commands.ScoreSaber.Profile.InvalidInput)}`"
+                                Description = GetString(t.Commands.ScoreSaber.Profile.InvalidInput, true)
                             }.AsError(ctx, "Score Saber")));
                             return;
                         }
@@ -39,7 +39,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.ScoreSaber.Profile.NoUser)}`"
+                        Description = GetString(t.Commands.ScoreSaber.Profile.NoUser, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -53,7 +53,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.ScoreSaber.Profile.NoProfile)}`"
+                        Description = GetString(t.Commands.ScoreSaber.Profile.NoProfile, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }

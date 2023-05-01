@@ -13,7 +13,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Utility.Upload.NoInteraction)}`"
+                    Description = GetString(t.Commands.Utility.Upload.NoInteraction, true)
                 }.AsError(ctx));
                 return;
             }
@@ -22,7 +22,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Utility.Upload.AlreadyUploaded)}`"
+                    Description = GetString(t.Commands.Utility.Upload.AlreadyUploaded, true)
                 }.AsError(ctx));
                 return;
             }
@@ -31,7 +31,8 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Utility.Upload.TimedOut).Replace("{Timestamp}", $"`{ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()}`")}`"
+                    Description = GetString(t.Commands.Utility.Upload.TimedOut, true,
+                        new TVar("Timestamp", ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()))
                 }.AsError(ctx));
                 ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
                 return;
@@ -43,7 +44,7 @@ internal class UploadCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Utility.Upload.Uploaded)}`"
+                Description = GetString(t.Commands.Utility.Upload.Uploaded, true)
             }.AsSuccess(ctx));
 
             await Task.Delay(5000);

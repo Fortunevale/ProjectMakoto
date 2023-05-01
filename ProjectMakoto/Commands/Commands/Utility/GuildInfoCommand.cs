@@ -16,7 +16,7 @@ internal class GuildInfoCommand : BaseCommand
 			if (guildId == 0)
 				guildId = ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.Utility.GuildInfo.Fetching)}`").AsBotLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.GuildInfo.Fetching, true)).AsBotLoading(ctx));
 
             try
 			{
@@ -54,11 +54,11 @@ internal class GuildInfoCommand : BaseCommand
                                   $"⚠ **{GetString(t.Commands.Utility.GuildInfo.Nsfw)}**: `{guild.NsfwLevel switch { NsfwLevel.Default => GetString(t.Commands.Utility.GuildInfo.NsfwNoRating), NsfwLevel.Explicit => GetString(t.Commands.Utility.GuildInfo.NsfwExplicit), NsfwLevel.Safe => GetString(t.Commands.Utility.GuildInfo.NsfwSafe), NsfwLevel.Age_Restricted => GetString(t.Commands.Utility.GuildInfo.NsfwQuestionable), _ => "?", }}`\n" +
                                   $"💬 **{GetString(t.Commands.Utility.GuildInfo.DefaultNotifications)}**: `{guild.DefaultMessageNotifications switch { DefaultMessageNotifications.AllMessages => GetString(t.Commands.Utility.GuildInfo.DefaultNotificationsAll), DefaultMessageNotifications.MentionsOnly => GetString(t.Commands.Utility.GuildInfo.DefaultNotificationsMentions), _ => "?", }}`\n", true));
 
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.GuildInfo.SpecialChannels), $"📑 **{GetString(t.Commands.Utility.GuildInfo.Rules)}**: {guild.RulesChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n" +
-                                  $"📰 **{GetString(t.Commands.Utility.GuildInfo.CommunityUpdates)}**: {guild.PublicUpdatesChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n\n" +
-                                  $"⌨ **{GetString(t.Commands.Utility.GuildInfo.InactiveChannel)}**: {guild.AfkChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n" +
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.GuildInfo.SpecialChannels), $"📑 **{GetString(t.Commands.Utility.GuildInfo.Rules)}**: {guild.RulesChannel?.Mention ?? GetString(t.Common.Off, true)}\n" +
+                                  $"📰 **{GetString(t.Commands.Utility.GuildInfo.CommunityUpdates)}**: {guild.PublicUpdatesChannel?.Mention ?? GetString(t.Common.Off, true)}\n\n" +
+                                  $"⌨ **{GetString(t.Commands.Utility.GuildInfo.InactiveChannel)}**: {guild.AfkChannel?.Mention ?? GetString(t.Common.Off, true)}\n" +
                                   $"> **{GetString(t.Commands.Utility.GuildInfo.InactiveTimeout)}**: `{((long)guild.AfkTimeout).GetHumanReadable()}`\n\n" +
-                                  $"🤖 **{GetString(t.Commands.Utility.GuildInfo.SystemMessages)}**: {guild.SystemChannel?.Mention ?? $"`{GetString(t.Common.Off)}`"}\n" +
+                                  $"🤖 **{GetString(t.Commands.Utility.GuildInfo.SystemMessages)}**: {guild.SystemChannel?.Mention ?? GetString(t.Common.Off, true)}\n" +
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotifications)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.Utility.GuildInfo.SystemMessagesWelcome)}**\n" +
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressJoinNotificationReplies)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.Utility.GuildInfo.SystemMessagesWelcomeStickers)}**\n" +
                                   $"> {(!guild.SystemChannelFlags.HasSystemChannelFlag(SystemChannelFlags.SuppressPremiumSubscriptions)).ToPillEmote(ctx.Bot)} **{GetString(t.Commands.Utility.GuildInfo.SystemMessagesBoost)}**\n" +
@@ -159,7 +159,7 @@ internal class GuildInfoCommand : BaseCommand
 						{
                             var embed = new DiscordEmbedBuilder
                             {
-                                Description = $"`{GetString(t.Commands.Utility.GuildInfo.NoGuildFound)}`",
+                                Description = GetString(t.Commands.Utility.GuildInfo.NoGuildFound, true),
                             }.AsBotError(ctx);
 
                             await RespondOrEdit(embed);

@@ -45,7 +45,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.ScoreSaber.Search.SelectContinent)}`"
+                Description = GetString(t.Commands.ScoreSaber.Search.SelectContinent, true)
             }.AsAwaitingInput(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents("no_country")).AddComponents(start_search_button));
@@ -71,7 +71,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
 
                             async Task RefreshCountryList()
                             {
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.Search.SelectCountry)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.Search.SelectCountry, true);
 
                                 if (selectedCountry != "no_country")
                                 {
@@ -103,7 +103,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                             async Task RefreshPlayerList()
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.Search.Searching)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.Search.Searching, true);
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx, "Score Saber")));
 
                                 if (currentFetchedPage != lastFetchedPage)
@@ -117,7 +117,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                                        embed.Description = $"`{GetString(t.Commands.ScoreSaber.InternalServerError)}`";
+                                        embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
@@ -126,7 +126,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                                        embed.Description = $"`{GetString(t.Commands.ScoreSaber.ForbiddenError)}`";
+                                        embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
@@ -165,7 +165,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
 
                                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-                                embed.Description = $"`{GetString(t.Commands.ScoreSaber.Search.FoundCount).Replace("{TotalCount}", lastSearch.metadata.total)}`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.Search.FoundCount, true, new TVar("TotalCount", lastSearch.metadata.total));
                                 await RespondOrEdit(builder.WithEmbed(embed.AsSuccess(ctx, "Score Saber")));
                             }
 
@@ -273,7 +273,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
                     }
                     catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                     {
-                        embed.Description = $"`{GetString(t.Commands.ScoreSaber.Search.NoSearchResult)}`";
+                        embed.Description = GetString(t.Commands.ScoreSaber.Search.NoSearchResult, true);
                         _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     }
                     catch (Exception)
