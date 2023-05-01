@@ -42,7 +42,7 @@ jobs:
       - name: Creating .ssh/ Folder
         run: mkdir -p ~/.ssh
       - name: Deploy with rsync
-        run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/xorog/Bots/latestProjectIchigo/
+        run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigo/
         working-directory: ProjectMakoto/ProjectMakoto/build/
   cleanup:
     name: Cleanup
