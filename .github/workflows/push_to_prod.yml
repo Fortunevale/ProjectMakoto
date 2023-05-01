@@ -40,7 +40,7 @@ jobs:
           key: ${{ secrets.SSH_TOKEN }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
       - name: Creating .ssh/ Folder
-        run: mkdir ~/.ssh
+        run: mkdir -p ~/.ssh
       - name: Deploy with rsync
         run: rsync -avzn --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/xorog/Bots/latestProjectIchigo/
         working-directory: build/
