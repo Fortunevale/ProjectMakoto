@@ -678,6 +678,15 @@ public class Translations
             {
                 public SingleTranslationKey Skipped;
             }
+
+
+            public pause Pause;
+
+            public class pause
+            {
+                public SingleTranslationKey Paused;
+                public SingleTranslationKey Resumed;
+            }
         }
 
         public configurationCommands Config;

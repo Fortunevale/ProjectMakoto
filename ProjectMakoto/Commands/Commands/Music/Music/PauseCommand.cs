@@ -15,20 +15,11 @@ internal class PauseCommand : BaseCommand
             var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
-            if (conn is null)
+            if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is not in a voice channel.`",
-                }.AsError(ctx));
-                return;
-            }
-
-            if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
-            {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
-                {
-                    Description = $"`You aren't in the same channel as the bot.`",
+                    Description = GetString(t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -42,7 +33,7 @@ internal class PauseCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? "`Paused playback.`" : "`Resumed playback.`"),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? GetString(t.Commands.Music.Pause.Paused, true) : GetString(t.Commands.Music.Pause.Resumed, true)),
             }.AsSuccess(ctx));
         });
     }

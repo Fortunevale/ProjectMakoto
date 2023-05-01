@@ -1576,6 +1576,14 @@
         "Skipped": {
           "en": "The song was force skipped."
         }
+      },
+      "Pause": {
+        "Paused": {
+          "en": "Paused playback."
+        },
+        "Resumed": {
+          "en": "Resumed playback."
+        }
       }
     },
     "Config": {
