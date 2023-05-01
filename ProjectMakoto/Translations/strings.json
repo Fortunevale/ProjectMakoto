@@ -48,6 +48,10 @@
       "en": "Next Page",
       "de": "Nächste Seite"
     },
+    "Refresh": {
+      "en": "Refresh",
+      "de": "Neu laden"
+    },
     "NotSelected": {
       "en": "Not yet selected.",
       "de": "Noch nicht ausgewählt."

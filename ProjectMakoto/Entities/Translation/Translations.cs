@@ -19,6 +19,7 @@ public class Translations
         public SingleTranslationKey Page;
         public SingleTranslationKey PreviousPage;
         public SingleTranslationKey NextPage;
+        public SingleTranslationKey Refresh;
         public SingleTranslationKey NotSelected;
         public SingleTranslationKey Reason;
     }
