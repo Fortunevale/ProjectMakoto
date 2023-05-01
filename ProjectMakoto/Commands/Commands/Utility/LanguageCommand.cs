@@ -8,14 +8,14 @@ internal class LanguageCommand : BaseCommand
         {
             await RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"{GetString(t.Commands.Language.Disclaimer, true)}\n" +
-                              $"{GetString(t.Commands.Language.Response, true)}: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
+                Description = $"{GetString(t.Commands.Utility.Language.Disclaimer, true)}\n" +
+                              $"{GetString(t.Commands.Utility.Language.Response, true)}: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
             });
 
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Utility.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
 
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
@@ -64,7 +64,7 @@ internal class LanguageCommand : BaseCommand
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Language.Selector));
+            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Utility.Language.Selector));
 
             if (SelectionResult.TimedOut)
             {

@@ -26,15 +26,6 @@ public class Translations
     public _commands Commands;
     public class _commands
     {
-        public language Language;
-        public class language
-        {
-            public SingleTranslationKey Disclaimer;
-            public SingleTranslationKey Response;
-            public SingleTranslationKey DisableOverride;
-            public SingleTranslationKey Selector;
-        }
-
         public common Common;
         public class common
         {
@@ -121,6 +112,15 @@ public class Translations
                 public SingleTranslationKey Module;
                 public SingleTranslationKey Disclaimer;
                 public SingleTranslationKey MissingCommand;
+            }
+
+            public language Language;
+            public class language
+            {
+                public SingleTranslationKey Disclaimer;
+                public SingleTranslationKey Response;
+                public SingleTranslationKey DisableOverride;
+                public SingleTranslationKey Selector;
             }
 
             public avatar Avatar;

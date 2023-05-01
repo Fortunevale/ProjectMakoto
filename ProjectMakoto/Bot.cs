@@ -350,6 +350,7 @@ public class Bot
                     return counts;
                 }
                 loadedTranslations.Progress = CalculateTranslationProgress(loadedTranslations);
+                _logger.LogDebug("Loaded translations: {0}", string.Join("; ", loadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
 
                 foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
                     if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))
