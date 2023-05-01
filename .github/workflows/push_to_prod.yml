@@ -5,11 +5,16 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    name: Build Project
+    name: Build Project and Upload to Server
     runs-on: self-hosted
     steps:
-      - name: Cleanup before build
+      - name: Cleanup
         run: rm -rf ProjectMakoto/
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_TOKEN }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
       - name: Setup .NET Core SDK 6.x
         uses: actions/setup-dotnet@v3
         with:
@@ -20,35 +25,26 @@ jobs:
           submodules: recursive
           path: ProjectMakoto
           token: ${{ secrets.Access_token }}
-      - name: Install dependencies
+      - name: Install Dependencies
         run: dotnet restore
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Build Makoto
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build"
         working-directory: ProjectMakoto/ProjectMakoto/
-      - name: Writing current version to file
+      - name: Create Version File
         run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakoto/
-  deploy:
-    name: Deploy Build to Server
-    needs: build
-    runs-on: self-hosted
-    steps:
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_TOKEN }}
-          known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
-      - name: Creating .ssh/ Folder
-        run: mkdir -p ~/.ssh
-      - name: Deploy with rsync
+      - name: Deploy to Production Server
         run: rsync -avz --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/${{ secrets.SSH_USERNAME }}/Bots/latestProjectIchigo/
         working-directory: ProjectMakoto/ProjectMakoto/build/
+      - name: Send Update Signal to Production Client
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigo/updated
   cleanup:
     name: Cleanup
-    needs: [ "build", "deploy" ]
+    needs: [ "build" ]
     if: success() || failure()
     runs-on: self-hosted
     steps:
-      - name: Cleanup Source Code
+      - name: Cleanup
         run: rm -rf ProjectMakoto/
+

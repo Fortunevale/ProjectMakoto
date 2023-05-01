@@ -6,7 +6,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Cleanup before build
-        run: rm -rf ProjectMakoto/
+        run: rm -rf ProjectMakotoTest/
       - name: Setup .NET Core SDK 6.x
         uses: actions/setup-dotnet@v3
         with:
@@ -15,11 +15,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-          path: ProjectMakoto
+          path: ProjectMakotoTest
           token: ${{ secrets.Access_token }}
       - name: Install dependencies
         run: dotnet restore
-        working-directory: ProjectMakoto/ProjectMakoto/
+        working-directory: ProjectMakotoTest/ProjectMakoto/
       - name: Build Makoto
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained
-        working-directory: ProjectMakoto/ProjectMakoto/
+        working-directory: ProjectMakotoTest/ProjectMakoto/
