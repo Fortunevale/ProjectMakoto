@@ -15,20 +15,11 @@ internal class ClearQueueCommand : BaseCommand
             var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
-            if (conn is null)
+            if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is not in a voice channel.`",
-                }.AsError(ctx));
-                return;
-            }
-
-            if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
-            {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
-                {
-                    Description = $"`You aren't in the same channel as the bot.`",
+                    Description = GetString(t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +28,7 @@ internal class ClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`You already voted to clear the current queue.`",
+                    Description = GetString(t.Commands.Music.ClearQueue.AlreadyVoted, true),
                 }.AsError(ctx));
                 return;
             }
@@ -51,19 +42,19 @@ internal class ClearQueueCommand : BaseCommand
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`The queue was cleared.`",
+                    Description = GetString(t.Commands.Music.ClearQueue.Cleared, true),
                 }.AsSuccess(ctx));
                 return;
             }
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`You voted to clear the current queue. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Vote to clear the current queue", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Commands.Music.ClearQueue.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
             builder.AddComponents(DisconnectVote);
 
             await RespondOrEdit(builder);
@@ -89,7 +80,7 @@ internal class ClearQueueCommand : BaseCommand
 
                         if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Contains(e.User.Id))
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `You already voted to clear the current queue.`").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(t.Commands.Music.ClearQueue.AlreadyVoted, true)}").AsEphemeral());
                             return;
                         }
 
@@ -97,7 +88,7 @@ internal class ClearQueueCommand : BaseCommand
 
                         if (member.VoiceState is null || member.VoiceState.Channel.Id != conn.Channel.Id)
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `You aren't in the same channel as the bot.`").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
                             return;
                         }
 
@@ -110,12 +101,12 @@ internal class ClearQueueCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = $"`The queue was cleared.`",
+                                Description = GetString(t.Commands.Music.ClearQueue.Cleared, true),
                             }.AsSuccess(ctx)));
                             return;
                         }
 
-                        embed.Description = $"`You voted to clear the current queue. ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot.watcher);

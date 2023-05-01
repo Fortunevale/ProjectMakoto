@@ -636,13 +636,14 @@ public class Translations
         public musicCommands Music;
         public class musicCommands
         {
-            public SingleTranslationKey BotNotInVc;
             public SingleTranslationKey NotSameChannel;
 
             public clearQueue ClearQueue;
             public class clearQueue
             {
-                
+                public SingleTranslationKey AlreadyVoted;
+                public SingleTranslationKey Cleared;
+                public SingleTranslationKey VoteStarted;
             }
         }
 

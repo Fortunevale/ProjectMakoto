@@ -1528,14 +1528,22 @@
       }
     },
     "Music": {
-      "BotNotInVc": {
-        "en": ""
-      },
       "NotSameChannel": {
-        "en": ""
+        "en": "You aren't in the same channel as the bot."
       },
       "ClearQueue": {
-
+        "AlreadyVoted": {
+          "en": "You already voted to clear the current queue."
+        },
+        "Cleared": {
+          "en": "The queue was cleared."
+        },
+        "VoteStarted": {
+          "en": "You voted to clear the current queue."
+        },
+        "VoteButton": {
+          "en": "Vote to clear the current queue"
+        }
       }
     },
     "Config": {
