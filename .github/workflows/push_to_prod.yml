@@ -18,17 +18,17 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-          path: ProjectMakoto
+          path: ~/ProjectMakoto
           token: ${{ secrets.Access_token }}
       - name: Install dependencies
         run: dotnet restore
-        working-directory: ProjectMakoto/ProjectMakoto/
+        working-directory: ~/ProjectMakoto/ProjectMakoto/
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "ProjectMakoto/build"
-        working-directory: ProjectMakoto/ProjectMakoto/
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "~/build"
+        working-directory: ~/ProjectMakoto/ProjectMakoto/
       - name: Writing current version to file
-        run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
-        working-directory: ProjectMakoto/
+        run: git rev-parse --short HEAD > "~/build/LatestGitPush.cfg" && git branch --show-current >> ~/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ~/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ~/build/LatestGitPush.cfg
+        working-directory: ~/ProjectMakoto/
   deploy:
     name: Deploy Build to Server
     needs: build
@@ -43,10 +43,14 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_SERVER }}{% endraw%} >> ~/.ssh/known_hosts
       - name: Deploy with rsync
         run: rsync -avzn --delete --force -e "ssh -p ${{ secrets.SSH_PORT }}" . ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }}:/home/xorog/Bots/latestProjectIchigo/
-        working-directory: ProjectMakoto/build/
+        working-directory: ~/build/
   cleanup:
     name: Cleanup
+    needs: [ "build", "deploy" ]#
+    if: success() || failure()
     runs-on: self-hosted
     steps:
-      - name: Cleanup
-        run: rm -rf ProjectMakoto/
+      - name: Cleanup Source Code
+        run: rm -rf ~/ProjectMakoto/
+      - name: Cleanup Build
+        run: rm -rf ~/build/
