@@ -1,8 +1,5 @@
-name: Build and Push to Production
-on: 
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+name: Test Build
+on: ["push", "workflow_dispatch", "pull_request"]
 jobs:
   push:
     name: Build Project
@@ -24,16 +21,5 @@ jobs:
         run: dotnet restore
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Build Makoto
-        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "/home/github-runner/build/"
+        run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained
         working-directory: ProjectMakoto/ProjectMakoto/
-      - name: Writing current version to file
-        run: git rev-parse --short HEAD > "/home/github-runner/build/LatestGitPush.cfg" && git branch --show-current >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> /home/github-runner/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> /home/github-runner/build/LatestGitPush.cfg
-        working-directory: ProjectMakoto/
-      - name: Cleanup
-        run: rm -rf ProjectMakoto/
-      - name: Deleting old successful build
-        run: rm -rf /home/github-runner/successful_build
-      - name: Moving successful build
-        run: mv /home/github-runner/build/ /home/github-runner/successful_build
-      - name: Adjusting permissions for successful build
-        run: chmod -R 0755 /home/github-runner/successful_build
