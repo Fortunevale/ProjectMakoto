@@ -636,6 +636,7 @@ public class Translations
         public musicCommands Music;
         public class musicCommands
         {
+            public SingleTranslationKey DjRole;
             public SingleTranslationKey NotSameChannel;
 
             public clearQueue ClearQueue;
@@ -654,6 +655,13 @@ public class Translations
                 public SingleTranslationKey Disconnected;
                 public SingleTranslationKey VoteStarted;
                 public SingleTranslationKey VoteButton;
+            }
+
+            public forceClearQueue ForceClearQueue;
+
+            public class forceClearQueue
+            {
+                public SingleTranslationKey Cleared;
             }
         }
 

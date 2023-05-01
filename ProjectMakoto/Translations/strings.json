@@ -1531,6 +1531,9 @@
       "NotSameChannel": {
         "en": "You aren't in the same channel as the bot."
       },
+      "DjRole": {
+        "en": "You need Administrator Permissions or a role called '{Role}' to utilize this command."
+      },
       "ClearQueue": {
         "AlreadyVoted": {
           "en": "You already voted to clear the current queue."
@@ -1547,16 +1550,16 @@
       },
       "Disconnect": {
         "AlreadyVoted": {
-          "en": "You already voted to clear the current queue."
+          "en": "You already voted to disconnect the bot."
         },
         "Disconnected": {
-          "en": "The queue was cleared."
+          "en": "The bot was disconnected."
         },
         "VoteStarted": {
-          "en": "You voted to clear the current queue."
+          "en": "You voted to disconnect the bot."
         },
         "VoteButton": {
-          "en": "Vote to clear the current queue"
+          "en": "Vote to disconnect"
         }
       }
     },
