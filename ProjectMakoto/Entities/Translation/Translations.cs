@@ -670,6 +670,14 @@ public class Translations
             {
                 public SingleTranslationKey Disconnected;
             }
+
+
+            public forceSkip ForceSkip;
+
+            public class forceSkip
+            {
+                public SingleTranslationKey Skipped;
+            }
         }
 
         public configurationCommands Config;
