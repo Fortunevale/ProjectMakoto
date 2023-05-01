@@ -27,7 +27,7 @@ jobs:
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained --output "build"
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Writing current version to file
-        run: git rev-parse --short HEAD > "build/LatestGitPush.cfg" && git branch --show-current >> build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> build/LatestGitPush.cfg
+        run: git rev-parse --short HEAD > "ProjectMakoto/build/LatestGitPush.cfg" && git branch --show-current >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%d.%m.%y) >> ProjectMakoto/build/LatestGitPush.cfg && echo $(date +%H:%M:%S,00) >> ProjectMakoto/build/LatestGitPush.cfg
         working-directory: ProjectMakoto/
   deploy:
     name: Deploy Build to Server
@@ -46,7 +46,7 @@ jobs:
         working-directory: build/
   cleanup:
     name: Cleanup
-    needs: [ "build", "deploy" ]#
+    needs: [ "build", "deploy" ]
     if: success() || failure()
     runs-on: self-hosted
     steps:
