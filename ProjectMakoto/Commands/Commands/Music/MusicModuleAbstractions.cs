@@ -4,6 +4,8 @@ internal class MusicModuleAbstractions
 {
     public static async Task<(List<LavalinkTrack> Tracks, LavalinkLoadResult oriResult, bool Continue)> GetLoadResult(SharedCommandContext ctx, string load)
     {
+        var t = ctx.BaseCommand.t;
+
         if (Regex.IsMatch(load, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+") || load.ToLower().Contains("localhost") || load.ToLower().Contains("127.0.0.1"))
             throw new Exception();
 
@@ -13,7 +15,7 @@ internal class MusicModuleAbstractions
         var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
-        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription($"`Looking for '{load}'..`").AsLoading(ctx));
+        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, new TVar("Search", load))).AsLoading(ctx));
 
         LavalinkLoadResult loadResult;
 
@@ -61,7 +63,7 @@ internal class MusicModuleAbstractions
         }
         else
         {
-            embed.Description = $"`On what platform do you want to search?`";
+            embed.Description = t.Commands.Music.Play.PlatformSelect.Get(ctx.DbUser).Build(true);
             embed.AsAwaitingInput(ctx);
             
             var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Bot)));
@@ -79,7 +81,9 @@ internal class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription($"`Looking for '{load}' on {(Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")}..`").AsLoading(ctx));
+            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, 
+                new TVar("Search", load),
+                new TVar("Platform", (Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")))).AsLoading(ctx));
 
             loadResult = await node.Rest.GetTracksAsync(load, (Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
         }
@@ -87,14 +91,16 @@ internal class MusicModuleAbstractions
         if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
         {
             _logger.LogError("An exception occurred while trying to load lavalink track: {Exception}", loadResult.Exception.Message);
-            embed.Description = $"`Failed to load '{load}'.`";
+            embed.Description = t.Commands.Music.Play.FailedToLoad.Get(ctx.DbUser).Build(true,
+                new TVar("Search", load));
             embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
         {
-            embed.Description = $"`No matches found for '{load}'.`";
+            embed.Description = t.Commands.Music.Play.NoMatches.Get(ctx.DbUser).Build(true,
+                new TVar("Search", load));
             embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
@@ -111,7 +117,9 @@ internal class MusicModuleAbstractions
         }
         else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
         {
-            embed.Description = $"`Found {loadResult.Tracks.Count} load result(s). Please select the song you want to add below.`";
+            embed.Description = t.Commands.Music.Play.SearchSuccess.Get(ctx.DbUser).Build(true,
+                new TVar("Count", loadResult.Tracks.Count));
+            ;
             embed.AsAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 

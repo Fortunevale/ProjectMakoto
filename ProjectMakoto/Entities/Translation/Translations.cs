@@ -687,6 +687,26 @@ public class Translations
                 public SingleTranslationKey Paused;
                 public SingleTranslationKey Resumed;
             }
+
+
+            public play Play;
+
+            public class play
+            {
+                public SingleTranslationKey Preparing;
+                public SingleTranslationKey QueuedMultiple;
+                public SingleTranslationKey QueuedSingle;
+                public SingleTranslationKey QueuePositions;
+                public SingleTranslationKey QueuePosition;
+                public SingleTranslationKey Uploader;
+                public SingleTranslationKey Duration;
+                public SingleTranslationKey LookingFor;
+                public SingleTranslationKey LookingForPlatform;
+                public SingleTranslationKey PlatformSelect;
+                public SingleTranslationKey FailedToLoad;
+                public SingleTranslationKey NoMatches;
+                public SingleTranslationKey SearchSuccess;
+            }
         }
 
         public configurationCommands Config;

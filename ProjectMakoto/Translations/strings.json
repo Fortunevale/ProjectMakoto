@@ -1584,6 +1584,47 @@
         "Resumed": {
           "en": "Resumed playback."
         }
+      },
+      "Play": {
+        "Preparing": {
+          "en": "Preparing connection.."
+        },
+        "QueuedMultiple": {
+          "en": "Queued {Count} songs from {Playlist}."
+        },
+        "QueuedSingle": {
+          "en": "Queued {Track}."
+        },
+        "QueuePositions": {
+          "en": "Queue Positions"
+        },
+        "QueuePosition": {
+          "en": "Queue Position"
+        },
+        "Uploader": {
+          "en": "Uploaded by"
+        },
+        "Duration": {
+          "en": "Duration"
+        },
+        "LookingFor": {
+          "en": "Looking for '{Search}'.."
+        },
+        "LookingForPlatform": {
+          "en": "Looking for '{Search}' on {Platform}.."
+        },
+        "PlatformSelect": {
+          "en": "On what platform do you want to search?"
+        },
+        "FailedToLoad": {
+          "en": "Failed to load '{Search}'."
+        },
+        "NoMatches": {
+          "en": "No matches found for '{Search}'."
+        },
+        "SearchSuccess": {
+          "en": "Found {Count} load result(s). Please select the song you want to add below."
+        }
       }
     },
     "Config": {
