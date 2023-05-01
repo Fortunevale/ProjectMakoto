@@ -77,9 +77,9 @@ internal class TaskWatcher
                 else
                     _logger.LogError("A task failed to execute", b.task.Exception);
 
-                var ExceptionType = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.GetType() : b.task.Exception.InnerException.GetType());
-                var Exception = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception : b.task.Exception.InnerException);
-                string ExceptionMessage = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.Message : b.task.Exception.InnerException.Message);
+                var ExceptionType = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception?.GetType() : b.task.Exception?.InnerException.GetType());
+                var Exception = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception : b.task.Exception.InnerException);
+                string ExceptionMessage = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception?.Message : b.task.Exception.InnerException?.Message);
 
                 if (ExceptionType == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {
