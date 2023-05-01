@@ -41,7 +41,7 @@ jobs:
         run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigo/updated
   cleanup:
     name: Cleanup
-    needs: [ "build", "deploy" ]
+    needs: [ "build" ]
     if: success() || failure()
     runs-on: self-hosted
     steps:
