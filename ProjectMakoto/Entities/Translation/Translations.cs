@@ -717,6 +717,13 @@ public class Translations
                 public SingleTranslationKey CurrentlyPlaying;
                 public SingleTranslationKey NoSong;
             }
+
+            public join Join;
+            public class join
+            {
+                public SingleTranslationKey Joined;
+                public SingleTranslationKey AlreadyUsed;
+            }
         }
 
         public configurationCommands Config;

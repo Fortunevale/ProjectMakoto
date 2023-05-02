@@ -35,7 +35,7 @@ internal class JoinCommand : BaseCommand
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`The bot joined your channel.`",
+                        Description = GetString(t.Commands.Music.Join.Joined, true),
                     }.AsSuccess(ctx));
                 return;
             }
@@ -44,7 +44,7 @@ internal class JoinCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is already in use.`",
+                    Description = GetString(t.Commands.Music.Join.AlreadyUsed, true),
                 }.AsError(ctx));
 
                 throw new CancelException();
@@ -59,7 +59,7 @@ internal class JoinCommand : BaseCommand
             if (Announce)
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot joined your channel.`",
+                    Description = GetString(t.Commands.Music.Join.Joined, true),
                 }.AsSuccess(ctx));
         });
     }

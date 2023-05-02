@@ -1643,6 +1643,14 @@
         "NoSong": {
           "en": "No song is playing"
         }
+      },
+      "Join": {
+        "Joined": {
+          "en": "The bot joined your channel."
+        },
+        "AlreadyUsed": {
+          "en": "The bot is already in use."
+        }
       }
     },
     "Config": {
