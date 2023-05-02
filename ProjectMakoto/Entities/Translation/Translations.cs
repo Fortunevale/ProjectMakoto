@@ -708,6 +708,15 @@ public class Translations
                 public SingleTranslationKey NoMatches;
                 public SingleTranslationKey SearchSuccess;
             }
+
+            public queue Queue;
+            public class queue
+            {
+                public SingleTranslationKey QueueCount;
+                public SingleTranslationKey Track;
+                public SingleTranslationKey CurrentlyPlaying;
+                public SingleTranslationKey NoSong;
+            }
         }
 
         public configurationCommands Config;

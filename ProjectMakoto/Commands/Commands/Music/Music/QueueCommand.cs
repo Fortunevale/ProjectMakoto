@@ -15,20 +15,11 @@ internal class QueueCommand : BaseCommand
             var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
-            if (conn is null)
+            if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is not in a voice channel.`",
-                }.AsError(ctx));
-                return;
-            }
-
-            if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
-            {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
-                {
-                    Description = $"`You aren't in the same channel as the bot.`",
+                    Description = GetString(t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -44,10 +35,10 @@ internal class QueueCommand : BaseCommand
 
             async Task UpdateMessage()
             {
-                DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", "Refresh", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+                DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", GetString(t.Common.Refresh), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
 
-                DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-                DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", GetString(t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", GetString(t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 
                 LastInt = CurrentPage * 10;
 
@@ -58,13 +49,13 @@ internal class QueueCommand : BaseCommand
                     TotalTimespan = TotalTimespan.Add(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue[i].Length);
                 }
 
-                var Description = $"**`There's currently {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count} song(s) queued. This queue last for {TotalTimespan.GetHumanReadable()}.`**\n\n";
-                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` [`{x.VideoTitle}`]({x.Url}) requested by {x.user.Mention}"))}\n\n";
+                var Description = $"{GetString(t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
+                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {GetString(t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count > 0)
-                    Description += $"`Page {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count / 10.0)}`\n\n";
+                    Description += $"`{GetString(t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count / 10.0)}`\n\n";
 
-                Description += $"`Currently playing:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : "No song is playing")}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
+                Description += $"`{GetString(t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : GetString(t.Commands.Music.Queue.NoSong))}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
                 Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
                 Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
                 Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";

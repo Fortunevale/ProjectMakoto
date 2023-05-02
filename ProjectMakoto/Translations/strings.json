@@ -1629,6 +1629,20 @@
         "SearchSuccess": {
           "en": "Found {Count} load result(s). Please select the song you want to add below."
         }
+      },
+      "Queue": {
+        "QueueCount": {
+          "en": "There's currently {Count} song(s) queued. This queue last for {Timespan}."
+        },
+        "Track": {
+          "en": "{Video} requested by {Requester}"
+        },
+        "CurrentlyPlaying": {
+          "en": "Currently playing"
+        },
+        "NoSong": {
+          "en": "No song is playing"
+        }
       }
     },
     "Config": {
