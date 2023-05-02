@@ -49,12 +49,12 @@ internal class ClearQueueCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetGuildString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Commands.Music.ClearQueue.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(t.Commands.Music.ClearQueue.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
             builder.AddComponents(DisconnectVote);
 
             await RespondOrEdit(builder);
@@ -106,7 +106,7 @@ internal class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`{GetString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetGuildString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot.watcher);
