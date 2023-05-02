@@ -739,6 +739,13 @@ public class Translations
                 public SingleTranslationKey On;
                 public SingleTranslationKey Off;
             }
+
+            public shuffle Shuffle;
+            public class shuffle
+            {
+                public SingleTranslationKey On;
+                public SingleTranslationKey Off;
+            }
         }
 
         public configurationCommands Config;

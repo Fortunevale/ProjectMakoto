@@ -1670,6 +1670,14 @@
         "Off": {
           "en": "The queue no longer repeats itself."
         }
+      },
+      "Shuffle": {
+        "On": {
+          "en": "The queue now shuffles."
+        },
+        "Off": {
+          "en": "The queue no longer shuffles."
+        }
       }
     },
     "Config": {
