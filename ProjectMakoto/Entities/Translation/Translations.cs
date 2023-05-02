@@ -732,6 +732,13 @@ public class Translations
                 public SingleTranslationKey NoSong;
                 public SingleTranslationKey Removed;
             }
+
+            public repeat Repeat;
+            public class repeat
+            {
+                public SingleTranslationKey On;
+                public SingleTranslationKey Off;
+            }
         }
 
         public configurationCommands Config;
