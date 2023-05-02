@@ -1678,6 +1678,20 @@
         "Off": {
           "en": "The queue no longer shuffles."
         }
+      },
+      "Skip": {
+        "AlreadyVoted": {
+          "en": "You already voted to skip the current song."
+        },
+        "Skipped": {
+          "en": "The song was skipped."
+        },
+        "VoteStarted": {
+          "en": "You voted to skip the current song."
+        },
+        "VoteButton": {
+          "en": "Vote to skip the current song"
+        }
       }
     },
     "Config": {

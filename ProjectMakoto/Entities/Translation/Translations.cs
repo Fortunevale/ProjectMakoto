@@ -746,6 +746,15 @@ public class Translations
                 public SingleTranslationKey On;
                 public SingleTranslationKey Off;
             }
+
+            public skip Skip;
+            public class skip
+            {
+                public SingleTranslationKey AlreadyVoted;
+                public SingleTranslationKey Skipped;
+                public SingleTranslationKey VoteStarted;
+                public SingleTranslationKey VoteButton;
+            }
         }
 
         public configurationCommands Config;
