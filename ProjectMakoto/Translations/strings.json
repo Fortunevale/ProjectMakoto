@@ -1651,6 +1651,17 @@
         "AlreadyUsed": {
           "en": "The bot is already in use."
         }
+      },
+      "RemoveQueue": {
+        "OutOfRange": {
+          "en": "Your value is out of range. Currently, the range is {Min}-{Max}."
+        },
+        "NoSong": {
+          "en": "There is no such song queued."
+        },
+        "Removed": {
+          "en": "Removed {Track} from the current queue."
+        }
       }
     },
     "Config": {

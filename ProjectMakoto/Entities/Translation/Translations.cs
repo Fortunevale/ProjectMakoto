@@ -724,6 +724,14 @@ public class Translations
                 public SingleTranslationKey Joined;
                 public SingleTranslationKey AlreadyUsed;
             }
+
+            public removeQueue RemoveQueue;
+            public class removeQueue
+            {
+                public SingleTranslationKey OutOfRange;
+                public SingleTranslationKey NoSong;
+                public SingleTranslationKey Removed;
+            }
         }
 
         public configurationCommands Config;
