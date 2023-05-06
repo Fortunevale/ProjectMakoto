@@ -1795,6 +1795,14 @@
           "Exported": {
             "en": "Exported your playlist '{Name}' to json. Please download the attached file."
           }
+        },
+        "Delete": {
+          "Deleting": {
+            "en": "Deleting your playlist '{Name}'.."
+          },
+          "Deleted": {
+            "en": "Your playlist '{Name}' has ben deleted."
+          }
         }
       }
     },

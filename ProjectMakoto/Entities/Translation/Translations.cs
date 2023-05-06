@@ -814,6 +814,13 @@ public class Translations
                 {
                     public SingleTranslationKey Exported;
                 }
+
+                public delete Delete;
+                public class delete
+                {
+                    public SingleTranslationKey Deleting;
+                    public SingleTranslationKey Deleted;
+                }
             }
         }
 

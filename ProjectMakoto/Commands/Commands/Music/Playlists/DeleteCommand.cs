@@ -24,14 +24,14 @@ internal class DeleteCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`Deleting your playlist '{SelectedPlaylist.PlaylistName}'..`",
+                Description = GetString(t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
             }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
             ctx.Bot.users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`Your playlist '{SelectedPlaylist.PlaylistName}' has been deleted.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
+                Description = GetString(t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
             }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
             await Task.Delay(5000);
             return;
