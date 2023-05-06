@@ -1692,6 +1692,43 @@
         "VoteButton": {
           "en": "Vote to skip the current song"
         }
+      },
+      "Playlists": {
+        "Title": {
+          "en": "Playlists"
+        },
+        "PlayListLimit": {
+          "en": "You already have {Count} playlists stored. Please delete on to create a new one."
+        },
+        "LoadShare": {
+          "Loading": {
+            "en": "Loading the shared playlists.."
+          },
+          "NotFound": {
+            "en": "The specified sharecode couldn't be found."
+          },
+          "Found": {
+            "en": "Playlist found! Please check details of the playlist below and confirm or deny whether you want to import this playlist."
+          },
+          "PlaylistName": {
+            "en": "Playlist Name"
+          },
+          "Tracks": {
+            "en": "Tracks"
+          },
+          "CreatedBy": {
+            "en": "Created by"
+          },
+          "ImportButton": {
+            "en": "Import this playlist"
+          },
+          "Importing": {
+            "en": "Importing playlist.."
+          },
+          "Imported": {
+            "en": "The playlist '{Name}' has been added to your playlists."
+          }
+        }
       }
     },
     "Config": {

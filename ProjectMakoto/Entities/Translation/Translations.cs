@@ -755,6 +755,27 @@ public class Translations
                 public SingleTranslationKey VoteStarted;
                 public SingleTranslationKey VoteButton;
             }
+
+            public playlists Playlists;
+            public class playlists
+            {
+                public SingleTranslationKey Title;
+                public SingleTranslationKey PlayListLimit;
+
+                public loadShare LoadShare;
+                public class loadShare
+                {
+                    public SingleTranslationKey Loading;
+                    public SingleTranslationKey NotFound;
+                    public SingleTranslationKey Found;
+                    public SingleTranslationKey PlaylistName;
+                    public SingleTranslationKey Tracks;
+                    public SingleTranslationKey CreatedBy;
+                    public SingleTranslationKey ImportButton;
+                    public SingleTranslationKey Importing;
+                    public SingleTranslationKey Imported;
+                }
+            }
         }
 
         public configurationCommands Config;

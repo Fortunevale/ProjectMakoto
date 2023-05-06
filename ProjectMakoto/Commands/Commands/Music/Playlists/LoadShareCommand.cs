@@ -7,15 +7,22 @@ internal class LoadShareCommand : BaseCommand
         return Task.Run(async () =>
         {
             ulong userid = (ulong)arguments["userid"];
-            string id = (string)arguments["id"];
+            string id = ((string)arguments["id"])
+                .Replace("/", "")
+                .Replace("\\", "")
+                .Replace(">", "")
+                .Replace("<", "")
+                .Replace("|", "")
+                .Replace(":", "")
+                .Replace("&", "");
 
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
                 return;
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`Loading the shared playlists..`"
-            }.AsLoading(ctx, "Playlists");
+                Description = GetString(t.Commands.Music.Playlists.LoadShare.Loading, true)
+            }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title));
             await RespondOrEdit(embed);
 
             if (!Directory.Exists("PlaylistShares"))
@@ -23,8 +30,8 @@ internal class LoadShareCommand : BaseCommand
 
             if (!Directory.Exists($"PlaylistShares/{userid}") || !File.Exists($"PlaylistShares/{userid}/{id}.json"))
             {
-                embed.Description = "`The specified sharecode couldn't be found.`";
-                embed.AsError(ctx, "Playlists");
+                embed.Description = GetString(t.Commands.Music.Playlists.LoadShare.NotFound);
+                embed.AsError(ctx, GetString(t.Commands.Music.Playlists.Title));
                 await RespondOrEdit(embed.Build());
                 return;
             }
@@ -34,15 +41,17 @@ internal class LoadShareCommand : BaseCommand
             var rawJson = File.ReadAllText($"PlaylistShares/{userid}/{id}.json");
             var ImportJson = JsonConvert.DeserializeObject<UserPlaylist>((rawJson is null or "null" or "" ? "[]" : rawJson), new JsonSerializerSettings() { MissingMemberHandling = MissingMemberHandling.Error });
 
-            embed.AsInfo(ctx, "Playlists");
+            var pad = TranslationUtil.CalculatePadding(ctx.DbUser, t.Commands.Music.Playlists.LoadShare.PlaylistName, t.Commands.Music.Playlists.LoadShare.Tracks, t.Commands.Music.Playlists.LoadShare.CreatedBy);
+
+            embed.AsInfo(ctx, GetString(t.Commands.Music.Playlists.Title));
             embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = ImportJson.PlaylistThumbnail };
             embed.Color = (ImportJson.PlaylistColor is "#FFFFFF" or null or "" ? EmbedColors.Info : new DiscordColor(ImportJson.PlaylistColor.IsValidHexColor()));
-            embed.Description = "`Playlist found! Please check details of the playlist below and confirm or deny whether you want to import this playlist.`\n\n" +
-                               $"`Playlist Name`: `{ImportJson.PlaylistName}`\n" +
-                               $"`Tracks       `: `{ImportJson.List.Count}`\n" +
-                               $"`Created by   `: {user.Mention} `{user.UsernameWithDiscriminator} ({user.Id})`";
+            embed.Description = $"{GetString(t.Commands.Music.Playlists.LoadShare.Found, true)}\n\n" +
+                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.PlaylistName).PadRight(pad)}`: `{ImportJson.PlaylistName}`\n" +
+                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.Tracks).PadRight(pad)}`: `{ImportJson.List.Count}`\n" +
+                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.UsernameWithDiscriminator} ({user.Id})`";
 
-            DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), "Import this playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
+            DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { Confirm, MessageComponents.GetCancelButton(ctx.DbUser) }));
 
@@ -61,15 +70,15 @@ internal class LoadShareCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`Importing playlist..`",
-                }.AsLoading(ctx, "Playlists")));
+                    Description = GetString(t.Commands.Music.Playlists.LoadShare.Importing, true),
+                }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                 if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
-                    }.AsError(ctx, "Playlists")));
+                        Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true),
+                    }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     return;
                 }
 
@@ -77,8 +86,8 @@ internal class LoadShareCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`The playlist '{ImportJson.PlaylistName}' has been added to your playlists.`",
-                }.AsSuccess(ctx, "Playlists")));
+                    Description = GetString(t.Commands.Music.Playlists.LoadShare.Imported, true, new TVar("Name", ImportJson.PlaylistName)),
+                }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
             }
             else
             {
