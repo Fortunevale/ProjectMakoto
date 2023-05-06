@@ -13,17 +13,17 @@ internal class ImportCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
+                    Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
                 }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                 return;
             }
 
-            var Link = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Link", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
-            var ExportedPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Exported Playlist", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📂")));
+            var Link = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Import.Link), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
+            var ExportedPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Import.ExportedPlaylist), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📂")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`Do you want to import a playlist via link or exported playlist?`",
+                Description = GetString(t.Commands.Music.Playlists.Import.ImportMethod, true),
             }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)))
             .AddComponents(new List<DiscordComponent> { Link, ExportedPlaylist })
             .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
@@ -38,8 +38,8 @@ internal class ImportCommand : BaseCommand
 
             if (Menu.GetCustomId() == Link.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder("Import Playlist", Guid.NewGuid().ToString())
-                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Playlist Url, Playlist Url", "", 1, 100, true));
+                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Music.Playlists.Import.ImportPlaylist), Guid.NewGuid().ToString())
+                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", GetString(t.Commands.Music.Playlists.Import.PlaylistUrl), "", 1, 100, true));
 
                 var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
 
@@ -71,7 +71,7 @@ internal class ImportCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Couldn't load a playlist from this url.`",
+                        Description = GetString(t.Commands.Music.Playlists.Import.NotLoaded, true),
                     }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     return;
                 }
@@ -81,14 +81,14 @@ internal class ImportCommand : BaseCommand
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
+                            Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
                         }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Creating your playlist..`",
+                        Description = GetString(t.Commands.Music.Playlists.Import.Creating, true),
                     }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                     var v = new UserPlaylist
@@ -101,7 +101,9 @@ internal class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Your playlist '{v.PlaylistName}' has been created with {v.List.Count} entries.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
+                        Description = GetString(t.Commands.Music.Playlists.Import.Created, true, 
+                        new TVar("Name", v.PlaylistName),
+                        new TVar("Count", v.List.Count)),
                     }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;
@@ -110,7 +112,7 @@ internal class ImportCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`The specified url doesn't lead to a playlist.`",
+                        Description = GetString(t.Commands.Music.Playlists.Import.NotLoaded, true),
                     }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     return;
                 }
@@ -123,7 +125,7 @@ internal class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Please upload an exported playlist via '{ctx.Prefix}upload'.`",
+                        Description = GetString(t.Commands.Music.Playlists.Import.UploadExport, true, new TVar("Command", $"{ctx.Prefix}upload")),
                     }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                     Stream stream;
@@ -134,10 +136,6 @@ internal class ImportCommand : BaseCommand
                     }
                     catch (AlreadyAppliedException)
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-                        {
-                            Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                        }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                         return;
                     }
                     catch (ArgumentException)
@@ -148,7 +146,7 @@ internal class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Importing your attachment..`",
+                        Description = GetString(t.Commands.Music.Playlists.Import.Importing, true),
                     }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                     var rawJson = new StreamReader(stream).ReadToEnd();
@@ -164,15 +162,10 @@ internal class ImportCommand : BaseCommand
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
+                            Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
                         }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                         return;
                     }
-
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
-                    {
-                        Description = $"`Creating your playlist..`",
-                    }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                     var v = new UserPlaylist
                     {
@@ -185,7 +178,9 @@ internal class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Your playlist '{v.PlaylistName}' has been created with {v.List.Count} entries.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..",
+                        Description = GetString(t.Commands.Music.Playlists.Import.Created, true,
+                        new TVar("Name", v.PlaylistName),
+                        new TVar("Count", v.List.Count)),
                     }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;
@@ -194,7 +189,7 @@ internal class ImportCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Failed to import your attachment. Is this a valid playlist?`",
+                        Description = GetString(t.Commands.Music.Playlists.Import.ImportFailed, true),
                     }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                     _logger.LogError("Failed to import a playlist", ex);

@@ -44,6 +44,7 @@ public class Translations
                 public SingleTranslationKey Data;
                 public SingleTranslationKey BotPermissions;
                 public SingleTranslationKey DirectMessage;
+                public SingleTranslationKey UploadInProgress;
             }
 
             public prompts Prompts;
@@ -820,6 +821,22 @@ public class Translations
                 {
                     public SingleTranslationKey Deleting;
                     public SingleTranslationKey Deleted;
+                }
+
+                public import Import;
+                public class import
+                {
+                    public SingleTranslationKey Link;
+                    public SingleTranslationKey ExportedPlaylist;
+                    public SingleTranslationKey ImportMethod;
+                    public SingleTranslationKey ImportPlaylist;
+                    public SingleTranslationKey PlaylistUrl;
+                    public SingleTranslationKey NotLoaded;
+                    public SingleTranslationKey Creating;
+                    public SingleTranslationKey Created;
+                    public SingleTranslationKey UploadExport;
+                    public SingleTranslationKey Importing;
+                    public SingleTranslationKey ImportFailed;
                 }
             }
         }

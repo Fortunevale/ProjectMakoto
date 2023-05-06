@@ -107,6 +107,10 @@
         "DirectMessage": {
           "en": "I am unable to send you a direct message. Please make sure you have the server's direct messages on and you don't have me blocked.",
           "de": "Ich kann dir keine Direktnachricht senden. Bitte stelle sicher dass du mich nicht blockiert hast und Direktnachrichten auf diesem Server an hast."
+        },
+        "UploadInProgress": {
+          "en": "An upload interaction is already taking place. Please finish it beforehand.",
+          "de": "Eine Upload Interaktion läuft bereits. Bitte beende diese bevor du eine weitere startest."
         }
       },
       "Prompts": {
@@ -1802,6 +1806,41 @@
           },
           "Deleted": {
             "en": "Your playlist '{Name}' has ben deleted."
+          }
+        },
+        "Import": {
+          "Link": {
+            "en": "Link"
+          },
+          "ExportedPlaylist": {
+            "en": "Exported Playlist"
+          },
+          "ImportMethod": {
+            "en": "Do you want to import a playlist via link or exported playlist?"
+          },
+          "ImportPlaylist": {
+            "en": "Import Playlist"
+          },
+          "PlaylistUrl": {
+            "en": "Playlist Url"
+          },
+          "NotLoaded": {
+            "en": "Couldn't load a playlist from this url."
+          },
+          "Creating": {
+            "en": "Creating your playlist.."
+          },
+          "Created": {
+            "en": "Your playlist '{Name}' with {Count} entries has been created."
+          },
+          "UploadExport": {
+            "en": "Please upload an exported playlist via '{Command}'."
+          },
+          "Importing": {
+            "en": "Importing your attachment.."
+          },
+          "ImportFailed": {
+            "en": "Failed to import your attachment. Is this a valid playlist?"
           }
         }
       }
