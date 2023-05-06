@@ -49,7 +49,7 @@ internal class LoadShareCommand : BaseCommand
             embed.Description = $"{GetString(t.Commands.Music.Playlists.LoadShare.Found, true)}\n\n" +
                                 $"`{GetString(t.Commands.Music.Playlists.LoadShare.PlaylistName).PadRight(pad)}`: `{ImportJson.PlaylistName}`\n" +
                                 $"`{GetString(t.Commands.Music.Playlists.Tracks).PadRight(pad)}`: `{ImportJson.List.Count}`\n" +
-                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.UsernameWithDiscriminator} ({user.Id})`";
+                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.GetUsername()} ({user.Id})`";
 
             DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
 
@@ -77,7 +77,7 @@ internal class LoadShareCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true),
+                        Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
                     }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     return;
                 }
