@@ -40,7 +40,10 @@ public static class TranslationUtil
 
         foreach (var b in vars)
         {
-            var newText = b.Replacement.ToString();
+            if (b.Replacement is null)
+                _logger.LogWarn("TVar is null on ValueName {0}", b.ValName);
+
+            var newText = b.Replacement?.ToString() ?? "";
 
             if (newText.StartsWith("<") && newText.EndsWith(">") && Code)
             {
