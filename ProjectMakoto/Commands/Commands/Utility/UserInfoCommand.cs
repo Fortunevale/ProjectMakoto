@@ -189,7 +189,7 @@ internal class UserInfoCommand : BaseCommand
             try
             {
                 if (victim.Presence is not null && victim.Presence.Activities is not null && victim.Presence.Activities?.Count > 0)
-                    embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.Activities), string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"• {GetString(t.Commands.Utility.UserInfo.Status)}: `{x.CustomStatus.Emoji.Name}`{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"• {TranslateActivity(x.ActivityType)} {x.Name}")}")), true));
+                    embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.Activities), string.Join("\n", victim.Presence.Activities.Select(x => $"{(x.ActivityType == ActivityType.Custom ? $"• {GetString(t.Commands.Utility.UserInfo.Status)}: `{x.CustomStatus.Emoji?.Name ?? "None"}`{(string.IsNullOrWhiteSpace(x.CustomStatus.Name) ? "" : $" {x.CustomStatus.Name}")}\n" : $"• {TranslateActivity(x.ActivityType)} {x.Name}")}")), true));
             }
             catch { }
 
