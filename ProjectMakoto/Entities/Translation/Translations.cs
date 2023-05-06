@@ -762,6 +762,7 @@ public class Translations
                 public SingleTranslationKey Title;
                 public SingleTranslationKey PlayListLimit;
                 public SingleTranslationKey NoPlaylist;
+                public SingleTranslationKey Tracks;
 
                 public loadShare LoadShare;
                 public class loadShare
@@ -770,7 +771,6 @@ public class Translations
                     public SingleTranslationKey NotFound;
                     public SingleTranslationKey Found;
                     public SingleTranslationKey PlaylistName;
-                    public SingleTranslationKey Tracks;
                     public SingleTranslationKey CreatedBy;
                     public SingleTranslationKey ImportButton;
                     public SingleTranslationKey Importing;
@@ -780,6 +780,7 @@ public class Translations
                 public manage Manage;
                 public class manage
                 {
+                    public SingleTranslationKey NoPlaylists;
                     public SingleTranslationKey AddToQueueButton;
                     public SingleTranslationKey ShareButton;
                     public SingleTranslationKey ExportButton;
@@ -788,6 +789,12 @@ public class Translations
                     public SingleTranslationKey CreateNewButton;
                     public SingleTranslationKey ModifyButton;
                     public SingleTranslationKey DeleteButton;
+
+                    public SingleTranslationKey PlaylistSelectorQueue;
+                    public SingleTranslationKey PlaylistSelectorShare;
+                    public SingleTranslationKey PlaylistSelectorExport;
+                    public SingleTranslationKey PlaylistSelectorModify;
+                    public SingleTranslationKey PlaylistSelectorDelete;
                 }
 
                 public addToQueue AddToQueue;

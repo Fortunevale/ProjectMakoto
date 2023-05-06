@@ -1703,6 +1703,9 @@
         "NoPlaylist": {
           "en": "That playlist does not exist."
         },
+        "Tracks": {
+          "en": "Tracks"
+        },
         "LoadShare": {
           "Loading": {
             "en": "Loading the shared playlists.."
@@ -1715,9 +1718,6 @@
           },
           "PlaylistName": {
             "en": "Playlist Name"
-          },
-          "Tracks": {
-            "en": "Tracks"
           },
           "CreatedBy": {
             "en": "Created by"
@@ -1733,6 +1733,9 @@
           }
         },
         "Manage": {
+          "NoPlaylists": {
+            "en": "No playlist created yet."
+          },
           "AddToQueueButton": {
             "en": "Add a playlist to the current queue"
           },
@@ -1756,6 +1759,21 @@
           },
           "DeleteButton": {
             "en": "Delete a playlist"
+          },
+          "PlaylistSelectorQueue": {
+            "en": "Which playlist do you want to add to the queue?"
+          },
+          "PlaylistSelectorShare": {
+            "en": "Which playlist do you want to share?"
+          },
+          "PlaylistSelectorExport": {
+            "en": "Which playlist do you want to export?"
+          },
+          "PlaylistSelectorModify": {
+            "en": "Which playlist do you want to modify?"
+          },
+          "PlaylistSelectorDelete": {
+            "en": "Which playlist do you want to delete?"
           }
         },
         "AddToQueue": {
