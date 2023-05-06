@@ -1700,6 +1700,9 @@
         "PlayListLimit": {
           "en": "You already have {Count} playlists stored. Please delete on to create a new one."
         },
+        "NoPlaylist": {
+          "en": "That playlist does not exist."
+        },
         "LoadShare": {
           "Loading": {
             "en": "Loading the shared playlists.."
@@ -1727,6 +1730,52 @@
           },
           "Imported": {
             "en": "The playlist '{Name}' has been added to your playlists."
+          }
+        },
+        "Manage": {
+          "AddToQueueButton": {
+            "en": "Add a playlist to the current queue"
+          },
+          "ShareButton": {
+            "en": "Share a playlist"
+          },
+          "ExportButton": {
+            "en": "Export a playlist"
+          },
+          "ImportButton": {
+            "en": "Import a playlist"
+          },
+          "SaveCurrentButton": {
+            "en": "Save current queue as playlist"
+          },
+          "CreateNewButton": {
+            "en": "Create new playlist"
+          },
+          "ModifyButton": {
+            "en": "Modify a playlist"
+          },
+          "DeleteButton": {
+            "en": "Delete a playlist"
+          }
+        },
+        "AddToQueue": {
+          "Adding": {
+            "en": "Adding '{Name}' with {Count} track(s) to the queue.."
+          }
+        },
+        "Share": {
+          "Shared": {
+            "en": [
+              "Your playlist is ready for sharing!",
+              "",
+              "For others to use your playlist, instruct them to run:",
+              "{Command}"
+            ]
+          }
+        },
+        "Export": {
+          "Exported": {
+            "en": "Exported your playlist '{Name}' to json. Please download the attached file."
           }
         }
       }

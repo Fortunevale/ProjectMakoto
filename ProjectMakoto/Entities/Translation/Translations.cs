@@ -761,6 +761,7 @@ public class Translations
             {
                 public SingleTranslationKey Title;
                 public SingleTranslationKey PlayListLimit;
+                public SingleTranslationKey NoPlaylist;
 
                 public loadShare LoadShare;
                 public class loadShare
@@ -774,6 +775,37 @@ public class Translations
                     public SingleTranslationKey ImportButton;
                     public SingleTranslationKey Importing;
                     public SingleTranslationKey Imported;
+                }
+
+                public manage Manage;
+                public class manage
+                {
+                    public SingleTranslationKey AddToQueueButton;
+                    public SingleTranslationKey ShareButton;
+                    public SingleTranslationKey ExportButton;
+                    public SingleTranslationKey ImportButton;
+                    public SingleTranslationKey SaveCurrentButton;
+                    public SingleTranslationKey CreateNewButton;
+                    public SingleTranslationKey ModifyButton;
+                    public SingleTranslationKey DeleteButton;
+                }
+
+                public addToQueue AddToQueue;
+                public class addToQueue
+                {
+                    public SingleTranslationKey Adding;
+                }
+                
+                public share Share;
+                public class share
+                {
+                    public MultiTranslationKey Shared;
+                }
+
+                public export Export;
+                public class export
+                {
+                    public SingleTranslationKey Exported;
                 }
             }
         }
