@@ -1,3 +1,12 @@
+// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
 using System.Linq.Expressions;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -111,45 +120,6 @@ public class Bot
         if (args.Contains("--debug"))
         {
             _logger.ChangeLogLevel(LogLevel.DEBUG);
-        }
-
-        if (status.LoadedConfig.EnablePlugins)
-        {
-            _logger.LogDebug("Loading Plugins..");
-            List<string> pluginsToLoad = new();
-
-            if (Directory.Exists("Plugins"))
-                pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
-
-            foreach (var pluginPath in pluginsToLoad)
-            {
-                int count = 0;
-                _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
-
-                PluginLoadContext pluginLoadContext = new(pluginPath);
-                var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
-
-                foreach (Type type in assembly.GetTypes())
-                {
-                    if (typeof(BasePlugin).IsAssignableFrom(type))
-                    {
-                        count++;
-                        BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
-                        Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
-                    }
-                }
-
-                if (count == 0)
-                {
-                    string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
-                    _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
-                }
-
-
-                _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
-            }
-
-            _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
         }
 
         _logger.LogDebug("Loading all assemblies..");
@@ -409,6 +379,45 @@ public class Bot
                     }
                 }).Add(watcher);
                 await Task.Delay(1000);
+
+                if (status.LoadedConfig.EnablePlugins)
+                {
+                    _logger.LogDebug("Loading Plugins..");
+                    List<string> pluginsToLoad = new();
+
+                    if (Directory.Exists("Plugins"))
+                        pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
+
+                    foreach (var pluginPath in pluginsToLoad)
+                    {
+                        int count = 0;
+                        _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+
+                        PluginLoadContext pluginLoadContext = new(pluginPath);
+                        var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
+
+                        foreach (Type type in assembly.GetTypes())
+                        {
+                            if (typeof(BasePlugin).IsAssignableFrom(type))
+                            {
+                                count++;
+                                BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
+                                Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                            }
+                        }
+
+                        if (count == 0)
+                        {
+                            string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+                            _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
+                        }
+
+
+                        _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
+                    }
+
+                    _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
+                }
 
                 foreach (var b in Plugins)
                 {

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Playlists;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Playlists;
 
 internal class NewPlaylistCommand : BaseCommand
 {
@@ -18,7 +27,7 @@ internal class NewPlaylistCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
+                        Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
                     }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;
@@ -119,7 +128,7 @@ internal class NewPlaylistCommand : BaseCommand
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = $"`You already have 10 Playlists stored. Please delete one to create a new one.`",
+                            Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
                         }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
                         await Task.Delay(5000);
                         return;
