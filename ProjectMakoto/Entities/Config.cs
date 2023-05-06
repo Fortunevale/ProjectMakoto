@@ -23,6 +23,8 @@ public class Config
 
     public bool MonitorSystemStatus = true;
 
+    public bool EnablePlugins = false;
+
     public string SupportServerInvite = "";
 
     public ChannelsConfig Channels = new();

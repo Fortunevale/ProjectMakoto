@@ -119,33 +119,34 @@ public class Bot
         if (Directory.Exists("Plugins"))
             pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
 
-        foreach (var pluginPath in pluginsToLoad)
-        {
-            int count = 0;
-            _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
-
-            PluginLoadContext pluginLoadContext = new(pluginPath);
-            var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
-
-            foreach (Type type in assembly.GetTypes())
+        if (status.LoadedConfig.EnablePlugins)
+            foreach (var pluginPath in pluginsToLoad)
             {
-                if (typeof(BasePlugin).IsAssignableFrom(type))
+                int count = 0;
+                _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+
+                PluginLoadContext pluginLoadContext = new(pluginPath);
+                var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
+
+                foreach (Type type in assembly.GetTypes())
                 {
-                    count++;
-                    BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
-                    Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                    if (typeof(BasePlugin).IsAssignableFrom(type))
+                    {
+                        count++;
+                        BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
+                        Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                    }
                 }
+
+                if (count == 0)
+                {
+                    string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+                    _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
+                }
+
+
+                _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
             }
-
-            if (count == 0)
-            {
-                string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
-                _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
-            }
-
-
-            _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
-        }
 
         _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
 
