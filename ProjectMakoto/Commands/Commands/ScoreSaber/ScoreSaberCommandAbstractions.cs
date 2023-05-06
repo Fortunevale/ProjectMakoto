@@ -1,9 +1,24 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
+        var t = ctx.BaseCommand.t;
+        string GetString(SingleTranslationKey v, bool Code = false, params TVar[] vars)
+            => ctx.BaseCommand.GetString(v, Code, vars);
+        string GetMString(MultiTranslationKey v)
+            => ctx.BaseCommand.GetString(v);
+
         if (string.IsNullOrWhiteSpace(id))
         {
             if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id != 0)
@@ -19,7 +34,7 @@ internal class ScoreSaberCommandAbstractions
 
         var embed = new DiscordEmbedBuilder
         {
-            Description = $"`Looking for player..`"
+            Description = GetString(t.Commands.ScoreSaber.Profile.LoadingPlayer, true)
         }.AsLoading(ctx, "Score Saber");
 
         await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -30,13 +45,13 @@ internal class ScoreSaberCommandAbstractions
 
             CancellationTokenSource cancellationTokenSource = new();
 
-            DiscordButtonComponent ShowProfileButton = new(ButtonStyle.Primary, "getmain", "Show Profile", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-            DiscordButtonComponent TopScoresButton = new(ButtonStyle.Primary, "gettopscores", "Show Top Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎇")));
-            DiscordButtonComponent RecentScoresButton = new(ButtonStyle.Primary, "getrecentscores", "Show Recent Scores", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+            DiscordButtonComponent ShowProfileButton = new(ButtonStyle.Primary, "getmain", GetString(t.Commands.ScoreSaber.Profile.ShowProfile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            DiscordButtonComponent TopScoresButton = new(ButtonStyle.Primary, "gettopscores", GetString(t.Commands.ScoreSaber.Profile.ShowTopScores), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎇")));
+            DiscordButtonComponent RecentScoresButton = new(ButtonStyle.Primary, "getrecentscores", GetString(t.Commands.ScoreSaber.Profile.ShowRecentScores), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
 
-            DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", "Link Score Saber Profile to Discord Account", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
+            DiscordButtonComponent LinkButton = new(ButtonStyle.Primary, "thats_me", GetString(t.Commands.ScoreSaber.Profile.LinkProfileToAccount), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
 
-            DiscordLinkButtonComponent OpenProfileInBrowser = new($"https://scoresaber.com/u/{id}", "Open in browser", false);
+            DiscordLinkButtonComponent OpenProfileInBrowser = new($"https://scoresaber.com/u/{id}", GetString(t.Commands.ScoreSaber.Profile.OpenInBrowser), false);
 
             List<DiscordComponent> ProfileInteractionRow = new()
             {
@@ -78,8 +93,11 @@ internal class ScoreSaberCommandAbstractions
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = $"{ctx.User.Mention} `Linked '{player.name.SanitizeForCode()}' ({player.id}) to your account. You can now run '{ctx.Prefix}scoresaber' without an argument to get your profile in an instant.`\n" +
-                                              $"`To remove the link, run '{ctx.Prefix}scoresaber-unlink'.`"
+                                Description = GetMString(t.Commands.ScoreSaber.Profile.LinkSuccessful).Build(
+                                    new TVar("ProfileName", player.name),
+                                    new TVar("ProfileId", player.id),
+                                    new TVar("ProfileCommand", $"{ctx.Prefix}scoresaber profile"),
+                                    new TVar("UnlinkCommand", $"{ctx.Prefix}scoresaber unlink"))
                             }.AsSuccess(ctx, "Score Saber")));
 
                             _ = Task.Delay(10000).ContinueWith(x =>
@@ -101,7 +119,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`An internal server exception occurred. Please retry later.`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 
                                 return;
@@ -112,7 +130,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -135,7 +153,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`An internal server exception occurred. Please retry later.`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -145,7 +163,7 @@ internal class ScoreSaberCommandAbstractions
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
                                 embed = embed.AsError(ctx, "Score Saber");
-                                embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                                embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
@@ -180,7 +198,7 @@ internal class ScoreSaberCommandAbstractions
                 embed.ClearFields();
                 embed.ImageUrl = "";
                 embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n\n" +
-                                    $"{(scoreType == RequestParameters.ScoreType.TOP ? "**Top Scores**" : "**Recent Scores**")}";
+                                    $"{(scoreType == RequestParameters.ScoreType.TOP ? $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**" : $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**")}";
 
                 foreach (var score in scores.playerScores.Take(5))
                 {
@@ -193,7 +211,7 @@ internal class ScoreSaberCommandAbstractions
                         $":globe_with_meridians: **#{score.score.rank}**  󠂪 󠂪| 󠂪 󠂪 {Formatter.Timestamp(score.score.timeSet, TimestampFormat.RelativeTime)}\n" +
                         $"{(score.leaderboard.ranked ? $"**`{((decimal)((decimal)score.score.modifiedScore / (decimal)score.leaderboard.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp [{(score.score.pp * score.score.weight).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp]`**\n" : "\n")}" +
                         $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? "✅ `FC`" : $"{false.ToEmote(ctx.Bot)} `{score.score.missedNotes + score.score.badCuts}`")}**\n" +
-                        $"Map Leaderboard: `{ctx.Prefix}scoresaber map-leaderboard {score.leaderboard.difficulty.leaderboardId} {page}{(odd ? " 1" : "")}`"));
+                        $"{GetString(t.Commands.ScoreSaber.Profile.MapLeaderboard)}: `{ctx.Prefix}scoresaber map-leaderboard {score.leaderboard.difficulty.leaderboardId} {page}{(odd ? " 1" : "")}`"));
                 }
 
                 DiscordMessageBuilder builder = new();
@@ -214,12 +232,12 @@ internal class ScoreSaberCommandAbstractions
                 embed.Title = $"{player.name.FullSanitize()} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
                 embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
-                embed.AddField(new DiscordEmbedField("Ranked Play Count", $"`{player.scoreStats.rankedPlayCount}`", true));
-                embed.AddField(new DiscordEmbedField("Total Ranked Score", $"`{player.scoreStats.totalRankedScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-                embed.AddField(new DiscordEmbedField("Average Ranked Accuracy", $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
-                embed.AddField(new DiscordEmbedField("Total Play Count", $"`{player.scoreStats.totalPlayCount}`", true));
-                embed.AddField(new DiscordEmbedField("Total Score", $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-                embed.AddField(new DiscordEmbedField("Replays Watched By Others", $"`{player.scoreStats.replaysWatched}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.RankedPlayCount), $"`{player.scoreStats.rankedPlayCount}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalRankedScore), $"`{player.scoreStats.totalRankedScore.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.AverageRankedAccuracy), $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalPlayCount), $"`{player.scoreStats.totalPlayCount}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalScore), $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.ReplaysWatched), $"`{player.scoreStats.replaysWatched}`", true));
 
                 DiscordMessageBuilder builder = new();
 
@@ -237,6 +255,24 @@ internal class ScoreSaberCommandAbstractions
 
                 var file = $"{Guid.NewGuid()}.png";
 
+                string labels = "";
+
+                for (int i = 50; i >= 0; i -= 2)
+                {
+                    if (i == 0)
+                    {
+                        labels += $"'{t.Commands.ScoreSaber.Profile.GraphToday}'\n";
+                        break;
+                    }
+                    if (i == 2)
+                    {
+                        labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}',\n";
+                        continue;
+                    }
+
+                    labels += $"'{GetString(t.Commands.ScoreSaber.Profile.GraphDays).Build(new TVar("Count", i))}','',\n";
+                }
+
                 if (string.IsNullOrWhiteSpace(LoadedGraph))
                     try
                     {
@@ -250,37 +286,12 @@ internal class ScoreSaberCommandAbstractions
                             {{
                                 labels: 
                                 [
-                                    '',
-                                    '48 days ago','',
-                                    '46 days ago','',
-                                    '44 days ago','',
-                                    '42 days ago','',
-                                    '40 days ago','',
-                                    '38 days ago','',
-                                    '36 days ago','',
-                                    '34 days ago','',
-                                    '32 days ago','',
-                                    '30 days ago','',
-                                    '28 days ago','',
-                                    '26 days ago','',
-                                    '24 days ago','',
-                                    '22 days ago','',
-                                    '20 days ago','',
-                                    '18 days ago','',
-                                    '16 days ago','',
-                                    '14 days ago','',
-                                    '12 days ago','',
-                                    '10 days ago','',
-                                    '8 days ago','',
-                                    '6 days ago','',
-                                    '4 days ago','',
-                                    '2 days ago','',
-                                    'Today'
+                                    {labels}
                                 ],
                                 datasets: 
                                 [
                                     {{
-                                        label: 'Placements',
+                                        label: '{GetString(t.Commands.ScoreSaber.Profile.Placement)}',
                                         data: [{player.histories},{player.rank}],
                                         fill: false,
                                         borderColor: getGradientFillHelper('vertical', ['#6b76da', '#a336eb', '#FC0000']),
@@ -367,22 +378,22 @@ internal class ScoreSaberCommandAbstractions
         }
         catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
         {
-            embed.Description = $"`An internal server exception occurred. Please retry later.`";
+            embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
         {
-            embed.Description = $"`The access to the player api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+            embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
         {
-            embed.Description = $"`Couldn't find the specified player.`";
+            embed.Description = GetString(t.Commands.ScoreSaber.Profile.InvalidId, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Xorog.ScoreSaber.Exceptions.UnprocessableEntity)
         {
-            embed.Description = $"`Please provide an user id.`";
+            embed.Description = GetString(t.Commands.ScoreSaber.Profile.InvalidId, true);
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Exception)

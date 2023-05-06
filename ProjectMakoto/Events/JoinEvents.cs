@@ -1,3 +1,12 @@
+// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
 namespace ProjectMakoto.Events;
 
 internal class JoinEvents
@@ -39,7 +48,7 @@ internal class JoinEvents
                         Author = new()
                         {
                             IconUrl = AuditLogIcons.UserAdded,
-                            Name = e.Member.UsernameWithDiscriminator
+                            Name = e.Member.GetUsername()
                         },
                         Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
                         Color = EmbedColors.Success,
@@ -66,7 +75,7 @@ internal class JoinEvents
                         Author = new()
                         {
                             IconUrl = AuditLogIcons.UserLeft,
-                            Name = e.Member.UsernameWithDiscriminator
+                            Name = e.Member.GetUsername()
                         },
                         Description = $"has left **{e.Guild.Name}**.\n" +
                                       $"They've been on the server for _{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}_.",

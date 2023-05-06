@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class CustomEmbedCommand : BaseCommand
 {
@@ -195,10 +204,6 @@ internal class CustomEmbedCommand : BaseCommand
                             }
                             catch (AlreadyAppliedException)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder
-                                {
-                                    Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                                }.AsError(ctx));
                                 continue;
                             }
                             catch (ArgumentException)
@@ -216,7 +221,7 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                             GeneratedEmbed.Author.IconUrl = asset.Attachments[0].Url;
                             continue;
@@ -250,7 +255,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                                 GeneratedEmbed.Author = new DiscordEmbedBuilder.EmbedAuthor
                                 {
-                                    Name = user.UsernameWithDiscriminator,
+                                    Name = user.GetUsername(),
                                     IconUrl = user.AvatarUrl,
                                     Url = user.ProfileUrl
                                 };
@@ -294,10 +299,6 @@ internal class CustomEmbedCommand : BaseCommand
                         }
                         catch (AlreadyAppliedException)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder
-                            {
-                                Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                            }.AsError(ctx));
                             continue;
                         }
                         catch (ArgumentException)
@@ -315,7 +316,7 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                         GeneratedEmbed.Thumbnail.Url = asset.Attachments[0].Url;
                         continue;
@@ -362,10 +363,6 @@ internal class CustomEmbedCommand : BaseCommand
                         }
                         catch (AlreadyAppliedException)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder
-                            {
-                                Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                            }.AsError(ctx));
                             continue;
                         }
                         catch (ArgumentException)
@@ -383,7 +380,7 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                         GeneratedEmbed.ImageUrl = asset.Attachments[0].Url;
                         continue;
@@ -481,10 +478,6 @@ internal class CustomEmbedCommand : BaseCommand
                             }
                             catch (AlreadyAppliedException)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder
-                                {
-                                    Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
-                                }.AsError(ctx));
                                 continue;
                             }
                             catch (ArgumentException)
@@ -502,7 +495,7 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                             GeneratedEmbed.Footer.IconUrl = asset.Attachments[0].Url;
                             continue;
@@ -536,7 +529,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                                 GeneratedEmbed.Footer = new DiscordEmbedBuilder.EmbedFooter
                                 {
-                                    Text = user.UsernameWithDiscriminator,
+                                    Text = user.GetUsername(),
                                     IconUrl = user.AvatarUrl
                                 };
                             }

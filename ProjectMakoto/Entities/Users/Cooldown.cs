@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Entities;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Entities;
 
 public class Cooldown
 {
@@ -39,7 +48,7 @@ public class Cooldown
         var Cancelled = false;
 
         var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown).Replace("{Timestamp}", $"`{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`")}`")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton));
 
         Task.Run(async () =>
@@ -74,7 +83,7 @@ public class Cooldown
         try
         {
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown).Replace("{Timestamp}", $"`{LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()}`")}`")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton.Disable()));
         }
         catch { }

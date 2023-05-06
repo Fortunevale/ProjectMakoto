@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.PrefixCommand;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.PrefixCommand;
 
 internal class ConfigCommand : BaseCommand
 {
@@ -14,10 +23,10 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = PrefixCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(t.Commands.PrefixConfigCommand.Title));
+            }.AsAwaitingInput(ctx, GetString(t.Commands.Config.PrefixConfigCommand.Title));
 
-            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
-            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
+            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
+            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -38,15 +47,15 @@ internal class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].PrefixDisabled = !ctx.Bot.guilds[ctx.Guild.Id].PrefixDisabled;
+                ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled = !ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangePrefix.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
+                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
 
-                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.Prefix));
+                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.Config.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
 
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
@@ -73,7 +82,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].Prefix = newPrefix;
+                ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.Prefix = newPrefix;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }

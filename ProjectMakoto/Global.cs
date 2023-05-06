@@ -1,3 +1,12 @@
+// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
 global using Dapper;
 global using DisCatSharp;
 global using DisCatSharp.ApplicationCommands;
@@ -14,6 +23,8 @@ global using DisCatSharp.Interactivity.Extensions;
 global using DisCatSharp.Lavalink;
 global using DisCatSharp.Lavalink.EventArgs;
 global using DisCatSharp.Net;
+global using DisCatSharp.Extensions.TwoFactorCommands;
+global using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using MySql.Data.MySqlClient;
@@ -58,3 +69,8 @@ global using User = ProjectMakoto.Entities.User;
 global using FileMode = System.IO.FileMode;
 global using LogLevel = Xorog.Logger.Enums.LogLevel;
 global using RequestParameters = Xorog.ScoreSaber.Objects.RequestParameters;
+global using ProjectMakoto.Plugins;
+global using ProjectMakoto.PrefixCommands;
+global using ProjectMakoto.Util.SystemMonitor;
+global using System.Collections;
+global using System.Reflection;

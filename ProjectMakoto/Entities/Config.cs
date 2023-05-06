@@ -1,11 +1,38 @@
-﻿namespace ProjectMakoto.Entities;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Entities;
 
 public class Config
 {
+    public void Save(int retry = 0)
+    {
+        try
+        {
+            File.WriteAllText("config.json", JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+        }
+        catch (Exception)
+        {
+            if (retry > 10)
+                return;
+
+            Thread.Sleep(500);
+            Save(retry + 1);
+        }
+    }
+
     public bool IsDev = false;
     public bool AllowMoreThan100Guilds = false;
 
     public bool MonitorSystemStatus = true;
+
+    public bool EnablePlugins = false;
 
     public string SupportServerInvite = "";
 
@@ -15,6 +42,8 @@ public class Config
     public AccountIdsConfig Accounts = new();
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
+
+    public Dictionary<string, object> PluginData = new();
 
     public class ChannelsConfig
     {

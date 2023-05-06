@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Events;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Events;
 
 internal class EmbedMessagesEvents
 {
@@ -52,7 +61,7 @@ internal class EmbedMessagesEvents
 
                         var msg = await e.Message.RespondAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.UsernameWithDiscriminator} ({message.Author.Id})" },
+                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.GetUsername()} ({message.Author.Id})" },
                             Color = message.Author.BannerColor ?? EmbedColors.Info,
                             Description = $"[`Jump to message`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
                             ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].FileName.EndsWith(".png")

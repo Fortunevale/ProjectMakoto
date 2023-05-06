@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class GuildPurgeCommand : BaseCommand
 {
@@ -22,7 +31,7 @@ internal class GuildPurgeCommand : BaseCommand
 
             var status_embed = new DiscordEmbedBuilder
             {
-                Description = $"`Scanning all channels for messages sent by '{victim.UsernameWithDiscriminator}' ({victim.Id})..`"
+                Description = $"`Scanning all channels for messages sent by '{victim.GetUsername()}' ({victim.Id})..`"
             }.AsLoading(ctx, "Server Purge");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
@@ -41,7 +50,7 @@ internal class GuildPurgeCommand : BaseCommand
 
                 currentProg++;
 
-                status_embed.Description = $"`Scanning all channels for messages sent by '{victim.UsernameWithDiscriminator}' ({victim.Id})..`\n\n" +
+                status_embed.Description = $"`Scanning all channels for messages sent by '{victim.GetUsername()}' ({victim.Id})..`\n\n" +
                                             $"`Current Channel`: `({currentProg}/{maxProg})` {channel.Value.Mention} `({channel.Value.Id})`\n" +
                                             $"`Found Messages `: `{allMsg}`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
@@ -105,7 +114,7 @@ internal class GuildPurgeCommand : BaseCommand
                     }
             }
 
-            status_embed.Description = $"`Found {allMsg} messages sent by '{victim.UsernameWithDiscriminator}' ({victim.Id}). Deleting..`";
+            status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsername()}' ({victim.Id}). Deleting..`";
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
 
             currentProg = 0;
@@ -114,7 +123,7 @@ internal class GuildPurgeCommand : BaseCommand
             foreach (var channel in messages)
             {
                 currentProg++;
-                status_embed.Description = $"`Found {allMsg} messages sent by '{victim.UsernameWithDiscriminator}' ({victim.Id}). Deleting..`\n\n" +
+                status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsername()}' ({victim.Id}). Deleting..`\n\n" +
                                             $"`Current Channel`: `({currentProg}/{maxProg})` <#{channel.Key}> `({channel.Key})`\n" +
                                             $"`Found Messages `: `{allMsg}`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));

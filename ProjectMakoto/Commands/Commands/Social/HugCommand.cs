@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class HugCommand : BaseCommand
 {
@@ -11,26 +20,19 @@ internal class HugCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases =
-            {
-                "%1 hugs %2! How sweet! ♥",
-                $"%1 gives %2 a big fat hug! {ctx.Bot.status.LoadedConfig.Emojis.Hug}",
-                $"%2, watch out! %1 is coming to squeeze you tight! {ctx.Bot.status.LoadedConfig.Emojis.Hug}",
-            };
+            string[] PositiveEmojis = { "♥", ctx.Bot.status.LoadedConfig.Emojis.Hug };
+            string[] NegativeEmojis = { "😢", "😓" };
 
-            string[] self_phrases =
-            {
-                "There, there.. I'll hug you %1 😢",
-                "Does no one else hug you, %1? There, there.. I'll hug you.. 😢",
-                "There, there.. I'll hug you %1. 😢 Sorry if i'm a bit cold, i'm not human y'know.. 😓",
-                "You look lonely there, %1..",
-            };
+            string[] phrases = t.Commands.Social.Hug.Other.Get(ctx.DbGuild);
+            string[] self_phrases = t.Commands.Social.Hug.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.Member.DisplayName),
+                    new TVar("Emoji", NegativeEmojis.SelectRandom())),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -41,7 +43,11 @@ internal class HugCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false),
+                    new TVar("Emoji", PositiveEmojis.SelectRandom(), false))
+                    .Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

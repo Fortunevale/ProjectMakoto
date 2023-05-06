@@ -1,9 +1,18 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 public abstract class BaseCommand
 {
-    internal SharedCommandContext ctx { private get; set; }
-    internal Translations t { get; set; }
+    public SharedCommandContext ctx { private get; set; }
+    public Translations t { get; set; }
 
     #region Execution
     public virtual async Task<bool> BeforeExecution(SharedCommandContext ctx)
@@ -58,7 +67,13 @@ public abstract class BaseCommand
         if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].CurrentLocale != ctx.User.Locale)
         {
             ctx.Bot.users[ctx.User.Id].CurrentLocale = ctx.User.Locale;
-            _logger.LogDebug("Updated language for '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
+            _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
+        }
+
+        if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
+        {
+            ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale = ctx.Guild.PreferredLocale;
+            _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", ctx.Guild.Id, ctx.Guild.PreferredLocale);
         }
 
         if (!(await CheckOwnPermissions(Permissions.SendMessages)))
@@ -109,16 +124,16 @@ public abstract class BaseCommand
     #endregion
 
     #region RespondOrEdit
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
+    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
         => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
+    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
         => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
 
-    internal async Task<DiscordMessage> RespondOrEdit(string content)
+    public async Task<DiscordMessage> RespondOrEdit(string content)
         => await RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
 
-    internal async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
+    public async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
     {
         switch (ctx.CommandType)
         {
@@ -215,14 +230,72 @@ public abstract class BaseCommand
     }
     #endregion
 
-    internal string GetString(SingleTranslationKey key) 
-        => key.Get(ctx.Bot.users[ctx.User.Id]);
-    
-    internal string[] GetString(MultiTranslationKey key) 
-        => key.Get(ctx.Bot.users[ctx.User.Id]);
+    #region GetString
+    TVar[] GetDefaultVars() 
+        => new TVar[]
+        {
+            new TVar("CurrentCommand", ctx.Prefix + ctx.CommandName, false),
+            new TVar("Bot", ctx.CurrentUser.Mention, false),
+            new TVar("BotName", ctx.CurrentUser.Username, false),
+            new TVar("FullBot", ctx.CurrentUser.GetUsername(), false),
+            new TVar("BotDisplayName", ctx.CurrentUser.GetUsername(), false),
+            new TVar("User", ctx.User.Mention, false),
+            new TVar("UserName", ctx.User.Username, false),
+            new TVar("FullUser", ctx.User.GetUsername(), false),
+            new TVar("UserDisplayName", ctx.Member?.DisplayName ?? ctx.User.Username, false),
+        };
+
+    public string GetString(SingleTranslationKey key)
+        => GetString(key, false, Array.Empty<TVar>());
+
+    public string GetString(SingleTranslationKey key, params TVar[] vars)
+        => GetString(key, false, vars);
+
+    public string GetString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
+        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
+
+
+
+    public string GetString(MultiTranslationKey key)
+        => GetString(key, false, false, Array.Empty<TVar>());
+
+    public string GetString(MultiTranslationKey key, params TVar[] vars)
+        => GetString(key, false, false, vars);
+
+    public string GetString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
+        => GetString(key, true, false, vars);
+
+    public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
+        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
+
+
+
+    public string GetGuildString(SingleTranslationKey key)
+        => GetGuildString(key, false, Array.Empty<TVar>());
+
+    public string GetGuildString(SingleTranslationKey key, params TVar[] vars)
+        => GetGuildString(key, false, vars);
+
+    public string GetGuildString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
+        => key.Get(ctx.DbGuild).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
+
+
+
+    public string GetGuildString(MultiTranslationKey key)
+        => GetGuildString(key, false, false, Array.Empty<TVar>());
+
+    public string GetGuildString(MultiTranslationKey key, params TVar[] vars)
+        => GetGuildString(key, false, false, vars);
+
+    public string GetGuildString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
+        => GetGuildString(key, Code, false, vars);
+
+    public string GetGuildString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
+        => key.Get(ctx.DbGuild).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray()); 
+    #endregion
 
     #region Selections
-    internal async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DiscordRole>> PromptRoleSelection(RolePromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
@@ -299,7 +372,7 @@ public abstract class BaseCommand
                                 if (role.IsManaged || ctx.Member.GetRoleHighestPosition() <= role.Position)
                                 {
                                     Selected = "";
-                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ `{GetString(t.Commands.Common.Prompts.SelectedRoleUnavailable)}`"));
+                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ {GetString(t.Commands.Common.Prompts.SelectedRoleUnavailable, true)}"));
                                 }
                             }
                             catch { }
@@ -361,10 +434,10 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordRole>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
         => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
 
-    internal async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
@@ -483,7 +556,7 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    internal async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromSeconds(120);
         CustomPlaceHolder ??= GetString(t.Commands.Common.Prompts.SelectAnOption);
@@ -600,10 +673,10 @@ public abstract class BaseCommand
     #endregion
 
     #region Modals
-    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null) 
+    public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null) 
         => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
-    internal async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
+    public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
@@ -613,7 +686,7 @@ public abstract class BaseCommand
 
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Prompts.WaitingForModalResponse)}`"
+            Description = GetString(t.Commands.Common.Prompts.WaitingForModalResponse, true)
         }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(ctx.DbUser) }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
@@ -688,7 +761,7 @@ public abstract class BaseCommand
     }
 
 
-    internal async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<TimeSpan>> PromptModalForTimeSpan(DiscordInteraction interaction, TimeSpan? MaxTime = null, TimeSpan? MinTime = null, TimeSpan? DefaultTime = null, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         MinTime ??= TimeSpan.Zero;
         MaxTime ??= TimeSpan.FromDays(356);
@@ -696,16 +769,16 @@ public abstract class BaseCommand
 
         var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", GetString(t.Commands.Common.Prompts.TimespanSeconds).Replace("{Max}", 59), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
+        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", GetString(t.Commands.Common.Prompts.TimespanSeconds).Build(new TVar("Max", 59)), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
 
         if (MaxTime.Value.TotalMinutes >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", GetString(t.Commands.Common.Prompts.TimespanMinutes).Replace("{Max}", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}")), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", GetString(t.Commands.Common.Prompts.TimespanMinutes).Build(new TVar("Max", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}"))), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
 
         if (MaxTime.Value.TotalHours >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", GetString(t.Commands.Common.Prompts.TimespanHours).Replace("{Max}", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}")), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", GetString(t.Commands.Common.Prompts.TimespanHours).Build(new TVar("Max", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}"))), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
 
         if (MaxTime.Value.TotalDays >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", GetString(t.Commands.Common.Prompts.TimespanDays).Replace("{Max}", ((int)MaxTime.Value.TotalDays)), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
+            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", GetString(t.Commands.Common.Prompts.TimespanDays).Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
         var ModalResult = await PromptModalWithRetry(interaction, modal, false);
 
@@ -755,7 +828,7 @@ public abstract class BaseCommand
         return new InteractionResult<TimeSpan>(length);
     }
 
-    internal async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
         var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
 
@@ -812,17 +885,24 @@ public abstract class BaseCommand
         }
 
         return new InteractionResult<DateTime>(dateTime);
-    } 
+    }
     #endregion
 
-    internal async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
+    public async Task<(Stream stream, int fileSize)> PromptForFileUpload(TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
         if (ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id))
         {
             if (ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
+                }.AsError(ctx)));
+
                 throw new AlreadyAppliedException("");
+            }
 
             ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
         }
@@ -862,7 +942,7 @@ public abstract class BaseCommand
 
     public void DeleteOrInvalidate()
     {
-        _ = RespondOrEdit($"✅ _`{GetString(t.Commands.Common.InteractionFinished)}`_");
+        _ = RespondOrEdit($"✅ _{GetString(t.Commands.Common.InteractionFinished, true)}_");
         switch (ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -973,43 +1053,43 @@ public abstract class BaseCommand
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"{ctx.CurrentUser.Username} Staff")
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"{ctx.CurrentUser.Username} Staff"))
         }.AsError(ctx));
 
     public void SendBotOwnerError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", $"<@{ctx.Bot.status.TeamOwner}>"),
+        Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"<@{ctx.Bot.status.TeamOwner}>", false)),
     }.AsError(ctx));
 
     public void SendAdminError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", "Administrator"),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", "Administrator")),
         }.AsError(ctx));
 
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Replace("{Command}", ctx.Prefix + ctx.CommandName).Replace("{Required}", perms.ToPermissionString()),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToPermissionString())),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.VoiceChannel)}`",
+            Description = GetString(t.Commands.Common.Errors.VoiceChannel).Build(true),
         }.AsError(ctx)));
 
     public void SendUserBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.UserBan).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
+            Description = GetString(t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(ctx)));
 
     public void SendGuildBanError(BlacklistEntry entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.GuildBan).Replace("{Reason}", entry.Reason.SanitizeForCode())}`",
+            Description = GetString(t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(ctx)));
 
     public void SendSourceError(Enums.CommandType commandType)
@@ -1017,11 +1097,11 @@ public abstract class BaseCommand
         {
             Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Common.Errors.ExclusiveApp)}`",
+                Description = GetString(t.Commands.Common.Errors.ExclusiveApp).Build(true),
             }.AsError(ctx)),
             Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Common.Errors.ExclusivePrefix)}`"
+                Description = GetString(t.Commands.Common.Errors.ExclusivePrefix).Build(true)
             }.AsError(ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
@@ -1029,20 +1109,20 @@ public abstract class BaseCommand
     public void SendDataError()
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"`{GetString(t.Commands.Common.Errors.Data).Replace("{Command}", $"{ctx.Prefix}data delete")}`",
+            Description = GetString(t.Commands.Common.Errors.Data, true, new TVar("Command", $"{ctx.Prefix}data delete")),
         }.AsError(ctx)));
 
     public void SendDmError() 
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"📩 `{GetString(t.Commands.Common.Errors.DirectMessage)}`",
+            Description = $"📩 {GetString(t.Commands.Common.Errors.DirectMessage, true)}",
             ImageUrl = (ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
         }.AsError(ctx)));
     
     public void SendDmRedirect() 
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"📩 `{GetString(t.Commands.Common.DirectMessageRedirect)}`",
+            Description = $"📩 {GetString(t.Commands.Common.DirectMessageRedirect, true)}",
         }.AsSuccess(ctx)));
 
     public void SendOwnPermissionError(Permissions perms)
@@ -1052,7 +1132,7 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.BotPermissions).Replace("{Required}", perms.ToPermissionString())
+            Description = GetString(t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToPermissionString()))
         }.AsError(ctx));
     }
 

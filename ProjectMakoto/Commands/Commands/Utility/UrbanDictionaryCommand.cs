@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class UrbanDictionaryCommand : BaseCommand
 {
@@ -15,7 +24,7 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.UrbanDictionary.AdultContentError)}`"
+                    Description = GetString(t.Commands.Utility.UrbanDictionary.AdultContentError, true)
                 }.AsError(ctx));
                 return;
             }
@@ -25,7 +34,7 @@ internal class UrbanDictionaryCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.UrbanDictionary.AdultContentWarning)}`"
+                Description = GetString(t.Commands.Utility.UrbanDictionary.AdultContentWarning, true)
             }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
@@ -42,14 +51,16 @@ internal class UrbanDictionaryCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.UrbanDictionary.LookingUp).Replace("{Term}", term)}`"
+                    Description = GetString(t.Commands.Utility.UrbanDictionary.LookingUp, true,
+                        new TVar("Term", term))
                 }.AsLoading(ctx));
 
                 if (term.IsNullOrWhiteSpace())
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
+                        Description = GetString(t.Commands.Utility.UrbanDictionary.LookupFail, true,
+                            new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
@@ -72,7 +83,8 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.UrbanDictionary.LookupFail).Replace("{Term}", term)}`"
+                        Description = GetString(t.Commands.Utility.UrbanDictionary.LookupFail, true, 
+                            new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
@@ -94,17 +106,17 @@ internal class UrbanDictionaryCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.UrbanDictionary.NotExist).Replace("{Term}", term)}`"
+                        Description = GetString(t.Commands.Utility.UrbanDictionary.NotExist, true, new TVar("Term", term))
                     }.AsError(ctx));
                     return;
                 }
 
                 var embeds = Definitions.Take(3).Select(x => new DiscordEmbedBuilder
                 {
-                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.UrbanDictionary.WrittenBy).Replace("{Author}", x.author)}",
-                    Description = $"**{GetString(t.Commands.UrbanDictionary.Definition)}**\n\n" +
+                    Title = $"**{x.word.Replace("**", "")}** - {GetString(t.Commands.Utility.UrbanDictionary.WrittenBy, new TVar("Author", x.author))}",
+                    Description = $"**{GetString(t.Commands.Utility.UrbanDictionary.Definition)}**\n\n" +
                                   $"{x.definition.Replace("[", "").Replace("]", "")}\n\n" +
-                                  $"**{GetString(t.Commands.UrbanDictionary.Example)}**\n\n" +
+                                  $"**{GetString(t.Commands.Utility.UrbanDictionary.Example)}**\n\n" +
                                   $"{x.example.Replace("[", "").Replace("]", "")}\n\n" +
                                   $"👍 `{x.thumbs_up}` | 👎 `{x.thumbs_down}` | 🕒 {Formatter.Timestamp(x.written_on, TimestampFormat.LongDateTime)}",
                     Url = x.permalink

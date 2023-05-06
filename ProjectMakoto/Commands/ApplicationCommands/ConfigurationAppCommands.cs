@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.ApplicationCommands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.ApplicationCommands;
 public class ConfigurationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
@@ -419,6 +428,30 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.VcCreatorCommand.ConfigCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+    }
+
+    [SlashCommandGroup("guild-language", "Allows you to review and change settings related to the guild's selected language.")]
+    public class GuildLanguage : ApplicationCommandsModule
+    {
+        public Bot _bot { private get; set; }
+
+        [SlashCommand("review", "Allows you to review currently used settings related to the guild's selected language.")]
+        public async Task Review(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.GuildLanguage.ReviewCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("config", "Allows you to change currently used settings related to the guild's selected language.")]
+        public async Task Config(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.GuildLanguage.ConfigCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
     }

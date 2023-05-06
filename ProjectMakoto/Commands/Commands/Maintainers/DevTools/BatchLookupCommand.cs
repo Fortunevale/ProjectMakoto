@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class BatchLookupCommand : BaseCommand
 {
@@ -28,7 +37,7 @@ internal class BatchLookupCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{GenerateASCIIProgressbar(i, IDs.Count)}`").AsLoading(ctx));
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.UsernameWithDiscriminator}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.GetUsername()}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
         });
     }
 }

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Music;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Music;
 
 internal class JoinCommand : BaseCommand
 {
@@ -35,7 +44,7 @@ internal class JoinCommand : BaseCommand
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`The bot joined your channel.`",
+                        Description = GetString(t.Commands.Music.Join.Joined, true),
                     }.AsSuccess(ctx));
                 return;
             }
@@ -44,7 +53,7 @@ internal class JoinCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is already in use.`",
+                    Description = GetString(t.Commands.Music.Join.AlreadyUsed, true),
                 }.AsError(ctx));
 
                 throw new CancelException();
@@ -59,7 +68,7 @@ internal class JoinCommand : BaseCommand
             if (Announce)
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot joined your channel.`",
+                    Description = GetString(t.Commands.Music.Join.Joined, true),
                 }.AsSuccess(ctx));
         });
     }

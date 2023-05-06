@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Music;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Music;
 
 internal class RemoveQueueCommand : BaseCommand
 {
@@ -23,20 +32,11 @@ internal class RemoveQueueCommand : BaseCommand
             var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
-            if (conn is null)
+            if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is not in a voice channel.`",
-                }.AsError(ctx));
-                return;
-            }
-
-            if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
-            {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
-                {
-                    Description = $"`You aren't in the same channel as the bot.`",
+                    Description = GetString(t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -51,7 +51,7 @@ internal class RemoveQueueCommand : BaseCommand
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = $"`Your value is out of range. Currently, the range is 1-{ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}.`",
+                        Description = GetString(t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)),
                     }.AsError(ctx));
                     return;
                 }
@@ -64,7 +64,7 @@ internal class RemoveQueueCommand : BaseCommand
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = $"`There is no such song queued.`",
+                        Description = GetString(t.Commands.Music.RemoveQueue.NoSong, true),
                     }.AsError(ctx));
                     return;
                 }
@@ -76,7 +76,7 @@ internal class RemoveQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`There is no such song queued.`",
+                    Description = GetString(t.Commands.Music.RemoveQueue.NoSong, true),
                 }.AsError(ctx));
                 return;
             }
@@ -85,7 +85,7 @@ internal class RemoveQueueCommand : BaseCommand
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = $"`Removed` [`{info.VideoTitle}`]({info.Url}) `from the current queue.`",
+                Description = GetString(t.Commands.Music.RemoveQueue.Removed, true, new TVar("Track", $"`[`{info.VideoTitle}`]({info.Url})`")),
             }.AsSuccess(ctx));
         });
     }

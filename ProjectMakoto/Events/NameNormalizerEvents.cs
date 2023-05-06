@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Events;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Events;
 
 internal class NameNormalizerEvents
 {
@@ -16,12 +25,12 @@ internal class NameNormalizerEvents
             if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
                 return;
 
-            string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
+            string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
                 PingableName = "Pingable Name";
 
-            if (PingableName != e.Member.PreferredDisplayName)
+            if (PingableName != e.Member.DisplayName)
                 _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
         }).Add(_bot.watcher);
     }
@@ -35,12 +44,12 @@ internal class NameNormalizerEvents
 
             if (e.NicknameBefore != e.NicknameAfter)
             {
-                string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
+                string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
                 if (PingableName.IsNullOrWhiteSpace())
                     PingableName = "Pingable Name";
 
-                if (PingableName != e.Member.PreferredDisplayName)
+                if (PingableName != e.Member.DisplayName)
                     _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
             }
         }).Add(_bot.watcher);
@@ -60,12 +69,12 @@ internal class NameNormalizerEvents
 
                 var member = await e.UserAfter.ConvertToMember(guild.Value);
 
-                string PingableName = RegexTemplates.AllowedNickname.Replace(member.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
+                string PingableName = RegexTemplates.AllowedNickname.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
                 if (PingableName.IsNullOrWhiteSpace())
                     PingableName = "Pingable Name";
 
-                if (PingableName != member.PreferredDisplayName)
+                if (PingableName != member.DisplayName)
                     _ = member.ModifyAsync(x => x.Nickname = PingableName);
             }
         }).Add(_bot.watcher);

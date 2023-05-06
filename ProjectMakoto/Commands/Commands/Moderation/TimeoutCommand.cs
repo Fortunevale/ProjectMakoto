@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class TimeoutCommand : BaseCommand
 {
@@ -28,7 +37,7 @@ internal class TimeoutCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Timing {victim.UsernameWithDiscriminator} ({victim.Id}) out..`",
+                Description = $"`Timing {victim.GetUsername()} ({victim.Id}) out..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -78,7 +87,7 @@ internal class TimeoutCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await victim.TimeoutAsync(until, $"{ctx.User.GetUsername()} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
                 embed.Description = $"{victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`\n" +
                                     $"`The time out will end` {until.ToTimestamp()}`.`";
                 embed = embed.AsSuccess(ctx);

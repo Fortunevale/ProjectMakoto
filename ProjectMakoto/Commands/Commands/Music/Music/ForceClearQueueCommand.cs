@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Music;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Music;
 
 internal class ForceClearQueueCommand : BaseCommand
 {
@@ -15,20 +24,11 @@ internal class ForceClearQueueCommand : BaseCommand
             var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
             var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
 
-            if (conn is null)
+            if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`The bot is not in a voice channel.`",
-                }.AsError(ctx));
-                return;
-            }
-
-            if (conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
-            {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
-                {
-                    Description = $"`You aren't in the same channel as the bot.`",
+                    Description = GetString(t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal class ForceClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = $"`You need Administrator Permissions or a role called 'DJ' to utilize this command.`",
+                    Description = GetString(t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
                 }.AsError(ctx));
                 return;
             }
@@ -47,7 +47,7 @@ internal class ForceClearQueueCommand : BaseCommand
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = $"`The queue was force cleared.`",
+                Description = GetString(t.Commands.Music.ForceClearQueue.Cleared, true),
             }.AsSuccess(ctx));
         });
     }

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class CreditsCommand : BaseCommand
 {
@@ -11,7 +20,7 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Credits.Fetching)}`"
+                Description = GetString(t.Commands.Utility.Credits.Fetching, true)
             }.AsBotLoading(ctx));
 
             var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
@@ -30,19 +39,18 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Credits.Credits)
-                .Replace("{BotName}", ctx.CurrentUser.Username)
-                .Replace("{Developer}", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))")
-                .Replace("{DiscordStaffList}", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.UsernameWithDiscriminator}`]({x.ProfileUrl})")))
-                .Replace("{GitHubContList}", string.Join("\n", contributors.Where(x => !x.Login.Contains("[bot]") && x.Login != "TheXorog").OrderByDescending(x => x.Contributions).Select(x => $"• [`{x.Login}`]({x.HtmlUrl})")))
-                .Replace("{Library}", "[`DisCatSharp`](https://github.com/Aiko-IT-Systems/DisCatSharp)")
-                .Replace("{LibraryContList}", string.Join(", ", contributorsdcs.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")))
-                .Replace("{LibraryContCount}", $"[{contributorsdcs.Count - 10}](https://github.com/Aiko-IT-Systems/DisCatSharp/graphs/contributors)")
-                .Replace("{MusicModule}", $"[`Lavalink`](https://github.com/freyacodes/Lavalink)")
-                .Replace("{MusicContList}", string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")))
-                .Replace("{MusicContCount}", $"[{contributorslava.Count - 10}](https://github.com/freyacodes/Lavalink/graphs/contributors)")
-                .Replace("{PhishingListRepos}", $"[`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) & [`Junortiz`](https://github.com/Junortiz)")
-                .Build()
+                Description = GetString(t.Commands.Utility.Credits.Credits, false, false,
+                new TVar("BotName", ctx.CurrentUser.Username, false),
+                new TVar("Developer", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))", false),
+                new TVar("DiscordStaffList", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.GetUsername()}`]({x.ProfileUrl})")), false),
+                new TVar("GitHubContList", string.Join("\n", contributors.Where(x => !x.Login.Contains("[bot]") && x.Login != "TheXorog").OrderByDescending(x => x.Contributions).Select(x => $"• [`{x.Login}`]({x.HtmlUrl})")), false),
+                new TVar("Library", "[`DisCatSharp`](https://github.com/Aiko-IT-Systems/DisCatSharp)", false),
+                new TVar("LibraryContList", string.Join(", ", contributorsdcs.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")), false),
+                new TVar("LibraryContCount", $"[{contributorsdcs.Count - 10}](https://github.com/Aiko-IT-Systems/DisCatSharp/graphs/contributors)", false),
+                new TVar("MusicModule", $"[`Lavalink`](https://github.com/freyacodes/Lavalink)", false),
+                new TVar("MusicContList", string.Join(", ", contributorslava.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")), false),
+                new TVar("MusicContCount", $"[{contributorslava.Count - 10}](https://github.com/freyacodes/Lavalink/graphs/contributors)", false),
+                new TVar("PhishingListRepos", $"[`nikolaischunk`](https://github.com/nikolaischunk), [`DevSpen`](https://github.com/DevSpen), [`PoorPocketsMcNewHold`](https://github.com/PoorPocketsMcNewHold), [`sk-cat`](https://github.com/sk-cat) & [`Junortiz`](https://github.com/Junortiz)", false))
             }.AsBotInfo(ctx));
         });
     }

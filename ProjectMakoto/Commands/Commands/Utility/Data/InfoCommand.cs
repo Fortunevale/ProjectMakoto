@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Data;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Data;
 
 internal class InfoCommand : BaseCommand
 {
@@ -13,7 +22,7 @@ internal class InfoCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Data.Policy.NoPolicy).Replace("{Bot}", ctx.CurrentUser.Username)}`",
+                    Description = GetString(t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.Username)),
                 }.AsBotError(ctx));
                 return;
             }

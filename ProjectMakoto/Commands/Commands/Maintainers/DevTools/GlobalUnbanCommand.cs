@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class GlobalUnbanCommand : BaseCommand
 {
@@ -15,7 +24,7 @@ internal class GlobalUnbanCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`'{victim.UsernameWithDiscriminator}' is not global banned.`"
+                    Description = $"`'{victim.GetUsername()}' is not global banned.`"
                 }.AsError(ctx, "Global Ban"));
                 return;
             }
@@ -28,7 +37,7 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Removing global ban for '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
+                Description = $"`Removing global ban for '{victim.GetUsername()}' ({victim.Id})`.."
             }.AsLoading(ctx, "Global Ban"));
 
             if (UnbanFromGuilds)
@@ -58,7 +67,7 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
+                Description = $"`Removed '{victim.GetUsername()}' from global bans.`"
             }.AsSuccess(ctx, "Global Ban"));
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
@@ -69,8 +78,8 @@ internal class GlobalUnbanCommand : BaseCommand
                     Name = ctx.CurrentUser.Username,
                     IconUrl = AuditLogIcons.UserBanRemoved
                 },
-                Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
-                              $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
+                Description = $"{victim.Mention} `{victim.GetUsername()}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
+                              $"Moderator: {ctx.User.Mention} `{ctx.User.GetUsername()}` (`{ctx.User.Id}`)",
                 Color = EmbedColors.Success,
                 Timestamp = DateTime.UtcNow
             });

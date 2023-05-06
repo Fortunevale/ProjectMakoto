@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class CreateIssueCommand : BaseCommand
 {
@@ -71,7 +80,7 @@ internal class CreateIssueCommand : BaseCommand
                             return;
                         }
 
-                        var issue = await client.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.UsernameWithDiscriminator}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
+                        var issue = await client.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.GetUsername()}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
 
                         if (labels.Count > 0)
                             await client.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());

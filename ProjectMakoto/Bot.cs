@@ -1,7 +1,15 @@
-using ProjectMakoto.PrefixCommands;
-using ProjectMakoto.Util.SystemMonitor;
-using System.Collections;
-using System.Reflection;
+// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using System.Linq.Expressions;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace ProjectMakoto;
 
@@ -20,6 +28,8 @@ public class Bot
     internal ThreadJoinClient threadJoinClient { get; set; }
     internal AbuseIpDbClient abuseIpDbClient { get; set; }
     internal MonitorClient monitorClient { get; set; }
+
+    public Dictionary<string, BasePlugin> Plugins { get; set; } = new();
 
     #endregion Clients
 
@@ -215,7 +225,7 @@ public class Bot
                 _logger.LogDebug("Loaded {Count} profanity words", profanityList.Count);
 
                 if (!File.Exists("config.json"))
-                    File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                    new Config().Save();
 
                 loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
                 _logger.LogDebug("Loaded translations");
@@ -313,6 +323,7 @@ public class Bot
                     return counts;
                 }
                 loadedTranslations.Progress = CalculateTranslationProgress(loadedTranslations);
+                _logger.LogDebug("Loaded translations: {0}", string.Join("; ", loadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
 
                 foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
                     if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))
@@ -334,7 +345,7 @@ public class Bot
 
                     status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
                     await Task.Delay(500);
-                    File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented));
+                    status.LoadedConfig.Save();
 
                     while (true)
                     {
@@ -368,6 +379,91 @@ public class Bot
                     }
                 }).Add(watcher);
                 await Task.Delay(1000);
+
+                if (status.LoadedConfig.EnablePlugins)
+                {
+                    _logger.LogDebug("Loading Plugins..");
+                    List<string> pluginsToLoad = new();
+
+                    if (Directory.Exists("Plugins"))
+                        pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
+
+                    foreach (var pluginPath in pluginsToLoad)
+                    {
+                        int count = 0;
+                        _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
+
+                        PluginLoadContext pluginLoadContext = new(pluginPath);
+                        var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
+
+                        foreach (Type type in assembly.GetTypes())
+                        {
+                            if (typeof(BasePlugin).IsAssignableFrom(type))
+                            {
+                                count++;
+                                BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
+                                Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                            }
+                        }
+
+                        if (count == 0)
+                        {
+                            string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+                            _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
+                        }
+
+
+                        _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
+                    }
+
+                    _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
+                }
+
+                foreach (var b in Plugins)
+                {
+                    if (b.Value.Name.IsNullOrWhiteSpace())
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Name.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.Description.IsNullOrWhiteSpace())
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Description.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.Author.IsNullOrWhiteSpace())
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Author.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.AuthorId is null)
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing AuthorId.", b.Key);
+                        continue;
+                    }
+
+                    if (b.Value.Version is null)
+                    {
+                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
+                        continue;
+                    }
+
+                    _logger.LogDebug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
+
+                    try
+                    {
+                        b.Value.Load(this);
+                        _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Failed to load Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
+                        _logger.LogError("Exception", ex);
+                    }
+                }
 
                 monitorClient = new MonitorClient(this);
                 abuseIpDbClient = AbuseIpDbClient.Initialize(this);
@@ -481,27 +577,7 @@ public class Bot
             };
 
             discordClient.UseLavalink();
-
-
-
-            _logger.LogDebug("Registering Commands..");
-
-            cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
-            cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
-            
-            cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
-
-
-
-            _logger.LogDebug("Registering Command Converters..");
-
-            cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
-
-
+            // var tfa = discordClient.UseTwoFactor();
 
             _logger.LogDebug("Registering DisCatSharp EventHandler..");
 
@@ -591,6 +667,8 @@ public class Bot
                     x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); 
                 }
 
+                Dictionary<string, BaseCommand> PluginCommands = new();
+
                 if (!status.LoadedConfig.IsDev)
                 {
                     appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
@@ -612,6 +690,132 @@ public class Bot
                     appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(status.LoadedConfig.Channels.Assets, GetCommandTranslations);
                 }
 
+                _logger.LogDebug("Registering Commands..");
+                cNext.RegisterCommands<PrefixCommands.UtilityPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.MusicPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.SocialPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
+                cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
+
+                _logger.LogDebug("Registering Command Converters..");
+                cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
+
+                var commandsNextTypes = new List<Type>();
+                var applicationCommandTypes = new List<Type>();
+
+                foreach (var plugin in Plugins)
+                {
+                    try
+                    {
+                        var pluginCommands = await plugin.Value.RegisterCommands();
+
+                        if (pluginCommands.IsNotNullAndNotEmpty())
+                        {
+                            _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+
+                            try
+                            {
+                                var typeSignature = Guid.NewGuid().ToString();
+                                var an = new AssemblyName(typeSignature);
+                                AssemblyBuilder assembly = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
+                                ModuleBuilder moduleBuilder = assembly.DefineDynamicModule("MainModule");
+                                TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature,
+                                    TypeAttributes.Public |
+                                    TypeAttributes.Class |
+                                    TypeAttributes.AutoClass |
+                                    TypeAttributes.AnsiClass |
+                                    TypeAttributes.BeforeFieldInit |
+                                    TypeAttributes.AutoLayout,
+                                    null);
+
+                                typeBuilder.AddInterfaceImplementation(typeof(BaseCommandModule));
+
+                                foreach (var rawCommand in pluginCommands)
+                                {
+                                    _logger.LogDebug("Found Command '{0}'", rawCommand.Name);
+
+                                    var overloadList = new List<Type>();
+
+                                    overloadList.Insert(0, typeof(CommandContext));
+                                    overloadList.AddRange(rawCommand.Overloads.Select(x => x.Type));
+
+                                    var methodBuilder = typeBuilder.DefineMethod(rawCommand.Name, MethodAttributes.Public, typeof(Task), null);
+
+                                    var methodParams = methodBuilder.DefineGenericParameters(rawCommand.Overloads.Select(x => x.Name).Prepend("ctx").ToArray());
+
+                                    methodParams[0].SetBaseTypeConstraint(typeof(CommandContext));
+
+                                    for (int i = 1; i < rawCommand.Overloads.Length; i++)
+                                        methodParams[i].SetBaseTypeConstraint(rawCommand.Overloads[i].Type);
+
+                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                                        typeof(CommandAttribute).GetConstructor(new[] { typeof(string) }),
+                                        new List<string> { rawCommand.Name }.ToArray()));
+
+                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                                        typeof(DescriptionAttribute).GetConstructor(new[] { typeof(string) }),
+                                        new List<string> { rawCommand.Description }.ToArray()));
+                                    
+                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
+                                        typeof(CommandModuleAttribute).GetConstructor(new[] { typeof(string) }),
+                                        new List<string> { rawCommand.Module }.ToArray()));
+
+                                    methodBuilder.SetParameters(methodParams);
+
+                                    methodBuilder.SetReturnType(typeof(Task));
+
+                                    methodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
+
+                                    var delegateType = Expression.GetFuncType(overloadList.ToArray());
+
+                                    Delegate commandDelegate = null;
+                                    commandDelegate = Delegate.CreateDelegate(delegateType, (CommandContext ctx) =>
+                                    {
+                                        var parsedArgs = new Dictionary<string, object>();
+
+                                        MethodInfo method = commandDelegate.GetType().GetMethod("Invoke");
+                                        ParameterInfo[] parameters = method.GetParameters();
+
+                                        for (int i = 1; i < parameters.Length; i++)
+                                        {
+                                            if (i == 0)
+                                                continue;
+
+                                            ParameterInfo parameter = parameters[i];
+                                            object value = null;
+
+                                            PropertyInfo property = typeof(object).GetProperty(parameter.Name, BindingFlags.Public | BindingFlags.Instance);
+                                            if (property != null)
+                                            {
+                                                value = property.GetValue(ctx);
+                                            }
+
+                                            parsedArgs.Add(parameter.Name, value);
+                                        }
+
+                                        return Task.CompletedTask;
+                                    }, rawCommand.Name);
+
+                                    var newDelegate = methodBuilder.CreateDelegate(commandDelegate.GetType(), commandDelegate);
+                                }
+
+                                cNext.RegisterCommands(typeBuilder);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("Failed to generate CommandsNext Command", ex);
+                                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+
                 _logger.LogInfo("Connecting and authenticating with Discord..");
                 await discordClient.ConnectAsync();
 
@@ -626,7 +830,7 @@ public class Bot
                     if (status.LoadedConfig.DontModify.LastStartedVersion != RunningVersion)
                     {
                         status.LoadedConfig.DontModify.LastStartedVersion = RunningVersion;
-                        File.WriteAllText("config.json", JsonConvert.SerializeObject(status.LoadedConfig, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Include }));
+                        status.LoadedConfig.Save();
 
                         var channel = await discordClient.GetChannelAsync(status.LoadedConfig.Channels.GithubLog);
                         await channel.SendMessageAsync(new DiscordEmbedBuilder
@@ -899,11 +1103,11 @@ public class Bot
             //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
             //        return -1;
 
-            string currentPrefix = guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.Prefix : Prefix;
+            string currentPrefix = guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.PrefixSettings.Prefix : Prefix;
 
             int CommandStart = -1;
 
-            if (!(guild?.PrefixDisabled ?? false))
+            if (!(guild?.PrefixSettings.PrefixDisabled ?? false))
                 CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, currentPrefix);
 
             if (CommandStart == -1)
@@ -1288,6 +1492,12 @@ public class Bot
         ExitCalled = true;
 
         _logger.LogInfo("Preparing to shut down Makoto..");
+
+        foreach (var b in Plugins)
+        {
+            _logger.LogInfo("Shutting down '{0}'..", b.Value.Name);
+            await b.Value.Shutdown();
+        }
 
         if (status.DiscordInitialized && !Immediate)
         {

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class LanguageCommand : BaseCommand
 {
@@ -8,13 +17,14 @@ internal class LanguageCommand : BaseCommand
         {
             await RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = $"`{GetString(t.Commands.Language.Disclaimer)}`\n`{GetString(t.Commands.Language.Response)}`: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
+                Description = $"{GetString(t.Commands.Utility.Language.Disclaimer, true)}\n" +
+                              $"{GetString(t.Commands.Utility.Language.Response, true)}: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
             });
 
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Utility.Language.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
 
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
@@ -63,7 +73,7 @@ internal class LanguageCommand : BaseCommand
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Language.Selector));
+            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Utility.Language.Selector));
 
             if (SelectionResult.TimedOut)
             {

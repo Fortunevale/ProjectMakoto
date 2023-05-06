@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class UnbanCommand : BaseCommand
 {
@@ -12,7 +21,7 @@ internal class UnbanCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Unbanning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Unbanning {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -24,12 +33,12 @@ internal class UnbanCommand : BaseCommand
             {
                 await ctx.Guild.UnbanMemberAsync(victim);
 
-                embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was unbanned.";
+                embed.Description = $"<@{victim.Id}> `{victim.GetUsername()}` was unbanned.";
                 embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be unbanned.`";
+                embed.Description = $"`{victim.GetUsername()} ({victim.Id}) couldn't be unbanned.`";
                 embed = embed.AsError(ctx);
             }
 

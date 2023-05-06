@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class UploadCommand : BaseCommand
 {
@@ -13,7 +22,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Upload.NoInteraction)}`"
+                    Description = GetString(t.Commands.Utility.Upload.NoInteraction, true)
                 }.AsError(ctx));
                 return;
             }
@@ -22,7 +31,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Upload.AlreadyUploaded)}`"
+                    Description = GetString(t.Commands.Utility.Upload.AlreadyUploaded, true)
                 }.AsError(ctx));
                 return;
             }
@@ -31,7 +40,8 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Upload.TimedOut).Replace("{Timestamp}", $"`{ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()}`")}`"
+                    Description = GetString(t.Commands.Utility.Upload.TimedOut, true,
+                        new TVar("Timestamp", ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()))
                 }.AsError(ctx));
                 ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
                 return;
@@ -43,7 +53,7 @@ internal class UploadCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Upload.Uploaded)}`"
+                Description = GetString(t.Commands.Utility.Upload.Uploaded, true)
             }.AsSuccess(ctx));
 
             await Task.Delay(5000);

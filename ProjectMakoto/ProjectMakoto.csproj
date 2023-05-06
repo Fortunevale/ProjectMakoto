@@ -29,17 +29,21 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
-    <PackageReference Include="DisCatSharp" Version="10.3.3-nightly-028" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-028" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-028" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.3.3-nightly-028" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-028" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-028" />
-    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.2-pre200" />
+    <PackageReference Include="DisCatSharp" Version="10.3.3-nightly-041" />
+    <PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-041" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-041" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.3.3-nightly-041" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-006" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-041" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-041" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0-1.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.6.0-1.final" />
-    <PackageReference Include="MySql.Data" Version="8.0.32.1" />
-    <PackageReference Include="Octokit" Version="5.0.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.33" />
+    <PackageReference Include="Octokit" Version="5.1.0" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
   </ItemGroup>
@@ -90,9 +94,13 @@
     <None Update="Translations\*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	<Content Include="Plugins\**">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Plugins\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

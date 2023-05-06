@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 internal class AvatarCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
@@ -17,7 +26,7 @@ internal class AvatarCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.AvatarUrl,
-            }.AsInfo(ctx, GetString(t.Commands.Avatar.Avatar).Replace("{User}", victim.UsernameWithDiscriminator));
+            }.AsInfo(ctx, GetString(t.Commands.Utility.Avatar.Avatar, false, new TVar("User", victim.GetUsername())));
 
             DiscordMember member = null;
 
@@ -25,8 +34,8 @@ internal class AvatarCommand : BaseCommand
             { member = await victim.ConvertToMember(ctx.Guild); }
             catch { }
 
-            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", GetString(t.Commands.Avatar.ShowServerProfile), (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
-            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", GetString(t.Commands.Avatar.ShowUserProfile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            var ServerProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowServer", GetString(t.Commands.Utility.Avatar.ShowServerProfile), (string.IsNullOrWhiteSpace(member?.GuildAvatarHash)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+            var ProfilePictureButton = new DiscordButtonComponent(ButtonStyle.Secondary, "ShowProfile", GetString(t.Commands.Utility.Avatar.ShowUserProfile), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton);
 

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class ScoreSaberMapLeaderboardCommand : BaseCommand
 {
@@ -21,7 +30,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Looking for scoreboard..`"
+                Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.LoadingScoreboard, true)
             }.AsLoading(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -46,19 +55,19 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             }
             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
             {
-                embed.Description = $"`An internal server exception occurred. Please retry later.`";
+                embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
             catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
             {
-                embed.Description = $"`The requested scoreboard does not exist.`";
+                embed.Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 throw;
             }
             catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
             {
-                embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
@@ -131,7 +140,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             {
                 if (scoreSaberPage > TotalPages)
                 {
-                    embed.Description = $"`Page {scoreSaberPage} doesn't exist.`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.PageNotExist, true, new TVar("Page", scoreSaberPage));
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -146,19 +155,19 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 }
                 catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                 {
-                    embed.Description = $"`An internal server exception occurred. Please retry later.`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
                 catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                 {
-                    embed.Description = $"`The requested scoreboard does not exist.`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     throw;
                 }
                 catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
                 {
-                    embed.Description = $"`The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled.`";
+                    embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -172,18 +181,18 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
                 embed.Description = "";
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = leaderboard.leaderboardInfo.coverImage };
-                embed.Footer = ctx.GenerateUsedByFooter($"Page {scoreSaberPage}/{TotalPages}");
+                embed.Footer = ctx.GenerateUsedByFooter($"{GetString(t.Common.Page)} {scoreSaberPage}/{TotalPages}");
                 embed.ClearFields();
                 foreach (var score in scores.scores.ToList().Skip(internalPage * 6).Take(6))
                 {
                     embed.AddField(new DiscordEmbedField($"**#{score.rank}** {score.leaderboardPlayerInfo.country.IsoCountryCodeToFlagEmoji()} `{score.leaderboardPlayerInfo.name.SanitizeForCode()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.timeSet, TimestampFormat.RelativeTime)}",
                         $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.modifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
                         $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? "✅ `FC`" : $"{false.ToEmote(ctx.Bot)} `{score.missedNotes + score.badCuts}`")}**\n" +
-                        $"Profile: `{ctx.Prefix}scoresaber profile {score.leaderboardPlayerInfo.id}`"));
+                        $"{GetString(t.Commands.ScoreSaber.MapLeaderboard.Profile)}: `{ctx.Prefix}scoresaber profile {score.leaderboardPlayerInfo.id}`"));
                 }
 
-                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, "Previous page", (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, "Next page", (scoreSaberPage + 1 > scores.metadata.total / scores.metadata.itemsPerPage), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, GetString(t.Common.PreviousPage), (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, GetString(t.Common.NextPage), (scoreSaberPage + 1 > scores.metadata.total / scores.metadata.itemsPerPage), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
             };

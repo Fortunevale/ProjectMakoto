@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.NameNormalizerCommand;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.NameNormalizerCommand;
 
 internal class ConfigCommand : BaseCommand
 {
@@ -74,12 +83,12 @@ internal class ConfigCommand : BaseCommand
                     {
                         var b = members.ElementAt(i);
 
-                        string PingableName = RegexTemplates.AllowedNickname.Replace(b.PreferredDisplayName.Normalize(NormalizationForm.FormKC), "");
+                        string PingableName = RegexTemplates.AllowedNickname.Replace(b.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
                         if (PingableName.IsNullOrWhiteSpace())
                             PingableName = "Pingable Name";
 
-                        if (PingableName != b.PreferredDisplayName)
+                        if (PingableName != b.DisplayName)
                         {
                             _ = b.ModifyAsync(x => x.Nickname = PingableName);
                             Renamed++;

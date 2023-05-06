@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class GlobalNotesCommand : BaseCommand
 {
@@ -37,7 +46,7 @@ internal class GlobalNotesCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
                     .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var list) ? list.Count : 0)} global notes.`")
-                    .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
+                    .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsername())}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
                 .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
 
@@ -87,7 +96,7 @@ internal class GlobalNotesCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 var SelectionResult = await PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
-                    .Select(x => new DiscordStringSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].UsernameWithDiscriminator)} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
+                    .Select(x => new DiscordStringSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsername())} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {

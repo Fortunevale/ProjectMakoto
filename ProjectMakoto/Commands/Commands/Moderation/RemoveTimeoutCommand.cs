@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class RemoveTimeoutCommand : BaseCommand
 {
@@ -26,7 +35,7 @@ internal class RemoveTimeoutCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Removing timeout for {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Removing timeout for {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -37,12 +46,12 @@ internal class RemoveTimeoutCommand : BaseCommand
             try
             {
                 await victim.RemoveTimeoutAsync();
-                embed.Description = $"`Removed timeout for {victim.UsernameWithDiscriminator} ({victim.Id}).`";
+                embed.Description = $"`Removed timeout for {victim.GetUsername()} ({victim.Id}).`";
                 embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"`Couldn't remove timeout for {victim.UsernameWithDiscriminator} ({victim.Id}).`";
+                embed.Description = $"`Couldn't remove timeout for {victim.GetUsername()} ({victim.Id}).`";
                 embed = embed.AsError(ctx);
             }
 

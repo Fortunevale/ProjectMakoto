@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.VcCreator;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.VcCreator;
 
 internal class LimitCommand : BaseCommand
 {
@@ -14,24 +23,24 @@ internal class LimitCommand : BaseCommand
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannel)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
             if (newLimit > 99)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Input outside of range.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Limit.OutsideRange, true)).AsError(ctx));
                 return;
             }
 
             await channel.ModifyAsync(x => x.UserLimit = newLimit.ToInt32());
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`The channel's user limit has been changed to {newLimit}.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Limit.Success, true, new TVar("Count", newLimit))).AsSuccess(ctx));
         });
     }
 }

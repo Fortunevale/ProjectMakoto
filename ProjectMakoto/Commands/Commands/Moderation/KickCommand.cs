@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class KickCommand : BaseCommand
 {
@@ -27,7 +36,7 @@ internal class KickCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Kicking {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Kicking {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -40,7 +49,7 @@ internal class KickCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.RemoveAsync($"{ctx.User.UsernameWithDiscriminator} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await victim.RemoveAsync($"{ctx.User.GetUsername()} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
                 embed = embed.AsSuccess(ctx);

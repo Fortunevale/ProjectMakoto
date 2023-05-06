@@ -1,7 +1,19 @@
-﻿namespace ProjectMakoto.Util;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
 {
+    internal static string GetUsername(this DiscordUser user)
+        => user.IsMigrated ? user.UsernameWithGlobalName : user.UsernameWithDiscriminator;
+
     internal static List<DiscordOverwriteBuilder> ConvertToBuilderWithNewOverwrites(this IReadOnlyList<DiscordOverwrite> overwrites, DiscordMember member, Permissions allowed, Permissions denied)
         => overwrites.Where(x => x.Id != member.Id).Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).Append(new DiscordOverwriteBuilder(member) { Allowed = (overwrites.FirstOrDefault(x => x.Id == member.Id, null)?.Allowed ?? Permissions.None) | allowed, Denied = (overwrites.FirstOrDefault(x => x.Id == member.Id, null)?.Denied ?? Permissions.None) | denied }).ToList();
     

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class KissCommand : BaseCommand
 {
@@ -11,21 +20,14 @@ internal class KissCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases =
-            {
-                $"%1 kisses %2! {ctx.Bot.status.LoadedConfig.Emojis.Cuddle}",
-            };
-
-            string[] self_phrases =
-            {
-                "%1, i don't think that's how it works..",
-            };
+            string[] phrases = t.Commands.Social.Kiss.Other.Get(ctx.DbGuild);
+            string[] self_phrases = t.Commands.Social.Kiss.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Build(new TVar("User1", ctx.Member.DisplayName)),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -36,7 +38,11 @@ internal class KissCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false),
+                    new TVar("Emoji", ctx.Bot.status.LoadedConfig.Emojis.Cuddle, false))
+                    .Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

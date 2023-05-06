@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.InviteNotesCommand;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.InviteNotesCommand;
 
 internal class ConfigCommand : BaseCommand
 {
@@ -104,7 +113,7 @@ internal class ConfigCommand : BaseCommand
                         var invites = await ctx.Guild.GetInvitesAsync();
 
                         var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
-                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.UsernameWithDiscriminator}")).ToList());
+                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.GetUsername()}")).ToList());
 
                         if (SelectionResult.TimedOut)
                         {

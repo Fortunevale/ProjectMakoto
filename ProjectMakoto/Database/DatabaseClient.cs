@@ -1,3 +1,12 @@
+// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
 using ProjectMakoto.Entities.Database;
 using ProjectMakoto.Entities.Database.ColumnAttributes;
 using ProjectMakoto.Entities.Database.ColumnTypes;
@@ -380,8 +389,11 @@ internal class DatabaseClient
             {
                 serverid = x.Key,
 
-                prefix = x.Value.Prefix,
-                prefix_disabled = x.Value.PrefixDisabled,
+                current_locale = x.Value.CurrentLocale,
+                override_locale = x.Value.OverrideLocale,
+
+                prefix = x.Value.PrefixSettings.Prefix,
+                prefix_disabled = x.Value.PrefixSettings.PrefixDisabled,
 
                 experience_use = x.Value.Experience.UseExperience,
                 experience_boost_bumpreminder = x.Value.Experience.BoostXpForBumpReminder,

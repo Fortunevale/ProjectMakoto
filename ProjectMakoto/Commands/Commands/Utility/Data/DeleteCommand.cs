@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Data;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Data;
 
 internal class DeleteCommand : BaseCommand
 {
@@ -16,7 +25,7 @@ internal class DeleteCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Data.Object.ProfileAlreadyDeleted)}`"
+                    Description = GetString(t.Commands.Utility.Data.Object.ProfileAlreadyDeleted, true)
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
@@ -33,7 +42,7 @@ internal class DeleteCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Data.Object.EnablingDataProcessing)}`"
+                        Description = GetString(t.Commands.Utility.Data.Object.EnablingDataProcessing, true)
                     }.AsBotLoading(ctx));
 
                     try
@@ -47,14 +56,14 @@ internal class DeleteCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordEmbedBuilder
                         {
-                            Description = $"`{GetString(t.Commands.Data.Object.EnablingDataProcessingError)}`"
+                            Description = GetString(t.Commands.Utility.Data.Object.EnablingDataProcessingError, true)
                         }.AsBotError(ctx));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Data.Object.EnablingDataProcessingSuccess)}`"
+                        Description = GetString(t.Commands.Utility.Data.Object.EnablingDataProcessingSuccess, true)
                     }.AsBotSuccess(ctx));
                 }
                 else
@@ -69,7 +78,9 @@ internal class DeleteCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Data.Object.DeletionAlreadyScheduled).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.DeletionRequestDate.AddDays(-14).ToTimestamp()}`").Replace("{ScheduleTimestamp}", $"`{ctx.DbUser.Data.DeletionRequestDate.ToTimestamp()}`")}`"
+                    Description = GetString(t.Commands.Utility.Data.Object.DeletionAlreadyScheduled, true, 
+                    new TVar("RequestTimestamp", ctx.DbUser.Data.DeletionRequestDate.AddDays(-14).ToTimestamp()),
+                    new TVar("ScheduleTimestamp", ctx.DbUser.Data.DeletionRequestDate.ToTimestamp()))
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
                 var Menu1 = await ctx.WaitForButtonAsync();
@@ -89,7 +100,7 @@ internal class DeleteCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Data.Object.DeletionScheduleReversed)}`"
+                        Description = GetString(t.Commands.Utility.Data.Object.DeletionScheduleReversed, true)
                     }.AsBotSuccess(ctx));
                 }
                 else
@@ -102,7 +113,7 @@ internal class DeleteCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Data.Object.ObjectionDisclaimer).Build(true, true)
+                Description = GetString(t.Commands.Utility.Data.Object.ObjectionDisclaimer, true, true)
             }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { Yes, No }));
 
             var Menu = await ctx.WaitForButtonAsync();
@@ -119,7 +130,7 @@ internal class DeleteCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"**`{GetString(t.Commands.Data.Object.SecondaryConfirm)}`**"
+                    Description = $"**{GetString(t.Commands.Utility.Data.Object.SecondaryConfirm, true)}**"
                 }.AsBotAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { No, Yes }));
 
                 Menu = await ctx.WaitForButtonAsync();
@@ -139,7 +150,7 @@ internal class DeleteCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Data.Object.ProfileDeletionScheduled)}`"
+                        Description = GetString(t.Commands.Utility.Data.Object.ProfileDeletionScheduled, true)
                     }.AsBotSuccess(ctx));
                 }
                 else

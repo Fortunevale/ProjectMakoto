@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.VcCreator;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.VcCreator;
 
 internal class InviteCommand : BaseCommand
 {
@@ -14,25 +23,31 @@ internal class InviteCommand : BaseCommand
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannel)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`{GetString(t.Commands.VoiceChannelCreator.NotAVccChannelOwner)}`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You cannot invite yourself.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Invite.CannotInviteSelf, true)).AsError(ctx));
                 return;
             }
 
             if (channel.Users.Any(x => x.Id == victim.Id))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `is already in your Voice Channel.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Invite.AlreadyPresent, true, new TVar("User", victim.Mention))).AsError(ctx));
+                return;
+            }
+
+            if (victim.IsBot)
+            {
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.VictimIsBot, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
@@ -40,15 +55,15 @@ internal class InviteCommand : BaseCommand
 
             try
             {
-                await victim.SendMessageAsync($"{ctx.User.Mention} has invited you to join {channel.Mention}.");
+                await victim.SendMessageAsync(t.Commands.Utility.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.users[victim.Id]).Build(new TVar("Channel", channel.Mention)));
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `can now join this channel. However, i was unable to send a Direct Message to them.`").AsError(ctx));
+                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Invite.PartialSuccess, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{victim.Mention} `has been invited to this channel.`").AsSuccess(ctx));
+            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Invite.Success, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });
     }
 }

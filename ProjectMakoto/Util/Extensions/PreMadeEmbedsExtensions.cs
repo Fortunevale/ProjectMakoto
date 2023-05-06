@@ -1,3 +1,12 @@
+// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
 namespace ProjectMakoto.Util;
 
 internal static class PreMadeEmbedsExtensions
@@ -197,14 +206,14 @@ internal static class PreMadeEmbedsExtensions
         => new()
         {
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : user.AvatarUrl),
-            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(dbUser).Replace("{User}", user.UsernameWithDiscriminator)}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(dbUser).Build(new TVar("User", user.GetUsername()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
     public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "", string customIcon = "")
         => new()
         {
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
-            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Replace("{User}", ctx.User.UsernameWithDiscriminator)}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Build(new TVar("User", ctx.User.GetUsername()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
     public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")

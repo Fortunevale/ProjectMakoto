@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class SoftBanCommand : BaseCommand
 {
@@ -23,7 +32,7 @@ internal class SoftBanCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Soft banning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Soft banning {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -36,8 +45,8 @@ internal class SoftBanCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= (bMember?.GetRoleHighestPosition() ?? -1))
                     throw new Exception();
 
-                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.UsernameWithDiscriminator} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
-                await ctx.Guild.UnbanMemberAsync(victim.Id, $"{ctx.User.UsernameWithDiscriminator} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.GetUsername()} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await ctx.Guild.UnbanMemberAsync(victim.Id, $"{ctx.User.GetUsername()} soft banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was soft banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
                 embed = embed.AsSuccess(ctx);

@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class SlapCommand : BaseCommand
 {
@@ -11,22 +20,14 @@ internal class SlapCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases =
-            {
-                $"%1 slaps %2! That looks like it hurt.. {ctx.Bot.status.LoadedConfig.Emojis.Slap}",
-            };
-
-            string[] self_phrases =
-            {
-                "Come on, %1. There's no need to be so hard on yourself!",
-                "Bad %1! I don't know what you did but bad!"
-            };
+            string[] phrases = t.Commands.Social.Slap.Other.Get(ctx.DbGuild);
+            string[] self_phrases = t.Commands.Social.Slap.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Build(new TVar("User1", ctx.Member.DisplayName)),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -37,7 +38,11 @@ internal class SlapCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.User.Mention, false), 
+                    new TVar("User2", user.Mention, false), 
+                    new TVar("Emoji", ctx.Bot.status.LoadedConfig.Emojis.Slap, false))
+                    .Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

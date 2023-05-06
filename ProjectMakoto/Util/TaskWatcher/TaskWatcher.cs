@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Util;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Util;
 
 internal class TaskWatcher
 {
@@ -77,9 +86,9 @@ internal class TaskWatcher
                 else
                     _logger.LogError("A task failed to execute", b.task.Exception);
 
-                var ExceptionType = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.GetType() : b.task.Exception.InnerException.GetType());
-                var Exception = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception : b.task.Exception.InnerException);
-                string ExceptionMessage = (b.task.Exception.GetType() != typeof(AggregateException) ? b.task.Exception.Message : b.task.Exception.InnerException.Message);
+                var ExceptionType = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception?.GetType() : b.task.Exception?.InnerException.GetType());
+                var Exception = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception : b.task.Exception.InnerException);
+                string ExceptionMessage = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception?.Message : b.task.Exception.InnerException?.Message);
 
                 if (ExceptionType == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {

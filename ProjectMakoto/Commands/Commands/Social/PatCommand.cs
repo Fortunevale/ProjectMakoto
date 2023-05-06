@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class PatCommand : BaseCommand
 {
@@ -11,23 +20,16 @@ internal class PatCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases =
-            {
-                    "%1 gives %2 headpats!",
-                };
-
-            string[] self_phrases =
-            {
-                    "There, there.. I'll give you some headpats, %1 😢",
-                    "I'll give you some headpats, %1.. 😢",
-                    "You look lonely there, %1..",
-                };
+            string[] phrases = t.Commands.Social.Pat.Other.Get(ctx.DbGuild);
+            string[] self_phrases = t.Commands.Social.Pat.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Title = self_phrases.SelectRandom().Replace("%1", ctx.User.Username),
+                    Title = self_phrases.SelectRandom().Build(
+                        new TVar("User1", ctx.Member.DisplayName),
+                        new TVar("Emoji", "😢")),
                     Color = EmbedColors.HiddenSidebar,
                     Footer = ctx.GenerateUsedByFooter(),
                 }));
@@ -38,7 +40,10 @@ internal class PatCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = Formatter.Bold(phrases.SelectRandom().Replace("%1", ctx.User.Mention).Replace("%2", user.Mention)),
+                Description = phrases.SelectRandom().Build(
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false))
+                    .Bold(),
                 ImageUrl = response.Item2,
                 Color = EmbedColors.HiddenSidebar,
                 Footer = ctx.GenerateUsedByFooter(response.Item1),

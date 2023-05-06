@@ -1,10 +1,19 @@
-﻿namespace ProjectMakoto.Entities;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
 
-internal class RolePromptConfiguration
+namespace ProjectMakoto.Entities;
+
+public class RolePromptConfiguration
 {
-    internal string? CreateRoleOption { get; set; } = null;
+    public string? CreateRoleOption { get; set; } = null;
 
-    internal string? DisableOption { get; set; } = null;
+    public string? DisableOption { get; set; } = null;
 
-    internal bool IncludeEveryone { get; set; } = false;
+    public bool IncludeEveryone { get; set; } = false;
 }

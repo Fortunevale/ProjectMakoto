@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class ClearBackupCommand : BaseCommand
 {
@@ -17,7 +26,7 @@ internal class ClearBackupCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
+                    Description = $"`{victim.GetUsername()} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                     {
                         Url = victim.AvatarUrl
@@ -35,7 +44,7 @@ internal class ClearBackupCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Deleted stored nickname and roles for {victim.UsernameWithDiscriminator} ({victim.Id}).`",
+                Description = $"`Deleted stored nickname and roles for {victim.GetUsername()} ({victim.Id}).`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl

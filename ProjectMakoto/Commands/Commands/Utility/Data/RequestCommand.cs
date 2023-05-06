@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands.Data;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands.Data;
 
 internal class RequestCommand : BaseCommand
 {
@@ -13,14 +22,16 @@ internal class RequestCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{GetString(t.Commands.Data.Request.TimeError).Replace("{RequestTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)}`").Replace("{WaitTimestamp}", $"`{ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)}`")}`"
+                    Description = GetString(t.Commands.Utility.Data.Request.TimeError, true, 
+                        new TVar("RequestTimestamp", ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)), 
+                        new TVar("WaitTimestamp", ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)))
                 }.AsError(ctx));
                 return;
             }
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`{GetString(t.Commands.Data.Request.Fetching)}`"
+                Description = GetString(t.Commands.Utility.Data.Request.Fetching, true)
             }.AsLoading(ctx));
 
             RequestData requestData = new();
@@ -46,7 +57,7 @@ internal class RequestCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
+                        Description = GetString(t.Commands.Utility.Data.Request.Confirm, true)
                     }.AsSuccess(ctx)).WithFile("userdata.json", stream));
                     ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
                     break;
@@ -57,7 +68,7 @@ internal class RequestCommand : BaseCommand
                     {
                         await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = $"`{GetString(t.Commands.Data.Request.Confirm).Replace("{User}", ctx.User.UsernameWithDiscriminator)}`"
+                            Description = GetString(t.Commands.Utility.Data.Request.Confirm, true)
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));
                         ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
 

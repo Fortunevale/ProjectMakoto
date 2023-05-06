@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class ScoreSaberUnlinkCommand : BaseCommand
 {
@@ -15,14 +24,14 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"{ctx.User.Mention} `Unlinked your Score Saber Profile from your Discord Account`"
+                    Description = GetString(t.Commands.ScoreSaber.Unlink.Unlinked, true)
                 }.AsSuccess(ctx, "Score Saber")));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = $"{ctx.User.Mention} `There is no Score Saber Profile linked to your Discord Account.`"
+                    Description = GetString(t.Commands.ScoreSaber.Unlink.NoLink, true)
                 }.AsError(ctx, "Score Saber")));
             }
         });

@@ -1,4 +1,13 @@
-﻿using System.Reflection;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+using System.Reflection;
 
 namespace ProjectMakoto.Util;
 
@@ -65,63 +74,5 @@ internal static class GenericExtensions
         writer.Flush();
         stream.Position = 0;
         return stream;
-    }
-
-    /// <summary>
-    /// Builds a string array into a string, used for MultiTranslationKeys.
-    /// </summary>
-    /// <param name="array"></param>
-    /// <param name="Code">Whether to prefix and suffix ` on non-empty lines.</param>
-    /// <returns></returns>
-    internal static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false)
-        => string.Join("\n", array.Select(x => 
-        {
-            if (!Code)
-                return x;
-
-            if (x.IsNullOrWhiteSpace())
-                return x;
-
-            bool boldLine = false;
-            var y = x;
-
-            if (y.StartsWith("**"))
-            {
-                boldLine = true;
-                y = y.Remove(0, 2);
-            }
-
-            return $"{(boldLine ? "**" : "")}`{y}`{(boldLine ? "**" : "")}";
-        }));
-
-    /// <summary>
-    /// Runs Replace on every string in a string array and returns the new array.
-    /// </summary>
-    /// <param name="array"></param>
-    /// <param name="old"></param>
-    /// <param name="new"></param>
-    /// <returns></returns>
-    internal static string[] Replace(this string[] array, string old, object @new) 
-        => array.Select(x => x.Replace(old, @new)).ToArray();
-
-    /// <summary>
-    /// Calculates maximum character count for given list of translation keys.
-    /// </summary>
-    /// <param name="user"></param>
-    /// <param name="pairs"></param>
-    /// <returns></returns>
-    internal static int CalculatePadding(User user, params SingleTranslationKey[] pairs)
-    {
-        int pad = 0;
-
-        foreach (var b in pairs)
-        {
-            var length = b.Get(user).Length;
-
-            if (length > pad)
-                pad = length;
-        }
-
-        return pad;
     }
 }

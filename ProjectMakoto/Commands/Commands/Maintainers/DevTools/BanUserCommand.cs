@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class BanUserCommand : BaseCommand
 {
@@ -14,13 +23,13 @@ internal class BanUserCommand : BaseCommand
 
             if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' is registered in the staff team.`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.bannedUsers.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.UsernameWithDiscriminator}' is already banned from using the bot.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' is already banned from using the bot.`").AsError(ctx));
                 return;
             }
 
@@ -32,7 +41,7 @@ internal class BanUserCommand : BaseCommand
                 await b.Value.LeaveAsync();
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.UsernameWithDiscriminator}' was banned from using the bot.`").AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' was banned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

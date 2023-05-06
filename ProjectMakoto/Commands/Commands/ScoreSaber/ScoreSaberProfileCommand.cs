@@ -1,4 +1,13 @@
-﻿namespace ProjectMakoto.Commands;
+﻿// Project Makoto
+// Copyright (C) 2023  Fortunevale
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY
+
+namespace ProjectMakoto.Commands;
 
 internal class ScoreSaberProfileCommand : BaseCommand
 {
@@ -22,12 +31,12 @@ internal class ScoreSaberProfileCommand : BaseCommand
                     if (!string.IsNullOrWhiteSpace(id))
                     {
                         if (Regex.IsMatch(id, @"<@((!?)(\d*))>", RegexOptions.ExplicitCapture))
-                            user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@((!?)(\d*))>", RegexOptions.ExplicitCapture).Groups[3].Value));
+                            user = await ctx.Client.GetUserAsync(Convert.ToUInt64(Regex.Match(id, @"<@((!?)(\d*))>").Groups[3].Value));
                         else
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = $"`Invalid input.`"
+                                Description = GetString(t.Commands.ScoreSaber.Profile.InvalidInput, true)
                             }.AsError(ctx, "Score Saber")));
                             return;
                         }
@@ -39,7 +48,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`The user you tagged does not exist.`"
+                        Description = GetString(t.Commands.ScoreSaber.Profile.NoUser, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -53,7 +62,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`This user has no Score Saber Profile linked to their Discord Account.`"
+                        Description = GetString(t.Commands.ScoreSaber.Profile.NoProfile, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }
