@@ -113,13 +113,14 @@ public class Bot
             _logger.ChangeLogLevel(LogLevel.DEBUG);
         }
 
-        _logger.LogDebug("Loading Plugins..");
-        List<string> pluginsToLoad = new();
-
-        if (Directory.Exists("Plugins"))
-            pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
-
         if (status.LoadedConfig.EnablePlugins)
+        {
+            _logger.LogDebug("Loading Plugins..");
+            List<string> pluginsToLoad = new();
+
+            if (Directory.Exists("Plugins"))
+                pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
+
             foreach (var pluginPath in pluginsToLoad)
             {
                 int count = 0;
@@ -148,7 +149,8 @@ public class Bot
                 _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
             }
 
-        _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
+            _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
+        }
 
         _logger.LogDebug("Loading all assemblies..");
 
