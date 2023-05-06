@@ -18,7 +18,7 @@ internal class BannerCommand : BaseCommand
             {
                 ImageUrl = victim.BannerUrl,
                 Description = victim.BannerUrl.IsNullOrWhiteSpace() ? GetString(t.Commands.Utility.Banner.NoBanner, true) : ""
-            }.AsInfo(ctx, GetString(t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.UsernameWithDiscriminator)));
+            }.AsInfo(ctx, GetString(t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.GetUsername())));
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 

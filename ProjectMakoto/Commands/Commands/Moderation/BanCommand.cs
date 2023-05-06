@@ -22,7 +22,7 @@ internal class BanCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Banning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Banning {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -35,7 +35,7 @@ internal class BanCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= (bMember?.GetRoleHighestPosition() ?? -1))
                     throw new Exception();
 
-                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.UsernameWithDiscriminator} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.GetUsername()} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
                 embed = embed.AsSuccess(ctx);

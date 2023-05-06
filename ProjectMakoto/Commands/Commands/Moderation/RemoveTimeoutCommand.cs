@@ -26,7 +26,7 @@ internal class RemoveTimeoutCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Removing timeout for {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Removing timeout for {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -37,12 +37,12 @@ internal class RemoveTimeoutCommand : BaseCommand
             try
             {
                 await victim.RemoveTimeoutAsync();
-                embed.Description = $"`Removed timeout for {victim.UsernameWithDiscriminator} ({victim.Id}).`";
+                embed.Description = $"`Removed timeout for {victim.GetUsername()} ({victim.Id}).`";
                 embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"`Couldn't remove timeout for {victim.UsernameWithDiscriminator} ({victim.Id}).`";
+                embed.Description = $"`Couldn't remove timeout for {victim.GetUsername()} ({victim.Id}).`";
                 embed = embed.AsError(ctx);
             }
 

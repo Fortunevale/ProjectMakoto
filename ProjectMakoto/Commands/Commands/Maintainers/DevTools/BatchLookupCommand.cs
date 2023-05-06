@@ -28,7 +28,7 @@ internal class BatchLookupCommand : BaseCommand
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Looking up {IDs.Count} users..`\n`{GenerateASCIIProgressbar(i, IDs.Count)}`").AsLoading(ctx));
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.UsernameWithDiscriminator}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(string.Join("\n", fetched.Select(x => $"{(x.Value is null ? $"❌ `Failed to fetch '{x.Key}'`" : $"✅ {x.Value.Mention} `{x.Value.GetUsername()}` (`{x.Value.Id}`)")}"))).AsSuccess(ctx));
         });
     }
 }

@@ -71,7 +71,7 @@ internal class CreateIssueCommand : BaseCommand
                             return;
                         }
 
-                        var issue = await client.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.UsernameWithDiscriminator}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
+                        var issue = await client.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.GetUsername()}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
 
                         if (labels.Count > 0)
                             await client.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());

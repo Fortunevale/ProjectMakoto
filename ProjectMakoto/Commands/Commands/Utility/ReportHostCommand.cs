@@ -171,7 +171,7 @@ internal class ReportHostCommand : BaseCommand
                     Color = EmbedColors.Success,
                     Timestamp = DateTime.UtcNow,
                     Description = $"`Submitted host`: `{host.SanitizeForCode()}`\n" +
-                                  $"`Submission by `: `{ctx.User.UsernameWithDiscriminator} ({ctx.User.Id})`\n" +
+                                  $"`Submission by `: `{ctx.User.GetUsername()} ({ctx.User.Id})`\n" +
                                   $"`Submitted on  `: `{ctx.Guild.Name} ({ctx.Guild.Id})`"
                 })
                 .AddComponents(new List<DiscordComponent>

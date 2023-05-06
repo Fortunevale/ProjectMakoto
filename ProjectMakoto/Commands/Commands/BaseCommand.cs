@@ -228,11 +228,11 @@ public abstract class BaseCommand
             new TVar("CurrentCommand", ctx.Prefix + ctx.CommandName, false),
             new TVar("Bot", ctx.CurrentUser.Mention, false),
             new TVar("BotName", ctx.CurrentUser.Username, false),
-            new TVar("FullBot", ctx.CurrentUser.UsernameWithDiscriminator, false),
-            new TVar("BotDisplayName", ctx.CurrentUser.UsernameWithDiscriminator, false),
+            new TVar("FullBot", ctx.CurrentUser.GetUsername(), false),
+            new TVar("BotDisplayName", ctx.CurrentUser.GetUsername(), false),
             new TVar("User", ctx.User.Mention, false),
             new TVar("UserName", ctx.User.Username, false),
-            new TVar("FullUser", ctx.User.UsernameWithDiscriminator, false),
+            new TVar("FullUser", ctx.User.GetUsername(), false),
             new TVar("UserDisplayName", ctx.Member?.DisplayName ?? ctx.User.Username, false),
         };
 
@@ -886,7 +886,14 @@ public abstract class BaseCommand
         if (ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id))
         {
             if (ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
+            {
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                {
+                    Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
+                }.AsError(ctx)));
+
                 throw new AlreadyAppliedException("");
+            }
 
             ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
         }

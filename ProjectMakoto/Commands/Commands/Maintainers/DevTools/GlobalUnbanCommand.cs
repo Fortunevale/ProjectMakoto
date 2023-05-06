@@ -15,7 +15,7 @@ internal class GlobalUnbanCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`'{victim.UsernameWithDiscriminator}' is not global banned.`"
+                    Description = $"`'{victim.GetUsername()}' is not global banned.`"
                 }.AsError(ctx, "Global Ban"));
                 return;
             }
@@ -28,7 +28,7 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Removing global ban for '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
+                Description = $"`Removing global ban for '{victim.GetUsername()}' ({victim.Id})`.."
             }.AsLoading(ctx, "Global Ban"));
 
             if (UnbanFromGuilds)
@@ -58,7 +58,7 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Removed '{victim.UsernameWithDiscriminator}' from global bans.`"
+                Description = $"`Removed '{victim.GetUsername()}' from global bans.`"
             }.AsSuccess(ctx, "Global Ban"));
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
@@ -69,8 +69,8 @@ internal class GlobalUnbanCommand : BaseCommand
                     Name = ctx.CurrentUser.Username,
                     IconUrl = AuditLogIcons.UserBanRemoved
                 },
-                Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
-                              $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
+                Description = $"{victim.Mention} `{victim.GetUsername()}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
+                              $"Moderator: {ctx.User.Mention} `{ctx.User.GetUsername()}` (`{ctx.User.Id}`)",
                 Color = EmbedColors.Success,
                 Timestamp = DateTime.UtcNow
             });

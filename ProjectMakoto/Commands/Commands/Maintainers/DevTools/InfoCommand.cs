@@ -61,8 +61,8 @@ internal class InfoCommand : BaseCommand
             Time = Time[..Time.IndexOf(",")];
 
             var miscEmbed = new DiscordEmbedBuilder().WithTitle($"{ctx.CurrentUser.Username} Details")
-                .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.UsernameWithDiscriminator}`"))
-                .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).UsernameWithDiscriminator} ({Version} ({Branch}) built on the {Date} at {Time})`"))
+                .AddField(new DiscordEmbedField("Currently running as", $"`{ctx.CurrentUser.GetUsername()}`"))
+                .AddField(new DiscordEmbedField("Currently running software", $"`Project Makoto by {(await ctx.Client.GetUserAsync(411950662662881290)).GetUsername()} ({Version} ({Branch}) built on the {Date} at {Time})`"))
                 .AddField(new DiscordEmbedField("Current bot library and version", $"[`{ctx.Client.BotLibrary} {ctx.Client.VersionString}`](https://github.com/Aiko-IT-Systems/DisCatSharp)"))
                 .AddField(new DiscordEmbedField("Bot uptime", $"`{Math.Round((DateTime.UtcNow - ctx.Bot.status.startupTime).TotalHours, 2)} hours`"))
                 .AddField(new DiscordEmbedField("Discord API Latency", $"`{ctx.Client.Ping}ms`"))

@@ -18,9 +18,9 @@ internal class GlobalBanCommand : BaseCommand
 
             if (ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.UsernameWithDiscriminator}'..`").AsLoading(ctx, "Global Ban"));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Updating Global Ban Entry for '{victim.GetUsername()}'..`").AsLoading(ctx, "Global Ban"));
                 ctx.Bot.globalBans[victim.Id] = new() { Reason = reason, Moderator = ctx.User.Id };
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.UsernameWithDiscriminator}' updated.`").AsSuccess(ctx, "Global Ban"));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Global Ban Entry for '{victim.GetUsername()}' updated.`").AsSuccess(ctx, "Global Ban"));
 
                 var announceChannel1 = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
                 await announceChannel1.SendMessageAsync(new DiscordEmbedBuilder
@@ -30,9 +30,9 @@ internal class GlobalBanCommand : BaseCommand
                         Name = ctx.CurrentUser.Username,
                         IconUrl = AuditLogIcons.UserUpdated
                     },
-                    Description = $"The global ban entry of {victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was updated.\n\n" +
+                    Description = $"The global ban entry of {victim.Mention} `{victim.GetUsername()}` (`{victim.Id}`) was updated.\n\n" +
                                   $"Reason: `{reason.SanitizeForCode()}`\n" +
-                                  $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
+                                  $"Moderator: {ctx.User.Mention} `{ctx.User.GetUsername()}` (`{ctx.User.Id}`)",
                     Color = EmbedColors.Warning,
                     Timestamp = DateTime.UtcNow
                 });
@@ -41,14 +41,14 @@ internal class GlobalBanCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`Global banning '{victim.UsernameWithDiscriminator}' ({victim.Id})`.."
+                Description = $"`Global banning '{victim.GetUsername()}' ({victim.Id})`.."
             }.AsLoading(ctx, "Global Ban");
 
             var msg = RespondOrEdit(embed);
 
             if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
-                embed.Description = $"`'{victim.UsernameWithDiscriminator}' is registered in the staff team.`";
+                embed.Description = $"`'{victim.GetUsername()}' is registered in the staff team.`";
                 msg = RespondOrEdit(embed.AsError(ctx, "Global Ban"));
                 return;
             }
@@ -78,7 +78,7 @@ internal class GlobalBanCommand : BaseCommand
                 }
             }
 
-            embed.Description = $"`Banned '{victim.UsernameWithDiscriminator}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
+            embed.Description = $"`Banned '{victim.GetUsername()}' ({victim.Id}) from {Success}/{Success + Failed} guilds.`";
             msg = RespondOrEdit(embed.AsSuccess(ctx, "Global Ban"));
 
 
@@ -90,9 +90,9 @@ internal class GlobalBanCommand : BaseCommand
                     Name = ctx.CurrentUser.Username,
                     IconUrl = AuditLogIcons.UserBanned
                 },
-                Description = $"{victim.Mention} `{victim.UsernameWithDiscriminator}` (`{victim.Id}`) was added to the global ban list.\n\n" +
+                Description = $"{victim.Mention} `{victim.GetUsername()}` (`{victim.Id}`) was added to the global ban list.\n\n" +
                               $"Reason: `{reason.SanitizeForCode()}`\n" +
-                              $"Moderator: {ctx.User.Mention} `{ctx.User.UsernameWithDiscriminator}` (`{ctx.User.Id}`)",
+                              $"Moderator: {ctx.User.Mention} `{ctx.User.GetUsername()}` (`{ctx.User.Id}`)",
                 Color = EmbedColors.Error,
                 Timestamp = DateTime.UtcNow
             });

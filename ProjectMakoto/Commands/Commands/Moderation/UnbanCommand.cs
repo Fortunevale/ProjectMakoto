@@ -12,7 +12,7 @@ internal class UnbanCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Unbanning {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Unbanning {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -24,12 +24,12 @@ internal class UnbanCommand : BaseCommand
             {
                 await ctx.Guild.UnbanMemberAsync(victim);
 
-                embed.Description = $"<@{victim.Id}> `{victim.UsernameWithDiscriminator}` was unbanned.";
+                embed.Description = $"<@{victim.Id}> `{victim.GetUsername()}` was unbanned.";
                 embed = embed.AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) couldn't be unbanned.`";
+                embed.Description = $"`{victim.GetUsername()} ({victim.Id}) couldn't be unbanned.`";
                 embed = embed.AsError(ctx);
             }
 

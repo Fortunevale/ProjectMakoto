@@ -27,7 +27,7 @@ internal class KickCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Kicking {victim.UsernameWithDiscriminator} ({victim.Id})..`",
+                Description = $"`Kicking {victim.GetUsername()} ({victim.Id})..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -40,7 +40,7 @@ internal class KickCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.RemoveAsync($"{ctx.User.UsernameWithDiscriminator} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await victim.RemoveAsync($"{ctx.User.GetUsername()} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
 
                 embed.Description = $"{victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
                 embed = embed.AsSuccess(ctx);

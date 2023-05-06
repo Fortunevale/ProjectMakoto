@@ -17,7 +17,7 @@ internal class ClearBackupCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`{victim.UsernameWithDiscriminator} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
+                    Description = $"`{victim.GetUsername()} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                     {
                         Url = victim.AvatarUrl
@@ -35,7 +35,7 @@ internal class ClearBackupCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Deleted stored nickname and roles for {victim.UsernameWithDiscriminator} ({victim.Id}).`",
+                Description = $"`Deleted stored nickname and roles for {victim.GetUsername()} ({victim.Id}).`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl

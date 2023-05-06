@@ -37,7 +37,7 @@ internal class GuildInfoCommand : BaseCommand
                                   $"🟢 `{guild.Members.Where(x => (x.Value?.Presence?.Status ?? UserStatus.Offline) != UserStatus.Offline).Count()}` **{GetString(t.Commands.Utility.GuildInfo.OnlineMembers)}**\n" +
                                   $"🛑 `{guild.MaxMembers}` **{GetString(t.Commands.Utility.GuildInfo.MaxMembers)}**\n"));
                 
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.GuildInfo.GuildTitle), $"👤 **{GetString(t.Commands.Utility.GuildInfo.Owner)}**: {guild.Owner.Mention} (`{guild.Owner.UsernameWithDiscriminator}`)\n" +
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.GuildInfo.GuildTitle), $"👤 **{GetString(t.Commands.Utility.GuildInfo.Owner)}**: {guild.Owner.Mention} (`{guild.Owner.GetUsername()}`)\n" +
                                   $"🕒 **{GetString(t.Commands.Utility.GuildInfo.Creation)}**: {guild.CreationTimestamp.ToTimestamp(TimestampFormat.LongDateTime)} ({guild.CreationTimestamp.ToTimestamp()})\n" +
                                   $"🗺 **{GetString(t.Commands.Utility.GuildInfo.Locale)}**: `{guild.PreferredLocale}`\n" +
                                   $"🔮 `{guild.PremiumSubscriptionCount}` **{GetString(t.Commands.Utility.GuildInfo.Boosts)} (`{guild.PremiumTier switch { PremiumTier.None => GetString(t.Commands.Utility.GuildInfo.BoostsNone), PremiumTier.TierOne => GetString(t.Commands.Utility.GuildInfo.BoostsTierOne), PremiumTier.TierTwo => GetString(t.Commands.Utility.GuildInfo.BoostsTierTwo), PremiumTier.TierThree => GetString(t.Commands.Utility.GuildInfo.BoostsTierThree), PremiumTier.Unknown => "?", _ => "?", }}`)**\n\n" +

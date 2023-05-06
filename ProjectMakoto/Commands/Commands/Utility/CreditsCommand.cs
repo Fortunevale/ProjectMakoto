@@ -33,7 +33,7 @@ internal class CreditsCommand : BaseCommand
                 Description = GetString(t.Commands.Utility.Credits.Credits, false, false,
                 new TVar("BotName", ctx.CurrentUser.Username, false),
                 new TVar("Developer", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))", false),
-                new TVar("DiscordStaffList", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.UsernameWithDiscriminator}`]({x.ProfileUrl})")), false),
+                new TVar("DiscordStaffList", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.GetUsername()}`]({x.ProfileUrl})")), false),
                 new TVar("GitHubContList", string.Join("\n", contributors.Where(x => !x.Login.Contains("[bot]") && x.Login != "TheXorog").OrderByDescending(x => x.Contributions).Select(x => $"• [`{x.Login}`]({x.HtmlUrl})")), false),
                 new TVar("Library", "[`DisCatSharp`](https://github.com/Aiko-IT-Systems/DisCatSharp)", false),
                 new TVar("LibraryContList", string.Join(", ", contributorsdcs.Take(10).Where(x => !x.Login.Contains("[bot]")).OrderByDescending(x => x.Contributions).Select(x => $"[`{x.Login}`]({x.HtmlUrl})")), false),

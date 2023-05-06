@@ -28,7 +28,7 @@ internal class TimeoutCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = $"`Timing {victim.UsernameWithDiscriminator} ({victim.Id}) out..`",
+                Description = $"`Timing {victim.GetUsername()} ({victim.Id}) out..`",
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                 {
                     Url = victim.AvatarUrl
@@ -78,7 +78,7 @@ internal class TimeoutCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.TimeoutAsync(until, $"{ctx.User.UsernameWithDiscriminator} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                await victim.TimeoutAsync(until, $"{ctx.User.GetUsername()} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
                 embed.Description = $"{victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`\n" +
                                     $"`The time out will end` {until.ToTimestamp()}`.`";
                 embed = embed.AsSuccess(ctx);
