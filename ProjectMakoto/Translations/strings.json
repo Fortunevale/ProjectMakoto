@@ -964,194 +964,254 @@
       },
       "UserInfo": {
         "System": {
-          "en": "System"
+          "en": "System",
+          "de": "System"
         },
         "Bot": {
-          "en": "Bot"
+          "en": "Bot",
+          "de": "Bot"
         },
         "NeverJoined": {
-          "en": "User never joined this server."
+          "en": "User never joined this server.",
+          "de": "Nutzer ist diesem Server noch nie beigetreten."
         },
         "IsBanned": {
-          "en": "User is currently banned from this server."
+          "en": "User is currently banned from this server.",
+          "de": "Nutzer ist aktuell von diesem Server gebannt."
         },
         "JoinedBefore": {
-          "en": "User is currently not in this server."
+          "en": "User is currently not in this server.",
+          "de": "Nutzer ist aktuell nicht auf dem Server."
         },
         "GlobalBanned": {
-          "en": "User is globally banned."
+          "en": "User is globally banned.",
+          "de": "Nutzer ist global gebannt."
         },
         "BotOwner": {
-          "en": "{Bot} Owner"
+          "en": "{Bot} Owner",
+          "de": "Besitzer von {Bot}"
         },
         "BotStaff": {
-          "en": "{Bot} Staff"
+          "en": "{Bot} Staff",
+          "de": "Team von {Bot}"
         },
         "Owner": {
-          "en": "This user owns this guild"
+          "en": "This user owns this guild",
+          "de": "Dieser Nutzer besitzt diesen Server."
         },
         "DiscordStaff": {
-          "en": "Discord Staff"
+          "en": "Discord Staff",
+          "de": "Discord Mitarbeiter"
         },
         "CertifiedMod": {
-          "en": "Certified Content Moderator"
+          "en": "Certified Content Moderator",
+          "de": "Zertifizierter Content Moderator"
         },
         "VerifiedBotDeveloper": {
-          "en": "Verified Bot Developer"
+          "en": "Verified Bot Developer",
+          "de": "Verifizierter Bot Entwickler"
         },
         "DiscordPartner": {
-          "en": "Discord Partner"
+          "en": "Discord Partner",
+          "de": "Discord Partner"
         },
         "PendingMembership": {
-          "en": "User's Membership pending"
+          "en": "User's Membership pending",
+          "de": "Mitgliedschaft noch nicht bestätigt"
         },
         "Roles": {
-          "en": "Roles"
+          "en": "Roles",
+          "de": "Rollen"
         },
         "Backup": {
-          "en": "Backup"
+          "en": "Backup",
+          "de": "Backup"
         },
         "BotNotes": {
-          "en": "{Bot} Staff Notes"
+          "en": "{Bot} Staff Notes",
+          "de": "{Bot} Team Notizen"
         },
         "NoReason": {
-          "en": "No reason provided."
+          "en": "No reason provided.",
+          "de": "Kein Grund angegeben"
         },
         "GlobalBanReason": {
-          "en": "Global Ban Reason"
+          "en": "Global Ban Reason",
+          "de": "Globaler Banngrund"
         },
         "GlobalBanMod": {
-          "en": "Global Ban Moderator"
+          "en": "Global Ban Moderator",
+          "de": "Globaler Bannmoderator"
         },
         "GlobalBanDate": {
-          "en": "Global Ban Date"
+          "en": "Global Ban Date",
+          "de": "Globales Banndatum"
         },
         "BanDetails": {
-          "en": "Ban Details"
+          "en": "Ban Details",
+          "de": "Banndetails"
         },
         "InvitedBy": {
-          "en": "Invited By"
+          "en": "Invited By",
+          "de": "Eingeladen von"
         },
         "NoInviter": {
-          "en": "No Inviter found."
+          "en": "No Inviter found.",
+          "de": "Kein Einladungsdetails gefunden."
         },
         "UsersInvited": {
-          "en": "Users invited"
+          "en": "Users invited",
+          "de": "Anzahl von eingeladenen Nutzern"
         },
         "ShowProfileInviter": {
-          "en": "Show Profile of Inviter"
+          "en": "Show Profile of Inviter",
+          "de": "Profile vom Einladenen ansehen"
         },
         "ServerJoinDate": {
-          "en": "Server Join Date"
+          "en": "Server Join Date",
+          "de": "Serverbeitrittsdatum"
         },
         "ServerLeaveDate": {
-          "en": "Server Leave Date"
+          "en": "Server Leave Date",
+          "de": "Serververlassungsdatum"
         },
         "FirstJoinDate": {
-          "en": "First Join Date"
+          "en": "First Join Date",
+          "de": "Datum des ersten Beitritts"
         },
         "AccountCreationDate": {
-          "en": "Account Creation Date"
+          "en": "Account Creation Date",
+          "de": "Accounterstellungsdatum"
         },
         "ServerBoosterSince": {
-          "en": "Server Booster Since"
+          "en": "Server Booster Since",
+          "de": "Serverbooster seit"
         },
         "Pronouns": {
-          "en": "Pronouns"
+          "en": "Pronouns",
+          "de": "Pronomen"
         },
         "BannerColor": {
-          "en": "Banner Color"
+          "en": "Banner Color",
+          "de": "Banner Farbe"
         },
         "Presence": {
-          "en": "Current Presence"
+          "en": "Current Presence",
+          "de": "Aktuelle Presenz"
         },
         "Desktop": {
-          "en": "Desktop"
+          "en": "Desktop",
+          "de": "PC"
         },
         "Mobile": {
-          "en": "Mobile"
+          "en": "Mobile",
+          "de": "Telefon"
         },
         "Web": {
-          "en": "Web"
+          "en": "Web",
+          "de": "Internetbrowser"
         },
         "Online": {
-          "en": "Online"
+          "en": "Online",
+          "de": "Online"
         },
         "Offline": {
-          "en": "Offline"
+          "en": "Offline",
+          "de": "Offline"
         },
         "Idle": {
-          "en": "Idle"
+          "en": "Idle",
+          "de": "Abwesend"
         },
         "DoNotDisturb": {
-          "en": "Do Not Disturb"
+          "en": "Do Not Disturb",
+          "de": "Bitte nicht stören"
         },
         "Activities": {
-          "en": "Current Activities"
+          "en": "Current Activities",
+          "de": "Aktuelle Aktivitäten"
         },
         "Playing": {
-          "en": "Playing"
+          "en": "Playing",
+          "de": "Spielt"
         },
         "Streaming": {
-          "en": "Streaming"
+          "en": "Streaming",
+          "de": "Streamt"
         },
         "ListeningTo": {
-          "en": "Listening to"
+          "en": "Listening to",
+          "de": "Hört"
         },
         "Watching": {
-          "en": "Watching"
+          "en": "Watching",
+          "de": "Schaut"
         },
         "Competing": {
           "en": "Competing"
         },
         "Status": {
-          "en": "Status"
+          "en": "Status",
+          "de": "Status"
         },
         "TimedOutUntil": {
-          "en": "Current Activities"
+          "en": "Timed out until",
+          "de": "Ausgetimed bis"
         },
         "FetchUserError": {
-          "en": "Failed to fetch user '{User}'"
+          "en": "Failed to fetch user '{User}'",
+          "de": "Konnte den Nutzer '{User}' nicht abfragen."
         }
       },
       "Data": {
         "Request": {
           "TimeError": {
-            "en": "Your last request was {RequestTimestamp}, please wait until {WaitTimestamp} to request your user data again."
+            "en": "Your last request was {RequestTimestamp}, please wait until {WaitTimestamp} to request your user data again.",
+            "de": "Ihre letzte Anfrage war {RequestTimestamp}, bitte warten Sie bis {WaitTimestamp} um Ihre Daten erneut anzufragen."
           },
           "Fetching": {
-            "en": "Fetching all your user data. This might take a moment.."
+            "en": "Fetching all your user data. This might take a moment..",
+            "de": "Frage alle Ihre gespeicherten Nutzerdaten ab. Dies braucht eventuell einen Moment.."
           },
           "Confirm": {
-            "en": "Hello, {User}. Here's your user data you requested. This may contain sensitive information."
+            "en": "Hello, {User}. Here's your user data you requested. This may contain sensitive information.",
+            "de": "Hallo, {User}. Hier sind Ihre angefragten Nutzerdaten. Dies enthält eventuell sensible Informationen."
           },
           "DmNotice": {
-            "en": "I sent your data via direct messages."
+            "en": "I sent your data via direct messages.",
+            "de": "Ich habe Ihnen ihre Nutzerdaten per Direktnachricht gesendet."
           }
         },
         "Policy": {
           "NoPolicy": {
-            "en": "The privacy policy was not loaded. This is most likely unintended, please report to {Bot} Staff."
+            "en": "The privacy policy was not loaded. This is most likely unintended, please report to {Bot} Staff.",
+            "de": "Die Privacy Policy wurde nicht geladen. Dies ist wahrscheinlich ungewohlt, bitte melden Sie dies an das {Bot} Team."
           }
         },
         "Object": {
           "ProfileAlreadyDeleted": {
-            "en": "You already objected to your data being processed and saved. Do you want to reverse that decision?"
+            "en": "You already objected to your data being processed and saved. Do you want to reverse that decision?",
+            "de": "Sie haben bereits das Verarbeiten ihrer Daten verweigert. Möchten Sie diese Entscheidung rückgängig machen?"
           },
           "EnablingDataProcessing": {
-            "en": "Okay, removing you from the objection list.."
+            "en": "Okay, removing you from the objection list..",
+            "de": "Sie werden von der Verweigerungsliste entfernt.."
           },
           "EnablingDataProcessingError": {
-            "en": "I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours."
+            "en": "I'm sorry but something went wrong while remove you from the objection list. This exception has been logged and will be fixed asap. Please retry in a few hours.",
+            "de": "Es ist ein Fehler aufgetreten bei dem Versuch Sie von der Verweigerungsliste zu entfernen. Der Fehler wurde gemeldet, bitte versuchen Sie es in wenigen Stunden erneut."
           },
           "EnablingDataProcessingSuccess": {
-            "en": "You've been removed from our objection list. You're now able to run commands again."
+            "en": "You've been removed from our objection list. You're now able to run commands again.",
+            "de": "Sie wurden von der Verweigerungsliste entfernt. Sie haben erneut Zugriff auf alle Befehle."
           },
           "DeletionAlreadyScheduled": {
-            "en": "You objected to your data being processed {RequestTimestamp}, your data will be deleted {ScheduleTimestamp}. Do you want to cancel your account's deletion?"
+            "en": "You objected to your data being processed {RequestTimestamp}, your data will be deleted {ScheduleTimestamp}. Do you want to cancel your account's deletion?",
+            "de": "Sie haben das Verarbeiten ihrer Daten {RequestTimestamp} verweigert und ihre Daten werden {ScheduledTimestamp} gelöscht. Möchten Sie den Vorgang abbrechen?"
           },
           "DeletionScheduleReversed": {
-            "en": "Your user data is no longer scheduled for deletion."
+            "en": "Your user data is no longer scheduled for deletion.",
+            "de": "Ihre Nutzerdaten werden nicht mehr gelöscht."
           },
           "ObjectionDisclaimer": {
             "en": [
@@ -1162,113 +1222,149 @@
               "**Additionally, this action will make the bot leave every server you own.",
               "",
               "**Are you sure you want to continue?"
+            ],
+            "de": [
+              "Dies wird alle Nutzerdaten von Ihnen löschen und weiteres Verarbeiten verbieten.",
+              "",
+              "Dies wird dazu führen, dass Sie keine Befehle mehr von diesem Bot verwenden können.",
+              "Dies wird NICHT server-spezifische Daten löschen. (um diese einzusehen, verwenden sie '/data request').",
+              "",
+              "Sind Sie sich sicher Sie möchten die Verarbeitung ihrer Daten verbieten?"
             ]
           },
           "SecondaryConfirm": {
-            "en": "Please confirm again, are you sure?"
+            "en": "Please confirm again, are you sure?",
+            "de": "Bitte bestätigen Sie erneut, sind Sie sich sicher?"
           },
           "ProfileDeletionScheduled": {
-            "en": "Okay, your data was scheduled for deletion in 14 days."
+            "en": "Okay, your data was scheduled for deletion in 14 days.",
+            "de": "Ihre Nutzerdaten werden in 14 Tagen gelöscht."
           }
         }
       },
       "VoiceChannelCreator": {
         "NotAVccChannel": {
-          "en": "You're not in a channel created by the Voice Channel Creator."
+          "en": "You're not in a channel created by the Voice Channel Creator.",
+          "de": "Du bist nicht in einem Kanal der vom Voice Channel Creator erstellt wurde."
         },
         "NotAVccChannelOwner": {
-          "en": "You don't own this channel."
+          "en": "You don't own this channel.",
+          "de": "Du besitzt diesen Kanal nicht."
         },
         "VictimNotPresent": {
-          "en": "{User} is not in your Voice Channel."
+          "en": "{User} is not in your Voice Channel.",
+          "de": "{User} ist nicht in deinem Kanal."
         },
         "VictimIsBot": {
-          "en": "{User} is a bot."
+          "en": "{User} is a bot.",
+          "de": "{User} ist ein Bot."
         },
         "Events": {
           "DefaultChannelName": {
-            "en": "{User}'s Channel'"
+            "en": "{User}'s Channel'",
+            "de": "{User}s Kanal"
           }
         },
         "Ban": {
           "CannotBanSelf": {
-            "en": "You cannot ban yourself."
+            "en": "You cannot ban yourself.",
+            "de": "Du kannst dich nicht selbst bannen."
           },
           "VictimAlreadyBanned": {
-            "en": "{User} has already been banned from your Voice Channel."
+            "en": "{User} has already been banned from your Voice Channel.",
+            "de": "{User} ist bereits von deinem Kanal gebannt."
           },
           "VictimBanned": {
-            "en": "{User} has been banned from this channel."
+            "en": "{User} has been banned from this channel.",
+            "de": "{User} wurde von deinem Kanal gebannt."
           }
         },
         "ChangeOwner": {
           "AlreadyOwner": {
-            "en": "{User} is already the owner."
+            "en": "{User} is already the owner.",
+            "de": "{User} ist bereits der Besitzer."
           },
           "ForceAssign": {
-            "en": "{User} was forcefully assigned as the new owner of this channel."
+            "en": "{User} was forcefully assigned as the new owner of this channel.",
+            "de": "{User} wurde als Besitzer erwzungen."
           },
           "Success": {
-            "en": "{User} now owns this channel."
+            "en": "{User} now owns this channel.",
+            "de": "{User} ist der neue Besitzer dieses Kanals."
           }
         },
         "Close": {
           "Success": {
-            "en": "The channel has been closed."
+            "en": "The channel has been closed.",
+            "de": "Der Kanal wurde geschlossen."
           }
         },
         "Invite": {
           "CannotInviteSelf": {
-            "en": "You cannot invite yourself."
+            "en": "You cannot invite yourself.",
+            "de": "Du kannst dich nicht selbst einladen."
           },
           "AlreadyPresent": {
-            "en": "{User} is already in your Voice Channel."
+            "en": "{User} is already in your Voice Channel.",
+            "de": "{User} ist bereits in deinem Kanal."
           },
           "PartialSuccess": {
-            "en": "{User} can now join this channel. However, i was unable to send a Direct Message to them."
+            "en": "{User} can now join this channel. However, i was unable to send a Direct Message to them.",
+            "de": "{User} kann jetzt diesen Kanel beitreten, ich konnte allerdings keine Direktnachricht an {User} versenden."
           },
           "Success": {
-            "en": "{User} has been invited to this channel."
+            "en": "{User} has been invited to this channel.",
+            "de": "{User} wurde zu diesem Kanal angeladen."
           },
           "VictimMessage": {
-            "en": "{User} has invited you to join {Channel}."
+            "en": "{User} has invited you to join {Channel}.",
+            "de": "{User} hat dich dazu eingeladen {Channel} zu joinen."
           }
         },
         "Kick": {
           "CannotKickSelf": {
-            "en": "You cannot kick yourself."
+            "en": "You cannot kick yourself.",
+            "de": "Du kannst dich nicht selbst kicken."
           },
           "Success": {
-            "en": "{User} has been kicked from this channel."
+            "en": "{User} has been kicked from this channel.",
+            "de": "{User} wurde vom Kanal gekickt."
           }
         },
         "Limit": {
           "OutsideRange": {
-            "en": "Input outside of range."
+            "en": "Input outside of range.",
+            "de": "Eingabe außerhalb des Limits."
           },
           "Success": {
-            "en": "The channel's user limit has been changed to {Count}."
+            "en": "The channel's user limit has been changed to {Count}.",
+            "de": "Das Kanallimit wurde auf {Count} geändert."
           }
         },
         "Name": {
           "Cooldown": {
-            "en": "You're on cooldown for renaming this channel. You can rename it again {Timestamp}."
+            "en": "You're on cooldown for renaming this channel. You can rename it again {Timestamp}.",
+            "de": "Du musst noch warten bis du diesen Kanal erneut umbennen kannst. Versuche es erneut {Timestamp}."
           },
           "Success": {
-            "en": "The channel has been renamed to {Name}."
+            "en": "The channel has been renamed to {Name}.",
+            "de": "Der Kanal wurde umbenannt zu {Name}."
           }
         },
         "Open": {
           "Success": {
-            "en": "The channel has been opened."
+            "en": "The channel has been opened.",
+            "de": "Der Kanal wurde geöffnet."
           }
         },
         "Unban": {
           "VictimNotBanned": {
-            "en": "{User} is not banned from your Voice Channel."
+            "en": "{User} is not banned from your Voice Channel.",
+            "de": "{User} ist nicht von deinem Kanal gebannt."
           },
           "VictimUnbanned": {
-            "en": "{User} has been unbanned from this channel."
+            "en": "{User} has been unbanned from this channel.",
+            "de": "{User} wurde von deinem Kanal entbannt."
           }
         }
       }
