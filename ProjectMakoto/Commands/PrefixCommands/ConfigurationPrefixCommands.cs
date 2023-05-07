@@ -765,7 +765,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
 
         [Command("review"), Aliases("list"), 
         Description("Allows you to review settings related to the guild's prefix.")]
-        public async Task Review(InteractionContext ctx)
+        public async Task Review(CommandContext ctx)
         {
             Task.Run(async () =>
             {
@@ -775,7 +775,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change settings related to the guild's prefix.")]
-        public async Task Config(InteractionContext ctx)
+        public async Task Config(CommandContext ctx)
         {
             Task.Run(async () =>
             {
