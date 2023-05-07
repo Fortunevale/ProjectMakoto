@@ -24,7 +24,7 @@ internal class GlobalUnbanCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`'{victim.GetUsername()}' is not global banned.`"
+                    Description = $"`'{victim.GetUsernameWithIdentifier()}' is not global banned.`"
                 }.AsError(ctx, "Global Ban"));
                 return;
             }
@@ -37,7 +37,7 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Removing global ban for '{victim.GetUsername()}' ({victim.Id})`.."
+                Description = $"`Removing global ban for '{victim.GetUsernameWithIdentifier()}' ({victim.Id})`.."
             }.AsLoading(ctx, "Global Ban"));
 
             if (UnbanFromGuilds)
@@ -67,7 +67,7 @@ internal class GlobalUnbanCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"`Removed '{victim.GetUsername()}' from global bans.`"
+                Description = $"`Removed '{victim.GetUsernameWithIdentifier()}' from global bans.`"
             }.AsSuccess(ctx, "Global Ban"));
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
@@ -75,11 +75,11 @@ internal class GlobalUnbanCommand : BaseCommand
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    Name = ctx.CurrentUser.Username,
+                    Name = ctx.CurrentUser.GetUsername(),
                     IconUrl = AuditLogIcons.UserBanRemoved
                 },
-                Description = $"{victim.Mention} `{victim.GetUsername()}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
-                              $"Moderator: {ctx.User.Mention} `{ctx.User.GetUsername()}` (`{ctx.User.Id}`)",
+                Description = $"{victim.Mention} `{victim.GetUsernameWithIdentifier()}` (`{victim.Id}`) was removed from the global ban list.\n\n" +
+                              $"Moderator: {ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()}` (`{ctx.User.Id}`)",
                 Color = EmbedColors.Success,
                 Timestamp = DateTime.UtcNow
             });

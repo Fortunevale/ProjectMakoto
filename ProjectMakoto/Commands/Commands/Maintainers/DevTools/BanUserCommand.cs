@@ -23,13 +23,13 @@ internal class BanUserCommand : BaseCommand
 
             if (ctx.Bot.status.TeamMembers.Contains(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' is registered in the staff team.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is registered in the staff team.`").AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.bannedUsers.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' is already banned from using the bot.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is already banned from using the bot.`").AsError(ctx));
                 return;
             }
 
@@ -41,7 +41,7 @@ internal class BanUserCommand : BaseCommand
                 await b.Value.LeaveAsync();
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' was banned from using the bot.`").AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' was banned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

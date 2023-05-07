@@ -58,7 +58,7 @@ internal class LoadShareCommand : BaseCommand
             embed.Description = $"{GetString(t.Commands.Music.Playlists.LoadShare.Found, true)}\n\n" +
                                 $"`{GetString(t.Commands.Music.Playlists.LoadShare.PlaylistName).PadRight(pad)}`: `{ImportJson.PlaylistName}`\n" +
                                 $"`{GetString(t.Commands.Music.Playlists.Tracks).PadRight(pad)}`: `{ImportJson.List.Count}`\n" +
-                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.GetUsername()} ({user.Id})`";
+                                $"`{GetString(t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.GetUsernameWithIdentifier()} ({user.Id})`";
 
             DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
 

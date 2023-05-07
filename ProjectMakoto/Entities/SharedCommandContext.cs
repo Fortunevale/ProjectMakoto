@@ -207,6 +207,10 @@ public class SharedCommandContext
     /// What DiscordClient was used to execute this command.
     /// </summary>
     public DiscordClient Client { get; set; }
+
+    /// <inheritdoc cref="Client"/>
+    public DiscordClient Discord
+        => Client;
     
 
     /// <summary>

@@ -31,7 +31,7 @@ internal class GuildPurgeCommand : BaseCommand
 
             var status_embed = new DiscordEmbedBuilder
             {
-                Description = $"`Scanning all channels for messages sent by '{victim.GetUsername()}' ({victim.Id})..`"
+                Description = $"`Scanning all channels for messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id})..`"
             }.AsLoading(ctx, "Server Purge");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
@@ -50,7 +50,7 @@ internal class GuildPurgeCommand : BaseCommand
 
                 currentProg++;
 
-                status_embed.Description = $"`Scanning all channels for messages sent by '{victim.GetUsername()}' ({victim.Id})..`\n\n" +
+                status_embed.Description = $"`Scanning all channels for messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id})..`\n\n" +
                                             $"`Current Channel`: `({currentProg}/{maxProg})` {channel.Value.Mention} `({channel.Value.Id})`\n" +
                                             $"`Found Messages `: `{allMsg}`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
@@ -114,7 +114,7 @@ internal class GuildPurgeCommand : BaseCommand
                     }
             }
 
-            status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsername()}' ({victim.Id}). Deleting..`";
+            status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id}). Deleting..`";
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
 
             currentProg = 0;
@@ -123,7 +123,7 @@ internal class GuildPurgeCommand : BaseCommand
             foreach (var channel in messages)
             {
                 currentProg++;
-                status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsername()}' ({victim.Id}). Deleting..`\n\n" +
+                status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id}). Deleting..`\n\n" +
                                             $"`Current Channel`: `({currentProg}/{maxProg})` <#{channel.Key}> `({channel.Key})`\n" +
                                             $"`Found Messages `: `{allMsg}`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));

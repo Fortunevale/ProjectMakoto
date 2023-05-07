@@ -12,6 +12,9 @@ namespace ProjectMakoto.Util;
 internal static class DiscordExtensions
 {
     internal static string GetUsername(this DiscordUser user)
+        => user.IsMigrated ? user.GlobalName : user.Username;
+
+    internal static string GetUsernameWithIdentifier(this DiscordUser user)
         => user.IsMigrated ? user.UsernameWithGlobalName : user.UsernameWithDiscriminator;
 
     internal static List<DiscordOverwriteBuilder> ConvertToBuilderWithNewOverwrites(this IReadOnlyList<DiscordOverwrite> overwrites, DiscordMember member, Permissions allowed, Permissions denied)

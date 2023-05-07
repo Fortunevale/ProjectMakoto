@@ -59,7 +59,7 @@ internal class NameNormalizerEvents
     {
         Task.Run(async () =>
         {
-            if (e.UserBefore.Username == e.UserAfter.Username)
+            if (e.UserBefore.GetUsername() == e.UserAfter.GetUsername())
                 return;
 
             foreach (var guild in sender.Guilds)

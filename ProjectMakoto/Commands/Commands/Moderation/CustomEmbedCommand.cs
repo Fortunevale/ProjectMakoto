@@ -221,7 +221,7 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                             GeneratedEmbed.Author.IconUrl = asset.Attachments[0].Url;
                             continue;
@@ -255,7 +255,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                                 GeneratedEmbed.Author = new DiscordEmbedBuilder.EmbedAuthor
                                 {
-                                    Name = user.GetUsername(),
+                                    Name = user.GetUsernameWithIdentifier(),
                                     IconUrl = user.AvatarUrl,
                                     Url = user.ProfileUrl
                                 };
@@ -316,7 +316,7 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                         GeneratedEmbed.Thumbnail.Url = asset.Attachments[0].Url;
                         continue;
@@ -380,7 +380,7 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                        var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                         GeneratedEmbed.ImageUrl = asset.Attachments[0].Url;
                         continue;
@@ -495,7 +495,7 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsername()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
+                            var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.OtherAssets)).SendMessageAsync(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} `{ctx.User.GetUsernameWithIdentifier()} ({ctx.User.Id})`").WithFile($"{Guid.NewGuid()}.png", stream.stream));
 
                             GeneratedEmbed.Footer.IconUrl = asset.Attachments[0].Url;
                             continue;
@@ -529,7 +529,7 @@ internal class CustomEmbedCommand : BaseCommand
 
                                 GeneratedEmbed.Footer = new DiscordEmbedBuilder.EmbedFooter
                                 {
-                                    Text = user.GetUsername(),
+                                    Text = user.GetUsernameWithIdentifier(),
                                     IconUrl = user.AvatarUrl
                                 };
                             }
