@@ -1365,8 +1365,12 @@
       {
         "name": "load-share",
         "description": "Loads a playlist share.",
-        "name_translations": null,
-        "description_translations": null,
+        "name_translations": {
+          "de": "laden"
+        },
+        "description_translations": {
+          "de": "Lädt eine geteilte Wiedergabeliste."
+        },
         "options": [
           {
             "name": "user",
@@ -1381,6 +1385,126 @@
             "description_translations": null
           }
         ]
+      },
+      {
+        "name": "add-to-queue",
+        "description": "Adds a playlist to the current song queue.",
+        "name_translations": {
+          "de": "abspielen"
+        },
+        "description_translations": {
+          "de": "Fügt eine deiner Wiedergabelisten zur aktuellen Warteschlange hinzu."
+        },
+        "options": [
+          {
+            "name": "playlist",
+            "description": "The Playlist Id",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "share",
+        "description": "Share one of your playlists.",
+        "name_translations": {
+          "de": "teilen"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir eine der Wiedergabelisten zu teilen."
+        },
+        "options": [
+          {
+            "name": "playlist",
+            "description": "The Playlist Id",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "export",
+        "description": "Export one of your playlists.",
+        "name_translations": {
+          "de": "exportieren"
+        },
+        "description_translations": {
+          "de": "Exportiert eine deiner Wiedergabelisten."
+        },
+        "options": [
+          {
+            "name": "playlist",
+            "description": "The Playlist Id",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "modify",
+        "description": "Modify one of your playlists.",
+        "name_translations": {
+          "de": "bearbeiten"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir eine Wiedergabeliste zu bearbeiten."
+        },
+        "options": [
+          {
+            "name": "playlist",
+            "description": "The Playlist Id",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "delete",
+        "description": "Delete one of your playlists.",
+        "name_translations": {
+          "de": "löschen"
+        },
+        "description_translations": {
+          "de": "Erlaubt es dir eine Wiedergabeliste zu löschen."
+        },
+        "options": [
+          {
+            "name": "playlist",
+            "description": "The Playlist Id",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "create-new",
+        "description": "Create a new playlist from scratch.",
+        "name_translations": {
+          "de": "wiedergabeliste-erstellen"
+        },
+        "description_translations": {
+          "de": "Erstellt eine neue Wiedergabeliste."
+        }
+      },
+      {
+        "name": "save-queue",
+        "description": "Save the current queue as playlist.",
+        "name_translations": {
+          "de": "warteschlange-speichern"
+        },
+        "description_translations": {
+          "de": "Speichert die aktuelle Warteschlange als Wiedergabeliste."
+        }
+      },
+      {
+        "name": "import",
+        "description": "Import a playlists from another platform or from a previously exported playlist.",
+        "name_translations": {
+          "de": "importieren"
+        },
+        "description_translations": {
+          "de": "Importiert eine exportierte oder eine Wiedergabeliste von einer anderen Plattform."
+        }
       }
     ]
   }
