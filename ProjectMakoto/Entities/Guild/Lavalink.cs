@@ -290,7 +290,7 @@ public class Lavalink
 
                     if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                     {
-                        if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
+                        if (loadResult.LoadResultType is LavalinkLoadResultType.NoMatches or LavalinkLoadResultType.LoadFailed)
                             _bot.guilds[Guild.Id].MusicModule.SongQueue.Remove(Track);
 
                         continue;
