@@ -48,7 +48,7 @@ internal class JoinEvents
                         Author = new()
                         {
                             IconUrl = AuditLogIcons.UserAdded,
-                            Name = e.Member.GetUsername()
+                            Name = e.Member.GetUsernameWithIdentifier()
                         },
                         Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
                         Color = EmbedColors.Success,
@@ -75,7 +75,7 @@ internal class JoinEvents
                         Author = new()
                         {
                             IconUrl = AuditLogIcons.UserLeft,
-                            Name = e.Member.GetUsername()
+                            Name = e.Member.GetUsernameWithIdentifier()
                         },
                         Description = $"has left **{e.Guild.Name}**.\n" +
                                       $"They've been on the server for _{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}_.",

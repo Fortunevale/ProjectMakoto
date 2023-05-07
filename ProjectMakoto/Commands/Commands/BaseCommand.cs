@@ -236,13 +236,13 @@ public abstract class BaseCommand
         {
             new TVar("CurrentCommand", ctx.Prefix + ctx.CommandName, false),
             new TVar("Bot", ctx.CurrentUser.Mention, false),
-            new TVar("BotName", ctx.CurrentUser.Username, false),
-            new TVar("FullBot", ctx.CurrentUser.GetUsername(), false),
-            new TVar("BotDisplayName", ctx.CurrentUser.GetUsername(), false),
+            new TVar("BotName", ctx.Client.CurrentApplication.Name, false),
+            new TVar("FullBot", ctx.CurrentUser.GetUsernameWithIdentifier(), false),
+            new TVar("BotDisplayName", ctx.CurrentUser.GetUsernameWithIdentifier(), false),
             new TVar("User", ctx.User.Mention, false),
-            new TVar("UserName", ctx.User.Username, false),
-            new TVar("FullUser", ctx.User.GetUsername(), false),
-            new TVar("UserDisplayName", ctx.Member?.DisplayName ?? ctx.User.Username, false),
+            new TVar("UserName", ctx.User.GetUsername(), false),
+            new TVar("FullUser", ctx.User.GetUsernameWithIdentifier(), false),
+            new TVar("UserDisplayName", ctx.Member?.DisplayName ?? ctx.User.GetUsername(), false),
         };
 
     public string GetString(SingleTranslationKey key)
@@ -1053,7 +1053,7 @@ public abstract class BaseCommand
     public void SendMaintenanceError()
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"{ctx.CurrentUser.Username} Staff"))
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"{ctx.CurrentUser.GetUsername()} Staff"))
         }.AsError(ctx));
 
     public void SendBotOwnerError()

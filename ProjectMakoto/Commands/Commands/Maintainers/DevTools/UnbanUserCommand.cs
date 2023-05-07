@@ -19,13 +19,13 @@ internal class UnbanUserCommand : BaseCommand
 
             if (!ctx.Bot.bannedUsers.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' is not banned from using the bot.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' is not banned from using the bot.`").AsError(ctx));
                 return;
             }
 
             ctx.Bot.bannedUsers.Remove(victim.Id);
             await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "banned_users", "id", $"{victim.Id}");
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsername()}' was unbanned from using the bot.`").AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`'{victim.GetUsernameWithIdentifier()}' was unbanned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

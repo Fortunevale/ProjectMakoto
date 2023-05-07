@@ -74,7 +74,7 @@ internal class UserInfoCommand : BaseCommand
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {
-                    Name = $"{(victim.IsBot ? $"[{(victim.IsSystem ?? false ? GetString(t.Commands.Utility.UserInfo.System) : $"{GetString(t.Commands.Utility.UserInfo.Bot)}{(victim.IsVerifiedBot ? "✅" : "❎")}")}] " : "")}{victim.GetUsername()}",
+                    Name = $"{(victim.IsBot ? $"[{(victim.IsSystem ?? false ? GetString(t.Commands.Utility.UserInfo.System) : $"{GetString(t.Commands.Utility.UserInfo.Bot)}{(victim.IsVerifiedBot ? "✅" : "❎")}")}] " : "")}{victim.GetUsernameWithIdentifier()}",
                     Url = victim.ProfileUrl
                 },
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
@@ -110,7 +110,7 @@ internal class UserInfoCommand : BaseCommand
                 var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot.globalBans[victim.Id].Moderator);
 
                 embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.GlobalBanReason), $"`{((string.IsNullOrWhiteSpace(globalBanDetails.Reason) || globalBanDetails.Reason == "-") ? GetString(t.Commands.Utility.UserInfo.NoReason) : globalBanDetails.Reason).SanitizeForCode()}`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.GlobalBanMod), $"`{gBanMod.GetUsername()}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.GlobalBanMod), $"`{gBanMod.GetUsernameWithIdentifier()}`", true));
                 embed.AddField(new DiscordEmbedField(GetString(t.Commands.Utility.UserInfo.GlobalBanDate), $"{Formatter.Timestamp(globalBanDetails.Timestamp)} ({Formatter.Timestamp(globalBanDetails.Timestamp, TimestampFormat.LongDateTime)})", true));
             }
 

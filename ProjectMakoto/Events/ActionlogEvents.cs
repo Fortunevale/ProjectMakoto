@@ -52,7 +52,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`\n" +
+                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
                               $"**Account Age**: `{e.Member.CreationTimestamp.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.CreationTimestamp, TimestampFormat.LongDateTime)}"
             };
 
@@ -109,7 +109,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`\n" +
+                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
                                 $"**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}"
             };
 
@@ -131,7 +131,7 @@ internal class ActionlogEvents
 
                     embed.Author.Name = "User kicked";
                     embed.Author.IconUrl = AuditLogIcons.UserKicked;
-                    embed.Description += $"\n\n**Kicked by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Kicked by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
                         embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCode()}";
@@ -179,7 +179,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Message.Author.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author.AvatarUrl },
-                Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.GetUsername()}`\n" +
+                Description = $"**User**: {e.Message.Author.Mention} `{e.Message.Author.GetUsernameWithIdentifier()}`\n" +
                               $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`"
             };
 
@@ -222,7 +222,7 @@ internal class ActionlogEvents
                         Color = EmbedColors.Success,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
-                        Description = $"**User**: {e.User.Mention} `{e.User.GetUsername()}`\n" +
+                        Description = $"**User**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
                                       $"**Channel**: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
                     };
 
@@ -237,7 +237,7 @@ internal class ActionlogEvents
                         Color = EmbedColors.Error,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
-                        Description = $"**User**: {e.User.Mention} `{e.User.GetUsername()}`\n" +
+                        Description = $"**User**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
                                       $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]`"
                     };
 
@@ -252,7 +252,7 @@ internal class ActionlogEvents
                         Color = EmbedColors.Warning,
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.User.Id}" },
                         Timestamp = DateTime.UtcNow,
-                        Description = $"**User**: {e.User.Mention} `{e.User.GetUsername()}`\n" +
+                        Description = $"**User**: {e.User.Mention} `{e.User.GetUsernameWithIdentifier()}`\n" +
                                       $"**Channel**: {PreviousChannel.Mention} `[🔊{PreviousChannel.Name}]` :arrow_right: {NewChannel.Mention} `[🔊{NewChannel.Name}]`"
                     };
 
@@ -288,7 +288,7 @@ internal class ActionlogEvents
 
                 try
                 {
-                    CurrentMessage += $"[{b.Timestamp.ToUniversalTime():dd.MM.yyyy, HH:mm:ss zzz}] {b.Author.GetUsername()} (UserId: '{b.Author.Id}' | MessageId: {b.Id})\n";
+                    CurrentMessage += $"[{b.Timestamp.ToUniversalTime():dd.MM.yyyy, HH:mm:ss zzz}] {b.Author.GetUsernameWithIdentifier()} (UserId: '{b.Author.Id}' | MessageId: {b.Id})\n";
                 }
                 catch (Exception)
                 {
@@ -369,7 +369,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Message.Author.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author?.AvatarUrl },
-                Description = $"**User**: {e.Message.Author?.Mention} `{e.Message.Author?.GetUsername()}`\n" +
+                Description = $"**User**: {e.Message.Author?.Mention} `{e.Message.Author?.GetUsernameWithIdentifier()}`\n" +
                                 $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
                                 $"**Message**: [`Jump to message`]({e.Message.JumpLink})"
             };
@@ -408,7 +408,7 @@ internal class ActionlogEvents
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`"
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
                 };
 
                 if (string.IsNullOrWhiteSpace(e.NicknameBefore))
@@ -470,7 +470,7 @@ internal class ActionlogEvents
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`"
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
                 };
 
                 string Roles = "";
@@ -532,7 +532,7 @@ internal class ActionlogEvents
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                        Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`\n" +
+                        Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`\n" +
                                         $"**Timed out until**: {Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.LongDateTime)} ({Formatter.Timestamp((DateTime)(e.TimeoutAfter?.ToUniversalTime().DateTime), TimestampFormat.RelativeTime)})"
                     }));
 
@@ -544,7 +544,7 @@ internal class ActionlogEvents
                         Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                         Timestamp = DateTime.UtcNow,
                         Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                        Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`"
+                        Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
                     }));
             }
 
@@ -560,7 +560,7 @@ internal class ActionlogEvents
                             Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                             Timestamp = DateTime.UtcNow,
                             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                            Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`"
+                            Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
                         }));
                 }
                 catch { }
@@ -580,7 +580,7 @@ internal class ActionlogEvents
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`",
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`",
                     ImageUrl = e.Member.AvatarUrl
                 }));
             }
@@ -594,7 +594,7 @@ internal class ActionlogEvents
                     Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                     Timestamp = DateTime.UtcNow,
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`",
+                    Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`",
                     ImageUrl = e.Member.GuildAvatarUrl
                 }));
             }
@@ -621,7 +621,7 @@ internal class ActionlogEvents
                 {
                     var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 
-                    Integration = $"**Integration**: {bot.Mention} `{bot.GetUsername()}`\n\n";
+                    Integration = $"**Integration**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
                 }
             }
 
@@ -654,7 +654,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer.Text += "\n(Please note that the 'Created by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -687,7 +687,7 @@ internal class ActionlogEvents
                 {
                     var bot = await sender.GetUserAsync((ulong)e.Role.Tags.BotId);
 
-                    Integration = $"**Integration**: {bot.Mention} `{bot.GetUsername()}`\n\n";
+                    Integration = $"**Integration**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
                 }
             }
 
@@ -720,7 +720,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.Role.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -791,7 +791,7 @@ internal class ActionlogEvents
                 {
                     var bot = await sender.GetUserAsync((ulong)e.RoleAfter.Tags.BotId);
 
-                    Integration = $"**Integration**: {bot.Mention} `{bot.GetUsername()}`\n\n";
+                    Integration = $"**Integration**: {bot.Mention} `{bot.GetUsernameWithIdentifier()}`\n\n";
                 }
             }
 
@@ -834,7 +834,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogRoleUpdateEntry)AuditLogEntries.First(x => ((DiscordAuditLogRoleUpdateEntry)x).Target.Id == e.RoleAfter.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -862,7 +862,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`" +
+                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`" +
                               $"{(e.Member.JoinedAt.Year > 2014 ? $"\n**Joined at**: `{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(e.Member.JoinedAt, TimestampFormat.LongDateTime)}" : (_bot.guilds[e.Guild.Id].Members.TryGetValue(e.Member.Id, out var member) ? (member.FirstJoinDate != DateTime.UnixEpoch ? $"\n**First joined at**: `{member.FirstJoinDate.GetTotalSecondsSince().GetHumanReadable()}` {Formatter.Timestamp(member.FirstJoinDate, TimestampFormat.LongDateTime)}" : "") : ""))}"
             };
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
@@ -882,7 +882,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Banned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Banned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                     if (!string.IsNullOrWhiteSpace(Entry.Reason))
                         embed.Description += $"\n**Reason**: {Entry.Reason.SanitizeForCode()}";
@@ -912,7 +912,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"User-Id: {e.Member.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Member.AvatarUrl },
-                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsername()}`"
+                Description = $"**User**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`"
             };
 
             var msg = await SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
@@ -929,7 +929,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogBanEntry)AuditLogEntries.First(x => ((DiscordAuditLogBanEntry)x).Target.Id == e.Member.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Unbanned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Unbanned by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                     embed.Footer.Text += "\n(Please note that the 'Unbanned by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
 
@@ -951,7 +951,7 @@ internal class ActionlogEvents
 
             string Description = "";
 
-            try { Description += $"{(e.GuildBefore.Owner.Id != e.GuildAfter.Owner.Id ? $"**Owner**: {e.GuildBefore.Owner.Mention} `{e.GuildBefore.Owner.GetUsername()}` :arrow_right: {e.GuildAfter.Owner.Mention} `{e.GuildAfter.Owner.GetUsername()}`\n" : "")}"; } catch { }
+            try { Description += $"{(e.GuildBefore.Owner.Id != e.GuildAfter.Owner.Id ? $"**Owner**: {e.GuildBefore.Owner.Mention} `{e.GuildBefore.Owner.GetUsernameWithIdentifier()}` :arrow_right: {e.GuildAfter.Owner.Mention} `{e.GuildAfter.Owner.GetUsernameWithIdentifier()}`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.Name != e.GuildAfter.Name ? $"**Name**: `{e.GuildBefore.Name}` :arrow_right: `{e.GuildAfter.Name}`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.Description != e.GuildAfter.Description ? $"**Description**: `{e.GuildBefore.Description}` :arrow_right: `{e.GuildAfter.Description}`\n" : "")}"; } catch { }
             try { Description += $"{(e.GuildBefore.IconHash != e.GuildAfter.IconHash ? $"`Icon updated`\n" : "")}"; } catch { }
@@ -1006,7 +1006,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogGuildEntry)AuditLogEntries.First(x => !_bot.guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.GuildAfter.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
 
                     embed.Footer = new();
                     embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -1050,7 +1050,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Created by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer.Text += "\n(Please note that the 'Created by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -1094,7 +1094,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.Channel.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer.Text += "\n(Please note that the 'Deleted by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -1149,7 +1149,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogChannelEntry)AuditLogEntries.First(x => ((DiscordAuditLogChannelEntry)x).Target.Id == e.ChannelAfter.Id && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Modified by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer.Text += "\n(Please note that the 'Modified by' may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things.)";
@@ -1176,7 +1176,7 @@ internal class ActionlogEvents
                 Color = EmbedColors.Success,
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
-                                $"**Created by**: {e.Invite.Inviter?.Mention ?? "`No Inviter found.`"} `{e.Invite.Inviter?.GetUsername() ?? "-"}`\n" +
+                                $"**Created by**: {e.Invite.Inviter?.Mention ?? "`No Inviter found.`"} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
                                 $"**Channel**: {e.Channel.Mention} `[{(e.Channel.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel.Name}]`"
             }));
         }).Add(_bot.watcher);
@@ -1195,7 +1195,7 @@ internal class ActionlogEvents
                 Color = EmbedColors.Error,
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Invite**: `https://discord.gg/{e.Invite.Code}`\n" +
-                                $"**Created by**: {e.Invite.Inviter?.Mention ?? "`No Inviter found.`"} `{e.Invite.Inviter?.GetUsername() ?? "-"}`\n" +
+                                $"**Created by**: {e.Invite.Inviter?.Mention ?? "`No Inviter found.`"} `{e.Invite.Inviter?.GetUsernameWithIdentifier() ?? "-"}`\n" +
                                 $"**Channel**: {e.Channel?.Mention} `[{(e.Channel?.Type is ChannelType.Text or ChannelType.News or ChannelType.Store or ChannelType.NewsThread or ChannelType.PublicThread or ChannelType.PrivateThread ? "#" : $"{(e.Channel.Type is ChannelType.Voice or ChannelType.Stage ? "🔊" : "")}")}{e.Channel?.Name}]`"
             };
 
@@ -1214,7 +1214,7 @@ internal class ActionlogEvents
                     var Entry = (DiscordAuditLogInviteEntry)AuditLogEntries.First(x => ((DiscordAuditLogInviteEntry)x).Target.Code == e.Invite.Code && !_bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Contains(x.Id));
                     _bot.guilds[e.Guild.Id].ActionLog.ProcessedAuditLogs.Add(Entry.Id);
 
-                    embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsername()}`";
+                    embed.Description += $"\n\n**Deleted by**: {Entry.UserResponsible.Mention} `{Entry.UserResponsible.GetUsernameWithIdentifier()}`";
                     embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = Entry.UserResponsible.AvatarUrl };
 
                     embed.Footer = new();

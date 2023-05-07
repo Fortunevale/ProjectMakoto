@@ -195,7 +195,7 @@ internal static class PreMadeEmbedsExtensions
 
     private static DiscordEmbedBuilder.EmbedAuthor MakeDefaultBotAuthor(DiscordClient client, string CustomText = "") => new()
     {
-        Name = client.CurrentUser.Username,
+        Name = client.CurrentUser.GetUsername(),
         IconUrl = client.CurrentUser.AvatarUrl
     };
 
@@ -206,14 +206,14 @@ internal static class PreMadeEmbedsExtensions
         => new()
         {
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : user.AvatarUrl),
-            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(dbUser).Build(new TVar("User", user.GetUsername()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(dbUser).Build(new TVar("User", user.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
     public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "", string customIcon = "")
         => new()
         {
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
-            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Build(new TVar("User", ctx.User.GetUsername()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Build(new TVar("User", ctx.User.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
     public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")

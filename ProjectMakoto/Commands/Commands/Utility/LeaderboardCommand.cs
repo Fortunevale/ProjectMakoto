@@ -77,7 +77,7 @@ internal class LeaderboardCommand : BaseCommand
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.GetUsername()}` ({GetString(t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.GetUsernameWithIdentifier()}` ({GetString(t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
 
                     if (count >= ShowAmount)
                         break;

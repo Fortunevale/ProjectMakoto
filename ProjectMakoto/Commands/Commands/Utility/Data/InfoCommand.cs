@@ -22,7 +22,7 @@ internal class InfoCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.Username)),
+                    Description = GetString(t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.GetUsername())),
                 }.AsBotError(ctx));
                 return;
             }

@@ -113,7 +113,7 @@ internal class ConfigCommand : BaseCommand
                         var invites = await ctx.Guild.GetInvitesAsync();
 
                         var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
-                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.GetUsername()}")).ToList());
+                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.GetUsernameWithIdentifier()}")).ToList());
 
                         if (SelectionResult.TimedOut)
                         {
