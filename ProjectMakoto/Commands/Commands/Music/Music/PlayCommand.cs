@@ -89,7 +89,7 @@ internal class PlayCommand : BaseCommand
 
                 ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Add(new(track.Title, track.Uri.ToString(), track.Length, ctx.Guild, ctx.User));
 
-                embed.Description = GetString(t.Commands.Music.Play.QueuedMultiple, true,
+                embed.Description = GetString(t.Commands.Music.Play.QueuedSingle, true,
                     new TVar("Track", $"`[`{track.Title}`]({track.Uri})`"));
 
                 embed.AddField(new DiscordEmbedField($"📜 {GetString(t.Commands.Music.Play.QueuePosition)}", $"{ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}", true));
