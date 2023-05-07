@@ -200,7 +200,7 @@ public class MusicPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                DummyCommand dummyCommand = new DummyCommand();
+                DummyCommand dummyCommand = new();
                 await dummyCommand.ExecuteCommand(ctx, this._bot);
 
                 dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
@@ -248,7 +248,7 @@ public class MusicPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                DummyCommand dummyCommand = new DummyCommand();
+                DummyCommand dummyCommand = new();
                 await dummyCommand.ExecuteCommand(ctx, this._bot);
 
                 dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);

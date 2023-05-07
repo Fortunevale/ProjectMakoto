@@ -56,7 +56,7 @@ internal class UploadCommand : BaseCommand
                 Description = GetString(t.Commands.Utility.Upload.Uploaded, true)
             }.AsSuccess(ctx));
 
-            await Task.Delay(5000);
+            await Task.Delay(500);
             DeleteOrInvalidate();
         });
     }
