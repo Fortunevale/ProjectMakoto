@@ -259,6 +259,11 @@ public class SharedCommandContext
     public bool RespondedToInitial { get; set; }
 
     /// <summary>
+    /// If the command was executed through another command.
+    /// </summary>
+    public bool Transferred { get; set; } = false;
+
+    /// <summary>
     /// The message that's being used to interact with the user.
     /// </summary>
     public DiscordMessage ResponseMessage { get; set; }

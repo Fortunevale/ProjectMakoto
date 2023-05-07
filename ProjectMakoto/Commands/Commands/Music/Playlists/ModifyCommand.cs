@@ -31,7 +31,7 @@ internal class ModifyCommand : BaseCommand
 
             UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == playlistId);
 
-            var embed = new DiscordEmbedBuilder();
+            var embed = new DiscordEmbedBuilder().AsInfo(ctx);
 
             int LastInt = 0;
             int GetInt()
@@ -391,6 +391,11 @@ internal class ModifyCommand : BaseCommand
                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
+
+                                if (!ctx.Transferred)
+                                    DeleteOrInvalidate();
+                                else
+                                    _ = new ManageCommand().TransferCommand(ctx, null);
                                 return;
                             }
                         }

@@ -26,6 +26,8 @@ public abstract class BaseCommand
     {
         this.ctx = ctx;
 
+        ctx.Transferred = true;
+
         if (await BasePreExecutionCheck())
             await ExecuteCommand(this.ctx, arguments);
     }

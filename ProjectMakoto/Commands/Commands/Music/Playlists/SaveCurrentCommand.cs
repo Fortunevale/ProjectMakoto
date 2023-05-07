@@ -67,7 +67,7 @@ internal class SaveCurrentCommand : BaseCommand
                 if (Menu.GetCustomId() == SelectName.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "" : SelectedPlaylistName)));
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "New Playlist" : SelectedPlaylistName)));
 
 
                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
@@ -132,6 +132,9 @@ internal class SaveCurrentCommand : BaseCommand
                 }
                 else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                 {
+                    if (!ctx.Transferred)
+                        DeleteOrInvalidate();
+
                     return;
                 }
 

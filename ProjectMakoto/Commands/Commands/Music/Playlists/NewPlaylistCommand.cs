@@ -59,7 +59,7 @@ internal class NewPlaylistCommand : BaseCommand
                 if (Menu.GetCustomId() == SelectName.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "" : SelectedPlaylistName)));
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "New Playlist" : SelectedPlaylistName)));
 
                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                     {
@@ -86,7 +86,7 @@ internal class NewPlaylistCommand : BaseCommand
                 else if (Menu.GetCustomId() == SelectFirstTracks.CustomId)
                 {
                     var modal = new DiscordInteractionModalBuilder("Set first track(s) for your Playlist", Guid.NewGuid().ToString())
-                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url, Playlist Url or Search Query", "", 1, 100, true));
+                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url, Playlist Url or Search Query", "Url", 1, 100, true));
 
 
                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
@@ -160,6 +160,9 @@ internal class NewPlaylistCommand : BaseCommand
                 }
                 else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
                 {
+                    if (!ctx.Transferred)
+                        DeleteOrInvalidate();
+
                     return;
                 }
 

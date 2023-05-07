@@ -163,15 +163,11 @@ internal class ManageCommand : BaseCommand
             else if (e.GetCustomId() == NewPlaylist.CustomId)
             {
                 await new NewPlaylistCommand().TransferCommand(ctx, null);
-
-                await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == SaveCurrent.CustomId)
             {
                 await new SaveCurrentCommand().TransferCommand(ctx, null);
-
-                await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ImportPlaylist.CustomId)
@@ -209,8 +205,6 @@ internal class ManageCommand : BaseCommand
                 {
                     { "id", PlaylistResult.Result }
                 });
-
-                await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == DeletePlaylist.CustomId)

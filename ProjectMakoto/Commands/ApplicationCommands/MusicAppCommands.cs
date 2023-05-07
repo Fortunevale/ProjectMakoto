@@ -168,6 +168,27 @@ public class MusicAppCommands : ApplicationCommandsModule
     [SlashCommandGroup("playlists", "Allows you to manage your personal playlists.", dmPermission: false)]
     public class Playlists : ApplicationCommandsModule
     {
+        public class PlaylistsAutoCompleteProvider : IAutocompleteProvider
+        {
+            public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
+            {
+                try
+                {
+                    Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+                    IEnumerable<UserPlaylist> Queue = bot.users[ctx.User.Id].UserPlaylists
+                        .Where(x => x.PlaylistName.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
+
+                    List<DiscordApplicationCommandAutocompleteChoice> options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Count} {Bot.loadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
+                    return options.AsEnumerable();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to provide autocomplete for playlists", ex);
+                    return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
+                }
+            }
+        }
+
         public Bot _bot { private get; set; }
 
         [SlashCommand("manage", "Allows you to use and manage your playlists.", dmPermission: false)]
@@ -176,6 +197,93 @@ public class MusicAppCommands : ApplicationCommandsModule
             Task.Run(async () =>
             {
                 await new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("add-to-queue", "Adds a playlist to the current song queue.", dmPermission: false)]
+        public async Task AddToQueue(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.AddToQueueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "id", id },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("share", "Share one of your playlists.", dmPermission: false)]
+        public async Task Share(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.ShareCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "id", id },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("export", "Export one of your playlists.", dmPermission: false)]
+        public async Task Export(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.ExportCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "id", id },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("modify", "Modify one of your playlists.", dmPermission: false)]
+        public async Task Modify(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.ModifyCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "id", id },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("delete", "Delete one of your playlists.", dmPermission: false)]
+        public async Task Delete(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.DeleteCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                {
+                    { "id", id },
+                });
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("create-new", "Create a new playlist from scratch.", dmPermission: false)]
+        public async Task CreateNew(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.NewPlaylistCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("save-queue", "Save the current queue as playlist.", dmPermission: false)]
+        public async Task SaveQueue(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.SaveCurrentCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [SlashCommand("import", "Import a playlists from another platform or from a previously exported playlist.", dmPermission: false)]
+        public async Task Import(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.ImportCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
 
