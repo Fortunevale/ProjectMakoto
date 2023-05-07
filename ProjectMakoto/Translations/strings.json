@@ -1710,6 +1710,9 @@
         "Tracks": {
           "en": "Tracks"
         },
+        "NameModerationNote": {
+          "en": "Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥"
+        },
         "LoadShare": {
           "Loading": {
             "en": "Loading the shared playlists.."
@@ -1841,6 +1844,38 @@
           },
           "ImportFailed": {
             "en": "Failed to import your attachment. Is this a valid playlist?"
+          }
+        },
+        "CreatePlaylist": {
+          "ChangeName": {
+            "en": "Change Playlist Name"
+          },
+          "ChangeTracks": {
+            "en": "Change First Tracks"
+          },
+          "CreatePlaylist": {
+            "en": "Create Playlist"
+          },
+          "PlaylistName": {
+            "en": "Playlist Name"
+          },
+          "FirstTracks": {
+            "en": "First Track(s)"
+          },
+          "SetPlaylistName": {
+            "en": "Set a playlist name"
+          },
+          "SetFirstTracks": {
+            "en": "Set first track(s) for your playlist"
+          },
+          "SupportedAddType": {
+            "en": "Song Url, Playlist Url or Search Query"
+          },
+          "Creating": {
+            "en": "Creating your playlist.."
+          },
+          "Created": {
+            "en": "Your playlist '{Playlist}' has been created with {Count} entries."
           }
         }
       }

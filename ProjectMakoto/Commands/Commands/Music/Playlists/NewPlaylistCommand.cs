@@ -33,15 +33,16 @@ internal class NewPlaylistCommand : BaseCommand
                     return;
                 }
 
-                var SelectName = new DiscordButtonComponent((SelectedPlaylistName.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Change Playlist Name", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
-                var SelectFirstTracks = new DiscordButtonComponent((SelectedTracks is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Change First Tracks", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎵")));
-                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Create Playlist", (SelectedPlaylistName.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                var SelectName = new DiscordButtonComponent((SelectedPlaylistName.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.CreatePlaylist.ChangeName), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
+                var SelectFirstTracks = new DiscordButtonComponent((SelectedTracks is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.CreatePlaylist.ChangeTracks), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎵")));
+                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.CreatePlaylist.CreatePlaylist), (SelectedPlaylistName.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
+                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, t.Commands.Music.Playlists.CreatePlaylist.PlaylistName, t.Commands.Music.Playlists.CreatePlaylist.FirstTracks);
 
                 var embed = new DiscordEmbedBuilder
                 {
-                    Description = $"`Playlist Name `: `{(SelectedPlaylistName.IsNullOrWhiteSpace() ? "Not yet selected." : SelectedPlaylistName)}`\n" +
-                                  $"`First Track(s)`: {(SelectedTracks.IsNotNullAndNotEmpty() ? (SelectedTracks.Count > 1 ? $"`{SelectedTracks.Count} Tracks`" : $"[`{SelectedTracks[0].Title}`]({SelectedTracks[0].Url})") : "`Not yet selected.`")}"
+                    Description = $"`{GetString(t.Commands.Music.Playlists.CreatePlaylist.PlaylistName).PadRight(pad)}`: `{(SelectedPlaylistName.IsNullOrWhiteSpace() ? GetString(t.Common.NotSelected) : SelectedPlaylistName)}`\n" +
+                                  $"`{GetString(t.Commands.Music.Playlists.CreatePlaylist.FirstTracks).PadRight(pad)}`: {(SelectedTracks.IsNotNullAndNotEmpty() ? (SelectedTracks.Count > 1 ? $"`{SelectedTracks.Count} {GetString(t.Commands.Music.Playlists.Tracks)}`" : $"[`{SelectedTracks[0].Title}`]({SelectedTracks[0].Url})") : GetString(t.Common.NotSelected, true))}"
                 }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title));
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -58,12 +59,12 @@ internal class NewPlaylistCommand : BaseCommand
 
                 if (Menu.GetCustomId() == SelectName.CustomId)
                 {
-                    var modal = new DiscordInteractionModalBuilder("Set a playlist name", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Playlist Name", "Playlist", 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "New Playlist" : SelectedPlaylistName)));
+                    var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Music.Playlists.CreatePlaylist.SetPlaylistName), Guid.NewGuid().ToString())
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", GetString(t.Commands.Music.Playlists.CreatePlaylist.PlaylistName), GetString(t.Commands.Music.Playlists.Title), 1, 100, true, (SelectedPlaylistName.IsNullOrWhiteSpace() ? "New Playlist" : SelectedPlaylistName)));
 
                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, new DiscordEmbedBuilder
                     {
-                        Description = $"⚠ `Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`",
+                        Description = $"⚠ {GetString(t.Commands.Music.Playlists.NameModerationNote, true)}",
                     }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)), false);
 
                     if (ModalResult.TimedOut)
@@ -85,8 +86,8 @@ internal class NewPlaylistCommand : BaseCommand
                 }
                 else if (Menu.GetCustomId() == SelectFirstTracks.CustomId)
                 {
-                    var modal = new DiscordInteractionModalBuilder("Set first track(s) for your Playlist", Guid.NewGuid().ToString())
-                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", "Song Url, Playlist Url or Search Query", "Url", 1, 100, true));
+                    var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Music.Playlists.CreatePlaylist.SetFirstTracks), Guid.NewGuid().ToString())
+                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", GetString(t.Commands.Music.Playlists.CreatePlaylist.SupportedAddType), "Url", 1, 100, true));
 
 
                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
@@ -136,7 +137,7 @@ internal class NewPlaylistCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Creating your playlist..`",
+                        Description = GetString(t.Commands.Music.Playlists.CreatePlaylist.Creating, true),
                     }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
                     var v = new UserPlaylist
@@ -149,7 +150,9 @@ internal class NewPlaylistCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = $"`Your playlist '{v.PlaylistName}' has been created with {v.List.Count} entries.`",
+                        Description = GetString(t.Commands.Music.Playlists.CreatePlaylist.Created, true,
+                            new TVar("Playlist", v.PlaylistName),
+                            new TVar("Count", v.List.Count)),
                     }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     await Task.Delay(2000);
                     await new ModifyCommand().TransferCommand(ctx, new Dictionary<string, object>
