@@ -22,6 +22,14 @@ public abstract class BaseCommand
 
     public abstract Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments = null);
 
+    public async Task TransferCommand(SharedCommandContext ctx, Dictionary<string, object> arguments = null)
+    {
+        this.ctx = ctx;
+
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
+    }
+
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);

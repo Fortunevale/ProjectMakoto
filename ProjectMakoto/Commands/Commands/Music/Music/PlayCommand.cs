@@ -36,7 +36,7 @@ internal class PlayCommand : BaseCommand
 
             try
             {
-                await new JoinCommand().ExecuteCommand(ctx, null);
+                await new JoinCommand().TransferCommand(ctx, null);
             }
             catch (CancelException)
             {
@@ -49,7 +49,7 @@ internal class PlayCommand : BaseCommand
 
             try
             {
-                await new JoinCommand().ExecuteCommand(ctx, null);
+                await new JoinCommand().TransferCommand(ctx, null);
             }
             catch (CancelException)
             {

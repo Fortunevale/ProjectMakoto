@@ -28,7 +28,7 @@ internal class ManageCommand : BaseCommand
 
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             {
-                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCode()}`: `{x.List.Count} {GetString(t.Commands.Music.Playlists.Tracks)}`")) : GetString(t.Commands.Music.Playlists.Manage.NoPlaylists))}"
+                Description = $"{(ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count > 0 ? string.Join("\n", ctx.Bot.users[ctx.Member.Id].UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCode()}`: `{x.List.Count} {GetString(t.Commands.Music.Playlists.Tracks)}`")) : GetString(t.Commands.Music.Playlists.Manage.NoPlaylists, true))}"
             }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
 
             var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.AddToQueueButton), (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
@@ -94,7 +94,7 @@ internal class ManageCommand : BaseCommand
                     throw PlaylistResult.Exception;
                 }
 
-                await new AddToQueueCommand().ExecuteCommand(ctx, new Dictionary<string, object>
+                await new AddToQueueCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
                     { "id", PlaylistResult.Result }
                 });
@@ -124,7 +124,7 @@ internal class ManageCommand : BaseCommand
                     throw PlaylistResult.Exception;
                 }
 
-                await new ShareCommand().ExecuteCommand(ctx, new Dictionary<string, object>
+                await new ShareCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
                     { "id", PlaylistResult.Result }
                 });
@@ -154,7 +154,7 @@ internal class ManageCommand : BaseCommand
                     throw PlaylistResult.Exception;
                 }
 
-                await new ExportCommand().ExecuteCommand(ctx, new Dictionary<string, object>
+                await new ExportCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
                     { "id", PlaylistResult.Result }
                 });
@@ -162,21 +162,21 @@ internal class ManageCommand : BaseCommand
             }
             else if (e.GetCustomId() == NewPlaylist.CustomId)
             {
-                await new NewPlaylistCommand().ExecuteCommand(ctx, null);
+                await new NewPlaylistCommand().TransferCommand(ctx, null);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == SaveCurrent.CustomId)
             {
-                await new SaveCurrentCommand().ExecuteCommand(ctx, null);
+                await new SaveCurrentCommand().TransferCommand(ctx, null);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ImportPlaylist.CustomId)
             {
-                await new ImportCommand().ExecuteCommand(ctx, null);
+                await new ImportCommand().TransferCommand(ctx, null);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -205,7 +205,7 @@ internal class ManageCommand : BaseCommand
                     throw PlaylistResult.Exception;
                 }
 
-                await new ModifyCommand().ExecuteCommand(ctx, new Dictionary<string, object>
+                await new ModifyCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
                     { "id", PlaylistResult.Result }
                 });
@@ -237,7 +237,7 @@ internal class ManageCommand : BaseCommand
                     throw PlaylistResult.Exception;
                 }
 
-                await new DeleteCommand().ExecuteCommand(ctx, new Dictionary<string, object>
+                await new DeleteCommand().TransferCommand(ctx, new Dictionary<string, object>
                 {
                     { "id", PlaylistResult.Result }
                 });

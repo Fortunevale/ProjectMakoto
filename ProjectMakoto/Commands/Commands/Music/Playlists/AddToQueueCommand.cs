@@ -38,7 +38,7 @@ internal class AddToQueueCommand : BaseCommand
 
             try
             {
-                await new Music.JoinCommand().ExecuteCommand(ctx, null);
+                await new Music.JoinCommand().TransferCommand(ctx, null);
             }
             catch (CancelException)
             {

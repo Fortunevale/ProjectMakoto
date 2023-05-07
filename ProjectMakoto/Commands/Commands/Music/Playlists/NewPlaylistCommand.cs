@@ -152,7 +152,7 @@ internal class NewPlaylistCommand : BaseCommand
                         Description = $"`Your playlist '{v.PlaylistName}' has been created with {v.List.Count} entries.`",
                     }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
                     await Task.Delay(2000);
-                    await new ModifyCommand().ExecuteCommand(ctx, new Dictionary<string, object>
+                    await new ModifyCommand().TransferCommand(ctx, new Dictionary<string, object>
                     {
                         { "id", v.PlaylistId }
                     });
