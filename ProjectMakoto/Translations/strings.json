@@ -1372,10 +1372,12 @@
     "Social": {
       "Afk": {
         "Title": {
-          "en": "Afk Status"
+          "en": "Afk Status",
+          "de": "Afk Status"
         },
         "SetAfk": {
-          "en": "You're now marked as afk. Next time you send a message, your afk status will be removed."
+          "en": "You're now marked as afk. Next time you send a message, your afk status will be removed.",
+          "de": "Du bist jetzt als AFK makiert. Nächstes mal wenn du eine Nachricht sendest wird dein AFK Status entfernt."
         }
       },
       "Boop": {
@@ -1383,11 +1385,18 @@
           "en": [
             "{User1} boops {User2}! Adorable..",
             "{User1} boops {User2}! So cute!"
+          ],
+          "de": [
+            "{User1} boopt {User2}! Süß..",
+            "{User1} boopt {User2}! Wie niedlich.."
           ]
         },
         "Self": {
           "en": [
             "{User1}, i don't think thats how it works.."
+          ],
+          "de": [
+            "{User1}, Ich glaube so funktioniert Das nicht.."
           ]
         }
       },
@@ -1395,23 +1404,35 @@
         "Other": {
           "en": [
             "{User1} cuddles with {User2}! {Emoji}"
+          ],
+          "de": [
+            "{User1} kuschelt mit {User2}! {Emoji}"
           ]
         },
         "Self": {
           "en": [
             "{User1}, i don't think thats how it works.."
+          ],
+          "de": [
+            "{User1}, Ich glaube so funktioniert Das nicht.."
           ]
         }
       },
       "HighFive": {
         "Other": {
           "en": [
-            "{User1} highfives {User2} That's the spirit. {Emoji}"
+            "{User1} highfives {User2}! That's the spirit. {Emoji}"
+          ],
+          "de": [
+            "{User1} gibt {User2} ein Highfive! So will ich Das sehen. {Emoji}"
           ]
         },
         "Self": {
           "en": [
             "{User1}, are you trying to clap..?"
+          ],
+          "de": [
+            "{User1}, versuchst du zu klatschen..?"
           ]
         }
       },
@@ -1421,6 +1442,11 @@
             "{User1} hugs {User2}! How sweet! {Emoji}",
             "{User1} gives {User2} a big fat hug! {Emoji}",
             "{User2}, watch out! {User1} is coming to squeeze you tight! {Emoji}"
+          ],
+          "de": [
+            "{User1} umarmt {User2}! Wie schön! {Emoji}",
+            "{User1} gibt {User2} eine dicke fette Umarmung! {Emoji}",
+            "{User2}, pass auf! {User1} kommt und umarmt dich ganz fest! {Emoji}"
           ]
         },
         "Self": {
@@ -1429,6 +1455,11 @@
             "Does no one else hug you, {User1}? There, there.. I'll hug you.. {Emoji}",
             "There, there.. I'll hug you {User1}. {Emoji} Sorry if i'm a bit cold, i'm not human y'know.. {Emoji}",
             "You look lonely there, {User1}.."
+          ],
+          "de": [
+            "Komm her, ich umarme dich {User1}.. {Emoji}",
+            "Umarmt dich niemand anders, {User1}? Komm her, ich umarme dich.. {Emoji}",
+            "Du siehst einsam aus, {User1}.. {Emoji}"
           ]
         }
       },
@@ -1437,12 +1468,20 @@
           "en": [
             "{User1} kills {User2}! That looks like it hurt.. {Emoji}",
             "{User1} kills {User2}! Ouch.. {Emoji}"
+          ],
+          "de": [
+            "{User1} tötet {User2}! Das sieht so aus als ob es weg getan hat.. {Emoji}",
+            "{User1} tötet {User2}! Ow.. {Emoji}"
           ]
         },
         "Self": {
           "en": [
             "Come on, {User1}. There's no need to be so hard on yourself!",
             "Come on, {User1}.. This isn't a solution is it?"
+          ],
+          "de": [
+            "Ach komm schon, {User1}. Du musst nicht so hart mit dir selber sein!",
+            "Ach komm schon, {User1}. Das ist doch auch keine Lösung."
           ]
         }
       },
@@ -1450,11 +1489,17 @@
         "Other": {
           "en": [
             "{User1} kisses {User2}! {Emoji}"
+          ],
+          "de": [
+            "{User1} küsst {User2}! {Emoji}"
           ]
         },
         "Self": {
           "en": [
             "{User1}, i don't think that's how it works.."
+          ],
+          "de": [
+            "{User1}, Ich glaube so funktioniert Das nicht.."
           ]
         }
       },
@@ -1462,6 +1507,9 @@
         "Other": {
           "en": [
             "{User1} gives {User2} headpats!"
+          ],
+          "de": [
+            "{User1} streichelt {User2}!"
           ]
         },
         "Self": {
@@ -1469,6 +1517,10 @@
             "There, there.. I'll give you some headpats, {User1} {Emoji}",
             "I'll give you some headpats, {User1}.. {Emoji}",
             "You look lonely there, {User1}.."
+          ],
+          "de": [
+            "Komm her, {User1}.. Ich streichle dich. {Emoji}",
+            "Du siehst einsam aus, {User1}.. {Emoji}"
           ]
         }
       },
@@ -1476,12 +1528,19 @@
         "Other": {
           "en": [
             "{User1} slaps {User2}! That looks like it hurt.. {Emoji}"
+          ],
+          "de": [
+            "{User1} schlägt {User2}! Das sieht so aus, als ob es weh getan hat.. {Emoji}"
           ]
         },
         "Self": {
           "en": [
             "Come on, {User1}. There's no need to be so hard on yourself!",
             "Bad {User1}! I don't know what you did but bad!"
+          ],
+          "de": [
+            "Ach komm schon, {User1}. Du musst nicht so hart mit dir selber sein!",
+            "Ach komm schon, {User1}. Das ist doch auch keine Lösung."
           ]
         }
       }
