@@ -774,6 +774,7 @@ public class Translations
                 public SingleTranslationKey NoPlaylist;
                 public SingleTranslationKey Tracks;
                 public SingleTranslationKey NameModerationNote;
+                public SingleTranslationKey ThumbnailModerationNote;
 
                 public loadShare LoadShare;
                 public class loadShare
@@ -862,6 +863,30 @@ public class Translations
                     public SingleTranslationKey SupportedAddType;
                     public SingleTranslationKey Creating;
                     public SingleTranslationKey Created;
+                }
+
+                public modify Modify;
+                public class modify
+                {
+                    public SingleTranslationKey ChangeName;
+                    public SingleTranslationKey ChangeColor;
+                    public SingleTranslationKey ChangeThumbnail;
+                    public SingleTranslationKey AddTracks;
+                    public SingleTranslationKey RemoveTracks;
+                    public SingleTranslationKey RemoveDuplicates;
+                    public SingleTranslationKey CurrentTrackCount;
+                    public SingleTranslationKey Track;
+                    public SingleTranslationKey ModifyingPlaylist;
+                    public SingleTranslationKey TrackLimit;
+                    public SingleTranslationKey AddSong;
+                    public SingleTranslationKey UploadThumbnail;
+                    public SingleTranslationKey ImportingThumbnail;
+                    public SingleTranslationKey ThumbnailSizeError;
+                    public SingleTranslationKey ThumbnailError;
+                    public SingleTranslationKey NewPlaylistColor;
+                    public SingleTranslationKey NewPlaylistColorPrompt;
+                    public SingleTranslationKey HexHelp;
+                    public SingleTranslationKey DeleteNote;
                 }
             }
         }

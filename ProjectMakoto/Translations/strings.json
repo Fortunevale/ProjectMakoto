@@ -1713,6 +1713,9 @@
         "NameModerationNote": {
           "en": "Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥"
         },
+        "ThumbnailModerationNote": {
+          "en": "Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥"
+        },
         "LoadShare": {
           "Loading": {
             "en": "Loading the shared playlists.."
@@ -1876,6 +1879,65 @@
           },
           "Created": {
             "en": "Your playlist '{Playlist}' has been created with {Count} entries."
+          }
+        },
+        "Modify": {
+          "ChangeName": {
+            "en": "Change Name"
+          },
+          "ChangeColor": {
+            "en": "Change Color"
+          },
+          "ChangeThumbnail": {
+            "en": "Change Thumbnail"
+          },
+          "AddTracks": {
+            "en": "Add tracks"
+          },
+          "RemoveTracks": {
+            "en": "Remove tracks"
+          },
+          "RemoveDuplicates": {
+            "en": "Remove all duplicates"
+          },
+          "CurrentTrackCount": {
+            "en": "There's currently {Count} tracks(s) in this playlist. This playlist lasts for {Timespan}."
+          },
+          "Track": {
+            "en": "{Track} added {Timestamp}"
+          },
+          "ModifyingPlaylist": {
+            "en": "Modifying your playlist"
+          },
+          "TrackLimit": {
+            "en": "You already have 250 Tracks stored in this playlist. Please delete one to add a new one."
+          },
+          "AddSong": {
+            "en": "Add Song to Playlist"
+          },
+          "UploadThumbnail": {
+            "en": "Please upload thumbnail via '{Command}'"
+          },
+          "ImportingThumbnail": {
+            "en": "Importing your thumbnail.."
+          },
+          "ThumbnailSizeError": {
+            "en": "Please attach an image below {Size}."
+          },
+          "ThumbnailError": {
+            "en": "Something went wrong while trying to upload your thumbnail. Please try again."
+          },
+          "NewPlaylistColor": {
+            "en": "New Playlist Color"
+          },
+          "NewPlaylistColorPrompt": {
+            "en": "What color should this playlist be? (e.g. {Hex}){HelpUrl}"
+          },
+          "HexHelp": {
+            "en": "Need help with hex color codes?"
+          },
+          "DeleteNote": {
+            "en": "Select 1 or more songs to delete.."
           }
         }
       }
