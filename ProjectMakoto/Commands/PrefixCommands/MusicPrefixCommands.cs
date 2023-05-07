@@ -170,27 +170,115 @@ public class MusicPrefixCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
-        //[GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
-        //public async Task Help(CommandContext ctx)
-        //{
-        //    Task.Run(async () =>
-        //    {
-        //        if (await _bot._users[ ctx.Member.Id ].Cooldown.WaitForLight(ctx.Client, new SharedCommandContext(ctx.Message, _bot)))
-        //            return;
 
-        //        if (ctx.Command.Parent is not null)
-        //            await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
-        //        else
-        //            await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
-        //    }).Add(_bot._watcher, ctx);
-        //}
+        [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+        public async Task Help(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "playlists")))
+                    return;
 
-        [GroupCommand, Command("manage"), Description("Allows you to use and manage your playlists.")]
+                if (ctx.Command.Parent is not null)
+                    await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx);
+                else
+                    await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("manage"), Description("Allows you to use and manage your playlists.")]
         public async Task Manage(CommandContext ctx)
         {
             Task.Run(async () =>
             {
                 await new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("add-to-queue"), Description("Adds a playlist to the current song queue.")]
+        public async Task AddToQueue(CommandContext ctx, [Description("Playlist Id")]string id)
+        {
+            Task.Run(async () =>
+            {
+                DummyCommand dummyCommand = new DummyCommand();
+                await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+                dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
+            }).Add(this._bot.watcher, ctx);
+        }
+
+        [Command("share"), Description("Share one of your playlists.")]
+        public async Task Share(CommandContext ctx, [Description("Playlist Id")] string id)
+        {
+            Task.Run(async () =>
+            {
+                DummyCommand dummyCommand = new DummyCommand();
+                await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+                dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("export"), Description("Export one of your playlists.")]
+        public async Task Export(CommandContext ctx, [Description("Playlist Id")] string id)
+        {
+            Task.Run(async () =>
+            {
+                DummyCommand dummyCommand = new DummyCommand();
+                await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+                dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("modify"), Description("Modify one of your playlists.")]
+        public async Task Modify(CommandContext ctx, [Description("Playlist Id")] string id)
+        {
+            Task.Run(async () =>
+            {
+                DummyCommand dummyCommand = new DummyCommand();
+                await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+                dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("delete"), Description("Delete one of your playlists.")]
+        public async Task Delete(CommandContext ctx, [Description("Playlist Id")] string id)
+        {
+            Task.Run(async () =>
+            {
+                DummyCommand dummyCommand = new DummyCommand();
+                await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+                dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("create-new"), Description("Create a new playlist from scratch.")]
+        public async Task CreateNew(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.NewPlaylistCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("save-queue"), Description("Save the current queue as playlist.")]
+        public async Task SaveQueue(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.SaveCurrentCommand().ExecuteCommand(ctx, _bot);
+            }).Add(_bot.watcher, ctx);
+        }
+
+        [Command("import"), Description("Import a playlists from another platform or from a previously exported playlist.")]
+        public async Task Import(CommandContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await new Commands.Playlists.ImportCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
 
