@@ -11,7 +11,7 @@ namespace ProjectMakoto.Entities;
 
 internal class RegexTemplates
 {
-    public static readonly Regex UserMention = new(@"((<@\d+>)|(<@!\d+>))", RegexOptions.Compiled);
+    public static readonly Regex UserMention = new(@"((<@(\d+)>)|(<@!(\d+)>))", RegexOptions.Compiled);
     public static readonly Regex ChannelMention = new(@"(<#\d+>)", RegexOptions.Compiled);
 
     public static readonly Regex BandcampUrl = new(@"(https?:\/\/)?([\d|\w]+)\.bandcamp\.com\/?.*", RegexOptions.IgnoreCase | RegexOptions.Compiled);

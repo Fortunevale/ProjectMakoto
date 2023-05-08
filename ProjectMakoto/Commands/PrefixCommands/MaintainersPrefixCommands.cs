@@ -12,7 +12,7 @@ public class MaintainersPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
-    [Group("dev_tools"),
+    [Group("developertools"), Aliases("dev_tools"),
     CommandModule("maintenance"),
     Description("Developer Tools used to develop/manage Makoto.")]
     public class DevTools : BaseCommandModule
@@ -26,6 +26,15 @@ public class MaintainersPrefixCommands : BaseCommandModule
             {
                 if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "dev_tools")))
                     return;
+
+                if (!ctx.User.IsMaintenance(_bot.status))
+                {
+                    DummyCommand dummyCommand = new();
+                    await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+                    dummyCommand.SendMaintenanceError();
+                    return;
+                }
 
                 if (ctx.Command.Parent is not null)
                     await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, "", "", "");

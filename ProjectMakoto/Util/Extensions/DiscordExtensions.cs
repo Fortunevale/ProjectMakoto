@@ -232,4 +232,19 @@ internal static class DiscordExtensions
                   .Replace("8", "8️⃣")
                   .Replace("9", "9️⃣");
     }
+
+    public async static Task<DiscordUser> ParseStringAsUser(string str, DiscordClient client)
+    {
+        if (str.IsDigitsOnly())
+            return await client.GetUserAsync(UInt64.Parse(str));
+        else
+        {
+            var reg = RegexTemplates.UserMention.Match(str);
+
+            if (reg.Success)
+                return await client.GetUserAsync(UInt64.Parse(reg.Groups[3].Value));
+        }
+
+        throw new ArgumentException("");
+    }
 }

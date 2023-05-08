@@ -20,7 +20,10 @@ internal class RawGuildCommand : BaseCommand
             ulong? guild = (ulong?)arguments["guild"];
             guild ??= ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithFile("guild.json", JsonConvert.SerializeObject(ctx.Bot.guilds[guild.Value], Formatting.Indented).ToStream()));
+            await RespondOrEdit(new DiscordMessageBuilder().WithFile("guild.json", JsonConvert.SerializeObject(ctx.Bot.guilds[guild.Value], Formatting.Indented, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            }).ToStream()));
         });
     }
 }
