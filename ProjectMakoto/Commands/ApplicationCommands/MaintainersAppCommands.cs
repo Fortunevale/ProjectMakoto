@@ -306,9 +306,18 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 case MaintainerAutoComplete.Commands.Evaluate:
                     Task.Run(async () =>
                     {
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
+
+                        var id = Convert.ToUInt64(argument1);
+                        var message = await ctx.Channel.GetMessageAsync(id);
+
                         await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                         {
-                            { "message", (argument1.IsNullOrWhiteSpace() ? (await ctx.Channel.GetMessagesAsync(1))[0].Id : Convert.ToUInt64(argument1)) },
+                            { "code", message.Content },
                         });
                     }).Add(_bot.watcher, ctx);
                     break;

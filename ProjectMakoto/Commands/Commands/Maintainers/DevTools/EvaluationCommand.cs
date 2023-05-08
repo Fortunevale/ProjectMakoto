@@ -37,27 +37,11 @@ internal class EvaluationCommand : BaseCommand
                 }
             }
 
-            DiscordMessage msg;
-
-            try
-            {
-                msg = await ctx.Channel.GetMessageAsync((ulong)arguments["message"]);
-            }
-            catch (Exception)
-            {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to fetch specified message.`").AsBotError(ctx));
-                return;
-            }
-
-            if (msg.Author.Id != ctx.User.Id)
-            {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You cannot evaluate other people's code.`").AsBotError(ctx));
-                return;
-            }
+            string rawCode = (string)arguments["code"];
 
             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Evaluating..`").AsBotLoading(ctx));
 
-            var code = RegexTemplates.Code.Match(msg.Content).Groups[1]?.Value?.Trim() ?? "";
+            var code = RegexTemplates.Code.Match(rawCode).Groups[1]?.Value?.Trim() ?? "";
 
             if (code.IsNullOrWhiteSpace())
             {
@@ -82,7 +66,7 @@ internal class EvaluationCommand : BaseCommand
                     "DisCatSharp.Enums", 
                     "Newtonsoft.Json"
                     );
-                options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
+                options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic));
 
                 var script = CSharpScript.Create(code, options, typeof(SharedCommandContext));
                 script.Compile();

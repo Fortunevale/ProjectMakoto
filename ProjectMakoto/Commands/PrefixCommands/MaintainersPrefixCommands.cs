@@ -250,13 +250,13 @@ public class MaintainersPrefixCommands : BaseCommandModule
         }
 
         [Command("evaluate"), Aliases("eval"), Description("Evaluates CScript.")]
-        public async Task Evaluate(CommandContext ctx)
+        public async Task Evaluate(CommandContext ctx, string code)
         {
             Task.Run(async () =>
             {
                 await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
-                    { "message", (ctx.Message.ReferencedMessage is null ? (await ctx.Channel.GetMessagesAsync(2))[1].Id : ctx.Message.ReferencedMessage?.Id) },
+                    { "code", code },
                 });
             }).Add(_bot.watcher, ctx);
         }

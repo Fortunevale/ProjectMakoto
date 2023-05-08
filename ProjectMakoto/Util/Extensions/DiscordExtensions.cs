@@ -11,9 +11,12 @@ namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
     internal static string GetUsername(this DiscordUser user)
         => user.IsMigrated ? user.GlobalName : user.Username;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0102:[Discord] Deprecated", Justification = "<Pending>")]
     internal static string GetUsernameWithIdentifier(this DiscordUser user)
         => user.IsMigrated ? user.UsernameWithGlobalName : user.UsernameWithDiscriminator;
 
