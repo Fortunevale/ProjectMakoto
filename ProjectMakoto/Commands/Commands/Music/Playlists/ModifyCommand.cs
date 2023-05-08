@@ -220,9 +220,9 @@ internal class ModifyCommand : BaseCommand
                                     embed.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title));
                                     await RespondOrEdit(embed.Build());
 
-                                    if (stream.fileSize > 8000000)
+                                    if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                                     {
-                                        embed.Description = GetString(t.Commands.Music.Playlists.Modify.ThumbnailSizeError, true, new TVar("Size", "8 MB"));
+                                        embed.Description = GetString(t.Commands.Music.Playlists.Modify.ThumbnailSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()));
                                         embed.AsError(ctx, GetString(t.Commands.Music.Playlists.Title));
                                         await RespondOrEdit(embed.Build());
                                         _ = Task.Delay(5000).ContinueWith(async x =>
