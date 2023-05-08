@@ -7,10 +7,10 @@ jobs:
     steps:
       - name: Cleanup before build
         run: rm -rf ProjectMakotoTest/
-      - name: Setup .NET Core SDK 6.x
+      - name: Setup .NET Core SDK 7.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.x'
+          dotnet-version: '7.x'
       - name: "Clone Repository"
         uses: actions/checkout@v3
         with:
@@ -20,6 +20,6 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
         working-directory: ProjectMakotoTest/ProjectMakoto/
-      - name: Build Makoto
+      - name: Test Build Makoto
         run: dotnet publish --configuration RELEASE --runtime linux-x64 --no-self-contained
         working-directory: ProjectMakotoTest/ProjectMakoto/
