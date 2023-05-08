@@ -325,7 +325,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         }
         catch (Exception)
         {
-            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Exception occured, check console.").AsEphemeral());
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Exception occurred, check console.").AsEphemeral());
         }
     }
 
