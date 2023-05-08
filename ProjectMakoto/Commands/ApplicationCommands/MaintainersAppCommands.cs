@@ -61,6 +61,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommand("developertools", "Developer Tools used to manage Makoto.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "<Pending>")]
     public async Task DevTools(InteractionContext ctx, [Autocomplete(typeof(MaintainerAutoComplete))] [Option("command", "The command to run.", true)]string command, [Option("argument1", "Argument 1, if required")]string argument1 = "", [Option("argument2", "Argument 2, if required")]string argument2 = "", [Option("argument3", "Argument 3, if required")]string argument3 = "")
     {
         bool Require1()
@@ -96,209 +97,226 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             return;
         }
 
-        MaintainerAutoComplete.Commands Command = (MaintainerAutoComplete.Commands)Enum.Parse(typeof(MaintainerAutoComplete.Commands), command);
+        MaintainerAutoComplete.Commands Command;
 
-        switch (Command)
+        try
         {
-            case MaintainerAutoComplete.Commands.Info:
-                Task.Run(async () =>
-                {
-                    await new InfoCommand().ExecuteCommand(ctx, _bot);
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.RawGuild:
-                Task.Run(async () =>
-                {
-                    if (!Require1())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required"));
-                        return;
-                    }
+            Command = (MaintainerAutoComplete.Commands)Enum.Parse(typeof(MaintainerAutoComplete.Commands), command);
+        }
+        catch (Exception)
+        {
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Specified Command does not exist.").AsEphemeral());
+            return;
+        }
 
-                    await new RawGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+        try
+        {
+            switch (Command)
+            {
+                case MaintainerAutoComplete.Commands.Info:
+                    Task.Run(async () =>
                     {
-                        { "guild", argument1 is not null ? Convert.ToUInt64(argument1) : null }
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.BotNick:
-                Task.Run(async () =>
-                {
-                    await new BotnickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new InfoCommand().ExecuteCommand(ctx, _bot);
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.RawGuild:
+                    Task.Run(async () =>
                     {
-                        { "newNickname", argument1 }
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.BanUser:
-                Task.Run(async () =>
-                {
-                    if (!Require1() || !Require2())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required"));
-                        return;
-                    }
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
 
-                    await new BanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new RawGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "guild", argument1 is not null ? Convert.ToUInt64(argument1) : null }
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.BotNick:
+                    Task.Run(async () =>
                     {
+                        await new BotnickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "newNickname", argument1 }
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.BanUser:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1() || !Require2())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
+                            return;
+                        }
+
+                        await new BanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                            { "reason", argument2 },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.UnbanUser:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
+
+                        await new UnbanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.BanGuild:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1() || !Require2())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
+                            return;
+                        }
+
+                        await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "guild", Convert.ToUInt64(argument1) },
+                            { "reason", argument2 },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.UnbanGuild:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
+
+                        await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "guild", Convert.ToUInt64(argument1) },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.GlobalBan:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1() || !Require2())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
+                            return;
+                        }
+
+                        await new GlobalBanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                            { "reason", argument2 },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.GlobalUnban:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1() || !Require2())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
+                            return;
+                        }
+
+                        await new GlobalUnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
                         { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
-                        { "reason", argument2 },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.UnbanUser:
-                Task.Run(async () =>
-                {
-                    if (!Require1())
+                            { "UnbanFromGuilds", bool.Parse(argument2) },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.GlobalNotes:
+                    Task.Run(async () =>
                     {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required"));
-                        return;
-                    }
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
 
-                    await new UnbanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new GlobalNotesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.Log:
+                    Task.Run(async () =>
                     {
-                        { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.BanGuild:
-                Task.Run(async () =>
-                {
-                    if (!Require1() || !Require2())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required"));
-                        return;
-                    }
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
 
-                    await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new Commands.LogCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "Level", (LogLevel)Enum.Parse(typeof(LogLevel), argument1) },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.Stop:
+                    Task.Run(async () =>
                     {
-                        { "guild", Convert.ToUInt64(argument1) },
-                        { "reason", argument2 },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.UnbanGuild:
-                Task.Run(async () =>
-                {
-                    if (!Require1())
+                        await new StopCommand().ExecuteCommand(ctx, _bot);
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.Save:
+                    Task.Run(async () =>
                     {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required"));
-                        return;
-                    }
+                        await new SaveCommand().ExecuteCommand(ctx, _bot);
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.BatchLookup:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1())
+                        {
+                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
+                            return;
+                        }
 
-                    await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new BatchLookupCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "IDs", argument1 },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.CreateIssue:
+                    Task.Run(async () =>
                     {
-                        { "guild", Convert.ToUInt64(argument1) },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.GlobalBan:
-                Task.Run(async () =>
-                {
-                    if (!Require1() || !Require2())
+                        await new Commands.CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "UseOldTagsSelector", (bool.TryParse(argument1, out var result) ? result : true) },
+                        }, InitiateInteraction: false);
+                    }).Add(_bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.Evaluate:
+                    Task.Run(async () =>
                     {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required"));
-                        return;
-                    }
-
-                    await new GlobalBanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
-                        { "reason", argument2 },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.GlobalUnban:
-                Task.Run(async () =>
-                {
-                    if (!Require1() || !Require2())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required"));
-                        return;
-                    }
-
-                    await new GlobalUnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
-                        { "UnbanFromGuilds", bool.Parse(argument2) },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.GlobalNotes:
-                Task.Run(async () =>
-                {
-                    if (!Require1())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required"));
-                        return;
-                    }
-
-                    await new GlobalNotesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.Log:
-                Task.Run(async () =>
-                {
-                    if (!Require1())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required"));
-                        return;
-                    }
-
-                    await new Commands.LogCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "Level", (LogLevel)Enum.Parse(typeof(LogLevel), argument1) },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.Stop:
-                Task.Run(async () =>
-                {
-                    await new StopCommand().ExecuteCommand(ctx, _bot);
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.Save:
-                Task.Run(async () =>
-                {
-                    await new SaveCommand().ExecuteCommand(ctx, _bot);
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.BatchLookup:
-                Task.Run(async () =>
-                {
-                    if (!Require1())
-                    {
-                        await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required"));
-                        return;
-                    }
-
-                    await new BatchLookupCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "IDs", argument1 },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.CreateIssue:
-                Task.Run(async () =>
-                {
-                    await new Commands.CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "UseOldTagsSelector", bool.Parse(argument1) },
-                    }, InitiateInteraction: false);
-                }).Add(_bot.watcher, ctx);
-                break;
-            case MaintainerAutoComplete.Commands.Evaluate:
-                Task.Run(async () =>
-                {
-                    await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
-                    {
-                        { "message", (argument1.IsNullOrWhiteSpace() ? (await ctx.Channel.GetMessagesAsync(1))[0].Id : Convert.ToUInt64(argument1)) },
-                    });
-                }).Add(_bot.watcher, ctx);
-                break;
+                        await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        {
+                            { "message", (argument1.IsNullOrWhiteSpace() ? (await ctx.Channel.GetMessagesAsync(1))[0].Id : Convert.ToUInt64(argument1)) },
+                        });
+                    }).Add(_bot.watcher, ctx);
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Exception occured, check console.").AsEphemeral());
         }
     }
 
