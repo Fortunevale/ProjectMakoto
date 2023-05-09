@@ -47,4 +47,7 @@ public class User
 
     [JsonIgnore]
     public Cooldown Cooldown { get; set; }
+
+    [JsonIgnore]
+    public DateTime LastSuccessful2FA { get; set; } = DateTime.MinValue;
 }

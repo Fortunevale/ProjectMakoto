@@ -7,8 +7,6 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using ProjectMakoto.Entities.Plugins.Commands;
-
 namespace ProjectMakoto.ApplicationCommands;
 
 public class MaintainersAppCommands : ApplicationCommandsModule
@@ -35,6 +33,9 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             BatchLookup, 
             CreateIssue, 
             Evaluate,
+            Enroll2FA,
+            Quit2FASession,
+            Disenroll2FAUser,
         };
 
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
@@ -67,28 +68,39 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         bool Require1()
         {
             if (argument1.IsNullOrWhiteSpace())
+            {
+                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                 return false;
+            }
             else
                 return true;
         }
 
         bool Require2()
         {
-            if (argument1.IsNullOrWhiteSpace())
+            if (argument2.IsNullOrWhiteSpace())
+            {
+                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 2 required").AsEphemeral());
                 return false;
+            }
             else
                 return true;
         }
 
         bool Require3()
         {
-            if (argument1.IsNullOrWhiteSpace())
+            if (argument3.IsNullOrWhiteSpace())
+            {
+                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 3 required").AsEphemeral());
                 return false;
+            }
             else
                 return true;
         }
 
-        if (!ctx.User.IsMaintenance(_bot.status))
+
+
+        if (!ctx.User.IsMaintenance(this._bot.status))
         {
             DummyCommand dummyCommand = new();
             await dummyCommand.ExecuteCommand(ctx, this._bot);
@@ -116,210 +128,202 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 case MaintainerAutoComplete.Commands.Info:
                     Task.Run(async () =>
                     {
-                        await new InfoCommand().ExecuteCommand(ctx, _bot);
-                    }).Add(_bot.watcher, ctx);
+                        await new InfoCommand().ExecuteCommand(ctx, this._bot);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.RawGuild:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
-                        await new RawGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new RawGuildCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "guild", argument1 is not null ? Convert.ToUInt64(argument1) : null }
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.BotNick:
                     Task.Run(async () =>
                     {
-                        await new BotnickCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new BotnickCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "newNickname", argument1 }
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.BanUser:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
                             return;
-                        }
 
-                        await new BanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new BanUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "reason", argument2 },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.UnbanUser:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
-                        await new UnbanUserCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new UnbanUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.BanGuild:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
                             return;
-                        }
 
-                        await new BanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new BanGuildCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "guild", Convert.ToUInt64(argument1) },
-                            { "reason", argument2 },
+                            { "reason", argument2 }
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.UnbanGuild:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
-                        await new UnbanGuildCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new UnbanGuildCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "guild", Convert.ToUInt64(argument1) },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.GlobalBan:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
                             return;
-                        }
 
-                        await new GlobalBanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new GlobalBanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "reason", argument2 },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.GlobalUnban:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 & 2 required").AsEphemeral());
                             return;
-                        }
 
-                        await new GlobalUnbanCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new GlobalUnbanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
-                        { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "UnbanFromGuilds", bool.Parse(argument2) },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.GlobalNotes:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
-                        await new GlobalNotesCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new GlobalNotesCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.Log:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
-                        await new Commands.LogCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new Commands.LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "Level", (LogLevel)Enum.Parse(typeof(LogLevel), argument1) },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.Stop:
                     Task.Run(async () =>
                     {
-                        await new StopCommand().ExecuteCommand(ctx, _bot);
-                    }).Add(_bot.watcher, ctx);
+                        await new StopCommand().ExecuteCommandWith2FA(ctx, this._bot, null);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.Save:
                     Task.Run(async () =>
                     {
-                        await new SaveCommand().ExecuteCommand(ctx, _bot);
-                    }).Add(_bot.watcher, ctx);
+                        await new SaveCommand().ExecuteCommand(ctx, this._bot);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.BatchLookup:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
-                        await new BatchLookupCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new BatchLookupCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "IDs", argument1 },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.CreateIssue:
                     Task.Run(async () =>
                     {
-                        await new Commands.CreateIssueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new Commands.CreateIssueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "UseOldTagsSelector", (bool.TryParse(argument1, out var result) ? result : true) },
                         }, InitiateInteraction: false);
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
                     break;
                 case MaintainerAutoComplete.Commands.Evaluate:
                     Task.Run(async () =>
                     {
                         if (!Require1())
-                        {
-                            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Argument 1 required").AsEphemeral());
                             return;
-                        }
 
                         var id = Convert.ToUInt64(argument1);
                         var message = await ctx.Channel.GetMessageAsync(id);
 
-                        await new EvaluationCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+                        await new EvaluationCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "code", message.Content },
                         });
-                    }).Add(_bot.watcher, ctx);
+                    }).Add(this._bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.Enroll2FA:
+                    Task.Run(async () =>
+                    {
+                        await new EnrollTwoFactorCommand().ExecuteCommand(ctx, this._bot);
+                    }).Add(this._bot.watcher, ctx);
+                    break;
+                case MaintainerAutoComplete.Commands.Quit2FASession:
+                    Task.Run(async () =>
+                    {
+                        await new Quit2FASessionCommand().ExecuteCommand(ctx, this._bot);
+                    }).Add(this._bot.watcher, ctx);
+                    break;
+
+                case MaintainerAutoComplete.Commands.Disenroll2FAUser:
+                    Task.Run(async () =>
+                    {
+                        if (!Require1())
+                            return;
+
+                        await new Disenroll2FAUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        {
+                            { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
+                        });
+                    }).Add(this._bot.watcher, ctx);
                     break;
             }
         }
@@ -342,7 +346,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
                 throw new InvalidCastException();
-            }).Add(_bot.watcher, ctx);
+            }).Add(this._bot.watcher, ctx);
         }
     }
 #endif

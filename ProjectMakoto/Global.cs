@@ -25,6 +25,7 @@ global using DisCatSharp.Lavalink.EventArgs;
 global using DisCatSharp.Net;
 global using DisCatSharp.Extensions.TwoFactorCommands;
 global using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
+global using DisCatSharp.Extensions.TwoFactorCommands.Entities;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using MySql.Data.MySqlClient;

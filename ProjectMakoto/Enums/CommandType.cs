@@ -14,5 +14,6 @@ public enum CommandType
     ApplicationCommand,
     ContextMenu,
     PrefixCommand,
+    Event,
     Custom
 }
