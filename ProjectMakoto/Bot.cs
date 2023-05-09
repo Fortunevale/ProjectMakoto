@@ -707,7 +707,6 @@ public class Bot
                 cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
                 cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
                 cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
-                cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
 
                 _logger.LogDebug("Registering Command Converters..");
                 cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
