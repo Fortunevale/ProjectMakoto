@@ -13,31 +13,31 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
+    internal enum Commands
+    {
+        Info,
+        RawGuild,
+        BotNick,
+        BanUser,
+        UnbanUser,
+        BanGuild,
+        UnbanGuild,
+        GlobalBan,
+        GlobalUnban,
+        GlobalNotes,
+        Log,
+        Stop,
+        Save,
+        BatchLookup,
+        CreateIssue,
+        Evaluate,
+        Enroll2FA,
+        Quit2FASession,
+        Disenroll2FAUser,
+    };
+
     public class MaintainerAutoComplete : IAutocompleteProvider
     {
-        internal enum Commands
-        {
-            Info, 
-            RawGuild, 
-            BotNick, 
-            BanUser, 
-            UnbanUser, 
-            BanGuild, 
-            UnbanGuild, 
-            GlobalBan, 
-            GlobalUnban, 
-            GlobalNotes, 
-            Log, 
-            Stop, 
-            Save, 
-            BatchLookup, 
-            CreateIssue, 
-            Evaluate,
-            Enroll2FA,
-            Quit2FASession,
-            Disenroll2FAUser,
-        };
-
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
             try
@@ -61,9 +61,129 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         }
     }
 
+    public class ArgumentAutoComplete : IAutocompleteProvider
+    {
+        public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
+        {
+            try
+            {
+                Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+
+                if (!ctx.User.IsMaintenance(bot.status))
+                    return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
+
+                if (ctx.Options.Any(x => x.Name == "command"))
+                {
+                    int currentArgument = ctx.FocusedOption.Name switch
+                    {
+                        "argument1" => 1,
+                        "argument2" => 2,
+                        "argument3" => 3,
+                        "argument4" => 4,
+                        _ => -1,
+                    };
+
+                    if (ctx.FocusedOption.Value.ToString().Length > 1)
+                        return new List<DiscordApplicationCommandAutocompleteChoice>() { };
+
+                    Commands Command = (Commands)Enum.Parse(typeof(Commands), ctx.Options.First(x => x.Name == "command").Value.ToString());
+
+                    return Command switch
+                    {
+                        Commands.RawGuild => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.BotNick => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("NewNickName", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.BanUser => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
+                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.UnbanUser => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.BanGuild => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
+                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.UnbanGuild => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.GlobalBan => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
+                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.GlobalUnban => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
+                            2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UnbanFromServers (True/False)", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.GlobalNotes => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.Log => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("LogLevel", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.BatchLookup => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId, UserId, UserId, ...", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.CreateIssue => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UseOldSelector (True/False)", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.Evaluate => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("MessageId", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        Commands.Disenroll2FAUser => currentArgument switch
+                        {
+                            1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
+                            _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                        },
+                        _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
+                    };
+                }
+
+                return new List<DiscordApplicationCommandAutocompleteChoice>() { };
+            }
+            catch (Exception ex)
+            {
+                return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
+            }
+        }
+    }
+
     [SlashCommand("developertools", "Developer Tools used to manage Makoto.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "<Pending>")]
-    public async Task DevTools(InteractionContext ctx, [Autocomplete(typeof(MaintainerAutoComplete))] [Option("command", "The command to run.", true)]string command, [Option("argument1", "Argument 1, if required")]string argument1 = "", [Option("argument2", "Argument 2, if required")]string argument2 = "", [Option("argument3", "Argument 3, if required")]string argument3 = "")
+    public async Task DevTools(InteractionContext ctx, 
+        [Autocomplete(typeof(MaintainerAutoComplete))] [Option("command", "The command to run.", true)]string command, 
+        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument1", "Argument 1, if required", true)] string argument1 = "", 
+        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument2", "Argument 2, if required", true)] string argument2 = "",
+        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument3", "Argument 3, if required", true)] string argument3 = "")
     {
         bool Require1()
         {
@@ -109,11 +229,11 @@ public class MaintainersAppCommands : ApplicationCommandsModule
             return;
         }
 
-        MaintainerAutoComplete.Commands Command;
+        Commands Command;
 
         try
         {
-            Command = (MaintainerAutoComplete.Commands)Enum.Parse(typeof(MaintainerAutoComplete.Commands), command);
+            Command = (Commands)Enum.Parse(typeof(Commands), command);
         }
         catch (Exception)
         {
@@ -125,13 +245,13 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         {
             switch (Command)
             {
-                case MaintainerAutoComplete.Commands.Info:
+                case Commands.Info:
                     Task.Run(async () =>
                     {
                         await new InfoCommand().ExecuteCommand(ctx, this._bot);
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.RawGuild:
+                case Commands.RawGuild:
                     Task.Run(async () =>
                     {
                         if (!Require1())
@@ -143,7 +263,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.BotNick:
+                case Commands.BotNick:
                     Task.Run(async () =>
                     {
                         await new BotnickCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -152,7 +272,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.BanUser:
+                case Commands.BanUser:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
@@ -165,7 +285,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.UnbanUser:
+                case Commands.UnbanUser:
                     Task.Run(async () =>
                     {
                         if (!Require1())
@@ -177,7 +297,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.BanGuild:
+                case Commands.BanGuild:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
@@ -190,7 +310,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.UnbanGuild:
+                case Commands.UnbanGuild:
                     Task.Run(async () =>
                     {
                         if (!Require1())
@@ -202,7 +322,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.GlobalBan:
+                case Commands.GlobalBan:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
@@ -215,7 +335,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.GlobalUnban:
+                case Commands.GlobalUnban:
                     Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
@@ -228,7 +348,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.GlobalNotes:
+                case Commands.GlobalNotes:
                     Task.Run(async () =>
                     {
                         if (!Require1())
@@ -240,31 +360,31 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.Log:
+                case Commands.Log:
                     Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new Commands.LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "Level", (LogLevel)Enum.Parse(typeof(LogLevel), argument1) },
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.Stop:
+                case Commands.Stop:
                     Task.Run(async () =>
                     {
                         await new StopCommand().ExecuteCommandWith2FA(ctx, this._bot, null);
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.Save:
+                case Commands.Save:
                     Task.Run(async () =>
                     {
                         await new SaveCommand().ExecuteCommand(ctx, this._bot);
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.BatchLookup:
+                case Commands.BatchLookup:
                     Task.Run(async () =>
                     {
                         if (!Require1())
@@ -276,16 +396,16 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.CreateIssue:
+                case Commands.CreateIssue:
                     Task.Run(async () =>
                     {
-                        await new Commands.CreateIssueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new CreateIssueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "UseOldTagsSelector", (bool.TryParse(argument1, out var result) ? result : true) },
                         }, InitiateInteraction: false);
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.Evaluate:
+                case Commands.Evaluate:
                     Task.Run(async () =>
                     {
                         if (!Require1())
@@ -300,20 +420,20 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.Enroll2FA:
+                case Commands.Enroll2FA:
                     Task.Run(async () =>
                     {
                         await new EnrollTwoFactorCommand().ExecuteCommand(ctx, this._bot);
                     }).Add(this._bot.watcher, ctx);
                     break;
-                case MaintainerAutoComplete.Commands.Quit2FASession:
+                case Commands.Quit2FASession:
                     Task.Run(async () =>
                     {
                         await new Quit2FASessionCommand().ExecuteCommand(ctx, this._bot);
                     }).Add(this._bot.watcher, ctx);
                     break;
 
-                case MaintainerAutoComplete.Commands.Disenroll2FAUser:
+                case Commands.Disenroll2FAUser:
                     Task.Run(async () =>
                     {
                         if (!Require1())
