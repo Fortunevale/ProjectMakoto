@@ -11,6 +11,8 @@ namespace ProjectMakoto.Commands;
 
 internal class UnbanUserCommand : BaseCommand
 {
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
