@@ -82,7 +82,7 @@ public abstract class BaseCommand
                 var tfa = await ctx.RequestTwoFactorAsync();
 
                 if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
-                    await SwitchToEvent(tfa.Interaction);
+                    await SwitchToEvent(tfa.ComponentInteraction);
 
                 if (tfa.Result != TwoFactorResult.ValidCode)
                 {
