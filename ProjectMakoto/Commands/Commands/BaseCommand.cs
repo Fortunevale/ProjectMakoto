@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using DisCatSharp.Extensions.TwoFactorCommands.Enums;
+
 namespace ProjectMakoto.Commands;
 
 public abstract class BaseCommand
@@ -40,7 +42,7 @@ public abstract class BaseCommand
             await ExecuteCommand(this.ctx, arguments);
     }
 
-    public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
+    public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         if (InitiateInteraction)
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -51,12 +53,57 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 
         this.ctx.RespondedToInitial = InitiateInteraction;
+
+        if (InteractionInitiated)
+            this.ctx.RespondedToInitial = true;
 
         if (await BasePreExecutionCheck())
             await ExecuteCommand(this.ctx, arguments);
     }
 
-    public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true)
+    public async Task ExecuteCommandWith2FA(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
+    {
+        this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.ctx.RespondedToInitial = false;
+
+        if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
+        {
+            _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
+            {
+                Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
+            }.AsBotError(this.ctx)).AsEphemeral());
+            return;
+        }
+        else
+        {
+            if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
+            {
+                this.ctx.RespondedToInitial = true;
+                var tfa = await ctx.RequestTwoFactorAsync();
+
+                if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
+                    await SwitchToEvent(tfa.ComponentInteraction);
+
+                if (tfa.Result != TwoFactorResult.ValidCode)
+                {
+                    _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
+                    return;
+                }
+                _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+            }
+        }
+        
+        if (!this.ctx.RespondedToInitial)
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            {
+                IsEphemeral = true
+            });
+
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
+    }
+
+    public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         if (InitiateInteraction)
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -66,6 +113,9 @@ public abstract class BaseCommand
 
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.ctx.RespondedToInitial = InitiateInteraction;
+
+        if (InteractionInitiated)
+            this.ctx.RespondedToInitial = true;
 
         if (await BasePreExecutionCheck())
             await ExecuteCommand(this.ctx, arguments);
@@ -133,6 +183,17 @@ public abstract class BaseCommand
     }
     #endregion
 
+    public async Task SwitchToEvent(ComponentInteractionCreateEventArgs e)
+    {
+        await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+        {
+            IsEphemeral = true
+        });
+        this.ctx.RespondedToInitial = true;
+        this.ctx.OriginalComponentInteractionCreateEventArgs = e;
+        this.ctx.CommandType = Enums.CommandType.Event;
+    }
+
     #region RespondOrEdit
     public async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
         => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
@@ -181,6 +242,25 @@ public abstract class BaseCommand
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
                 var msg = await ctx.OriginalContextMenuContext.EditResponseAsync(discordWebhookBuilder);
+                ctx.ResponseMessage = msg;
+                return msg;
+            }
+
+            case Enums.CommandType.Event:
+            {
+                DiscordWebhookBuilder discordWebhookBuilder = new();
+
+                var files = new Dictionary<string, Stream>();
+
+                foreach (var b in discordMessageBuilder.Files)
+                    files.Add(b.FileName, b.Stream);
+
+                discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
+                discordWebhookBuilder.AddFiles(files);
+                discordWebhookBuilder.Content = discordMessageBuilder.Content;
+
+                DiscordMessage msg = await ctx.OriginalComponentInteractionCreateEventArgs.Interaction.EditOriginalResponseAsync(discordWebhookBuilder);
                 ctx.ResponseMessage = msg;
                 return msg;
             }
@@ -958,6 +1038,11 @@ public abstract class BaseCommand
             case Enums.CommandType.ContextMenu:
             {
                 _ = ctx.OriginalContextMenuContext.DeleteResponseAsync();
+                break;
+            }
+            case Enums.CommandType.Event:
+            {
+                _ = ctx.OriginalComponentInteractionCreateEventArgs.Interaction.DeleteOriginalResponseAsync();
                 break;
             }
             case Enums.CommandType.ApplicationCommand:

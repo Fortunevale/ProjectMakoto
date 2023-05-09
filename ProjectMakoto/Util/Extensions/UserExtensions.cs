@@ -11,7 +11,19 @@ namespace ProjectMakoto.Util;
 
 internal static class UserExtensions
 {
-    internal static bool IsMaintenance(this DiscordMember member, Status _status) => (member as DiscordUser).IsMaintenance(_status);
+    internal static bool IsTeamOwner(this DiscordMember member, Status _status)
+    => (member as DiscordUser).IsTeamOwner(_status);
+
+    internal static bool IsTeamOwner(this DiscordUser user, Status _status)
+    {
+        if (_status.TeamOwner == user.Id)
+            return true;
+
+        return false;
+    }
+
+    internal static bool IsMaintenance(this DiscordMember member, Status _status) 
+        => (member as DiscordUser).IsMaintenance(_status);
 
     internal static bool IsMaintenance(this DiscordUser user, Status _status)
     {

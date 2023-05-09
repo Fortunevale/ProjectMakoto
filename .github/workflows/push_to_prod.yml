@@ -15,10 +15,10 @@ jobs:
         with:
           key: ${{ secrets.SSH_TOKEN }}
           known_hosts: ${{ secrets.SSH_KNOWN_HOST }}
-      - name: Setup .NET Core SDK 6.x
+      - name: Setup .NET Core SDK 7.x
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.x'
+          dotnet-version: '7.x'
       - name: "Clone Repository"
         uses: actions/checkout@v3
         with:

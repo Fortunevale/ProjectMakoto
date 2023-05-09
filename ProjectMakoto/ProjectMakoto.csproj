@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>ProjectMakoto</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>annotations</Nullable>
@@ -37,13 +37,13 @@
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-041" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-041" />
     <PackageReference Include="DisCatSharp.Common" Version="10.3.3-nightly-041" />
-    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-006" />
+    <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-007" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-041" />
     <PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-041" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0-1.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.6.0-1.final" />
     <PackageReference Include="MySql.Data" Version="8.0.33" />
-    <PackageReference Include="Octokit" Version="5.1.0" />
+    <PackageReference Include="Octokit" Version="6.0.0" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
   </ItemGroup>

@@ -13,6 +13,30 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    internal static string FileSizeToHumanReadable(this int size)
+        => GetHumanReadableSize((long)size);
+
+    internal static string FileSizeToHumanReadable(this uint size)
+    => GetHumanReadableSize((long)size);
+
+    internal static string FileSizeToHumanReadable(this long size)
+        => GetHumanReadableSize((long)size);
+
+    internal static string FileSizeToHumanReadable(this ulong size)
+    => GetHumanReadableSize((long)size);
+
+    private static string GetHumanReadableSize(this long size)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        int order = 0;
+        while (size >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            size /= 1024;
+        }
+        return String.Format("{0:0.##} {1}", size, sizes[order]);
+    }
+
     internal static string GetSHA256(this string value)
     {
         StringBuilder Sb = new();

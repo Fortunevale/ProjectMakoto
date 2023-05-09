@@ -36,6 +36,7 @@ public class Config
 
     public string SupportServerInvite = "";
 
+    public DiscordConfig Discord = new();
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();
     public LavalinkConfig Lavalink = new();
@@ -44,6 +45,11 @@ public class Config
     public DontModifyConfig DontModify = new();
 
     public Dictionary<string, object> PluginData = new();
+
+    public class DiscordConfig
+    {
+        public uint MaxUploadSize = 8388608;
+    }
 
     public class ChannelsConfig
     {
@@ -159,162 +165,4 @@ public class Config
     {
         public string LastStartedVersion = "UNIDENTIFIED";
     }
-
-    #region Legacy
-    [Obsolete("Legacy")]
-    [JsonProperty("UseLavalinkAutoUpdater")]
-    public bool LegacyUseLavalinkAutoUpdater { set { Lavalink.UseAutoUpdater = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("LavalinkDownloadPreRelease")]
-    public bool LegacyLavalinkDownloadPreRelease { set { Lavalink.DownloadPreRelease = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("LavalinkJarFolderPath")]
-    public string LegacyLavalinkJarFolderPath { set { Lavalink.JarFolderPath = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("DotEmoji")]
-    public string LegacyDotEmoji { set { Emojis.Dot = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("DisabledRepeatEmoji")]
-    public string LegacyDisabledRepeatEmoji { set { Emojis.DisabledRepeat = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("DisabledShuffleEmoji")]
-    public string LegacyDisabledShuffleEmoji { set { Emojis.DisabledShuffle = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("PausedEmoji")]
-    public string LegacyPausedEmoji { set { Emojis.Paused = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("DisabledPlayEmoji")]
-    public string LegacyDisabledPlayEmoji { set { Emojis.DisabledPlay = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("JoinEventsEmojis")]
-    public string[] LegacyJoinEventsEmojis { set { Emojis.JoinEvent = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CuddleEmoji")]
-    public string LegacyCuddleEmoji { set { Emojis.Cuddle = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("KissEmoji")]
-    public string LegacyKissEmoji { set { Emojis.Kiss = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("SlapEmoji")]
-    public string LegacySlapEmoji { set { Emojis.Slap = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("ProudEmoji")]
-    public string LegacyProudEmoji { set { Emojis.Proud = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("HugEmoji")]
-    public string LegacyHugEmoji { set { Emojis.Hug = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CheckboxTickedRedEmojiId")]
-    public ulong LegacyCheckboxTickedRedEmojiId { set { Emojis.CheckboxTickedRedId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CheckboxUntickedRedEmojiId")]
-    public ulong LegacyCheckboxUntickedRedEmojiId { set { Emojis.CheckboxUntickedRedId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CheckboxTickedBlueEmojiId")]
-    public ulong LegacyCheckboxTickedBlueEmojiId { set { Emojis.CheckboxTickedBlueId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CheckboxUntickedBlueEmojiId")]
-    public ulong LegacyCheckboxUntickedBlueEmojiId { set { Emojis.CheckboxUntickedBlueId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CheckboxTickedGreenEmojiId")]
-    public ulong LegacyCheckboxTickedGreenEmojiId { set { Emojis.CheckboxTickedGreenId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("CheckboxUntickedGreenEmojiId")]
-    public ulong LegacyCheckboxUntickedGreenEmojiId { set { Emojis.CheckboxUntickedGreenId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("QuestionMarkEmojiId")]
-    public ulong LegacyQuestionMarkEmojiId { set { Emojis.QuestionMarkId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("ChannelEmojiId")]
-    public ulong LegacyChannelEmojiId { set { Emojis.ChannelId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("UserEmojiId")]
-    public ulong LegacyUserEmojiId { set { Emojis.UserId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("VoiceStateEmojiId")]
-    public ulong LegacyVoiceStateEmojiId { set { Emojis.VoiceStateId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("MessageEmojiId")]
-    public ulong LegacyMessageEmojiId { set { Emojis.MessageId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("GuildEmojiId")]
-    public ulong LegacyGuildEmojiId { set { Emojis.GuildId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("InviteEmojiId")]
-    public ulong LegacyInviteEmojiId { set { Emojis.InviteId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("YouTubeEmojiId")]
-    public ulong LegacyYouTubeEmojiId { set { Emojis.YouTubeId = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("SoundCloudEmojiId")]
-    public ulong LegacySoundCloudEmojiId { set { Emojis.SoundCloudId = value; } } 
-    
-    [Obsolete("Legacy")]
-    [JsonProperty("DisboardAccountId")]
-    public ulong LegacyDisboardAccountId { set { Accounts.Disboard = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("GlobalBanAnnouncementsChannelId")]
-    public ulong LegacyGlobalBanAnnouncementsChannelId { set { Channels.GlobalBanAnnouncements = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("GithubLogChannelId")]
-    public ulong LegacyGithubLogChannelId { set { Channels.GithubLog = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("NewsChannelId")]
-    public ulong LegacyNewsChannelId { set { Channels.News = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("AssetsGuildId")]
-    public ulong LegacyAssetsGuildId { set { Channels.Assets = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("GraphAssetsChannelId")]
-    public ulong LegacyGraphAssetsChannelId { set { Channels.GraphAssets = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("PlaylistAssetsChannelId")]
-    public ulong LegacyPlaylistAssetsChannelId { set { Channels.PlaylistAssets = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("UrlSubmissionsChannelId")]
-    public ulong LegacyUrlSubmissionsChannelId { set { Channels.UrlSubmissions = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("OtherAssetsChannelId")]
-    public ulong LegacyOtherAssetsChannelId { set { Channels.OtherAssets = value; } }
-
-    [Obsolete("Legacy")]
-    [JsonProperty("ExceptionLogChannelId")]
-    public ulong LegacyExceptionLogChannelId { set { Channels.ExceptionLog = value; } }
-    #endregion
 }

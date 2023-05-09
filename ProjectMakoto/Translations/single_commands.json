@@ -893,5 +893,38 @@
         }
       }
     ]
+  },
+  {
+    "name": "developertools",
+    "description": "Developer Tools used to manage Makoto.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "command",
+        "description": "The command to run.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "argument1",
+        "description": "Argument 1, if required",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "argument2",
+        "description": "Argument 2, if required",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "argument3",
+        "description": "Argument 3, if required",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
   }
 ]

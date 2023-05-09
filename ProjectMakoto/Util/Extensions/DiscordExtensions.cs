@@ -11,9 +11,12 @@ namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
     internal static string GetUsername(this DiscordUser user)
         => user.IsMigrated ? user.GlobalName : user.Username;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0102:[Discord] Deprecated", Justification = "<Pending>")]
     internal static string GetUsernameWithIdentifier(this DiscordUser user)
         => user.IsMigrated ? user.UsernameWithGlobalName : user.UsernameWithDiscriminator;
 
@@ -231,5 +234,20 @@ internal static class DiscordExtensions
                   .Replace("7", "7️⃣")
                   .Replace("8", "8️⃣")
                   .Replace("9", "9️⃣");
+    }
+
+    public async static Task<DiscordUser> ParseStringAsUser(string str, DiscordClient client)
+    {
+        if (str.IsDigitsOnly())
+            return await client.GetUserAsync(UInt64.Parse(str));
+        else
+        {
+            var reg = RegexTemplates.UserMention.Match(str);
+
+            if (reg.Success)
+                return await client.GetUserAsync(UInt64.Parse(reg.Groups[3].Value));
+        }
+
+        throw new ArgumentException("");
     }
 }

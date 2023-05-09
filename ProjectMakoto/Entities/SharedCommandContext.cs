@@ -282,4 +282,9 @@ public class SharedCommandContext
     /// The original context.
     /// </summary>
     public InteractionContext OriginalInteractionContext { get; set; }
+
+    /// <summary>
+    /// The original event args.
+    /// </summary>
+    public ComponentInteractionCreateEventArgs OriginalComponentInteractionCreateEventArgs { get; set; }
 }

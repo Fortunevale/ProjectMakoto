@@ -22,7 +22,7 @@ internal class PhishingSubmissionEvents
     {
         _ = Task.Run(async () =>
         {
-            if (_bot.submittedUrls.ContainsKey(e.Message.Id))
+            if (_bot.submittedUrls.ContainsKey(e.Message?.Id ?? 0))
             {
                 if (!e.User.IsMaintenance(_bot.status))
                     return;

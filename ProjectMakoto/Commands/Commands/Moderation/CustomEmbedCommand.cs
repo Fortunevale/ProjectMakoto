@@ -214,9 +214,9 @@ internal class CustomEmbedCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
-                            if (stream.fileSize > 8000000)
+                            if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()}.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -309,9 +309,9 @@ internal class CustomEmbedCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
-                        if (stream.fileSize > 8000000)
+                        if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()}.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -373,9 +373,9 @@ internal class CustomEmbedCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
-                        if (stream.fileSize > 8000000)
+                        if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()} .`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -488,9 +488,9 @@ internal class CustomEmbedCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
 
-                            if (stream.fileSize > 8000000)
+                            if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below 8mb.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()} .`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }

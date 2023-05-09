@@ -577,7 +577,17 @@ public class Bot
             };
 
             discordClient.UseLavalink();
-            // var tfa = discordClient.UseTwoFactor();
+
+            _logger.LogDebug("Registering DisCatSharp TwoFactor..");
+
+            var tfa = discordClient.UseTwoFactor(new TwoFactorConfiguration
+            {
+                ResponseConfiguration = new TwoFactorResponseConfiguration
+                {
+                    ShowResponse = false,
+                    AuthenticatorAccountPrefix = "Project Makoto"
+                }
+            });
 
             _logger.LogDebug("Registering DisCatSharp EventHandler..");
 
@@ -697,7 +707,6 @@ public class Bot
                 cNext.RegisterCommands<PrefixCommands.ScoreSaberPrefixCommands>();
                 cNext.RegisterCommands<PrefixCommands.ModerationPrefixCommands>();
                 cNext.RegisterCommands<PrefixCommands.ConfigurationPrefixCommands>();
-                cNext.RegisterCommands<PrefixCommands.MaintainersPrefixCommands>();
 
                 _logger.LogDebug("Registering Command Converters..");
                 cNext.RegisterConverter(new CustomArgumentConverter.BoolConverter());
