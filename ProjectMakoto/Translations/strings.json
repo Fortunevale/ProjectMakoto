@@ -1765,258 +1765,332 @@
     },
     "Music": {
       "NotSameChannel": {
-        "en": "You aren't in the same channel as the bot."
+        "en": "You aren't in the same channel as the bot.",
+        "de": "Du bist nicht im gleichen Kanal wie der Bot."
       },
       "DjRole": {
-        "en": "You need Administrator Permissions or a role called '{Role}' to utilize this command."
+        "en": "You need Administrator Permissions or a role called '{Role}' to utilize this command.",
+        "de": "Du brauchst Administrator Rechte oder eine Rolle mit dem Namen '{Role}' um diesen Befehl zu verwenden."
       },
       "ClearQueue": {
         "AlreadyVoted": {
-          "en": "You already voted to clear the current queue."
+          "en": "You already voted to clear the current queue.",
+          "de": "Du hast bereits dafür gestimmt die Warteschlange zu leeren."
         },
         "Cleared": {
-          "en": "The queue was cleared."
+          "en": "The queue was cleared.",
+          "de": "Die Warteschlange wurde geleert."
         },
         "VoteStarted": {
-          "en": "You voted to clear the current queue."
+          "en": "You voted to clear the current queue.",
+          "de": "Du hast dafür gestimmt die Warteschlange zu leeren."
         },
         "VoteButton": {
-          "en": "Vote to clear the current queue"
+          "en": "Vote to clear the current queue",
+          "de": "Dafür stimmen die Warteschlange zu leeren"
         }
       },
       "Disconnect": {
         "AlreadyVoted": {
-          "en": "You already voted to disconnect the bot."
+          "en": "You already voted to disconnect the bot.",
+          "de": "Du hast bereits dafür gestimmt den Bot zu disconnecten."
         },
         "Disconnected": {
-          "en": "The bot was disconnected."
+          "en": "The bot was disconnected.",
+          "de": "Der Bot wurde disconnected."
         },
         "VoteStarted": {
-          "en": "You voted to disconnect the bot."
+          "en": "You voted to disconnect the bot.",
+          "de": "Du hast dafür gestimmt den Bot zu disconnecten."
         },
         "VoteButton": {
-          "en": "Vote to disconnect"
+          "en": "Vote to disconnect",
+          "de": "Dafür stimmen dass der Bot disconnected"
         }
       },
       "ForceClearQueue": {
         "Cleared": {
-          "en": "The queue was force cleared."
+          "en": "The queue was force cleared.",
+          "de": "Die Warteschlange wurde zwanghaft geleert."
         }
       },
       "ForceDisconnect": {
         "Disconnected": {
-          "en": "The bot was force disconnected."
+          "en": "The bot was force disconnected.",
+          "de": "Der Bot wurde zwanghaft disconnected."
         }
       },
       "ForceSkip": {
         "Skipped": {
-          "en": "The song was force skipped."
+          "en": "The song was force skipped.",
+          "de": "Das aktuelle Lied wurde zwanghaft übersprungen."
         }
       },
       "Pause": {
         "Paused": {
-          "en": "Paused playback."
+          "en": "Paused playback.",
+          "de": "Wiedergabe pausiert."
         },
         "Resumed": {
-          "en": "Resumed playback."
+          "en": "Resumed playback.",
+          "de": "Wiedergabe fortgesetzt."
         }
       },
       "Play": {
         "Preparing": {
-          "en": "Preparing connection.."
+          "en": "Preparing connection..",
+          "de": "Bereite Verbindung vor.."
         },
         "QueuedMultiple": {
-          "en": "Queued {Count} songs from {Playlist}."
+          "en": "Queued {Count} songs from {Playlist}.",
+          "de": "{Count} Lieder von der Wiedergabeliste {Playlist} in die Warteschlange geladen."
         },
         "QueuedSingle": {
-          "en": "Queued {Track}."
+          "en": "Queued {Track}.",
+          "de": "{Track} ist nun in der Warteschlange."
         },
         "QueuePositions": {
-          "en": "Queue Positions"
+          "en": "Queue Positions",
+          "de": "Positionen in der Warteschlange"
         },
         "QueuePosition": {
-          "en": "Queue Position"
+          "en": "Queue Position",
+          "de": "Position in der Warteschlange"
         },
         "Uploader": {
-          "en": "Uploaded by"
+          "en": "Uploaded by",
+          "de": "Hochgeladen von"
         },
         "Duration": {
-          "en": "Duration"
+          "en": "Duration",
+          "de": "Dauer"
         },
         "LookingFor": {
-          "en": "Looking for '{Search}'.."
+          "en": "Looking for '{Search}'..",
+          "de": "Suche nach '{Search}'.."
         },
         "LookingForPlatform": {
-          "en": "Looking for '{Search}' on {Platform}.."
+          "en": "Looking for '{Search}' on {Platform}..",
+          "de": "Sache nach '{Search}' auf {Platform}.."
         },
         "PlatformSelect": {
-          "en": "On what platform do you want to search?"
+          "en": "On what platform do you want to search?",
+          "de": "Auf welcher Plattform möchtest du suchen?"
         },
         "FailedToLoad": {
-          "en": "Failed to load '{Search}'."
+          "en": "Failed to load '{Search}'.",
+          "de": "Suche '{Search}' fehlgeschlagen."
         },
         "NoMatches": {
-          "en": "No matches found for '{Search}'."
+          "en": "No matches found for '{Search}'.",
+          "de": "Keine Ergebnisse für '{Search}'."
         },
         "SearchSuccess": {
-          "en": "Found {Count} load result(s). Please select the song you want to add below."
+          "en": "Found {Count} load result(s). Please select the song you want to add below.",
+          "de": "{Count} Ergebnisse gefunden. Wähle das Lied was du hinzufügen möchstest."
         }
       },
       "Queue": {
         "QueueCount": {
-          "en": "There's currently {Count} song(s) queued. This queue last for {Timespan}."
+          "en": "There's currently {Count} song(s) queued. This queue last for {Timespan}.",
+          "de": "Aktuell befinden sich {Count} Lieder in der Warteschlange. Diese Warteschlange wird {Timestamp} dauern."
         },
         "Track": {
-          "en": "{Video} requested by {Requester}"
+          "en": "{Video} requested by {Requester}",
+          "de": "{Video} angefragt von {Requester}"
         },
         "CurrentlyPlaying": {
-          "en": "Currently playing"
+          "en": "Currently playing",
+          "de": "Aktuell spielt"
         },
         "NoSong": {
-          "en": "No song is playing"
+          "en": "No song is playing",
+          "de": "Kein Lied spielt"
         }
       },
       "Join": {
         "Joined": {
-          "en": "The bot joined your channel."
+          "en": "The bot joined your channel.",
+          "de": "Der Bot ist deinem Kanal beigetreten."
         },
         "AlreadyUsed": {
-          "en": "The bot is already in use."
+          "en": "The bot is already in use.",
+          "de": "Der Bot wird bereits verwendet."
         }
       },
       "RemoveQueue": {
         "OutOfRange": {
-          "en": "Your value is out of range. Currently, the range is {Min}-{Max}."
+          "en": "Your value is out of range. Currently, the range is {Min}-{Max}.",
+          "de": "Dein Eingabe ist außerhalb des möglichen Bereichs. Aktuell ist der Bereich {Min}-{Max}."
         },
         "NoSong": {
-          "en": "There is no such song queued."
+          "en": "There is no such song queued.",
+          "de": "Dieses Lied ist nicht in der Warteschlange."
         },
         "Removed": {
-          "en": "Removed {Track} from the current queue."
+          "en": "Removed {Track} from the current queue.",
+          "de": "{Track} wurde von der Warteschlange entfernt."
         }
       },
       "Repeat": {
         "On": {
-          "en": "The queue now repeats itself."
+          "en": "The queue now repeats itself.",
+          "de": "Die Warteschlange wiederholt sich jetzt."
         },
         "Off": {
-          "en": "The queue no longer repeats itself."
+          "en": "The queue no longer repeats itself.",
+          "de": "Die Warteschlange wiederholt sich nicht mehr."
         }
       },
       "Shuffle": {
         "On": {
-          "en": "The queue now shuffles."
+          "en": "The queue now shuffles.",
+          "de": "Die Warteschlange ist nun gemischt."
         },
         "Off": {
-          "en": "The queue no longer shuffles."
+          "en": "The queue no longer shuffles.",
+          "de": "Die Warteschlange ist nicht mehr gemischt."
         }
       },
       "Skip": {
         "AlreadyVoted": {
-          "en": "You already voted to skip the current song."
+          "en": "You already voted to skip the current song.",
+          "de": "Du hast bereits dafür gestimmt das aktuelle Lied zu überspringen."
         },
         "Skipped": {
-          "en": "The song was skipped."
+          "en": "The song was skipped.",
+          "de": "Das Lied wurde übersprungen."
         },
         "VoteStarted": {
-          "en": "You voted to skip the current song."
+          "en": "You voted to skip the current song.",
+          "de": "Du hast dafür gestimmt das aktuelle Lied zu überspringen."
         },
         "VoteButton": {
-          "en": "Vote to skip the current song"
+          "en": "Vote to skip the current song",
+          "de": "Dafür stimmen das aktuelle zu überspringen"
         }
       },
       "Playlists": {
         "Title": {
-          "en": "Playlists"
+          "en": "Playlists",
+          "de": "Wiedergabelisten"
         },
         "PlayListLimit": {
-          "en": "You already have {Count} playlists stored. Please delete on to create a new one."
+          "en": "You already have {Count} playlists stored. Please delete on to create a new one.",
+          "de": "Du hast bereits {Count} Wiedergabelisten. Bitte lösch eine um eine neue zu erstellen."
         },
         "NoPlaylist": {
-          "en": "That playlist does not exist."
+          "en": "That playlist does not exist.",
+          "de": "Diese Wiedergabeliste exisiert nicht."
         },
         "Tracks": {
-          "en": "Tracks"
+          "en": "Tracks",
+          "de": "Lieder"
         },
         "NameModerationNote": {
-          "en": "Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥"
+          "en": "Please note: Playlist Names are being moderated. If your playlist name is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥",
+          "de": "Bitte beachte: Namen von Wiedergabelisten werden moderiert. Falls der Name als schädlich identifiziert wurde, wird sie entfernt und du verlierst Zugriff auf Makoto. Dies beinhaltet dass der Bot von Server entfernt wird welche du besitzt oder verwaltest."
         },
         "ThumbnailModerationNote": {
-          "en": "Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥"
+          "en": "Please note: Playlist thumbnails are being moderated. If your thumbnail is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥",
+          "de": "Bitte beachte: Thumbnails von Wiedergabelisten werden moderiert. Falls das Thumbnail als schädlich identifiziert wurde, wird sie entfernt und du verlierst Zugriff auf Makoto. Dies beinhaltet dass der Bot von Server entfernt wird welche du besitzt oder verwaltest."
         },
         "LoadShare": {
           "Loading": {
-            "en": "Loading the shared playlists.."
+            "en": "Loading the shared playlists..",
+            "de": "Lade geteilte Wiedergabeliste.."
           },
           "NotFound": {
-            "en": "The specified sharecode couldn't be found."
+            "en": "The specified sharecode couldn't be found.",
+            "de": "Es wurde keine Wiedergabeliste mit diesem Code gefunden."
           },
           "Found": {
-            "en": "Playlist found! Please check details of the playlist below and confirm or deny whether you want to import this playlist."
+            "en": "Playlist found! Please check details of the playlist below and confirm or deny whether you want to import this playlist.",
+            "de": "Wiedergabeliste gefunden! Bitte überprüfe die Details der Wiedergabeliste und besätige oder lehne das Importieren ab."
           },
           "PlaylistName": {
-            "en": "Playlist Name"
+            "en": "Playlist Name",
+            "de": "Wiedergabelistenname"
           },
           "CreatedBy": {
-            "en": "Created by"
+            "en": "Created by",
+            "de": "Erstellt von"
           },
           "ImportButton": {
-            "en": "Import this playlist"
+            "en": "Import this playlist",
+            "de": "Wiedergabeliste importieren"
           },
           "Importing": {
-            "en": "Importing playlist.."
+            "en": "Importing playlist..",
+            "de": "Importiere Wiedergabeliste.."
           },
           "Imported": {
-            "en": "The playlist '{Name}' has been added to your playlists."
+            "en": "The playlist '{Name}' has been added to your playlists.",
+            "de": "Die Wiedergabeliste '{Name}' wurde zu deinen Wiedergabelisten hinzugefügt."
           }
         },
         "Manage": {
           "NoPlaylists": {
-            "en": "No playlist created yet."
+            "en": "No playlist created yet.",
+            "de": "Noch keine Wiedergabeliste erstellt."
           },
           "AddToQueueButton": {
-            "en": "Add a playlist to the current queue"
+            "en": "Add a playlist to the current queue",
+            "de": "Wiedergabeliste zur aktuellen Warteschlange hinzufügen"
           },
           "ShareButton": {
-            "en": "Share a playlist"
+            "en": "Share a playlist",
+            "de": "Wiedergabeliste teilen"
           },
           "ExportButton": {
-            "en": "Export a playlist"
+            "en": "Export a playlist",
+            "de": "Wiedergabeliste exportieren"
           },
           "ImportButton": {
-            "en": "Import a playlist"
+            "en": "Import a playlist",
+            "de": "Wiedergabeliste importieren"
           },
           "SaveCurrentButton": {
-            "en": "Save current queue as playlist"
+            "en": "Save current queue as playlist",
+            "de": "Aktuelle Warteschlange als Wiedergabeliste speichern"
           },
           "CreateNewButton": {
-            "en": "Create new playlist"
+            "en": "Create new playlist",
+            "de": "Neue Wiedergabeliste erstellen"
           },
           "ModifyButton": {
-            "en": "Modify a playlist"
+            "en": "Modify a playlist",
+            "de": "Wiedergabeliste bearbeiten"
           },
           "DeleteButton": {
-            "en": "Delete a playlist"
+            "en": "Delete a playlist",
+            "de": "Wiedergabeliste löschen"
           },
           "PlaylistSelectorQueue": {
-            "en": "Which playlist do you want to add to the queue?"
+            "en": "Which playlist do you want to add to the queue?",
+            "de": "Welche Wiedergabeliste willst du zur Warteschlange hinzufügen?"
           },
           "PlaylistSelectorShare": {
-            "en": "Which playlist do you want to share?"
+            "en": "Which playlist do you want to share?",
+            "de": "Welche Wiedergabeliste willst du teilen?"
           },
           "PlaylistSelectorExport": {
-            "en": "Which playlist do you want to export?"
+            "en": "Which playlist do you want to export?",
+            "de": "Welche Wiedergabeliste willst du exportieren?"
           },
           "PlaylistSelectorModify": {
-            "en": "Which playlist do you want to modify?"
+            "en": "Which playlist do you want to modify?",
+            "de": "Welche Wiedergabeliste möchtest du bearbeiten?"
           },
           "PlaylistSelectorDelete": {
-            "en": "Which playlist do you want to delete?"
+            "en": "Which playlist do you want to delete?",
+            "de": "Welche Wiedergabeliste möchtest du löschen?"
           }
         },
         "AddToQueue": {
           "Adding": {
-            "en": "Adding '{Name}' with {Count} track(s) to the queue.."
+            "en": "Adding '{Name}' with {Count} track(s) to the queue..",
+            "de": "Füge '{Name}' mit {Count} Liedern zu Warteschlange hinzu.."
           }
         },
         "Share": {
@@ -2026,146 +2100,195 @@
               "",
               "For others to use your playlist, instruct them to run:",
               "{Command}"
+            ],
+            "de": [
+              "Deine Wiedergabeliste ist bereit zum Teilen!",
+              "",
+              "Um dass andere deine Playlist importieren können müssen sie diesen Befehl verwenden:",
+              "{Command}"
             ]
           }
         },
         "Export": {
           "Exported": {
             "en": "Exported your playlist '{Name}' to json. Please download the attached file."
-          }
+          },
+          "de": "Deine Wiedergabeliste '{Name}' wurde als Json exportiert. Bitte lade die angehängte Datei herunter."
         },
         "Delete": {
           "Deleting": {
-            "en": "Deleting your playlist '{Name}'.."
+            "en": "Deleting your playlist '{Name}'..",
+            "de": "Lösche deine Wiedergabeliste '{Name}'.."
           },
           "Deleted": {
-            "en": "Your playlist '{Name}' has ben deleted."
+            "en": "Your playlist '{Name}' has ben deleted.",
+            "de": "Deine Wiedergabeliste '{Name}' wurde gelöscht."
           }
         },
         "Import": {
           "Link": {
-            "en": "Link"
+            "en": "Link",
+            "de": "Url"
           },
           "ExportedPlaylist": {
-            "en": "Exported Playlist"
+            "en": "Exported Playlist",
+            "de": "Exportierte Wiedergabeliste"
           },
           "ImportMethod": {
-            "en": "Do you want to import a playlist via link or exported playlist?"
+            "en": "Do you want to import a playlist via link or exported playlist?",
+            "de": "Möchtest du eine Wiedergabeliste importieren als Url oder exportierte Wiedergabeliste?"
           },
           "ImportPlaylist": {
-            "en": "Import Playlist"
+            "en": "Import Playlist",
+            "de": "Wiedergabeliste importieren"
           },
           "PlaylistUrl": {
-            "en": "Playlist Url"
+            "en": "Playlist Url",
+            "de": "Wiedergabelisten- Url"
           },
           "NotLoaded": {
-            "en": "Couldn't load a playlist from this url."
+            "en": "Couldn't load a playlist from this url.",
+            "de": "Konnte keine Wiedergabeliste von der Url laden."
           },
           "Creating": {
-            "en": "Creating your playlist.."
+            "en": "Creating your playlist..",
+            "de": "Erstelle deine Wiedergabeliste.."
           },
           "Created": {
-            "en": "Your playlist '{Name}' with {Count} entries has been created."
+            "en": "Your playlist '{Name}' with {Count} entries has been created.",
+            "de": "Deine Wiedergabeliste '{Name}' mit {Count} Liedern wurde erstellt."
           },
           "UploadExport": {
-            "en": "Please upload an exported playlist via '{Command}'."
+            "en": "Please upload an exported playlist via '{Command}'.",
+            "de": "Bitte lade eine exportierte Playlist hoch via '{Command}'."
           },
           "Importing": {
-            "en": "Importing your attachment.."
+            "en": "Importing your attachment..",
+            "de": "Importiere deinen Anhang.."
           },
           "ImportFailed": {
-            "en": "Failed to import your attachment. Is this a valid playlist?"
+            "en": "Failed to import your attachment. Is this a valid playlist?",
+            "de": "Import deines Anhangs ist fehlgeschlagen. Ist das eine kompatible Playlist?"
           }
         },
         "CreatePlaylist": {
           "ChangeName": {
-            "en": "Change Playlist Name"
+            "en": "Change Playlist Name",
+            "de": "Name ändern"
           },
           "ChangeTracks": {
-            "en": "Change First Tracks"
+            "en": "Change First Tracks",
+            "de": "Die ersten Lieder ändern"
           },
           "CreatePlaylist": {
-            "en": "Create Playlist"
+            "en": "Create Playlist",
+            "de": "Wiedergabeliste erstellen"
           },
           "PlaylistName": {
-            "en": "Playlist Name"
+            "en": "Playlist Name",
+            "de": "Wiedergabenliste Name"
           },
           "FirstTracks": {
-            "en": "First Track(s)"
+            "en": "First Track(s)",
+            "de": "Erste Lieder"
           },
           "SetPlaylistName": {
-            "en": "Set a playlist name"
+            "en": "Set a playlist name",
+            "de": "Name der Wiedergabeliste"
           },
           "SetFirstTracks": {
-            "en": "Set first track(s) for your playlist"
+            "en": "Set first track(s) for your playlist",
+            "de": "Erste Lieder der Wiedergabeliste"
           },
           "SupportedAddType": {
-            "en": "Song Url, Playlist Url or Search Query"
+            "en": "Song Url, Playlist Url or Search Query",
+            "de": "Lied Url, Wiedergabeliste Url oder Suchbegriff"
           },
           "Creating": {
-            "en": "Creating your playlist.."
+            "en": "Creating your playlist..",
+            "de": "Erstelle deine Wiedergabeliste.."
           },
           "Created": {
-            "en": "Your playlist '{Playlist}' has been created with {Count} entries."
+            "en": "Your playlist '{Playlist}' has been created with {Count} entries.",
+            "de": "Deine Wiedergabeliste '{Playlist}' mit {Count} Liedern wurde erstellt."
           }
         },
         "Modify": {
           "ChangeName": {
-            "en": "Change Name"
+            "en": "Change Name",
+            "de": "Name ändern"
           },
           "ChangeColor": {
-            "en": "Change Color"
+            "en": "Change Color",
+            "de": "Farbe ändern"
           },
           "ChangeThumbnail": {
-            "en": "Change Thumbnail"
+            "en": "Change Thumbnail",
+            "de": "Thumbnail ändern"
           },
           "AddTracks": {
-            "en": "Add tracks"
+            "en": "Add tracks",
+            "de": "Lieder hinzufügen"
           },
           "RemoveTracks": {
-            "en": "Remove tracks"
+            "en": "Remove tracks",
+            "de": "Lieder entfernen"
           },
           "RemoveDuplicates": {
-            "en": "Remove all duplicates"
+            "en": "Remove all duplicates",
+            "de": "Alle doppelten Lieder entfernen"
           },
           "CurrentTrackCount": {
-            "en": "There's currently {Count} tracks(s) in this playlist. This playlist lasts for {Timespan}."
+            "en": "There's currently {Count} tracks(s) in this playlist. This playlist lasts for {Timespan}.",
+            "de": "Aktuell befinden sich {Count} Lieder in dieser Wiedergabeliste. Sie wird {Timestamp} dauern."
           },
           "Track": {
-            "en": "{Track} added {Timestamp}"
+            "en": "{Track} added {Timestamp}",
+            "de": "{Track} hinzugefügt {Timestamp}"
           },
           "ModifyingPlaylist": {
-            "en": "Modifying your playlist"
+            "en": "Modifying your playlist",
+            "de": "Modifiziere deine Wiedergabeliste"
           },
           "TrackLimit": {
-            "en": "You already have 250 Tracks stored in this playlist. Please delete one to add a new one."
+            "en": "You already have 250 Tracks stored in this playlist. Please delete one to add a new one.",
+            "de": "Du hast bereits 250 Lieder in deiner Wiedergabeliste. Bitte lösche eins um ein neues hinzuzufügen."
           },
           "AddSong": {
-            "en": "Add Song to Playlist"
+            "en": "Add Song to Playlist",
+            "de": "Lieder zur Wiedergabeliste hinzufügen"
           },
           "UploadThumbnail": {
-            "en": "Please upload thumbnail via '{Command}'"
+            "en": "Please upload thumbnail via '{Command}'",
+            "de": "Bitte lade ein neues Thumbnail via '{Command}' hoch."
           },
           "ImportingThumbnail": {
-            "en": "Importing your thumbnail.."
+            "en": "Importing your thumbnail..",
+            "de": "Importiere dein Thumbnail.."
           },
           "ThumbnailSizeError": {
-            "en": "Please attach an image below {Size}."
+            "en": "Please attach an image below {Size}.",
+            "de": "Bitte verwende ein Bild unter {Size}."
           },
           "ThumbnailError": {
-            "en": "Something went wrong while trying to upload your thumbnail. Please try again."
+            "en": "Something went wrong while trying to upload your thumbnail. Please try again.",
+            "de": "Es ist ein Fehler aufgetreten bei dem Versuch dein Thumbnail hochzuladen. Bitte versuche es erneut."
           },
           "NewPlaylistColor": {
-            "en": "New Playlist Color"
+            "en": "New Playlist Color",
+            "de": "Neue Farbe"
           },
           "NewPlaylistColorPrompt": {
-            "en": "What color should this playlist be? (e.g. {Hex}){HelpUrl}"
+            "en": "What color should this playlist be? (e.g. {Hex}){HelpUrl}",
+            "de": "Was für eine Farbe soll diese Wiedergabelist haben? (z.B. {Hex}){HelpUrl}"
           },
           "HexHelp": {
-            "en": "Need help with hex color codes?"
+            "en": "Need help with hex color codes?",
+            "de": "Brauchst du Hilfe mit den Farbcodes?"
           },
           "DeleteNote": {
-            "en": "Select 1 or more songs to delete.."
+            "en": "Select 1 or more songs to delete..",
+            "de": "Wähle 1 oder mehr Lieder aus um sie zu löschen.."
           }
         }
       }
