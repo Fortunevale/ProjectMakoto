@@ -36,24 +36,32 @@ internal class AfkEvents
 
                 var embed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"Afk Status • {e.Guild.Name}" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{Bot.loadedTranslations.Commands.Social.Afk.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
                     Color = EmbedColors.Info,
                     Timestamp = DateTime.UtcNow,
-                    Description = $"{e.Author.Mention} `You're no longer afk. You've been afk for {cache.GetTotalSecondsSince().GetHumanReadable()}.`"
+                    Description = Bot.loadedTranslations.Commands.Social.Afk.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true, 
+                    new TVar("User", e.Author.Mention),
+                    new TVar("Timestamp", cache.ToTimestamp()))
                 };
 
                 bool ExtendDelay = false;
 
                 if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount > 0)
                 {
-                    embed.Description += $"\n\n`Here is what you missed:`\n" +
-                                         $"{string.Join("\n", _bot.users[e.Author.Id].AfkStatus.Messages.Select(x => $"[`Message`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId}) by <@!{x.AuthorId}>"))}";
+                    embed.Description += $"\n\n{Bot.loadedTranslations.Commands.Social.Afk.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true)}\n" +
+                                         $"{string.Join("\n", _bot.users[e.Author.Id].AfkStatus.Messages
+                                             .Select(x => Bot.loadedTranslations.Commands.Social.Afk.Events.MessageListing
+                                                 .Get(_bot.users[e.Author.Id])
+                                                 .Build(true, 
+                                                    new TVar("User", $"<@!{x.AuthorId}>"),
+                                                    new TVar("Message", $"[`{Bot.loadedTranslations.Commands.Social.Afk.Events.Message.Get(_bot.users[e.Author.Id])}`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId})"))))}";
 
                     ExtendDelay = true;
 
                     if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5 > 0)
                     {
-                        embed.Description += $"\n`And {_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5} more..`";
+                        embed.Description += $"\n{Bot.loadedTranslations.Commands.Social.Afk.Events.AndMore.Get(_bot.users[e.Author.Id])
+                            .Build(true, new TVar("Count", _bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5))}";
                     }
 
                     _bot.users[e.Author.Id].AfkStatus.MessagesAmount = 0;
@@ -100,10 +108,13 @@ internal class AfkEvents
 
                         _ = e.Message.RespondAsync(new DiscordEmbedBuilder
                         {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"Afk Status • {e.Guild.Name}" },
+                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{Bot.loadedTranslations.Commands.Social.Afk.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
                             Color = EmbedColors.Info,
                             Timestamp = DateTime.UtcNow,
-                            Description = $"{b.Mention} `is currently AFK and has been since` {Formatter.Timestamp(_bot.users[b.Id].AfkStatus.TimeStamp)}`, they most likely wont answer your message: '{_bot.users[b.Id].AfkStatus.Reason}'`"
+                            Description = Bot.loadedTranslations.Commands.Social.Afk.Events.CurrentlyAfk.Get(_bot.users[e.Author.Id]).Build(true,
+                                new TVar("User", b.Mention),
+                                new TVar("Timestamp", _bot.users[b.Id].AfkStatus.TimeStamp.ToTimestamp()),
+                                new TVar("Reason", _bot.users[b.Id].AfkStatus.Reason.FullSanitize()))
                         }).ContinueWith(async x =>
                         {
                             await Task.Delay(10000);

@@ -1371,6 +1371,26 @@
     },
     "Social": {
       "Afk": {
+        "Events": {
+          "NoLongerAfk": {
+            "en": "Welcome back {User}! You're no longer marked as afk. You've been afk since {Timestamp}."
+          },
+          "MissedTitle": {
+            "en": "Here's what you missed:"
+          },
+          "Message": {
+            "en": "Message"
+          },
+          "MessageListing": {
+            "en": "{Message} by {User}"
+          },
+          "AndMore": {
+            "en": "And {Count} more.."
+          },
+          "CurrentlyAfk": {
+            "en": "{User} is currently AFK and has been since {Timestamp}, they most likely wont answer your message: '{Reason}'"
+          }
+        },
         "Title": {
           "en": "Afk Status",
           "de": "Afk Status"

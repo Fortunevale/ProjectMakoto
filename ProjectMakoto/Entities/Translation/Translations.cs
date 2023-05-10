@@ -514,6 +514,17 @@ public class Translations
             public afk Afk;
             public class afk
             {
+                public events Events;
+                public class events
+                {
+                    public SingleTranslationKey NoLongerAfk;
+                    public SingleTranslationKey MissedTitle;
+                    public SingleTranslationKey Message;
+                    public SingleTranslationKey MessageListing;
+                    public SingleTranslationKey AndMore;
+                    public SingleTranslationKey CurrentlyAfk;
+                }
+
                 public SingleTranslationKey Title;
                 public SingleTranslationKey SetAfk;
             }
