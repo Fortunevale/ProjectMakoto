@@ -1573,146 +1573,193 @@
     },
     "ScoreSaber": {
       "InternalServerError": {
-        "en": "An internal server exception occurred. Please retry later."
+        "en": "An internal server exception occurred. Please retry later.",
+        "de": "Ein interner Fehler ist aufgetreten. Bitte versuche es später erneut."
       },
       "ForbiddenError": {
-        "en": "The access to the search api endpoint is currently forbidden. This may mean that it's temporarily disabled."
+        "en": "The access to this api endpoint is currently forbidden. This may mean that it's temporarily disabled.",
+        "de": "Der Zugriff auf diesen API Endpoint ist aktuell verboten. Dies heißt wahrscheinlich dass er aktuell deaktiviert ist."
       },
       "MapLeaderboard": {
         "LoadingScoreboard": {
-          "en": "Looking for scoreboard.."
+          "en": "Looking for scoreboard..",
+          "de": "Suche nach der Rangliste.."
         },
         "ScoreboardNotExist": {
-          "en": "The requested scoreboard does not exist."
+          "en": "The requested scoreboard does not exist.",
+          "de": "Die angefragte Rangliste existiert nicht."
         },
         "PageNotExist": {
-          "en": "Page {Page} doesn't exist."
+          "en": "Page {Page} doesn't exist.",
+          "de": "Seite {Page} existiert nicht."
         },
         "Profile": {
-          "en": "Profile"
+          "en": "Profile",
+          "de": "Profil"
         }
       },
       "Profile": {
         "InvalidInput": {
-          "en": "Input must be a scoresaber id or @user."
+          "en": "Input must be a scoresaber id or @user.",
+          "de": "Eingabe muss eine ScoreSaber Id oder @DiscordNutzer sein."
         },
         "NoUser": {
-          "en": "The user you tagged does not exist."
+          "en": "The user you tagged does not exist.",
+          "de": "Der getaggte Nutzer existiert nicht."
         },
         "NoProfile": {
-          "en": "This user has no Score Saber Profile linked to their Discord Account."
+          "en": "This user has no Score Saber Profile linked to their Discord Account.",
+          "de": "Dieser Benutzer hat kein Score Saber Profile mit seinem Discord-Account verknüpft."
         },
         "LoadingPlayer": {
-          "en": "Loading player profile.."
+          "en": "Loading player profile..",
+          "de": "Lade Spielerprofil.."
         },
         "ShowProfile": {
-          "en": "Show Profile"
+          "en": "Show Profile",
+          "de": "Profil anzeigen"
         },
         "ShowTopScores": {
-          "en": "Show Top Scores"
+          "en": "Show Top Scores",
+          "de": "Beste Scores anzeigen"
         },
         "ShowRecentScores": {
-          "en": "Show Recent Scores"
+          "en": "Show Recent Scores",
+          "de": "Letzte Scores anzeigen"
         },
         "LinkProfileToAccount": {
-          "en": "Link Score Saber Profile to Discord Account"
+          "en": "Link Score Saber Profile to Discord Account",
+          "de": "Score Saber Account mit Discord Account verknüpfen"
         },
         "OpenInBrowser": {
-          "en": "Open in browser"
+          "en": "Open in browser",
+          "de": "Im Browser öffnen"
         },
         "LinkSuccessful": {
           "en": [
             "Linked '{ProfileName}' ({ProfileId}) to your account. You can now run '{ProfileCommand}' without an argument to get your profile in an instant.",
             "To remove the link, run '{UnlinkCommand}'."
+          ],
+          "de": [
+            "'{ProfileName}' ({ProfileId}) mit deinem Discord Account verknüpft. Du kannst jetzt '{ProfileCommand}' ausführen ohne Argumente um dein Profil anzusehen.",
+            "Um die Verknüpfung zu entfernen, verwende '{UnlinkCommand}'."
           ]
         },
         "TopScores": {
-          "en": "Top Scores"
+          "en": "Top Scores",
+          "de": "Beste Scores"
         },
         "RecentScores": {
-          "en": "Recent Scores"
+          "en": "Recent Scores",
+          "de": "Letzte Scores"
         },
         "MapLeaderboard": {
-          "en": "Map Leaderboard"
+          "en": "Map Leaderboard",
+          "de": "Map Rangliste"
         },
         "RankedPlayCount": {
-          "en": "Ranked Play Count"
+          "en": "Ranked Play Count",
+          "de": "Gewertete Spielanzahl"
         },
         "TotalRankedScore": {
-          "en": "Total Ranked Score"
+          "en": "Total Ranked Score",
+          "de": "Gesamter gewertete Punktzahl"
         },
         "AverageRankedAccuracy": {
-          "en": "Average Ranked Accuracy"
+          "en": "Average Ranked Accuracy",
+          "de": "Gewertete durchschnittliche Genauigkeit"
         },
         "TotalPlayCount": {
-          "en": "Total Play Count"
+          "en": "Total Play Count",
+          "de": "Gesamte Spielanzahl"
         },
         "TotalScore": {
-          "en": "Total Score"
+          "en": "Total Score",
+          "de": "Gesamte Punktzahl"
         },
         "ReplaysWatched": {
-          "en": "Replays Watched By Others"
+          "en": "Replays Watched By Others",
+          "de": "Replays angeschaut von Anderen"
         },
         "GraphDays": {
-          "en": "{Count} days ago"
+          "en": "{Count} days ago",
+          "de": "Vor {Count} Tagen"
         },
         "GraphToday": {
-          "en": "Today"
+          "en": "Today",
+          "de": "Heute"
         },
         "Placement": {
-          "en": "Placement"
+          "en": "Placement",
+          "de": "Platzierung"
         },
         "UserDoesNotExist": {
-          "en": "Couldn't find the specified player."
+          "en": "Couldn't find the specified player.",
+          "de": "Konnte den angegebenen Spieler nicht finden."
         },
         "InvalidId": {
-          "en": "Please provide a scoresaber profile id."
+          "en": "Please provide a scoresaber profile id.",
+          "de": "Bitte gebe eine ScoreSaber Profil Id an."
         }
       },
       "Search": {
         "NoCountryFilter": {
-          "en": "No country filter (may load much longer)"
+          "en": "No country filter (may load much longer)",
+          "de": "Kein Landfilter (lädt evtl. wesentlich länger)"
         },
         "SelectContinentDropdown": {
-          "en": "Select a continent.."
+          "en": "Select a continent..",
+          "de": "Wähle ein Kontinent aus.."
         },
         "SelectCountryDropdown": {
-          "en": "Select a country.."
+          "en": "Select a country..",
+          "de": "Wähle ein Land aus.."
         },
         "StartSearch": {
-          "en": "Select a country.."
+          "en": "Start Search",
+          "de": "Suche starten"
         },
         "NextStep": {
-          "en": "Next step.."
+          "en": "Next step..",
+          "de": "Nächster Schritt.."
         },
         "SelectContinent": {
-          "en": "Please select a continent filter below."
+          "en": "Please select a continent filter below.",
+          "de": "Bitte wähle ein Kontinent-Filter."
         },
         "SelectCountry": {
-          "en": "Please select a country filter below."
+          "en": "Please select a country filter below.",
+          "de": "Bitte wähle ein Land-Filter."
         },
         "SelectedCountry": {
-          "en": "Selected country"
+          "en": "Selected country",
+          "de": "Ausgewähltes Land"
         },
         "Searching": {
-          "en": "Searching for players with specified criteria.."
+          "en": "Searching for players with specified criteria..",
+          "de": "Suche nach Spielern mit den gewählten Kriterien."
         },
         "SelectPlayer": {
-          "en": "Select a player.."
+          "en": "Select a player..",
+          "de": "Wähle ein Spieler aus.."
         },
         "FoundCount": {
-          "en": "Found {TotalCount} players."
+          "en": "Found {TotalCount} players.",
+          "de": "{TotalCount} Spieler gefunden."
         },
         "NoSearchResult": {
-          "en": "Couldn't find any player with the specified criteria."
+          "en": "Couldn't find any player with the specified criteria.",
+          "de": "Es konnten keine Spieler mit den gewählten Kriterien gefunden werden."
         }
       },
       "Unlink": {
         "Unlinked": {
-          "en": "Unlinked your Score Saber Profile from your Discord Account."
+          "en": "Unlinked your Score Saber Profile from your Discord Account.",
+          "de": "ScoreSaber Profil vom Discord Account entfernt."
         },
         "NoLink": {
-          "en": "There is no Score Saber Profile linked to your Discord Account."
+          "en": "There is no Score Saber Profile linked to your Discord Account.",
+          "de": "Kein ScoreSaber Profil ist mit deinem Discord Account verknüpft."
         }
       }
     },
