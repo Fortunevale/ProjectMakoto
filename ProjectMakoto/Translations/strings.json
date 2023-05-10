@@ -1373,22 +1373,28 @@
       "Afk": {
         "Events": {
           "NoLongerAfk": {
-            "en": "Welcome back {User}! You're no longer marked as afk. You've been afk since {Timestamp}."
+            "en": "Welcome back {User}! You're no longer marked as afk. You've been afk since {Timestamp}.",
+            "de": "Willkommen zurück, {User}! Du bist nun nicht mehr als Afk makiert. Du warst Afk seit {Timestamp}."
           },
           "MissedTitle": {
-            "en": "Here's what you missed:"
+            "en": "Here's what you missed:",
+            "de": "Das hast du verpasst:"
           },
           "Message": {
-            "en": "Message"
+            "en": "Message",
+            "de": "Nachricht"
           },
           "MessageListing": {
-            "en": "{Message} by {User}"
+            "en": "{Message} by {User}",
+            "de": "{Message} von {User}"
           },
           "AndMore": {
-            "en": "And {Count} more.."
+            "en": "And {Count} more..",
+            "de": "Und {Count} mehr.."
           },
           "CurrentlyAfk": {
-            "en": "{User} is currently AFK and has been since {Timestamp}, they most likely wont answer your message: '{Reason}'"
+            "en": "{User} is currently AFK and has been since {Timestamp}, they most likely wont answer your message: '{Reason}'",
+            "de": "{User} ist Afk seit {Timestamp}, {User} wird dir wahrscheinlich jetzt nicht antworten: '{Reason}'"
           }
         },
         "Title": {
