@@ -42,7 +42,7 @@ internal static class DiscordExtensions
         => await msg.Channel.GetMessageAsync(msg.Id, true);
 
     internal static int GetRoleHighestPosition(this DiscordMember member) 
-        => (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
+        => member is null ? -1 : (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
 
     internal static string GetUniqueDiscordName(this DiscordEmoji emoji)
         => $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";

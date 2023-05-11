@@ -21,6 +21,8 @@ internal class BanCommand : BaseCommand
             int deleteMessageDays = (int)arguments["days"];
             string reason = (string)arguments["reason"];
 
+            var CommandKey = t.Commands.Moderation.Ban;
+
             DiscordMember bMember = null;
 
             try
@@ -29,30 +31,25 @@ internal class BanCommand : BaseCommand
             }
             catch { }
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Banning {victim.GetUsernameWithIdentifier()} ({victim.Id})..`",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                {
-                    Url = victim.AvatarUrl
-                }
-            }.AsLoading(ctx);
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Banning, true, new TVar("Victim", victim.Mention)))
+                .WithThumbnail(victim.AvatarUrl)
+                .AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
             {
-                if (ctx.Member.GetRoleHighestPosition() <= (bMember?.GetRoleHighestPosition() ?? -1))
+                if (ctx.Member.GetRoleHighestPosition() <= bMember.GetRoleHighestPosition())
                     throw new Exception();
 
-                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, $"{ctx.User.GetUsernameWithIdentifier()} banned user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(t.Commands.Moderation.NoReason) : reason);
+                await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
 
-                embed.Description = $"{victim.Mention} `was banned for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
-                embed = embed.AsSuccess(ctx);
+                embed = embed.WithDescription(GetString(CommandKey.Banned, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"{victim.Mention} `could not be banned.`";
-                embed = embed.AsError(ctx);
+                embed = embed.WithDescription(GetString(CommandKey.Errored, true, new TVar("Victim", victim.Mention))).AsError(ctx);
             }
 
             await RespondOrEdit(embed);

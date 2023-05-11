@@ -902,6 +902,28 @@ public class Translations
             }
         }
 
+        public moderationCommands Moderation;
+        public class moderationCommands
+        {
+            public SingleTranslationKey NoReason;
+
+            public ban Ban;
+            public class ban
+            {
+                public SingleTranslationKey AuditLog;
+                public SingleTranslationKey Banning;
+                public SingleTranslationKey Banned;
+                public SingleTranslationKey Errored;
+            }
+
+            public clearBackup ClearBackup;
+            public class clearBackup
+            {
+                public SingleTranslationKey IsOnServer;
+                public SingleTranslationKey Deleted;
+            }
+        }
+
         public configurationCommands Config;
         public class configurationCommands
         {

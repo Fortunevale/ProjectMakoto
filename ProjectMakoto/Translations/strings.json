@@ -2293,6 +2293,33 @@
         }
       }
     },
+    "Moderation": {
+      "NoReason": {
+        "en": "No reason provided."
+      },
+      "Ban": {
+        "AuditLog": {
+          "en": "{FullUser} banned user: {Reason}"
+        },
+        "Banning": {
+          "en": "Banning {Victim}.."
+        },
+        "Banned": {
+          "en": "{Victim} was banned for '{Reason}' by {User}."
+        },
+        "Errored": {
+          "en": "{Victim} could not be banned."
+        }
+      },
+      "ClearBackup": {
+        "IsOnServer": {
+          "en": "{Victim} is on the server and therefor their stored nickname and roles cannot be cleared."
+        },
+        "Deleted": {
+          "en": "Deleted stored nickname and roles for {Victim}."
+        }
+      }
+    },
     "Config": {
       "PrefixConfigCommand": {
         "Title": {

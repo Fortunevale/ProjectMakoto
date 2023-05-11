@@ -27,6 +27,8 @@ internal class AfkEvents
             if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)
                 return;
 
+            var AfkKey = Bot.loadedTranslations.Commands.Social.Afk;
+
             if (_bot.users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
             {
                 DateTime cache = new DateTime().ToUniversalTime().AddTicks(_bot.users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
@@ -36,10 +38,10 @@ internal class AfkEvents
 
                 var embed = new DiscordEmbedBuilder
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{Bot.loadedTranslations.Commands.Social.Afk.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
+                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
                     Color = EmbedColors.Info,
                     Timestamp = DateTime.UtcNow,
-                    Description = Bot.loadedTranslations.Commands.Social.Afk.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true, 
+                    Description = AfkKey.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true, 
                     new TVar("User", e.Author.Mention),
                     new TVar("Timestamp", cache.ToTimestamp()))
                 };
@@ -48,19 +50,19 @@ internal class AfkEvents
 
                 if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount > 0)
                 {
-                    embed.Description += $"\n\n{Bot.loadedTranslations.Commands.Social.Afk.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true)}\n" +
+                    embed.Description += $"\n\n{AfkKey.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true)}\n" +
                                          $"{string.Join("\n", _bot.users[e.Author.Id].AfkStatus.Messages
-                                             .Select(x => Bot.loadedTranslations.Commands.Social.Afk.Events.MessageListing
+                                             .Select(x => AfkKey.Events.MessageListing
                                                  .Get(_bot.users[e.Author.Id])
                                                  .Build(true, 
                                                     new TVar("User", $"<@!{x.AuthorId}>"),
-                                                    new TVar("Message", $"[`{Bot.loadedTranslations.Commands.Social.Afk.Events.Message.Get(_bot.users[e.Author.Id])}`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId})"))))}";
+                                                    new TVar("Message", $"[`{AfkKey.Events.Message.Get(_bot.users[e.Author.Id])}`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId})"))))}";
 
                     ExtendDelay = true;
 
                     if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5 > 0)
                     {
-                        embed.Description += $"\n{Bot.loadedTranslations.Commands.Social.Afk.Events.AndMore.Get(_bot.users[e.Author.Id])
+                        embed.Description += $"\n{AfkKey.Events.AndMore.Get(_bot.users[e.Author.Id])
                             .Build(true, new TVar("Count", _bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5))}";
                     }
 
@@ -108,10 +110,10 @@ internal class AfkEvents
 
                         _ = e.Message.RespondAsync(new DiscordEmbedBuilder
                         {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{Bot.loadedTranslations.Commands.Social.Afk.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
+                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
                             Color = EmbedColors.Info,
                             Timestamp = DateTime.UtcNow,
-                            Description = Bot.loadedTranslations.Commands.Social.Afk.Events.CurrentlyAfk.Get(_bot.users[e.Author.Id]).Build(true,
+                            Description = AfkKey.Events.CurrentlyAfk.Get(_bot.users[e.Author.Id]).Build(true,
                                 new TVar("User", b.Mention),
                                 new TVar("Timestamp", _bot.users[b.Id].AfkStatus.TimeStamp.ToTimestamp()),
                                 new TVar("Reason", _bot.users[b.Id].AfkStatus.Reason.FullSanitize()))
