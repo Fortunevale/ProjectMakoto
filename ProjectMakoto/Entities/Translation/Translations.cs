@@ -975,7 +975,13 @@ public class Translations
                 public SingleTranslationKey InlineField;
 
                 public SingleTranslationKey NoValidChannels;
+            }
 
+            public followUpdates FollowUpdates;
+            public class followUpdates
+            {
+                public SingleTranslationKey Followed;
+                public SingleTranslationKey Failed;
             }
         }
 

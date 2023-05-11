@@ -19,6 +19,8 @@ internal class FollowUpdatesCommand : BaseCommand
         {
             var channel = (FollowChannel)arguments["channel"];
 
+            var CommandKey = t.Commands.Moderation.FollowUpdates;
+
             try
             {
                 switch (channel)
@@ -45,14 +47,14 @@ internal class FollowUpdatesCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Successfully followed {channel}.`",
+                    Description = GetString(CommandKey.Followed, true, new TVar("Channel", channel)),
                 }.AsSuccess(ctx));
             }
             catch (Exception)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = $"`Could not follow {channel}.`",
+                    Description = GetString(CommandKey.Failed, true, new TVar("Channel", channel)),
                 }.AsError(ctx));
             }
         });

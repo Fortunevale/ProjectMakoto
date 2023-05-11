@@ -2443,6 +2443,14 @@
         "NoValidChannels": {
           "en": "Couldn't find any text or announcement channels in this server."
         }
+      },
+      "FollowUpdates": {
+        "Followed": {
+          "en": "Successfully followed {Channel}."
+        },
+        "Failed": {
+          "en": "Could not follow {Channel}."
+        }
       }
     },
     "Config": {
