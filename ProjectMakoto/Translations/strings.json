@@ -2318,6 +2318,131 @@
         "Deleted": {
           "en": "Deleted stored nickname and roles for {Victim}."
         }
+      },
+      "CustomEmbed": {
+        "UploadNotice": {
+          "en": "Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. This includes the bot being removed from guilds you own or manage. Please keep it safe."
+        },
+        "New": {
+          "en": "New Embed"
+        },
+        "SetTitleButton": {
+          "en": "Set Title"
+        },
+        "SetAuthorButton": {
+          "en": "Set Author"
+        },
+        "SetThumbnailButton": {
+          "en": "Set Thumbnail"
+        },
+        "SetDescriptionButton": {
+          "en": "Set Description"
+        },
+        "SetImageButton": {
+          "en": "Set Image"
+        },
+        "SetColorButton": {
+          "en": "Set Color"
+        },
+        "SetTimestampButton": {
+          "en": "Set Timestamp"
+        },
+        "SetFooterButton": {
+          "en": "Set Footer"
+        },
+        "AddFieldButton": {
+          "en": "Add Field"
+        },
+        "ModifyFieldButton": {
+          "en": "Modify Field"
+        },
+        "RemoveFieldButton": {
+          "en": "Remove Field"
+        },
+        "SendEmbedButton": {
+          "en": "Send Embed"
+        },
+        "ContinueTimer": {
+          "en": "Continuing {Timestamp}.."
+        },
+        "UploadImage": {
+          "en": "Please upload an image via '{Command}'."
+        },
+        "ImportingUpload": {
+          "en": "Importing your upload.."
+        },
+        "ImportSizeError": {
+          "en": "Please attach an image below {Size}."
+        },
+        "ModifyingTitle": {
+          "en": "Modifying Title"
+        },
+        "TitleField": {
+          "en": "Title"
+        },
+        "UrlField": {
+          "en": "Url"
+        },
+        "SetNameButton": {
+          "en": "Set Name"
+        },
+        "SetUrlButton": {
+          "en": "Set Url"
+        },
+        "SetIconButton": {
+          "en": "Set Icon"
+        },
+        "SetAsUserButton": {
+          "en": "Set as User"
+        },
+        "SetAsServer": {
+          "en": "Set as Server"
+        },
+        "ModifyingAuthorName": {
+          "en": "Modifying Author Name"
+        },
+        "NameField": {
+          "en": "Name"
+        },
+        "ModifyingAuthorUrl": {
+          "en": "Modifying Author Url"
+        },
+        "ModifyingAuthorbyUserId": {
+          "en": "Replacing Author with User"
+        },
+        "UserIdField": {
+          "en": "User Id"
+        },
+        "ModifyingDescription": {
+          "en": "Modifying Description"
+        },
+        "DescriptionField": {
+          "en": "Description"
+        },
+        "ModifyingColor": {
+          "en": "Modifying Color"
+        },
+        "ColorField": {
+          "en": "Color"
+        },
+        "SetTextButton": {
+          "en": "Set Text"
+        },
+        "ModifyingFooterText": {
+          "en": "Modifying Footer Text"
+        },
+        "TextField": {
+          "en": "Text"
+        },
+        "ModifyingField": {
+          "en": "Modifying Field"
+        },
+        "InlineField": {
+          "en": "Inline"
+        },
+        "NoValidChannels": {
+          "en": "Couldn't find any text or announcement channels in this server."
+        }
       }
     },
     "Config": {

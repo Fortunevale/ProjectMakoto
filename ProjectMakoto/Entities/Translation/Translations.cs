@@ -922,6 +922,61 @@ public class Translations
                 public SingleTranslationKey IsOnServer;
                 public SingleTranslationKey Deleted;
             }
+
+            public customEmbed CustomEmbed;
+            public class customEmbed
+            {
+                public SingleTranslationKey UploadNotice;
+
+                public SingleTranslationKey New;
+                public SingleTranslationKey SetTitleButton;
+                public SingleTranslationKey SetAuthorButton;
+                public SingleTranslationKey SetThumbnailButton;
+                public SingleTranslationKey SetDescriptionButton;
+                public SingleTranslationKey SetImageButton;
+                public SingleTranslationKey SetColorButton;
+                public SingleTranslationKey SetTimestampButton;
+                public SingleTranslationKey SetFooterButton;
+                public SingleTranslationKey AddFieldButton;
+                public SingleTranslationKey ModifyFieldButton;
+                public SingleTranslationKey RemoveFieldButton;
+                public SingleTranslationKey SendEmbedButton;
+
+                public SingleTranslationKey ContinueTimer;
+                public SingleTranslationKey UploadImage;
+                public SingleTranslationKey ImportingUpload;
+                public SingleTranslationKey ImportSizeError;
+
+                public SingleTranslationKey ModifyingTitle;
+                public SingleTranslationKey TitleField;
+                public SingleTranslationKey UrlField;
+
+                public SingleTranslationKey SetNameButton;
+                public SingleTranslationKey SetUrlButton;
+                public SingleTranslationKey SetIconButton;
+                public SingleTranslationKey SetAsUserButton;
+                public SingleTranslationKey SetAsServer;
+                public SingleTranslationKey ModifyingAuthorName;
+                public SingleTranslationKey NameField;
+                public SingleTranslationKey ModifyingAuthorUrl;
+                public SingleTranslationKey ModifyingAuthorbyUserId;
+                public SingleTranslationKey UserIdField;
+
+                public SingleTranslationKey ModifyingDescription;
+                public SingleTranslationKey DescriptionField;
+
+                public SingleTranslationKey ModifyingColor;
+                public SingleTranslationKey ColorField;
+
+                public SingleTranslationKey SetTextButton;
+                public SingleTranslationKey ModifyingFooterText;
+                public SingleTranslationKey TextField;
+                public SingleTranslationKey ModifyingField;
+                public SingleTranslationKey InlineField;
+
+                public SingleTranslationKey NoValidChannels;
+
+            }
         }
 
         public configurationCommands Config;
