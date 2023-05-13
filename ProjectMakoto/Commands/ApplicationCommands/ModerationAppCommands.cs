@@ -185,7 +185,7 @@ public class ModerationAppCommands : ApplicationCommandsModule
 
 
 
-    [SlashCommand("override-bump-time", "Allows fixing of the last bump in case Disboard did not properly post a message.")]
+    [SlashCommand("override-bump-time", "Allows fixing of the last bump in case Disboard did not properly post a message.", dmPermission: false)]
     public async Task OverrideBumpTime(InteractionContext ctx)
     {
         Task.Run(async () =>

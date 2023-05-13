@@ -13,7 +13,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
     public Bot _bot { private get; set; }
 
 
-    [SlashCommand("help", "Sends you a list of all available commands, their usage and their description.")]
+    [SlashCommand("help", "Sends you a list of all available commands, their usage and their description.", dmPermission: false)]
     public async Task Help(InteractionContext ctx, [Option("command", "The command to show help for")] string command = "")
     {
         Task.Run(async () =>
@@ -26,7 +26,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommand("user-info", "Displays information the bot knows about you or the mentioned user.", dmPermission: false)]
-    public async Task UserInfo(InteractionContext ctx, [Option("User", "The User")]DiscordUser victim = null)
+    public async Task UserInfo(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {
         Task.Run(async () =>
         {
@@ -36,9 +36,9 @@ public class UtilityAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot.watcher, ctx);
     }
-    
+
     [SlashCommand("guild-info", "Displays information this or the mentioned guild.", dmPermission: false)]
-    public async Task GuildInfo(InteractionContext ctx, [Option("Guild", "The Guild")]string guildId = null)
+    public async Task GuildInfo(InteractionContext ctx, [Option("Guild", "The Guild")] string guildId = null)
     {
         Task.Run(async () =>
         {
@@ -75,7 +75,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot.watcher, ctx);
     }
-    
+
     [SlashCommand("banner", "Displays your or the mentioned user's banner as an embedded image.", dmPermission: false)]
     public async Task Banner(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {
@@ -87,7 +87,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot.watcher, ctx);
     }
-    
+
     [SlashCommand("rank", "Shows your or the mentioned user's rank and rank progress.", dmPermission: false)]
     public async Task Rank(InteractionContext ctx, [Option("User", "The User")] DiscordUser victim = null)
     {
@@ -111,7 +111,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
             });
         }).Add(_bot.watcher, ctx);
     }
-    
+
     [SlashCommand("report-host", "Allows you to contribute a new malicious host to our database.", dmPermission: false)]
     public async Task ReportHost(InteractionContext ctx, [Option("url", "The host")] string url)
     {
@@ -162,7 +162,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
                 await new Commands.Data.RequestCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
-        
+
         [SlashCommand("delete", "Allows you to delete your user data and stop Makoto from further processing of your user data.", dmPermission: false)]
         public async Task Delete(InteractionContext ctx)
         {
@@ -171,7 +171,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
                 await new Commands.Data.DeleteCommand().ExecuteCommand(ctx, _bot);
             }).Add(_bot.watcher, ctx);
         }
-        
+
         [SlashCommand("policy", "Allows you to view how Makoto processes your data.", dmPermission: false)]
         public async Task Info(InteractionContext ctx)
         {
@@ -236,7 +236,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("limit", "Changes the user limit of your channel.")]
-        public async Task Limit(InteractionContext ctx, [Option("limit", "Limit"), MaximumValue(99), MinimumValue(0)]int newLimit)
+        public async Task Limit(InteractionContext ctx, [Option("limit", "Limit"), MaximumValue(99), MinimumValue(0)] int newLimit)
         {
             Task.Run(async () =>
             {
@@ -314,6 +314,9 @@ public class UtilityAppCommands : ApplicationCommandsModule
     {
         Task.Run(async () =>
         {
+            if (ctx.Channel.IsPrivate)
+                return;
+
             await new EmojiStealerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "message", ctx.TargetMessage }
@@ -326,6 +329,9 @@ public class UtilityAppCommands : ApplicationCommandsModule
     {
         Task.Run(async () =>
         {
+            if (ctx.Channel.IsPrivate)
+                return;
+
             await new TranslateCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "message", ctx.TargetMessage }
