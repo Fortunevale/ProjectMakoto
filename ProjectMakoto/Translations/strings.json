@@ -2462,6 +2462,20 @@
         "Ended": {
           "en": "{Min}/{Max} messages across {ChannelCount} channel(s) sent by {Victim} deleted."
         }
+      },
+      "Kick": {
+        "AuditLog": {
+          "en": "{FullUser} banned user: {Reason}"
+        },
+        "Kicking": {
+          "en": "Kicking {Victim}.."
+        },
+        "Kicked": {
+          "en": "{Victim} was kicked for '{Reason}' by {User}."
+        },
+        "Errored": {
+          "en": "{Victim} could not be kicked."
+        }
       }
     },
     "Config": {

@@ -991,6 +991,15 @@ public class Translations
                 public SingleTranslationKey Deleting;
                 public SingleTranslationKey Ended;
             }
+
+            public kick Kick;
+            public class kick
+            {
+                public SingleTranslationKey AuditLog;
+                public SingleTranslationKey Kicking;
+                public SingleTranslationKey Kicked;
+                public SingleTranslationKey Errored;
+            }
         }
 
         public configurationCommands Config;
