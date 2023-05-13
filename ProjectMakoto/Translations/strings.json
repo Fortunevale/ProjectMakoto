@@ -2451,6 +2451,17 @@
         "Failed": {
           "en": "Could not follow {Channel}."
         }
+      },
+      "GuildPurge": {
+        "Scanning": {
+          "en": "Scanning all channels for messages sent by {Victim}.."
+        },
+        "Deleting": {
+          "en": "Found {Count} messages sent by {Victim}. Deleting.."
+        },
+        "Ended": {
+          "en": "{Min}/{Max} messages across {ChannelCount} channel(s) sent by {Victim} deleted."
+        }
       }
     },
     "Config": {

@@ -17,6 +17,8 @@ internal class GuildPurgeCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Moderation.GuildPurge;
+
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
@@ -29,31 +31,28 @@ internal class GuildPurgeCommand : BaseCommand
                 return;
             }
 
-            var status_embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Scanning all channels for messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id})..`"
-            }.AsLoading(ctx, "Server Purge");
-
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
+                WithDescription(GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention)))
+                .AsLoading(ctx)));
 
             int currentProg = 0;
             int maxProg = ctx.Guild.Channels.Count;
 
             int allMsg = 0;
-            Dictionary<ulong, List<DiscordMessage>> messages = new();
+            Dictionary<ulong, List<DiscordMessage>> channelList = new();
 
-            foreach (var channel in ctx.Guild.Channels.Where(x => x.Value.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.News))
+            foreach (var channel in ctx.Guild.Channels.Where(x => x.Value.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread or ChannelType.News or ChannelType.Voice))
             {
                 allMsg = 0;
-                foreach (var b in messages)
+                foreach (var b in channelList)
                     allMsg += b.Value.Count;
 
                 currentProg++;
 
-                status_embed.Description = $"`Scanning all channels for messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id})..`\n\n" +
-                                            $"`Current Channel`: `({currentProg}/{maxProg})` {channel.Value.Mention} `({channel.Value.Id})`\n" +
-                                            $"`Found Messages `: `{allMsg}`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
+                    WithDescription($"{GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention))}\n" +
+                                    $"`{GenerateASCIIProgressbar(currentProg, maxProg)} {CalculatePercentage(currentProg, maxProg),3}%`")
+                    .AsLoading(ctx)));
 
                 int MessageInt = number;
 
@@ -106,33 +105,53 @@ internal class GuildPurgeCommand : BaseCommand
                     {
                         if (b.Author.Id == victim.Id && b.CreationTimestamp.AddDays(14) > DateTime.UtcNow)
                         {
-                            if (!messages.ContainsKey(channel.Key))
-                                messages.Add(channel.Key, new List<DiscordMessage>());
+                            if (!channelList.ContainsKey(channel.Key))
+                                channelList.Add(channel.Key, new List<DiscordMessage>());
 
-                            messages[channel.Key].Add(b);
+                            channelList[channel.Key].Add(b);
                         }
                     }
             }
 
-            status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id}). Deleting..`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
+            foreach (var channel in channelList)
+                foreach (var message in channel.Value.ToList())
+                    if (message.CreationTimestamp.GetTimespanSince() > TimeSpan.FromDays(14))
+                        channel.Value.Remove(message);
+
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
+                                 $"`{GenerateASCIIProgressbar(currentProg, maxProg)} {CalculatePercentage(currentProg, maxProg)}%`")
+                .AsLoading(ctx)));
 
             currentProg = 0;
-            maxProg = messages.Count;
+            maxProg = 0;
 
-            foreach (var channel in messages)
+            foreach (var channel in channelList)
+                maxProg += channel.Value.Count;
+
+            foreach (var channel in channelList)
             {
-                currentProg++;
-                status_embed.Description = $"`Found {allMsg} messages sent by '{victim.GetUsernameWithIdentifier()}' ({victim.Id}). Deleting..`\n\n" +
-                                            $"`Current Channel`: `({currentProg}/{maxProg})` <#{channel.Key}> `({channel.Key})`\n" +
-                                            $"`Found Messages `: `{allMsg}`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed));
+                try
+                {
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                        .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
+                                         $"`{GenerateASCIIProgressbar(currentProg, maxProg)} {CalculatePercentage(currentProg, maxProg)}%`")
+                        .AsLoading(ctx)));
 
-                await ctx.Guild.GetChannel(channel.Key).DeleteMessagesAsync(channel.Value);
+                    while (channel.Value.Count > 0)
+                    {
+                        var msgs = channel.Value.Take(100).ToList();
+                        await ctx.Guild.GetChannel(channel.Key).DeleteMessagesAsync(msgs);
+                        channel.Value.RemoveRange(0, msgs.Count);
+                        currentProg += msgs.Count;
+                    }
+                }
+                catch { }
             }
 
-            status_embed.Description = $"`{allMsg} were found. {currentProg}/{maxProg} were deleted.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(status_embed.AsSuccess(ctx, "Server Purge")));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Ended, true, new TVar("Victim", victim.Mention), new TVar("Min", currentProg), new TVar("Max", maxProg), new TVar("ChannelCount", channelList.Count)))
+                .AsSuccess(ctx)));
         });
     }
 }

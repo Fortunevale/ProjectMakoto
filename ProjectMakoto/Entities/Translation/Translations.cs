@@ -983,6 +983,14 @@ public class Translations
                 public SingleTranslationKey Followed;
                 public SingleTranslationKey Failed;
             }
+
+            public guildPurge GuildPurge;
+            public class guildPurge
+            {
+                public SingleTranslationKey Scanning;
+                public SingleTranslationKey Deleting;
+                public SingleTranslationKey Ended;
+            }
         }
 
         public configurationCommands Config;
