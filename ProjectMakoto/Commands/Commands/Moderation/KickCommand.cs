@@ -17,47 +17,46 @@ internal class KickCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            DiscordMember victim;
+            DiscordUser victim = (DiscordUser)arguments["victim"];
             string reason = (string)arguments["reason"];
+
+            var CommandKey = t.Commands.Moderation.Kick;
+
+            DiscordMember bMember = null;
 
             try
             {
-                victim = await ((DiscordUser)arguments["victim"]).ConvertToMember(ctx.Guild);
+                bMember = await victim.ConvertToMember(ctx.Guild);
             }
             catch (DisCatSharp.Exceptions.NotFoundException)
             {
                 SendNoMemberError();
-                throw;
+                return;
             }
             catch (Exception)
             {
                 throw;
             }
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Kicking {victim.GetUsernameWithIdentifier()} ({victim.Id})..`",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                {
-                    Url = victim.AvatarUrl
-                },
-            }.AsLoading(ctx);
+            var embed = new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Kicking, true, new TVar("Victim", victim.Mention)))
+                .WithThumbnail(victim.AvatarUrl)
+                .AsLoading(ctx);
             await RespondOrEdit(embed);
 
             try
             {
-                if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
+                if (ctx.Member.GetRoleHighestPosition() <= bMember.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.RemoveAsync($"{ctx.User.GetUsernameWithIdentifier()} kicked user: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
+                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(t.Commands.Moderation.NoReason) : reason);
+                await bMember.RemoveAsync(GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
 
-                embed.Description = $"{victim.Mention} `was kicked for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`";
-                embed = embed.AsSuccess(ctx);
+                embed = embed.WithDescription(GetString(CommandKey.Kicked, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed.Description = $"{victim.Mention} `could not be kicked.`";
-                embed.AsError(ctx);
+                embed = embed.WithDescription(GetString(CommandKey.Errored, true, new TVar("Victim", victim.Mention))).AsError(ctx);
             }
 
             await RespondOrEdit(embed);

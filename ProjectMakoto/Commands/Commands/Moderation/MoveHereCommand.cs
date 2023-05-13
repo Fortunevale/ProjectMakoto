@@ -19,26 +19,42 @@ internal class MoveHereCommand : BaseCommand
         {
             DiscordChannel oldChannel = (DiscordChannel)arguments["oldChannel"];
 
+            var CommandKey = t.Commands.Moderation.Move;
+
             if (oldChannel.Type != ChannelType.Voice)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is not a voice channel.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.NotAVc, true))
+                    .AsError(ctx));
                 return;
             }
             
             if (!oldChannel.Users.IsNotNullAndNotEmpty())
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is empty.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.VcEmpty, true))
+                    .AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moving {oldChannel.Users.Count} users to` {ctx.Member.VoiceState.Channel.Mention}`..`").AsLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Moving, true,
+                    new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
+                    new TVar("Destination", ctx.Member.VoiceState.Channel.Mention),
+                    new TVar("Origin", oldChannel.Mention)))
+                .AsLoading(ctx));
 
             foreach (var b in oldChannel.Users)
             {
-                await b.ModifyAsync(x => x.VoiceChannel = ctx.Member.VoiceState.Channel);
+                _ = b.ModifyAsync(x => x.VoiceChannel = ctx.Member.VoiceState.Channel);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moved {oldChannel.Users.Count} users to` {ctx.Member.VoiceState.Channel.Mention}`.`").AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Moved, true,
+                    new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
+                    new TVar("Destination", ctx.Member.VoiceState.Channel.Mention),
+                    new TVar("Origin", oldChannel.Mention)))
+                .AsSuccess(ctx));
         });
     }
 }

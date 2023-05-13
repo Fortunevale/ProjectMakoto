@@ -12,12 +12,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    [SlashCommandGroup("join", "Allows you to review and change settings in the event somebody joins the server.", dmPermission: false)]
+    [SlashCommandGroup("join", "Allows you to review and change settings in the event somebody joins the server.", (long)Permissions.Administrator, dmPermission: false)]
     public class Join : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows to review the currently used settings in the event somebody joins the server.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows to review the currently used settings in the event somebody joins the server.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -26,7 +26,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings in the event somebody joins the server.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings in the event somebody joins the server.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -36,12 +36,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("experience", "Allows you to review and change settings related to experience.", dmPermission: false)]
+    [SlashCommandGroup("experience", "Allows you to review and change settings related to experience.", (long)Permissions.Administrator, dmPermission: false)]
     public class Experience : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to experience.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to experience.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -50,7 +50,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to experience.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to experience.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -60,12 +60,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("levelrewards", "Allows you to review, add and change Level Rewards.", dmPermission: false)]
+    [SlashCommandGroup("levelrewards", "Allows you to review, add and change Level Rewards.", (long)Permissions.Administrator, dmPermission: false)]
     public class LevelRewards : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review currently defined Level Rewards.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review currently defined Level Rewards.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -74,7 +74,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to add, remove and modify currently defined Level Rewards.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to add, remove and modify currently defined Level Rewards.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -84,12 +84,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("phishing", "Allows you to review and change settings related to phishing link protection.", dmPermission: false)]
+    [SlashCommandGroup("phishing", "Allows you to review and change settings related to phishing link protection.", (long)Permissions.Administrator, dmPermission: false)]
     public class PhishingSettings : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to phshing link protection.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to phshing link protection.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -98,7 +98,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to phishing link protection.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to phishing link protection.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -108,12 +108,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("bumpreminder", "Allows you to review, set up and change settings related to the Bump Reminder.", dmPermission: false)]
+    [SlashCommandGroup("bumpreminder", "Allows you to review, set up and change settings related to the Bump Reminder.", (long)Permissions.Administrator, dmPermission: false)]
     public class BumpReminder : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to the Bump Reminder.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to the Bump Reminder.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -122,7 +122,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change currently used settings related to the Bump Reminder.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change currently used settings related to the Bump Reminder.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -132,12 +132,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("actionlog", "Allows you to review and change settings related to the actionlog.", dmPermission: false)]
+    [SlashCommandGroup("actionlog", "Allows you to review and change settings related to the actionlog.", (long)Permissions.Administrator, dmPermission: false)]
     public class ActionLog : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review currently used settings related to the actionlog.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review currently used settings related to the actionlog.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -146,7 +146,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change currently used settings related to the actionlog.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change currently used settings related to the actionlog.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -156,12 +156,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("autocrosspost", "Allows you to review and change settings related to automatic crossposting.", dmPermission: false)]
+    [SlashCommandGroup("autocrosspost", "Allows you to review and change settings related to automatic crossposting.", (long)Permissions.Administrator, dmPermission: false)]
     public class AutoCrosspost : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review currently used settings related to automatic crossposting.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review currently used settings related to automatic crossposting.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -170,7 +170,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change currently used settings related to automatic crossposting.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change currently used settings related to automatic crossposting.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -180,12 +180,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("reactionroles", "Allows you to review and change settings related to Reaction Roles.", dmPermission: false)]
+    [SlashCommandGroup("reactionroles", "Allows you to review and change settings related to Reaction Roles.", (long)Permissions.Administrator, dmPermission: false)]
     public class ReactionRoles : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review currently registered Reaction Roles.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review currently registered Reaction Roles.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -194,7 +194,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to add and remove registered Reaction Roles.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to add and remove registered Reaction Roles.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -209,6 +209,9 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     {
         Task.Run(async () =>
         {
+            if (ctx.Channel.IsPrivate)
+                return;
+
             await new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "message", ctx.TargetMessage },
@@ -221,6 +224,9 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     {
         Task.Run(async () =>
         {
+            if (ctx.Channel.IsPrivate)
+                return;
+
             await new Commands.ReactionRolesCommand.RemoveCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "message", ctx.TargetMessage },
@@ -233,6 +239,9 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     {
         Task.Run(async () =>
         {
+            if (ctx.Channel.IsPrivate)
+                return;
+
             await new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "message", ctx.TargetMessage },
@@ -240,12 +249,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
-    [SlashCommandGroup("invoiceprivacy", "Allows you to review and change settings related to In-Voice Text Channel Privacy.", dmPermission: false)]
+    [SlashCommandGroup("invoiceprivacy", "Allows you to review and change settings related to In-Voice Text Channel Privacy.", (long)Permissions.Administrator, dmPermission: false)]
     public class InVoiceTextPrivacy : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review currently used settings related to In-Voice Text Channel Privacy.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review currently used settings related to In-Voice Text Channel Privacy.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -254,7 +263,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change currently used settings related to In-Voice Text Channel Privacy.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change currently used settings related to In-Voice Text Channel Privacy.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -264,12 +273,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("invitetracker", "Allows you to review and change settings related to Invite Tracking.", dmPermission: false)]
+    [SlashCommandGroup("invitetracker", "Allows you to review and change settings related to Invite Tracking.", (long)Permissions.Administrator, dmPermission: false)]
     public class InviteTracker : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to Invite Tracking.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to Invite Tracking.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -278,7 +287,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to Invite Tracking.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to Invite Tracking.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -288,12 +297,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("namenormalizer", "Allows you to review and change settings related to automatic name normalization.", dmPermission: false)]
+    [SlashCommandGroup("namenormalizer", "Allows you to review and change settings related to automatic name normalization.", (long)Permissions.Administrator, dmPermission: false)]
     public class NameNormalizer : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to name normalization.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to name normalization.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -302,7 +311,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to name normalization.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to name normalization.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -312,12 +321,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("autounarchive", "Allows you to review and change settings related to automatic thread unarchiving.", dmPermission: false)]
+    [SlashCommandGroup("autounarchive", "Allows you to review and change settings related to automatic thread unarchiving.", (long)Permissions.Administrator, dmPermission: false)]
     public class AutoUnarchive : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to automatic thread unarchiving.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to automatic thread unarchiving.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -326,7 +335,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to automatic thread unarchiving.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to automatic thread unarchiving.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -336,12 +345,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [SlashCommandGroup("embedmessages", "Allows you to review and change settings related to automatic message embedding.", dmPermission: false)]
+    [SlashCommandGroup("embedmessages", "Allows you to review and change settings related to automatic message embedding.", (long)Permissions.Administrator, dmPermission: false)]
     public class MessageEmbedding : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to automatic message embedding.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to automatic message embedding.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -350,7 +359,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to automatic message embedding.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to automatic message embedding.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -360,12 +369,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("tokendetection", "Allows you to review and change settings related to automatic token invalidation.", dmPermission: false)]
+    [SlashCommandGroup("tokendetection", "Allows you to review and change settings related to automatic token invalidation.", (long)Permissions.Administrator, dmPermission: false)]
     public class TokenDetection : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review the currently used settings related to automatic token invalidation.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review the currently used settings related to automatic token invalidation.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -374,7 +383,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to change the currently used settings related to automatic token invalidation.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to change the currently used settings related to automatic token invalidation.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -384,12 +393,12 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("invitenotes", "Allows you to add notes to invite codes.", dmPermission: false)]
+    [SlashCommandGroup("invitenotes", "Allows you to add notes to invite codes.", (long)Permissions.Administrator, dmPermission: false)]
     public class InviteNotes : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        [SlashCommand("review", "Allows you to review currently set up invite notes.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("review", "Allows you to review currently set up invite notes.")]
         public async Task Review(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -398,7 +407,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
             }).Add(_bot.watcher, ctx);
         }
 
-        [SlashCommand("config", "Allows you to add and remove currently set up invite notes.", (long)Permissions.Administrator, dmPermission: false)]
+        [SlashCommand("config", "Allows you to add and remove currently set up invite notes.")]
         public async Task Config(InteractionContext ctx)
         {
             Task.Run(async () =>
@@ -408,7 +417,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("vccreator", "Allows you to review and change settings related to the Voice Channel Creator.")]
+    [SlashCommandGroup("vccreator", "Allows you to review and change settings related to the Voice Channel Creator.", (long)Permissions.Administrator, dmPermission: false)]
     public class VcCreator : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
@@ -432,7 +441,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("guild-language", "Allows you to review and change settings related to the guild's selected language.")]
+    [SlashCommandGroup("guild-language", "Allows you to review and change settings related to the guild's selected language.", (long)Permissions.Administrator, dmPermission: false)]
     public class GuildLanguage : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
@@ -456,7 +465,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
 
-    [SlashCommandGroup("guild-prefix", "Allows you to review and change settings related to the guild's prefix.")]
+    [SlashCommandGroup("guild-prefix", "Allows you to review and change settings related to the guild's prefix.", (long)Permissions.Administrator, dmPermission: false)]
     public class GuildPrefix : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }

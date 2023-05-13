@@ -17,28 +17,30 @@ internal class CustomEmbedCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var GeneratedEmbed = new DiscordEmbedBuilder().WithDescription("New embed");
+            var CommandKey = t.Commands.Moderation.CustomEmbed;
+
+            var GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.New));
 
             while (true)
             {
                 try
                 {
-                    var SetTitle = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set title", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖋")));
-                    var SetAuthor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set author", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                    var SetThumbnail = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set thumbnail", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                    var SetTitle = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetTitleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖋")));
+                    var SetAuthor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAuthorButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var SetThumbnail = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetThumbnailButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                    var SetDescription = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set description", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📝")));
-                    var SetImage = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set image", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
-                    var SetColor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set color", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎨")));
+                    var SetDescription = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetDescriptionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📝")));
+                    var SetImage = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetImageButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                    var SetColor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetColorButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎨")));
 
-                    var SetTimestamp = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set timestamp", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-                    var SetFooter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set footer", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✒")));
+                    var SetTimestamp = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetTimestampButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+                    var SetFooter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetFooterButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✒")));
 
-                    var AddField = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Add field", (GeneratedEmbed.Fields.Count >= 25), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                    var ModifyField = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Modify field", (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
-                    var RemoveField = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Remove field", (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➖")));
+                    var AddField = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.AddFieldButton), (GeneratedEmbed.Fields.Count >= 25), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                    var ModifyField = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ModifyFieldButton), (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+                    var RemoveField = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveFieldButton), (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➖")));
 
-                    var FinishAndSend = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Send embed", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                    var FinishAndSend = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SendEmbedButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
                     try
                     {
@@ -51,7 +53,7 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     catch (Exception)
                     {
-                        GeneratedEmbed = new DiscordEmbedBuilder().WithDescription("New embed");
+                        GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.New));
                         continue;
                     }
 
@@ -65,9 +67,9 @@ internal class CustomEmbedCommand : BaseCommand
 
                     if (Menu1.GetCustomId() == SetTitle.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder("Set title for embed", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 0, 256, false, GeneratedEmbed.Title))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Url", "", 0, 256, false, GeneratedEmbed.Url));
+                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingTitle), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", GetString(CommandKey.TitleField), "", 0, 256, false, GeneratedEmbed.Title))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", GetString(CommandKey.UrlField), "", 0, 256, false, GeneratedEmbed.Url));
 
                         var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
@@ -110,12 +112,12 @@ internal class CustomEmbedCommand : BaseCommand
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        var SetName = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set name", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                        var SetUrl = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set url", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
-                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set icon", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                        var SetName = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetNameButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                        var SetUrl = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetUrlButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
+                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetIconButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set by user", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set by current server", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetName, SetUrl, SetIcon })
@@ -132,8 +134,8 @@ internal class CustomEmbedCommand : BaseCommand
 
                         if (Menu2.GetCustomId() == SetName.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder("Set name for author field", Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", "Name", "", 0, 256, false, GeneratedEmbed.Author.Name));
+                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorName), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", GetString(CommandKey.NameField), "", 0, 256, false, GeneratedEmbed.Author.Name));
 
                             var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
@@ -158,8 +160,8 @@ internal class CustomEmbedCommand : BaseCommand
                         }
                         else if (Menu2.GetCustomId() == SetUrl.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder("Set url for author field", Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", "Url", "", 0, 256, false, GeneratedEmbed.Author.Url));
+                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorUrl), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", GetString(CommandKey.UrlField), "", 0, 256, false, GeneratedEmbed.Author.Url));
 
                             var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
@@ -192,9 +194,8 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an icon via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                                $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
 
@@ -212,11 +213,12 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                             if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()}.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -228,8 +230,8 @@ internal class CustomEmbedCommand : BaseCommand
                         }
                         else if (Menu2.GetCustomId() == SetByUser.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder("Select user by id", Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", "User Id", "", 0, 20, false));
+                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorbyUserId), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", GetString(CommandKey.UserIdField), "", 0, 20, false));
 
                             var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
@@ -287,9 +289,8 @@ internal class CustomEmbedCommand : BaseCommand
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload a thumbnail via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                            $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
 
@@ -307,11 +308,12 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                         if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()}.`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -323,8 +325,8 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetDescription.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder("Set description for embed", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 0, 4000, false, GeneratedEmbed.Description));
+                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingDescription), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", GetString(CommandKey.DescriptionField), "", 0, 4000, false, GeneratedEmbed.Description));
 
                         var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
@@ -351,9 +353,8 @@ internal class CustomEmbedCommand : BaseCommand
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an image via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                            $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
 
@@ -371,11 +372,12 @@ internal class CustomEmbedCommand : BaseCommand
                             continue;
                         }
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
+                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                         if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()} .`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -387,8 +389,8 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetColor.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder("Set color for embed", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", "Color", "#FF0000", 1, 100, false));
+                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingColor), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", GetString(CommandKey.ColorField), "#FF0000", 1, 100, false));
 
                         var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
@@ -417,11 +419,11 @@ internal class CustomEmbedCommand : BaseCommand
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        var SetText = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set text", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖊")));
-                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set icon", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                        var SetText = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetTextButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖊")));
+                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetIconButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set by user", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Set by current server", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetText, SetIcon })
@@ -438,8 +440,8 @@ internal class CustomEmbedCommand : BaseCommand
 
                         if (Menu2.GetCustomId() == SetText.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder("Set text for footer field", Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "text", "Text", "", 0, 2048, false, GeneratedEmbed.Footer.Text));
+                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingFooterText), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "text", GetString(CommandKey.TextField), "", 0, 2048, false, GeneratedEmbed.Footer.Text));
 
                             var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
@@ -466,9 +468,8 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please upload an icon via '{ctx.Prefix}upload'.`\n\n" +
-                            $"⚠ `Please note: Uploads are being moderated. If your upload is determined to be inappropriate or otherwise harming it will be removed and you'll lose access to the entirety of Makoto. " +
-                            $"This includes the bot being removed from guilds you own or manage. Please keep it safe. ♥`").AsAwaitingInput(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                                $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
 
@@ -486,11 +487,12 @@ internal class CustomEmbedCommand : BaseCommand
                                 continue;
                             }
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Importing your upload..`").AsAwaitingInput(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                             if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Please attach an image below {ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()} .`\nContinuing {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(6))}..").AsError(ctx));
+                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -502,8 +504,8 @@ internal class CustomEmbedCommand : BaseCommand
                         }
                         else if (Menu2.GetCustomId() == SetByUser.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder("Select user by id", Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", "User Id", "", 0, 20, false));
+                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorbyUserId), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", GetString(CommandKey.UserIdField), "", 0, 20, false));
 
                             var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
@@ -578,10 +580,10 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == AddField.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder("Add field for embed", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "", 0, 256, true))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 0, 1024, true))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "inline", "Inline", "", 4, 5, true, false.ToString()));
+                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingField), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", GetString(CommandKey.TitleField), "", 0, 256, true))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", GetString(CommandKey.DescriptionField), "", 0, 1024, true))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "inline", GetString(CommandKey.InlineField), "", 4, 5, true, false.ToString()));
 
                         var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
@@ -610,8 +612,6 @@ internal class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == ModifyField.CustomId)
                     {
-                        _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-
                         int Count = -1;
 
                         int GetInt()
@@ -639,12 +639,12 @@ internal class CustomEmbedCommand : BaseCommand
 
                         DiscordEmbedField FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)];
 
-                        var modal = new DiscordInteractionModalBuilder("Modify field for embed", Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", "Title", "", 1, 256, true, FieldToEdit.Name))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", "Description", "", 1, 1024, true, FieldToEdit.Value))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "inline", "Inline", "", 4, 5, true, FieldToEdit.Inline.ToString()));
+                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingField), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", GetString(CommandKey.TitleField), "", 1, 256, true, FieldToEdit.Name))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", GetString(CommandKey.DescriptionField), "", 1, 1024, true, FieldToEdit.Value))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "inline", GetString(CommandKey.InlineField), "", 4, 5, true, FieldToEdit.Inline.ToString()));
 
-                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, null, false, null, false);
 
                         if (ModalResult.TimedOut)
                         {
@@ -723,7 +723,7 @@ internal class CustomEmbedCommand : BaseCommand
                         {
                             if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any text or announcement channels in your server.`"));
+                                await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.NoValidChannels, true)));
                                 await Task.Delay(3000);
                                 continue;
                             }

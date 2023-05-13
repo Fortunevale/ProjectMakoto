@@ -22,16 +22,14 @@ internal class ClearBackupCommand : BaseCommand
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
                 return;
 
+        var CommandKey = t.Commands.Moderation.ClearBackup;
+
             if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
-                {
-                    Description = $"`{victim.GetUsernameWithIdentifier()} ({victim.Id}) is on the server and therefor their stored nickname and roles cannot be cleared.`",
-                    Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                    {
-                        Url = victim.AvatarUrl
-                    },
-                }.AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.IsOnServer, true, new TVar("Victim", victim.Mention)))
+                    .WithThumbnail(victim.AvatarUrl)
+                    .AsError(ctx));
 
                 return;
             }
@@ -42,14 +40,10 @@ internal class ClearBackupCommand : BaseCommand
             ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
             ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
 
-            await RespondOrEdit(new DiscordEmbedBuilder
-            {
-                Description = $"`Deleted stored nickname and roles for {victim.GetUsernameWithIdentifier()} ({victim.Id}).`",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                {
-                    Url = victim.AvatarUrl
-                }
-            }.AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Deleted, true, new TVar("Victim", victim.Mention)))
+                .WithThumbnail(victim.AvatarUrl)
+                .AsSuccess(ctx));
         });
     }
 }

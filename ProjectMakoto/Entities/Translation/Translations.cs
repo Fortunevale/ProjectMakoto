@@ -514,6 +514,17 @@ public class Translations
             public afk Afk;
             public class afk
             {
+                public events Events;
+                public class events
+                {
+                    public SingleTranslationKey NoLongerAfk;
+                    public SingleTranslationKey MissedTitle;
+                    public SingleTranslationKey Message;
+                    public SingleTranslationKey MessageListing;
+                    public SingleTranslationKey AndMore;
+                    public SingleTranslationKey CurrentlyAfk;
+                }
+
                 public SingleTranslationKey Title;
                 public SingleTranslationKey SetAfk;
             }
@@ -888,6 +899,122 @@ public class Translations
                     public SingleTranslationKey HexHelp;
                     public SingleTranslationKey DeleteNote;
                 }
+            }
+        }
+
+        public moderationCommands Moderation;
+        public class moderationCommands
+        {
+            public SingleTranslationKey NoReason;
+
+            public ban Ban;
+            public class ban
+            {
+                public SingleTranslationKey AuditLog;
+                public SingleTranslationKey Banning;
+                public SingleTranslationKey Banned;
+                public SingleTranslationKey Errored;
+            }
+
+            public clearBackup ClearBackup;
+            public class clearBackup
+            {
+                public SingleTranslationKey IsOnServer;
+                public SingleTranslationKey Deleted;
+            }
+
+            public customEmbed CustomEmbed;
+            public class customEmbed
+            {
+                public SingleTranslationKey UploadNotice;
+
+                public SingleTranslationKey New;
+                public SingleTranslationKey SetTitleButton;
+                public SingleTranslationKey SetAuthorButton;
+                public SingleTranslationKey SetThumbnailButton;
+                public SingleTranslationKey SetDescriptionButton;
+                public SingleTranslationKey SetImageButton;
+                public SingleTranslationKey SetColorButton;
+                public SingleTranslationKey SetTimestampButton;
+                public SingleTranslationKey SetFooterButton;
+                public SingleTranslationKey AddFieldButton;
+                public SingleTranslationKey ModifyFieldButton;
+                public SingleTranslationKey RemoveFieldButton;
+                public SingleTranslationKey SendEmbedButton;
+
+                public SingleTranslationKey ContinueTimer;
+                public SingleTranslationKey UploadImage;
+                public SingleTranslationKey ImportingUpload;
+                public SingleTranslationKey ImportSizeError;
+
+                public SingleTranslationKey ModifyingTitle;
+                public SingleTranslationKey TitleField;
+                public SingleTranslationKey UrlField;
+
+                public SingleTranslationKey SetNameButton;
+                public SingleTranslationKey SetUrlButton;
+                public SingleTranslationKey SetIconButton;
+                public SingleTranslationKey SetAsUserButton;
+                public SingleTranslationKey SetAsServer;
+                public SingleTranslationKey ModifyingAuthorName;
+                public SingleTranslationKey NameField;
+                public SingleTranslationKey ModifyingAuthorUrl;
+                public SingleTranslationKey ModifyingAuthorbyUserId;
+                public SingleTranslationKey UserIdField;
+
+                public SingleTranslationKey ModifyingDescription;
+                public SingleTranslationKey DescriptionField;
+
+                public SingleTranslationKey ModifyingColor;
+                public SingleTranslationKey ColorField;
+
+                public SingleTranslationKey SetTextButton;
+                public SingleTranslationKey ModifyingFooterText;
+                public SingleTranslationKey TextField;
+                public SingleTranslationKey ModifyingField;
+                public SingleTranslationKey InlineField;
+
+                public SingleTranslationKey NoValidChannels;
+            }
+
+            public followUpdates FollowUpdates;
+            public class followUpdates
+            {
+                public SingleTranslationKey Followed;
+                public SingleTranslationKey Failed;
+            }
+
+            public guildPurge GuildPurge;
+            public class guildPurge
+            {
+                public SingleTranslationKey Scanning;
+                public SingleTranslationKey Deleting;
+                public SingleTranslationKey Ended;
+            }
+
+            public kick Kick;
+            public class kick
+            {
+                public SingleTranslationKey AuditLog;
+                public SingleTranslationKey Kicking;
+                public SingleTranslationKey Kicked;
+                public SingleTranslationKey Errored;
+            }
+
+            public manualBump ManualBump;
+            public class manualBump
+            {
+                public SingleTranslationKey NotSetUp;
+                public SingleTranslationKey Warning;
+            }
+
+            public move Move;
+            public class move
+            {
+                public SingleTranslationKey NotAVc;
+                public SingleTranslationKey VcEmpty;
+                public SingleTranslationKey Moving;
+                public SingleTranslationKey Moved;
             }
         }
 

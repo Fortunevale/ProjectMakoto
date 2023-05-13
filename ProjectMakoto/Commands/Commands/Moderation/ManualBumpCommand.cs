@@ -17,18 +17,19 @@ internal class ManualBumpCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Moderation.ManualBump;
+
             if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
             {
-                _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The bump reminder is not set up.`").AsError(ctx));
+                _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.NotSetUp, true)).AsError(ctx));
                 return;
             }
 
-            DiscordButtonComponent YesButton = new(ButtonStyle.Success, Guid.NewGuid().ToString(), "Yes", false, DiscordEmoji.FromUnicode("✅").ToComponent());
+            DiscordButtonComponent YesButton = new(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Yes), false, DiscordEmoji.FromUnicode("✅").ToComponent());
 
             await RespondOrEdit(new DiscordMessageBuilder()
-                .WithEmbed(new DiscordEmbedBuilder().WithDescription("`Manually overwriting the last bump time will re-schedule the bump reminder as if the server was just bumped. Are you sure you want to continue?`").AsWarning(ctx))
-                .AddComponents(YesButton)
-                .AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "No", false, DiscordEmoji.FromUnicode("❌").ToComponent())));
+                .WithEmbed(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.Warning, true)).AsWarning(ctx))
+                .AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Common.No), false, DiscordEmoji.FromUnicode("❌").ToComponent()), YesButton));
 
             var e = await ctx.ResponseMessage.WaitForButtonAsync(ctx.User);
 
