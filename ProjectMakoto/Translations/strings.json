@@ -2476,6 +2476,14 @@
         "Errored": {
           "en": "{Victim} could not be kicked."
         }
+      },
+      "ManualBump": {
+        "NotSetUp": {
+          "en": "The bump reminder is not set up."
+        },
+        "Warning": {
+          "en": "Manually overwriting the last bump time will re-schedule the bump reminder as if the server was just bumped. Are you sure you want to continue?"
+        }
       }
     },
     "Config": {

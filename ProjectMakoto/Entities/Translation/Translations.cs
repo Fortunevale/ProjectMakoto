@@ -1000,6 +1000,13 @@ public class Translations
                 public SingleTranslationKey Kicked;
                 public SingleTranslationKey Errored;
             }
+
+            public manualBump ManualBump;
+            public class manualBump
+            {
+                public SingleTranslationKey NotSetUp;
+                public SingleTranslationKey Warning;
+            }
         }
 
         public configurationCommands Config;
