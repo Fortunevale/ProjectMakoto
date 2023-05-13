@@ -2484,6 +2484,20 @@
         "Warning": {
           "en": "Manually overwriting the last bump time will re-schedule the bump reminder as if the server was just bumped. Are you sure you want to continue?"
         }
+      },
+      "Move": {
+        "NotAVc": {
+          "en": "The channel you selected is not a voice channel."
+        },
+        "VcEmpty": {
+          "en": "The channel you selected is empty."
+        },
+        "Moving": {
+          "en": "Moving {Count} users from {Origin} to {Destination}.."
+        },
+        "Moved": {
+          "en": "Moved {Count} users from {Origin} to {Destination}.."
+        }
       }
     },
     "Config": {

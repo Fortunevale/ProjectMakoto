@@ -19,20 +19,34 @@ internal class MoveAllCommand : BaseCommand
         {
             DiscordChannel newChannel = (DiscordChannel)arguments["newChannel"];
 
+            var CommandKey = t.Commands.Moderation.Move;
+
             if (newChannel.Type != ChannelType.Voice)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`The channel you selected is not a voice channel.`").AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.NotAVc, true))
+                    .AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moving {ctx.Member.VoiceState.Channel.Users.Count} users to` {newChannel.Mention}`..`").AsLoading(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Moving, true, 
+                    new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
+                    new TVar("Origin", ctx.Member.VoiceState.Channel.Mention),
+                    new TVar("Destination", newChannel.Mention)))
+                .AsLoading(ctx));
 
             foreach (var b in ctx.Member.VoiceState.Channel.Users)
             {
-                await b.ModifyAsync(x => x.VoiceChannel = newChannel);
+                _ = b.ModifyAsync(x => x.VoiceChannel = newChannel);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Moved {ctx.Member.VoiceState.Channel.Users.Count} users to` {newChannel.Mention}`.`").AsSuccess(ctx));
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Moved, true,
+                    new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
+                    new TVar("Origin", ctx.Member.VoiceState.Channel.Mention),
+                    new TVar("Destination", newChannel.Mention)))
+                .AsSuccess(ctx));
         });
     }
 }

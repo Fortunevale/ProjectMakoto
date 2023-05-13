@@ -1007,6 +1007,15 @@ public class Translations
                 public SingleTranslationKey NotSetUp;
                 public SingleTranslationKey Warning;
             }
+
+            public move Move;
+            public class move
+            {
+                public SingleTranslationKey NotAVc;
+                public SingleTranslationKey VcEmpty;
+                public SingleTranslationKey Moving;
+                public SingleTranslationKey Moved;
+            }
         }
 
         public configurationCommands Config;
