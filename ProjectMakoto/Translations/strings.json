@@ -2641,6 +2641,20 @@
         "Failed": {
           "en": "Couldn't remove timeout for {Victim}."
         }
+      },
+      "Softban": {
+        "AuditLog": {
+          "en": "{FullUser} soft-banned user: {Reason}"
+        },
+        "Banning": {
+          "en": "Softbanning {Victim}.."
+        },
+        "Banned": {
+          "en": "{Victim} was soft-banned for '{Reason}' by {User}."
+        },
+        "Errored": {
+          "en": "{Victim} could not be soft-banned."
+        }
       }
     },
     "Config": {

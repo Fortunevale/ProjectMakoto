@@ -1076,6 +1076,15 @@ public class Translations
                 public SingleTranslationKey Removed;
                 public SingleTranslationKey Failed;
             }
+
+            public softban Softban;
+            public class softban
+            {
+                public SingleTranslationKey AuditLog;
+                public SingleTranslationKey Banning;
+                public SingleTranslationKey Banned;
+                public SingleTranslationKey Errored;
+            }
         }
 
         public configurationCommands Config;
