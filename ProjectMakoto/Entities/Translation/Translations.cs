@@ -1058,6 +1058,16 @@ public class Translations
                 public SingleTranslationKey NoVotes;
                 public SingleTranslationKey Votes;
             }
+
+            public purge Purge;
+            public class purge
+            {
+                public SingleTranslationKey Fetching;
+                public SingleTranslationKey Fetched;
+                public SingleTranslationKey NoMessages;
+                public SingleTranslationKey Deleted;
+                public SingleTranslationKey Failed;
+            }
         }
 
         public configurationCommands Config;

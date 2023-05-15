@@ -2613,6 +2613,23 @@
         "Votes": {
           "en": "{Count} Votes"
         }
+      },
+      "Purge": {
+        "Fetching": {
+          "en": "Fetching {Count} messages.."
+        },
+        "Fetched": {
+          "en": "Fetched {Count} messages.."
+        },
+        "NoMessages": {
+          "en": "No messages were found with the specified filter."
+        },
+        "Deleted": {
+          "en": "Successfully deleted {Count} messages."
+        },
+        "Failed": {
+          "en": "Failed to delete {Count} messages because they were more than 14 days old."
+        }
       }
     },
     "Config": {
