@@ -204,14 +204,11 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }
     }
     
-    [ContextMenu(ApplicationCommandType.Message, "Add a Reaction Role", (long)Permissions.Administrator)]
+    [ContextMenu(ApplicationCommandType.Message, "Add a Reaction Role", (long)Permissions.Administrator, dmPermission: false)]
     public async Task Add(ContextMenuContext ctx)
     {
         Task.Run(async () =>
         {
-            if (ctx.Channel.IsPrivate)
-                return;
-
             await new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "message", ctx.TargetMessage },
@@ -219,14 +216,11 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
-    [ContextMenu(ApplicationCommandType.Message, "Remove a Reaction Role", (long)Permissions.Administrator)]
+    [ContextMenu(ApplicationCommandType.Message, "Remove a Reaction Role", (long)Permissions.Administrator, dmPermission: false)]
     public async Task Remove(ContextMenuContext ctx)
     {
         Task.Run(async () =>
         {
-            if (ctx.Channel.IsPrivate)
-                return;
-
             await new Commands.ReactionRolesCommand.RemoveCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "message", ctx.TargetMessage },
@@ -234,14 +228,11 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
 
-    [ContextMenu(ApplicationCommandType.Message, "Remove all Reaction Roles", (long)Permissions.Administrator)]
+    [ContextMenu(ApplicationCommandType.Message, "Remove all Reaction Roles", (long)Permissions.Administrator, dmPermission: false)]
     public async Task RemoveAll(ContextMenuContext ctx)
     {
         Task.Run(async () =>
         {
-            if (ctx.Channel.IsPrivate)
-                return;
-
             await new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
                 {
                     { "message", ctx.TargetMessage },
