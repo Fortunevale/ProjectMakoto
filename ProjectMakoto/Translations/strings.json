@@ -111,6 +111,14 @@
         "UploadInProgress": {
           "en": "An upload interaction is already taking place. Please finish it beforehand.",
           "de": "Eine Upload Interaktion läuft bereits. Bitte beende diese bevor du eine weitere startest."
+        },
+        "NoRoles": {
+          "en": "Could not find any roles in your server.",
+          "de": "Es konnten keine Rollen in deinem Server gefunden werden."
+        },
+        "NoChannels": {
+          "en": "Could not find any fitting channels in your server.",
+          "de": "Es konnten keine passenden Kanäle in deinem Server gefunden werden."
         }
       },
       "Prompts": {
@@ -2497,6 +2505,113 @@
         },
         "Moved": {
           "en": "Moved {Count} users from {Origin} to {Destination}.."
+        }
+      },
+      "Poll": {
+        "PollLimitReached": {
+          "en": "There's already 10 polls running on this guild."
+        },
+        "InvalidTime": {
+          "en": "You specified a date in the past or a date further away than 1 month."
+        },
+        "InvalidOptionLimit": {
+          "en": "You specified an invalid minimum or maximum."
+        },
+        "SelectRoleButton": {
+          "en": "Select Role"
+        },
+        "SelectChannelButton": {
+          "en": "Select Channel"
+        },
+        "SelectPollContentButton": {
+          "en": "Set Poll Content"
+        },
+        "NewOptionButton": {
+          "en": "Add new option"
+        },
+        "RemoveOptionButton": {
+          "en": "Remove option"
+        },
+        "SetTimeButton": {
+          "en": "Set Due Date & Time"
+        },
+        "SelectMultiSelectButton": {
+          "en": "Set Multi Select Limits"
+        },
+        "PollContent": {
+          "en": "Poll Content"
+        },
+        "AvailableOptions": {
+          "en": "Available Options"
+        },
+        "SelectedChannel": {
+          "en": "Selected Channel"
+        },
+        "DueTime": {
+          "en": "Due Date & Time"
+        },
+        "Role": {
+          "en": "Role to mention"
+        },
+        "MinimumVotes": {
+          "en": "Minimum Votes"
+        },
+        "MaximumVotes": {
+          "en": "Maximum Votes"
+        },
+        "NoOptions": {
+          "en": "No options set"
+        },
+        "DontPing": {
+          "en": "Do not ping anyone for this poll"
+        },
+        "ModalTitle": {
+          "en": "New Poll"
+        },
+        "Title": {
+          "en": "Title"
+        },
+        "Description": {
+          "en": "Description"
+        },
+        "OptionExists": {
+          "en": "This option has already been added."
+        },
+        "VoteOnThisPoll": {
+          "en": "Vote on this poll.."
+        },
+        "EndPollEarly": {
+          "en": "End this poll early"
+        },
+        "Poll": {
+          "en": "Poll"
+        },
+        "PollEnding": {
+          "en": "This poll will end {Timestamp}."
+        },
+        "TotalVotes": {
+          "en": "{Count} Total Votes"
+        },
+        "Voted": {
+          "en": "Voted for {Options}"
+        },
+        "VoteUpdated": {
+          "en": "Updated your vote to {Options}"
+        },
+        "NoPerms": {
+          "en": "You don't have the necessary permissions to end this poll early."
+        },
+        "PollEnded": {
+          "en": "Poll ended."
+        },
+        "Results": {
+          "en": "Results"
+        },
+        "NoVotes": {
+          "en": "No one voted on this poll."
+        },
+        "Votes": {
+          "en": "{Count} Votes"
         }
       }
     },

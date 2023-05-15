@@ -54,6 +54,8 @@ public class Translations
                 public SingleTranslationKey BotPermissions;
                 public SingleTranslationKey DirectMessage;
                 public SingleTranslationKey UploadInProgress;
+                public SingleTranslationKey NoRoles;
+                public SingleTranslationKey NoChannels;
             }
 
             public prompts Prompts;
@@ -1015,6 +1017,46 @@ public class Translations
                 public SingleTranslationKey VcEmpty;
                 public SingleTranslationKey Moving;
                 public SingleTranslationKey Moved;
+            }
+
+            public poll Poll;
+            public class poll
+            {
+                public SingleTranslationKey PollLimitReached;
+                public SingleTranslationKey InvalidTime;
+                public SingleTranslationKey InvalidOptionLimit;
+                public SingleTranslationKey SelectRoleButton;
+                public SingleTranslationKey SelectChannelButton;
+                public SingleTranslationKey SelectPollContentButton;
+                public SingleTranslationKey NewOptionButton;
+                public SingleTranslationKey RemoveOptionButton;
+                public SingleTranslationKey SetTimeButton;
+                public SingleTranslationKey SelectMultiSelectButton;
+                public SingleTranslationKey PollContent;
+                public SingleTranslationKey AvailableOptions;
+                public SingleTranslationKey SelectedChannel;
+                public SingleTranslationKey DueTime;
+                public SingleTranslationKey Role;
+                public SingleTranslationKey MinimumVotes;
+                public SingleTranslationKey MaximumVotes;
+                public SingleTranslationKey NoOptions;
+                public SingleTranslationKey DontPing;
+                public SingleTranslationKey ModalTitle;
+                public SingleTranslationKey Title;
+                public SingleTranslationKey Description;
+                public SingleTranslationKey OptionExists;
+                public SingleTranslationKey VoteOnThisPoll;
+                public SingleTranslationKey EndPollEarly;
+                public SingleTranslationKey Poll;
+                public SingleTranslationKey PollEnding;
+                public SingleTranslationKey TotalVotes;
+                public SingleTranslationKey Voted;
+                public SingleTranslationKey VoteUpdated;
+                public SingleTranslationKey NoPerms;
+                public SingleTranslationKey PollEnded;
+                public SingleTranslationKey Results;
+                public SingleTranslationKey NoVotes;
+                public SingleTranslationKey Votes;
             }
         }
 
