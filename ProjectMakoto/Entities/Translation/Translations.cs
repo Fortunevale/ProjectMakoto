@@ -1085,6 +1085,16 @@ public class Translations
                 public SingleTranslationKey Banned;
                 public SingleTranslationKey Errored;
             }
+
+            public timeout Timeout;
+            public class timeout
+            {
+                public SingleTranslationKey AuditLog;
+                public SingleTranslationKey TimingOut;
+                public SingleTranslationKey TimedOut;
+                public SingleTranslationKey Failed;
+                public SingleTranslationKey Invalid;
+            }
         }
 
         public configurationCommands Config;

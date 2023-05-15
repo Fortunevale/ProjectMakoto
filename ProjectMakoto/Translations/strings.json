@@ -2655,6 +2655,23 @@
         "Errored": {
           "en": "{Victim} could not be soft-banned."
         }
+      },
+      "Timeout": {
+        "AuditLog": {
+          "en": "{FullUser} timed user out: {Reason}"
+        },
+        "TimingOut": {
+          "en": "Timing {Victim} out.."
+        },
+        "TimedOut": {
+          "en": "{Victim} was timed out for: {Reason}"
+        },
+        "Failed": {
+          "en": "Couldn't timeout {Victim}."
+        },
+        "Invalid": {
+          "en": "The Duration you specified is invalid."
+        }
       }
     },
     "Config": {
