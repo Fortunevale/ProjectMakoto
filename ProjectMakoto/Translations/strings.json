@@ -2672,6 +2672,17 @@
         "Invalid": {
           "en": "The Duration you specified is invalid."
         }
+      },
+      "Unban": {
+        "Removing": {
+          "en": "Unbanning {Victim}.."
+        },
+        "Removed": {
+          "en": "{Victim} was unbanned."
+        },
+        "Failed": {
+          "en": "Couldn't unban {Victim}."
+        }
       }
     },
     "Config": {

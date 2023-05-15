@@ -1095,6 +1095,14 @@ public class Translations
                 public SingleTranslationKey Failed;
                 public SingleTranslationKey Invalid;
             }
+
+            public unban Unban;
+            public class unban
+            {
+                public SingleTranslationKey Removing;
+                public SingleTranslationKey Removed;
+                public SingleTranslationKey Failed;
+            }
         }
 
         public configurationCommands Config;
