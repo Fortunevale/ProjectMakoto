@@ -1068,6 +1068,14 @@ public class Translations
                 public SingleTranslationKey Deleted;
                 public SingleTranslationKey Failed;
             }
+
+            public removeTimeout RemoveTimeout;
+            public class removeTimeout
+            {
+                public SingleTranslationKey Removing;
+                public SingleTranslationKey Removed;
+                public SingleTranslationKey Failed;
+            }
         }
 
         public configurationCommands Config;

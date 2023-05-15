@@ -2630,6 +2630,17 @@
         "Failed": {
           "en": "Failed to delete {Count} messages because they were more than 14 days old."
         }
+      },
+      "RemoveTimeout": {
+        "Removing": {
+          "en": "Removing timeout for {Victim}.."
+        },
+        "Removed": {
+          "en": "Removed timeout for {Victim}."
+        },
+        "Failed": {
+          "en": "Couldn't remove timeout for {Victim}."
+        }
       }
     },
     "Config": {
