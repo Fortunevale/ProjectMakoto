@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.ScoreSaber", "..\Xoro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xorog.UniversalExtensions", "..\Xorog.UniversalExtensions\Xorog.UniversalExtensions.csproj", "{906F9C70-17B3-4B6D-AFFF-976338D641C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslationSourceGenerator", "..\TranslationSourceGenerator\TranslationSourceGenerator.csproj", "{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +81,18 @@ Global
 		{906F9C70-17B3-4B6D-AFFF-976338D641C4}.x64|Any CPU.Build.0 = x64|Any CPU
 		{906F9C70-17B3-4B6D-AFFF-976338D641C4}.x64|x64.ActiveCfg = x64|x64
 		{906F9C70-17B3-4B6D-AFFF-976338D641C4}.x64|x64.Build.0 = x64|x64
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Debug|x64.Build.0 = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Release|x64.ActiveCfg = Release|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.Release|x64.Build.0 = Release|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.x64|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.x64|Any CPU.Build.0 = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.x64|x64.ActiveCfg = Debug|Any CPU
+		{AEA153B6-64F6-48F7-AB08-FE4D56E8240C}.x64|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
