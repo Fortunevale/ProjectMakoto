@@ -42,6 +42,32 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public actionLog ActionLog;
+            public class actionLog
+            {
+                public SingleTranslationKey NoOptions;
+                public SingleTranslationKey OptionInaccurate;
+                public SingleTranslationKey ChangeFilterButton;
+                public SingleTranslationKey ChangeChannelButton;
+                public SingleTranslationKey SetChannelButton;
+                public SingleTranslationKey DisableActionLogButton;
+                public SingleTranslationKey InviteModifications;
+                public SingleTranslationKey VoiceChannelUpdates;
+                public SingleTranslationKey ChannelModifications;
+                public SingleTranslationKey ServerModifications;
+                public SingleTranslationKey BanUpdates;
+                public SingleTranslationKey RoleUpdates;
+                public SingleTranslationKey MessageModifications;
+                public SingleTranslationKey MessageDeletions;
+                public SingleTranslationKey UserProfileUpdates;
+                public SingleTranslationKey UserRoleUpdates;
+                public SingleTranslationKey UserStateUpdates;
+                public SingleTranslationKey AttemptGatheringMoreDetails;
+                public SingleTranslationKey ActionLogChannel;
+                public SingleTranslationKey ActionlogDisabled;
+                public SingleTranslationKey Title;
+            }
+
         }
 
         public moderation Moderation;

@@ -13,21 +13,27 @@ internal class ActionLogAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        if (ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0)
-            return $"❌ `The actionlog is disabled.`";
+        var CommandKey = Bot.loadedTranslations.Commands.Config.ActionLog;
 
-        return $"{EmojiTemplates.GetChannel(ctx.Bot)} `Actionlog Channel                 ` : <#{ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel}>\n\n" +
-               $"⚠ `Attempt gathering more details    ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.AttemptGettingMoreDetails.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `Join, Leaves & Kicks              ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MembersModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `Nickname, Role, Membership Updates` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `User Profile Updates              ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberProfileModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetMessage(ctx.Bot)} `Message Deletions                 ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageDeleted.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetMessage(ctx.Bot)} `Message Modifications             ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `Role Updates                      ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.RolesModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `Bans & Unbans                     ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.BanlistModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetGuild(ctx.Bot)} `Server Modifications              ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.GuildModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetChannel(ctx.Bot)} `Channel Modifications             ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.ChannelsModified.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetVoiceState(ctx.Bot)} `Voice Channel Updates             ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.VoiceStateUpdated.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetInvite(ctx.Bot)} `Invite Modifications              ` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.InvitesModified.ToEmote(ctx.Bot)}";
+        if (ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0)
+            return $"❌ {CommandKey.ActionlogDisabled.Get(ctx.DbUser).Build(true)}";
+
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.InviteModifications, CommandKey.VoiceChannelUpdates, CommandKey.ChannelModifications, CommandKey.ServerModifications, CommandKey.BanUpdates, 
+            CommandKey.RoleUpdates, CommandKey.MessageModifications, CommandKey.MessageModifications, CommandKey.UserProfileUpdates, CommandKey.UserRoleUpdates, CommandKey.UserStateUpdates, 
+            CommandKey.AttemptGatheringMoreDetails, CommandKey.ActionLogChannel);
+
+        return $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.ActionLogChannel.Get(ctx.DbUser).PadRight(pad)}` : <#{ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel}>\n\n" +
+               $"⚠ `{CommandKey.AttemptGatheringMoreDetails.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.AttemptGettingMoreDetails.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.UserStateUpdates.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MembersModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.UserRoleUpdates.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.UserProfileUpdates.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MemberProfileModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetMessage(ctx.Bot)} `{CommandKey.MessageDeletions.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageDeleted.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetMessage(ctx.Bot)} `{CommandKey.MessageModifications.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.MessageModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.RoleUpdates.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.RolesModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.BanUpdates.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.BanlistModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetGuild(ctx.Bot)} `{CommandKey.ServerModifications.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.GuildModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.ChannelModifications.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.ChannelsModified.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetVoiceState(ctx.Bot)} `{CommandKey.VoiceChannelUpdates.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.VoiceStateUpdated.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetInvite(ctx.Bot)} `{CommandKey.InviteModifications.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].ActionLog.InvitesModified.ToEmote(ctx.Bot)}";
     }
 }

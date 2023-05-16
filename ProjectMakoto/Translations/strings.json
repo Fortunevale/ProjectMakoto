@@ -2805,6 +2805,71 @@
       }
     },
     "Config": {
+      "ActionLog": {
+        "Title": {
+          "en": "Actionlog"
+        },
+        "ActionlogDisabled": {
+          "en": "The actionlog is disabled."
+        },
+        "ActionLogChannel": {
+          "en": "Actionlog Channel"
+        },
+        "AttemptGatheringMoreDetails": {
+          "en": "Attempt gathering more details"
+        },
+        "UserStateUpdates": {
+          "en": "Joins, Leaves, Kicks"
+        },
+        "UserRoleUpdates": {
+          "en": "Nickname, Role Updates"
+        },
+        "UserProfileUpdates": {
+          "en": "User Profile Updates"
+        },
+        "MessageDeletions": {
+          "en": "Message Deletions"
+        },
+        "MessageModifications": {
+          "en": "Message Modifications"
+        },
+        "RoleUpdates": {
+          "en": "Role Updates"
+        },
+        "BanUpdates": {
+          "en": "Banlist Updates"
+        },
+        "ServerModifications": {
+          "en": "Server Modifications"
+        },
+        "ChannelModifications": {
+          "en": "Channel Modifications"
+        },
+        "VoiceChannelUpdates": {
+          "en": "Voice Channel Updates"
+        },
+        "InviteModifications": {
+          "en": "Invite Modifications"
+        },
+        "DisableActionLogButton": {
+          "en": "Disable Actionlog"
+        },
+        "SetChannelButton": {
+          "en": "Set Channel"
+        },
+        "ChangeChannelButton": {
+          "en": "Change Channel"
+        },
+        "ChangeFilterButton": {
+          "en": "Edit Filter"
+        },
+        "OptionInaccurate": {
+          "en": "This option may sometimes be inaccurate."
+        },
+        "NoOptions": {
+          "en": "No options selected."
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",
