@@ -88,6 +88,7 @@ public class Translations
                     {
                         try
                         {
+                            List<string> Warnings = new();
                             string Insert = "";
 
                             _logger.LogDebug("Translation file updated. Updating Translations.cs..");
@@ -125,13 +126,18 @@ public class Translations
                                         {
                                             bool containsLocaleCode = false;
                                             bool localeCodeIsArray = false;
+
+                                            List<KeyValuePair<string, JToken?>> tokens = new();
                                             foreach (var subItem in item.Value.ToObject<JObject>())
+                                            {
+                                                tokens.Add(subItem);
+
                                                 if (subItem.Key == "en")
                                                 {
                                                     containsLocaleCode = true;
                                                     localeCodeIsArray = subItem.Value.Type == JTokenType.Array;
-                                                    break;
                                                 }
+                                            }
 
                                             if (containsLocaleCode)
                                             {
@@ -139,11 +145,17 @@ public class Translations
                                                 {
                                                     _logger.LogDebug("Found SingleKey '{0}'", item.Key);
                                                     Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public SingleTranslationKey {item.Key};");
+
+                                                    if (!tokens.Any(x => x.Key == "de"))
+                                                        Warnings.Add($"String at path {entryPoint} has no de translation");
                                                 }
                                                 else
                                                 {
                                                     _logger.LogDebug("Found MultiKey '{0}'", item.Key);
                                                     Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public MultiTranslationKey {item.Key};");
+
+                                                    if (!tokens.Any(x => x.Key == "de"))
+                                                        Warnings.Add($"String at path {entryPoint} has no de translation");
                                                 }
                                                 continue;
                                             }
@@ -167,6 +179,10 @@ public class Translations
                                 }
                             }
                             RecursiveHandle(jsonFile, "", 1);
+                            foreach (var b in Warnings)
+                            {
+                                _logger.LogWarn(b);
+                            }
 
                             Insert = string.Join("\n", Insert.Split("\n").Where(x => !x.Contains("InsertPoint")));
 

@@ -1156,7 +1156,8 @@
           "de": "Schaut"
         },
         "Competing": {
-          "en": "Competing"
+          "en": "Competing",
+          "de": "Konkurriert"
         },
         "Status": {
           "en": "Status",
@@ -2119,9 +2120,9 @@
         },
         "Export": {
           "Exported": {
-            "en": "Exported your playlist '{Name}' to json. Please download the attached file."
-          },
-          "de": "Deine Wiedergabeliste '{Name}' wurde als Json exportiert. Bitte lade die angehängte Datei herunter."
+            "en": "Exported your playlist '{Name}' to json. Please download the attached file.",
+            "de": "Deine Wiedergabeliste '{Name}' wurde als Json exportiert. Bitte lade die angehängte Datei herunter."
+          }
         },
         "Delete": {
           "Deleting": {
