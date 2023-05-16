@@ -2870,6 +2870,38 @@
           "en": "No options selected."
         }
       },
+      "AutoCrosspost": {
+        "Title": {
+          "en": "Auto Crosspost"
+        },
+        "ExcludeBots": {
+          "en": "Exclude Bots"
+        },
+        "DelayBeforePosting": {
+          "en": "Delay before crossposting"
+        },
+        "SetDelayButton": {
+          "en": "Set Delay"
+        },
+        "ToggleExcludeBotsButton": {
+          "en": "Toggle Exclude Bots"
+        },
+        "AddChannelButton": {
+          "en": "Add Channel"
+        },
+        "RemoveChannelButton": {
+          "en": "Remove Channel"
+        },
+        "DurationLimit": {
+          "en": "The duration has to be between 1 second and 5 minutes."
+        },
+        "ChannelLimit": {
+          "en": "You cannot add more than 20 channels to crosspost. Need more? Ask for approval on our development server: {Invite}"
+        },
+        "NoCrosspostChannels": {
+          "en": "No Crosspost Channels are set up."
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

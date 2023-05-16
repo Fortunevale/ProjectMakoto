@@ -42,6 +42,21 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public autoCrosspost AutoCrosspost;
+            public class autoCrosspost
+            {
+                public SingleTranslationKey NoCrosspostChannels;
+                public SingleTranslationKey ChannelLimit;
+                public SingleTranslationKey DurationLimit;
+                public SingleTranslationKey RemoveChannelButton;
+                public SingleTranslationKey AddChannelButton;
+                public SingleTranslationKey ToggleExcludeBotsButton;
+                public SingleTranslationKey SetDelayButton;
+                public SingleTranslationKey DelayBeforePosting;
+                public SingleTranslationKey ExcludeBots;
+                public SingleTranslationKey Title;
+            }
+
             public actionLog ActionLog;
             public class actionLog
             {

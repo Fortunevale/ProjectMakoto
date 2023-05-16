@@ -13,8 +13,12 @@ internal class AutoCrosspostCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"🤖 `Exclude Bots             `: {ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots.ToEmote(ctx.Bot)}\n" +
-               $"🕒 `Delay before crossposting`: `{TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.DelayBeforePosting).GetHumanReadable()}`\n\n" +
-               $"{(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count != 0 ? string.Join("\n\n", ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : "`No Auto Crosspost Channels set up.`")}";
+        var CommandKey = Bot.loadedTranslations.Commands.Config.AutoCrosspost;
+
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ExcludeBots, CommandKey.DelayBeforePosting);
+
+        return $"🤖 `{CommandKey.ExcludeBots.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots.ToEmote(ctx.Bot)}\n" +
+               $"🕒 `{CommandKey.DelayBeforePosting.Get(ctx.DbUser).PadRight(pad)}`: `{TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.DelayBeforePosting).GetHumanReadable()}`\n\n" +
+               $"{(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count != 0 ? string.Join("\n\n", ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
     }
 }
