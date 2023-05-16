@@ -2902,6 +2902,23 @@
           "en": "No Crosspost Channels are set up."
         }
       },
+      "AutoUnarchive": {
+        "Title": {
+          "en": "Auto Thread Unarchiver"
+        },
+        "NoChannels": {
+          "en": "No channels defined."
+        },
+        "Explanation": {
+          "en": "This module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**"
+        },
+        "AddChannelButton": {
+          "en": "Add Channel"
+        },
+        "RemoveChannelButton": {
+          "en": "Remove Channel"
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

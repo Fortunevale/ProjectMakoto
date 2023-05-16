@@ -19,6 +19,6 @@ internal class AutoUnarchiveCommandAbstractions
                 ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Remove(b);
         }
 
-        return $"{(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : "`No channels defined.`")}";
+        return $"{(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : Bot.loadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
     }
 }

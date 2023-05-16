@@ -42,6 +42,16 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public autoUnarchive AutoUnarchive;
+            public class autoUnarchive
+            {
+                public SingleTranslationKey RemoveChannelButton;
+                public SingleTranslationKey AddChannelButton;
+                public SingleTranslationKey Explanation;
+                public SingleTranslationKey NoChannels;
+                public SingleTranslationKey Title;
+            }
+
             public autoCrosspost AutoCrosspost;
             public class autoCrosspost
             {
