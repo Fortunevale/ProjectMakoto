@@ -65,6 +65,12 @@ public class Translations
 
         _ = Task.Run(async () =>
         {
+            if (!Directory.Exists(args.Length > 0 ? args[0] : "e252zru2rjb2rtb23jbrj2bthj2bthjb2jtb4jbtb2jtb4hj"))
+            {
+                _logger.LogError("Valid directory expected as arg0");
+                return;
+            }
+
             this.SourceDirectory = args[0];
 
             _logger.LogDebug("Project Makoto Translation Source Generator started up.");
