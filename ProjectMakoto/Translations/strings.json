@@ -2983,6 +2983,23 @@
           "en": "Toggle Github Code Embeds"
         }
       },
+      "Experience": {
+        "Title": {
+          "en": "Experience"
+        },
+        "ExperienceEnabled": {
+          "en": "Experience Enabled"
+        },
+        "ExperienceBoostForBumpers": {
+          "en": "Experience Boost for Bumpers"
+        },
+        "ToggleExperienceButton": {
+          "en": "Toggle Experience System"
+        },
+        "ToggleExperienceBoostButton": {
+          "en": "Toggle Experience Boost for Bumpers"
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

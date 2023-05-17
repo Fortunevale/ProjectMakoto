@@ -43,6 +43,16 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public experience Experience;
+            public class experience
+            {
+                public SingleTranslationKey ToggleExperienceBoostButton;
+                public SingleTranslationKey ToggleExperienceButton;
+                public SingleTranslationKey ExperienceBoostForBumpers;
+                public SingleTranslationKey ExperienceEnabled;
+                public SingleTranslationKey Title;
+            }
+
             public embedMessages EmbedMessages;
             public class embedMessages
             {
