@@ -3043,6 +3043,29 @@
           "en": "Toggle Invite Tracker"
         }
       },
+      "InVoicePrivacy": {
+        "Title": {
+          "en": "In-Voice Text Channel Privacy"
+        },
+        "ClearMessagesOnLeave": {
+          "en": "Clear User's Messages on Leave"
+        },
+        "SetPermissions": {
+          "en": "Set Permissions on User Join/Leave"
+        },
+        "ToggleMessageDeletionButton": {
+          "en": "Toggle Message Deletion"
+        },
+        "TogglePermissionProtectionButton": {
+          "en": "Toggle Permission Protection"
+        },
+        "EnabledInVoicePrivacy": {
+          "en": "Enabled In-Voice Privacy"
+        },
+        "DisabledInVoicePrivacy": {
+          "en": "Disabled In-Voice Privacy"
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

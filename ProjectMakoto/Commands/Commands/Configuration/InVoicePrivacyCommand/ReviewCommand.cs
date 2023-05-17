@@ -23,7 +23,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = InVoicePrivacyCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, "In-Voice Text Channel Privacy"));
+            }.AsInfo(ctx, GetString(t.Commands.Config.InVoicePrivacy.Title)));
         });
     }
 }

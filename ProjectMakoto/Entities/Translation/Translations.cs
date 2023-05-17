@@ -43,6 +43,18 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public inVoicePrivacy InVoicePrivacy;
+            public class inVoicePrivacy
+            {
+                public SingleTranslationKey DisabledInVoicePrivacy;
+                public SingleTranslationKey EnabledInVoicePrivacy;
+                public SingleTranslationKey TogglePermissionProtectionButton;
+                public SingleTranslationKey ToggleMessageDeletionButton;
+                public SingleTranslationKey SetPermissions;
+                public SingleTranslationKey ClearMessagesOnLeave;
+                public SingleTranslationKey Title;
+            }
+
             public inviteTracker InviteTracker;
             public class inviteTracker
             {

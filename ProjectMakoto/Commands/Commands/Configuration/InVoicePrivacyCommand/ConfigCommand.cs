@@ -17,16 +17,18 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.InVoicePrivacy;
+
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             var embed = new DiscordEmbedBuilder
             {
                 Description = InVoicePrivacyCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, "In-Voice Text Channel Privacy");
+            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var ToggleDeletion = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Deletion", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
-            var TogglePermission = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Permission Protection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
+            var ToggleDeletion = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleMessageDeletionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            var TogglePermission = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.TogglePermissionProtectionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -66,7 +68,7 @@ internal class ConfigCommand : BaseCommand
 
                         foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
                         {
-                            _ = b.Value.AddOverwriteAsync(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages, "Enabled In-Voice Privacy");
+                            _ = b.Value.AddOverwriteAsync(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.SendMessages, GetGuildString(CommandKey.EnabledInVoicePrivacy));
                         }
                     }
                     else
@@ -76,7 +78,7 @@ internal class ConfigCommand : BaseCommand
 
                         foreach (var b in ctx.Guild.Channels.Where(x => x.Value.Type == ChannelType.Voice))
                         {
-                            _ = b.Value.DeleteOverwriteAsync(ctx.Guild.EveryoneRole, "Disabled In-Voice Privacy");
+                            _ = b.Value.DeleteOverwriteAsync(ctx.Guild.EveryoneRole, GetGuildString(CommandKey.DisabledInVoicePrivacy));
                         }
                     }
                 });

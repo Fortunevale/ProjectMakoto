@@ -13,7 +13,11 @@ internal class InVoicePrivacyCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"🗑 `Clear Messages on empty Voice Channel`: {ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled.ToEmote(ctx.Bot)}\n" +
-               $"📋 `Set Permissions on User Join         `: {ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled.ToEmote(ctx.Bot)}";
+        var CommandKey = Bot.loadedTranslations.Commands.Config.InVoicePrivacy;
+
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ClearMessagesOnLeave, CommandKey.SetPermissions);
+
+        return $"{"🗑".UnicodeToEmoji()} `{CommandKey.ClearMessagesOnLeave.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled.ToEmote(ctx.Bot)}\n" +
+               $"{"📋".UnicodeToEmoji()} `{CommandKey.SetPermissions.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled.ToEmote(ctx.Bot)}";
     }
 }
