@@ -3274,6 +3274,62 @@
           "en": "You cannot set the bump reminder role to be automatically assigned on join."
         }
       },
+      "LevelRewards": {
+        "Title": {
+          "en": "Level Rewards"
+        },
+        "Level": {
+          "en": "Level"
+        },
+        "Role": {
+          "en": "Role"
+        },
+        "Message": {
+          "en": "Message"
+        },
+        "NoRewardsSetup": {
+          "en": "No Level Rewards are set up."
+        },
+        "Loading": {
+          "en": "Loading Level Rewards.."
+        },
+        "SelectPrompt": {
+          "en": "Please select a Level Reward to modify or delete."
+        },
+        "AddNewButton": {
+          "en": "Add new Level Reward"
+        },
+        "ModifyButton": {
+          "en": "Modify Message"
+        },
+        "RemoveButton": {
+          "en": "Delete"
+        },
+        "SelectDropdown": {
+          "en": "Select a Level Reward.."
+        },
+        "DefaultCustomText": {
+          "en": "You received ##Role##!"
+        },
+        "SelectRoleButton": {
+          "en": "Select Role"
+        },
+        "SelectLevelButton": {
+          "en": "Select Level"
+        },
+        "ChangeMessageButton": {
+          "en": "Change Message"
+        },
+        "CantUseRole": {
+          "en": "You cannot set a bump reminder role to be automatically assigned as reward."
+        },
+        "MessageTooLong": {
+          "en": "Your custom message can't contain more than 256 characters."
+        },
+        "AddedNewReward": {
+          "en": "The role {Role} will be assigned at Level {Level}."
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

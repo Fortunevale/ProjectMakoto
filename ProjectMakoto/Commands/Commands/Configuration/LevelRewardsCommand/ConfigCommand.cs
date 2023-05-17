@@ -17,6 +17,8 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.LevelRewards;
+
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
@@ -24,12 +26,12 @@ internal class ConfigCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`Loading Level Rewards..`"
-            }.AsLoading(ctx, "Level Rewards");
+                Description = GetString(CommandKey.Loading, true)
+            }.AsLoading(ctx, GetString(CommandKey.Title));
 
             await RespondOrEdit(embed);
 
-            embed = embed.AsAwaitingInput(ctx, "Level Rewards");
+            embed = embed.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
             string selected = "";
 
@@ -49,35 +51,35 @@ internal class ConfigCommand : BaseCommand
 
                     var role = ctx.Guild.GetRole(reward.RoleId);
 
-                    DefinedRewards.Add(new DiscordStringSelectComponentOption($"Level {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message.TruncateWithIndication(100)}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
+                    DefinedRewards.Add(new DiscordStringSelectComponentOption($"{GetString(CommandKey.Level)} {reward.Level}: @{role.Name}", role.Id.ToString(), $"{reward.Message.TruncateWithIndication(100)}", (selected == role.Id.ToString()), new DiscordComponentEmoji(role.Color.GetClosestColorEmoji(ctx.Client))));
 
                     if (selected == role.Id.ToString())
                     {
-                        embed.Description = $"**Level**: `{reward.Level}`\n" +
-                                            $"**Role**: <@&{reward.RoleId}> (`{reward.RoleId}`)\n" +
-                                            $"**Message**: `{reward.Message}`\n";
+                        embed.Description = $"**{GetString(CommandKey.Level)}**: `{reward.Level}`\n" +
+                                            $"**{GetString(CommandKey.Role)}**: <@&{reward.RoleId}> (`{reward.RoleId}`)\n" +
+                                            $"**{GetString(CommandKey.Message)}**: `{reward.Message}`\n";
                     }
                 }
 
                 if (DefinedRewards.Count > 0)
                 {
                     if (embed.Description == "")
-                        embed.Description = "`Please select a Level Reward to modify or delete.`";
+                        embed.Description = GetString(CommandKey.SelectPrompt, true);
                 }
                 else
                 {
-                    embed.Description = "`No Level Rewards are defined.`";
+                    embed.Description = GetString(CommandKey.NoRewardsSetup, true);
                 }
 
-                var PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", "Previous page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-                var NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", "Next page", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                var PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", GetString(t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                var NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", GetString(t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-                var Add = new DiscordButtonComponent(ButtonStyle.Success, "Add", "Add new Level Reward", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                var Modify = new DiscordButtonComponent(ButtonStyle.Primary, "Modify", "Modify Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
-                var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "Delete", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
+                var Add = new DiscordButtonComponent(ButtonStyle.Success, "Add", GetString(CommandKey.AddNewButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                var Modify = new DiscordButtonComponent(ButtonStyle.Primary, "Modify", GetString(CommandKey.ModifyButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
+                var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "Delete", GetString(CommandKey.RemoveButton), false, new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, 1005430134070841395)));
 
-                var Dropdown = new DiscordStringSelectComponent("Select a Level Reward..", DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
-                embed = embed.AsAwaitingInput(ctx, "Level Rewards");
+                var Dropdown = new DiscordStringSelectComponent(GetString(CommandKey.SelectDropdown), DefinedRewards.Skip(CurrentPage * 20).Take(20).ToList(), "RewardSelection");
+                embed = embed.AsAwaitingInput(ctx, GetString(CommandKey.Title));
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
                 if (DefinedRewards.Count > 0)
@@ -144,21 +146,23 @@ internal class ConfigCommand : BaseCommand
 
                             DiscordRole selectedRole = null;
                             int selectedLevel = -1;
-                            string selectedCustomText = "You received ##Role##!";
+                            string selectedCustomText = GetGuildString(CommandKey.DefaultCustomText);
 
                             while (true)
                             {
-                                var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Role", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                                var SelectLevel = new DiscordButtonComponent((selectedLevel is -1 ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Level", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
-                                var SelectCustomText = new DiscordButtonComponent((selectedCustomText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Change Message", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
-                                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Submit", (selectedRole is null || selectedLevel is -1 || selectedCustomText.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                                var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectRoleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                                var SelectLevel = new DiscordButtonComponent((selectedLevel is -1 ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectLevelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
+                                var SelectCustomText = new DiscordButtonComponent((selectedCustomText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.ChangeMessageButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
+                                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Submit), (selectedRole is null || selectedLevel is -1 || selectedCustomText.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+
+                                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.Role, CommandKey.Level, CommandKey.Message);
 
                                 var action_embed = new DiscordEmbedBuilder
                                 {
-                                    Description = $"`Role   `: {(selectedRole is null ? "`Not yet selected.`" : selectedRole.Mention)}\n" +
-                                                  $"`Level  `: {(selectedLevel is -1 ? "`Not yet selected.`" : selectedLevel.ToEmotes())}\n" +
-                                                  $"`Message`: `{selectedCustomText}`"
-                                }.AsAwaitingInput(ctx, "Level Rewards");
+                                    Description = $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(selectedRole is null ? GetString(t.Common.NotSelected, true) : selectedRole.Mention)}\n" +
+                                                  $"`{GetString(CommandKey.Level).PadRight(pad)}`: {(selectedLevel is -1 ? GetString(t.Common.NotSelected, true) : selectedLevel.ToEmotes())}\n" +
+                                                  $"`{GetString(CommandKey.Message).PadRight(pad)}`: `{selectedCustomText}`"
+                                }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                                     .AddComponents(new List<DiscordComponent> { SelectRole, SelectLevel, SelectCustomText, Finish })
@@ -176,9 +180,6 @@ internal class ConfigCommand : BaseCommand
                                 {
                                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                                    action_embed.Description = $"`Select a role to assign.`";
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed));
-
                                     var RoleResult = await PromptRoleSelection();
 
                                     if (RoleResult.TimedOut)
@@ -194,7 +195,7 @@ internal class ConfigCommand : BaseCommand
                                     {
                                         if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                                         {
-                                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`Could not find any roles in your server.`"));
+                                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoRoles, true)));
                                             await Task.Delay(3000);
                                             return;
                                         }
@@ -204,7 +205,7 @@ internal class ConfigCommand : BaseCommand
 
                                     if (RoleResult.Result.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
                                     {
-                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned as reward.`"));
+                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
                                         await Task.Delay(3000);
                                         continue;
                                     }
@@ -214,8 +215,8 @@ internal class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.GetCustomId() == SelectLevel.CustomId)
                                 {
-                                    var modal = new DiscordInteractionModalBuilder("Input Level", Guid.NewGuid().ToString())
-                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "level", "Level", "2", 1, 3, true, (selectedLevel is -1 ? 2 : selectedLevel).ToString()));
+                                    var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.Title), Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "level", GetString(CommandKey.Level), "2", 1, 3, true, (selectedLevel is -1 ? 2 : selectedLevel).ToString()));
 
 
                                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
@@ -248,9 +249,6 @@ internal class ConfigCommand : BaseCommand
                                     }
                                     catch (Exception)
                                     {
-                                        action_embed.Description = "`You must specify a valid level.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Level Rewards")));
-                                        await Task.Delay(3000);
                                         continue;
                                     }
 
@@ -259,8 +257,8 @@ internal class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.GetCustomId() == SelectCustomText.CustomId)
                                 {
-                                    var modal = new DiscordInteractionModalBuilder("Define new custom message", Guid.NewGuid().ToString())
-                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "message", "Custom Message", "You received ##Role##!", 1, 256, true, selectedCustomText));
+                                    var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.Title), Guid.NewGuid().ToString())
+                                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "message", GetString(CommandKey.Message), GetGuildString(CommandKey.DefaultCustomText), 1, 256, true, selectedCustomText));
 
 
                                     var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
@@ -285,8 +283,8 @@ internal class ConfigCommand : BaseCommand
 
                                     if (newMessage.Length > 256)
                                     {
-                                        action_embed.Description = "`Your custom message can't contain more than 256 characters.`";
-                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, "Level Rewards")));
+                                        action_embed.Description = GetString(CommandKey.MessageTooLong, true);
+                                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsError(ctx, GetString(CommandKey.Title))));
                                         await Task.Delay(3000);
                                         continue;
                                     }
@@ -298,7 +296,7 @@ internal class ConfigCommand : BaseCommand
                                 {
                                     if (selectedRole.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
                                     {
-                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription("`You cannot set the bump reminder role to be automatically assigned as reward.`"));
+                                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
                                         await Task.Delay(3000);
                                         await ExecuteCommand(ctx, arguments);
                                         return;
@@ -311,8 +309,8 @@ internal class ConfigCommand : BaseCommand
                                         Message = selectedCustomText
                                     });
 
-                                    action_embed.Description = $"`The role` <@&{selectedRole.Id}> `({selectedRole.Id}) will be assigned at Level {selectedLevel}.`";
-                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, "Level Rewards")));
+                                    action_embed.Description = GetString(CommandKey.AddedNewReward, true, new TVar("Role", $"<@&{selectedRole.Id}>"), new TVar("Level", selectedLevel));
+                                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed.AsSuccess(ctx, GetString(CommandKey.Title))));
 
                                     await Task.Delay(5000);
                                     await RefreshMessage();
@@ -334,9 +332,9 @@ internal class ConfigCommand : BaseCommand
                         else if (e.GetCustomId() == "Modify")
                         {
                             var modal = new DiscordInteractionModalBuilder()
-                                .WithTitle("Define a new custom message")
+                                .WithTitle(GetString(CommandKey.Title))
                                 .WithCustomId(Guid.NewGuid().ToString())
-                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", "Custom Message (<256 characters)", null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
+                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", GetString(CommandKey.Message), null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message)); ;
 
                             var ModalResult = await PromptModalWithRetry(e.Interaction, modal, false);
 
@@ -360,7 +358,7 @@ internal class ConfigCommand : BaseCommand
 
                             if (result.Length > 256)
                             {
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`Your custom message can't contain more than 256 characters.`").AsError(ctx, "Level Rewards")));
+                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(CommandKey.MessageTooLong, true)).AsError(ctx, GetString(CommandKey.Title))));
                                 await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);
                                 return;
@@ -378,15 +376,11 @@ internal class ConfigCommand : BaseCommand
 
                             if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count == 0)
                             {
-                                embed.Description = $"`There are no more Level Rewards to display.`";
-                                embed = embed.AsSuccess(ctx, "Level Rewards");
-                                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-                                await Task.Delay(5000);
                                 await ExecuteCommand(ctx, arguments);
                                 return;
                             }
 
-                            embed.Description = $"`Select a Level Reward to modify.`";
+                            embed.Description = GetString(CommandKey.SelectPrompt, true);
                             selected = "";
 
                             await RefreshMessage();

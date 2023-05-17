@@ -43,6 +43,29 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public levelRewards LevelRewards;
+            public class levelRewards
+            {
+                public SingleTranslationKey AddedNewReward;
+                public SingleTranslationKey MessageTooLong;
+                public SingleTranslationKey CantUseRole;
+                public SingleTranslationKey ChangeMessageButton;
+                public SingleTranslationKey SelectLevelButton;
+                public SingleTranslationKey SelectRoleButton;
+                public SingleTranslationKey DefaultCustomText;
+                public SingleTranslationKey SelectDropdown;
+                public SingleTranslationKey RemoveButton;
+                public SingleTranslationKey ModifyButton;
+                public SingleTranslationKey AddNewButton;
+                public SingleTranslationKey SelectPrompt;
+                public SingleTranslationKey Loading;
+                public SingleTranslationKey NoRewardsSetup;
+                public SingleTranslationKey Message;
+                public SingleTranslationKey Role;
+                public SingleTranslationKey Level;
+                public SingleTranslationKey Title;
+            }
+
             public join Join;
             public class join
             {

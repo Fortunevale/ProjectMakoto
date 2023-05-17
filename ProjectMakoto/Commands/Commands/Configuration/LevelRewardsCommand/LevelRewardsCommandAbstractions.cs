@@ -13,6 +13,8 @@ internal class LevelRewardsCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
+        var CommandKey = Bot.loadedTranslations.Commands.Config.LevelRewards;
+
         string str = "";
         if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count != 0)
         {
@@ -24,16 +26,16 @@ internal class LevelRewardsCommandAbstractions
                     continue;
                 }
 
-                str += $"**Level**: `{b.Level}`\n" +
-                        $"**Role**: <@&{b.RoleId}> (`{b.RoleId}`)\n" +
-                        $"**Message**: `{b.Message}`\n";
+                str += $"**{ctx.BaseCommand.GetString(CommandKey.Level)}**: `{b.Level}`\n" +
+                        $"**{ctx.BaseCommand.GetString(CommandKey.Role)}**: <@&{b.RoleId}> (`{b.RoleId}`)\n" +
+                        $"**{ctx.BaseCommand.GetString(CommandKey.Message)}**: `{b.Message}`\n";
 
                 str += "\n\n";
             }
         }
         else
         {
-            str = $"`No Level Rewards are set up.`";
+            str = ctx.BaseCommand.GetString(CommandKey.NoRewardsSetup, true);
         }
 
         return str;
