@@ -3218,6 +3218,62 @@
           "en": "Disabled In-Voice Privacy"
         }
       },
+      "Join": {
+        "Title": {
+          "en": "Join Settings"
+        },
+        "Autoban": {
+          "en": "Autoban Globally Banned Users"
+        },
+        "JoinLogChannel": {
+          "en": "Joinlog Channel"
+        },
+        "Role": {
+          "en": "Role On Join"
+        },
+        "ReApplyRoles": {
+          "en": "Re-Apply Roles on Rejoin"
+        },
+        "ReApplyNickname": {
+          "en": "Re-Apply Nickname on Rejoin"
+        },
+        "SecurityNotice": {
+          "en": "For security reasons, roles with any of the following permissions never get re-applied: {Permissions}"
+        },
+        "TimeNotice": {
+          "en": "In addition, if the user left the server 60+ days ago, neither roles nor nicknames will be re-applied."
+        },
+        "ToggleGlobalBansButton": {
+          "en": "Toggle Global Bans"
+        },
+        "ChangeJoinlogChannelButton": {
+          "en": "Change Joinlog Channel"
+        },
+        "ChangeRoleButton": {
+          "en": "Change Role assigned on join"
+        },
+        "ToggleReApplyRole": {
+          "en": "Toggle Role Re-Apply"
+        },
+        "ToggleReApplyNickname": {
+          "en": "Toggle Nickname Re-Apply"
+        },
+        "JoinLogChannelName": {
+          "en": "joinlog"
+        },
+        "DisableJoinlog": {
+          "en": "Disable Joinlog"
+        },
+        "AutoAssignRoleName": {
+          "en": "Automatically Assigned Role"
+        },
+        "DisableRoleOnJoin": {
+          "en": "Disable Role on join"
+        },
+        "CantUseRole": {
+          "en": "You cannot set the bump reminder role to be automatically assigned on join."
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

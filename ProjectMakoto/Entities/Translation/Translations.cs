@@ -43,6 +43,29 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public join Join;
+            public class join
+            {
+                public SingleTranslationKey CantUseRole;
+                public SingleTranslationKey DisableRoleOnJoin;
+                public SingleTranslationKey AutoAssignRoleName;
+                public SingleTranslationKey DisableJoinlog;
+                public SingleTranslationKey JoinLogChannelName;
+                public SingleTranslationKey ToggleReApplyNickname;
+                public SingleTranslationKey ToggleReApplyRole;
+                public SingleTranslationKey ChangeRoleButton;
+                public SingleTranslationKey ChangeJoinlogChannelButton;
+                public SingleTranslationKey ToggleGlobalBansButton;
+                public SingleTranslationKey TimeNotice;
+                public SingleTranslationKey SecurityNotice;
+                public SingleTranslationKey ReApplyNickname;
+                public SingleTranslationKey ReApplyRoles;
+                public SingleTranslationKey Role;
+                public SingleTranslationKey JoinLogChannel;
+                public SingleTranslationKey Autoban;
+                public SingleTranslationKey Title;
+            }
+
             public inVoicePrivacy InVoicePrivacy;
             public class inVoicePrivacy
             {
