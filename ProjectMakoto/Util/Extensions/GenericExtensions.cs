@@ -13,6 +13,44 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
+    internal static string Log(this string str, LogLevel lvl, string additionalInfo)
+    {
+        switch (lvl)
+        {
+            case LogLevel.NONE:
+                _logger.LogNone($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.FATAL:
+                _logger.LogFatal($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.ERROR:
+                _logger.LogError($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.WARN:
+                _logger.LogWarn($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.INFO:
+                _logger.LogInfo($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.DEBUG:
+                _logger.LogDebug($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.DEBUG2:
+                _logger.LogDebug2($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.TRACE:
+                _logger.LogTrace($"String {{0}} logged: {additionalInfo}", str);
+                break;
+            case LogLevel.TRACE2:
+                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Trace, $"String {{0}} logged: {additionalInfo}", str);
+                break;
+            default:
+                break;
+        }
+        return str;
+    }
+
     internal static string FileSizeToHumanReadable(this int size)
         => GetHumanReadableSize((long)size);
 
