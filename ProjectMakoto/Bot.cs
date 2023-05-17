@@ -541,6 +541,8 @@ public class Bot
                 LoggerFactory = logger,
                 HttpTimeout = TimeSpan.FromSeconds(60),
                 MessageCacheSize = 4096,
+                EnableSentry = true,
+                ReportMissingFields = true,
             });
 
             experienceHandler = new(this);
