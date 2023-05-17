@@ -3032,6 +3032,17 @@
           "en": "Uses: {Uses}; Creator: {Creator}"
         }
       },
+      "InviteTracker": {
+        "Title": {
+          "en": "Invite Tracker"
+        },
+        "InviteTrackerEnabled": {
+          "en": "Invite Tracker Enabled"
+        },
+        "ToggleInviteTrackerButton": {
+          "en": "Toggle Invite Tracker"
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

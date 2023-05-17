@@ -43,6 +43,14 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public inviteTracker InviteTracker;
+            public class inviteTracker
+            {
+                public SingleTranslationKey ToggleInviteTrackerButton;
+                public SingleTranslationKey InviteTrackerEnabled;
+                public SingleTranslationKey Title;
+            }
+
             public inviteNotes InviteNotes;
             public class inviteNotes
             {

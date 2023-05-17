@@ -17,15 +17,17 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.InviteTracker;
+
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             var embed = new DiscordEmbedBuilder
             {
                 Description = InviteTrackerCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, "Invite Tracker");
+            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Invite Tracking", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
+            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleInviteTrackerButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
