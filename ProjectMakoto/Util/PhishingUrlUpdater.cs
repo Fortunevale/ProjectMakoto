@@ -125,7 +125,7 @@ internal class PhishingUrlUpdater
             "https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/suspicious-list.json",
             "https://raw.githubusercontent.com/DevSpen/links/master/src/links.txt",
             "https://raw.githubusercontent.com/PoorPocketsMcNewHold/SteamScamSites/master/steamscamsite.txt",
-            "https://fortunevale.line.pm/discord-scam-urls.txt",
+            "https://fortunevale.de/discord-scam-urls.txt",
             "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Discord.txt",
             "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Facebook.txt",
             "https://raw.githubusercontent.com/sk-cat/fluffy-blocklist/main/phisising/Steam.txt",
@@ -152,10 +152,10 @@ internal class PhishingUrlUpdater
 
         try
         {
-            var urls = await DownloadList("https://fortunevale.line.pm/discord-scam-urls-whitelist.txt");
+            var urls = await DownloadList("https://fortunevale.de/discord-scam-urls-whitelist.txt");
             WhitelistedDomains.AddRange(urls);
         }
-        catch (Exception ex) { throw new Exception($"An exception occurred while trying to download URLs from 'https://fortunevale.line.pm/discord-scam-urls-whitelist.txt'", ex); }
+        catch (Exception ex) { throw new Exception($"An exception occurred while trying to download URLs from 'https://fortunevale.de/discord-scam-urls-whitelist.txt'", ex); }
 
         try
         {
