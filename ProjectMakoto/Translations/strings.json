@@ -2966,6 +2966,23 @@
           "en": "The Bump Reminder has been disabled."
         }
       },
+      "EmbedMessages": {
+        "Title": {
+          "en": "Embed Messages"
+        },
+        "EmbedMessageLinks": {
+          "en": "Embed Message Links"
+        },
+        "EmbedGithubCode": {
+          "en": "Embed Github Code"
+        },
+        "ToggleMessageLinkButton": {
+          "en": "Toggle Message Link Embeds"
+        },
+        "ToggleGithubCodeButton": {
+          "en": "Toggle Github Code Embeds"
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

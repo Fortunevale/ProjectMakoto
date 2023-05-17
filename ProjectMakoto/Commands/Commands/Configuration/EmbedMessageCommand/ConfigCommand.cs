@@ -17,16 +17,18 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.EmbedMessages;
+
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             var embed = new DiscordEmbedBuilder
             {
                 Description = EmbedMessageCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, "Embed Messages");
+            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var ToggleMsg = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Message Link Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var ToggleGithub = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Github Code Embeds", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
+            var ToggleMsg = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleMessageLinkButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ToggleGithub = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleGithubCodeButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🤖")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>

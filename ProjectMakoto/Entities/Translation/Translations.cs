@@ -43,6 +43,16 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public embedMessages EmbedMessages;
+            public class embedMessages
+            {
+                public SingleTranslationKey ToggleGithubCodeButton;
+                public SingleTranslationKey ToggleMessageLinkButton;
+                public SingleTranslationKey EmbedGithubCode;
+                public SingleTranslationKey EmbedMessageLinks;
+                public SingleTranslationKey Title;
+            }
+
             public bumpReminder BumpReminder;
             public class bumpReminder
             {

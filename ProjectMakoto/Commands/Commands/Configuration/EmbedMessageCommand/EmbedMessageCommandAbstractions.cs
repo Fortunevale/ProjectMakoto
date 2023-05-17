@@ -13,7 +13,11 @@ internal class EmbedMessageCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"💬 `Embed Message Links`: {ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding.ToEmote(ctx.Bot)}\n" +
-               $"🤖 `Embed Github Code  `: {ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding.ToEmote(ctx.Bot)}";
+        var CommandKey = Bot.loadedTranslations.Commands.Config.EmbedMessages;
+
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.EmbedGithubCode, CommandKey.EmbedMessageLinks);
+
+        return $"{"💬".UnicodeToEmoji()} `{CommandKey.EmbedMessageLinks.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseEmbedding.ToEmote(ctx.Bot)}\n" +
+               $"{"🤖".UnicodeToEmoji()} `{CommandKey.EmbedGithubCode.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].EmbedMessage.UseGithubEmbedding.ToEmote(ctx.Bot)}";
     }
 }
