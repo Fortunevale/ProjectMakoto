@@ -3000,6 +3000,38 @@
           "en": "Toggle Experience Boost for Bumpers"
         }
       },
+      "InviteNotes": {
+        "Title": {
+          "en": "Invite Notes"
+        },
+        "NoNotesDefined": {
+          "en": "No Invite Notes defined."
+        },
+        "AddNoteButton": {
+          "en": "Add Note"
+        },
+        "RemoveNoteButton": {
+          "en": "Remove Note"
+        },
+        "SetNoteButton": {
+          "en": "Set Note"
+        },
+        "SelectInviteButton": {
+          "en": "Select Invite"
+        },
+        "CreateButton": {
+          "en": "Create Invite Note"
+        },
+        "Note": {
+          "en": "Note"
+        },
+        "Invite": {
+          "en": "Invite"
+        },
+        "InviteDescription": {
+          "en": "Uses: {Uses}; Creator: {Creator}"
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

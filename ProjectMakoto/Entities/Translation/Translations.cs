@@ -43,6 +43,21 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public inviteNotes InviteNotes;
+            public class inviteNotes
+            {
+                public SingleTranslationKey InviteDescription;
+                public SingleTranslationKey Invite;
+                public SingleTranslationKey Note;
+                public SingleTranslationKey CreateButton;
+                public SingleTranslationKey SelectInviteButton;
+                public SingleTranslationKey SetNoteButton;
+                public SingleTranslationKey RemoveNoteButton;
+                public SingleTranslationKey AddNoteButton;
+                public SingleTranslationKey NoNotesDefined;
+                public SingleTranslationKey Title;
+            }
+
             public experience Experience;
             public class experience
             {

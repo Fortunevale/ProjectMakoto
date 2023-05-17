@@ -17,17 +17,18 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.InviteNotes;
+
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
-
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add Note", false, DiscordEmoji.FromUnicode("➕").ToComponent());
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove Note", false, DiscordEmoji.FromUnicode("➖").ToComponent());
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.AddNoteButton), false, DiscordEmoji.FromUnicode("➕").ToComponent());
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveNoteButton), false, DiscordEmoji.FromUnicode("➖").ToComponent());
 
             var embed = new DiscordEmbedBuilder
             {
                 Description = InviteNotesCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, "Invite Notes");
+            }.AsInfo(ctx, GetString(CommandKey.Title));
 
             if (!(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Count > 19))
             {
@@ -61,16 +62,17 @@ internal class ConfigCommand : BaseCommand
 
                 while (true)
                 {
-                    var SelectTextButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Set Note", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
-                    var SelectInviteButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), "Select Invite", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Create Invite Note", (SelectedText.IsNullOrWhiteSpace() || SelectedInvite is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                    var SelectTextButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SetNoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
+                    var SelectInviteButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectInviteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.CreateButton), (SelectedText.IsNullOrWhiteSpace() || SelectedInvite is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
+                    var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.Note, CommandKey.Invite);
 
                     embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`Note  `: `{(SelectedText.IsNullOrWhiteSpace() ? "Not yet selected." : SelectedText).SanitizeForCode()}`\n" +
-                                      $"`Invite`: `{(SelectedInvite is null ? $"Not yet selected." : $"{SelectedInvite.Code}")}`"
-                    }.AsAwaitingInput(ctx, "Playlists");
+                        Description = $"`{GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? GetString(t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
+                                      $"`{GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? GetString(t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
+                    }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })
@@ -87,7 +89,7 @@ internal class ConfigCommand : BaseCommand
                     if (Menu.GetCustomId() == SelectTextButton.CustomId)
                     {
                         var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, new DiscordInteractionModalBuilder()
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 128, true)), false);
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", GetString(CommandKey.Note), "", 1, 128, true)), false);
 
                         if (ModalResult.TimedOut)
                         {
@@ -113,7 +115,7 @@ internal class ConfigCommand : BaseCommand
                         var invites = await ctx.Guild.GetInvitesAsync();
 
                         var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
-                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, $"Uses: {x.Uses}; Creator: {x.Inviter.GetUsernameWithIdentifier()}")).ToList());
+                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, GetString(CommandKey.InviteDescription, new TVar("Uses", x.Uses), new TVar("Creator", x.Inviter.GetUsernameWithIdentifier())))).ToList());
 
                         if (SelectionResult.TimedOut)
                         {
