@@ -2919,6 +2919,53 @@
           "en": "Remove Channel"
         }
       },
+      "BumpReminder": {
+        "Title": {
+          "en": "Bump Reminder"
+        },
+        "BumpReminderEnabled": {
+          "en": "Bump Reminder Enabled"
+        },
+        "BumpReminderChannel": {
+          "en": "Bump Reminder Channel"
+        },
+        "BumpReminderRole": {
+          "en": "Bump Reminder Role"
+        },
+        "SetupBumpReminderButton": {
+          "en": "Set up Bump Reminder"
+        },
+        "DisableBumpReminderButton": {
+          "en": "Disable Bump Reminder"
+        },
+        "ChangeChannelButton": {
+          "en": "Change Channel"
+        },
+        "ChangeRoleButton": {
+          "en": "Change Role"
+        },
+        "DisboardMissing": {
+          "en": "The Disboard bot is not on this server. Please create a guild listing on Disboard and invite their bot."
+        },
+        "SettingUp": {
+          "en": "Setting up Bump Reminder in this channel.."
+        },
+        "SelectRole": {
+          "en": "Please select a role to ping when the server can be bumped."
+        },
+        "CantUseRole": {
+          "en": "The role you selected is already being assigned on join or part of a level reward."
+        },
+        "ReactionRoleMessage": {
+          "en": "React to this message with {Emoji} to receive notifications as soon as the server can be bumped again."
+        },
+        "SetupComplete": {
+          "en": "The Bump Reminder has been set up."
+        },
+        "Disabled": {
+          "en": "The Bump Reminder has been disabled."
+        }
+      },
       "PrefixConfigCommand": {
         "Title": {
           "en": "Prefix Commands",

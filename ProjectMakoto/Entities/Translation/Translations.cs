@@ -43,6 +43,26 @@ public class Translations
                 public SingleTranslationKey Title;
             }
 
+            public bumpReminder BumpReminder;
+            public class bumpReminder
+            {
+                public SingleTranslationKey Disabled;
+                public SingleTranslationKey SetupComplete;
+                public SingleTranslationKey ReactionRoleMessage;
+                public SingleTranslationKey CantUseRole;
+                public SingleTranslationKey SelectRole;
+                public SingleTranslationKey SettingUp;
+                public SingleTranslationKey DisboardMissing;
+                public SingleTranslationKey ChangeRoleButton;
+                public SingleTranslationKey ChangeChannelButton;
+                public SingleTranslationKey DisableBumpReminderButton;
+                public SingleTranslationKey SetupBumpReminderButton;
+                public SingleTranslationKey BumpReminderRole;
+                public SingleTranslationKey BumpReminderChannel;
+                public SingleTranslationKey BumpReminderEnabled;
+                public SingleTranslationKey Title;
+            }
+
             public autoUnarchive AutoUnarchive;
             public class autoUnarchive
             {
