@@ -543,6 +543,8 @@ public class Bot
                 MessageCacheSize = 4096,
                 EnableSentry = true,
                 ReportMissingFields = true,
+                AttachUserInfo = true,
+			    DeveloperUserId = 411950662662881290
             });
 
             experienceHandler = new(this);
