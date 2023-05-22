@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,9 +33,20 @@ internal class PhishingProtectionEvents
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        if (e.Content.StartsWith($";;"))
+        string prefix;
+
+        try
+        {
+            prefix = _bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[guild.Id].PrefixSettings.Prefix;
+        }
+        catch (Exception)
+        {
+            prefix = ";;";
+        }
+
+        if (e.Content.StartsWith(prefix))
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                if (e.Content.StartsWith($";;{command.Key}"))
+                if (e.Content.StartsWith($"{prefix}{command.Key}"))
                     return;
 
         if (e.WebhookMessage || guild is null || e.Author?.Id == sender.CurrentUser.Id)
@@ -123,6 +134,12 @@ internal class PhishingProtectionEvents
 
         foreach (var match in parsedMatches)
         {
+            if (match.Uri.ToString().Contains('⁄'))
+            {
+                _ = PunishMember(guild, member, e, match.Uri.ToString());
+                return;
+            }
+
             CheckDb(match.Uri);
         }
 
