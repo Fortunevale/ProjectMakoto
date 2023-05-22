@@ -28,6 +28,8 @@ public class PollSettings
 
     private async void RunningPollsUpdatedAsync(object? sender, ObservableListUpdate<PollEntry> e)
     {
+        var CommandKey = Bot.loadedTranslations.Commands.Moderation.Poll;
+
         while (RunningPolls.Count > 10)
             RunningPolls.RemoveAt(0);
 
@@ -52,18 +54,18 @@ public class PollSettings
                                 if (b.Votes.TryGetValue(e.User.Id, out List<string> currentVotes))
                                 {
                                     b.Votes[e.User.Id] = new List<string>(e.Values);
-                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 `Updated your vote to {string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))}.`"));
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))))}"));
                                     return;
                                 }
 
                                 b.Votes.Add(e.User.Id, new List<string>(e.Values));
-                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"✅ `Voted for {string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))}.`"));
+                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"✅ {CommandKey.Voted.Get(Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))))}"));
                             }
                             else if (e.GetCustomId() == b.EndEarlyUUID)
                             {
                                 if (!(await e.User.ConvertToMember(e.Guild)).Permissions.HasPermission(Permissions.ManageMessages))
                                 {
-                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ `You don't have the necessary permissions to end this poll early.`"));
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ {CommandKey.NoPerms.Get(_bot.users[e.User.Id]).Build(true)}"));
                                     return;
                                 }
                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
@@ -72,7 +74,7 @@ public class PollSettings
                                 await Task.Delay(5000);
                                 this.RunningPolls.Add(b);
                                 cancellationTokenSource.Cancel();
-                                _ = e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"✅ `Poll ended.`"));
+                                _ = e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"✅ {CommandKey.PollEnded.Get(_bot.users[e.User.Id]).Build(true)}"));
                             }
                         }
                     }).Add(_bot.watcher);
@@ -136,8 +138,8 @@ public class PollSettings
                     { _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(message.Embeds?.ElementAt(0))); }
                     catch { }
                     await message.RespondAsync(new DiscordEmbedBuilder()
-                        .WithDescription($"`Poll ended.`\n\n**Results**\n{(votes.Count <= 0 ? "`No one voted on this poll.`" : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n`{x.Value} Votes`")))}")
-                        .WithAuthor($"Poll • {channel.Guild.Name}", null, channel.Guild.IconUrl)
+                        .WithDescription($"{CommandKey.PollEnded.Get(Parent).Build(true)}\n\n**{CommandKey.Results.Get(Parent).Build()}**\n{(votes.Count <= 0 ? CommandKey.NoVotes.Get(Parent).Build(true) : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n{CommandKey.Votes.Get(Parent).Build(true, new TVar("Count", x.Value))}")))}")
+                        .WithAuthor($"{CommandKey.Poll.Get(Parent)} • {channel.Guild.Name}", null, channel.Guild.IconUrl)
                         .WithColor(EmbedColors.Success));
                 });
 
@@ -154,7 +156,7 @@ public class PollSettings
                             var channel = await _bot.discordClient.GetChannelAsync(b.ChannelId);
                             var message = await channel.GetMessageAsync(b.MessageId, true);
 
-                            await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_This poll will end {b.DueTime.ToTimestamp()}._\n\n`{b.Votes.Count} Total Votes`").Build()); 
+                            await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(Parent).Build(true, new TVar("Count", b.Votes.Count))}").Build());
                         }
 
                         if (cancellationTokenSource.IsCancellationRequested)

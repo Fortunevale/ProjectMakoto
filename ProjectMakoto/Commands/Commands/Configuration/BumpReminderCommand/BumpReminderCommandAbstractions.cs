@@ -13,11 +13,15 @@ internal class BumpReminderCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
-            return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `Bump Reminder Enabled` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}";
+        var CommandKey = Bot.loadedTranslations.Commands.Config.BumpReminder;
 
-        return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `Bump Reminder Enabled` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetChannel(ctx.Bot)} `Bump Reminder Channel` : <#{ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId}> `({ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId})`\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `Bump Reminder Role   ` : <@&{ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId}> `({ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId})`";
+        if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
+            return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser)}` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}";
+
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.BumpReminderEnabled, CommandKey.BumpReminderChannel, CommandKey.BumpReminderRole);
+
+        return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.BumpReminderChannel.Get(ctx.DbUser).PadRight(pad)}` : <#{ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId}> `({ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId})`\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.BumpReminderRole.Get(ctx.DbUser).PadRight(pad)}` : <@&{ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId}> `({ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId})`";
     }
 }

@@ -1166,7 +1166,7 @@ public abstract class BaseCommand
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToPermissionString())),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToTranslatedPermissionString(ctx.DbUser))),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
@@ -1227,7 +1227,7 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToPermissionString()))
+            Description = GetString(t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToTranslatedPermissionString(ctx.DbUser)))
         }.AsError(ctx));
     }
 

@@ -18,7 +18,7 @@ internal class BanCommand : BaseCommand
         return Task.Run(async () =>
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
-            int deleteMessageDays = (int)arguments["days"];
+            int deleteMessageDays = (int)arguments["days"] > 7 ? 7 : ((int)arguments["days"] < 0 ? 0 : (int)arguments["days"]);
             string reason = (string)arguments["reason"];
 
             var CommandKey = t.Commands.Moderation.Ban;

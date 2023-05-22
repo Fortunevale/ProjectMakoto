@@ -17,18 +17,20 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.Experience;
+
             if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
                 return;
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = ExperienceCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, "Experience");
+            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            var ToggleExperienceSystem = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience System", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
-            var ToggleBumperBoost = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Experience.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Experience Boost for Bumpers", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
+            var ToggleExperienceSystem = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleExperienceButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
+            var ToggleBumperBoost = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Experience.BoostXpForBumpReminder ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleExperienceBoostButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏫")));
 
             await RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent>

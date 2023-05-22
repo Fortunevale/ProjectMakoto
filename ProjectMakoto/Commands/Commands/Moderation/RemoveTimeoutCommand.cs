@@ -33,29 +33,25 @@ internal class RemoveTimeoutCommand : BaseCommand
                 throw;
             }
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Removing timeout for {victim.GetUsernameWithIdentifier()} ({victim.Id})..`",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                {
-                    Url = victim.AvatarUrl
-                },
-            }.AsLoading(ctx);
-            await RespondOrEdit(embed: embed);
+            var CommandKey = t.Commands.Moderation.RemoveTimeout;
+
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
+                .AsLoading(ctx));
 
             try
             {
                 await victim.RemoveTimeoutAsync();
-                embed.Description = $"`Removed timeout for {victim.GetUsernameWithIdentifier()} ({victim.Id}).`";
-                embed = embed.AsSuccess(ctx);
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
+                    .AsSuccess(ctx));
             }
             catch (Exception)
             {
-                embed.Description = $"`Couldn't remove timeout for {victim.GetUsernameWithIdentifier()} ({victim.Id}).`";
-                embed = embed.AsError(ctx);
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
+                    .AsError(ctx));
             }
-
-            await RespondOrEdit(embed);
         });
     }
 }

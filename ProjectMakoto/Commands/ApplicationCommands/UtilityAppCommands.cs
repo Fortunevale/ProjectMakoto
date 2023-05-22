@@ -309,14 +309,11 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }
     }
 
-    [ContextMenu(ApplicationCommandType.Message, "Steal Emojis")]
+    [ContextMenu(ApplicationCommandType.Message, "Steal Emojis", dmPermission: false)]
     public async Task EmojiStealer(ContextMenuContext ctx)
     {
         Task.Run(async () =>
         {
-            if (ctx.Channel.IsPrivate)
-                return;
-
             await new EmojiStealerCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "message", ctx.TargetMessage }
@@ -324,14 +321,11 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }).Add(_bot.watcher, ctx);
     }
     
-    [ContextMenu(ApplicationCommandType.Message, "Translate Message")]
+    [ContextMenu(ApplicationCommandType.Message, "Translate Message", dmPermission: false)]
     public async Task Translate(ContextMenuContext ctx)
     {
         Task.Run(async () =>
         {
-            if (ctx.Channel.IsPrivate)
-                return;
-
             await new TranslateCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
             {
                 { "message", ctx.TargetMessage }

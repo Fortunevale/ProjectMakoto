@@ -17,7 +17,7 @@ public class PrefixSettings
 
     private Guild Parent { get; set; }
 
-    private string _Prefix { get; set; } = "";
+    private string _Prefix { get; set; } = ";;";
     public string Prefix
     {
         get => _Prefix.IsNullOrWhiteSpace() ? Parent._bot.Prefix : _Prefix; set

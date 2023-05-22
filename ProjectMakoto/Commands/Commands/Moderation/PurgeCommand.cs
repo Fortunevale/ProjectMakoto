@@ -20,6 +20,8 @@ internal class PurgeCommand : BaseCommand
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
+            var CommandKey = t.Commands.Moderation.Purge;
+
             try
             {
                 if (ctx.CommandType == Enums.CommandType.PrefixCommand)
@@ -37,11 +39,9 @@ internal class PurgeCommand : BaseCommand
 
             if (number > 100)
             {
-                var embed = new DiscordEmbedBuilder
-                {
-                    Description = $"`Fetching {number} messages..`",
-                }.AsLoading(ctx);
-                await RespondOrEdit(embed);
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Fetching, true, new TVar("Count", number)))
+                    .AsLoading(ctx));
 
                 List<DiscordMessage> fetchedMessages = (await ctx.Channel.GetMessagesAsync(100)).ToList();
 
@@ -78,13 +78,15 @@ internal class PurgeCommand : BaseCommand
 
                 if (fetchedMessages.Count > 0)
                 {
-                    embed.Description = $"`Fetched {fetchedMessages.Count} messages. Deleting..`";
-                    await RespondOrEdit(embed);
+                    await RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(GetString(CommandKey.Fetched, true, new TVar("Count", fetchedMessages.Count)))
+                        .AsError(ctx));
                 }
                 else
                 {
-                    embed.Description = $"`No messages were found with the specified filter.`";
-                    await RespondOrEdit(embed.AsError(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(GetString(CommandKey.NoMessages, true))
+                        .AsError(ctx));
                     return;
                 }
 
@@ -114,21 +116,17 @@ internal class PurgeCommand : BaseCommand
                 catch (Exception ex)
                 {
                     _logger.LogError("Failed to delete messages", ex);
-                    embed.Description = $"`An error occurred trying to delete the specified messages. The error has been reported, please try again in a few hours.`";
-                    await RespondOrEdit(embed.AsError(ctx));
-                    return;
+                    throw;
                 }
 
                 while (!deletionOperations.All(x => x.IsCompleted))
                 {
-                    await Task.Delay(1000);
-                    embed.Description = $"`Deleted {deleted}/{total} messages..`";
-                    await RespondOrEdit(embed);
+                    await RespondOrEdit($"`{GenerateASCIIProgressbar(deleted, total)} {CalculatePercentage(deleted, total),3}%`");
                 }
 
-                embed.Description = $"`Successfully deleted {deleted} messages`\n{(FailedToDeleteAmount > 0 ? $"`Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}";
-
-                await RespondOrEdit(embed.AsSuccess(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder().
+                    WithDescription($"{GetString(CommandKey.Deleted, true, new TVar("Count", deleted))}\n{GetString(CommandKey.Failed, true, new TVar("Count", FailedToDeleteAmount))}")
+                    .AsSuccess(ctx));
                 return;
             }
             else
@@ -152,11 +150,9 @@ internal class PurgeCommand : BaseCommand
                 if (bMessages.Count > 0)
                     await ctx.Channel.DeleteMessagesAsync(bMessages);
 
-                var embed = new DiscordEmbedBuilder
-                {
-                    Description = $"`Deleted {bMessages.Count} messages.`\n{(FailedToDeleteAmount > 0 ? $"`Failed to delete {FailedToDeleteAmount} messages because they we're more than 14 days old.`" : "")}",
-                };
-                await RespondOrEdit((FailedToDeleteAmount > 0 ? embed.AsError(ctx) : embed.AsSuccess(ctx)));
+                await RespondOrEdit(new DiscordEmbedBuilder().
+                WithDescription($"{GetString(CommandKey.Deleted, true, new TVar("Count", bMessages.Count))}\n{GetString(CommandKey.Failed, true, new TVar("Count", FailedToDeleteAmount))}")
+                .AsSuccess(ctx));
             }
         });
     }

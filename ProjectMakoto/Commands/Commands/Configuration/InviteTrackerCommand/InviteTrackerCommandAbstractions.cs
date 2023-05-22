@@ -13,6 +13,6 @@ internal class InviteTrackerCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"📲 `Invite Tracker Enabled`: {ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled.ToEmote(ctx.Bot)}";
+        return $"{"📲".UnicodeToEmoji()} `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.InviteTracker.InviteTrackerEnabled)}`: {ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled.ToEmote(ctx.Bot)}";
     }
 }

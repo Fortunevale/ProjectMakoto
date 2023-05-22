@@ -19,30 +19,26 @@ internal class UnbanCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Unbanning {victim.GetUsernameWithIdentifier()} ({victim.Id})..`",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                {
-                    Url = victim.AvatarUrl
-                },
-            }.AsLoading(ctx);
-            await RespondOrEdit(embed);
+            var CommandKey = t.Commands.Moderation.Unban;
+
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
+                .AsLoading(ctx));
 
             try
             {
                 await ctx.Guild.UnbanMemberAsync(victim);
 
-                embed.Description = $"<@{victim.Id}> `{victim.GetUsernameWithIdentifier()}` was unbanned.";
-                embed = embed.AsSuccess(ctx);
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Removed, true, new TVar("Victim", victim.Mention)))
+                    .AsSuccess(ctx));
             }
             catch (Exception)
             {
-                embed.Description = $"`{victim.GetUsernameWithIdentifier()} ({victim.Id}) couldn't be unbanned.`";
-                embed = embed.AsError(ctx);
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
+                    .AsError(ctx));
             }
-
-            await RespondOrEdit(embed);
         });
     }
 }

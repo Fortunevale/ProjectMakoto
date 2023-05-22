@@ -20,6 +20,78 @@ internal static class DiscordExtensions
     internal static string GetUsernameWithIdentifier(this DiscordUser user)
         => user.IsMigrated ? user.UsernameWithGlobalName : user.UsernameWithDiscriminator;
 
+    internal static string ToTranslatedPermissionString(this Permissions perm, Guild guild)
+        => GetTranslationObject(perm) == Bot.loadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(Xorog.Logger.Enums.LogLevel.WARN, "Missing Translation") : GetTranslationObject(perm).Get(guild);
+
+    internal static string ToTranslatedPermissionString(this Permissions perm, DiscordGuild guild)
+        => GetTranslationObject(perm) == Bot.loadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(Xorog.Logger.Enums.LogLevel.WARN, "Missing Translation") : GetTranslationObject(perm).Get(guild);
+
+    internal static string ToTranslatedPermissionString(this Permissions perm, User user)
+        => GetTranslationObject(perm) == Bot.loadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(Xorog.Logger.Enums.LogLevel.WARN, "Missing Translation") : GetTranslationObject(perm).Get(user);
+
+    internal static string ToTranslatedPermissionString(this Permissions perm, DiscordUser user)
+        => GetTranslationObject(perm) == Bot.loadedTranslations.Common.MissingTranslation ? perm.ToPermissionString().Log(Xorog.Logger.Enums.LogLevel.WARN, "Missing Translation") : GetTranslationObject(perm).Get(user);
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0103:[Discord] Unreleased", Justification = "<Pending>")]
+    private static SingleTranslationKey GetTranslationObject(Permissions perm) 
+        => perm switch
+        {
+            Permissions.None => Bot.loadedTranslations.Common.Permissions.None,
+            Permissions.All => Bot.loadedTranslations.Common.Permissions.All,
+            Permissions.CreateInstantInvite => Bot.loadedTranslations.Common.Permissions.CreateInstantInvite,
+            Permissions.KickMembers => Bot.loadedTranslations.Common.Permissions.KickMembers,
+            Permissions.BanMembers => Bot.loadedTranslations.Common.Permissions.BanMembers,
+            Permissions.Administrator => Bot.loadedTranslations.Common.Permissions.Administrator,
+            Permissions.ManageChannels => Bot.loadedTranslations.Common.Permissions.ManageChannels,
+            Permissions.ManageGuild => Bot.loadedTranslations.Common.Permissions.ManageGuild,
+            Permissions.AddReactions => Bot.loadedTranslations.Common.Permissions.AddReactions,
+            Permissions.ViewAuditLog => Bot.loadedTranslations.Common.Permissions.ViewAuditLog,
+            Permissions.PrioritySpeaker => Bot.loadedTranslations.Common.Permissions.PrioritySpeaker,
+            Permissions.Stream => Bot.loadedTranslations.Common.Permissions.Stream,
+            Permissions.AccessChannels => Bot.loadedTranslations.Common.Permissions.AccessChannels,
+            Permissions.SendMessages => Bot.loadedTranslations.Common.Permissions.SendMessages,
+            Permissions.SendTtsMessages => Bot.loadedTranslations.Common.Permissions.SendTtsMessages,
+            Permissions.ManageMessages => Bot.loadedTranslations.Common.Permissions.ManageMessages,
+            Permissions.EmbedLinks => Bot.loadedTranslations.Common.Permissions.EmbedLinks,
+            Permissions.AttachFiles => Bot.loadedTranslations.Common.Permissions.AttachFiles,
+            Permissions.ReadMessageHistory => Bot.loadedTranslations.Common.Permissions.ReadMessageHistory,
+            Permissions.MentionEveryone => Bot.loadedTranslations.Common.Permissions.MentionEveryone,
+            Permissions.UseExternalEmojis => Bot.loadedTranslations.Common.Permissions.UseExternalEmojis,
+            Permissions.ViewGuildInsights => Bot.loadedTranslations.Common.Permissions.ViewGuildInsights,
+            Permissions.UseVoice => Bot.loadedTranslations.Common.Permissions.UseVoice,
+            Permissions.Speak => Bot.loadedTranslations.Common.Permissions.Speak,
+            Permissions.MuteMembers => Bot.loadedTranslations.Common.Permissions.MuteMembers,
+            Permissions.DeafenMembers => Bot.loadedTranslations.Common.Permissions.DeafenMembers,
+            Permissions.MoveMembers => Bot.loadedTranslations.Common.Permissions.MoveMembers,
+            Permissions.UseVoiceDetection => Bot.loadedTranslations.Common.Permissions.UseVoiceDetection,
+            Permissions.ChangeNickname => Bot.loadedTranslations.Common.Permissions.ChangeNickname,
+            Permissions.ManageNicknames => Bot.loadedTranslations.Common.Permissions.ManageNicknames,
+            Permissions.ManageRoles => Bot.loadedTranslations.Common.Permissions.ManageRoles,
+            Permissions.ManageWebhooks => Bot.loadedTranslations.Common.Permissions.ManageWebhooks,
+            Permissions.ManageGuildExpressions => Bot.loadedTranslations.Common.Permissions.ManageGuildExpressions,
+            Permissions.UseApplicationCommands => Bot.loadedTranslations.Common.Permissions.UseApplicationCommands,
+            Permissions.RequestToSpeak => Bot.loadedTranslations.Common.Permissions.RequestToSpeak,
+            Permissions.ManageEvents => Bot.loadedTranslations.Common.Permissions.ManageEvents,
+            Permissions.ManageThreads => Bot.loadedTranslations.Common.Permissions.ManageThreads,
+            Permissions.CreatePublicThreads => Bot.loadedTranslations.Common.Permissions.CreatePublicThreads,
+            Permissions.CreatePrivateThreads => Bot.loadedTranslations.Common.Permissions.CreatePrivateThreads,
+            Permissions.UseExternalStickers => Bot.loadedTranslations.Common.Permissions.UseExternalStickers,
+            Permissions.SendMessagesInThreads => Bot.loadedTranslations.Common.Permissions.SendMessagesInThreads,
+            Permissions.StartEmbeddedActivities => Bot.loadedTranslations.Common.Permissions.StartEmbeddedActivities,
+            Permissions.ModerateMembers => Bot.loadedTranslations.Common.Permissions.ModerateMembers,
+            Permissions.ViewCreatorMonetizationInsights => Bot.loadedTranslations.Common.Permissions.ViewCreatorMonetizationInsights,
+            Permissions.UseSoundboard => Bot.loadedTranslations.Common.Permissions.UseSoundboard,
+            Permissions.CreateGuildExpressions => Bot.loadedTranslations.Common.Permissions.CreateGuildExpressions,
+            Permissions.CreateEvents => Bot.loadedTranslations.Common.Permissions.CreateEvents,
+            Permissions.UseExternalSounds => Bot.loadedTranslations.Common.Permissions.UseExternalSounds,
+            Permissions.SendVoiceMessages => Bot.loadedTranslations.Common.Permissions.SendVoiceMessages,
+            _ => Bot.loadedTranslations.Common.MissingTranslation,
+        };
+
+    internal static string UnicodeToEmoji(this string str)
+        => DiscordEmoji.FromUnicode(str);
+
     internal static List<DiscordOverwriteBuilder> ConvertToBuilderWithNewOverwrites(this IReadOnlyList<DiscordOverwrite> overwrites, DiscordMember member, Permissions allowed, Permissions denied)
         => overwrites.Where(x => x.Id != member.Id).Select(x => (x.Type == OverwriteType.Role ? new DiscordOverwriteBuilder(x.GetRoleAsync().Result) { Allowed = x.Allowed, Denied = x.Denied } : new DiscordOverwriteBuilder(x.GetMemberAsync().Result) { Allowed = x.Allowed, Denied = x.Denied })).Append(new DiscordOverwriteBuilder(member) { Allowed = (overwrites.FirstOrDefault(x => x.Id == member.Id, null)?.Allowed ?? Permissions.None) | allowed, Denied = (overwrites.FirstOrDefault(x => x.Id == member.Id, null)?.Denied ?? Permissions.None) | denied }).ToList();
     

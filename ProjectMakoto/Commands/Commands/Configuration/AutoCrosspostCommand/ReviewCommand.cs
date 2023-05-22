@@ -23,7 +23,7 @@ internal class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = AutoCrosspostCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, "Auto Crosspost"));
+            }.AsInfo(ctx, GetString(t.Commands.Config.AutoCrosspost.Title)));
         });
     }
 }

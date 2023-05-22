@@ -35,15 +35,11 @@ internal class TimeoutCommand : BaseCommand
                 throw;
             }
 
-            var embed = new DiscordEmbedBuilder
-            {
-                Description = $"`Timing {victim.GetUsernameWithIdentifier()} ({victim.Id}) out..`",
-                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
-                {
-                    Url = victim.AvatarUrl
-                },
-            }.AsLoading(ctx);
-            await RespondOrEdit(embed: embed);
+            var CommandKey = t.Commands.Moderation.Timeout;
+
+            await RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(GetString(CommandKey.TimingOut, true, new TVar("Victim", victim.Mention)))
+                .AsLoading(ctx));
 
             if (string.IsNullOrWhiteSpace(duration))
                 duration = "30m";
@@ -65,20 +61,18 @@ internal class TimeoutCommand : BaseCommand
                 }
                 catch (Exception)
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder
-                    {
-                        Description = $"`The Duration you specified is invalid.`",
-                    }.AsError(ctx));
+                    await RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(GetString(CommandKey.Invalid, true))
+                        .AsError(ctx));
                     return;
                 }
             }
 
             if (DateTime.UtcNow > until || DateTime.UtcNow.AddDays(28) < until)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
-                {
-                    Description = $"``The duration you specified is invalid.``",
-                }.AsError(ctx));
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Invalid, true))
+                    .AsError(ctx));
                 return;
             }
 
@@ -87,18 +81,18 @@ internal class TimeoutCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= victim.GetRoleHighestPosition())
                     throw new Exception();
 
-                await victim.TimeoutAsync(until, $"{ctx.User.GetUsernameWithIdentifier()} timed user out: {(reason.IsNullOrWhiteSpace() ? "No reason provided." : reason)}");
-                embed.Description = $"{victim.Mention} `was timed out for '{(reason.IsNullOrWhiteSpace() ? "No reason provided" : reason).SanitizeForCode()}' by` {ctx.User.Mention}`.`\n" +
-                                    $"`The time out will end` {until.ToTimestamp()}`.`";
-                embed = embed.AsSuccess(ctx);
+                await victim.TimeoutAsync(until, GetGuildString(CommandKey.AuditLog, new TVar("Reason", (reason.IsNullOrWhiteSpace() ? "No reason provided." : reason))));
+
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.TimedOut, true, new TVar("Victim", victim.Mention), new TVar("Reason", reason.IsNullOrWhiteSpace() ? "No reason provided" : reason)))
+                    .AsSuccess(ctx));
             }
             catch (Exception)
             {
-                embed.Description = $"{victim.Mention} `could not be timed out.`";
-                embed = embed.AsError(ctx);
+                await RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(GetString(CommandKey.Failed, true, new TVar("Victim", victim.Mention)))
+                    .AsSuccess(ctx));
             }
-
-            await RespondOrEdit(embed);
         });
     }
 }
