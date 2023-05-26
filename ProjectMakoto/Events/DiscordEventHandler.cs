@@ -35,6 +35,7 @@ internal class DiscordEventHandler
         embedMessagesEvents = new(_bot);
         tokenLeakEvents = new(_bot);
         vcCreatorEvents = new(_bot);
+        reminderEvents = new(_bot);
     }
 
 
@@ -60,6 +61,7 @@ internal class DiscordEventHandler
     NameNormalizerEvents nameNormalizerEvents { get; set; }
     EmbedMessagesEvents embedMessagesEvents { get; set; }
     TokenLeakEvents tokenLeakEvents { get; set; }
+    ReminderEvents reminderEvents { get; set; }
 
     internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -202,6 +204,7 @@ internal class DiscordEventHandler
 
             _ = submissionEvents.ComponentInteractionCreated(sender, e);
             _ = embedMessagesEvents.ComponentInteractionCreated(sender, e);
+            _ = reminderEvents.ComponentInteractionCreated(sender, e);
         });
     }
 
