@@ -121,6 +121,24 @@ public abstract class BaseCommand
             await ExecuteCommand(this.ctx, arguments);
     }
 
+    public async Task ExecuteCommand(ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
+    {
+        if (InitiateInteraction)
+            await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            {
+                IsEphemeral = Ephemeral
+            });
+
+        this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
+        this.ctx.RespondedToInitial = InitiateInteraction;
+
+        if (InteractionInitiated)
+            this.ctx.RespondedToInitial = true;
+
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
+    }
+
     internal async Task<bool> BasePreExecutionCheck()
     {
         t = Bot.loadedTranslations;
@@ -130,32 +148,35 @@ public abstract class BaseCommand
             _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
         }
 
-        if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
+        if (!ctx.Channel.IsPrivate)
         {
-            ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale = ctx.Guild.PreferredLocale;
-            _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", ctx.Guild.Id, ctx.Guild.PreferredLocale);
+            if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
+            {
+                ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale = ctx.Guild.PreferredLocale;
+                _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", ctx.Guild.Id, ctx.Guild.PreferredLocale);
+            }
+
+            if (!(await CheckOwnPermissions(Permissions.SendMessages)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.AddReactions)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
+                return false;
+
+            if (!(await BeforeExecution(this.ctx)))
+                return false;
         }
-
-        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
-            return false;
-
-        if (!(await BeforeExecution(this.ctx)))
-            return false;
 
         if ((this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) || ctx.DbUser.Data.DeletionRequested) && this.ctx.CommandName != "data" && this.ctx.CommandName != "delete")
         {

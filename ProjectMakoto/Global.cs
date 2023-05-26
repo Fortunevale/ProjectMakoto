@@ -75,3 +75,4 @@ global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
 global using System.Collections;
 global using System.Reflection;
+global using ProjectMakoto.Util.JsonSerializers;
