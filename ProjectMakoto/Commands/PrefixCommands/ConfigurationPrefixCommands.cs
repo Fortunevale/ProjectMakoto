@@ -26,7 +26,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "join")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "join")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -69,7 +69,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "experience")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "experience")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -112,7 +112,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "levelrewards")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "levelrewards")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -155,7 +155,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "phishing")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "phishing")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -198,7 +198,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "bumpreminder")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "bumpreminder")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -241,7 +241,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "actionlog")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "actionlog")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -285,7 +285,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "autocrosspost")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "autocrosspost")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -329,7 +329,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "reactionroles")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "reactionroles")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -410,7 +410,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "invoiceprivacy")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "invoiceprivacy")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -454,7 +454,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "invitetracker")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "invitetracker")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -497,7 +497,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "namenormalizer")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "namenormalizer")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -540,7 +540,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "autounarchive")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "autounarchive")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -583,7 +583,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "embedmessages")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "embedmessages")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -626,7 +626,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "tokendetection")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "tokendetection")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -669,7 +669,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "invitenotes")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "invitenotes")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -710,7 +710,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -753,7 +753,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
                     return;
 
                 if (ctx.Command.Parent is not null)
@@ -796,7 +796,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "vccreator")))
                     return;
 
                 if (ctx.Command.Parent is not null)

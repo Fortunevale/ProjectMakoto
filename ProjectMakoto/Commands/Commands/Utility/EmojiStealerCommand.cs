@@ -44,7 +44,7 @@ internal class EmojiStealerCommand : BaseCommand
                 }
             }
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             HttpClient client = new();
@@ -348,13 +348,13 @@ internal class EmojiStealerCommand : BaseCommand
 
                                             var currentFilename = $"{current.Value.Name}.{(current.Value.Animated == true ? "gif" : "png")}";
 
-                                            await ctx.Member.SendMessageAsync(new DiscordMessageBuilder()
+                                            await ctx.User.SendMessageAsync(new DiscordMessageBuilder()
                                                 .WithContent($"`{i + 1}/{totalCount}` `{currentFilename}`")
                                                 .WithFile($"{currentFilename}", current.Value.Data.Stream));
                                             await Task.Delay(1000);
                                         }
 
-                                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithContent(GetString(t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
+                                        await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithContent(GetString(t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
                                     }
                                     catch (DisCatSharp.Exceptions.UnauthorizedException)
                                     {
@@ -405,7 +405,7 @@ internal class EmojiStealerCommand : BaseCommand
                                         try
                                         {
                                             zipFileStream.Seek(0, SeekOrigin.Begin);
-                                            await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emojis.zip", zipFileStream).WithContent(GetString(t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
+                                            await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emojis.zip", zipFileStream).WithContent(GetString(t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
                                         }
                                         catch (DisCatSharp.Exceptions.UnauthorizedException)
                                         {

@@ -15,12 +15,12 @@ internal class DeleteCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             string playlistId = (string)arguments["id"];
 
-            if (!ctx.Bot.users[ctx.Member.Id].UserPlaylists.Any(x => x.PlaylistId == playlistId))
+            if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -29,14 +29,14 @@ internal class DeleteCommand : BaseCommand
                 return;
             }
 
-            UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == playlistId);
+            UserPlaylist SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = GetString(t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
             }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
-            ctx.Bot.users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+            ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {

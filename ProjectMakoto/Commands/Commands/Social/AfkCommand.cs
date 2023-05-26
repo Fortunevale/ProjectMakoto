@@ -17,7 +17,7 @@ internal class AfkCommand : BaseCommand
         {
             string reason = (string)arguments["reason"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             if (reason.Length > 128)
@@ -26,8 +26,8 @@ internal class AfkCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.users[ctx.User.Id].AfkStatus.Reason = reason.FullSanitize();
-            ctx.Bot.users[ctx.User.Id].AfkStatus.TimeStamp = DateTime.UtcNow;
+            ctx.DbUser.AfkStatus.Reason = reason.FullSanitize();
+            ctx.DbUser.AfkStatus.TimeStamp = DateTime.UtcNow;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {

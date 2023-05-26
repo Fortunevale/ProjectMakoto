@@ -25,7 +25,7 @@ internal class LoadShareCommand : BaseCommand
                 .Replace(":", "")
                 .Replace("&", "");
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
@@ -82,7 +82,7 @@ internal class LoadShareCommand : BaseCommand
                     Description = GetString(t.Commands.Music.Playlists.LoadShare.Importing, true),
                 }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
-                if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                if (ctx.DbUser.UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -91,7 +91,7 @@ internal class LoadShareCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(ImportJson);
+                ctx.DbUser.UserPlaylists.Add(ImportJson);
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

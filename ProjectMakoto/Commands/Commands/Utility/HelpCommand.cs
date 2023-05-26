@@ -19,7 +19,7 @@ internal class HelpCommand : BaseCommand
         {
             var command_filter = (string)arguments["command"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             List<KeyValuePair<string, string>> Commands = new();
@@ -99,7 +99,7 @@ internal class HelpCommand : BaseCommand
                             continue;
                         break;
                     case "maintenance":
-                        if (!ctx.Member.IsMaintenance(ctx.Bot.status))
+                        if (!ctx.User.IsMaintenance(ctx.Bot.status))
                             continue;
                         break;
                     case "hidden":

@@ -19,7 +19,7 @@ internal class ScoreSaberMapLeaderboardCommand : BaseCommand
             int Page = (int)arguments["Page"];
             int Internal_Page = (int)arguments["Internal_Page"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             if (Page <= 0 || !(Internal_Page is 0 or 1))

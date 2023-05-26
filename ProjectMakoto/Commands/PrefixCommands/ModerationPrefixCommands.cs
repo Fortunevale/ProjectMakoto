@@ -204,7 +204,7 @@ public class ModerationPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "follow")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "follow")))
                     return;
 
                 if (ctx.Command.Parent is not null)

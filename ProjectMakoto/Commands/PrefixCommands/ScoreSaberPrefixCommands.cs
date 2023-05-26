@@ -23,7 +23,7 @@ public class ScoreSaberPrefixCommands : BaseCommandModule
         {
             Task.Run(async () =>
             {
-                if (await _bot.users[ctx.Member.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "scoresaber")))
+                if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, "scoresaber")))
                     return;
 
                 if (ctx.Command.Parent is not null)

@@ -16,7 +16,7 @@ internal class LeaderboardCommand : BaseCommand
         {
             int ShowAmount = (int)arguments["ShowAmount"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             if (!ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience)

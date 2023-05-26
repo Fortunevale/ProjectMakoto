@@ -19,7 +19,7 @@ internal class ConfigCommand : BaseCommand
         {
             var CommandKey = t.Commands.Config.InviteNotes;
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.AddNoteButton), false, DiscordEmoji.FromUnicode("➕").ToComponent());

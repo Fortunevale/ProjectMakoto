@@ -17,7 +17,7 @@ internal class ScoreSaberSearchCommand : BaseCommand
         {
             string name = (string)arguments["name"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             DiscordStringSelectComponent GetContinents(string default_code)

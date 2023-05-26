@@ -44,7 +44,7 @@ internal class TranslateCommand : BaseCommand
                 }
             }
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             var transSource = bMessage.Content;
@@ -88,7 +88,7 @@ internal class TranslateCommand : BaseCommand
                     Description = GetString(t.Commands.Utility.TranslateMessage.SelectSource, true),
                 }.AsAwaitingInput(ctx)));
 
-                var SourceResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.Bot.users[ctx.User.Id].Translation.LastGoogleSource))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectSourceDropdown));
+                var SourceResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.DbUser.Translation.LastGoogleSource))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectSourceDropdown));
 
                 if (SourceResult.TimedOut)
                 {
@@ -105,7 +105,7 @@ internal class TranslateCommand : BaseCommand
                     throw SourceResult.Exception;
                 }
 
-                ctx.Bot.users[ctx.User.Id].Translation.LastGoogleSource = SourceResult.Result;
+                ctx.DbUser.Translation.LastGoogleSource = SourceResult.Result;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -113,7 +113,7 @@ internal class TranslateCommand : BaseCommand
                         new TVar("Source", SourceResult.Result)),
                 }.AsAwaitingInput(ctx)));
 
-                var TargetResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.Bot.users[ctx.User.Id].Translation.LastGoogleTarget))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectTargetDropdown));
+                var TargetResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.DbUser.Translation.LastGoogleTarget))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectTargetDropdown));
 
                 if (TargetResult.TimedOut)
                 {
@@ -130,7 +130,7 @@ internal class TranslateCommand : BaseCommand
                     throw TargetResult.Exception;
                 }
 
-                ctx.Bot.users[ctx.User.Id].Translation.LastGoogleTarget = TargetResult.Result;
+                ctx.DbUser.Translation.LastGoogleTarget = TargetResult.Result;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -184,7 +184,7 @@ internal class TranslateCommand : BaseCommand
                     Description = GetString(t.Commands.Utility.TranslateMessage.SelectSource, true),
                 }.AsAwaitingInput(ctx)));
 
-                var SourceResult = await PromptCustomSelection(TranslationSources.Select(x => new DiscordStringSelectComponentOption(x.name, x.code, null, (x.code == ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateSource))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectSourceDropdown));
+                var SourceResult = await PromptCustomSelection(TranslationSources.Select(x => new DiscordStringSelectComponentOption(x.name, x.code, null, (x.code == ctx.DbUser.Translation.LastLibreTranslateSource))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectSourceDropdown));
 
                 if (SourceResult.TimedOut)
                 {
@@ -201,7 +201,7 @@ internal class TranslateCommand : BaseCommand
                     throw SourceResult.Exception;
                 }
 
-                ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateSource = SourceResult.Result;
+                ctx.DbUser.Translation.LastLibreTranslateSource = SourceResult.Result;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -209,7 +209,7 @@ internal class TranslateCommand : BaseCommand
                         new TVar("Source", SourceResult.Result)),
                 }.AsAwaitingInput(ctx)));
 
-                var TargetResult = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordStringSelectComponentOption(x.name, x.code, null, (x.code == ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateTarget))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectTargetDropdown));
+                var TargetResult = await PromptCustomSelection(TranslationTargets.Select(x => new DiscordStringSelectComponentOption(x.name, x.code, null, (x.code == ctx.DbUser.Translation.LastLibreTranslateTarget))).ToList(), GetString(t.Commands.Utility.TranslateMessage.SelectTargetDropdown));
 
                 if (TargetResult.TimedOut)
                 {
@@ -226,7 +226,7 @@ internal class TranslateCommand : BaseCommand
                     throw TargetResult.Exception;
                 }
 
-                ctx.Bot.users[ctx.User.Id].Translation.LastLibreTranslateTarget = TargetResult.Result;
+                ctx.DbUser.Translation.LastLibreTranslateTarget = TargetResult.Result;
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {

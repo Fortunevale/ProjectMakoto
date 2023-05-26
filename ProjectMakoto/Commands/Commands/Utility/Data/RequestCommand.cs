@@ -15,7 +15,7 @@ internal class RequestCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForHeavy(ctx, true))
+            if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx, true))
                 return;
 
             if (ctx.DbUser.Data.LastDataRequest.GetTimespanSince() < TimeSpan.FromDays(14))
@@ -38,7 +38,7 @@ internal class RequestCommand : BaseCommand
 
             if (ctx.Bot.users.ContainsKey(ctx.User.Id))
             {
-                requestData.User = ctx.Bot.users[ctx.User.Id];
+                requestData.User = ctx.DbUser;
             }
 
             foreach (var guild in ctx.Bot.guilds)
@@ -66,7 +66,7 @@ internal class RequestCommand : BaseCommand
                 {
                     try
                     {
-                        await ctx.Member.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
                             Description = GetString(t.Commands.Utility.Data.Request.Confirm, true)
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));

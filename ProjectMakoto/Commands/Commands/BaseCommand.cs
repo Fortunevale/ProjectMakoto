@@ -124,9 +124,9 @@ public abstract class BaseCommand
     internal async Task<bool> BasePreExecutionCheck()
     {
         t = Bot.loadedTranslations;
-        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].CurrentLocale != ctx.User.Locale)
+        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.DbUser.CurrentLocale != ctx.User.Locale)
         {
-            ctx.Bot.users[ctx.User.Id].CurrentLocale = ctx.User.Locale;
+            ctx.DbUser.CurrentLocale = ctx.User.Locale;
             _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
         }
 
@@ -342,7 +342,7 @@ public abstract class BaseCommand
         => GetString(key, false, vars);
 
     public string GetString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
-        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(ctx.DbUser).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
 
 
 
@@ -356,7 +356,7 @@ public abstract class BaseCommand
         => GetString(key, true, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
-        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(ctx.DbUser).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
 
 
 

@@ -19,7 +19,7 @@ internal class ConfigCommand : BaseCommand
         {
             var CommandKey = t.Commands.Config.BumpReminder;
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SetupBumpReminderButton), ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));

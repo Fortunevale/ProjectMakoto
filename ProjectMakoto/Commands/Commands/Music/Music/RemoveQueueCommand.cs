@@ -25,7 +25,7 @@ internal class RemoveQueueCommand : BaseCommand
                 return;
             }
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             var lava = ctx.Client.GetLavalink();

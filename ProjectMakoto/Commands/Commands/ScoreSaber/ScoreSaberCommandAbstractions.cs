@@ -21,9 +21,9 @@ internal class ScoreSaberCommandAbstractions
 
         if (string.IsNullOrWhiteSpace(id))
         {
-            if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id != 0)
+            if (ctx.DbUser.ScoreSaber.Id != 0)
             {
-                id = ctx.Bot.users[ctx.User.Id].ScoreSaber.Id.ToString();
+                id = ctx.DbUser.ScoreSaber.Id.ToString();
             }
             else
             {
@@ -89,7 +89,7 @@ internal class ScoreSaberCommandAbstractions
                         {
                             AddLinkButton = false;
                             ShowProfile().Add(ctx.Bot.watcher, ctx);
-                            ctx.Bot.users[ctx.User.Id].ScoreSaber.Id = Convert.ToUInt64(player.id);
+                            ctx.DbUser.ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -216,7 +216,7 @@ internal class ScoreSaberCommandAbstractions
 
                 DiscordMessageBuilder builder = new();
 
-                if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (ctx.DbUser.ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
                 await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed).AddComponents((scoreType == RequestParameters.ScoreType.TOP ? TopScoreInteractionRow : RecentScoreInteractionRow)));
@@ -241,7 +241,7 @@ internal class ScoreSaberCommandAbstractions
 
                 DiscordMessageBuilder builder = new();
 
-                if (ctx.Bot.users[ctx.User.Id].ScoreSaber.Id == 0 && AddLinkButton)
+                if (ctx.DbUser.ScoreSaber.Id == 0 && AddLinkButton)
                     builder.AddComponents(LinkButton);
 
                 if (!string.IsNullOrWhiteSpace(LoadedGraph))

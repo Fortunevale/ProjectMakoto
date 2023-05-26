@@ -19,7 +19,7 @@ internal class ConfigCommand : BaseCommand
         {
             var CommandKey = t.Commands.Config.AutoCrosspost;
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.ToList())

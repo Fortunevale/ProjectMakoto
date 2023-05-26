@@ -15,12 +15,12 @@ internal class ShareCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             string playlistId = (string)arguments["id"];
 
-            if (!ctx.Bot.users[ctx.Member.Id].UserPlaylists.Any(x => x.PlaylistId == playlistId))
+            if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -29,7 +29,7 @@ internal class ShareCommand : BaseCommand
                 return;
             }
 
-            UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == playlistId);
+            UserPlaylist SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
             string ShareCode = $"{Guid.NewGuid()}";
 

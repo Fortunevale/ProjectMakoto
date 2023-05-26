@@ -17,7 +17,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             var embed = new DiscordEmbedBuilder
@@ -65,7 +65,7 @@ internal class ConfigCommand : BaseCommand
                     return;
                 }
 
-                if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
+                if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                     return;
 
                 ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning = true;

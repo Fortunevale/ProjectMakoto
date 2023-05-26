@@ -18,7 +18,7 @@ internal class LanguageCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = $"{GetString(t.Commands.Utility.Language.Disclaimer, true)}\n" +
-                              $"{GetString(t.Commands.Utility.Language.Response, true)}: `{(ctx.Bot.users[ctx.User.Id].OverrideLocale.IsNullOrWhiteSpace() ? (ctx.Bot.users[ctx.User.Id].CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.Bot.users[ctx.User.Id].CurrentLocale} (Discord)") : $"{ctx.Bot.users[ctx.User.Id].OverrideLocale} (Override)")}`"
+                              $"{GetString(t.Commands.Utility.Language.Response, true)}: `{(ctx.DbUser.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbUser.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbUser.CurrentLocale} (Discord)") : $"{ctx.DbUser.OverrideLocale} (Override)")}`"
             });
 
             List<DiscordStringSelectComponentOption> options = new();
@@ -94,12 +94,12 @@ internal class LanguageCommand : BaseCommand
             {
                 case "_":
                 {
-                    ctx.Bot.users[ctx.User.Id].OverrideLocale = null;
+                    ctx.DbUser.OverrideLocale = null;
                     break;
                 }
                 default:
                 {
-                    ctx.Bot.users[ctx.User.Id].OverrideLocale = SelectionResult.Result;
+                    ctx.DbUser.OverrideLocale = SelectionResult.Result;
                     break;
                 }
             }
