@@ -905,9 +905,13 @@
           "en": "You have {Count} reminders.",
           "de": "Du hast {Count} Erinnerungen."
         },
-        "Created": {
+        "CreatedOn": {
           "en": "Created on {Guild}",
           "de": "Erstellt auf {Guild}"
+        },
+        "CreatedAt": {
+          "en": "Created at {Timestamp}",
+          "de": "Erstellt um {Timestamp}"
         },
         "DueTime": {
           "en": "Due {Relative} ({DateTime})",
@@ -936,6 +940,14 @@
         "DateTime": {
           "en": "Due Date & Time",
           "de": "Erinnerungszeit"
+        },
+        "SentLate": {
+          "en": "This reminder has been sent late because of a recent bot outage.",
+          "de": "Diese Erinnerung konnte nicht pünktlich gesendet werden auf Grund von einem Ausfall."
+        },
+        "ReminderNotification": {
+          "en": "Reminder Notification",
+          "de": "Erinnerungsnachricht"
         }
       },
       "ReportHost": {

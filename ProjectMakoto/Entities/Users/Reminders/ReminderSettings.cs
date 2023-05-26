@@ -37,17 +37,19 @@ public class ReminderSettings
             {
                 Task task = new(async () =>
                 {
+                    var CommandKey = Bot.loadedTranslations.Commands.Utility.Reminders;
+
                     this.ScheduledReminders.Remove(b);
 
                     var user = await this._bot.discordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.UserId)).Value.GetMemberAsync(this.Parent.UserId);
 
                     DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"> {b.Description.FullSanitize()}\n" +
-                        $"Created on {b.CreationPlace}\n" +
-                        $"Created at {b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})\n" +
-                        $"Due {b.DueTime.ToTimestamp()} ({b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)})" +
-                        $"{(b.DueTime.GetTimespanSince() > TimeSpan.FromMinutes(2) ? "\n\n**This reminder has been sent late because of a recent bot outage.**" : "")}")
-                        .WithTitle("Reminder Notification")
+                        $"{CommandKey.CreatedOn.Get(_bot.users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
+                        $"{CommandKey.CreatedAt.Get(_bot.users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +
+                        $"{CommandKey.DueTime.Get(_bot.users[user.Id]).Build(new TVar("Relative", b.DueTime.ToTimestamp()), new TVar("DateTime", b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}\n" +
+                        $"{(b.DueTime.GetTimespanSince() > TimeSpan.FromMinutes(2) ? $"\n\n**{CommandKey.SentLate.Get(_bot.users[user.Id])}**" : "")}")
+                        .WithTitle(CommandKey.ReminderNotification.Get(_bot.users[user.Id]))
                         .WithColor(EmbedColors.Info));
 
                     var maxLength = 100 - JsonConvert.SerializeObject(new ReminderSnoozeButton(), new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include }).Length;

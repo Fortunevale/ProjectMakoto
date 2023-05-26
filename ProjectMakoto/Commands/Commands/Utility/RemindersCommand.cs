@@ -34,7 +34,7 @@ internal class RemindersCommand : BaseCommand
                 await RespondOrEdit(new DiscordMessageBuilder()
                     .WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"{GetString(t.Commands.Utility.Reminders.Count, true, new TVar("Count", rem.ScheduledReminders.Count))}\n\n" +
-                         $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{GetString(t.Commands.Utility.Reminders.Created, new TVar("Guild", $"**{x.CreationPlace}**"))}\n{GetString(t.Commands.Utility.Reminders.DueTime, new TVar("Relative", x.DueTime.ToTimestamp()), new TVar("DateTime", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}").ToList())}\n\n" +
+                         $"{string.Join("\n\n", rem.ScheduledReminders.Select(x => $"> {x.Description.FullSanitize()}\n{GetString(t.Commands.Utility.Reminders.CreatedOn, new TVar("Guild", $"**{x.CreationPlace}**"))}\n{GetString(t.Commands.Utility.Reminders.DueTime, new TVar("Relative", x.DueTime.ToTimestamp()), new TVar("DateTime", x.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}").ToList())}\n\n" +
                          $"**⚠ {GetString(t.Commands.Utility.Reminders.Notice)}**")
                         .AsInfo(ctx, GetString(t.Commands.Utility.Reminders.Title)))
                     .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
