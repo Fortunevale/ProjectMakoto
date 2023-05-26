@@ -2,155 +2,205 @@
   "Common": {
     "Permissions": {
       "None": {
-        "en": "None"
+        "en": "None",
+        "de": "Keine"
       },
       "All": {
-        "en": "All"
+        "en": "All",
+        "de": "Alle"
       },
       "CreateInstantInvite": {
-        "en": "Create Instant Invite"
+        "en": "Create Invite",
+        "de": "Einladung erstellen"
       },
       "KickMembers": {
-        "en": "Kick Members"
+        "en": "Kick Members",
+        "de": "Member kicken"
       },
       "BanMembers": {
-        "en": "Ban Members"
+        "en": "Ban Members",
+        "de": "Member bannen"
       },
       "Administrator": {
-        "en": "Administrator"
+        "en": "Administrator",
+        "de": "Administrator"
       },
       "ManageChannels": {
-        "en": "Manage Channels"
+        "en": "Manage Channels",
+        "de": "Kanäle verwalten"
       },
       "ManageGuild": {
-        "en": "Manage Guild"
+        "en": "Manage Guild",
+        "de": "Server verwalten"
       },
       "AddReactions": {
-        "en": "Add Reactions"
+        "en": "Add Reactions",
+        "de": "Reaktionen hinzufügen"
       },
       "ViewAuditLog": {
-        "en": "View AuditLog"
+        "en": "View AuditLog",
+        "de": "AuditLog ansehen"
       },
       "PrioritySpeaker": {
-        "en": "Priority Speaker"
+        "en": "Priority Speaker",
+        "de": "Prioritätssprecher"
       },
       "Stream": {
-        "en": "Screenshare"
+        "en": "Screenshare",
+        "de": "Bildschirmübertragung"
       },
       "AccessChannels": {
-        "en": "View Channels"
+        "en": "View Channels",
+        "de": "Kanäle sehen"
       },
       "SendMessages": {
-        "en": "Send Messages"
+        "en": "Send Messages",
+        "de": "Nachrichten senden"
       },
       "SendTtsMessages": {
-        "en": "Send TTS Messages"
+        "en": "Send TTS Messages",
+        "de": "TTS Nachrichten senden"
       },
       "ManageMessages": {
-        "en": "Mange Messages"
+        "en": "Mange Messages",
+        "de": "Nachrichten verwalten"
       },
       "EmbedLinks": {
-        "en": "Embed Links"
+        "en": "Embed Links",
+        "de": "Links einbetten"
       },
       "AttachFiles": {
-        "en": "Attach Files"
+        "en": "Attach Files",
+        "de": "Dateien anhängen"
       },
       "ReadMessageHistory": {
-        "en": "Read Message History"
+        "en": "Read Message History",
+        "de": "Nachrichtenverlauf lesen"
       },
       "MentionEveryone": {
-        "en": "Mention Everyone"
+        "en": "Mention Everyone",
+        "de": "Alle erwähnen"
       },
       "UseExternalEmojis": {
-        "en": "Use External Emojis"
+        "en": "Use External Emojis",
+        "de": "Externe Emojis verwenden"
       },
       "ViewGuildInsights": {
-        "en": "View Guild Insights"
+        "en": "View Guild Insights",
+        "de": "Server-Einblicke anzeigen"
       },
       "UseVoice": {
-        "en": "Use Voice"
+        "en": "Use Voice",
+        "de": "Verbinden"
       },
       "Speak": {
-        "en": "Speak"
+        "en": "Speak",
+        "de": "Sprechen"
       },
       "MuteMembers": {
-        "en": "Mute Members"
+        "en": "Mute Members",
+        "de": "Member stummschalten"
       },
       "DeafenMembers": {
-        "en": "Deafen Members"
+        "en": "Deafen Members",
+        "de": "Ein- und Ausgabe von Membern deaktivieren"
       },
       "MoveMembers": {
-        "en": "Move Members"
+        "en": "Move Members",
+        "de": "Member verschieben"
       },
       "UseVoiceDetection": {
-        "en": "Use Voice Detection"
+        "en": "Use Voice Detection",
+        "de": "Sprachaktivierung verwenden"
       },
       "ChangeNickname": {
-        "en": "Change Nickname"
+        "en": "Change Nickname",
+        "de": "Nickname ändern"
       },
       "ManageNicknames": {
-        "en": "Manage Nicknames"
+        "en": "Manage Nicknames",
+        "de": "Nicknames verwalten"
       },
       "ManageRoles": {
-        "en": "Manage Roles"
+        "en": "Manage Roles",
+        "de": "Rollen bearbeiten"
       },
       "ManageWebhooks": {
-        "en": "Manage Webhooks"
+        "en": "Manage Webhooks",
+        "de": "Webhooks verwalten"
       },
       "ManageGuildExpressions": {
-        "en": "Manage Guild Expressions"
+        "en": "Manage Guild's Sounds",
+        "de": "Serversounds verwalten"
       },
       "UseApplicationCommands": {
-        "en": "Use Application Commands"
+        "en": "Use Application Commands",
+        "de": "Anwendungsbefehle verwenden"
       },
       "RequestToSpeak": {
-        "en": "Request To Speak"
+        "en": "Request To Speak",
+        "de": "Redeanfrage"
       },
       "ManageEvents": {
-        "en": "Manage Events"
+        "en": "Manage Events",
+        "de": "Events verwalten"
       },
       "ManageThreads": {
-        "en": "Manage Threads"
+        "en": "Manage Threads",
+        "de": "Threads verwalten"
       },
       "CreatePublicThreads": {
-        "en": "Create Public Threads"
+        "en": "Create Public Threads",
+        "de": "Öffentliche Threads erstellen"
       },
       "CreatePrivateThreads": {
-        "en": "Create Private Threads"
+        "en": "Create Private Threads",
+        "de": "Private Threads erstellen"
       },
       "UseExternalStickers": {
-        "en": "Use External Stickers"
+        "en": "Use External Stickers",
+        "de": "Externe Sticker verwenden"
       },
       "SendMessagesInThreads": {
-        "en": "Send Messages In Threads"
+        "en": "Send Messages In Threads",
+        "de": "Nachrichten in Threads versenden"
       },
       "StartEmbeddedActivities": {
-        "en": "Start Activities"
+        "en": "Start Activities",
+        "de": "Aktivitäten starten"
       },
       "ModerateMembers": {
-        "en": "Moderate Members"
+        "en": "Moderate Members",
+        "de": "Member moderieren"
       },
       "ViewCreatorMonetizationInsights": {
-        "en": "View Creator Monetization Insights"
+        "en": "View Creator Monetization Insights",
+        "de": "Creator Monetarisierungseinblicke anzeigen"
       },
       "UseSoundboard": {
-        "en": "Use Soundboard"
+        "en": "Use Soundboard",
+        "de": "Soundboard verwenden"
       },
       "CreateGuildExpressions": {
-        "en": "Create Guild Expressions"
+        "en": "Create Guild Expressions",
+        "de": "Sounds erstellen"
       },
       "CreateEvents": {
-        "en": "Create Events"
+        "en": "Create Events",
+        "de": "Events erstellen"
       },
       "UseExternalSounds": {
-        "en": "Use External Sounds"
+        "en": "Use External Sounds",
+        "de": "Externe Sounds verwenden"
       },
       "SendVoiceMessages": {
-        "en": "Send Voice Messages"
+        "en": "Send Voice Messages",
+        "de": "Sprachnachricht senden"
       }
     },
     "MissingTranslation": {
-      "en": "Missing Translation"
+      "en": "Missing Translation",
+      "de": "Fehlende Übersetzung"
     },
     "Yes": {
       "en": "Yes",
