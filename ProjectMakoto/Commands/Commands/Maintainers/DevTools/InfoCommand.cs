@@ -263,7 +263,7 @@ internal class InfoCommand : BaseCommand
                                 scales: {{
                                     yAxes: [{{
                                     ticks: {{
-                                        max: {currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))},
+                                        max: {currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")},
                                         min: 0
                                         }}
                                     }}]
