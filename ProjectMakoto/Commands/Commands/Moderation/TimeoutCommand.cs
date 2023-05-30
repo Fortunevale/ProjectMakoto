@@ -84,7 +84,7 @@ internal class TimeoutCommand : BaseCommand
                 await victim.TimeoutAsync(until, GetGuildString(CommandKey.AuditLog, new TVar("Reason", (reason.IsNullOrWhiteSpace() ? "No reason provided." : reason))));
 
                 await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.TimedOut, true, new TVar("Victim", victim.Mention), new TVar("Reason", reason.IsNullOrWhiteSpace() ? "No reason provided" : reason)))
+                    .WithDescription(GetString(CommandKey.TimedOut, true, new TVar("Victim", victim.Mention), new TVar("Timestamp", until.ToTimestamp()), new TVar("Reason", reason.IsNullOrWhiteSpace() ? "No reason provided" : reason)))
                     .AsSuccess(ctx));
             }
             catch (Exception)

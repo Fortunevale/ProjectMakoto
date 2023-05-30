@@ -66,7 +66,7 @@ internal class EvaluationCommand : BaseCommand
                     "DisCatSharp.Enums", 
                     "Newtonsoft.Json"
                     );
-                options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic));
+                options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()));
 
                 var script = CSharpScript.Create(code, options, typeof(SharedCommandContext));
                 script.Compile();
