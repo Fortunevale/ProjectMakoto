@@ -37,7 +37,16 @@ public class PollSettings
             await Task.Delay(1000);
 
         foreach (var b in RunningPolls.ToList())
-            if (!GetScheduleTasks().ToList().Any(x => x.Value.customId == $"{Parent.ServerId}; {b.SelectUUID}; poll"))
+            if (!GetScheduledTasks().Any(x =>
+            {
+                if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
+                scheduledTaskIdentifier.Snowflake != this.Parent.ServerId ||
+                scheduledTaskIdentifier.Type != "poll" ||
+                scheduledTaskIdentifier.Id != b.SelectUUID)
+                    return false;
+
+                return true;
+            }))
             {
                 string taskuid = "";
                 CancellationTokenSource cancellationTokenSource = new();
@@ -169,7 +178,7 @@ public class PollSettings
                 _bot.discordClient.ComponentInteractionCreated += VoteHandling;
 
                 task.Add(_bot.watcher);
-                taskuid = task.CreateScheduleTask(b.DueTime.ToUniversalTime(), $"{Parent.ServerId}; {b.SelectUUID}; poll");
+                taskuid = task.CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(Parent.ServerId, b.SelectUUID, "poll"));
 
                 _bot.discordClient.MessageDeleted += MessageDeletionHandling;
                 _bot.discordClient.ChannelDeleted += ChannelDeletionHandling;
@@ -177,17 +186,17 @@ public class PollSettings
                 _logger.LogDebug("Created scheduled task for poll by '{Guild}'", Parent.ServerId);
             }
 
-        foreach (var b in GetScheduleTasks().ToList())
-            if (b.Value.customId.StartsWith($"{Parent.ServerId};") && b.Value.customId.EndsWith($"poll"))
-            {
-                var uuid = b.Value.customId[..b.Value.customId.LastIndexOf(";")];
-                uuid = uuid[(uuid.IndexOf(";") + 2)..];
+        foreach (var b in GetScheduledTasks())
+        {
+            if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+                continue;
 
-                if (!RunningPolls.Any(x => x.SelectUUID == uuid))
-                {
-                    DeleteScheduleTask(b.Key);
-                    _logger.LogDebug("Deleted scheduled task for poll by '{Guild}'", Parent.ServerId);
-                }
+            if (scheduledTaskIdentifier.Snowflake == this.Parent.ServerId && scheduledTaskIdentifier.Type == "poll" && !RunningPolls.Any(x => x.SelectUUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
+            {
+                b.Delete();
+
+                _logger.LogDebug("Deleted scheduled task for poll by '{Guild}'", Parent.ServerId);
             }
+        }
     }
 }

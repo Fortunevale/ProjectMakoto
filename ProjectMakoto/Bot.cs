@@ -82,6 +82,7 @@ public class Bot
 
         _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
         var loggerProvider = _logger._provider;
+        AttachLogger(_logger);
 
         _logger.LogRaised += LogHandler;
 
@@ -324,20 +325,6 @@ public class Bot
                 }
                 loadedTranslations.Progress = CalculateTranslationProgress(loadedTranslations);
                 _logger.LogDebug("Loaded translations: {0}", string.Join("; ", loadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
-
-                foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
-                    if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))
-                    {
-                        _logger.LogDebug("Deleting Directory \"{directory}\"..", directory.Name);
-                        await CleanupFilesAndDirectories(new List<string> { directory.Name }, new List<string>());
-                    }
-
-                foreach (FileInfo file in new DirectoryInfo(Environment.CurrentDirectory).GetFiles())
-                    if (file.Name.StartsWith("Emotes-"))
-                    {
-                        _logger.LogDebug("Deleting File \"{file}\"..", file.Name);
-                        await CleanupFilesAndDirectories(new List<string>(), new List<string> { file.Name });
-                    }
 
                 Task.Run(async () =>
                 {
@@ -1641,7 +1628,7 @@ public class Bot
         new Task(new Action(async () =>
         {
             ProcessDeletionRequests().Add(watcher);
-        })).CreateScheduleTask(DateTime.UtcNow.AddHours(24));
+        })).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
 
         lock (users)
         {

@@ -66,32 +66,33 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.ctx.RespondedToInitial = false;
 
-        if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
-        {
-            _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
+        if (!this.ctx.Bot.status.LoadedConfig.IsDev)
+            if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
             {
-                Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
-            }.AsBotError(this.ctx)).AsEphemeral());
-            return;
-        }
-        else
-        {
-            if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
-            {
-                this.ctx.RespondedToInitial = true;
-                var tfa = await ctx.RequestTwoFactorAsync();
-
-                if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
-                    await SwitchToEvent(tfa.ComponentInteraction);
-
-                if (tfa.Result != TwoFactorResult.ValidCode)
+                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
                 {
-                    _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
-                    return;
-                }
-                _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                    Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
+                }.AsBotError(this.ctx)).AsEphemeral());
+                return;
             }
-        }
+            else
+            {
+                if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
+                {
+                    this.ctx.RespondedToInitial = true;
+                    var tfa = await ctx.RequestTwoFactorAsync();
+
+                    if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
+                        await SwitchToEvent(tfa.ComponentInteraction);
+
+                    if (tfa.Result != TwoFactorResult.ValidCode)
+                    {
+                        _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
+                        return;
+                    }
+                    _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                }
+            }
         
         if (!this.ctx.RespondedToInitial)
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()

@@ -33,7 +33,16 @@ public class ReminderSettings
             ScheduledReminders.RemoveAt(0);
 
         foreach (var b in ScheduledReminders.ToList())
-            if (!GetScheduleTasks().ToList().Any(x => x.Value.customId == $"{Parent.UserId}; {b.UUID}; reminder"))
+            if (!GetScheduledTasks().Any(x =>
+            {
+                if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
+                scheduledTaskIdentifier.Snowflake != this.Parent.UserId ||
+                scheduledTaskIdentifier.Type != "reminder" ||
+                scheduledTaskIdentifier.Id != b.UUID)
+                    return false;
+
+                return true;
+            }))
             {
                 Task task = new(async () =>
                 {
@@ -61,24 +70,23 @@ public class ReminderSettings
                 });
 
                 task.Add(_bot.watcher);
-                task.CreateScheduleTask(b.DueTime, $"{Parent.UserId}; {b.UUID}; reminder");
+                task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(Parent.UserId, b.UUID, "reminder"));
 
                 _logger.LogDebug("Created scheduled task for reminder by '{User}'", Parent.UserId);
             }
 
-        foreach (var b in GetScheduleTasks().ToList())
-            if (b.Value.customId.StartsWith($"{Parent.UserId};") && b.Value.customId.EndsWith($"reminder"))
+        foreach (var b in GetScheduledTasks())
+        {
+            if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+                continue;
+
+            if (scheduledTaskIdentifier.Snowflake == this.Parent.UserId && scheduledTaskIdentifier.Type == "reminder" && !ScheduledReminders.Any(x => x.UUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
             {
-                var uuid = b.Value.customId[..b.Value.customId.LastIndexOf(";")];
-                uuid = uuid[(uuid.IndexOf(";") + 2)..];
+                b.Delete();
 
-                if (!ScheduledReminders.Any(x => x.UUID == uuid))
-                {
-                    DeleteScheduleTask(b.Key);
-
-                    _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", Parent.UserId);
-                }
+                _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", Parent.UserId);
             }
+        }
     }
 
     private User Parent { get; set; }

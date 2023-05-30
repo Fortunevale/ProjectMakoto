@@ -57,9 +57,14 @@ internal class BumpReminder
 
         try
         {
-            if (GetScheduleTasks() is not null)
-                if (GetScheduleTasks()?.Any(x => x.Value.customId == $"bumpmsg-{ServerId}") ?? false)
-                    DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ServerId}").Key);
+            foreach (var b in GetScheduledTasks())
+            {
+                if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+                    continue;
+
+                if (scheduledTaskIdentifier.Snowflake == ServerId && scheduledTaskIdentifier.Type == "bumpmsg")
+                    b.Delete();
+            }
         }
         catch (Exception ex)
         {
@@ -116,6 +121,6 @@ internal class BumpReminder
             _bot.guilds[ServerId].BumpReminder.LastReminder = DateTime.UtcNow;
 
             ScheduleBump(client, ServerId);
-        })).CreateScheduleTask(_bot.guilds[ServerId].BumpReminder.LastReminder.AddHours(2), $"bumpmsg-{ServerId}");
+        })).CreateScheduledTask(_bot.guilds[ServerId].BumpReminder.LastReminder.AddHours(2), new ScheduledTaskIdentifier(ServerId, "", "bumpmsg"));
     }
 }
