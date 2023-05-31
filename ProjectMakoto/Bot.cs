@@ -1579,11 +1579,76 @@ public class Bot
 
                         var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
 
-                        _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
-                            .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
-                            .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
-                            .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
-                            .WithTimestamp(e.LogEntry.TimeOfEvent));
+                        DiscordEmbedBuilder template = new DiscordEmbedBuilder()
+                                                    .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
+                                                    .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
+                                                    .WithTimestamp(e.LogEntry.TimeOfEvent);
+
+                        List<DiscordEmbedBuilder> embeds = new();
+
+                        if (e.LogEntry.Exception is not null)
+                        {
+                            void BuildEmbed(Exception ex, bool First)
+                            {
+                                var embed = new DiscordEmbedBuilder(template);
+
+                                if (First)
+                                    embed.WithDescription($"`{e.LogEntry.Message.SanitizeForCode()}`");
+                                else
+                                {
+                                    embed.Title = "";
+                                }
+
+                                embed.AddField(new DiscordEmbedField("Message", $"```{ex.Message.SanitizeForCode()}```"));
+                                if (!ex.StackTrace.IsNullOrWhiteSpace())
+                                {
+                                    string regex = @"((?:(?:(?:[A-Z]:\\)|(?:\/))[^\\\/]*[\\\/]).*):line (\d{0,10})";
+                                    var b = Regex.Matches(ex.StackTrace, regex);
+
+                                    if (b.Count > 0)
+                                    {
+                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```"));
+                                        embed.AddField(new DiscordEmbedField("File", $"```{b[0].Groups[1]}```"));
+                                        embed.AddField(new DiscordEmbedField("Line", $"`{b[0].Groups[2]}`"));
+                                    }
+                                    else
+                                    {
+                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{ex.StackTrace?.SanitizeForCode()}```"));
+                                    }
+                                }
+                                else
+                                {
+                                    embed.AddField(new DiscordEmbedField("Stack Trace", $"```No Stack Trace captured.```"));
+                                }
+
+                                embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`", true));
+                                embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`", true));
+                                embed.WithFooter(ex.HResult.ToString());
+
+                                if ((ex.Data?.Keys?.Count ?? 0) > 0)
+                                    embed.AddFields(ex.Data.Keys.Cast<object>().ToDictionary(k => k.ToString(), v => ex.Data[v]).Select(x => new DiscordEmbedField(x.Key, x.Value.ToString(), true)));
+
+                                embeds.Add(embed);
+
+                                if (ex is AggregateException aggr)
+                                    foreach (var b in aggr.InnerExceptions)
+                                    {
+                                        BuildEmbed(b, false);
+                                    }
+                                else if (ex.InnerException is not null)
+                                    BuildEmbed(ex.InnerException, false);
+                            }
+
+                            BuildEmbed(e.LogEntry.Exception, true);
+                        }
+
+                        int index = 0;
+
+                        while (index < embeds.Count)
+                        {
+                            _ = channel.SendMessageAsync(new DiscordMessageBuilder().AddEmbeds(embeds.Take(25).Select(x => x.Build())));
+                            index += 25;
+                        }
                     }
                 }
                 catch {}
