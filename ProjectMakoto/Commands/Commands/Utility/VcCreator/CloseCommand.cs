@@ -32,7 +32,7 @@ internal class CloseCommand : BaseCommand
                 return;
             }
 
-            await channel.ModifyAsync(x => x.PermissionOverwrites = channel.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.None, Permissions.UseVoice));
+            await channel.ModifyAsync(x => x.PermissionOverwrites = channel.PermissionOverwrites.Merge(ctx.Guild.EveryoneRole, Permissions.None, Permissions.UseVoice));
             _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.VoiceChannelCreator.Close.Success, true)).AsSuccess(ctx));
         });
     }

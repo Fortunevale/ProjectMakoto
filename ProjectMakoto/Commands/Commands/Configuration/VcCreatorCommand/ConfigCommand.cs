@@ -74,7 +74,7 @@ internal class ConfigCommand : BaseCommand
                 IReadOnlyList<DiscordOverwrite> present = ChannelResult.Result.Parent.PermissionOverwrites;
 
                 var Category = ChannelResult.Result?.Parent ?? await ctx.Guild.CreateChannelAsync("Voice Channel Creator", ChannelType.Category);
-                await ChannelResult.Result?.ModifyAsync(x => { x.Name = "➕ Create new Channel"; x.Parent = Category; x.PermissionOverwrites = ChannelResult.Result.Parent.PermissionOverwrites.ConvertToBuilderWithNewOverwrites(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak); });
+                await ChannelResult.Result?.ModifyAsync(x => { x.Name = "➕ Create new Channel"; x.Parent = Category; x.PermissionOverwrites = ChannelResult.Result.Parent.PermissionOverwrites.Merge(ctx.Guild.EveryoneRole, Permissions.None, Permissions.ReadMessageHistory | Permissions.UseVoiceDetection | Permissions.Speak); });
 
                 ctx.Bot.guilds[ctx.Guild.Id].VcCreator.Channel = ChannelResult.Result?.Id ?? 0;
 
