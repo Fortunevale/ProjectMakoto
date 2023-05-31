@@ -1572,7 +1572,9 @@ public class Bot
                 {
                     if (status.DiscordInitialized)
                     {
-                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
+                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" 
+                            or "[111] Connection terminated (-1, ''), reconnecting"
+                            or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
                         var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
