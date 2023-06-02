@@ -38,6 +38,7 @@ global using ProjectMakoto.Enums;
 global using ProjectMakoto.Events;
 global using ProjectMakoto.Exceptions;
 global using ProjectMakoto.Util;
+global using ProjectMakoto;
 global using QuickChart;
 global using System;
 global using System.Collections.Generic;

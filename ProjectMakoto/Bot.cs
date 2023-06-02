@@ -712,249 +712,360 @@ public class Bot
 
                 foreach (var plugin in Plugins)
                 {
-                    string classUsings =
-                    """
-                    namespace ProjectMakoto;
-
-                    using System.Linq.Expressions;
-                    using System.Reflection.Emit;
-                    using System.Runtime.CompilerServices;
-                    using Microsoft.CodeAnalysis;
-                    using Microsoft.CodeAnalysis.CSharp;
-                    using Microsoft.CodeAnalysis.CSharp.Scripting;
-                    using Microsoft.CodeAnalysis.Emit;
-                    using Microsoft.CodeAnalysis.Scripting;
-                    using ProjectMakoto.Entities.Plugins.Commands;
-                    using Dapper;
-                    using DisCatSharp;
-                    using DisCatSharp.ApplicationCommands;
-                    using DisCatSharp.ApplicationCommands.Attributes;
-                    using DisCatSharp.ApplicationCommands.Context;
-                    using DisCatSharp.CommandsNext;
-                    using DisCatSharp.CommandsNext.Attributes;
-                    using DisCatSharp.CommandsNext.Converters;
-                    using DisCatSharp.Entities;
-                    using DisCatSharp.Enums;
-                    using DisCatSharp.EventArgs;
-                    using DisCatSharp.Interactivity;
-                    using DisCatSharp.Interactivity.Extensions;
-                    using DisCatSharp.Lavalink;
-                    using DisCatSharp.Lavalink.EventArgs;
-                    using DisCatSharp.Net;
-                    using DisCatSharp.Extensions.TwoFactorCommands;
-                    using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
-                    using DisCatSharp.Extensions.TwoFactorCommands.Entities;
-                    using Microsoft.Extensions.DependencyInjection;
-                    using Microsoft.Extensions.Logging;
-                    using MySql.Data.MySqlClient;
-                    using Newtonsoft.Json;
-                    using Octokit;
-                    using ProjectMakoto.Commands;
-                    using ProjectMakoto.Database;
-                    using ProjectMakoto.Entities;
-                    using ProjectMakoto.Enums;
-                    using ProjectMakoto.Events;
-                    using ProjectMakoto.Exceptions;
-                    using ProjectMakoto.Util;
-                    using QuickChart;
-                    using System;
-                    using System.Collections.Generic;
-                    using System.Data;
-                    using System.Diagnostics;
-                    using System.Drawing;
-                    using System.Globalization;
-                    using System.IO;
-                    using System.IO.Compression;
-                    using System.Linq;
-                    using System.Net;
-                    using System.Net.Http;
-                    using System.Runtime.InteropServices;
-                    using System.Security.Cryptography;
-                    using System.Text;
-                    using System.Text.RegularExpressions;
-                    using System.Threading;
-                    using System.Threading.Tasks;
-                    using Xorog.Logger;
-                    using Xorog.ScoreSaber;
-                    using Xorog.ScoreSaber.Objects;
-                    using Xorog.UniversalExtensions;
-                    using Xorog.UniversalExtensions.Entities;
-                    using ProjectMakoto.Plugins;
-                    using ProjectMakoto.PrefixCommands;
-                    using ProjectMakoto.Util.SystemMonitor;
-                    using System.Collections;
-                    using System.Reflection;
-                    using ProjectMakoto.Util.JsonSerializers;
-                    using static ProjectMakoto.Util.Log;
-                    using static Xorog.Logger.Logger;
-                    """;
-
-                    var pluginCommands = await plugin.Value.RegisterCommands();
-
-                    if (pluginCommands.IsNotNullAndNotEmpty())
+                    try
                     {
-                        _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+                        string classUsings = 
+                        """
+                        namespace ProjectMakoto;
 
-                        foreach (var rawCommand in pluginCommands)
+                        """ + File.ReadAllText("Global.cs").Replace("global ", "");
+
+                        var pluginCommands = await plugin.Value.RegisterCommands();
+
+                        if (pluginCommands.IsNotNullAndNotEmpty())
                         {
-                            try
+                            _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+
+                            foreach (var rawCommand in pluginCommands)
                             {
-                                if (!PluginCommands.ContainsKey(plugin.Key))
-                                    PluginCommands.Add(plugin.Key, new());
+                                try
+                                {
+                                    if (!PluginCommands.ContainsKey(plugin.Key))
+                                        PluginCommands.Add(plugin.Key, new());
 
-                                PluginCommands[plugin.Key].Add(rawCommand);
+                                    PluginCommands[plugin.Key].Add(rawCommand);
 
-                                var code = 
-                                    $$"""
-                                    {{classUsings}}
-
-                                    public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : BaseCommandModule
+                                    if (rawCommand.IsGroup)
                                     {
-                                        public Bot _bot { private get; set; }
+                                        var ClassCode =
+                                            $$"""
+                                            {{classUsings}}
 
-                                        [Command("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
-                                        public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(CommandContext ctx{{(rawCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawCommand.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                                        {
-                                            try
+                                            [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
+                                            public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : BaseCommandModule
                                             {
-                                                Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType().GetMethods()
+                                                public Bot _bot { private get; set; }
+
+                                                
+                                                // EntryPoint
+                                            }
+                                            """;
+
+                                        foreach (var rawSubCommand in rawCommand.SubCommands)
+                                        {
+                                            rawSubCommand.Parent = rawCommand;
+
+                                            var IndexPath = $"// EntryPoint";
+                                            int InsertPosition = InsertPosition = ClassCode.IndexOf(IndexPath) + IndexPath.Length;
+
+                                            var MethodCode = 
+                                            $$"""
+
+                                                [Command("{{rawSubCommand.Name}}"), CommandModule("{{rawSubCommand.Module}}"), Description("{{rawSubCommand.Description}}")]
+                                                public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(CommandContext ctx{{(rawSubCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawSubCommand.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                {
+                                                    try
+                                                    {
+                                                        Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType().GetMethods()
                                                             .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(CommandContext)))
+                                                            .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType()), 
+                                                                new object[] 
+                                                                { ctx, _bot, new Dictionary<string, object>
+                                                                    {
+                                                                        {{string.Join(",\n", rawSubCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                    }
+                                                                });
+                                            
+                                                        TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        _logger.LogError($"Failed to execute plugin's prefix command", ex);
+                                                    }
+                                            
+                                                    return Task.CompletedTask;
+                                                }
+                                            """;
+
+                                            ClassCode = ClassCode.Insert(InsertPosition, MethodCode);
+                                        }
+
+                                        _logger.LogTrace($"\n{ClassCode}");
+
+                                        var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
+                                            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                            .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(ClassCode))
+                                            .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
+
+                                        using (var stream = new MemoryStream())
+                                        {
+                                            EmitResult result = compilation.Emit(stream);
+                                            if (!result.Success)
+                                            {
+                                                _logger.LogError("Failed to emit compilation\n{diagnostics}",
+                                                    JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {ClassCode[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+
+                                                throw new Exception();
+                                            }
+
+                                            byte[] assemblyBytes = stream.ToArray();
+                                            Assembly assembly = Assembly.Load(assemblyBytes);
+                                            cNext.RegisterCommands(assembly);
+
+                                            _logger.LogDebug("Registered prefix group '{cmd}'.", rawCommand.Name);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var code =
+                                            $$"""
+                                            {{classUsings}}
+
+                                            public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : BaseCommandModule
+                                            {
+                                                public Bot _bot { private get; set; }
+
+                                                [Command("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
+                                                public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(CommandContext ctx{{(rawCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawCommand.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                {
+                                                    try
+                                                    {
+                                                        Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType().GetMethods()
+                                                                    .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(CommandContext)))
+                                                                    .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType()), 
+                                                                        new object[] 
+                                                                        { ctx, _bot, new Dictionary<string, object>
+                                                                            {
+                                                                                {{string.Join(",\n", rawCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                            }
+                                                                        });
+
+                                                        TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        _logger.LogError($"Failed to execute plugin's prefix command", ex);
+                                                    }
+
+                                                    return Task.CompletedTask;
+                                                }
+                                            }
+                                            """;
+
+                                        _logger.LogTrace($"\n{code}");
+
+                                        var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
+                                            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                            .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                                            .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
+
+                                        using (var stream = new MemoryStream())
+                                        {
+                                            EmitResult result = compilation.Emit(stream);
+                                            if (!result.Success)
+                                            {
+                                                _logger.LogError("Failed to emit compilation\n{diagnostics}",
+                                                    JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+
+                                                throw new Exception();
+                                            }
+
+                                            byte[] assemblyBytes = stream.ToArray();
+                                            Assembly assembly = Assembly.Load(assemblyBytes);
+                                            cNext.RegisterCommands(assembly);
+
+                                            _logger.LogDebug("Registered prefix command '{cmd}'.", rawCommand.Name);
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError("Failed to generate CommandsNext Command", ex);
+                                    _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
+                                }
+                            }
+
+                            foreach (var rawCommand in pluginCommands)
+                            {
+                                try
+                                {
+                                    if (!PluginCommands.ContainsKey(plugin.Key))
+                                        PluginCommands.Add(plugin.Key, new());
+
+                                    PluginCommands[plugin.Key].Add(rawCommand);
+
+                                    if (rawCommand.IsGroup)
+                                    {
+                                        var ClassCode =
+                                        $$"""
+                                        {{classUsings}}
+
+                                        public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
+                                        {
+                                            [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}", dmPermission: false)]
+                                            public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
+                                            {
+                                                public Bot _bot { private get; set; }
+
+                                                
+                                                // EntryPoint
+                                            }
+                                        }
+                                        """;
+
+                                        foreach (var rawSubCommand in rawCommand.SubCommands)
+                                        {
+                                            rawSubCommand.Parent = rawCommand;
+
+                                            var IndexPath = $"// EntryPoint";
+                                            int InsertPosition = InsertPosition = ClassCode.IndexOf(IndexPath) + IndexPath.Length;
+
+                                            var MethodCode =
+                                            $$"""
+                                                
+                                                    [SlashCommand("{{rawSubCommand.Name}}", "{{rawSubCommand.Description}}")]
+                                                    public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(InteractionContext ctx{{(rawSubCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawSubCommand.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                    {
+                                                        try
+                                                        {
+                                                            Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType().GetMethods()
+                                                                .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(InteractionContext)))
+                                                                .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType()), 
+                                                                    new object[] 
+                                                                    { ctx, _bot, new Dictionary<string, object>
+                                                                        {
+                                                                            {{string.Join(",\n", rawSubCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                        }, true, true, false
+                                                                    });
+                                            
+                                                            TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            _logger.LogError($"Failed to execute plugin's prefix command", ex);
+                                                        }
+                                            
+                                                        return Task.CompletedTask;
+                                                    }
+                                            """;
+
+                                            ClassCode = ClassCode.Insert(InsertPosition, MethodCode);
+                                        }
+
+                                        _logger.LogTrace($"\n{ClassCode}");
+
+                                        var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
+                                            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                            .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(ClassCode))
+                                            .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
+
+                                        using (var stream = new MemoryStream())
+                                        {
+                                            EmitResult result = compilation.Emit(stream);
+                                            if (!result.Success)
+                                            {
+                                                _logger.LogError("Failed to emit compilation\n{diagnostics}",
+                                                    JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {ClassCode[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+
+                                                throw new Exception();
+                                            }
+
+                                            byte[] assemblyBytes = stream.ToArray();
+                                            Assembly assembly = Assembly.Load(assemblyBytes);
+
+                                            if (!status.LoadedConfig.IsDev)
+                                                appCommands.RegisterGlobalCommands(assembly);
+                                            else
+                                                appCommands.RegisterGuildCommands(assembly, status.LoadedConfig.Channels.Assets);
+
+                                            _logger.LogDebug("Registered appcmd group '{cmd}'.", rawCommand.Name);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var code =
+                                            $$"""
+                                            {{classUsings}}
+
+                                            public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
+                                            {
+                                                public Bot _bot { private get; set; }
+
+                                                [SlashCommand("{{rawCommand.Name}}", "{{rawCommand.Description}}")]
+                                                public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(InteractionContext ctx{{(rawCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawCommand.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                                {
+                                                    try
+                                                    {
+                                                        Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType().GetMethods()
+                                                            .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(InteractionContext)))
                                                             .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType()), 
                                                                 new object[] 
                                                                 { ctx, _bot, new Dictionary<string, object>
                                                                     {
                                                                         {{string.Join(",\n", rawCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                                                    }
+                                                                    }, true, true, false
                                                                 });
+                                    
+                                                        TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        _logger.LogError($"Failed to execute plugin's application command", ex);
+                                                    }
 
-                                                TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                                    return Task.CompletedTask;
+                                                }
                                             }
-                                            catch (Exception ex)
-                                            {
-                                                _logger.LogError($"Failed to execute plugin's prefix command", ex);
-                                            }
+                                            """;
 
-                                            return Task.CompletedTask;
-                                        }
-                                    }
-                                    """;
+                                        var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
+                                            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                            .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                                            .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
 
-                                _logger.LogTrace($"\n{code}");
+                                        _logger.LogTrace($"\n{code}");
 
-                                var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
-                                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
-
-                                using (var stream = new MemoryStream())
-                                {
-                                    EmitResult result = compilation.Emit(stream);
-                                    if (!result.Success)
-                                    {
-                                        _logger.LogError("Failed to emit compilation\n{diagnostics}", 
-                                            JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
-                                        
-                                        throw new Exception();
-                                    }
-
-                                    byte[] assemblyBytes = stream.ToArray();
-                                    Assembly assembly = Assembly.Load(assemblyBytes);
-                                    cNext.RegisterCommands(assembly);
-
-                                    _logger.LogDebug("Registered prefix command '{cmd}'.", rawCommand.Name);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError("Failed to generate CommandsNext Command", ex);
-                                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
-                            }
-                        }
-
-                        foreach (var rawCommand in pluginCommands)
-                        {
-                            try
-                            {
-                                if (!PluginCommands.ContainsKey(plugin.Key))
-                                    PluginCommands.Add(plugin.Key, new());
-
-                                PluginCommands[plugin.Key].Add(rawCommand);
-
-                                var code =
-                                    $$"""
-                                    {{classUsings}}
-
-                                    public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
-                                    {
-                                        public Bot _bot { private get; set; }
-
-                                        [SlashCommand("{{rawCommand.Name}}", "{{rawCommand.Description}}")]
-                                        public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(InteractionContext ctx{{(rawCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawCommand.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                        using (var stream = new MemoryStream())
                                         {
-                                            try
+                                            EmitResult result = compilation.Emit(stream);
+                                            if (!result.Success)
                                             {
-                                                Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType().GetMethods()
-                                                    .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(InteractionContext)))
-                                                    .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType()), 
-                                                        new object[] 
-                                                        { ctx, _bot, new Dictionary<string, object>
-                                                            {
-                                                                {{string.Join(",\n", rawCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                                            }, true, true, false
-                                                        });
-                                    
-                                                TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                _logger.LogError($"Failed to execute plugin's application command", ex);
+                                                _logger.LogError("Failed to emit compilation\n{diagnostics}",
+                                                    JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+
+                                                throw new Exception();
                                             }
 
-                                            return Task.CompletedTask;
+                                            byte[] assemblyBytes = stream.ToArray();
+                                            Assembly assembly = Assembly.Load(assemblyBytes);
+
+
+                                            if (!status.LoadedConfig.IsDev)
+                                                appCommands.RegisterGlobalCommands(assembly);
+                                            else
+                                                appCommands.RegisterGuildCommands(assembly, status.LoadedConfig.Channels.Assets);
+
+                                            _logger.LogDebug("Registered application command '{cmd}'.", rawCommand.Name);
                                         }
                                     }
-                                    """;
-
-                                var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
-                                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
-
-                                _logger.LogTrace($"\n{code}");
-
-                                using (var stream = new MemoryStream())
+                                }
+                                catch (Exception ex)
                                 {
-                                    EmitResult result = compilation.Emit(stream);
-                                    if (!result.Success)
-                                    {
-                                        _logger.LogError("Failed to emit compilation\n{diagnostics}",
-                                            JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
-
-                                        throw new Exception();
-                                    }
-
-                                    byte[] assemblyBytes = stream.ToArray();
-                                    Assembly assembly = Assembly.Load(assemblyBytes);
-                                    
-
-                                    if (!status.LoadedConfig.IsDev)
-                                        appCommands.RegisterGlobalCommands(assembly);
-                                    else
-                                        appCommands.RegisterGuildCommands(assembly, status.LoadedConfig.Channels.Assets);
-
-                                    _logger.LogDebug("Registered application command '{cmd}'.", rawCommand.Name);
+                                    _logger.LogError("Failed to generate Application Command", ex);
+                                    _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError("Failed to generate Application Command", ex);
-                                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
-                            }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Failed to load commands", ex);
+                        _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
                     }
                 }
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
+                await Task.Delay(2000);
                 await discordClient.ConnectAsync();
 
                 _logger.LogInfo("Connected and authenticated with Discord.");
