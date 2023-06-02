@@ -10,6 +10,12 @@
 using System.Linq.Expressions;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Scripting;
+using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto;
 
@@ -30,6 +36,7 @@ public class Bot
     internal MonitorClient monitorClient { get; set; }
 
     public Dictionary<string, BasePlugin> Plugins { get; set; } = new();
+    public Dictionary<string, List<BasePluginCommand>> PluginCommands { get; set; } = new();
 
     #endregion Clients
 
@@ -44,7 +51,7 @@ public class Bot
 
     internal BumpReminder bumpReminder { get; set; }
     internal ExperienceHandler experienceHandler { get; set; }
-    internal TaskWatcher watcher = new();
+    public TaskWatcher watcher = new();
     internal Dictionary<ulong, UserUpload> uploadInteractions { get; set; } = new();
     internal Dictionary<string, PhishingUrlEntry> phishingUrls = new();
     internal Dictionary<ulong, SubmittedUrlEntry> submittedUrls = new();
@@ -668,8 +675,6 @@ public class Bot
                     x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); 
                 }
 
-                Dictionary<string, BaseCommand> PluginCommands = new();
-
                 if (!status.LoadedConfig.IsDev)
                 {
                     appCommands.RegisterGlobalCommands<ApplicationCommands.MaintainersAppCommands>(GetCommandTranslations);
@@ -707,101 +712,157 @@ public class Bot
 
                 foreach (var plugin in Plugins)
                 {
-                    try
+                    string classUsings =
+                    """
+                    namespace ProjectMakoto;
+
+                    using System.Linq.Expressions;
+                    using System.Reflection.Emit;
+                    using System.Runtime.CompilerServices;
+                    using Microsoft.CodeAnalysis;
+                    using Microsoft.CodeAnalysis.CSharp;
+                    using Microsoft.CodeAnalysis.CSharp.Scripting;
+                    using Microsoft.CodeAnalysis.Emit;
+                    using Microsoft.CodeAnalysis.Scripting;
+                    using ProjectMakoto.Entities.Plugins.Commands;
+                    using Dapper;
+                    using DisCatSharp;
+                    using DisCatSharp.ApplicationCommands;
+                    using DisCatSharp.ApplicationCommands.Attributes;
+                    using DisCatSharp.ApplicationCommands.Context;
+                    using DisCatSharp.CommandsNext;
+                    using DisCatSharp.CommandsNext.Attributes;
+                    using DisCatSharp.CommandsNext.Converters;
+                    using DisCatSharp.Entities;
+                    using DisCatSharp.Enums;
+                    using DisCatSharp.EventArgs;
+                    using DisCatSharp.Interactivity;
+                    using DisCatSharp.Interactivity.Extensions;
+                    using DisCatSharp.Lavalink;
+                    using DisCatSharp.Lavalink.EventArgs;
+                    using DisCatSharp.Net;
+                    using DisCatSharp.Extensions.TwoFactorCommands;
+                    using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
+                    using DisCatSharp.Extensions.TwoFactorCommands.Entities;
+                    using Microsoft.Extensions.DependencyInjection;
+                    using Microsoft.Extensions.Logging;
+                    using MySql.Data.MySqlClient;
+                    using Newtonsoft.Json;
+                    using Octokit;
+                    using ProjectMakoto.Commands;
+                    using ProjectMakoto.Database;
+                    using ProjectMakoto.Entities;
+                    using ProjectMakoto.Enums;
+                    using ProjectMakoto.Events;
+                    using ProjectMakoto.Exceptions;
+                    using ProjectMakoto.Util;
+                    using QuickChart;
+                    using System;
+                    using System.Collections.Generic;
+                    using System.Data;
+                    using System.Diagnostics;
+                    using System.Drawing;
+                    using System.Globalization;
+                    using System.IO;
+                    using System.IO.Compression;
+                    using System.Linq;
+                    using System.Net;
+                    using System.Net.Http;
+                    using System.Runtime.InteropServices;
+                    using System.Security.Cryptography;
+                    using System.Text;
+                    using System.Text.RegularExpressions;
+                    using System.Threading;
+                    using System.Threading.Tasks;
+                    using Xorog.Logger;
+                    using Xorog.ScoreSaber;
+                    using Xorog.ScoreSaber.Objects;
+                    using Xorog.UniversalExtensions;
+                    using Xorog.UniversalExtensions.Entities;
+                    using ProjectMakoto.Plugins;
+                    using ProjectMakoto.PrefixCommands;
+                    using ProjectMakoto.Util.SystemMonitor;
+                    using System.Collections;
+                    using System.Reflection;
+                    using ProjectMakoto.Util.JsonSerializers;
+                    using static ProjectMakoto.Util.Log;
+                    using static Xorog.Logger.Logger;
+                    """;
+
+                    var pluginCommands = await plugin.Value.RegisterCommands();
+
+                    if (pluginCommands.IsNotNullAndNotEmpty())
                     {
-                        var pluginCommands = await plugin.Value.RegisterCommands();
+                        _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
 
-                        if (pluginCommands.IsNotNullAndNotEmpty())
+                        foreach (var rawCommand in pluginCommands)
                         {
-                            _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
-
                             try
                             {
-                                var typeSignature = Guid.NewGuid().ToString();
-                                var an = new AssemblyName(typeSignature);
-                                AssemblyBuilder assembly = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
-                                ModuleBuilder moduleBuilder = assembly.DefineDynamicModule("MainModule");
-                                TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature,
-                                    TypeAttributes.Public |
-                                    TypeAttributes.Class |
-                                    TypeAttributes.AutoClass |
-                                    TypeAttributes.AnsiClass |
-                                    TypeAttributes.BeforeFieldInit |
-                                    TypeAttributes.AutoLayout,
-                                    null);
+                                if (!PluginCommands.ContainsKey(plugin.Key))
+                                    PluginCommands.Add(plugin.Key, new());
 
-                                typeBuilder.AddInterfaceImplementation(typeof(BaseCommandModule));
+                                PluginCommands[plugin.Key].Add(rawCommand);
 
-                                foreach (var rawCommand in pluginCommands)
-                                {
-                                    _logger.LogDebug("Found Command '{0}'", rawCommand.Name);
+                                var code = 
+                                    $$"""
+                                    {{classUsings}}
 
-                                    var overloadList = new List<Type>();
-
-                                    overloadList.Insert(0, typeof(CommandContext));
-                                    overloadList.AddRange(rawCommand.Overloads.Select(x => x.Type));
-
-                                    var methodBuilder = typeBuilder.DefineMethod(rawCommand.Name, MethodAttributes.Public, typeof(Task), null);
-
-                                    var methodParams = methodBuilder.DefineGenericParameters(rawCommand.Overloads.Select(x => x.Name).Prepend("ctx").ToArray());
-
-                                    methodParams[0].SetBaseTypeConstraint(typeof(CommandContext));
-
-                                    for (int i = 1; i < rawCommand.Overloads.Length; i++)
-                                        methodParams[i].SetBaseTypeConstraint(rawCommand.Overloads[i].Type);
-
-                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(CommandAttribute).GetConstructor(new[] { typeof(string) }),
-                                        new List<string> { rawCommand.Name }.ToArray()));
-
-                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(DescriptionAttribute).GetConstructor(new[] { typeof(string) }),
-                                        new List<string> { rawCommand.Description }.ToArray()));
-                                    
-                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(CommandModuleAttribute).GetConstructor(new[] { typeof(string) }),
-                                        new List<string> { rawCommand.Module }.ToArray()));
-
-                                    methodBuilder.SetParameters(methodParams);
-
-                                    methodBuilder.SetReturnType(typeof(Task));
-
-                                    methodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
-
-                                    var delegateType = Expression.GetFuncType(overloadList.ToArray());
-
-                                    Delegate commandDelegate = null;
-                                    commandDelegate = Delegate.CreateDelegate(delegateType, (CommandContext ctx) =>
+                                    public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : BaseCommandModule
                                     {
-                                        var parsedArgs = new Dictionary<string, object>();
+                                        public Bot _bot { private get; set; }
 
-                                        MethodInfo method = commandDelegate.GetType().GetMethod("Invoke");
-                                        ParameterInfo[] parameters = method.GetParameters();
-
-                                        for (int i = 1; i < parameters.Length; i++)
+                                        [Command("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
+                                        public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(CommandContext ctx{{(rawCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawCommand.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                                         {
-                                            if (i == 0)
-                                                continue;
-
-                                            ParameterInfo parameter = parameters[i];
-                                            object value = null;
-
-                                            PropertyInfo property = typeof(object).GetProperty(parameter.Name, BindingFlags.Public | BindingFlags.Instance);
-                                            if (property != null)
+                                            try
                                             {
-                                                value = property.GetValue(ctx);
+                                                Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType().GetMethods()
+                                                            .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(CommandContext)))
+                                                            .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType()), 
+                                                                new object[] 
+                                                                { ctx, _bot, new Dictionary<string, object>
+                                                                    {
+                                                                        {{string.Join(",\n", rawCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                    }
+                                                                });
+
+                                                TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                _logger.LogError($"Failed to execute plugin's prefix command", ex);
                                             }
 
-                                            parsedArgs.Add(parameter.Name, value);
+                                            return Task.CompletedTask;
                                         }
+                                    }
+                                    """;
 
-                                        return Task.CompletedTask;
-                                    }, rawCommand.Name);
+                                _logger.LogTrace($"\n{code}");
 
-                                    var newDelegate = methodBuilder.CreateDelegate(commandDelegate.GetType(), commandDelegate);
+                                var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
+                                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                                    .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
+
+                                using (var stream = new MemoryStream())
+                                {
+                                    EmitResult result = compilation.Emit(stream);
+                                    if (!result.Success)
+                                    {
+                                        _logger.LogError("Failed to emit compilation\n{diagnostics}", 
+                                            JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+                                        
+                                        throw new Exception();
+                                    }
+
+                                    byte[] assemblyBytes = stream.ToArray();
+                                    Assembly assembly = Assembly.Load(assemblyBytes);
+                                    cNext.RegisterCommands(assembly);
+
+                                    _logger.LogDebug("Registered prefix command '{cmd}'.", rawCommand.Name);
                                 }
-
-                                cNext.RegisterCommands(typeBuilder);
                             }
                             catch (Exception ex)
                             {
@@ -809,10 +870,87 @@ public class Bot
                                 _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
                             }
                         }
-                    }
-                    catch (Exception)
-                    {
 
+                        foreach (var rawCommand in pluginCommands)
+                        {
+                            try
+                            {
+                                if (!PluginCommands.ContainsKey(plugin.Key))
+                                    PluginCommands.Add(plugin.Key, new());
+
+                                PluginCommands[plugin.Key].Add(rawCommand);
+
+                                var code =
+                                    $$"""
+                                    {{classUsings}}
+
+                                    public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
+                                    {
+                                        public Bot _bot { private get; set; }
+
+                                        [SlashCommand("{{rawCommand.Name}}", "{{rawCommand.Description}}")]
+                                        public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(InteractionContext ctx{{(rawCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawCommand.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                        {
+                                            try
+                                            {
+                                                Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType().GetMethods()
+                                                    .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(InteractionContext)))
+                                                    .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").Command.GetType()), 
+                                                        new object[] 
+                                                        { ctx, _bot, new Dictionary<string, object>
+                                                            {
+                                                                {{string.Join(",\n", rawCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                            }, true, true, false
+                                                        });
+                                    
+                                                TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                _logger.LogError($"Failed to execute plugin's application command", ex);
+                                            }
+
+                                            return Task.CompletedTask;
+                                        }
+                                    }
+                                    """;
+
+                                var compilation = CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
+                                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                                    .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location)));
+
+                                _logger.LogTrace($"\n{code}");
+
+                                using (var stream = new MemoryStream())
+                                {
+                                    EmitResult result = compilation.Emit(stream);
+                                    if (!result.Success)
+                                    {
+                                        _logger.LogError("Failed to emit compilation\n{diagnostics}",
+                                            JsonConvert.SerializeObject(result.Diagnostics.Select(x => $"{x.Id}: {x.Location}: {code[x.Location.SourceSpan.Start..x.Location.SourceSpan.End]}"), Formatting.Indented));
+
+                                        throw new Exception();
+                                    }
+
+                                    byte[] assemblyBytes = stream.ToArray();
+                                    Assembly assembly = Assembly.Load(assemblyBytes);
+                                    
+
+                                    if (!status.LoadedConfig.IsDev)
+                                        appCommands.RegisterGlobalCommands(assembly);
+                                    else
+                                        appCommands.RegisterGuildCommands(assembly, status.LoadedConfig.Channels.Assets);
+
+                                    _logger.LogDebug("Registered application command '{cmd}'.", rawCommand.Name);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError("Failed to generate Application Command", ex);
+                                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
+                            }
+                        }
                     }
                 }
 

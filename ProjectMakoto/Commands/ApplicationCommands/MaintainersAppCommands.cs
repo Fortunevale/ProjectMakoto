@@ -468,6 +468,17 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 throw new InvalidCastException();
             }).Add(this._bot.watcher, ctx);
         }
+
+        [SlashCommand("test", "Test.")]
+        public async Task Test(InteractionContext ctx)
+        {
+            Task.Run(async () =>
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
+                await ctx.Channel.ModifyAsync(x => x.PermissionOverwrites = ctx.Channel.PermissionOverwrites.Merge(ctx.Member, Permissions.UseExternalEmojis, Permissions.None));
+                await ctx.Channel.ModifyAsync(x => x.PermissionOverwrites = ctx.Channel.PermissionOverwrites.Merge(ctx.Member, Permissions.None, Permissions.UseExternalEmojis));
+            }).Add(this._bot.watcher, ctx);
+        }
     }
 #endif
 }

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal class Log
+public class Log
 {
-    internal static Logger _logger { get; set; }
+    public static Logger _logger { get; set; }
 }
