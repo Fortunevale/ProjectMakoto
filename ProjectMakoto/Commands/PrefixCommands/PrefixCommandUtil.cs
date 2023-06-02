@@ -14,9 +14,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.PrefixCommands;
-internal class PrefixCommandUtil
+public class PrefixCommandUtil
 {
-    internal static async Task SendGroupHelp(Bot _bot, CommandContext ctx, string CommandName, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
+    public static async Task SendGroupHelp(Bot _bot, CommandContext ctx, string CommandName, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
     {
         if (await _bot.users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, CommandName)))
             return;

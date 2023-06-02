@@ -18,6 +18,18 @@ public class SemVer
         this.Patch = patch;
     }
 
+    public SemVer(string v)
+    {
+        var regex = RegexTemplates.SemVer.Match(v);
+
+        if (!regex.Success)
+            throw new ArgumentException("Input string in incorrect format.");
+
+        this.Major = regex.Groups[1].Value.ToInt32();
+        this.Minor = regex.Groups[2].Value.ToInt32();
+        this.Patch = regex.Groups[3].Value.ToInt32();
+    }
+
     public int Major { get; set; }
     public int Minor { get; set; }
     public int Patch { get; set; }
@@ -30,4 +42,7 @@ public class SemVer
     
     public static implicit operator int(SemVer v) 
         => (v.Major * 1000) + (v.Minor * 100) + v.Patch;
+    
+    public static implicit operator SemVer(string v) 
+        => new(v);
 }

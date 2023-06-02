@@ -457,6 +457,15 @@ public class Bot
                         _logger.LogError("Failed to load Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
                         _logger.LogError("Exception", ex);
                     }
+
+                    try
+                    {
+                        await b.Value.CheckForUpdates();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Failed to check updates for '{PluginName}'", ex, b.Value.Name);
+                    }
                 }
 
                 monitorClient = new MonitorClient(this);
@@ -746,7 +755,6 @@ public class Bot
                                             {
                                                 public Bot _bot { private get; set; }
 
-                                                
                                                 // EntryPoint
                                             }
                                             """;
@@ -761,30 +769,46 @@ public class Bot
                                             var MethodCode = 
                                             $$"""
 
-                                                [Command("{{rawSubCommand.Name}}"), CommandModule("{{rawSubCommand.Module}}"), Description("{{rawSubCommand.Description}}")]
-                                                public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(CommandContext ctx{{(rawSubCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawSubCommand.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                            [{{(rawSubCommand.Name == "help" && !rawSubCommand.UseDefaultHelp ? "GroupCommand, " : "")}}Command("{{rawSubCommand.Name}}"), CommandModule("{{rawSubCommand.Module}}"), Description("{{rawSubCommand.Description}}")]
+                                            public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(CommandContext ctx{{(rawSubCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawSubCommand.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                            {
+                                                try
                                                 {
-                                                    try
-                                                    {
-                                                        Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType().GetMethods()
-                                                            .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(CommandContext)))
-                                                            .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType()), 
-                                                                new object[] 
-                                                                { ctx, _bot, new Dictionary<string, object>
-                                                                    {
-                                                                        {{string.Join(",\n", rawSubCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                                                    }
-                                                                });
+                                                    Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType().GetMethods()
+                                                        .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(CommandContext)))
+                                                        .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType()), 
+                                                            new object[] 
+                                                            { ctx, _bot, new Dictionary<string, object>
+                                                                {
+                                                                    {{string.Join(",\n", rawSubCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                }
+                                                            });
                                             
-                                                        TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        _logger.LogError($"Failed to execute plugin's prefix command", ex);
-                                                    }
-                                            
-                                                    return Task.CompletedTask;
+                                                    TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
                                                 }
+                                                catch (Exception ex)
+                                                {
+                                                    _logger.LogError($"Failed to execute plugin's prefix command", ex);
+                                                }
+                                            
+                                                return Task.CompletedTask;
+                                            }
+                                            """;
+
+                                            ClassCode = ClassCode.Insert(InsertPosition, MethodCode);
+                                        }
+
+                                        if (rawCommand.UseDefaultHelp)
+                                        {
+                                            var IndexPath = $"// EntryPoint";
+                                            int InsertPosition = InsertPosition = ClassCode.IndexOf(IndexPath) + IndexPath.Length;
+
+                                            var MethodCode =
+                                            $$"""
+
+                                            [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+                                            public async Task Help(CommandContext ctx)
+                                                => PrefixCommandUtil.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot.watcher, ctx);
                                             """;
 
                                             ClassCode = ClassCode.Insert(InsertPosition, MethodCode);
@@ -922,31 +946,31 @@ public class Bot
 
                                             var MethodCode =
                                             $$"""
-                                                
-                                                    [SlashCommand("{{rawSubCommand.Name}}", "{{rawSubCommand.Description}}")]
-                                                    public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(InteractionContext ctx{{(rawSubCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawSubCommand.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                                                    {
-                                                        try
-                                                        {
-                                                            Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType().GetMethods()
-                                                                .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(InteractionContext)))
-                                                                .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType()), 
-                                                                    new object[] 
-                                                                    { ctx, _bot, new Dictionary<string, object>
-                                                                        {
-                                                                            {{string.Join(",\n", rawSubCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                                                        }, true, true, false
-                                                                    });
                                             
-                                                            TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
-                                                        }
-                                                        catch (Exception ex)
-                                                        {
-                                                            _logger.LogError($"Failed to execute plugin's prefix command", ex);
-                                                        }
+                                            [SlashCommand("{{rawSubCommand.Name}}", "{{rawSubCommand.Description}}")]
+                                            public Task a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}}(InteractionContext ctx{{(rawSubCommand.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", rawSubCommand.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                                            {
+                                                try
+                                                {
+                                                    Task t = (Task)_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType().GetMethods()
+                                                        .First(x => x.Name == "ExecuteCommand" && x.GetParameters().Any(param => param.ParameterType == typeof(InteractionContext)))
+                                                        .Invoke(Activator.CreateInstance(_bot.PluginCommands["{{plugin.Key}}"].First(x => x.Name == "{{rawCommand.Name}}").SubCommands.First(x => x.Name == "{{rawSubCommand.Name}}").Command.GetType()), 
+                                                            new object[] 
+                                                            { ctx, _bot, new Dictionary<string, object>
+                                                                {
+                                                                    {{string.Join(",\n", rawSubCommand.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
+                                                                }, true, true, false
+                                                            });
                                             
-                                                        return Task.CompletedTask;
-                                                    }
+                                                    TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    _logger.LogError($"Failed to execute plugin's prefix command", ex);
+                                                }
+                                            
+                                                return Task.CompletedTask;
+                                            }
                                             """;
 
                                             ClassCode = ClassCode.Insert(InsertPosition, MethodCode);

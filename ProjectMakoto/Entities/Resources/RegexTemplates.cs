@@ -28,4 +28,7 @@ internal class RegexTemplates
     public static readonly Regex Code = new(@"(?:```)(?:cs)?((.|\n)*)(?:```)", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public static readonly Regex AllowedNickname = new(@"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", RegexOptions.IgnoreCase| RegexOptions.Compiled);
+
+    public static readonly Regex GitHubRepoUrl = new(@"https:\/\/github\.com\/([^\/]*)\/([^\/]*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    public static readonly Regex SemVer = new(@"^(\d*)\.(\d*)\.(\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 }
