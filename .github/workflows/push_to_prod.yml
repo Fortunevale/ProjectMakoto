@@ -47,6 +47,8 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       - name: Release to Github
         uses: softprops/action-gh-release@v1
+        permissions:
+          contents: write
         with:
           files: ProjectMakoto/ProjectMakoto/Release.zip
         env:
@@ -55,4 +57,5 @@ jobs:
           tag_name: ${{ steps.vars.outputs.sha }}
       - name: Cleanup
         run: rm -rf ProjectMakoto/
+        if: always()
 
