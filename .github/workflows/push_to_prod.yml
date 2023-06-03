@@ -3,6 +3,9 @@ on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+permissions: write-all
+
 jobs:
   build:
     name: Build Project and Upload to Server
@@ -44,7 +47,7 @@ jobs:
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Set outputs
         id: vars
-        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Release to Github
         uses: softprops/action-gh-release@v1
         with:
@@ -57,5 +60,3 @@ jobs:
       - name: Cleanup
         run: rm -rf ProjectMakoto/
         if: always()
-
-permissions: write-all
