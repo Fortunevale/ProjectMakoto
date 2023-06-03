@@ -132,6 +132,9 @@ internal class Plugins
 
                 if (pluginCommands.IsNotNullAndNotEmpty())
                 {
+                    var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithOptimizationLevel(OptimizationLevel.Release);
+                    var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location));
+
                     _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
 
                     Dictionary<CSharpCompilation, CompilationData> compilationList = new();
@@ -144,17 +147,17 @@ internal class Plugins
                         if (rawCommand.IsGroup)
                         {
                             var code =
-                                $$"""
-                                {{classUsings}}
+                            $$"""
+                            {{classUsings}}
 
-                                [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
-                                public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : BaseCommandModule
-                                {
-                                    public Bot _bot { private get; set; }
+                            [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
+                            public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                            {
+                                public {{nameof(Bot)}} _bot { private get; set; }
 
-                                    // EntryPoint
-                                }
-                                """;
+                                // EntryPoint
+                            }
+                            """;
 
                             var IndexPath = $"// EntryPoint";
                             int InsertPosition = InsertPosition = code.IndexOf(IndexPath) + IndexPath.Length;
@@ -181,30 +184,30 @@ internal class Plugins
 
                             _logger.LogTrace($"\n{code}");
 
-                            compilationList.Add(CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
-                                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                            compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
                                 .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location))), 
+                                .AddReferences(references)
+                                    .WithOptions(options), 
                                     new CompilationData("prefix_group", code, rawCommand));
                         }
                         else
                         {
                             var code =
-                                $$"""
-                                {{classUsings}}
+                            $$"""
+                            {{classUsings}}
 
-                                public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : BaseCommandModule
-                                {
-                                    public Bot _bot { private get; set; }
+                            public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                            {
+                                public {{nameof(Bot)}} _bot { private get; set; }
 
-                                    {{GetSingleMethodCode(plugin, nameof(CommandContext), rawCommand)}}
-                                }
-                                """;
+                                {{GetSingleMethodCode(plugin, nameof(CommandContext), rawCommand)}}
+                            }
+                            """;
 
-                            compilationList.Add(CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
-                                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                            compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
                                 .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location))),
+                                .AddReferences(references)
+                                    .WithOptions(options),
                                     new CompilationData("prefix_single", code, rawCommand));
                         }
                     }
@@ -222,20 +225,20 @@ internal class Plugins
                             {
                                 var code =
                                 $$"""
-                                        {{classUsings}}
+                                {{classUsings}}
 
-                                        public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
-                                        {
-                                            [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}", dmPermission: false)]
-                                            public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
-                                            {
-                                                public Bot _bot { private get; set; }
+                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                {
+                                    [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}", dmPermission: false)]
+                                    public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                    {
+                                        public {{nameof(Bot)}} _bot { private get; set; }
 
                                                 
-                                                // EntryPoint
-                                            }
-                                        }
-                                        """;
+                                        // EntryPoint
+                                    }
+                                }
+                                """;
 
                                 foreach (var rawSubCommand in rawCommand.SubCommands)
                                 {
@@ -247,30 +250,30 @@ internal class Plugins
                                     code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, nameof(InteractionContext), rawSubCommand, rawCommand));
                                 }
 
-                                compilationList.Add(CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
-                                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
                                     .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location))),
+                                    .AddReferences(references)
+                                    .WithOptions(options),
                                         new CompilationData("app_group", code, rawCommand));
                             }
                             else
                             {
                                 var code =
-                                    $$"""
-                                    {{classUsings}}
+                                $$"""
+                                {{classUsings}}
 
-                                    public class a{{Guid.NewGuid().ToString().ToLower().Replace("-", "")}} : ApplicationCommandsModule
-                                    {
-                                        public Bot _bot { private get; set; }
+                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                {
+                                    public {{nameof(Bot)}} _bot { private get; set; }
 
-                                        {{GetSingleMethodCode(plugin, nameof(InteractionContext), rawCommand)}}
-                                    }
-                                    """;
+                                    {{GetSingleMethodCode(plugin, nameof(InteractionContext), rawCommand)}}
+                                }
+                                """;
 
-                                compilationList.Add(CSharpCompilation.Create($"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}")
-                                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
                                     .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                    .AddReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location))),
+                                    .AddReferences(references)
+                                    .WithOptions(options),
                                         new CompilationData("app_single", code, rawCommand));
                             }
                         }
@@ -356,15 +359,15 @@ internal class Plugins
                         {
                             case "prefix_single":
                             case "prefix_group":
-                                cNext.RegisterCommands(assembly.Key.GetTypes()[0]);
+                                cNext.RegisterCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(BaseCommandModule)));
                                 break;
                             
                             case "app_single":
                             case "app_group":
                                 if (_bot.status.LoadedConfig.IsDev)
-                                    appCommands.RegisterGuildCommands(assembly.Key.GetTypes()[0], _bot.status.LoadedConfig.Channels.Assets);
+                                    appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Channels.Assets);
                                 else
-                                    appCommands.RegisterGlobalCommands(assembly.Key.GetTypes()[0]);
+                                    appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)));
                                 break;
                         }
                     }
@@ -389,9 +392,12 @@ internal class Plugins
         return CachedUsings;
     }
 
+    private static string GetUniqueCodeCompatibleName()
+        => $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
+
     private static string GetSingleMethodCode(KeyValuePair<string, BasePlugin> PluginIdentifier, string ContextName, BasePluginCommand Command)
     {
-        var TaskName = $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
+        var TaskName = GetUniqueCodeCompatibleName();
 
         string GetMethodLine()
         {
@@ -436,7 +442,7 @@ internal class Plugins
 
             private static Type {{TaskName}}_CommandType { get; set; }
             private static MethodInfo {{TaskName}}_CommandMethod { get; set; }
-            public static void Populate_{{TaskName}}(Bot _bot)
+            public static void Populate_{{TaskName}}({{nameof(Bot)}} _bot)
             {
                 _logger.LogDebug("Populating execution properties for '{CommandName}':'{taskname}'", "{{Command.Name}}","{{TaskName}}");
                 {{TaskName}}_CommandType = _bot.PluginCommands["{{PluginIdentifier.Key}}"].First(x => x.Name == "{{Command.Name}}").Command.GetType();
@@ -447,7 +453,7 @@ internal class Plugins
     
     private static string GetGroupMethodCode(KeyValuePair<string, BasePlugin> PluginIdentifier, string ContextName, BasePluginCommand Command, BasePluginCommand Parent)
     {
-        var TaskName = $"a{Guid.NewGuid().ToString().ToLower().Replace("-", "")}";
+        var TaskName = GetUniqueCodeCompatibleName();
 
         string GetMethodLine()
         {
@@ -492,7 +498,7 @@ internal class Plugins
 
             private static Type {{TaskName}}_CommandType { get; set; }
             private static MethodInfo {{TaskName}}_CommandMethod { get; set; }
-            public static void Populate_{{TaskName}}(Bot _bot)
+            public static void Populate_{{TaskName}}({{nameof(Bot)}} _bot)
             {
                 _logger.LogDebug("Populating execution properties for '{ParentCommandName} {CommandName}':'{taskname}'", "{{Parent.Name}}", "{{Command.Name}}","{{TaskName}}");
                 {{TaskName}}_CommandType = _bot.PluginCommands["{{PluginIdentifier.Key}}"].First(x => x.Name == "{{Parent.Name}}").SubCommands.First(x => x.Name == "{{Command.Name}}").Command.GetType();
