@@ -51,8 +51,8 @@ jobs:
           artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
           generateReleaseNotes: true
           prerelease: true
-          tag: ${{ github.GITHUB_SHA }}
-          commit: ${{ github.GITHUB_SHA }}
+          tag: ${{ github.sha }}
+          commit: ${{ github.sha }}
       - name: Cleanup
         run: rm -rf ProjectMakoto/
         if: always()
