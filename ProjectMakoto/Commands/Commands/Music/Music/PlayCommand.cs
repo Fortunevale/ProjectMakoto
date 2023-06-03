@@ -19,7 +19,7 @@ internal class PlayCommand : BaseCommand
         {
             string search = (string)arguments["search"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             if (search.IsNullOrWhiteSpace())

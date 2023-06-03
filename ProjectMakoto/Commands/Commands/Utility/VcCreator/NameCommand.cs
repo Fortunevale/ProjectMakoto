@@ -15,7 +15,7 @@ internal class NameCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             string newName = (string)arguments["newName"];

@@ -66,32 +66,33 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.ctx.RespondedToInitial = false;
 
-        if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
-        {
-            _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
+        if (!this.ctx.Bot.status.LoadedConfig.IsDev)
+            if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
             {
-                Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
-            }.AsBotError(this.ctx)).AsEphemeral());
-            return;
-        }
-        else
-        {
-            if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
-            {
-                this.ctx.RespondedToInitial = true;
-                var tfa = await ctx.RequestTwoFactorAsync();
-
-                if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
-                    await SwitchToEvent(tfa.ComponentInteraction);
-
-                if (tfa.Result != TwoFactorResult.ValidCode)
+                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
                 {
-                    _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
-                    return;
-                }
-                _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                    Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
+                }.AsBotError(this.ctx)).AsEphemeral());
+                return;
             }
-        }
+            else
+            {
+                if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
+                {
+                    this.ctx.RespondedToInitial = true;
+                    var tfa = await ctx.RequestTwoFactorAsync();
+
+                    if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
+                        await SwitchToEvent(tfa.ComponentInteraction);
+
+                    if (tfa.Result != TwoFactorResult.ValidCode)
+                    {
+                        _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
+                        return;
+                    }
+                    _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                }
+            }
         
         if (!this.ctx.RespondedToInitial)
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -121,41 +122,62 @@ public abstract class BaseCommand
             await ExecuteCommand(this.ctx, arguments);
     }
 
-    internal async Task<bool> BasePreExecutionCheck()
+    public async Task ExecuteCommand(ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
+    {
+        if (InitiateInteraction)
+            await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+            {
+                IsEphemeral = Ephemeral
+            });
+
+        this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
+        this.ctx.RespondedToInitial = InitiateInteraction;
+
+        if (InteractionInitiated)
+            this.ctx.RespondedToInitial = true;
+
+        if (await BasePreExecutionCheck())
+            await ExecuteCommand(this.ctx, arguments);
+    }
+
+    private async Task<bool> BasePreExecutionCheck()
     {
         t = Bot.loadedTranslations;
-        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.Bot.users[ctx.User.Id].CurrentLocale != ctx.User.Locale)
+        if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.DbUser.CurrentLocale != ctx.User.Locale)
         {
-            ctx.Bot.users[ctx.User.Id].CurrentLocale = ctx.User.Locale;
+            ctx.DbUser.CurrentLocale = ctx.User.Locale;
             _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
         }
 
-        if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
+        if (!ctx.Channel.IsPrivate)
         {
-            ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale = ctx.Guild.PreferredLocale;
-            _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", ctx.Guild.Id, ctx.Guild.PreferredLocale);
+            if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
+            {
+                ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale = ctx.Guild.PreferredLocale;
+                _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", ctx.Guild.Id, ctx.Guild.PreferredLocale);
+            }
+
+            if (!(await CheckOwnPermissions(Permissions.SendMessages)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.AddReactions)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
+                return false;
+
+            if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
+                return false;
+
+            if (!(await BeforeExecution(this.ctx)))
+                return false;
         }
-
-        if (!(await CheckOwnPermissions(Permissions.SendMessages)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.AddReactions)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
-            return false;
-
-        if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
-            return false;
-
-        if (!(await BeforeExecution(this.ctx)))
-            return false;
 
         if ((this.ctx.Bot.objectedUsers.Contains(ctx.User.Id) || ctx.DbUser.Data.DeletionRequested) && this.ctx.CommandName != "data" && this.ctx.CommandName != "delete")
         {
@@ -342,7 +364,7 @@ public abstract class BaseCommand
         => GetString(key, false, vars);
 
     public string GetString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
-        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(ctx.DbUser).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
 
 
 
@@ -356,7 +378,7 @@ public abstract class BaseCommand
         => GetString(key, true, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
-        => key.Get(ctx.Bot.users[ctx.User.Id]).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(ctx.DbUser).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
 
 
 

@@ -137,6 +137,48 @@ public class SharedCommandContext
         }
     }
 
+    public SharedCommandContext(BaseCommand cmd, ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot)
+    {
+        CommandType = CommandType.Event;
+
+        User = ctx.User;
+        Guild = ctx.Guild;
+        Channel = ctx.Channel;
+        Client = client;
+
+        try { if (ctx.Guild is not null) Member = ctx.User.ConvertToMember(ctx.Guild).GetAwaiter().GetResult(); } catch { }
+
+        CurrentMember = ctx.Guild?.CurrentMember;
+        CurrentUser = client.CurrentUser;
+
+        OriginalComponentInteractionCreateEventArgs = ctx;
+
+        Prefix = "/";
+        CommandName = commandName;
+
+        Bot = _bot;
+
+        BaseCommand = cmd;
+
+        try
+        {
+            DbUser = _bot.users[ctx.User.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User?.Id ?? 0, ex);
+        }
+
+        try
+        {
+            DbGuild = _bot.guilds[ctx.Guild.Id];
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarn("Unable to fetch database guild entry for '{Guild}'\n{ex}", ctx.Guild?.Id ?? 0, ex);
+        }
+    }
+
     public SharedCommandContext(BaseCommand cmd, ContextMenuContext ctx, Bot _bot)
     {
         CommandType = CommandType.ContextMenu;
@@ -287,4 +329,16 @@ public class SharedCommandContext
     /// The original event args.
     /// </summary>
     public ComponentInteractionCreateEventArgs OriginalComponentInteractionCreateEventArgs { get; set; }
+
+    /// <summary>
+    /// The original interaction that started this command.
+    /// </summary>
+    public DiscordInteraction Interaction
+        => this.CommandType switch
+        {
+            CommandType.ApplicationCommand => OriginalInteractionContext.Interaction,
+            CommandType.Event => OriginalComponentInteractionCreateEventArgs.Interaction,
+            CommandType.ContextMenu => OriginalContextMenuContext.Interaction,
+            _ => null
+        };
 }

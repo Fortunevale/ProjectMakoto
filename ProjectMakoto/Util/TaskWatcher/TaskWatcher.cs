@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal class TaskWatcher
+public class TaskWatcher
 {
     private List<TaskInfo> tasks = new();
 

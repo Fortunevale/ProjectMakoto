@@ -23,7 +23,7 @@ internal class PhishingUrlUpdater
         new Task(new Action(async () =>
         {
             _ = UpdatePhishingUrlDatabase();
-        })).CreateScheduleTask(DateTime.UtcNow.AddMinutes(30), $"phishing-update");
+        })).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
 
         var urls = await GetUrls();
 

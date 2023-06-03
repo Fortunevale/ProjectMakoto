@@ -17,12 +17,12 @@ internal class ReportHostCommand : BaseCommand
         {
             string url = (string)arguments["url"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             int tos_version = 3;
 
-            if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != tos_version)
+            if (ctx.DbUser.UrlSubmissions.AcceptedTOS != tos_version)
             {
                 var button = new DiscordButtonComponent(ButtonStyle.Primary, "accepted-tos", GetString(t.Commands.Utility.ReportHost.AcceptTos), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👍")));
 
@@ -35,7 +35,7 @@ internal class ReportHostCommand : BaseCommand
                         new TVar("4", 4.ToEmotes()))
                 }.AsAwaitingInput(ctx, GetString(t.Commands.Utility.ReportHost.Title));
 
-                if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS != 0 && ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS < tos_version)
+                if (ctx.DbUser.UrlSubmissions.AcceptedTOS != 0 && ctx.DbUser.UrlSubmissions.AcceptedTOS < tos_version)
                 {
                     tos_embed.Description = tos_embed.Description.Insert(0, $"**{GetString(t.Commands.Utility.ReportHost.TosChangedNotice)}**\n\n");
                 }
@@ -52,7 +52,7 @@ internal class ReportHostCommand : BaseCommand
 
                 await TosAccept.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.users[ctx.User.Id].UrlSubmissions.AcceptedTOS = tos_version;
+                ctx.DbUser.UrlSubmissions.AcceptedTOS = tos_version;
             }
 
             var embed = new DiscordEmbedBuilder
@@ -62,10 +62,10 @@ internal class ReportHostCommand : BaseCommand
 
             await RespondOrEdit(embed);
 
-            if (ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
+            if (ctx.DbUser.UrlSubmissions.LastTime.AddMinutes(45) > DateTime.UtcNow && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
                 embed.Description = GetString(t.Commands.Utility.ReportHost.CooldownError, true,
-                    new TVar("Timestamp", ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime.AddMinutes(45).ToTimestamp()));
+                    new TVar("Timestamp", ctx.DbUser.UrlSubmissions.LastTime.AddMinutes(45).ToTimestamp()));
                 _ = RespondOrEdit(embed.AsError(ctx, GetString(t.Commands.Utility.ReportHost.Title)));
                 return;
             }
@@ -198,7 +198,7 @@ internal class ReportHostCommand : BaseCommand
                     GuildOrigin = ctx.Guild.Id
                 });
 
-                ctx.Bot.users[ctx.User.Id].UrlSubmissions.LastTime = DateTime.UtcNow;
+                ctx.DbUser.UrlSubmissions.LastTime = DateTime.UtcNow;
 
                 embed.Description = GetString(t.Commands.Utility.ReportHost.SubmissionCreated, true);
                 embed.AsSuccess(ctx, GetString(t.Commands.Utility.ReportHost.Title));

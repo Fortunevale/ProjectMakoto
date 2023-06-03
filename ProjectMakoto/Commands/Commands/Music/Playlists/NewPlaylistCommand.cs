@@ -15,7 +15,7 @@ internal class NewPlaylistCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             string SelectedPlaylistName = "";
@@ -23,7 +23,7 @@ internal class NewPlaylistCommand : BaseCommand
 
             while (true)
             {
-                if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                if (ctx.DbUser.UserPlaylists.Count >= 10)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -125,7 +125,7 @@ internal class NewPlaylistCommand : BaseCommand
                 {
                     _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                    if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    if (ctx.DbUser.UserPlaylists.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -146,7 +146,7 @@ internal class NewPlaylistCommand : BaseCommand
                         List = SelectedTracks
                     };
 
-                    ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
+                    ctx.DbUser.UserPlaylists.Add(v);
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {

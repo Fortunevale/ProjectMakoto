@@ -120,7 +120,7 @@ internal class DatabaseClient
             _ = databaseClient.CheckDatabaseConnection(databaseClient.mainDatabaseConnection);
             await Task.Delay(10000);
             _ = databaseClient.CheckDatabaseConnection(databaseClient.guildDatabaseConnection);
-        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
+        })).CreateScheduledTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
 
         return databaseClient;
     }
@@ -233,7 +233,7 @@ internal class DatabaseClient
         new Task(new Action(async () =>
         {
             _ = CheckDatabaseConnection(connection);
-        })).CreateScheduleTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
+        })).CreateScheduledTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
 
         if (Disposed)
             return;
@@ -638,9 +638,8 @@ internal class DatabaseClient
 
     public async Task Dispose()
     {
-        foreach (var b in GetScheduleTasks())
-            if (b.Value.customId == "database-connection-watcher")
-                DeleteScheduleTask(b.Key);
+        foreach (var b in GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
+            b.Delete();
 
         int timeout = 0;
 

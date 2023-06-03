@@ -15,7 +15,7 @@ internal class UrbanDictionaryCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.User.Id].Cooldown.WaitForModerate(ctx, true))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx, true))
                 return;
 
             string term = (string)arguments["term"];

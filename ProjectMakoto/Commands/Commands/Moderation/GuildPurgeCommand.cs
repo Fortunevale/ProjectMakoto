@@ -22,7 +22,7 @@ internal class GuildPurgeCommand : BaseCommand
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForHeavy(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             if (number is > 2000 or < 1)

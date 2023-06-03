@@ -12,176 +12,140 @@ namespace ProjectMakoto.Util;
 internal static class PreMadeEmbedsExtensions
 {
     public static DiscordEmbedBuilder AsLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsLoading(b, ctx.Guild, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsLoading(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsBotLoading(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsBotLoading(b, ctx.Client, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsBotLoading(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultBotAuthor(client, CustomText);
+        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsInfo(b, ctx.Guild, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsInfo(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
 
         b.Color = EmbedColors.Info;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsBotInfo(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsBotInfo(b, ctx.Client, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-
-    public static DiscordEmbedBuilder AsBotInfo(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultBotAuthor(client, CustomText);
+        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
 
         b.Color = EmbedColors.Info;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsAwaitingInput(b, ctx.Guild, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsAwaitingInput(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
 
         b.Color = EmbedColors.AwaitingInput;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsBotAwaitingInput(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsBotAwaitingInput(b, ctx.Client, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsBotAwaitingInput(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultBotAuthor(client, CustomText);
+        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
 
         b.Color = EmbedColors.AwaitingInput;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsError(b, ctx.Guild, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsError(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsBotError(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsBotError(b, ctx.Client, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsBotError(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultBotAuthor(client, CustomText);
+        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsWarning(b, ctx.Guild, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-
-    public static DiscordEmbedBuilder AsWarning(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsBotWarning(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-    => AsBotWarning(b, ctx.Client, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-
-    public static DiscordEmbedBuilder AsBotWarning(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultBotAuthor(client, CustomText);
+        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsSuccess(b, ctx.Guild, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-    
-    public static DiscordEmbedBuilder AsSuccess(this DiscordEmbedBuilder b, DiscordGuild guild, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultAuthor(guild, CustomText);
+        b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
     }
 
     public static DiscordEmbedBuilder AsBotSuccess(this DiscordEmbedBuilder b, SharedCommandContext ctx, string CustomText = "", string CustomFooterText = "")
-        => AsBotSuccess(b, ctx.Client, ctx.User, ctx.DbUser, CustomText, CustomFooterText);
-
-    public static DiscordEmbedBuilder AsBotSuccess(this DiscordEmbedBuilder b, DiscordClient client, DiscordUser user, User dbUser, string CustomText = "", string CustomFooterText = "")
     {
-        b.Author = MakeDefaultBotAuthor(client, CustomText);
+        b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
         b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
-        b.Footer = user.GenerateUsedByFooter(dbUser, CustomFooterText);
+        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;

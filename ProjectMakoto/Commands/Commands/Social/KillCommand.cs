@@ -17,7 +17,7 @@ internal class KillCommand : BaseCommand
         {
             DiscordUser user = (DiscordUser)arguments["user"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             string[] phrases = t.Commands.Social.Kill.Other.Get(ctx.DbGuild);

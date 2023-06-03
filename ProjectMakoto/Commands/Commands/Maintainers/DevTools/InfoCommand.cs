@@ -17,7 +17,7 @@ internal class InfoCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsBotLoading(ctx));
@@ -263,7 +263,7 @@ internal class InfoCommand : BaseCommand
                                 scales: {{
                                     yAxes: [{{
                                     ticks: {{
-                                        max: {currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))},
+                                        max: {currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")).Replace(",", "").Replace(".", "")},
                                         min: 0
                                         }}
                                     }}]

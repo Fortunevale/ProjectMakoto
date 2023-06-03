@@ -10,6 +10,12 @@
 using System.Linq.Expressions;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Scripting;
+using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto;
 
@@ -30,6 +36,7 @@ public class Bot
     internal MonitorClient monitorClient { get; set; }
 
     public Dictionary<string, BasePlugin> Plugins { get; set; } = new();
+    public Dictionary<string, List<BasePluginCommand>> PluginCommands { get; set; } = new();
 
     #endregion Clients
 
@@ -44,7 +51,7 @@ public class Bot
 
     internal BumpReminder bumpReminder { get; set; }
     internal ExperienceHandler experienceHandler { get; set; }
-    internal TaskWatcher watcher = new();
+    public TaskWatcher watcher = new();
     internal Dictionary<ulong, UserUpload> uploadInteractions { get; set; } = new();
     internal Dictionary<string, PhishingUrlEntry> phishingUrls = new();
     internal Dictionary<ulong, SubmittedUrlEntry> submittedUrls = new();
@@ -82,6 +89,7 @@ public class Bot
 
         _logger = StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.INFO, DateTime.UtcNow.AddDays(-3), false);
         var loggerProvider = _logger._provider;
+        AttachLogger(_logger);
 
         _logger.LogRaised += LogHandler;
 
@@ -325,20 +333,6 @@ public class Bot
                 loadedTranslations.Progress = CalculateTranslationProgress(loadedTranslations);
                 _logger.LogDebug("Loaded translations: {0}", string.Join("; ", loadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
 
-                foreach (DirectoryInfo directory in new DirectoryInfo(Environment.CurrentDirectory).GetDirectories())
-                    if (directory.Name.StartsWith("emotes-") || directory.Name.StartsWith("zipfile-"))
-                    {
-                        _logger.LogDebug("Deleting Directory \"{directory}\"..", directory.Name);
-                        await CleanupFilesAndDirectories(new List<string> { directory.Name }, new List<string>());
-                    }
-
-                foreach (FileInfo file in new DirectoryInfo(Environment.CurrentDirectory).GetFiles())
-                    if (file.Name.StartsWith("Emotes-"))
-                    {
-                        _logger.LogDebug("Deleting File \"{file}\"..", file.Name);
-                        await CleanupFilesAndDirectories(new List<string>(), new List<string> { file.Name });
-                    }
-
                 Task.Run(async () =>
                 {
                     DateTime lastModify = new();
@@ -380,90 +374,7 @@ public class Bot
                 }).Add(watcher);
                 await Task.Delay(1000);
 
-                if (status.LoadedConfig.EnablePlugins)
-                {
-                    _logger.LogDebug("Loading Plugins..");
-                    List<string> pluginsToLoad = new();
-
-                    if (Directory.Exists("Plugins"))
-                        pluginsToLoad.AddRange(Directory.GetFiles("Plugins").Where(x => x.EndsWith(".dll")));
-
-                    foreach (var pluginPath in pluginsToLoad)
-                    {
-                        int count = 0;
-                        _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
-
-                        PluginLoadContext pluginLoadContext = new(pluginPath);
-                        var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
-
-                        foreach (Type type in assembly.GetTypes())
-                        {
-                            if (typeof(BasePlugin).IsAssignableFrom(type))
-                            {
-                                count++;
-                                BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
-                                Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
-                            }
-                        }
-
-                        if (count == 0)
-                        {
-                            string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
-                            _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
-                        }
-
-
-                        _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
-                    }
-
-                    _logger.LogInfo("Loaded {0} Plugins.", Plugins.Count);
-                }
-
-                foreach (var b in Plugins)
-                {
-                    if (b.Value.Name.IsNullOrWhiteSpace())
-                    {
-                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Name.", b.Key);
-                        continue;
-                    }
-
-                    if (b.Value.Description.IsNullOrWhiteSpace())
-                    {
-                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Description.", b.Key);
-                        continue;
-                    }
-
-                    if (b.Value.Author.IsNullOrWhiteSpace())
-                    {
-                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Author.", b.Key);
-                        continue;
-                    }
-
-                    if (b.Value.AuthorId is null)
-                    {
-                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing AuthorId.", b.Key);
-                        continue;
-                    }
-
-                    if (b.Value.Version is null)
-                    {
-                        _logger.LogWarn("Skipped loading Plugin '{0}': Missing Version.", b.Key);
-                        continue;
-                    }
-
-                    _logger.LogDebug("Initializing Plugin '{0}' ({1})..", b.Value.Name, b.Key);
-
-                    try
-                    {
-                        b.Value.Load(this);
-                        _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError("Failed to load Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
-                        _logger.LogError("Exception", ex);
-                    }
-                }
+                await Util.Initializers.Plugins.LoadPlugins(this);
 
                 monitorClient = new MonitorClient(this);
                 abuseIpDbClient = AbuseIpDbClient.Initialize(this);
@@ -656,11 +567,11 @@ public class Bot
 
             try
             {
-                _ = Task.Delay(10000).ContinueWith(t =>
+                _ = Task.Delay(60000).ContinueWith(t =>
                 {
                     if (!status.DiscordInitialized)
                     {
-                        _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 10 seconds");
+                        _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
                         Environment.Exit(ExitCodes.FailedDiscordLogin);
                         return;
                     }
@@ -680,8 +591,6 @@ public class Bot
                     x.AddSingleTranslation(File.ReadAllText("Translations/single_commands.json")); 
                     x.AddGroupTranslation(File.ReadAllText("Translations/group_commands.json")); 
                 }
-
-                Dictionary<string, BaseCommand> PluginCommands = new();
 
                 if (!status.LoadedConfig.IsDev)
                 {
@@ -718,118 +627,10 @@ public class Bot
                 var commandsNextTypes = new List<Type>();
                 var applicationCommandTypes = new List<Type>();
 
-                foreach (var plugin in Plugins)
-                {
-                    try
-                    {
-                        var pluginCommands = await plugin.Value.RegisterCommands();
-
-                        if (pluginCommands.IsNotNullAndNotEmpty())
-                        {
-                            _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
-
-                            try
-                            {
-                                var typeSignature = Guid.NewGuid().ToString();
-                                var an = new AssemblyName(typeSignature);
-                                AssemblyBuilder assembly = AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
-                                ModuleBuilder moduleBuilder = assembly.DefineDynamicModule("MainModule");
-                                TypeBuilder typeBuilder = moduleBuilder.DefineType(typeSignature,
-                                    TypeAttributes.Public |
-                                    TypeAttributes.Class |
-                                    TypeAttributes.AutoClass |
-                                    TypeAttributes.AnsiClass |
-                                    TypeAttributes.BeforeFieldInit |
-                                    TypeAttributes.AutoLayout,
-                                    null);
-
-                                typeBuilder.AddInterfaceImplementation(typeof(BaseCommandModule));
-
-                                foreach (var rawCommand in pluginCommands)
-                                {
-                                    _logger.LogDebug("Found Command '{0}'", rawCommand.Name);
-
-                                    var overloadList = new List<Type>();
-
-                                    overloadList.Insert(0, typeof(CommandContext));
-                                    overloadList.AddRange(rawCommand.Overloads.Select(x => x.Type));
-
-                                    var methodBuilder = typeBuilder.DefineMethod(rawCommand.Name, MethodAttributes.Public, typeof(Task), null);
-
-                                    var methodParams = methodBuilder.DefineGenericParameters(rawCommand.Overloads.Select(x => x.Name).Prepend("ctx").ToArray());
-
-                                    methodParams[0].SetBaseTypeConstraint(typeof(CommandContext));
-
-                                    for (int i = 1; i < rawCommand.Overloads.Length; i++)
-                                        methodParams[i].SetBaseTypeConstraint(rawCommand.Overloads[i].Type);
-
-                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(CommandAttribute).GetConstructor(new[] { typeof(string) }),
-                                        new List<string> { rawCommand.Name }.ToArray()));
-
-                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(DescriptionAttribute).GetConstructor(new[] { typeof(string) }),
-                                        new List<string> { rawCommand.Description }.ToArray()));
-                                    
-                                    methodBuilder.SetCustomAttribute(new CustomAttributeBuilder(
-                                        typeof(CommandModuleAttribute).GetConstructor(new[] { typeof(string) }),
-                                        new List<string> { rawCommand.Module }.ToArray()));
-
-                                    methodBuilder.SetParameters(methodParams);
-
-                                    methodBuilder.SetReturnType(typeof(Task));
-
-                                    methodBuilder.SetImplementationFlags(MethodImplAttributes.AggressiveInlining);
-
-                                    var delegateType = Expression.GetFuncType(overloadList.ToArray());
-
-                                    Delegate commandDelegate = null;
-                                    commandDelegate = Delegate.CreateDelegate(delegateType, (CommandContext ctx) =>
-                                    {
-                                        var parsedArgs = new Dictionary<string, object>();
-
-                                        MethodInfo method = commandDelegate.GetType().GetMethod("Invoke");
-                                        ParameterInfo[] parameters = method.GetParameters();
-
-                                        for (int i = 1; i < parameters.Length; i++)
-                                        {
-                                            if (i == 0)
-                                                continue;
-
-                                            ParameterInfo parameter = parameters[i];
-                                            object value = null;
-
-                                            PropertyInfo property = typeof(object).GetProperty(parameter.Name, BindingFlags.Public | BindingFlags.Instance);
-                                            if (property != null)
-                                            {
-                                                value = property.GetValue(ctx);
-                                            }
-
-                                            parsedArgs.Add(parameter.Name, value);
-                                        }
-
-                                        return Task.CompletedTask;
-                                    }, rawCommand.Name);
-
-                                    var newDelegate = methodBuilder.CreateDelegate(commandDelegate.GetType(), commandDelegate);
-                                }
-
-                                cNext.RegisterCommands(typeBuilder);
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogError("Failed to generate CommandsNext Command", ex);
-                                _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-                }
+                await Util.Initializers.Plugins.LoadPluginCommands(this, cNext, appCommands);
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
+                await Task.Delay(2000);
                 await discordClient.ConnectAsync();
 
                 _logger.LogInfo("Connected and authenticated with Discord.");
@@ -1585,16 +1386,83 @@ public class Bot
                 {
                     if (status.DiscordInitialized)
                     {
-                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" or "[111] Connection terminated (-1, ''), reconnecting")
+                        if (e.LogEntry.Message is "[111] Connection terminated (4000, ''), reconnecting" 
+                            or "[111] Connection terminated (-1, ''), reconnecting"
+                            or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
                         var channel = discordClient.Guilds[status.LoadedConfig.Channels.Assets].GetChannel(status.LoadedConfig.Channels.ExceptionLog);
 
-                        _ = channel.SendMessageAsync(new DiscordEmbedBuilder()
-                            .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
-                            .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
-                            .WithDescription($"```\n{e.LogEntry.Message.SanitizeForCode()}\n```{(e.LogEntry.Exception is not null ? $"\n```cs\n{e.LogEntry.Exception.ToString().SanitizeForCode()}```" : "")}")
-                            .WithTimestamp(e.LogEntry.TimeOfEvent));
+                        DiscordEmbedBuilder template = new DiscordEmbedBuilder()
+                                                    .WithColor(e.LogEntry.LogLevel == LogLevel.FATAL ? new DiscordColor("#FF0000") : EmbedColors.Error)
+                                                    .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
+                                                    .WithTimestamp(e.LogEntry.TimeOfEvent);
+
+                        List<DiscordEmbedBuilder> embeds = new();
+
+                        if (e.LogEntry.Exception is not null)
+                        {
+                            void BuildEmbed(Exception ex, bool First)
+                            {
+                                var embed = new DiscordEmbedBuilder(template);
+
+                                if (First)
+                                    embed.WithDescription($"`{e.LogEntry.Message.SanitizeForCode()}`");
+                                else
+                                {
+                                    embed.Title = "";
+                                }
+
+                                embed.AddField(new DiscordEmbedField("Message", $"```{ex.Message.SanitizeForCode()}```"));
+                                if (!ex.StackTrace.IsNullOrWhiteSpace())
+                                {
+                                    string regex = @"((?:(?:(?:[A-Z]:\\)|(?:\/))[^\\\/]*[\\\/]).*):line (\d{0,10})";
+                                    var b = Regex.Matches(ex.StackTrace, regex);
+
+                                    if (b.Count > 0)
+                                    {
+                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```"));
+                                        embed.AddField(new DiscordEmbedField("File", $"```{b[0].Groups[1]}```"));
+                                        embed.AddField(new DiscordEmbedField("Line", $"`{b[0].Groups[2]}`"));
+                                    }
+                                    else
+                                    {
+                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{ex.StackTrace?.SanitizeForCode()}```"));
+                                    }
+                                }
+                                else
+                                {
+                                    embed.AddField(new DiscordEmbedField("Stack Trace", $"```No Stack Trace captured.```"));
+                                }
+
+                                embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`", true));
+                                embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`", true));
+                                embed.WithFooter(ex.HResult.ToString());
+
+                                if ((ex.Data?.Keys?.Count ?? 0) > 0)
+                                    embed.AddFields(ex.Data.Keys.Cast<object>().ToDictionary(k => k.ToString(), v => ex.Data[v]).Select(x => new DiscordEmbedField(x.Key, x.Value.ToString(), true)));
+
+                                embeds.Add(embed);
+
+                                if (ex is AggregateException aggr)
+                                    foreach (var b in aggr.InnerExceptions)
+                                    {
+                                        BuildEmbed(b, false);
+                                    }
+                                else if (ex.InnerException is not null)
+                                    BuildEmbed(ex.InnerException, false);
+                            }
+
+                            BuildEmbed(e.LogEntry.Exception, true);
+                        }
+
+                        int index = 0;
+
+                        while (index < embeds.Count)
+                        {
+                            _ = channel.SendMessageAsync(new DiscordMessageBuilder().AddEmbeds(embeds.Take(25).Select(x => x.Build())));
+                            index += 25;
+                        }
                     }
                 }
                 catch {}
@@ -1641,7 +1509,7 @@ public class Bot
         new Task(new Action(async () =>
         {
             ProcessDeletionRequests().Add(watcher);
-        })).CreateScheduleTask(DateTime.UtcNow.AddHours(24));
+        })).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
 
         lock (users)
         {

@@ -15,12 +15,12 @@ internal class ModifyCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             string playlistId = (string)arguments["id"];
 
-            if (!ctx.Bot.users[ctx.Member.Id].UserPlaylists.Any(x => x.PlaylistId == playlistId))
+            if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -29,7 +29,7 @@ internal class ModifyCommand : BaseCommand
                 return;
             }
 
-            UserPlaylist SelectedPlaylist = ctx.Bot.users[ctx.Member.Id].UserPlaylists.First(x => x.PlaylistId == playlistId);
+            UserPlaylist SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
             var embed = new DiscordEmbedBuilder().AsInfo(ctx);
 
@@ -356,7 +356,7 @@ internal class ModifyCommand : BaseCommand
                                         Description = GetString(t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
                                     }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
 
-                                    ctx.Bot.users[ctx.Member.Id].UserPlaylists.Remove(SelectedPlaylist);
+                                    ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
 
                                     await Task.Delay(5000);
                                     return;

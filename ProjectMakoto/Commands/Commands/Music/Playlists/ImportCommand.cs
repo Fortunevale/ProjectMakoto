@@ -15,10 +15,10 @@ internal class ImportCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
+            if (ctx.DbUser.UserPlaylists.Count >= 10)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -86,7 +86,7 @@ internal class ImportCommand : BaseCommand
                 }
                 else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
                 {
-                    if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    if (ctx.DbUser.UserPlaylists.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -106,7 +106,7 @@ internal class ImportCommand : BaseCommand
                         List = loadResult.Tracks.Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString(), Length = x.Length }).Take(250).ToList()
                     };
 
-                    ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
+                    ctx.DbUser.UserPlaylists.Add(v);
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -167,7 +167,7 @@ internal class ImportCommand : BaseCommand
                     if (!ImportJson.List.Any())
                         throw new Exception();
 
-                    if (ctx.Bot.users[ctx.Member.Id].UserPlaylists.Count >= 10)
+                    if (ctx.DbUser.UserPlaylists.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
@@ -183,7 +183,7 @@ internal class ImportCommand : BaseCommand
                         PlaylistColor = ImportJson.PlaylistColor
                     };
 
-                    ctx.Bot.users[ctx.Member.Id].UserPlaylists.Add(v);
+                    ctx.DbUser.UserPlaylists.Add(v);
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {

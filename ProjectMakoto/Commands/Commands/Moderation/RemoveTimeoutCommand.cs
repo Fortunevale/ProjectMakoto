@@ -43,7 +43,7 @@ internal class RemoveTimeoutCommand : BaseCommand
             {
                 await victim.RemoveTimeoutAsync();
                 await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))
+                    .WithDescription(GetString(CommandKey.Removed, true, new TVar("Victim", victim.Mention)))
                     .AsSuccess(ctx));
             }
             catch (Exception)

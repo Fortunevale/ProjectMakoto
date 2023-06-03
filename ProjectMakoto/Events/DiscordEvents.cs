@@ -67,7 +67,7 @@ internal class DiscordEvents
             new Task(async () =>
             {
                 _ = msg.DeleteAsync();
-            }).CreateScheduleTask(DateTime.UtcNow.AddMinutes(60));
+            }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(60));
         }).Add(_bot.watcher);
     }
 }

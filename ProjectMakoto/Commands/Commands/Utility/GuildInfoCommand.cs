@@ -17,7 +17,7 @@ internal class GuildInfoCommand : BaseCommand
         {
 			ulong? rawGuildId = (ulong?)arguments["guildId"];
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForModerate(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             ulong guildId = rawGuildId ?? ctx.Guild.Id;

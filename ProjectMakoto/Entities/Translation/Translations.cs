@@ -1030,6 +1030,8 @@ public class Translations
             public reminders Reminders;
             public class reminders
             {
+                public SingleTranslationKey ReminderNotification;
+                public SingleTranslationKey SentLate;
                 public SingleTranslationKey DateTime;
                 public SingleTranslationKey Description;
                 public SingleTranslationKey SetDateTime;
@@ -1037,7 +1039,8 @@ public class Translations
                 public SingleTranslationKey InvalidDateTime;
                 public SingleTranslationKey Notice;
                 public SingleTranslationKey DueTime;
-                public SingleTranslationKey Created;
+                public SingleTranslationKey CreatedAt;
+                public SingleTranslationKey CreatedOn;
                 public SingleTranslationKey Count;
                 public SingleTranslationKey DeleteReminder;
                 public SingleTranslationKey NewReminder;

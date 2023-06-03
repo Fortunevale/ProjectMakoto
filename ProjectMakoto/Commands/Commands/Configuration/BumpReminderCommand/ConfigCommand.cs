@@ -19,7 +19,7 @@ internal class ConfigCommand : BaseCommand
         {
             var CommandKey = t.Commands.Config.BumpReminder;
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SetupBumpReminderButton), ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
@@ -128,9 +128,14 @@ internal class ConfigCommand : BaseCommand
             {
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminder = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
-                if (GetScheduleTasks() != null)
-                    if (GetScheduleTasks().Any(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}"))
-                        DeleteScheduleTask(GetScheduleTasks().First(x => x.Value.customId == $"bumpmsg-{ctx.Guild.Id}").Key);
+                foreach (var b in GetScheduledTasks())
+                {
+                    if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+                        continue;
+
+                    if (scheduledTaskIdentifier.Snowflake == ctx.Guild.Id && scheduledTaskIdentifier.Type == "bumpmsg")
+                        b.Delete();
+                }
 
                 await RespondOrEdit(new DiscordEmbedBuilder()
                     .WithDescription(GetString(CommandKey.DisableBumpReminderButton, true))

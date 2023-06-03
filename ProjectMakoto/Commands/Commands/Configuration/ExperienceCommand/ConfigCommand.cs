@@ -19,7 +19,7 @@ internal class ConfigCommand : BaseCommand
         {
             var CommandKey = t.Commands.Config.Experience;
 
-            if (await ctx.Bot.users[ctx.Member.Id].Cooldown.WaitForLight(ctx))
+            if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
