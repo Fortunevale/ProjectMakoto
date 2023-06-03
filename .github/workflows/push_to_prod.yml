@@ -45,20 +45,14 @@ jobs:
       - name: Create Zip File from Build
         run: zip -r Release.zip build
         working-directory: ProjectMakoto/ProjectMakoto/
-      - name: Set outputs
-        id: short
-        run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      - name: Set outputs
-        id: long
-        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
         with:
           artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
           generateReleaseNotes: true
           prerelease: true
-          tag: ${{ steps.short.outputs.sha }}
-          commit: ${{ steps.long.outputs.sha }}
+          tag: ${{ github.GITHUB_SHA }}
+          commit: ${{ github.GITHUB_SHA }}
       - name: Cleanup
         run: rm -rf ProjectMakoto/
         if: always()
