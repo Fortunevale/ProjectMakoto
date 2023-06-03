@@ -46,21 +46,19 @@ jobs:
         run: zip -r Release.zip build
         working-directory: ProjectMakoto/ProjectMakoto/
       - name: Set outputs
-        id: vars
+        id: short
         run: echo "sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      - uses: rickstaa/action-create-tag@v1
+      - name: Set outputs
+        id: long
+        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+      - name: Create Release
+        uses: ncipollo/release-action@v1.12.0
         with:
-          tag: ${{ steps.vars.outputs.sha }}
-          tag_exists_error: false
-      - name: Release to Github
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ProjectMakoto/ProjectMakoto/Release.zip
-        env:
-          generate_release_notes: true
+          artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
+          generateReleaseNotes: true
           prerelease: true
-          tag_name: ${{ steps.vars.outputs.sha }}
-          name: ${{ steps.vars.outputs.sha }}
+          tag: ${{ steps.short.outputs.sha }}
+          commit: ${{ steps.long.outputs.sha }}
       - name: Cleanup
         run: rm -rf ProjectMakoto/
         if: always()
