@@ -50,9 +50,10 @@ jobs:
         with:
           files: ProjectMakoto/ProjectMakoto/Release.zip
         env:
-          generate_release_notes: 1
-          prerelease: 1
+          generate_release_notes: true
+          prerelease: true
           tag_name: ${{ steps.vars.outputs.sha }}
+          name: ${{ steps.vars.outputs.sha }}
       - name: Cleanup
         run: rm -rf ProjectMakoto/
         if: always()
