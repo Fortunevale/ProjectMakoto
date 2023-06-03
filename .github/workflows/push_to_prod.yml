@@ -45,13 +45,19 @@ jobs:
       - name: Create Zip File from Build
         run: zip -r Release.zip build
         working-directory: ProjectMakoto/ProjectMakoto/
+      - name: Truncate String
+        uses: 2428392/gh-truncate-string-action@v1.2.0
+        id: truncatedString
+        with:
+          stringToTruncate: ${{ github.sha }}
+          maxLength: 10
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
         with:
           artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
           generateReleaseNotes: true
           prerelease: true
-          tag: ${{ github.sha }}
+          tag: ${{ steps.truncatedString.outputs.string }}
           commit: ${{ github.sha }}
       - name: Cleanup
         run: rm -rf ProjectMakoto/
