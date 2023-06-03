@@ -51,41 +51,6 @@ public class BasePluginCommand
     /// <param name="Module">The module of this plugin group.</param>
     /// <param name="UseDefaultHelp">Whether to use the default help for command groups. Requires adding your own help command.</param>
     /// <param name="Commands">The commands of this group.</param>
-    public BasePluginCommand(string Name, string Description, string Module, bool UseDefaultHelp = true, params BasePluginCommand[] Commands)
-    {
-        if (Name.IsNullOrWhiteSpace())
-            throw new ArgumentNullException(nameof(Name));
-
-        if (Description.IsNullOrWhiteSpace())
-            throw new ArgumentNullException(nameof(Description));
-
-        if (Module.IsNullOrWhiteSpace())
-            throw new ArgumentNullException(nameof(Module));
-
-        if ((Commands?.Length ?? 0) == 0)
-            throw new ArgumentNullException(nameof(Commands));
-
-        if (!UseDefaultHelp && !Commands.Any(x => x.Name == "help"))
-            throw new ArgumentException("You need to provide a help command if you disable the default help.");
-        else if (UseDefaultHelp && Commands.Any(x => x.Name == "help"))
-            throw new ArgumentException("You cannot provide a help command if the default help is enabled.");
-
-        this.Name = Name.Trim();
-        this.Description = Description.Trim();
-        this.Module = Module.Trim();
-        this.SubCommands = Commands;
-        this.Overloads = Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
-        this.UseDefaultHelp = UseDefaultHelp;
-    }
-
-    /// <summary>
-    /// Creates a new Plugin Command Group.
-    /// </summary>
-    /// <param name="Name">The name of this plugin group.</param>
-    /// <param name="Description">The description of this plugin group.</param>
-    /// <param name="Module">The module of this plugin group.</param>
-    /// <param name="UseDefaultHelp">Whether to use the default help for command groups. Requires adding your own help command.</param>
-    /// <param name="Commands">The commands of this group.</param>
     public BasePluginCommand(string Name, string Description, string Module, params BasePluginCommand[] Commands)
     {
         if (Name.IsNullOrWhiteSpace())
@@ -112,24 +77,30 @@ public class BasePluginCommand
     }
 
     /// <summary>
+    /// <para>Whether the command has been registered.</para>
+    /// <para>All modifications will fail if this values is true.</para>
+    /// </summary>
+    public bool Registered { get; internal set; } = false;
+
+    /// <summary>
     /// The command's name.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; internal set; }
 
     /// <summary>
     /// The command's description.
     /// </summary>
-    public string Description { get; set; }
+    public string Description { get; internal set; }
 
     /// <summary>
     /// The command's module.
     /// </summary>
-    public string Module { get; set; }
+    public string Module { get; internal set; }
 
     /// <summary>
     /// This command's parent, if group.
     /// </summary>
-    public BasePluginCommand? Parent { get; set; }
+    public BasePluginCommand? Parent { get; internal set; }
 
     /// <summary>
     /// Whether this command is a group.
@@ -138,22 +109,130 @@ public class BasePluginCommand
         => (Command is null && SubCommands is not null);
 
     /// <summary>
-    /// The command.
+    /// The command to execute.
     /// </summary>
-    public BaseCommand? Command { get; set; }
+    public BaseCommand? Command { get; internal set; }
 
     /// <summary>
     /// The command's sub commands, if group.
     /// </summary>
-    public BasePluginCommand[]? SubCommands { get; set; }
+    public BasePluginCommand[]? SubCommands { get; internal set; }
 
     /// <summary>
     /// The required overloads.
     /// </summary>
-    public BaseOverload[] Overloads { get; set; }
+    public BaseOverload[] Overloads { get; internal set; }
 
     /// <summary>
-    /// Whether to use the default help for command groups.
+    /// <para>Whether to use the default help for command groups.</para>
+    /// Defaults to <see cref="true"/>.
     /// </summary>
-    public bool UseDefaultHelp { get; set; } = true;
+    public bool UseDefaultHelp { get; internal set; } = true;
+
+    /// <summary>
+    /// Updates the <see cref="UseDefaultHelp"/> value.
+    /// <inheritdoc cref="UseDefaultHelp"/>
+    /// </summary>
+    /// <param name="UseDefaultHelp">The new <see cref="UseDefaultHelp"/> value.</param>
+    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public BasePluginCommand WithUseDefaultHelp(bool UseDefaultHelp)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.UseDefaultHelp = UseDefaultHelp;
+        return this;
+    }
+
+    /// <summary>
+    /// <para>The required permissions to <b>view</b> the command as application command.</para>
+    /// <para><b>This does not protect the command from users without this permission. It only hides the command in the application command list when the user does not fulfill the requirement.</b></para>
+    /// Defaults to <see cref="null"/>.
+    /// </summary>
+    public Permissions? RequiredPermissions { get; internal set; } = null;
+
+    /// <summary>
+    /// Updates the <see cref="RequiredPermissions"/> value.
+    /// <inheritdoc cref="RequiredPermissions"/>
+    /// </summary>
+    /// <param name="RequiredPermissions">The new <see cref="RequiredPermissions"/> value.</param>
+    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public BasePluginCommand WithRequiredPermissions(Permissions RequiredPermissions)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.RequiredPermissions = RequiredPermissions;
+        return this;
+    }
+
+    /// <summary>
+    /// <para>Whether to allow running this command in Direct Messages.</para>
+    /// <para>Make sure to adjust your command to accommodate for usage in direct messages. </para>
+    /// Defaults to <see cref="false"/>.
+    /// </summary>
+    public bool AllowPrivateUsage { get; internal set; } = false;
+
+    /// <summary>
+    /// Updates the <see cref="AllowPrivateUsage"/> value.
+    /// <inheritdoc cref="AllowPrivateUsage"/>
+    /// </summary>
+    /// <param name="AllowPrivateUsage">The new <see cref="AllowPrivateUsage"/> value.</param>
+    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public BasePluginCommand WithAllowPrivateUsage(bool AllowPrivateUsage)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.AllowPrivateUsage = AllowPrivateUsage;
+        return this;
+    }
+
+    /// <summary>
+    /// <para>Whether the command should be marked as NSFW.</para>
+    /// <para><b>This does not ensure that the command is only run by adult users. It only hides this command in the application command list when the user does not fulfill the requirement.</b></para>
+    /// Defaults to <see cref="false"/>.
+    /// </summary>
+    public bool IsNsfw { get; internal set; } = false;
+
+    /// <summary>
+    /// Updates the <see cref="IsNsfw"/> value.
+    /// <inheritdoc cref="IsNsfw"/>
+    /// </summary>
+    /// <param name="IsNsfw">The new <see cref="IsNsfw"/> value.</param>
+    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public BasePluginCommand WithIsNsfw(bool IsNsfw)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.IsNsfw = IsNsfw;
+        return this;
+    }
+
+    /// <summary>
+    /// <para>Which command types are supported.</para>
+    /// Defaults to <see cref="PluginCommandType.PrefixCommand"/> and  <see cref="PluginCommandType.SlashCommand"/>.
+    /// </summary>
+    public IReadOnlyList<PluginCommandType> SupportedCommands { get; internal set; } = new List<PluginCommandType>() { PluginCommandType.PrefixCommand, PluginCommandType.SlashCommand }.AsReadOnly();
+
+    /// <summary>
+    /// Updates the <see cref="SupportedCommands"/> value.
+    /// <inheritdoc cref="SupportedCommands"/>
+    /// </summary>
+    /// <param name="SupportedCommands">The new <see cref="SupportedCommands"/> value.</param>
+    /// <returns>This <see cref="BasePluginCommand"/> with the updated value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the command is already registered.</exception>
+    public BasePluginCommand WithSupportedCommands(params PluginCommandType[] SupportedCommands)
+    {
+        if (this.Registered)
+            throw new InvalidOperationException("The command is already registered. It can no longer be modified.");
+
+        this.SupportedCommands = SupportedCommands;
+        return this;
+    }
 }

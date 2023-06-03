@@ -100,6 +100,11 @@ public abstract class BasePlugin
         return;
     }
 
+    public void EnableCommandTranslations(ApplicationCommandsTranslationContext ctx)
+    {
+        return;
+    }
+
     public object GetConfig()
         => (_bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
 

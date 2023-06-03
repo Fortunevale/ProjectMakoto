@@ -144,83 +144,79 @@ internal class Plugins
 
                     foreach (var rawCommand in pluginCommands)
                     {
-                        if (rawCommand.IsGroup)
-                        {
-                            var code =
-                            $$"""
-                            {{classUsings}}
+                        rawCommand.Registered = true;
 
-                            [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
-                            public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                        if (rawCommand.SupportedCommands.Contains(PluginCommandType.PrefixCommand))
+                            if (rawCommand.IsGroup)
                             {
-                                public {{nameof(Bot)}} _bot { private get; set; }
-
-                                // EntryPoint
-                            }
-                            """;
-
-                            var IndexPath = $"// EntryPoint";
-                            int InsertPosition = InsertPosition = code.IndexOf(IndexPath) + IndexPath.Length;
-
-                            foreach (var rawSubCommand in rawCommand.SubCommands)
-                            {
-                                if (rawSubCommand.Name.ToLower() == "help")
-                                    continue;
-
-                                rawSubCommand.Parent = rawCommand;
-                                code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, nameof(CommandContext), rawSubCommand, rawCommand));
-                            }
-
-                            if (rawCommand.UseDefaultHelp)
-                            {
-                                code = code.Insert(InsertPosition,
+                                var code =
                                 $$"""
+                                {{classUsings}}
 
-                                [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
-                                public async Task Help(CommandContext ctx)
-                                    => PrefixCommandUtil.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot.watcher, ctx);
-                                """);
+                                [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
+                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                {
+                                    public {{nameof(Bot)}} _bot { private get; set; }
+
+                                    // EntryPoint
+                                }
+                                """;
+
+                                var IndexPath = $"// EntryPoint";
+                                int InsertPosition = InsertPosition = code.IndexOf(IndexPath) + IndexPath.Length;
+
+                                foreach (var rawSubCommand in rawCommand.SubCommands)
+                                {
+                                    rawSubCommand.Registered = true;
+
+                                    if (rawSubCommand.Name.ToLower() == "help")
+                                        continue;
+
+                                    rawSubCommand.Parent = rawCommand;
+                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, nameof(CommandContext), rawSubCommand, rawCommand));
+                                }
+
+                                if (rawCommand.UseDefaultHelp)
+                                {
+                                    code = code.Insert(InsertPosition,
+                                    $$"""
+
+                                    [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
+                                    public async Task Help(CommandContext ctx)
+                                        => PrefixCommandUtil.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot.watcher, ctx);
+                                    """);
+                                }
+
+                                _logger.LogTrace($"\n{code}");
+
+                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
+                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                                    .AddReferences(references)
+                                        .WithOptions(options), 
+                                        new CompilationData("prefix_group", code, rawCommand));
                             }
-
-                            _logger.LogTrace($"\n{code}");
-
-                            compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                .AddReferences(references)
-                                    .WithOptions(options), 
-                                    new CompilationData("prefix_group", code, rawCommand));
-                        }
-                        else
-                        {
-                            var code =
-                            $$"""
-                            {{classUsings}}
-
-                            public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                            else
                             {
-                                public {{nameof(Bot)}} _bot { private get; set; }
+                                var code =
+                                $$"""
+                                {{classUsings}}
 
-                                {{GetSingleMethodCode(plugin, nameof(CommandContext), rawCommand)}}
+                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                {
+                                    public {{nameof(Bot)}} _bot { private get; set; }
+
+                                    {{GetSingleMethodCode(plugin, nameof(CommandContext), rawCommand)}}
+                                }
+                                """;
+
+                                compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
+                                    .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
+                                    .AddReferences(references)
+                                        .WithOptions(options),
+                                        new CompilationData("prefix_single", code, rawCommand));
                             }
-                            """;
 
-                            compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
-                                .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
-                                .AddReferences(references)
-                                    .WithOptions(options),
-                                    new CompilationData("prefix_single", code, rawCommand));
-                        }
-                    }
-
-                    foreach (var rawCommand in pluginCommands)
-                    {
-                        try
-                        {
-                            if (!_bot.PluginCommands.ContainsKey(plugin.Key))
-                                _bot.PluginCommands.Add(plugin.Key, new());
-
-                            _bot.PluginCommands[plugin.Key].Add(rawCommand);
-
+                        if (rawCommand.SupportedCommands.Contains(PluginCommandType.SlashCommand))
                             if (rawCommand.IsGroup)
                             {
                                 var code =
@@ -229,12 +225,11 @@ internal class Plugins
 
                                 public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                 {
-                                    [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}", dmPermission: false)]
+                                    [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}"{{(rawCommand.RequiredPermissions is null ? "" : $", {(long)rawCommand.RequiredPermissions}")}}, dmPermission: {{rawCommand.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{rawCommand.IsNsfw.ToString().ToLower()}})]
                                     public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                     {
                                         public {{nameof(Bot)}} _bot { private get; set; }
 
-                                                
                                         // EntryPoint
                                     }
                                 }
@@ -276,12 +271,6 @@ internal class Plugins
                                     .WithOptions(options),
                                         new CompilationData("app_single", code, rawCommand));
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError("Failed to generate Application Command", ex);
-                            _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
-                        }
                     }
 
                     foreach (var compilation in compilationList)
@@ -305,6 +294,8 @@ internal class Plugins
                                 Assembly assembly = Assembly.Load(assemblyBytes);
                                 assemblyList.Add(assembly, compilation.Value.type);
 
+                                Directory.CreateDirectory("CompiledPluginCommands");
+
                                 _logger.LogDebug("Compiled class for command '{command}' of type '{type}'", compilation.Value.command.Name, compilation.Value.type);
                                 _logger.LogTrace($"\n{compilation.Value.code}");
                             }
@@ -321,8 +312,26 @@ internal class Plugins
                             Console.WriteLine();
                             for (int i = 0; i < compilation.Value.code.Length; i++)
                             {
-                                if (diagnostics.Any(x => i >= x.Location.SourceSpan.Start && i <= x.Location.SourceSpan.End))
-                                    Console.ForegroundColor = ConsoleColor.Red;
+                                Diagnostic? foundDiagnostic = diagnostics.FirstOrDefault(x => i >= x.Location.SourceSpan.Start && i <= x.Location.SourceSpan.End, null);
+
+                                if (foundDiagnostic is not null)
+                                    switch (foundDiagnostic.Severity)
+                                    {
+                                        case DiagnosticSeverity.Hidden:
+                                            Console.ForegroundColor = ConsoleColor.Gray;
+                                            break;
+                                        case DiagnosticSeverity.Info:
+                                            Console.ForegroundColor = ConsoleColor.Cyan;
+                                            break;
+                                        case DiagnosticSeverity.Warning:
+                                            Console.ForegroundColor = ConsoleColor.Yellow;
+                                            break;
+                                        case DiagnosticSeverity.Error:
+                                            Console.ForegroundColor = ConsoleColor.Red;
+                                            break;
+                                        default:
+                                            break;
+                                    }
                                 else
                                     Console.ForegroundColor = ConsoleColor.White;
 
@@ -365,9 +374,9 @@ internal class Plugins
                             case "app_single":
                             case "app_group":
                                 if (_bot.status.LoadedConfig.IsDev)
-                                    appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Channels.Assets);
+                                    appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Channels.Assets, plugin.Value.EnableCommandTranslations);
                                 else
-                                    appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)));
+                                    appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.Value.EnableCommandTranslations);
                                 break;
                         }
                     }
@@ -404,7 +413,7 @@ internal class Plugins
             if (ContextName == nameof(InteractionContext))
                 return
                     $$"""
-                    [SlashCommand("{{Command.Name}}", "{{Command.Description}}")]
+                    [SlashCommand("{{Command.Name}}", "{{Command.Description}}"{{(Command.RequiredPermissions is null ? "" : $", {(long)Command.RequiredPermissions}")}}, dmPermission: {{Command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{Command.IsNsfw.ToString().ToLower()}})]
                     public Task {{TaskName}}_Execute({{ContextName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
             else if (ContextName == nameof(CommandContext))
