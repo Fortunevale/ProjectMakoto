@@ -140,7 +140,7 @@ public abstract class BaseCommand
             await ExecuteCommand(this.ctx, arguments);
     }
 
-    internal async Task<bool> BasePreExecutionCheck()
+    private async Task<bool> BasePreExecutionCheck()
     {
         t = Bot.loadedTranslations;
         if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.DbUser.CurrentLocale != ctx.User.Locale)

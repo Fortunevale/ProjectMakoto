@@ -39,6 +39,16 @@ jobs:
         working-directory: ProjectMakoto/ProjectMakoto/build/
       - name: Send Update Signal to Production Client
         run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_SERVER }} -p ${{ secrets.SSH_PORT }} touch /home/${{ secrets.SSH_USERNAME }}/Bots/ProjectIchigo/updated
+      - name: Create Zip File from Build
+        run: zip -r Release.zip build
+        working-directory: ProjectMakoto/ProjectMakoto/
+      - name: Release to Github
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ProjectMakoto/ProjectMakoto/Release.zip
+        env:
+          generate_release_notes: 1
       - name: Cleanup
         run: rm -rf ProjectMakoto/
 
