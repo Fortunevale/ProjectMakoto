@@ -18,6 +18,8 @@ public abstract class BasePlugin
         this._logger = Log._logger;
     }
 
+    internal FileInfo LoadedFile { get; set; }
+
     public Bot _bot { get; set; }
     public Logger _logger { get; set; }
     public ApplicationCommandsExtension DiscordCommandsModule { get; set; }

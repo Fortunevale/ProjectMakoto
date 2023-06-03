@@ -44,6 +44,7 @@ public class Config
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
 
+    public Dictionary<string, PluginInfo> PluginCache = new();
     public Dictionary<string, object> PluginData = new();
 
     public class DiscordConfig
@@ -164,5 +165,12 @@ public class Config
     public class DontModifyConfig
     {
         public string LastStartedVersion = "UNIDENTIFIED";
+        public string LastKnownHash = "";
+    }
+
+    public class PluginInfo
+    {
+        public string? LastKnownHash = null;
+        public Dictionary<string, string> CompiledCommands = new();
     }
 }

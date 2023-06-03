@@ -47,6 +47,7 @@ internal class Plugins
                     {
                         count++;
                         BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
+                        result.LoadedFile = new FileInfo(pluginPath);
                         _bot.Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
                     }
                 }
@@ -122,25 +123,57 @@ internal class Plugins
 
     public static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
     {
+        var applicationHash = ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+
         foreach (var plugin in _bot.Plugins)
         {
             try
             {
-                string classUsings = GetUsings();
+                var pluginHash = ComputeSHA256Hash(plugin.Value.LoadedFile);
+                Dictionary<Assembly, string> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
+                _bot.PluginCommands.Add(plugin.Key, pluginCommands.ToList());
+
+                if (_bot.status.LoadedConfig.PluginCache.TryGetValue(plugin.Key, out var pluginInfo) &&
+                    pluginHash == pluginInfo.LastKnownHash &&
+                    applicationHash == _bot.status.LoadedConfig.DontModify.LastKnownHash &&
+                    pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)))
+                {
+                    _logger.LogInfo("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+                    
+                    foreach (var b in pluginInfo.CompiledCommands)
+                    {
+                        PluginLoadContext pluginLoadContext = new(b.Key);
+                        var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(b.Key)));
+
+                        assemblyList.Add(assembly, b.Value);
+                    }
+
+                    RegisterAssemblies(_bot, cNext, appCommands, plugin.Value, assemblyList);
+                    continue;
+                }
+
+                _bot.status.LoadedConfig.PluginCache.TryAdd(plugin.Key, new());
+                pluginInfo = _bot.status.LoadedConfig.PluginCache[plugin.Key];
+
+                pluginInfo.LastKnownHash = pluginHash;
+
+                if (pluginInfo.CompiledCommands.Any())
+                    _ = CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
+
+                pluginInfo.CompiledCommands = new();
+
+                string classUsings = GetUsings();
 
                 if (pluginCommands.IsNotNullAndNotEmpty())
                 {
                     var options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary).WithOptimizationLevel(OptimizationLevel.Release);
                     var references = AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()).Select(x => MetadataReference.CreateFromFile(x.Location));
 
-                    _logger.LogInfo("Adding {0} Commands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
+                    _logger.LogInfo("Compiling {0} BasePluginCommands from Plugin from '{1}' ({2}).", pluginCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
 
                     Dictionary<CSharpCompilation, CompilationData> compilationList = new();
-                    Dictionary<Assembly, string> assemblyList = new();
-
-                    _bot.PluginCommands.Add(plugin.Key, pluginCommands.ToList());
 
                     foreach (var rawCommand in pluginCommands)
                     {
@@ -296,6 +329,16 @@ internal class Plugins
 
                                 Directory.CreateDirectory("CompiledPluginCommands");
 
+                                var path = $"CompiledPluginCommands/{assembly.GetName().Name}.dll";
+                                using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
+                                {
+                                    stream.Seek(0, SeekOrigin.Begin);
+                                    await stream.CopyToAsync(fileStream);
+                                    await fileStream.FlushAsync();
+
+                                    pluginInfo.CompiledCommands.Add(path, compilation.Value.type);
+                                }
+
                                 _logger.LogDebug("Compiled class for command '{command}' of type '{type}'", compilation.Value.command.Name, compilation.Value.type);
                                 _logger.LogTrace($"\n{compilation.Value.code}");
                             }
@@ -341,51 +384,59 @@ internal class Plugins
                         }
                     }
 
-                    foreach (var assembly in assemblyList)
-                    {
-                        foreach (var parentType in assembly.Key.GetTypes())
-                        {
-                            foreach (var method in parentType.GetMethods())
-                            {
-                                if (method.Name.StartsWith("Populate"))
-                                    method.Invoke(null, new object[] { _bot });
-                            }
-
-                            foreach (var subTypes in parentType.GetNestedTypes())
-                            {
-                                foreach (var method in parentType.GetMethods())
-                                {
-                                    if (method.Name.StartsWith("Populate"))
-                                        method.Invoke(null, new object[] { _bot });
-                                }
-                            }
-                        }
-                    }
-
-                    foreach (var assembly in assemblyList)
-                    {
-                        switch (assembly.Value)
-                        {
-                            case "prefix_single":
-                            case "prefix_group":
-                                cNext.RegisterCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(BaseCommandModule)));
-                                break;
-                            
-                            case "app_single":
-                            case "app_group":
-                                if (_bot.status.LoadedConfig.IsDev)
-                                    appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Channels.Assets, plugin.Value.EnableCommandTranslations);
-                                else
-                                    appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.Value.EnableCommandTranslations);
-                                break;
-                        }
-                    }
+                    RegisterAssemblies(_bot, cNext, appCommands, plugin.Value, assemblyList);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("Failed to load commands", ex);
                 _logger.LogError("Affected plugin: {0}", plugin.Value.Name);
+            }
+        }
+
+        _bot.status.LoadedConfig.DontModify.LastKnownHash = applicationHash;
+        _bot.status.LoadedConfig.Save();
+    }
+
+    private static void RegisterAssemblies(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands, BasePlugin plugin, Dictionary<Assembly, string> assemblyList)
+    {
+        foreach (var assembly in assemblyList)
+        {
+            foreach (var parentType in assembly.Key.GetTypes())
+            {
+                foreach (var method in parentType.GetMethods())
+                {
+                    if (method.Name.StartsWith("Populate"))
+                        method.Invoke(null, new object[] { _bot });
+                }
+
+                foreach (var subTypes in parentType.GetNestedTypes())
+                {
+                    foreach (var method in parentType.GetMethods())
+                    {
+                        if (method.Name.StartsWith("Populate"))
+                            method.Invoke(null, new object[] { _bot });
+                    }
+                }
+            }
+        }
+
+        foreach (var assembly in assemblyList)
+        {
+            switch (assembly.Value)
+            {
+                case "prefix_single":
+                case "prefix_group":
+                    cNext.RegisterCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(BaseCommandModule)));
+                    break;
+
+                case "app_single":
+                case "app_group":
+                    if (_bot.status.LoadedConfig.IsDev)
+                        appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Channels.Assets, plugin.EnableCommandTranslations);
+                    else
+                        appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.EnableCommandTranslations);
+                    break;
             }
         }
     }
