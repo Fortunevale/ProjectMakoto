@@ -10,6 +10,7 @@ dotnet remove package DisCatSharp.Experimental
 dotnet remove package DisCatSharp.Interactivity
 dotnet remove package DisCatSharp.Lavalink
 dotnet remove package DisCatSharp.VoiceNext
+dotnet remove package DisCatSharp.VoiceNext.Natives
 echo.
 echo Adding Local Projects..
 echo.
@@ -22,6 +23,7 @@ dotnet sln add ..\..\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Experiment
 dotnet sln add ..\..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj
 dotnet sln add ..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj
 dotnet sln add ..\..\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj
+dotnet sln add ..\..\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj
 echo.
 echo Adding Project References..
 echo.
@@ -34,3 +36,4 @@ dotnet add reference ..\..\DisCatSharp\DisCatSharp.Experimental\DisCatSharp.Expe
 dotnet add reference ..\..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj
 dotnet add reference ..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj
 dotnet add reference ..\..\DisCatSharp\DisCatSharp.VoiceNext\DisCatSharp.VoiceNext.csproj
+dotnet add reference ..\..\DisCatSharp\DisCatSharp.VoiceNext.Natives\DisCatSharp.VoiceNext.Natives.csproj

@@ -112,7 +112,7 @@ public class SharedCommandContext
         OriginalInteractionContext = ctx;
 
         Prefix = "/";
-        CommandName = ctx.CommandName;
+        CommandName = ctx.FullCommandName;
 
         Bot = _bot;
 
@@ -195,7 +195,7 @@ public class SharedCommandContext
         OriginalContextMenuContext = ctx;
 
         Prefix = "";
-        CommandName = ctx.CommandName;
+        CommandName = ctx.FullCommandName;
 
         Bot = _bot;
 
