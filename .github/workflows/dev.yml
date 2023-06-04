@@ -1,11 +1,31 @@
-name: Test Build
+name: Test Dev Branch
 on:
   push:
     branches: [ "dev" ]
   workflow_dispatch:
   pull_request:
 jobs:
-  push:
+  secretscan:
+    name: Scan for Secrets
+    runs-on: self-hosted
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v3
+
+    - name: Secret Scan
+      uses: max/secret-scan@master
+      with:
+        exclude_path: 'SecretsIgnore.txt'
+  spellcheck:
+    name: Spell Check with Typos
+    runs-on: self-hosted
+    steps:
+    - name: Checkout Actions Repository
+      uses: actions/checkout@v3
+
+    - name: Check spelling
+      uses: crate-ci/typos@master
+  build:
     name: Build Project
     runs-on: self-hosted
     steps:
@@ -23,7 +43,7 @@ jobs:
           token: ${{ secrets.Access_token }}
       - name: Remove TranslationSourceGenerator from Build
         run: dotnet sln remove ../TranslationSourceGenerator/TranslationSourceGenerator.csproj
-        working-directory: ProjectMakoto/ProjectMakoto/
+        working-directory: ProjectMakotoTest/ProjectMakoto/
       - name: Install dependencies
         run: dotnet restore
         working-directory: ProjectMakotoTest/ProjectMakoto/
