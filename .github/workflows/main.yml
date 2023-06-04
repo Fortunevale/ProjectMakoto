@@ -28,6 +28,9 @@ jobs:
           submodules: recursive
           path: ProjectMakoto
           token: ${{ secrets.Access_token }}
+      - name: Remove TranslationSourceGenerator from Build
+        run: dotnet sln remove ../TranslationSourceGenerator/TranslationSourceGenerator.csproj
+        working-directory: ProjectMakoto/ProjectMakoto/
       - name: Install Dependencies
         run: dotnet restore
         working-directory: ProjectMakoto/ProjectMakoto/

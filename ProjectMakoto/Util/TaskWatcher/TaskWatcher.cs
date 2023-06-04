@@ -48,12 +48,12 @@ public class TaskWatcher
                             CommandContext?.Guild?.Id);
                     else if (InteractionContext is not null)
                         _logger.LogInfo("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
-                            InteractionContext?.CommandName,
+                            InteractionContext?.FullCommandName,
                             InteractionContext?.User?.Id,
                             InteractionContext?.Guild?.Id);
                     else if (ContextMenuContext is not null)
                         _logger.LogInfo("Successfully executed '{Name}' for '{User}' on '{Guild}'",
-                            ContextMenuContext?.CommandName,
+                            ContextMenuContext?.FullCommandName,
                             ContextMenuContext?.User?.Id,
                             ContextMenuContext?.Guild?.Id);
 
@@ -75,12 +75,12 @@ public class TaskWatcher
                             CommandContext?.Guild?.Id);
                 else if (InteractionContext != null)
                     _logger.LogError("Failed to execute '/{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            InteractionContext?.CommandName,
+                            InteractionContext?.FullCommandName,
                             InteractionContext?.User?.Id,
                             InteractionContext?.Guild?.Id);
                 else if (ContextMenuContext != null)
                     _logger.LogError("Failed to execute '{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            ContextMenuContext?.CommandName,
+                            ContextMenuContext?.FullCommandName,
                             ContextMenuContext?.User?.Id,
                             ContextMenuContext?.Guild?.Id);
                 else
