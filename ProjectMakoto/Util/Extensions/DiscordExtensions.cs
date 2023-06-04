@@ -89,7 +89,7 @@ internal static class DiscordExtensions
             _ => Bot.loadedTranslations.Common.MissingTranslation,
         };
 
-    internal static string UnicodeToEmoji(this string str)
+    internal static DiscordEmoji UnicodeToEmoji(this string str)
         => DiscordEmoji.FromUnicode(str);
 
     internal static string GetCustomId(this InteractivityResult<ComponentInteractionCreateEventArgs> e)
@@ -133,6 +133,11 @@ internal static class DiscordExtensions
         client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value.ToList() :
         client.GetApplicationCommands().GlobalCommands.ToList())
         .First(x => x.Name == command).Mention;
+
+    internal static IReadOnlyList<DiscordApplicationCommand> GetCommandList(this DiscordClient client, Bot bot)
+        => (bot.status.LoadedConfig.IsDev ?
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value :
+        client.GetApplicationCommands().GlobalCommands);
 
     internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
     {

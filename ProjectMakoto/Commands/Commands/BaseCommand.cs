@@ -149,6 +149,18 @@ public abstract class BaseCommand
             _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", ctx.User.Id, ctx.User.Locale);
         }
 
+        if (ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(ctx.ParentCommandName))
+        {
+            SendDisabledCommandError(ctx.ParentCommandName);
+            return false;
+        }
+
+        if (ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(ctx.CommandName))
+        {
+            SendDisabledCommandError(ctx.CommandName);
+            return false;
+        }
+
         if (!ctx.Channel.IsPrivate)
         {
             if (ctx.Bot.guilds.ContainsKey(ctx.Guild.Id) && !ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && ctx.Bot.guilds[ctx.Guild.Id].CurrentLocale != ctx.Guild.PreferredLocale)
@@ -1161,6 +1173,13 @@ public abstract class BaseCommand
     #endregion
 
     #region ErrorTemplates
+
+    public void SendDisabledCommandError(string disabledCommand)
+        => _ = RespondOrEdit(new DiscordEmbedBuilder()
+        {
+            Description = GetString(t.Commands.Common.Errors.CommandDisabled, true, new TVar("Command", disabledCommand))
+        }.AsError(ctx));
+
     public void SendNoMemberError()
     => _ = RespondOrEdit(new DiscordEmbedBuilder()
     {

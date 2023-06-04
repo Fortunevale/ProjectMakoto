@@ -50,6 +50,7 @@ public class Config
     public class DiscordConfig
     {
         public uint MaxUploadSize = 8388608;
+        public List<string> DisabledCommands = new();
     }
 
     public class ChannelsConfig

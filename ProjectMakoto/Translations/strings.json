@@ -321,6 +321,10 @@
         "NoChannels": {
           "en": "Could not find any fitting channels in your server.",
           "de": "Es konnten keine passenden Kanäle in deinem Server gefunden werden."
+        },
+        "CommandDisabled": {
+          "en": "The command '{Command}' is currently disabled.",
+          "de": "Der Befehl '{Command}' ist aktuell deaktiviert."
         }
       },
       "Prompts": {

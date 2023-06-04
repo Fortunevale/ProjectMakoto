@@ -1254,6 +1254,7 @@ public class Translations
             public errors Errors;
             public class errors
             {
+                public SingleTranslationKey CommandDisabled;
                 public SingleTranslationKey NoChannels;
                 public SingleTranslationKey NoRoles;
                 public SingleTranslationKey UploadInProgress;

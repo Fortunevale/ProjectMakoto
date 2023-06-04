@@ -113,6 +113,7 @@ public class SharedCommandContext
 
         Prefix = "/";
         CommandName = ctx.FullCommandName;
+        ParentCommandName = ctx.CommandName;
 
         Bot = _bot;
 
@@ -196,6 +197,7 @@ public class SharedCommandContext
 
         Prefix = "";
         CommandName = ctx.FullCommandName;
+        ParentCommandName = ctx.CommandName;
 
         Bot = _bot;
 
@@ -239,6 +241,11 @@ public class SharedCommandContext
     /// The name of the command used.
     /// </summary>
     public string CommandName { get; set; }
+    
+    /// <summary>
+    /// The name of the command used.
+    /// </summary>
+    public string ParentCommandName { get; set; }
 
     /// <summary>
     /// What Bot Instance was used to execute this command.

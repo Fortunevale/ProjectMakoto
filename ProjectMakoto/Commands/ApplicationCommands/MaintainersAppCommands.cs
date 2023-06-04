@@ -16,24 +16,25 @@ public class MaintainersAppCommands : ApplicationCommandsModule
     internal enum Commands
     {
         Info,
-        RawGuild,
+        Log,
+        Save,
+        Stop,
         BotNick,
+        Evaluate,
+        CreateIssue,
+        Enroll2FA,
+        Quit2FASession,
+        Disenroll2FAUser,
+        ManageCommands,
+        GlobalBan,
+        GlobalUnban,
+        GlobalNotes,
         BanUser,
         UnbanUser,
         BanGuild,
         UnbanGuild,
-        GlobalBan,
-        GlobalUnban,
-        GlobalNotes,
-        Log,
-        Stop,
-        Save,
         BatchLookup,
-        CreateIssue,
-        Evaluate,
-        Enroll2FA,
-        Quit2FASession,
-        Disenroll2FAUser,
+        RawGuild,
     };
 
     public class MaintainerAutoComplete : IAutocompleteProvider
@@ -443,6 +444,12 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
+                    }).Add(this._bot.watcher, ctx);
+                    break;
+                case Commands.ManageCommands:
+                    Task.Run(async () =>
+                    {
+                        await new CommandManageCommand().ExecuteCommand(ctx, this._bot);
                     }).Add(this._bot.watcher, ctx);
                     break;
             }
