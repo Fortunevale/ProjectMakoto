@@ -9,7 +9,7 @@
   "packageRules": [
     {
       "matchPackagePatterns": [ "DisCatSharp", "discatsharp", "Discatsharp" ],
-      "groupName": "discatsharp"
+      "groupName": "discatsharp",
 	  "automerge": true
     }
   ]
