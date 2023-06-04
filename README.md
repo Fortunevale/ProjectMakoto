@@ -3,7 +3,7 @@
 <p align="center" style="font-weight:bold;">A feature packed discord bot!</p>
 <a href="#getting-makoto" ><p align="center"><img src="ProjectMakoto/Assets/AddToServer.png" width=350 align="center"></p></a>
 
-<p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/build.yml/badge.svg" align="center"> <img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/typos.yml/badge.svg" align="center"></p>
+<p align="center"><img src="https://github.com/Fortunevale/ProjectMakoto/actions/workflows/dev.yml/badge.svg?branch=dev" align="center">
 <p align="center"><img src="https://img.shields.io/github/contributors/Fortunevale/ProjectMakoto" align="center"> <img src="https://img.shields.io/github/issues-raw/Fortunevale/ProjectMakoto" align="center"></p>
 <p align="center"><img src="https://wakatime.com/badge/github/Fortunevale/ProjectMakoto.svg" align="center"></p>
 
