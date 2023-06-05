@@ -630,7 +630,6 @@ public class Bot
                 await Util.Initializers.Plugins.LoadPluginCommands(this, cNext, appCommands);
 
                 _logger.LogInfo("Connecting and authenticating with Discord..");
-                await Task.Delay(2000);
                 await discordClient.ConnectAsync();
 
                 _logger.LogInfo("Connected and authenticated with Discord.");

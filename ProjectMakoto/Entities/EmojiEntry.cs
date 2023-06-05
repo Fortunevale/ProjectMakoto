@@ -12,13 +12,16 @@ namespace ProjectMakoto.Entities;
 internal class EmojiEntry
 {
     public string Name { get; set; }
-    public EmojiType Type { get; set; }
+    public string Description { get; set; }
+    public DiscordEmoji Emoji { get; set; }
+    public StickerFormat StickerFormat { get; set; }
+    public EmojiType EntryType { get; set; }
     public bool Animated { get; set; }
 
     public data Data { get; set; } = new();
     public class data
     {
         public string Name { get; set; }
-        public MemoryStream Stream { get; set; } = new();
+        public Stream Stream { get; set; } = new MemoryStream();
     }
 }

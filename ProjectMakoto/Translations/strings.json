@@ -611,9 +611,13 @@
           "en": "Include Stickers",
           "de": "Sticker beinhalten"
         },
-        "AddToServer": {
+        "AddEmojisToServer": {
           "en": "Add Emoji(s) to Server",
           "de": "Emoji(s) zum Server hinzufügen"
+        },
+        "AddEmojisAndStickerToServer": {
+          "en": "Add Emoji(s) and Sticker(s) to Server",
+          "de": "Emoji(s) und Sticker zum Server hinzufügen"
         },
         "DirectMessageZip": {
           "en": "Direct Message as Zip File",
@@ -627,13 +631,13 @@
           "en": "This chat as Zip File",
           "de": "Dieser Kanal, als Zip Datei"
         },
-        "AddToServerStickerError": {
-          "en": "You cannot add any emoji(s) to the server while including stickers.",
-          "de": "Du kannst keine Emojis zum Server hinzufügen wenn du Sticker beinhaltest."
-        },
-        "AddToServerLoading": {
+        "AddEmojisToServerLoading": {
           "en": "Adding {Min}/{Max} emojis to this server..",
           "de": "Füge {Min}/{Max} Emojis zum Server hinzu.."
+        },
+        "AddStickersToServerLoading": {
+          "en": "Adding {Min}/{Max} stickers to this server..",
+          "de": "Füge {Min}/{Max} Sticker zum Server hinzu.."
         },
         "AddToServerLoadingNotice": {
           "en": "_The bot most likely hit a rate limit. This can take up to an hour to continue._\n_If you want this to change, go scream at Discord. There's nothing i can do._",

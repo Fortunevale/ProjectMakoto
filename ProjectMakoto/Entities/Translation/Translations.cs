@@ -1140,12 +1140,13 @@ public class Translations
                 public SingleTranslationKey SuccessAdded;
                 public SingleTranslationKey NoMoreRoom;
                 public SingleTranslationKey AddToServerLoadingNotice;
-                public SingleTranslationKey AddToServerLoading;
-                public SingleTranslationKey AddToServerStickerError;
+                public SingleTranslationKey AddStickersToServerLoading;
+                public SingleTranslationKey AddEmojisToServerLoading;
                 public SingleTranslationKey CurrentChatZip;
                 public SingleTranslationKey DirectMessageSingle;
                 public SingleTranslationKey DirectMessageZip;
-                public SingleTranslationKey AddToServer;
+                public SingleTranslationKey AddEmojisAndStickerToServer;
+                public SingleTranslationKey AddEmojisToServer;
                 public SingleTranslationKey ToggleStickers;
                 public SingleTranslationKey ReceivePrompt;
                 public SingleTranslationKey NoSuccessfulDownload;
