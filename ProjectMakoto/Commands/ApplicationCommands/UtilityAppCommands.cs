@@ -13,8 +13,35 @@ public class UtilityAppCommands : ApplicationCommandsModule
     public Bot _bot { private get; set; }
 
 
+    public class HelpAutoComplete : IAutocompleteProvider
+    {
+        public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
+        {
+            try
+            {
+                Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+
+                IEnumerable<DiscordApplicationCommand> filteredCommands = bot.discordClient.GetCommandList(bot)
+                    .Where(x => x.Name.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                    .Where(x => x.DefaultMemberPermissions.HasValue ? ctx.Member.Permissions.HasPermission(x.DefaultMemberPermissions.Value) : true)
+                    .Where(x => x.Type == ApplicationCommandType.ChatInput)
+                    .Take(25);
+
+                List<DiscordApplicationCommandAutocompleteChoice> options = filteredCommands
+                    .Select(x => new DiscordApplicationCommandAutocompleteChoice(string.Join("-", x.Name.Split(new string[] { "-", "_" }, StringSplitOptions.None)
+                        .Select(x => x.FirstLetterToUpper())), x.Name))
+                    .ToList();
+                return options.AsEnumerable();
+            }
+            catch (Exception ex)
+            {
+                return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
+            }
+        }
+    }
+
     [SlashCommand("help", "Sends you a list of all available commands, their usage and their description.", dmPermission: false)]
-    public async Task Help(InteractionContext ctx, [Option("command", "The command to show help for")] string command = "") 
+    public async Task Help(InteractionContext ctx, [Option("command", "The command to show help for", true)][Autocomplete(typeof(HelpAutoComplete))] string command = "") 
         => new HelpCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
         { 
             { "command", command }
