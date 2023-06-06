@@ -29,7 +29,7 @@ internal class ReminderEvents
             if (privateButtonType != PrivateButtonType.ReminderSnooze)
                 return;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return;
         }

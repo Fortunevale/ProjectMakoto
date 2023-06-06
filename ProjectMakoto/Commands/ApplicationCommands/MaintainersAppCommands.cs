@@ -55,7 +55,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                     .Select(x => new DiscordApplicationCommandAutocompleteChoice(x, x)).ToList();
                 return options.AsEnumerable();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
             }
@@ -171,7 +171,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
                 return new List<DiscordApplicationCommandAutocompleteChoice>() { };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
             }
