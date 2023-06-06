@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class CrosspostEvents
+internal sealed class CrosspostEvents
 {
     internal CrosspostEvents(Bot _bot)
     {

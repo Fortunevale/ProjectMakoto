@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class TimeoutCommand : BaseCommand
+internal sealed class TimeoutCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ModerateMembers) && await CheckOwnPermissions(Permissions.ModerateMembers));
 

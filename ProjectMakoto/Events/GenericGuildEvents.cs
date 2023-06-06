@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class GenericGuildEvents
+internal sealed class GenericGuildEvents
 {
     internal GenericGuildEvents(Bot _bot)
     {

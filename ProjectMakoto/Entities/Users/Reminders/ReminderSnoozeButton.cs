@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace ProjectMakoto.Entities;
 
 [JsonConverter(typeof(ReminderSnoozeMinifiedSerializer))]
-public class ReminderSnoozeButton
+public sealed class ReminderSnoozeButton
 {
     public PrivateButtonType Type
         => PrivateButtonType.ReminderSnooze;

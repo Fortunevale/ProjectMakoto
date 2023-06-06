@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.ExperienceCommand;
 
-internal class ExperienceCommandAbstractions
+internal sealed class ExperienceCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

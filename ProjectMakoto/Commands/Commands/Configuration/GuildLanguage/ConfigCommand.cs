@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.GuildLanguage;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 

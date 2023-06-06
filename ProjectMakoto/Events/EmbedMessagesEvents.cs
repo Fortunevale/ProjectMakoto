@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class EmbedMessagesEvents
+internal sealed class EmbedMessagesEvents
 {
     internal EmbedMessagesEvents(Bot _bot)
     {

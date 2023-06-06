@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal class PhishingUrlUpdater
+internal sealed class PhishingUrlUpdater
 {
     internal PhishingUrlUpdater(Bot _bot)
     {

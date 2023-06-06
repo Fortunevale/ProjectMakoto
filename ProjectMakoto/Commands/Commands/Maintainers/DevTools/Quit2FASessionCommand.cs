@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class Quit2FASessionCommand : BaseCommand
+internal sealed class Quit2FASessionCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) 
         => await CheckMaintenance();

@@ -8,12 +8,12 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.ApplicationCommands;
-public class UtilityAppCommands : ApplicationCommandsModule
+public sealed class UtilityAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
 
-    public class HelpAutoComplete : IAutocompleteProvider
+    public sealed class HelpAutoComplete : IAutocompleteProvider
     {
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
@@ -124,7 +124,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
         }).Add(this._bot.watcher, ctx);
 
     [SlashCommandGroup("data", "Allows you to request or manage your user data.", dmPermission: false)]
-    public class Data : ApplicationCommandsModule
+    public sealed class Data : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -150,7 +150,7 @@ public class UtilityAppCommands : ApplicationCommandsModule
         => new CreditsCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
     [SlashCommandGroup("vcc", "Allows you to modify your own voice channel.", dmPermission: false)]
-    public class VcCreatorManagement : ApplicationCommandsModule
+    public sealed class VcCreatorManagement : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 

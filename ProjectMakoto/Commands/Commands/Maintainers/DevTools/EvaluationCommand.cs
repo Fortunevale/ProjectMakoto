@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.Scripting;
 
 namespace ProjectMakoto.Commands;
 
-internal class EvaluationCommand : BaseCommand
+internal sealed class EvaluationCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckBotOwner();
 

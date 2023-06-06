@@ -9,9 +9,11 @@
 
 namespace ProjectMakoto.Util;
 
-internal class ThreadJoinClient
+public sealed class ThreadJoinClient
 {
-    public static ThreadJoinClient Initialize()
+    internal ThreadJoinClient() { }
+
+    internal static ThreadJoinClient Initialize()
     {
         ThreadJoinClient threadJoinClient = new();
         _ = threadJoinClient.QueueHandler();

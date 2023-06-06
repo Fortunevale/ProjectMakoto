@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ReminderSettings
+public sealed class ReminderSettings
 {
     public ReminderSettings(User user, Bot bot)
     {

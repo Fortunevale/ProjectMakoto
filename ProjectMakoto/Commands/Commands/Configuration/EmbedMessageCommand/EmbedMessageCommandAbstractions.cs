@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.EmbedMessageCommand;
 
-internal class EmbedMessageCommandAbstractions
+internal sealed class EmbedMessageCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public class MultiTranslationKey : IDictionary<string, string[]>
+public sealed class MultiTranslationKey : IDictionary<string, string[]>
 {
     public Dictionary<string, string[]> t { get; set; } = new();
 

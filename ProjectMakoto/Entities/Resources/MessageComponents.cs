@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-internal class MessageComponents
+internal sealed class MessageComponents
 {
     public static DiscordButtonComponent GetCancelButton(User user, Bot _bot)
         => new(ButtonStyle.Secondary, "cancel", _bot.loadedTranslations.Common.Cancel.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));

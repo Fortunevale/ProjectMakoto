@@ -22,8 +22,11 @@ public abstract class BasePlugin
     internal FileInfo LoadedFile { get; set; }
 
     public Bot _bot { get; set; }
+
+    /// <summary>
+    /// Allows you to log events.
+    /// </summary>
     public PluginLoggerClient _logger { get; set; }
-    public ApplicationCommandsExtension DiscordCommandsModule { get; set; }
     
     /// <summary>
     /// Whether the client logged into discord.
@@ -101,8 +104,6 @@ public abstract class BasePlugin
             {
                 await Task.Delay(1000);
             }
-
-            this.DiscordCommandsModule = bot.discordClient.GetApplicationCommands();
         });
     }
 
@@ -164,11 +165,11 @@ public abstract class BasePlugin
 
             if ((int)latestVersion > (int)currentVersion)
             {
-                _logger.LogWarn("Plugin '{PluginName}' has an update available. The installed version is '{CurrentVersion}' and the latest version is '{LatestVersion}'.", this.Name, currentVersion, latestVersion);
+                _logger.LogWarn("Update found. The installed version is '{CurrentVersion}' and the latest version is '{LatestVersion}'.", currentVersion, latestVersion);
 
                 if (UpdateUrlCredentials is not null)
                 {
-                    _logger.LogInfo("Plugin '{PluginName}' has a private repository. Downloading latest version to 'UpdatedPlugins' Directory..", this.Name);
+                    _logger.LogInfo("Private repository detected. Downloading latest version to 'UpdatedPlugins' Directory..");
                     Directory.CreateDirectory("UpdatedPlugins");
                     HttpClient downloadClient = new();
 
@@ -182,17 +183,17 @@ public abstract class BasePlugin
                 }
                 else
                 {
-                    _logger.LogWarn("You can find the update for '{PluginName}' at '{LatestReleaseUrl}'", this.Name, release.HtmlUrl);
+                    _logger.LogWarn("You can download the update at '{LatestReleaseUrl}'", release.HtmlUrl);
                 }
             }
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            _logger.LogError("The repository of '{PluginName}' could not be found at '{RepoUrl}', the repo is private or the credentials are outdated.", this.Name, this.UpdateUrl);
+            _logger.LogError("The repository could not be found at '{RepoUrl}', is the repo private, the credentials outdated or no release published?", this.UpdateUrl);
         }
         catch (Exception ex)
         {
-            _logger.LogError("Could not check for a new version of '{PluginName}'", ex, this.Name);
+            _logger.LogError("Could not check for a new version", ex);
         }
     }
 }

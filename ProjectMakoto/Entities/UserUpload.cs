@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class UserUpload
+internal sealed class UserUpload
 {
     public bool InteractionHandled { get; set; } = false;
     public DateTime TimeOut { get; set; } = DateTime.Now;

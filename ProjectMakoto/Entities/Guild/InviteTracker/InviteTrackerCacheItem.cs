@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InviteTrackerCacheItem
+public sealed class InviteTrackerCacheItem
 {
     public ulong CreatorId { get; set; }
     public string Code { get; set; }

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class CrosspostRatelimit
+public sealed class CrosspostRatelimit
 {
     public DateTime FirstPost { get; set; } = DateTime.MinValue;
 

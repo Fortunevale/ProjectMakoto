@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ExperienceUserSettings
+public sealed class ExperienceUserSettings
 {
     public ExperienceUserSettings(User user)
     {

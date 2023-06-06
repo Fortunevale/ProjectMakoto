@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto;
 
-public class PhishingUrlEntry
+public sealed class PhishingUrlEntry
 {
     public string Url { get; set; } = "";
     public List<string> Origin { get; set; } = new();

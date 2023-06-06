@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InviteNotesSettings
+public sealed class InviteNotesSettings
 {
     public InviteNotesSettings(Guild guild)
     {

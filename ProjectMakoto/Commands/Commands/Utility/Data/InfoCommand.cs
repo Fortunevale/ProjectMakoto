@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Data;
 
-internal class InfoCommand : BaseCommand
+internal sealed class InfoCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

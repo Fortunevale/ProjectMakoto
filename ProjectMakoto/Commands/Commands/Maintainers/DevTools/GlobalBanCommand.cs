@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands;
-internal class GlobalBanCommand : BaseCommand
+internal sealed class GlobalBanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

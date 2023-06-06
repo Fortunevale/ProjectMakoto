@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ActionLogSettings
+public sealed class ActionLogSettings
 {
     public ActionLogSettings(Guild guild)
     {

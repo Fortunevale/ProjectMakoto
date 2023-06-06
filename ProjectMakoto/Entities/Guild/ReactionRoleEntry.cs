@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ReactionRoleEntry
+public sealed class ReactionRoleEntry
 {
     public string UUID = Guid.NewGuid().ToString();
     public ulong EmojiId { get; set; }

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class BigInt : BaseColumn
+public sealed class BigInt : BaseColumn
 {
     public BigInt(long MaxValue = 9223372036854775807)
     {

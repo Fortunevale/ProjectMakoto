@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Playlists;
 
-internal class ShareCommand : BaseCommand
+internal sealed class ShareCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

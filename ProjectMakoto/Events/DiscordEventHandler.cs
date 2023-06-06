@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class DiscordEventHandler
+internal sealed class DiscordEventHandler
 {
     private DiscordEventHandler() { }
 

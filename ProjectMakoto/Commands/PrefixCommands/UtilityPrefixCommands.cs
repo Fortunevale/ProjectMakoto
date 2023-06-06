@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.PrefixCommands;
 
-public class UtilityPrefixCommands : BaseCommandModule
+public sealed class UtilityPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
@@ -160,7 +160,7 @@ public class UtilityPrefixCommands : BaseCommandModule
     [Group("data"),
     CommandModule("utility"),
     Description("Allows you to request or manage your user data.")]
-    public class Join : BaseCommandModule
+    public sealed class Join : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -201,7 +201,7 @@ public class UtilityPrefixCommands : BaseCommandModule
     [Group("vcc"),
     CommandModule("utility"),
     Description("Allows you to modify your own voice channel.")]
-    public class VcCreatorManagement : BaseCommandModule
+    public sealed class VcCreatorManagement : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 

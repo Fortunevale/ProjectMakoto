@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.PrefixCommands;
 
-public class SocialPrefixCommands : BaseCommandModule
+public sealed class SocialPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 

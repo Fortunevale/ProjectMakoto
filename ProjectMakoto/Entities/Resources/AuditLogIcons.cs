@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class AuditLogIcons
+internal sealed class AuditLogIcons
 {
     public static readonly string QuestionMark = "https://media.discordapp.net/attachments/1005430437952356423/1006675199577567262/QuestionMark.png";
 

@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.Util;
 
-internal class AbuseIpDbClient
+public sealed class AbuseIpDbClient
 {
-    public AbuseIpDbClient(Bot bot)
+    internal AbuseIpDbClient(Bot bot)
     {
         this._bot = bot;
         _ = this.QueueHandler();

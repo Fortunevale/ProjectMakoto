@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class MessageDetails
+public sealed class MessageDetails
 {
     private ulong _MessageId { get; set; } = 0;
     public ulong MessageId { get => _MessageId; set { _MessageId = value; } }

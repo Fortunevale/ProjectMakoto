@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-public class PrefixSettings
+public sealed class PrefixSettings
 {
     public PrefixSettings(Guild guild)
     {

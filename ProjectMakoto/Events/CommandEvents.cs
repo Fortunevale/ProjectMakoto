@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class CommandEvents
+internal sealed class CommandEvents
 {
     internal CommandEvents(Bot _bot)
     {

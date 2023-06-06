@@ -19,7 +19,7 @@ using Microsoft.CodeAnalysis.Emit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class PluginLoader
+internal sealed class PluginLoader
 {
     private static string CachedUsings = "";
 
@@ -48,7 +48,7 @@ internal class PluginLoader
                         count++;
                         BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
                         result.LoadedFile = new FileInfo(pluginPath);
-                        _bot.Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                        _bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
                     }
                 }
 
@@ -133,7 +133,7 @@ internal class PluginLoader
                 Dictionary<Assembly, string> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
-                _bot.PluginCommands.Add(plugin.Key, pluginCommands.ToList());
+                _bot._PluginCommands.Add(plugin.Key, pluginCommands.ToList());
 
                 if (_bot.status.LoadedConfig.PluginCache.TryGetValue(plugin.Key, out var pluginInfo) &&
                     pluginHash == pluginInfo.LastKnownHash &&
@@ -187,7 +187,7 @@ internal class PluginLoader
                                 {{classUsings}}
 
                                 [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
                                 {
                                     public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -234,7 +234,7 @@ internal class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
                                 {
                                     public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -256,10 +256,10 @@ internal class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                 {
                                     [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}"{{(rawCommand.RequiredPermissions is null ? "" : $", {(long)rawCommand.RequiredPermissions}")}}, dmPermission: {{rawCommand.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{rawCommand.IsNsfw.ToString().ToLower()}})]
-                                    public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                    public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                     {
                                         public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -290,7 +290,7 @@ internal class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                 {
                                     public {{nameof(Bot)}} _bot { private get; set; }
 

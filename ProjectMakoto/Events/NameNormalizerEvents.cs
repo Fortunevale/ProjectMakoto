@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class NameNormalizerEvents
+internal sealed class NameNormalizerEvents
 {
     internal NameNormalizerEvents(Bot _bot)
     {

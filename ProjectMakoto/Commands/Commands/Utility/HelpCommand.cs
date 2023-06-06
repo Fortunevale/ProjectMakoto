@@ -11,7 +11,7 @@ using CommandType = ProjectMakoto.Enums.CommandType;
 
 namespace ProjectMakoto.Commands;
 
-internal class HelpCommand : BaseCommand
+internal sealed class HelpCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

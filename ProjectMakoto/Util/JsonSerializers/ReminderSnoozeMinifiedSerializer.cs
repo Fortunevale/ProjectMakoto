@@ -10,7 +10,7 @@
 using Newtonsoft.Json.Linq;
 
 namespace ProjectMakoto.Util.JsonSerializers;
-public class ReminderSnoozeMinifiedSerializer : JsonConverter
+public sealed class ReminderSnoozeMinifiedSerializer : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {

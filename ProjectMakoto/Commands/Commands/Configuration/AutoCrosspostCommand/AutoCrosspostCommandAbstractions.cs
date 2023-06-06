@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.AutoCrosspostCommand;
 
-internal class AutoCrosspostCommandAbstractions
+internal sealed class AutoCrosspostCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

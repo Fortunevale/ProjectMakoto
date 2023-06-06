@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.InviteNotesCommand;
 
-internal class InviteNotesCommandAbstractions
+internal sealed class InviteNotesCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

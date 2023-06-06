@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class PhishingDetectionSettings
+public sealed class PhishingDetectionSettings
 {
     public PhishingDetectionSettings(Guild guild)
     {

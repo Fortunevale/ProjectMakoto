@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-public class Log
+public sealed class Log
 {
     public static LoggerClient _logger { get; set; }
 }

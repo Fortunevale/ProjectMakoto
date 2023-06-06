@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InVoiceTextPrivacySettings
+public sealed class InVoiceTextPrivacySettings
 {
     public InVoiceTextPrivacySettings(Guild guild)
     {

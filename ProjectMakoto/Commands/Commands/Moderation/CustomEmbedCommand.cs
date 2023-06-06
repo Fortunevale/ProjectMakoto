@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class CustomEmbedCommand : BaseCommand
+internal sealed class CustomEmbedCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.EmbedLinks));
 

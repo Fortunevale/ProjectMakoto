@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Member
+public sealed class Member
 {
     public Member(Guild guild, ulong member)
     {

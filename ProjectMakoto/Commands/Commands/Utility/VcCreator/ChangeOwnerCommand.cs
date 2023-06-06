@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.VcCreator;
 
-internal class ChangeOwnerCommand : BaseCommand
+internal sealed class ChangeOwnerCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

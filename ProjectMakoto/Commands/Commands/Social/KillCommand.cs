@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class KillCommand : BaseCommand
+internal sealed class KillCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

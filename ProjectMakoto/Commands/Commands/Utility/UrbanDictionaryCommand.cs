@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class UrbanDictionaryCommand : BaseCommand
+internal sealed class UrbanDictionaryCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

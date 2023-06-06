@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class ListLoader
+internal sealed class ListLoader
 {
     public static async Task Load(Bot bot)
     {
@@ -22,7 +22,7 @@ internal class ListLoader
         List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Countries.json"));
         foreach (var b in cc)
         {
-            bot.countryCodes.List.Add(b[2], new CountryCodes.CountryInfo
+            bot.countryCodes._List.Add(b[2], new CountryCodes.CountryInfo
             {
                 Name = b[0],
                 ContinentCode = b[1],
@@ -46,7 +46,7 @@ internal class ListLoader
         List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
         foreach (var b in lc)
         {
-            bot.languageCodes.List.Add(new LanguageCodes.LanguageInfo
+            bot.languageCodes._List.Add(new LanguageCodes.LanguageInfo
             {
                 Code = b[0],
                 Name = b[1],

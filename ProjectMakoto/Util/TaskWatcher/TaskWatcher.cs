@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.Util;
 
-public class TaskWatcher
+public sealed class TaskWatcher
 {
-    public TaskWatcher()
+    internal TaskWatcher()
     {
         this.Watcher();
     }

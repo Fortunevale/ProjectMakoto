@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class KickCommand : BaseCommand
+internal sealed class KickCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.KickMembers) && await CheckOwnPermissions(Permissions.KickMembers));
 

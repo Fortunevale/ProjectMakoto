@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.NameNormalizerCommand;
 
-internal class NameNormalizerCommandAbstractions
+internal sealed class NameNormalizerCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Plugins.Commands;
 
-public class BasePluginCommand
+public sealed class BasePluginCommand
 {
     private BasePluginCommand() { }
 

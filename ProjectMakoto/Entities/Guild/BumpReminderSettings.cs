@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class BumpReminderSettings
+public sealed class BumpReminderSettings
 {
     public BumpReminderSettings(Guild guild)
     {

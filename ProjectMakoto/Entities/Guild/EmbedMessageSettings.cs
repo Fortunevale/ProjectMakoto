@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class EmbedMessageSettings
+public sealed class EmbedMessageSettings
 {
     public EmbedMessageSettings(Guild guild)
     {

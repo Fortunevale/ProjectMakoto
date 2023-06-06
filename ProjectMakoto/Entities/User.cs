@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class User
+public sealed class User
 {
     public User(Bot _bot, ulong userId)
     {

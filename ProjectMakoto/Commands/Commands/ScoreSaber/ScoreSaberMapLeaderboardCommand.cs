@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ScoreSaberMapLeaderboardCommand : BaseCommand
+internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Playlists;
 
-internal class ExportCommand : BaseCommand
+internal sealed class ExportCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

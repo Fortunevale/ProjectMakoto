@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class BatchLookupCommand : BaseCommand
+internal sealed class BatchLookupCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

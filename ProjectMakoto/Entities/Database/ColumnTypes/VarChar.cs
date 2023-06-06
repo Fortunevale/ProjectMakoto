@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class VarChar : BaseColumn
+public sealed class VarChar : BaseColumn
 {
     public VarChar(long MaxLength = 65535)
     {

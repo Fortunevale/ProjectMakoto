@@ -11,7 +11,7 @@ using Octokit;
 
 namespace ProjectMakoto.Commands;
 
-internal class CreateIssueCommand : BaseCommand
+internal sealed class CreateIssueCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckMaintenance() && await CheckSource(Enums.CommandType.ApplicationCommand));
 

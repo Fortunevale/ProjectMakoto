@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class InviteNoteEvents
+internal sealed class InviteNoteEvents
 {
     internal InviteNoteEvents(Bot _bot)
     {

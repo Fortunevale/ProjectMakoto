@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class LevelRewardEntry
+public sealed class LevelRewardEntry
 {
     public long Level { get; set; }
     public ulong RoleId { get; set; }

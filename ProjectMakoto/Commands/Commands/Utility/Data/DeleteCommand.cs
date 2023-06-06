@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Data;
 
-internal class DeleteCommand : BaseCommand
+internal sealed class DeleteCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

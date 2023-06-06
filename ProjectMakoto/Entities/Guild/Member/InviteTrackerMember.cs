@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InviteTrackerMember
+public sealed class InviteTrackerMember
 {
     public InviteTrackerMember(Member member)
     {

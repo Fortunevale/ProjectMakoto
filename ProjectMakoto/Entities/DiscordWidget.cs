@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class DiscordWidget
+internal sealed class DiscordWidget
 {
     public string id { get; set; }
     public string name { get; set; }
@@ -18,7 +18,7 @@ internal class DiscordWidget
     public Member[] members { get; set; }
     public int presence_count { get; set; }
 
-    public class Member
+    public sealed class Member
     {
         public string id { get; set; }
         public string username { get; set; }
@@ -29,7 +29,7 @@ internal class DiscordWidget
         public Game game { get; set; }
     }
 
-    public class Game
+    public sealed class Game
     {
         public string name { get; set; }
     }

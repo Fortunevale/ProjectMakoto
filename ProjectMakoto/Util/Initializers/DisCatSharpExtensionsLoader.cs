@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class DisCatSharpExtensionsLoader
+internal sealed class DisCatSharpExtensionsLoader
 {
     public static async Task Load(Bot bot, string[] args)
     {

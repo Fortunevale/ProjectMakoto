@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.VcCreator;
 
-internal class InviteCommand : BaseCommand
+internal sealed class InviteCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

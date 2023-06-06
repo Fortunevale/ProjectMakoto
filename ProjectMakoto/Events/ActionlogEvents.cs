@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class ActionlogEvents
+internal sealed class ActionlogEvents
 {
     internal ActionlogEvents(Bot _bot)
     {

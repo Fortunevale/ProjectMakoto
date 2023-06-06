@@ -8,12 +8,12 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.ApplicationCommands;
-public class ConfigurationAppCommands : ApplicationCommandsModule
+public sealed class ConfigurationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
     [SlashCommandGroup("join", "Allows you to review and change settings in the event somebody joins the server.", (long)Permissions.Administrator, dmPermission: false)]
-    public class Join : ApplicationCommandsModule
+    public sealed class Join : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -27,7 +27,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("experience", "Allows you to review and change settings related to experience.", (long)Permissions.Administrator, dmPermission: false)]
-    public class Experience : ApplicationCommandsModule
+    public sealed class Experience : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -41,7 +41,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("levelrewards", "Allows you to review, add and change Level Rewards.", (long)Permissions.Administrator, dmPermission: false)]
-    public class LevelRewards : ApplicationCommandsModule
+    public sealed class LevelRewards : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -55,7 +55,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("phishing", "Allows you to review and change settings related to phishing link protection.", (long)Permissions.Administrator, dmPermission: false)]
-    public class PhishingSettings : ApplicationCommandsModule
+    public sealed class PhishingSettings : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -69,7 +69,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("bumpreminder", "Allows you to review, set up and change settings related to the Bump Reminder.", (long)Permissions.Administrator, dmPermission: false)]
-    public class BumpReminder : ApplicationCommandsModule
+    public sealed class BumpReminder : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -83,7 +83,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("actionlog", "Allows you to review and change settings related to the actionlog.", (long)Permissions.Administrator, dmPermission: false)]
-    public class ActionLog : ApplicationCommandsModule
+    public sealed class ActionLog : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -97,7 +97,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("autocrosspost", "Allows you to review and change settings related to automatic crossposting.", (long)Permissions.Administrator, dmPermission: false)]
-    public class AutoCrosspost : ApplicationCommandsModule
+    public sealed class AutoCrosspost : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -111,7 +111,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("reactionroles", "Allows you to review and change settings related to Reaction Roles.", (long)Permissions.Administrator, dmPermission: false)]
-    public class ReactionRoles : ApplicationCommandsModule
+    public sealed class ReactionRoles : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -137,7 +137,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
         => new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> { { "message", ctx.TargetMessage }, }).Add(_bot.watcher, ctx);
 
     [SlashCommandGroup("invoiceprivacy", "Allows you to review and change settings related to In-Voice Text Channel Privacy.", (long)Permissions.Administrator, dmPermission: false)]
-    public class InVoiceTextPrivacy : ApplicationCommandsModule
+    public sealed class InVoiceTextPrivacy : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -151,7 +151,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("invitetracker", "Allows you to review and change settings related to Invite Tracking.", (long)Permissions.Administrator, dmPermission: false)]
-    public class InviteTracker : ApplicationCommandsModule
+    public sealed class InviteTracker : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -165,7 +165,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("namenormalizer", "Allows you to review and change settings related to automatic name normalization.", (long)Permissions.Administrator, dmPermission: false)]
-    public class NameNormalizer : ApplicationCommandsModule
+    public sealed class NameNormalizer : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -179,7 +179,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("autounarchive", "Allows you to review and change settings related to automatic thread unarchiving.", (long)Permissions.Administrator, dmPermission: false)]
-    public class AutoUnarchive : ApplicationCommandsModule
+    public sealed class AutoUnarchive : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -193,7 +193,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
     
     [SlashCommandGroup("embedmessages", "Allows you to review and change settings related to automatic message embedding.", (long)Permissions.Administrator, dmPermission: false)]
-    public class MessageEmbedding : ApplicationCommandsModule
+    public sealed class MessageEmbedding : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -207,7 +207,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("tokendetection", "Allows you to review and change settings related to automatic token invalidation.", (long)Permissions.Administrator, dmPermission: false)]
-    public class TokenDetection : ApplicationCommandsModule
+    public sealed class TokenDetection : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -221,7 +221,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("invitenotes", "Allows you to add notes to invite codes.", (long)Permissions.Administrator, dmPermission: false)]
-    public class InviteNotes : ApplicationCommandsModule
+    public sealed class InviteNotes : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -235,7 +235,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("vccreator", "Allows you to review and change settings related to the Voice Channel Creator.", (long)Permissions.Administrator, dmPermission: false)]
-    public class VcCreator : ApplicationCommandsModule
+    public sealed class VcCreator : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -249,7 +249,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("guild-language", "Allows you to review and change settings related to the guild's selected language.", (long)Permissions.Administrator, dmPermission: false)]
-    public class GuildLanguage : ApplicationCommandsModule
+    public sealed class GuildLanguage : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
@@ -263,7 +263,7 @@ public class ConfigurationAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("guild-prefix", "Allows you to review and change settings related to the guild's prefix.", (long)Permissions.Administrator, dmPermission: false)]
-    public class GuildPrefix : ApplicationCommandsModule
+    public sealed class GuildPrefix : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 

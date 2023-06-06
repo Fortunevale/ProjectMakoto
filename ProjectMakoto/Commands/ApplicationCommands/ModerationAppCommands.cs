@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.ApplicationCommands;
-public class ModerationAppCommands : ApplicationCommandsModule
+public sealed class ModerationAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class PlaylistEntry
+public sealed class PlaylistEntry
 {
     private string _Title { get; set; }
     [JsonProperty(Required = Required.Always)]

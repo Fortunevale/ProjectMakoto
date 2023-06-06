@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class PhishingProtectionEvents
+internal sealed class PhishingProtectionEvents
 {
     internal PhishingProtectionEvents(Bot _bot)
     {

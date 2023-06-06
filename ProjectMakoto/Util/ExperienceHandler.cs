@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Util;
 
-internal class ExperienceHandler
+internal sealed class ExperienceHandler
 {
     internal ExperienceHandler(Bot _bot)
     {

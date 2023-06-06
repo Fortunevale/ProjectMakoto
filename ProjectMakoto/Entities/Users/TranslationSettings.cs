@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class TranslationSettings
+public sealed class TranslationSettings
 {
     public TranslationSettings(User user)
     {

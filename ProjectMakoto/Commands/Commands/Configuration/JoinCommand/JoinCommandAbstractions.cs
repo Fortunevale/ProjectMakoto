@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.JoinCommand;
 
-internal class JoinCommandAbstractions
+internal sealed class JoinCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

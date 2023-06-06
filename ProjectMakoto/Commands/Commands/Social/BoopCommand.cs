@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class BoopCommand : BaseCommand
+internal sealed class BoopCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

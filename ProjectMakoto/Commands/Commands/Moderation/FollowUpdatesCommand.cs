@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class FollowUpdatesCommand : BaseCommand
+internal sealed class FollowUpdatesCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageWebhooks) && await CheckOwnPermissions(Permissions.ManageWebhooks));
 

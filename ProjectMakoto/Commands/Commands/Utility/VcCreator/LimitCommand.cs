@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.VcCreator;
 
-internal class LimitCommand : BaseCommand
+internal sealed class LimitCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

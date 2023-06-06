@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Plugins;
 
-public class SemVer
+public sealed class SemVer
 {
     public SemVer(int major, int minor, int patch) 
     {

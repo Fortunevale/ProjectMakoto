@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto;
 
-internal class VoicePrivacyEvents
+internal sealed class VoicePrivacyEvents
 {
     internal VoicePrivacyEvents(Bot _bot)
     {

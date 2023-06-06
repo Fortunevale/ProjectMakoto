@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ScoreSaberProfileCommand : BaseCommand
+internal sealed class ScoreSaberProfileCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

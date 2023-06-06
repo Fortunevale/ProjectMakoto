@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class AfkStatus
+public sealed class AfkStatus
 {
     public AfkStatus(User user)
     {

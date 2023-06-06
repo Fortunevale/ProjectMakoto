@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class GlobalUnbanCommand : BaseCommand
+internal sealed class GlobalUnbanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

@@ -11,7 +11,7 @@ using ProjectMakoto.Entities.SystemMonitor;
 
 namespace ProjectMakoto.Util.SystemMonitor;
 
-internal class MonitorClient
+public sealed class MonitorClient
 {
     internal MonitorClient(Bot bot)
     {
@@ -21,12 +21,12 @@ internal class MonitorClient
         this.InitializeMonitor();
     }
 
-    internal IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
+    public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
         return History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
     
-    internal async Task<SystemInfo> GetCurrent()
+    public async Task<SystemInfo> GetCurrent()
     {
         return await ReadSystemInfoAsync();
     }

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
-internal class AddCommand : BaseCommand
+internal sealed class AddCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 

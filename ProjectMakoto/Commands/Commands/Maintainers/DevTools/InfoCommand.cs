@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class InfoCommand : BaseCommand
+internal sealed class InfoCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

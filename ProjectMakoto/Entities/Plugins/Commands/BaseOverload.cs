@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities.Plugins.Commands;
-public class BaseOverload
+public sealed class BaseOverload
 {
     /// <summary>
     /// Creates a new required overload for a command.

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class AutoUnarchiveEvents
+internal sealed class AutoUnarchiveEvents
 {
     internal AutoUnarchiveEvents(Bot _bot)
     {

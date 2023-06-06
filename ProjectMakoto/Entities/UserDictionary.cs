@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public class UserDictionary : IDictionary<ulong, User>
+public sealed class UserDictionary : IDictionary<ulong, User>
 {
     public UserDictionary(Bot _bot)
     {

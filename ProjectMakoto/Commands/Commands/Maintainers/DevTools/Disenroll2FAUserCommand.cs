@@ -11,7 +11,7 @@ using DisCatSharp.Extensions.TwoFactorCommands.Enums;
 
 namespace ProjectMakoto.Commands;
 
-internal class Disenroll2FAUserCommand : BaseCommand
+internal sealed class Disenroll2FAUserCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) 
         => await CheckMaintenance() && await CheckBotOwner();

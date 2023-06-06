@@ -9,10 +9,10 @@
 
 namespace ProjectMakoto.ApplicationCommands;
 
-public class ScoreSaberAppCommands : ApplicationCommandsModule
+public sealed class ScoreSaberAppCommands : ApplicationCommandsModule
 {
     [SlashCommandGroup("scoresaber", "Interact with the ScoreSaber API.", dmPermission: false)]
-    public class ScoreSaberGroup : ApplicationCommandsModule
+    public sealed class ScoreSaberGroup : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 

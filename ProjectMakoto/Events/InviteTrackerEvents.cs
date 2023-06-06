@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class InviteTrackerEvents
+internal sealed class InviteTrackerEvents
 {
     internal InviteTrackerEvents(Bot _bot)
     {

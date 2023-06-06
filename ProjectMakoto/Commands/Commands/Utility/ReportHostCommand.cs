@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ReportHostCommand : BaseCommand
+internal sealed class ReportHostCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

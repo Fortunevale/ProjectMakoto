@@ -9,14 +9,14 @@
 
 namespace ProjectMakoto.Util;
 
-public class MemoryMetrics
+public sealed class MemoryMetrics
 {
     public double Total;
     public double Used;
     public double Free;
 }
 
-public class MemoryMetricsClient
+public sealed class MemoryMetricsClient
 {
     public static MemoryMetrics GetMetrics() 
         => IsUnix() ? GetUnixMetrics() : GetWindowsMetrics();

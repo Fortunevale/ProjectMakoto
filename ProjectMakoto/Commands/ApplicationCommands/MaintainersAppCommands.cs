@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.ApplicationCommands;
 
-public class MaintainersAppCommands : ApplicationCommandsModule
+public sealed class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
@@ -37,7 +37,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         RawGuild,
     };
 
-    public class MaintainerAutoComplete : IAutocompleteProvider
+    public sealed class MaintainerAutoComplete : IAutocompleteProvider
     {
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
@@ -62,7 +62,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
         }
     }
 
-    public class ArgumentAutoComplete : IAutocompleteProvider
+    public sealed class ArgumentAutoComplete : IAutocompleteProvider
     {
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
@@ -463,7 +463,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
 #if DEBUG
     [SlashCommandGroup("debug", "Debug commands, only registered in this server.")]
-    public class Debug : ApplicationCommandsModule
+    public sealed class Debug : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 

@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.Plugins;
-internal class PluginLoadContext : AssemblyLoadContext
+internal sealed class PluginLoadContext : AssemblyLoadContext
 {
     private AssemblyDependencyResolver _resolver;
 

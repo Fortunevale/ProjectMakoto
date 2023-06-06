@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class ReactionRoleEvents
+internal sealed class ReactionRoleEvents
 {
     internal ReactionRoleEvents(Bot _bot)
     {

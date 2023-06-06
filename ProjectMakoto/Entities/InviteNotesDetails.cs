@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InviteNotesDetails
+public sealed class InviteNotesDetails
 {
     public string Invite { get; set; }
 

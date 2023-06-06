@@ -7,32 +7,36 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using Microsoft.Extensions.Logging;
 using Octokit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto;
 
-public class Bot
+public sealed class Bot
 {
     #region Clients
 
     internal static DatabaseClient DatabaseClient { get; set; }
-    internal DatabaseClient databaseClient
+    public DatabaseClient databaseClient
         => Bot.DatabaseClient;
 
-    internal DiscordClient discordClient;
+    public DiscordClient discordClient { get; internal set; }
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
     internal ScoreSaberClient scoreSaberClient { get; set; }
-    internal GoogleTranslateClient translationClient { get; set; }
-    internal ThreadJoinClient threadJoinClient { get; set; }
-    internal AbuseIpDbClient abuseIpDbClient { get; set; }
-    internal MonitorClient monitorClient { get; set; }
+    public GoogleTranslateClient translationClient { get; internal set; }
+    public ThreadJoinClient threadJoinClient { get; internal set; }
+    public AbuseIpDbClient abuseIpDbClient { get; internal set; }
+    public MonitorClient monitorClient { get; internal set; }
     internal GitHubClient githubClient { get; set; }
 
-    public Dictionary<string, BasePlugin> Plugins { get; set; } = new();
-    public Dictionary<string, List<BasePluginCommand>> PluginCommands { get; set; } = new();
+    public IReadOnlyDictionary<string, BasePlugin> Plugins
+        => _Plugins.AsReadOnly();
+    internal Dictionary<string, BasePlugin> _Plugins { get; set; } = new();
+
+    public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
+        => _PluginCommands.AsReadOnly();
+    internal Dictionary<string, List<BasePluginCommand>> _PluginCommands { get; set; } = new();
 
     #endregion Clients
 
@@ -41,13 +45,13 @@ public class Bot
 
     internal Translations loadedTranslations { get; set; }
 
-    internal CountryCodes countryCodes { get; set; }
-    internal LanguageCodes languageCodes { get; set; }
+    public CountryCodes countryCodes { get; internal set; }
+    public LanguageCodes languageCodes { get; internal set; }
     internal IReadOnlyList<string> profanityList { get; set; }
 
     internal BumpReminder bumpReminder { get; set; }
     internal ExperienceHandler experienceHandler { get; set; }
-    public TaskWatcher watcher = new();
+    public TaskWatcher watcher { get; internal set; } = new();
     internal Dictionary<ulong, UserUpload> uploadInteractions { get; set; } = new();
     internal Dictionary<string, PhishingUrlEntry> phishingUrls = new();
     internal Dictionary<ulong, SubmittedUrlEntry> submittedUrls = new();
@@ -70,7 +74,7 @@ public class Bot
     #endregion Bans
 
 
-    internal Status status = new();
+    public Status status = new();
     internal GuildDictionary guilds = null;
     internal UserDictionary users = null;
 
@@ -234,7 +238,7 @@ public class Bot
                     this.status.TeamOwner = this.discordClient.CurrentApplication.Team.Owner.Id;
                     _logger.LogInfo("Set {TeamOwner} as owner of the bot", this.status.TeamOwner);
 
-                    this.status.TeamMembers.AddRange(this.discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
+                    this.status._TeamMembers.AddRange(this.discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
                     _logger.LogInfo("Added {Count} users to administrator list", this.status.TeamMembers.Count);
                 }
                 catch (Exception ex)

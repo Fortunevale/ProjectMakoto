@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class UrlSubmissionSettings
+public sealed class UrlSubmissionSettings
 {
     public UrlSubmissionSettings(User user)
     {

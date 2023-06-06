@@ -9,9 +9,11 @@
 
 namespace ProjectMakoto.Util;
 
-internal class GoogleTranslateClient
+public sealed class GoogleTranslateClient
 {
-    public static GoogleTranslateClient Initialize()
+    internal GoogleTranslateClient() { }
+
+    internal static GoogleTranslateClient Initialize()
     {
         GoogleTranslateClient translationClient = new();
         _ = translationClient.QueueHandler();
@@ -97,15 +99,15 @@ internal class GoogleTranslateClient
         throw new Exception("This exception should be impossible to get.");
     }
 
-    public async Task<Tuple<string, string>> Translate_a(string sl, string tl, string q)
+    public async Task<Tuple<string, string>> Translate(string SourceLanguage, string TargetLanguage, string Query)
     {
         string query;
 
         using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    { "sl", sl },
-                    { "tl", tl },
-                    { "q", q },
+                    { "sl", SourceLanguage },
+                    { "tl", TargetLanguage },
+                    { "q", Query },
                 }))
         {
             query = await content.ReadAsStringAsync();
@@ -119,7 +121,7 @@ internal class GoogleTranslateClient
 
         string translationSource = "";
 
-        if (sl == "auto")
+        if (SourceLanguage == "auto")
         {
             var parsedLanguageStep1 = JsonConvert.DeserializeObject<object[]>(parsedResponse[8].ToString());
             var parsedLanguageStep2 = JsonConvert.DeserializeObject<object[]>(parsedLanguageStep1[0].ToString());

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.ActionLogCommand;
 
-internal class ActionLogAbstractions
+internal sealed class ActionLogAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class JoinEvents
+internal sealed class JoinEvents
 {
     internal JoinEvents(Bot _bot)
     {

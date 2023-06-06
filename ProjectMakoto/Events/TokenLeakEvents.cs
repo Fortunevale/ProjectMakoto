@@ -11,7 +11,7 @@ using Octokit;
 
 namespace ProjectMakoto.Events;
 
-internal class TokenLeakEvents
+internal sealed class TokenLeakEvents
 {
     internal TokenLeakEvents(Bot _bot)
     {

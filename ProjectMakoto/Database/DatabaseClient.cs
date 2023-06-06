@@ -13,18 +13,20 @@ using ProjectMakoto.Entities.Database.ColumnTypes;
 
 namespace ProjectMakoto.Database;
 
-internal class DatabaseClient
+public sealed class DatabaseClient
 {
+    internal DatabaseClient() { }
+
     internal MySqlConnection mainDatabaseConnection { get; set; }
     internal MySqlConnection guildDatabaseConnection { get; set; }
     internal DatabaseHelper _helper { get; private set; }
     internal DatabaseQueue _queue { get; private set; }
 
-    public Bot _bot { private get; set; }
+    private Bot _bot { get; set; }
 
     private bool Disposed { get; set; } = false;
 
-    public static async Task<DatabaseClient> InitializeDatabase(Bot _bot)
+    internal static async Task<DatabaseClient> InitializeDatabase(Bot _bot)
     {
         _logger.LogInfo("Connecting to database..");
 
@@ -130,7 +132,7 @@ internal class DatabaseClient
         return databaseClient;
     }
 
-    public async Task CheckGuildTables()
+    internal async Task CheckGuildTables()
     {
         while (_queue.QueueCount!= 0)
             await Task.Delay(500);
@@ -295,9 +297,9 @@ internal class DatabaseClient
         }
     }
 
-    public bool RunningFullSync = false;
-    public CancellationTokenSource FullSyncCancel = new();
-    public DateTimeOffset LastFullSync = DateTimeOffset.MinValue;
+    private bool RunningFullSync = false;
+    private CancellationTokenSource FullSyncCancel = new();
+    private DateTimeOffset LastFullSync = DateTimeOffset.MinValue;
 
     public async Task FullSyncDatabase(bool Important = false)
     {
@@ -641,7 +643,7 @@ internal class DatabaseClient
         return;
     }
 
-    public async Task Dispose()
+    internal async Task Dispose()
     {
         foreach (var b in UniversalExtensions.GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
             b.Delete();

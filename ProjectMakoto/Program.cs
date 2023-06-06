@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto;
 
-internal class Program
+internal sealed class Program
 {
     internal static void Main(string[] args)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class PollSettings
+public sealed class PollSettings
 {
     public PollSettings(Guild guild, Bot bot)
     {

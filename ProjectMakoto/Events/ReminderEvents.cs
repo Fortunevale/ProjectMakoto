@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Events;
-internal class ReminderEvents
+internal sealed class ReminderEvents
 {
     internal ReminderEvents(Bot _bot)
     {

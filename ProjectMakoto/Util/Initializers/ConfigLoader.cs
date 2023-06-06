@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class ConfigLoader
+internal sealed class ConfigLoader
 {
     internal static async Task Load(Bot bot)
     {

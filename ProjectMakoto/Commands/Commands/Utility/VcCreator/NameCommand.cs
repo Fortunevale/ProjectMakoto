@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.VcCreator;
 
-internal class NameCommand : BaseCommand
+internal sealed class NameCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

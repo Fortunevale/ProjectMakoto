@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class PollCommand : BaseCommand
+internal sealed class PollCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages));
 

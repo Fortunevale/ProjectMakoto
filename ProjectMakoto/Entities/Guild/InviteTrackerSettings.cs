@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InviteTrackerSettings
+public sealed class InviteTrackerSettings
 {
     public InviteTrackerSettings(Guild guild)
     {

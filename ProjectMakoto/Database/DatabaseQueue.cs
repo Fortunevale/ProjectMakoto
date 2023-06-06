@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Database;
 
-internal class DatabaseQueue
+internal sealed class DatabaseQueue
 {
     internal DatabaseQueue(Bot _bot)
     {
@@ -226,7 +226,7 @@ internal class DatabaseQueue
 
     int FailCount = 0;
 
-    internal class RequestQueue
+    internal sealed class RequestQueue
     {
         public DatabaseRequestType RequestType { get; set; }
         public QueuePriority Priority { get; set; } = QueuePriority.Normal;

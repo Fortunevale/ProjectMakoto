@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ExperienceSettings
+public sealed class ExperienceSettings
 {
     public ExperienceSettings(Guild guild)
     {

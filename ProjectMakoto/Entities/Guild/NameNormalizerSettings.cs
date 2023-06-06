@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class NameNormalizerSettings
+public sealed class NameNormalizerSettings
 {
     public NameNormalizerSettings(Guild guild)
     {

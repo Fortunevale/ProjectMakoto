@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.InVoicePrivacyCommand;
 
-internal class InVoicePrivacyCommandAbstractions
+internal sealed class InVoicePrivacyCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

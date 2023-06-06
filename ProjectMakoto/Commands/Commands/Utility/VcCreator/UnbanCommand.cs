@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.VcCreator;
 
-internal class UnbanCommand : BaseCommand
+internal sealed class UnbanCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.InviteTrackerCommand;
 
-internal class InviteTrackerCommandAbstractions
+internal sealed class InviteTrackerCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

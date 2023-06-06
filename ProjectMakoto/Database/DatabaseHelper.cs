@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.Database;
-internal class DatabaseHelper
+internal sealed class DatabaseHelper
 {
     DatabaseClient _databaseClient { get; set; }
 

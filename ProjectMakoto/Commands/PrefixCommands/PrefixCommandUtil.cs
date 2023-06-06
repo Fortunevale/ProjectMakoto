@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.PrefixCommands;
-public class PrefixCommandUtil
+public sealed class PrefixCommandUtil
 {
     public static async Task SendGroupHelp(Bot _bot, CommandContext ctx, string CommandName, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
     {

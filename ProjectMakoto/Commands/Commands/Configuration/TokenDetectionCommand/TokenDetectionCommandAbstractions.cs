@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.TokenDetectionCommand;
 
-internal class TokenDetectionCommandAbstractions
+internal sealed class TokenDetectionCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

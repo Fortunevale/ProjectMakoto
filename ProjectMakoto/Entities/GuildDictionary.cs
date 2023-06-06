@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public class GuildDictionary : IDictionary<ulong, Guild>
+public sealed class GuildDictionary : IDictionary<ulong, Guild>
 {
     public GuildDictionary(Bot _bot)
     {

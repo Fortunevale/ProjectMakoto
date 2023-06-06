@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class TokenLeakDetectionSettings
+public sealed class TokenLeakDetectionSettings
 {
     public TokenLeakDetectionSettings(Guild guild)
     {

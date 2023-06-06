@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.VcCreatorCommand;
 
-internal class VcCreatorCommandAbstractions
+internal sealed class VcCreatorCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

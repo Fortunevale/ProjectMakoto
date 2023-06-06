@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class UrbanDictionary
+internal sealed class UrbanDictionary
 {
     public List[] list { get; set; }
 
-    public class List
+    public sealed class List
     {
         public string definition { get; set; }
         public string permalink { get; set; }

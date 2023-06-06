@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto;
-internal class BumpReminder
+internal sealed class BumpReminder
 {
     internal BumpReminder(Bot _bot)
     {

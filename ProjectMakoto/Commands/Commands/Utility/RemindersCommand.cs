@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class RemindersCommand : BaseCommand
+internal sealed class RemindersCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

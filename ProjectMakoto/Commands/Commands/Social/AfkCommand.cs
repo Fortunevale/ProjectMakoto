@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class AfkCommand : BaseCommand
+internal sealed class AfkCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

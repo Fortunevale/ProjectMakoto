@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class CuddleCommand : BaseCommand
+internal sealed class CuddleCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

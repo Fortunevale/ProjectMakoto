@@ -9,12 +9,19 @@
 
 namespace ProjectMakoto.Entities;
 
-public class LanguageCodes
+public sealed class LanguageCodes
 {
-    public List<LanguageInfo> List = new();
+    internal LanguageCodes() { }
 
-    public class LanguageInfo
+    public IReadOnlyList<LanguageInfo> List
+        => _List.AsReadOnly();
+
+    internal List<LanguageInfo> _List = new();
+
+    public sealed class LanguageInfo
     {
+        internal LanguageInfo() { }
+
         public string Name { get; set; }
         public string Code { get; set; }
     }

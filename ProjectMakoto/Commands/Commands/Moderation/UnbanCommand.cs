@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class UnbanCommand : BaseCommand
+internal sealed class UnbanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
 

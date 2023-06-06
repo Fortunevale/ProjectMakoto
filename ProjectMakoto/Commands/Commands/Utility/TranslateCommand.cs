@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class TranslateCommand : BaseCommand
+internal sealed class TranslateCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -137,7 +137,7 @@ internal class TranslateCommand : BaseCommand
                     Description = GetString(t.Commands.Utility.TranslateMessage.Translating, true),
                 }.AsLoading(ctx)));
 
-                var TranslationTask = ctx.Bot.translationClient.Translate_a(SourceResult.Result, TargetResult.Result, transSource);
+                var TranslationTask = ctx.Bot.translationClient.Translate(SourceResult.Result, TargetResult.Result, transSource);
 
                 int PosInQueue = ctx.Bot.translationClient.Queue.Count;
 

@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class SyncTasks
+internal sealed class SyncTasks
 {
     internal static async Task GuildDownloadCompleted(Bot bot, DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {

@@ -11,7 +11,7 @@ using DisCatSharp.Extensions.TwoFactorCommands.Enums;
 
 namespace ProjectMakoto.Commands;
 
-internal class EnrollTwoFactorCommand : BaseCommand
+internal sealed class EnrollTwoFactorCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) 
         => await CheckMaintenance();

@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-public class DataSettings
+public sealed class DataSettings
 {
     public DateTime LastDataRequest { get; set; } = DateTime.MinValue;
 

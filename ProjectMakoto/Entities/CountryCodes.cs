@@ -9,14 +9,21 @@
 
 namespace ProjectMakoto.Entities;
 
-public class CountryCodes
+public sealed class CountryCodes
 {
-    public Dictionary<string, CountryInfo> List = new();
+    internal CountryCodes() { }
 
-    public class CountryInfo
+    public IReadOnlyDictionary<string, CountryInfo> List
+        => _List.AsReadOnly();
+
+    internal Dictionary<string, CountryInfo> _List { get;  set; } = new();
+
+    public sealed class CountryInfo
     {
-        public string Name { get; set; }
-        public string ContinentCode { get; set; }
-        public string ContinentName { get; set; }
+        internal CountryInfo() { }
+
+        public string Name { get; internal set; }
+        public string ContinentCode { get; internal set; }
+        public string ContinentName { get; internal set; }
     }
 }

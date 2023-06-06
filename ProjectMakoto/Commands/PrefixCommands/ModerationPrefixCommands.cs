@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.PrefixCommands;
-public class ModerationPrefixCommands : BaseCommandModule
+public sealed class ModerationPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
@@ -140,7 +140,7 @@ public class ModerationPrefixCommands : BaseCommandModule
     [Group("follow"),
     CommandModule("moderation"),
     Description("Allows you to follow an announcement channel from our support server.")]
-    public class MessageEmbedding : BaseCommandModule
+    public sealed class MessageEmbedding : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 

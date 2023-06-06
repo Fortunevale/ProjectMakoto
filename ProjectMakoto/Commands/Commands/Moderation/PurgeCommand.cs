@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class PurgeCommand : BaseCommand
+internal sealed class PurgeCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages) && await CheckOwnPermissions(Permissions.ManageMessages));
 

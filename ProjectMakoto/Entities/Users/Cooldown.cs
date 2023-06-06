@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Cooldown
+public sealed class Cooldown
 {
     internal Cooldown(Bot _bot)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.JoinCommand;
 
-internal class ReviewCommand : BaseCommand
+internal sealed class ReviewCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 

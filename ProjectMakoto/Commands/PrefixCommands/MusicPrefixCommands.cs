@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.PrefixCommands;
 
-public class MusicPrefixCommands : BaseCommandModule
+public sealed class MusicPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
@@ -17,7 +17,7 @@ public class MusicPrefixCommands : BaseCommandModule
     [Group("music"),
     CommandModule("music"), Aliases("m"),
     Description("Allows to play music and change the current playback settings.")]
-    public class MusicCommands : BaseCommandModule
+    public sealed class MusicCommands : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -90,7 +90,7 @@ public class MusicPrefixCommands : BaseCommandModule
     [Group("playlists"), Aliases("playlist", "pl"),
     CommandModule("music"), 
     Description("Allows you to manage your personal playlists.")]
-    public class Playlists : BaseCommandModule
+    public sealed class Playlists : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 

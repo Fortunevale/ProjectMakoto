@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class JoinSettings
+public sealed class JoinSettings
 {
     public JoinSettings(Guild guild)
     {

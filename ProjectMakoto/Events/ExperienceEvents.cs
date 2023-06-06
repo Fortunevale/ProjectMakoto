@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class ExperienceEvents
+internal sealed class ExperienceEvents
 {
     internal ExperienceEvents(Bot _bot)
     {

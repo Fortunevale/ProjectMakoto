@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class RawGuildCommand : BaseCommand
+internal sealed class RawGuildCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

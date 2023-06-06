@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ClearBackupCommand : BaseCommand
+internal sealed class ClearBackupCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageRoles));
 

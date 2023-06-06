@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands;
-internal class SocialCommandAbstractions
+internal sealed class SocialCommandAbstractions
 {
     static HttpClient httpClient = null;
 

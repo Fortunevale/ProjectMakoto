@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class MoveAllCommand : BaseCommand
+internal sealed class MoveAllCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.MoveMembers) && await CheckOwnPermissions(Permissions.MoveMembers) && await CheckVoiceState());
 

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ReminderItem
+public sealed class ReminderItem
 {
     public string UUID { get; set; } = Guid.NewGuid().ToString();
 

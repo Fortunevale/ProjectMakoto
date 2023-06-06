@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class RegexTemplates
+internal sealed class RegexTemplates
 {
     public static readonly Regex UserMention = new(@"((<@(\d+)>)|(<@!(\d+)>))", RegexOptions.Compiled);
     public static readonly Regex ChannelMention = new(@"(<#\d+>)", RegexOptions.Compiled);

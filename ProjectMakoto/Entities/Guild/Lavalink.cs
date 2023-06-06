@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Lavalink
+public sealed class Lavalink
 {
     public Lavalink(Guild guild)
     {
@@ -94,7 +94,7 @@ public class Lavalink
         }
     }
 
-    public class QueueInfo
+    public sealed class QueueInfo
     {
         public QueueInfo(string VideoTitle, string Url, TimeSpan length, DiscordGuild guild, DiscordUser user)
         {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
-internal class ReactionRolesCommandAbstractions
+internal sealed class ReactionRolesCommandAbstractions
 {
     internal static async Task<Dictionary<ulong, DiscordMessage>> CheckForInvalid(SharedCommandContext ctx)
     {

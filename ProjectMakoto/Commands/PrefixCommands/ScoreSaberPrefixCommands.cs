@@ -9,12 +9,12 @@
 
 namespace ProjectMakoto.PrefixCommands;
 
-public class ScoreSaberPrefixCommands : BaseCommandModule
+public sealed class ScoreSaberPrefixCommands : BaseCommandModule
 {
     [Group("scoresaber"), Aliases("ss"),
     CommandModule("scoresaber"),
     Description("Interact with the ScoreSaber API.")]
-    internal class ScoreSaberGroup : BaseCommandModule
+    internal sealed class ScoreSaberGroup : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 

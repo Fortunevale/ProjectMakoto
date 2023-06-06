@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.PrefixCommands;
 
-public class ConfigurationPrefixCommands : BaseCommandModule
+public sealed class ConfigurationPrefixCommands : BaseCommandModule
 {
     public Bot _bot { private get; set; }
 
@@ -17,7 +17,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("join"), Aliases("joinsettings", "join-settings"),
     CommandModule("configuration"), 
     Description("Allows you to review and change settings in the event somebody joins the server.")]
-    public class JoinSettings : BaseCommandModule
+    public sealed class JoinSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -39,7 +39,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("experience"), Aliases("experiencesettings", "experience-settings"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to experience.")]
-    public class ExperienceSettings : BaseCommandModule
+    public sealed class ExperienceSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -61,7 +61,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("levelrewards"), Aliases("level-rewards", "rewards"),
     CommandModule("configuration"),
     Description("Allows you to review, add and change Level Rewards.")]
-    public class LevelRewards : BaseCommandModule
+    public sealed class LevelRewards : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -83,7 +83,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("phishing"), Aliases("phishingsettings", "phishing-settings"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to phishing link protection.")]
-    public class PhishingSettings : BaseCommandModule
+    public sealed class PhishingSettings : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -105,7 +105,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("bumpreminder"), Aliases("bump-reminder"),
     CommandModule("configuration"),
     Description("Allows you to review, set up and change settings related to the Bump Reminder.")]
-    public class BumpReminder : BaseCommandModule
+    public sealed class BumpReminder : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -127,7 +127,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("actionlog"), Aliases("action-log"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to the actionlog.")]
-    public class ActionLog : BaseCommandModule
+    public sealed class ActionLog : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -150,7 +150,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to automatic crossposting.")]
-    public class AutoCrosspost : BaseCommandModule
+    public sealed class AutoCrosspost : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -173,7 +173,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("reactionroles"), Aliases("reactionrole", "reaction-roles", "reaction-role"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to Reaction Roles.")]
-    public class ReactionRoles : BaseCommandModule
+    public sealed class ReactionRoles : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -212,7 +212,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("invoiceprivacy"), Aliases("in-voice-privacy", "vc-privacy", "vcprivacy"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to In-Voice Text Channel Privacy.")]
-    public class InVoiceTextPrivacy : BaseCommandModule
+    public sealed class InVoiceTextPrivacy : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -235,7 +235,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("invitetracker"), Aliases("invite-tracker", "invitetracking", "invite-tracking"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to Invite Tracking.")]
-    public class InviteTracker : BaseCommandModule
+    public sealed class InviteTracker : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -257,7 +257,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("namenormalizer"), Aliases("name-normalizer"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to automatic name normalization.")]
-    public class NameNormalizer : BaseCommandModule
+    public sealed class NameNormalizer : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -279,7 +279,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("autounarchive"), Aliases("auto-unarchive"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to automatic thread unarchiving.")]
-    public class AutoUnarchive : BaseCommandModule
+    public sealed class AutoUnarchive : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -301,7 +301,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("embedmessages"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to automatic message embedding.")]
-    public class MessageEmbedding : BaseCommandModule
+    public sealed class MessageEmbedding : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -323,7 +323,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("tokendetection"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to automatic token invalidation.")]
-    public class TokenDetection : BaseCommandModule
+    public sealed class TokenDetection : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -345,7 +345,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("invitenotes"),
     CommandModule("configuration"),
     Description("Allows you to add notes to invite codes.")]
-    public class InviteNotes : BaseCommandModule
+    public sealed class InviteNotes : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -365,7 +365,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("vccreator"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to the Voice Channel Creator.")]
-    public class VcCreator : BaseCommandModule
+    public sealed class VcCreator : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -387,7 +387,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("guild-prefix"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to the guild's prefix.")]
-    public class GuildPrefix : BaseCommandModule
+    public sealed class GuildPrefix : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 
@@ -409,7 +409,7 @@ public class ConfigurationPrefixCommands : BaseCommandModule
     [Group("guild-language"),
     CommandModule("configuration"),
     Description("Allows you to review and change settings related to the guild's selected language.")]
-    public class GuildLanguage : BaseCommandModule
+    public sealed class GuildLanguage : BaseCommandModule
     {
         public Bot _bot { private get; set; }
 

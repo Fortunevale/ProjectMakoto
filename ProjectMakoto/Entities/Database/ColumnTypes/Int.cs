@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class Int : BaseColumn
+public sealed class Int : BaseColumn
 {
     public Int(int MaxValue = 2147483647)
     {

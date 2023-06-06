@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class UserPlaylist
+public sealed class UserPlaylist
 {
     public string PlaylistId { get; set; } = Guid.NewGuid().ToString();
 

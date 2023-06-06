@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class RolePromptConfiguration
+public sealed class RolePromptConfiguration
 {
     public string? CreateRoleOption { get; set; } = null;
 

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Guild
+public sealed class Guild
 {
     public Guild(ulong serverId, Bot bot)
     {

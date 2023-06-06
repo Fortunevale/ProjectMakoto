@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class TranslationLoader
+internal sealed class TranslationLoader
 {
     internal static async Task Load(Bot _bot)
     {

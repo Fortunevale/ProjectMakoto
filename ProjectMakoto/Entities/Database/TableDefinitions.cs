@@ -12,14 +12,14 @@ using ProjectMakoto.Entities.Database.ColumnTypes;
 
 namespace ProjectMakoto.Entities.Database;
 
-public class TableDefinitions
+public sealed class TableDefinitions
 {
-    public class writetester
+    public sealed class writetester
     {
         [Primary][MaxValue(1)] public TinyInt aaa { get; set; }
     }
 
-    public class scam_urls
+    public sealed class scam_urls
     {
         [Primary][Collation("utf8_unicode_ci")][MaxValue(500)]
         public VarChar url { get; set; }
@@ -30,13 +30,13 @@ public class TableDefinitions
         public BigInt submitter { get; set; }
     }
 
-    public class objected_users
+    public sealed class objected_users
     {
         [Primary]
         public BigInt id { get; set; }
     }
 
-    public class globalbans
+    public sealed class globalbans
     {
         [Primary]
         public BigInt id { get; set; }
@@ -49,7 +49,7 @@ public class TableDefinitions
         public BigInt timestamp { get; set; }
     }
 
-    public class banned_users
+    public sealed class banned_users
     {
         [Primary]
         public BigInt id { get; set; }
@@ -62,7 +62,7 @@ public class TableDefinitions
         public BigInt timestamp { get; set; }
     }
     
-    public class banned_guilds
+    public sealed class banned_guilds
     {
         [Primary]
         public BigInt id { get; set; }
@@ -75,7 +75,7 @@ public class TableDefinitions
         public BigInt timestamp { get; set; }
     }
 
-    public class globalnotes
+    public sealed class globalnotes
     {
         [Primary]
         public BigInt id { get; set; }
@@ -84,7 +84,7 @@ public class TableDefinitions
         public LongText notes { get; set; }
     }
 
-    public class submission_user_bans
+    public sealed class submission_user_bans
     {
         [Primary]
         public BigInt id { get; set; }
@@ -95,7 +95,7 @@ public class TableDefinitions
         public BigInt moderator { get; set; }
     }
 
-    public class submission_guild_bans
+    public sealed class submission_guild_bans
     {
         [Primary]
         public BigInt id { get; set; }
@@ -106,7 +106,7 @@ public class TableDefinitions
         public BigInt moderator { get; set; }
     }
 
-    public class active_url_submissions
+    public sealed class active_url_submissions
     {
         [Primary]
         public BigInt messageid { get; set; }
@@ -118,7 +118,7 @@ public class TableDefinitions
         public BigInt guild { get; set; }
     }
 
-    public class users
+    public sealed class users
     {
         [Primary]
         public BigInt userid { get; set; }
@@ -176,7 +176,7 @@ public class TableDefinitions
         public BigInt last_data_request { get; set; }
     }
 
-    public class guilds
+    public sealed class guilds
     {
         [Primary]
         public BigInt serverid { get; set; }
@@ -364,7 +364,7 @@ public class TableDefinitions
         public Text override_locale { get; set; }
     }
 
-    public class guild_users
+    public sealed class guild_users
     {
         [Primary]
         public BigInt userid { get; set; }

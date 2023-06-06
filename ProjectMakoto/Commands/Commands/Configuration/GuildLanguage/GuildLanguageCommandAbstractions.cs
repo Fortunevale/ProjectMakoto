@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands.GuildLanguage;
-internal class GuildLanguageCommandAbstractions
+internal sealed class GuildLanguageCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

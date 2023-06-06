@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto;
 
-internal class BumpReminderEvents
+internal sealed class BumpReminderEvents
 {
     internal BumpReminderEvents(Bot _bot)
     {

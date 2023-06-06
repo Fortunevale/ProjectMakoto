@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class EmojiStealerCommand : BaseCommand
+internal sealed class EmojiStealerCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

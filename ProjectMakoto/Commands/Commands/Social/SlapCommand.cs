@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class SlapCommand : BaseCommand
+internal sealed class SlapCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class GuildPurgeCommand : BaseCommand
+internal sealed class GuildPurgeCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages) && await CheckPermissions(Permissions.ManageChannels) && await CheckOwnPermissions(Permissions.ManageMessages));
 

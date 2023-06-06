@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class VcCreatorEvents
+internal sealed class VcCreatorEvents
 {
     internal VcCreatorEvents(Bot _bot)
     {

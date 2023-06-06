@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Events;
-internal class AfkEvents
+internal sealed class AfkEvents
 {
     internal AfkEvents(Bot _bot)
     {

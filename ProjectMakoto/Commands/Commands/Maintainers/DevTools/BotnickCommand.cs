@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class BotnickCommand : BaseCommand
+internal sealed class BotnickCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

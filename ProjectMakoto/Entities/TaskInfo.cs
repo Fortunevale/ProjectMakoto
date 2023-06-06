@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class TaskInfo
+public sealed class TaskInfo
 {
     internal TaskInfo(Task task)
     {

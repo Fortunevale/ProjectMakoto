@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class PollEntry
+public sealed class PollEntry
 {
     public string PollText { get; set; }
 

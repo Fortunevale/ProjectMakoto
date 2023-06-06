@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ExperienceMember
+public sealed class ExperienceMember
 {
     public ExperienceMember(Member member)
     {

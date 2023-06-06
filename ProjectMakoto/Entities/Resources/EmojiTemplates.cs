@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class EmojiTemplates
+internal sealed class EmojiTemplates
 {
     public static DiscordEmoji GetCheckboxTickedRed(Bot bot) => DiscordEmoji.FromGuildEmote(bot.discordClient, bot.status.LoadedConfig.Emojis.CheckboxTickedRedId);
     public static DiscordEmoji GetCheckboxUntickedRed(Bot bot) => DiscordEmoji.FromGuildEmote(bot.discordClient, bot.status.LoadedConfig.Emojis.CheckboxUntickedRedId);

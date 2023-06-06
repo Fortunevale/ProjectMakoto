@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class HighFiveCommand : BaseCommand
+internal sealed class HighFiveCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

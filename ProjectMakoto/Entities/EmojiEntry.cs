@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class EmojiEntry
+internal sealed class EmojiEntry
 {
     public string Name { get; set; }
     public string Description { get; set; }
@@ -19,7 +19,7 @@ internal class EmojiEntry
     public bool Animated { get; set; }
 
     public data Data { get; set; } = new();
-    public class data
+    public sealed class data
     {
         public string Name { get; set; }
         public Stream Stream { get; set; } = new MemoryStream();

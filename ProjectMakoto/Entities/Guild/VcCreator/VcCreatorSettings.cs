@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class VcCreatorSettings
+public sealed class VcCreatorSettings
 {
     public VcCreatorSettings(Guild guild, Bot bot)
     {

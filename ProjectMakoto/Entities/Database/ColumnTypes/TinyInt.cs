@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class TinyInt : BaseColumn
+public sealed class TinyInt : BaseColumn
 {
     public TinyInt(uint MaxValue = 127)
     {

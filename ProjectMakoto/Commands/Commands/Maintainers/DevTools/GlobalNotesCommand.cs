@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class GlobalNotesCommand : BaseCommand
+internal sealed class GlobalNotesCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

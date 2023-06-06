@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto;
 
-internal class PhishingSubmissionEvents
+internal sealed class PhishingSubmissionEvents
 {
     internal PhishingSubmissionEvents(Bot _bot)
     {

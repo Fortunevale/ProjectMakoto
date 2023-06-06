@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class KissCommand : BaseCommand
+internal sealed class KissCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

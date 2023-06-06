@@ -11,7 +11,7 @@ using ProjectMakoto.Entities.Database;
 
 namespace ProjectMakoto.Database;
 
-internal class DatabaseInit
+internal sealed class DatabaseInit
 {
     internal Bot _bot { get; set; }
 

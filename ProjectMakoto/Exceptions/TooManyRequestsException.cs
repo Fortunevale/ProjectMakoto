@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Exceptions;
-internal class TooManyRequestsException : Exception
+internal sealed class TooManyRequestsException : Exception
 {
     public TooManyRequestsException(string message = "") : base(message)
     {

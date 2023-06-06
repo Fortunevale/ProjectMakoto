@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.LevelRewardsCommand;
 
-internal class LevelRewardsCommandAbstractions
+internal sealed class LevelRewardsCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

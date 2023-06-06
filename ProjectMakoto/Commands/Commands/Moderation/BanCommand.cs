@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class BanCommand : BaseCommand
+internal sealed class BanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
 

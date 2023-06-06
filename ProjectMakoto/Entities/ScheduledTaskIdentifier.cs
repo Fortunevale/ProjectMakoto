@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-public class ScheduledTaskIdentifier
+public sealed class ScheduledTaskIdentifier
 {
     public ScheduledTaskIdentifier(ulong Snowflake, string Id, string Type)
     {

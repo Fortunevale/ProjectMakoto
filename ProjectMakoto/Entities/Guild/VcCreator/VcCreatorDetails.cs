@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class VcCreatorDetails
+public sealed class VcCreatorDetails
 {
     public ulong OwnerId { get; set; }
 

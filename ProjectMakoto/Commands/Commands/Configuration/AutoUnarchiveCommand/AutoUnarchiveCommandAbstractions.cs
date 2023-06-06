@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.AutoUnarchiveCommand;
 
-internal class AutoUnarchiveCommandAbstractions
+internal sealed class AutoUnarchiveCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

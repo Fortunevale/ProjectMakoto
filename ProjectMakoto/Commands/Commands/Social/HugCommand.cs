@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class HugCommand : BaseCommand
+internal sealed class HugCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

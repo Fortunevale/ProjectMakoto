@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InteractionResult<T>
+public sealed class InteractionResult<T>
 {
     public InteractionResult(T result)
     {

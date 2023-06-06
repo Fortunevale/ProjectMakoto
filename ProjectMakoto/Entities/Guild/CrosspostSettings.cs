@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class CrosspostSettings
+public sealed class CrosspostSettings
 {
     public CrosspostSettings(Guild guild)
     {

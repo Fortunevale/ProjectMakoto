@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.PrefixCommands;
 
-internal class CustomArgumentConverter
+internal sealed class CustomArgumentConverter
 {
-    internal class BoolConverter : IArgumentConverter<bool>
+    internal sealed class BoolConverter : IArgumentConverter<bool>
     {
         public async Task<Optional<bool>> ConvertAsync(string value, CommandContext ctx)
         {

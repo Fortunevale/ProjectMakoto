@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ScoreSaberSettings
+public sealed class ScoreSaberSettings
 {
     public ScoreSaberSettings(User user)
     {

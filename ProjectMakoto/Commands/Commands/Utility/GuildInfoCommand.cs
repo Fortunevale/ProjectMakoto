@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class GuildInfoCommand : BaseCommand
+internal sealed class GuildInfoCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

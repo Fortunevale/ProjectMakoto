@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.BumpReminderCommand;
 
-internal class BumpReminderCommandAbstractions
+internal sealed class BumpReminderCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class LongText : BaseColumn
+public sealed class LongText : BaseColumn
 {
     public LongText(long MaxLength = 4294967296)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ManualBumpCommand : BaseCommand
+internal sealed class ManualBumpCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages));
 

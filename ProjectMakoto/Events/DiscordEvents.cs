@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class DiscordEvents
+internal sealed class DiscordEvents
 {
     internal DiscordEvents(Bot _bot)
     {

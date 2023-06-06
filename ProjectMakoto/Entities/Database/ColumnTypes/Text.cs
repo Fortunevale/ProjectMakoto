@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class Text : BaseColumn
+public sealed class Text : BaseColumn
 {
     public Text(long MaxLength = 65535)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class SaveCommand : BaseCommand
+internal sealed class SaveCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 

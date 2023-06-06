@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class UploadCommand : BaseCommand
+internal sealed class UploadCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

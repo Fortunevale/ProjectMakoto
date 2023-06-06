@@ -8,14 +8,14 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.ApplicationCommands;
-public class MusicAppCommands : ApplicationCommandsModule
+public sealed class MusicAppCommands : ApplicationCommandsModule
 {
     [SlashCommandGroup("music", "Allows to play music and change the current playback settings.", dmPermission: false)]
-    public class MusicCommands : ApplicationCommandsModule
+    public sealed class MusicCommands : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 
-        public class SongQueueAutocompleteProvider : IAutocompleteProvider
+        public sealed class SongQueueAutocompleteProvider : IAutocompleteProvider
         {
             public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
             {
@@ -101,9 +101,9 @@ public class MusicAppCommands : ApplicationCommandsModule
     }
 
     [SlashCommandGroup("playlists", "Allows you to manage your personal playlists.", dmPermission: false)]
-    public class Playlists : ApplicationCommandsModule
+    public sealed class Playlists : ApplicationCommandsModule
     {
-        public class PlaylistsAutoCompleteProvider : IAutocompleteProvider
+        public sealed class PlaylistsAutoCompleteProvider : IAutocompleteProvider
         {
             public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
             {

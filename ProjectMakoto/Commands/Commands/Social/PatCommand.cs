@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class PatCommand : BaseCommand
+internal sealed class PatCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

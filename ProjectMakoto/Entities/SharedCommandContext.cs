@@ -11,7 +11,7 @@ using CommandType = ProjectMakoto.Enums.CommandType;
 
 namespace ProjectMakoto.Entities;
 
-public class SharedCommandContext
+public sealed class SharedCommandContext
 {
     public SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
     {

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class CreditsCommand : BaseCommand
+internal sealed class CreditsCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

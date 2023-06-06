@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class BlacklistEntry
+public sealed class BlacklistEntry
 {
     public string Reason { get; set; }
 
