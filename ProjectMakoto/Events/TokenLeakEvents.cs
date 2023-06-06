@@ -33,9 +33,20 @@ internal sealed class TokenLeakEvents
 
     internal async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        if (e.Content.StartsWith($";;"))
+        string prefix;
+
+        try
+        {
+            prefix = _bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[guild.Id].PrefixSettings.Prefix;
+        }
+        catch (Exception)
+        {
+            prefix = ";;";
+        }
+
+        if (e.Content.StartsWith(prefix))
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                if (e.Content.StartsWith($";;{command.Key}"))
+                if (e.Content.StartsWith($"{prefix}{command.Key}"))
                     return;
 
         if (e.WebhookMessage || guild is null)

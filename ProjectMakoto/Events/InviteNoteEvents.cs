@@ -20,9 +20,6 @@ internal sealed class InviteNoteEvents
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        Task.Run(async () =>
-        {
-            _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
-        }).Add(_bot.watcher);
+        _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
     }
 }

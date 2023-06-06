@@ -19,130 +19,126 @@ internal sealed class AfkEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        Task.Run(async () =>
+        if (_bot.objectedUsers.Contains(e.Author.Id) || _bot.bannedUsers.ContainsKey(e.Author.Id) || _bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
+            return;
+
+        string prefix;
+
+        try
         {
-            if (_bot.objectedUsers.Contains(e.Author.Id) || _bot.bannedUsers.ContainsKey(e.Author.Id) || _bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
-                return;
+            prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
+        }
+        catch (Exception)
+        {
+            prefix = ";;";
+        }
 
-            string prefix;
+        if (e.Message.Content.StartsWith(prefix))
+            foreach (var command in sender.GetCommandsNext().RegisteredCommands)
+                if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
+                    return;
 
-            try
+        if (e.Guild == null || e.Channel.IsPrivate || e.Author.IsBot)
+            return;
+
+        var AfkKey = _bot.loadedTranslations.Commands.Social.Afk;
+
+        if (_bot.users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
+        {
+            DateTime cache = new DateTime().ToUniversalTime().AddTicks(_bot.users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
+
+            _bot.users[e.Author.Id].AfkStatus.Reason = "";
+            _bot.users[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
+
+            var embed = new DiscordEmbedBuilder
             {
-                prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
-            }
-            catch (Exception)
+                Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
+                Color = EmbedColors.Info,
+                Timestamp = DateTime.UtcNow,
+                Description = AfkKey.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true, 
+                new TVar("User", e.Author.Mention),
+                new TVar("Timestamp", cache.ToTimestamp()))
+            };
+
+            bool ExtendDelay = false;
+
+            if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount > 0)
             {
-                prefix = ";;";
-            }
+                embed.Description += $"\n\n{AfkKey.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true)}\n" +
+                                        $"{string.Join("\n", _bot.users[e.Author.Id].AfkStatus.Messages
+                                            .Select(x => AfkKey.Events.MessageListing
+                                                .Get(_bot.users[e.Author.Id])
+                                                .Build(true, 
+                                                new TVar("User", $"<@!{x.AuthorId}>"),
+                                                new TVar("Message", $"[`{AfkKey.Events.Message.Get(_bot.users[e.Author.Id])}`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId})"))))}";
 
-            if (e.Message.Content.StartsWith(prefix))
-                foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                    if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
-                        return;
+                ExtendDelay = true;
 
-            if (e.Guild == null || e.Channel.IsPrivate || e.Author.IsBot)
-                return;
-
-            var AfkKey = _bot.loadedTranslations.Commands.Social.Afk;
-
-            if (_bot.users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
-            {
-                DateTime cache = new DateTime().ToUniversalTime().AddTicks(_bot.users[e.Author.Id].AfkStatus.TimeStamp.Ticks);
-
-                _bot.users[e.Author.Id].AfkStatus.Reason = "";
-                _bot.users[e.Author.Id].AfkStatus.TimeStamp = DateTime.UnixEpoch;
-
-                var embed = new DiscordEmbedBuilder
+                if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5 > 0)
                 {
-                    Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
-                    Color = EmbedColors.Info,
-                    Timestamp = DateTime.UtcNow,
-                    Description = AfkKey.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true, 
-                    new TVar("User", e.Author.Mention),
-                    new TVar("Timestamp", cache.ToTimestamp()))
-                };
-
-                bool ExtendDelay = false;
-
-                if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount > 0)
-                {
-                    embed.Description += $"\n\n{AfkKey.Events.NoLongerAfk.Get(_bot.users[e.Author.Id]).Build(true)}\n" +
-                                         $"{string.Join("\n", _bot.users[e.Author.Id].AfkStatus.Messages
-                                             .Select(x => AfkKey.Events.MessageListing
-                                                 .Get(_bot.users[e.Author.Id])
-                                                 .Build(true, 
-                                                    new TVar("User", $"<@!{x.AuthorId}>"),
-                                                    new TVar("Message", $"[`{AfkKey.Events.Message.Get(_bot.users[e.Author.Id])}`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId})"))))}";
-
-                    ExtendDelay = true;
-
-                    if (_bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5 > 0)
-                    {
-                        embed.Description += $"\n{AfkKey.Events.AndMore.Get(_bot.users[e.Author.Id])
-                            .Build(true, new TVar("Count", _bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5))}";
-                    }
-
-                    _bot.users[e.Author.Id].AfkStatus.MessagesAmount = 0;
-                    _bot.users[e.Author.Id].AfkStatus.Messages = new();
+                    embed.Description += $"\n{AfkKey.Events.AndMore.Get(_bot.users[e.Author.Id])
+                        .Build(true, new TVar("Count", _bot.users[e.Author.Id].AfkStatus.MessagesAmount - 5))}";
                 }
 
-                _ = e.Message.RespondAsync(embed).ContinueWith(async x =>
-                {
-                    if (ExtendDelay)
-                        await Task.Delay(30000);
-                    else
-                        await Task.Delay(10000);
-
-                    _ = x.Result.DeleteAsync();
-                });
+                _bot.users[e.Author.Id].AfkStatus.MessagesAmount = 0;
+                _bot.users[e.Author.Id].AfkStatus.Messages = new();
             }
 
-            if (e.MentionedUsers != null && e.MentionedUsers.Count > 0)
+            _ = e.Message.RespondAsync(embed).ContinueWith(async x =>
             {
-                foreach (var b in e.MentionedUsers)
+                if (ExtendDelay)
+                    await Task.Delay(30000);
+                else
+                    await Task.Delay(10000);
+
+                _ = x.Result.DeleteAsync();
+            });
+        }
+
+        if (e.MentionedUsers != null && e.MentionedUsers.Count > 0)
+        {
+            foreach (var b in e.MentionedUsers)
+            {
+                if (b.Id == e.Author.Id)
+                    continue;
+
+                if (_bot.users[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
                 {
-                    if (b.Id == e.Author.Id)
-                        continue;
+                    if (_bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
+                        return;
 
-                    if (_bot.users[b.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch)
+                    if (_bot.users[b.Id].AfkStatus.Messages.Count < 5)
                     {
-                        if (_bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(30) > DateTime.UtcNow)
-                            return;
-
-                        if (_bot.users[b.Id].AfkStatus.Messages.Count < 5)
+                        _bot.users[b.Id].AfkStatus.Messages.Add(new MessageDetails
                         {
-                            _bot.users[b.Id].AfkStatus.Messages.Add(new MessageDetails
-                            {
-                                AuthorId = e.Author.Id,
-                                ChannelId = e.Channel.Id,
-                                GuildId = e.Guild.Id,
-                                MessageId = e.Message.Id,
-                            });
-                        }
-
-                        _bot.users[b.Id].AfkStatus.MessagesAmount++;
-
-                        _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger = DateTime.UtcNow;
-
-                        _ = e.Message.RespondAsync(new DiscordEmbedBuilder
-                        {
-                            Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
-                            Color = EmbedColors.Info,
-                            Timestamp = DateTime.UtcNow,
-                            Description = AfkKey.Events.CurrentlyAfk.Get(_bot.users[e.Author.Id]).Build(true,
-                                new TVar("User", b.Mention),
-                                new TVar("Timestamp", _bot.users[b.Id].AfkStatus.TimeStamp.ToTimestamp()),
-                                new TVar("Reason", _bot.users[b.Id].AfkStatus.Reason.FullSanitize()))
-                        }).ContinueWith(async x =>
-                        {
-                            await Task.Delay(10000);
-                            _ = x.Result.DeleteAsync();
+                            AuthorId = e.Author.Id,
+                            ChannelId = e.Channel.Id,
+                            GuildId = e.Guild.Id,
+                            MessageId = e.Message.Id,
                         });
-                        return;
                     }
+
+                    _bot.users[b.Id].AfkStatus.MessagesAmount++;
+
+                    _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger = DateTime.UtcNow;
+
+                    _ = e.Message.RespondAsync(new DiscordEmbedBuilder
+                    {
+                        Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(_bot.users[e.Author.Id])} • {e.Guild.Name}" },
+                        Color = EmbedColors.Info,
+                        Timestamp = DateTime.UtcNow,
+                        Description = AfkKey.Events.CurrentlyAfk.Get(_bot.users[e.Author.Id]).Build(true,
+                            new TVar("User", b.Mention),
+                            new TVar("Timestamp", _bot.users[b.Id].AfkStatus.TimeStamp.ToTimestamp()),
+                            new TVar("Reason", _bot.users[b.Id].AfkStatus.Reason.FullSanitize()))
+                    }).ContinueWith(async x =>
+                    {
+                        await Task.Delay(10000);
+                        _ = x.Result.DeleteAsync();
+                    });
+                    return;
                 }
             }
-
-        }).Add(_bot.watcher);
+        }
     }
 }

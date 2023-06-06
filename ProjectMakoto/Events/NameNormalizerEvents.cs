@@ -20,11 +20,25 @@ internal sealed class NameNormalizerEvents
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        Task.Run(async () =>
-        {
-            if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
-                return;
+        if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
+            return;
 
+        string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
+
+        if (PingableName.IsNullOrWhiteSpace())
+            PingableName = "Pingable Name";
+
+        if (PingableName != e.Member.DisplayName)
+            _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
+    }
+
+    internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
+    {
+        if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
+            return;
+
+        if (e.NicknameBefore != e.NicknameAfter)
+        {
             string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
@@ -32,51 +46,28 @@ internal sealed class NameNormalizerEvents
 
             if (PingableName != e.Member.DisplayName)
                 _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
-        }).Add(_bot.watcher);
-    }
-
-    internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
-    {
-        Task.Run(async () =>
-        {
-            if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
-                return;
-
-            if (e.NicknameBefore != e.NicknameAfter)
-            {
-                string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
-
-                if (PingableName.IsNullOrWhiteSpace())
-                    PingableName = "Pingable Name";
-
-                if (PingableName != e.Member.DisplayName)
-                    _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
-            }
-        }).Add(_bot.watcher);
+        }
     }
 
     internal async Task UserUpdated(DiscordClient sender, UserUpdateEventArgs e)
     {
-        Task.Run(async () =>
+        if (e.UserBefore.GetUsername() == e.UserAfter.GetUsername())
+            return;
+
+        foreach (var guild in sender.Guilds)
         {
-            if (e.UserBefore.GetUsername() == e.UserAfter.GetUsername())
+            if (!_bot.guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
                 return;
 
-            foreach (var guild in sender.Guilds)
-            {
-                if (!_bot.guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
-                    return;
+            var member = await e.UserAfter.ConvertToMember(guild.Value);
 
-                var member = await e.UserAfter.ConvertToMember(guild.Value);
+            string PingableName = RegexTemplates.AllowedNickname.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
-                string PingableName = RegexTemplates.AllowedNickname.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), "");
+            if (PingableName.IsNullOrWhiteSpace())
+                PingableName = "Pingable Name";
 
-                if (PingableName.IsNullOrWhiteSpace())
-                    PingableName = "Pingable Name";
-
-                if (PingableName != member.DisplayName)
-                    _ = member.ModifyAsync(x => x.Nickname = PingableName);
-            }
-        }).Add(_bot.watcher);
+            if (PingableName != member.DisplayName)
+                _ = member.ModifyAsync(x => x.Nickname = PingableName);
+        }
     }
 }
