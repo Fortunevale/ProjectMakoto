@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+    <CodeSnippet Format="1.0.0">
+        <Header>
+           <Title>Modal with Retry</Title>
+           <Author>Myself</Author>
+           <Description>Modal with Retry</Description>
+           <Shortcut>modal</Shortcut>
+        </Header>
+        <Snippet>
+            <Code Language="CSharp">
+                <![CDATA[var ModalResult = await PromptModalWithRetry();
+
+                if (ModalResult.TimedOut)
+                {
+                    ModifyToTimedOut(true);
+                    return;
+                }
+                else if (ModalResult.Cancelled)
+                {
+                    await ExecuteCommand(ctx, arguments);
+                    return;
+                }
+                else if (ModalResult.Errored)
+                {
+                    throw ModalResult.Exception;
+                }]]>
+            </Code>
+        </Snippet>
+    </CodeSnippet>
+</CodeSnippets>
