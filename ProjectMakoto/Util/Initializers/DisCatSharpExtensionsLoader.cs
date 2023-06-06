@@ -182,6 +182,9 @@ internal sealed class DisCatSharpExtensionsLoader
 
         _ = Task.Run(async () =>
         {
+            while (!bot.status.DiscordInitialized)
+                Thread.Sleep(100);
+
             try
             {
                 _logger.LogInfo("Connecting and authenticating with Lavalink..");
