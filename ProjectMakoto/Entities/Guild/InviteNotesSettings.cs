@@ -13,7 +13,7 @@ public sealed class InviteNotesSettings
 {
     public InviteNotesSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }

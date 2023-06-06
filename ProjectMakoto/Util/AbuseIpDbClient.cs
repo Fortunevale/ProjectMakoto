@@ -14,7 +14,7 @@ public sealed class AbuseIpDbClient
     internal AbuseIpDbClient(Bot bot)
     {
         this._bot = bot;
-        _ = this.QueueHandler();
+        _ = QueueHandler();
     }
 
     private Bot _bot { get; set; }
@@ -29,17 +29,17 @@ public sealed class AbuseIpDbClient
     {
         HttpClient client = new();
 
-        while (_bot.status.LoadedConfig.Secrets.AbuseIpDbToken.IsNullOrWhiteSpace())
+        while (this._bot.status.LoadedConfig.Secrets.AbuseIpDbToken.IsNullOrWhiteSpace())
         {
             await Task.Delay(5000);
         }
 
-        client.DefaultRequestHeaders.Add("Key", _bot.status.LoadedConfig.Secrets.AbuseIpDbToken);
+        client.DefaultRequestHeaders.Add("Key", this._bot.status.LoadedConfig.Secrets.AbuseIpDbToken);
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
         while (true)
         {
-            while (RequestsRemaining <= 0)
+            while (this.RequestsRemaining <= 0)
             {
                 var now = DateTimeOffset.UtcNow;
                 var tomorrow = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(1);
@@ -51,22 +51,22 @@ public sealed class AbuseIpDbClient
                     await Task.Delay(delay);
 
                 _logger.LogInfo("Ratelimit cleared for AbuseIPDB.");
-                RequestsRemaining = 1;
+                this.RequestsRemaining = 1;
             }
 
-            if (Queue.Count == 0 || !Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
             {
                 await Task.Delay(100);
                 continue;
             }
 
-            var b = Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
+            var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
 
             try
             {
                 var response = await client.GetAsync(b.Value.Url);
 
-                Queue[b.Key].StatusCode = response.StatusCode;
+                this.Queue[b.Key].StatusCode = response.StatusCode;
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -81,7 +81,7 @@ public sealed class AbuseIpDbClient
 
                     if (response.StatusCode == HttpStatusCode.TooManyRequests)
                     {
-                        RequestsRemaining = 0;
+                        this.RequestsRemaining = 0;
                         _logger.LogError("Daily Ratelimit hit for AbuseIPDB.");
                         continue;
                     }
@@ -89,16 +89,16 @@ public sealed class AbuseIpDbClient
                     throw new Exception($"Unhandled, unsuccessful request: {response.StatusCode}");
                 }
 
-                RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
-                _logger.LogDebug("{RequestsRemaining} AbuseIPDB requests remaining.", RequestsRemaining);
+                this.RequestsRemaining = response.Headers.First(x => x.Key == "X-RateLimit-Remaining").Value.First().ToInt32();
+                _logger.LogDebug("{RequestsRemaining} AbuseIPDB requests remaining.", this.RequestsRemaining);
 
-                Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
-                Queue[b.Key].Resolved = true;
+                this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
+                this.Queue[b.Key].Resolved = true;
             }
             catch (Exception ex)
             {
-                Queue[b.Key].Failed = true;
-                Queue[b.Key].Exception = ex;
+                this.Queue[b.Key].Failed = true;
+                this.Queue[b.Key].Exception = ex;
             }
             finally
             {
@@ -110,16 +110,16 @@ public sealed class AbuseIpDbClient
     private async Task<string> MakeRequest(string url)
     {
         string key = Guid.NewGuid().ToString();
-        Queue.Add(key, new RequestItem { Url = url });
+        this.Queue.Add(key, new RequestItem { Url = url });
 
-        while (Queue.ContainsKey(key) && !Queue[key].Resolved && !Queue[key].Failed)
+        while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);
 
-        if (!Queue.ContainsKey(key))
+        if (!this.Queue.ContainsKey(key))
             throw new Exception("The request has been removed from the queue prematurely.");
 
-        var response = Queue[key];
-        Queue.Remove(key);
+        var response = this.Queue[key];
+        this.Queue.Remove(key);
 
         if (response.Resolved)
             return response.Response;
@@ -132,15 +132,15 @@ public sealed class AbuseIpDbClient
 
     public async Task<AbuseIpDbQuery> QueryIp(string Ip, bool bypassCache = false)
     {
-        while (Cache.ContainsKey(Ip) && Cache[Ip] is null)
+        while (this.Cache.ContainsKey(Ip) && this.Cache[Ip] is null)
             await Task.Delay(100);
 
-        if (Cache.TryGetValue(Ip, out Tuple<AbuseIpDbQuery, DateTime> value) && value.Item2.AddHours(4).GetTotalSecondsUntil() > 0 && !bypassCache)
-            return Cache[Ip].Item1;
+        if (this.Cache.TryGetValue(Ip, out Tuple<AbuseIpDbQuery, DateTime> value) && value.Item2.AddHours(4).GetTotalSecondsUntil() > 0 && !bypassCache)
+            return this.Cache[Ip].Item1;
         else
-            Cache.Remove(Ip);
+            this.Cache.Remove(Ip);
 
-        Cache.Add(Ip, null);
+        this.Cache.Add(Ip, null);
 
         string query;
 
@@ -157,7 +157,7 @@ public sealed class AbuseIpDbClient
         var rawResponse = await MakeRequest($"https://api.abuseipdb.com/api/v2/check?{query}");
         var parsedResponse = JsonConvert.DeserializeObject<AbuseIpDbQuery>(rawResponse);
 
-        Cache[Ip] = new Tuple<AbuseIpDbQuery, DateTime>(parsedResponse, DateTime.UtcNow);
+        this.Cache[Ip] = new Tuple<AbuseIpDbQuery, DateTime>(parsedResponse, DateTime.UtcNow);
         return parsedResponse;
     }
 }

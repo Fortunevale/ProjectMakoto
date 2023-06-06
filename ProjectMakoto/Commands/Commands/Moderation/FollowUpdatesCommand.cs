@@ -19,7 +19,7 @@ internal sealed class FollowUpdatesCommand : BaseCommand
         {
             var channel = (FollowChannel)arguments["channel"];
 
-            var CommandKey = t.Commands.Moderation.FollowUpdates;
+            var CommandKey = this.t.Commands.Moderation.FollowUpdates;
 
             try
             {

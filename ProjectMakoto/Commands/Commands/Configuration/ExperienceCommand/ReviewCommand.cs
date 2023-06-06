@@ -23,7 +23,7 @@ internal sealed class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = ExperienceCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.Config.Experience.Title)));
+            }.AsInfo(ctx, GetString(this.t.Commands.Config.Experience.Title)));
         });
     }
 }

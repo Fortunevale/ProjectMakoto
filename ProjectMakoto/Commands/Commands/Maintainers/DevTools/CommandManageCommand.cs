@@ -98,8 +98,8 @@ internal sealed class CommandManageCommand : BaseCommand
                     return;
                 }
 
-                var SelectionResult = await PromptCustomSelection(CommandList.Select(x => 
-                    new DiscordStringSelectComponentOption(x.FirstLetterToUpper(), x, 
+                var SelectionResult = await PromptCustomSelection(CommandList.Select(x =>
+                    new DiscordStringSelectComponentOption(x.FirstLetterToUpper(), x,
                         (x.Contains(' ') ? "Sub Command" : (CommandList.Where(y => y.StartsWith(x)).Count() >= 2 ? "Command Group" : "Single Command")))).ToList(), "Select a command to disable..");
 
                 if (SelectionResult.TimedOut)

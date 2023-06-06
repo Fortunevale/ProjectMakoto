@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.LevelRewards;
+            var CommandKey = this.t.Commands.Config.LevelRewards;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -71,8 +71,8 @@ internal sealed class ConfigCommand : BaseCommand
                     embed.Description = GetString(CommandKey.NoRewardsSetup, true);
                 }
 
-                var PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", GetString(t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-                var NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", GetString(t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                var PreviousPage = new DiscordButtonComponent(ButtonStyle.Primary, "PreviousPage", GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                var NextPage = new DiscordButtonComponent(ButtonStyle.Primary, "NextPage", GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
                 var Add = new DiscordButtonComponent(ButtonStyle.Success, "Add", GetString(CommandKey.AddNewButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
                 var Modify = new DiscordButtonComponent(ButtonStyle.Primary, "Modify", GetString(CommandKey.ModifyButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
@@ -153,14 +153,14 @@ internal sealed class ConfigCommand : BaseCommand
                                 var SelectRole = new DiscordButtonComponent((selectedRole is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectRoleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
                                 var SelectLevel = new DiscordButtonComponent((selectedLevel is -1 ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectLevelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✨")));
                                 var SelectCustomText = new DiscordButtonComponent((selectedCustomText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.ChangeMessageButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
-                                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Submit), (selectedRole is null || selectedLevel is -1 || selectedCustomText.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Common.Submit), (selectedRole is null || selectedLevel is -1 || selectedCustomText.IsNullOrWhiteSpace()), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
                                 var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.Role, CommandKey.Level, CommandKey.Message);
 
                                 var action_embed = new DiscordEmbedBuilder
                                 {
-                                    Description = $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(selectedRole is null ? GetString(t.Common.NotSelected, true) : selectedRole.Mention)}\n" +
-                                                  $"`{GetString(CommandKey.Level).PadRight(pad)}`: {(selectedLevel is -1 ? GetString(t.Common.NotSelected, true) : selectedLevel.ToEmotes())}\n" +
+                                    Description = $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(selectedRole is null ? GetString(this.t.Common.NotSelected, true) : selectedRole.Mention)}\n" +
+                                                  $"`{GetString(CommandKey.Level).PadRight(pad)}`: {(selectedLevel is -1 ? GetString(this.t.Common.NotSelected, true) : selectedLevel.ToEmotes())}\n" +
                                                   $"`{GetString(CommandKey.Message).PadRight(pad)}`: `{selectedCustomText}`"
                                 }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
@@ -195,7 +195,7 @@ internal sealed class ConfigCommand : BaseCommand
                                     {
                                         if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                                         {
-                                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoRoles, true)));
+                                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoRoles, true)));
                                             await Task.Delay(3000);
                                             return;
                                         }
@@ -334,7 +334,8 @@ internal sealed class ConfigCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder()
                                 .WithTitle(GetString(CommandKey.Title))
                                 .WithCustomId(Guid.NewGuid().ToString())
-                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", GetString(CommandKey.Message), null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message)); ;
+                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", GetString(CommandKey.Message), null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
+                            ;
 
                             var ModalResult = await PromptModalWithRetry(e.Interaction, modal, false);
 

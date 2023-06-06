@@ -36,9 +36,9 @@ internal sealed class ReminderEvents
 
         ReminderSnoozeButton reminder = JsonConvert.DeserializeObject<ReminderSnoozeButton>(e.Id);
 
-        new RemindersCommand().ExecuteCommand(e, sender, "reminders", _bot, new Dictionary<string, object>
+        new RemindersCommand().ExecuteCommand(e, sender, "reminders", this._bot, new Dictionary<string, object>
         {
             { "description", reminder.Description },
-        }).Add(_bot.watcher);
+        }).Add(this._bot.watcher);
     }
 }

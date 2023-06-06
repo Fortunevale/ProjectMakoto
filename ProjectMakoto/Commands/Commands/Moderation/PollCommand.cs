@@ -20,7 +20,7 @@ internal sealed class PollCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            var CommandKey = t.Commands.Moderation.Poll;
+            var CommandKey = this.t.Commands.Moderation.Poll;
 
             if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
             {
@@ -59,22 +59,22 @@ internal sealed class PollCommand : BaseCommand
                 var SelectChannelButton = new DiscordButtonComponent((SelectedChannel is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectChannelButton), false, DiscordEmoji.FromUnicode("📢").ToComponent());
 
                 var SelectPromptButton = new DiscordButtonComponent((SelectedPrompt.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectPollContentButton), false, DiscordEmoji.FromUnicode("❓").ToComponent());
-            
+
                 var AddOptionButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.NewOptionButton), (SelectedOptions.Count >= 20), DiscordEmoji.FromUnicode("➕").ToComponent());
                 var RemoveOptionButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveOptionButton), (SelectedOptions.Count <= 0), DiscordEmoji.FromUnicode("➖").ToComponent());
                 var SelectDueDateButton = new DiscordButtonComponent((selectedDueDate is null ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SetTimeButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
                 var SelectMultiSelectButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(CommandKey.SelectMultiSelectButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💠")));
 
-                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Common.Submit), (SelectedChannel is null || SelectedPrompt.IsNullOrWhiteSpace() || !SelectedOptions.IsNotNullAndNotEmpty() || SelectedOptions.Count < 2 || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Common.Submit), (SelectedChannel is null || SelectedPrompt.IsNullOrWhiteSpace() || !SelectedOptions.IsNotNullAndNotEmpty() || SelectedOptions.Count < 2 || selectedDueDate is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
                 var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.PollContent, CommandKey.AvailableOptions, CommandKey.SelectedChannel, CommandKey.DueTime, CommandKey.Role, CommandKey.MinimumVotes, CommandKey.MaximumVotes);
 
                 var embed = new DiscordEmbedBuilder()
-                    .WithDescription($"`{GetString(CommandKey.PollContent).PadRight(pad)}`: {(SelectedPrompt.IsNullOrWhiteSpace() ? GetString(t.Common.NotSelected, true) : $"{SelectedPrompt.FullSanitize()}")}\n" +
+                    .WithDescription($"`{GetString(CommandKey.PollContent).PadRight(pad)}`: {(SelectedPrompt.IsNullOrWhiteSpace() ? GetString(this.t.Common.NotSelected, true) : $"{SelectedPrompt.FullSanitize()}")}\n" +
                                      $"`{GetString(CommandKey.AvailableOptions).PadRight(pad)}`: {(!SelectedOptions.IsNotNullAndNotEmpty() ? GetString(CommandKey.NoOptions, true) : $"{string.Join(", ", SelectedOptions.Select(x => $"`{x.Label.TruncateWithIndication(10)}`"))}")}\n\n" +
-                                     $"`{GetString(CommandKey.SelectedChannel).PadRight(pad)}`: {(SelectedChannel is null ? GetString(t.Common.NotSelected, true) : SelectedChannel.Mention)}\n" +
-                                     $"`{GetString(CommandKey.DueTime).PadRight(pad)}`: {(selectedDueDate is null ? GetString(t.Common.NotSelected, true) : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}\n" +
-                                     $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(SelectedRole is null ? GetString(t.Common.NotSelected, true) : SelectedRole.Mention)}\n" +
+                                     $"`{GetString(CommandKey.SelectedChannel).PadRight(pad)}`: {(SelectedChannel is null ? GetString(this.t.Common.NotSelected, true) : SelectedChannel.Mention)}\n" +
+                                     $"`{GetString(CommandKey.DueTime).PadRight(pad)}`: {(selectedDueDate is null ? GetString(this.t.Common.NotSelected, true) : $"{selectedDueDate.Value.ToTimestamp(TimestampFormat.LongDateTime)} ({selectedDueDate.Value.ToTimestamp()})")}\n" +
+                                     $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(SelectedRole is null ? GetString(this.t.Common.NotSelected, true) : SelectedRole.Mention)}\n" +
                                      $"`{GetString(CommandKey.MinimumVotes).PadRight(pad)}`: `{SelectedMin}`\n" +
                                      $"`{GetString(CommandKey.MaximumVotes).PadRight(pad)}`: `{SelectedMax}`")
                     .AsAwaitingInput(ctx);
@@ -112,7 +112,7 @@ internal sealed class PollCommand : BaseCommand
                     {
                         if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoRoles)));
+                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoRoles)));
                             await Task.Delay(3000);
                             continue;
                         }
@@ -142,7 +142,7 @@ internal sealed class PollCommand : BaseCommand
                     {
                         if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoChannels)));
+                            await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels)));
                             await Task.Delay(3000);
                             continue;
                         }

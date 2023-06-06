@@ -13,7 +13,7 @@ public sealed class InviteTrackerMember
 {
     public InviteTrackerMember(Member member)
     {
-        Parent = member;
+        this.Parent = member;
     }
 
     private Member Parent { get; set; }
@@ -21,24 +21,24 @@ public sealed class InviteTrackerMember
 
 
     private ulong _UserId { get; set; } = 0;
-    public ulong UserId 
-    { 
-        get => _UserId; 
-        set 
-        { 
-            _UserId = value;
-            _ = Bot.DatabaseClient.UpdateValue(Parent.Guild.ServerId.ToString(), "userid", Parent.MemberId, "invite_user", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public ulong UserId
+    {
+        get => this._UserId;
+        set
+        {
+            this._UserId = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "invite_user", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 
     private string _Code { get; set; } = "";
-    public string Code 
-    { 
-        get => _Code; 
-        set 
-        { 
-            _Code = value;
-            _ = Bot.DatabaseClient.UpdateValue(Parent.Guild.ServerId.ToString(), "userid", Parent.MemberId, "invite_code", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public string Code
+    {
+        get => this._Code;
+        set
+        {
+            this._Code = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "invite_code", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 }

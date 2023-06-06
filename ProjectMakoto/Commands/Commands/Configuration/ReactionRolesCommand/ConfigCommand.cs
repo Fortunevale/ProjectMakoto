@@ -338,7 +338,7 @@ internal sealed class ConfigCommand : BaseCommand
                 if (ctx.Guild.GetChannel(obj.Value.ChannelId).TryGetMessage(obj.Key, out var reactionMessage))
                     _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-                var role = ctx.Guild.GetRole(obj.Value.RoleId);                
+                var role = ctx.Guild.GetRole(obj.Value.RoleId);
 
                 ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 

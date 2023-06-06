@@ -26,21 +26,21 @@ public sealed class ThreadJoinClient
     {
         while (true)
         {
-            if (Queue.Count == 0)
+            if (this.Queue.Count == 0)
             {
                 await Task.Delay(100);
                 continue;
             }
 
-            var b = Queue.First();
+            var b = this.Queue.First();
 
             try
             {
                 await b.Value.JoinAsync();
 
-                lock (Queue)
+                lock (this.Queue)
                 {
-                    Queue.Remove(b.Key);
+                    this.Queue.Remove(b.Key);
                 }
             }
             finally
@@ -52,12 +52,12 @@ public sealed class ThreadJoinClient
 
     public async Task JoinThread(DiscordThreadChannel channel)
     {
-        lock (Queue)
+        lock (this.Queue)
         {
-            if (Queue.ContainsKey(channel.Id))
+            if (this.Queue.ContainsKey(channel.Id))
                 return;
 
-            Queue.Add(channel.Id, channel);
+            this.Queue.Add(channel.Id, channel);
             return;
         }
     }

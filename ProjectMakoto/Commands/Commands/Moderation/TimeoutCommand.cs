@@ -35,7 +35,7 @@ internal sealed class TimeoutCommand : BaseCommand
                 throw;
             }
 
-            var CommandKey = t.Commands.Moderation.Timeout;
+            var CommandKey = this.t.Commands.Moderation.Timeout;
 
             await RespondOrEdit(new DiscordEmbedBuilder()
                 .WithDescription(GetString(CommandKey.TimingOut, true, new TVar("Victim", victim.Mention)))

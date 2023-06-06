@@ -46,7 +46,7 @@ public sealed class BaseOverload
     /// If the overload is required.
     /// </summary>
     public bool Required { get; set; }
-    
+
     /// <summary>
     /// If the overload is required.
     /// </summary>

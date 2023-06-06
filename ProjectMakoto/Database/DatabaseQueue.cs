@@ -30,13 +30,13 @@ internal sealed class DatabaseQueue
                 {
                     bool Removed = false;
 
-                    for (int i = 0; i < Queue.Count; i++)
+                    for (int i = 0; i < this.Queue.Count; i++)
                     {
-                        var obj = Queue[i];
+                        var obj = this.Queue[i];
 
                         if (obj is null || obj.Executed || obj.Failed)
                         {
-                            Queue.Remove(obj);
+                            this.Queue.Remove(obj);
                             Removed = true;
                             break;
                         }
@@ -47,9 +47,9 @@ internal sealed class DatabaseQueue
 
                     RequestQueue b = null;
 
-                    for (int i = 0; i < Queue.Count; i++)
+                    for (int i = 0; i < this.Queue.Count; i++)
                     {
-                        var obj = Queue[i];
+                        var obj = this.Queue[i];
 
                         if (obj is null)
                             continue;
@@ -144,20 +144,20 @@ internal sealed class DatabaseQueue
             }
             catch (Exception)
             {
-                FailCount++;
+                this.FailCount++;
 
-                if (FailCount > 20)
+                if (this.FailCount > 20)
                 {
                     _logger.LogFatal("Queue Handler failed 20 times, terminating application.");
 
-                    _ = _bot.ExitApplication(true);
+                    _ = this._bot.ExitApplication(true);
                     throw;
                 }
 
                 _ = QueueHandler();
                 throw;
             }
-        }).Add(_bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal, int depth = 0)
@@ -167,8 +167,10 @@ internal sealed class DatabaseQueue
 
         RequestQueue value = new() { RequestType = DatabaseRequestType.Command, Command = cmd, Priority = priority };
 
-        Queue.Add(value);
-        try { Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority)); } catch { }
+        this.Queue.Add(value);
+        try
+        { this.Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority)); }
+        catch { }
 
         Stopwatch sw = new();
 
@@ -197,8 +199,10 @@ internal sealed class DatabaseQueue
 
         RequestQueue value = new() { RequestType = DatabaseRequestType.Ping, Connection = conn, Priority = QueuePriority.Low };
 
-        Queue.Add(value);
-        try { Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority)); } catch { }
+        this.Queue.Add(value);
+        try
+        { this.Queue.Sort((a, b) => ((int)a?.Priority).CompareTo((int)b?.Priority)); }
+        catch { }
 
         Stopwatch sw = new();
 

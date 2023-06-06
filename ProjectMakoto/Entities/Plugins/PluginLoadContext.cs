@@ -7,12 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Loader;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectMakoto.Plugins;
 internal sealed class PluginLoadContext : AssemblyLoadContext
@@ -21,12 +16,12 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
 
     public PluginLoadContext(string pluginPath)
     {
-        _resolver = new AssemblyDependencyResolver(pluginPath);
+        this._resolver = new AssemblyDependencyResolver(pluginPath);
     }
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
-        string assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        string assemblyPath = this._resolver.ResolveAssemblyToPath(assemblyName);
         if (assemblyPath != null)
         {
             return LoadFromAssemblyPath(assemblyPath);
@@ -37,7 +32,7 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
 
     protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
     {
-        string libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+        string libraryPath = this._resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
         if (libraryPath != null)
         {
             return LoadUnmanagedDllFromPath(libraryPath);

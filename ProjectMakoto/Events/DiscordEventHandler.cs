@@ -1,10 +1,10 @@
 // Project Makoto
 // Copyright (C) 2023  Fortunevale
-// handler program is free software: you can redistribute it and/or modify
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// handler program is distributed in the hope that it will be useful,
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Events;
@@ -115,30 +115,30 @@ internal sealed class DiscordEventHandler
     {
         if (guild is not null)
         {
-            if (!_bot.guilds.ContainsKey(guild.Id))
-                _bot.guilds.Add(guild.Id, new Guild(guild.Id, _bot));
+            if (!this._bot.guilds.ContainsKey(guild.Id))
+                this._bot.guilds.Add(guild.Id, new Guild(guild.Id, this._bot));
 
             if (guild.Members is not null && guild.Members.Count > 0)
                 foreach (var b in guild.Members)
-                    if (!_bot.guilds[guild.Id].Members.ContainsKey(b.Key))
-                        _bot.guilds[guild.Id].Members.Add(b.Key, new(_bot.guilds[guild.Id], b.Key));
+                    if (!this._bot.guilds[guild.Id].Members.ContainsKey(b.Key))
+                        this._bot.guilds[guild.Id].Members.Add(b.Key, new(this._bot.guilds[guild.Id], b.Key));
 
             if (member is not null)
-                if (!_bot.guilds[guild.Id].Members.ContainsKey(member.Id))
-                    _bot.guilds[guild.Id].Members.Add(member.Id, new(_bot.guilds[guild.Id], member.Id));
+                if (!this._bot.guilds[guild.Id].Members.ContainsKey(member.Id))
+                    this._bot.guilds[guild.Id].Members.Add(member.Id, new(this._bot.guilds[guild.Id], member.Id));
 
             if (user is not null)
-                if (!_bot.guilds[guild.Id].Members.ContainsKey(user.Id))
-                    _bot.guilds[guild.Id].Members.Add(user.Id, new(_bot.guilds[guild.Id], user.Id));
+                if (!this._bot.guilds[guild.Id].Members.ContainsKey(user.Id))
+                    this._bot.guilds[guild.Id].Members.Add(user.Id, new(this._bot.guilds[guild.Id], user.Id));
         }
 
         if (member is not null)
-            if (!_bot.users.ContainsKey(member.Id) && !_bot.objectedUsers.Contains(member.Id))
-                _bot.users.Add(member.Id, new(_bot, member.Id));
+            if (!this._bot.users.ContainsKey(member.Id) && !this._bot.objectedUsers.Contains(member.Id))
+                this._bot.users.Add(member.Id, new(this._bot, member.Id));
 
         if (user is not null)
-            if (!_bot.users.ContainsKey(user.Id) && !_bot.objectedUsers.Contains(user.Id))
-                _bot.users.Add(user.Id, new(_bot, user.Id));
+            if (!this._bot.users.ContainsKey(user.Id) && !this._bot.objectedUsers.Contains(user.Id))
+                this._bot.users.Add(user.Id, new(this._bot, user.Id));
     }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
@@ -147,12 +147,12 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, e.Member);
 
-            genericGuildEvents.GuildMemberAdded(sender, e).Add(_bot.watcher);
-            actionlogEvents.UserJoined(sender, e).Add(_bot.watcher);
-            joinEvents.GuildMemberAdded(sender, e).Add(_bot.watcher);
-            inviteTrackerEvents.GuildMemberAdded(sender, e).Add(_bot.watcher);
-            nameNormalizerEvents.GuildMemberAdded(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.genericGuildEvents.GuildMemberAdded(sender, e).Add(this._bot.watcher);
+            this.actionlogEvents.UserJoined(sender, e).Add(this._bot.watcher);
+            this.joinEvents.GuildMemberAdded(sender, e).Add(this._bot.watcher);
+            this.inviteTrackerEvents.GuildMemberAdded(sender, e).Add(this._bot.watcher);
+            this.nameNormalizerEvents.GuildMemberAdded(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
@@ -161,10 +161,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, e.Member);
 
-            genericGuildEvents.GuildMemberRemoved(sender, e).Add(_bot.watcher);
-            actionlogEvents.UserLeft(sender, e).Add(_bot.watcher);
-            joinEvents.GuildMemberRemoved(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.genericGuildEvents.GuildMemberRemoved(sender, e).Add(this._bot.watcher);
+            this.actionlogEvents.UserLeft(sender, e).Add(this._bot.watcher);
+            this.joinEvents.GuildMemberRemoved(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
@@ -173,10 +173,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, e.Member);
 
-            genericGuildEvents.GuildMemberUpdated(sender, e).Add(_bot.watcher);
-            actionlogEvents.MemberUpdated(sender, e).Add(_bot.watcher);
-            nameNormalizerEvents.GuildMemberUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.genericGuildEvents.GuildMemberUpdated(sender, e).Add(this._bot.watcher);
+            this.actionlogEvents.MemberUpdated(sender, e).Add(this._bot.watcher);
+            this.nameNormalizerEvents.GuildMemberUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildBanAdded(DiscordClient sender, GuildBanAddEventArgs e)
@@ -185,9 +185,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, e.Member);
 
-            genericGuildEvents.GuildMemberBanned(sender, e).Add(_bot.watcher);
-            actionlogEvents.BanAdded(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.genericGuildEvents.GuildMemberBanned(sender, e).Add(this._bot.watcher);
+            this.actionlogEvents.BanAdded(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
@@ -196,8 +196,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Context.Guild, e.Context.Member);
 
-            commandEvents.CommandExecuted(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.commandEvents.CommandExecuted(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task CommandError(CommandsNextExtension sender, CommandErrorEventArgs e)
@@ -205,8 +205,8 @@ internal sealed class DiscordEventHandler
         Task.Run(async () =>
         {
             FillDatabase(e.Context.Guild, e.Context.Member);
-            commandEvents.CommandError(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.commandEvents.CommandError(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
@@ -215,13 +215,13 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.Message.Author);
 
-            afkEvents.MessageCreated(sender, e).Add(_bot.watcher);
-            crosspostEvents.MessageCreated(sender, e).Add(_bot.watcher);
-            phishingProtectionEvents.MessageCreated(sender, e).Add(_bot.watcher);
-            bumpReminderEvents.MessageCreated(sender, e).Add(_bot.watcher);
-            experienceEvents.MessageCreated(sender, e).Add(_bot.watcher);
-            embedMessagesEvents.MessageCreated(sender, e).Add(_bot.watcher);
-            tokenLeakEvents.MessageCreated(sender, e).Add(_bot.watcher);
+            this.afkEvents.MessageCreated(sender, e).Add(this._bot.watcher);
+            this.crosspostEvents.MessageCreated(sender, e).Add(this._bot.watcher);
+            this.phishingProtectionEvents.MessageCreated(sender, e).Add(this._bot.watcher);
+            this.bumpReminderEvents.MessageCreated(sender, e).Add(this._bot.watcher);
+            this.experienceEvents.MessageCreated(sender, e).Add(this._bot.watcher);
+            this.embedMessagesEvents.MessageCreated(sender, e).Add(this._bot.watcher);
+            this.tokenLeakEvents.MessageCreated(sender, e).Add(this._bot.watcher);
 
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {
@@ -229,7 +229,7 @@ internal sealed class DiscordEventHandler
 
                 try
                 {
-                    prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
+                    prefix = this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
                 }
                 catch (Exception)
                 {
@@ -237,10 +237,10 @@ internal sealed class DiscordEventHandler
                 }
 
                 _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Makoto. I support Slash Commands, but additionally you can use me via `{prefix}`. To get a list of all commands, type `;;help` or do a `/` and filter by me.\n" +
-                                $"If you need help, feel free to join our Support and Development Server: <{_bot.status.DevelopmentServerInvite}>\n\n" +
+                                $"If you need help, feel free to join our Support and Development Server: <{this._bot.status.DevelopmentServerInvite}>\n\n" +
                                 $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/makoto>.");
             }
-        }).Add(_bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
@@ -249,10 +249,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.Message.Author);
 
-            phishingProtectionEvents.MessageUpdated(sender, e).Add(_bot.watcher);
-            actionlogEvents.MessageUpdated(sender, e).Add(_bot.watcher);
-            tokenLeakEvents.MessageUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.phishingProtectionEvents.MessageUpdated(sender, e).Add(this._bot.watcher);
+            this.actionlogEvents.MessageUpdated(sender, e).Add(this._bot.watcher);
+            this.tokenLeakEvents.MessageUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
@@ -261,10 +261,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.Interaction.User);
 
-            submissionEvents.ComponentInteractionCreated(sender, e).Add(_bot.watcher);
-            embedMessagesEvents.ComponentInteractionCreated(sender, e).Add(_bot.watcher);
-            reminderEvents.ComponentInteractionCreated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.submissionEvents.ComponentInteractionCreated(sender, e).Add(this._bot.watcher);
+            this.embedMessagesEvents.ComponentInteractionCreated(sender, e).Add(this._bot.watcher);
+            this.reminderEvents.ComponentInteractionCreated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildCreated(DiscordClient sender, GuildCreateEventArgs e)
@@ -273,9 +273,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            discordEvents.GuildCreated(sender, e).Add(_bot.watcher);
-            inviteTrackerEvents.GuildCreated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.discordEvents.GuildCreated(sender, e).Add(this._bot.watcher);
+            this.inviteTrackerEvents.GuildCreated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task MessageDeleted(DiscordClient sender, MessageDeleteEventArgs e)
@@ -284,9 +284,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.Message.Author);
 
-            actionlogEvents.MessageDeleted(sender, e).Add(_bot.watcher);
-            bumpReminderEvents.MessageDeleted(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.MessageDeleted(sender, e).Add(this._bot.watcher);
+            this.bumpReminderEvents.MessageDeleted(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task MessagesBulkDeleted(DiscordClient sender, MessageBulkDeleteEventArgs e)
@@ -295,8 +295,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.MessageBulkDeleted(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.MessageBulkDeleted(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildRoleCreated(DiscordClient sender, GuildRoleCreateEventArgs e)
@@ -305,8 +305,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.RoleCreated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.RoleCreated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildRoleUpdated(DiscordClient sender, GuildRoleUpdateEventArgs e)
@@ -315,8 +315,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.RoleModified(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.RoleModified(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildRoleDeleted(DiscordClient sender, GuildRoleDeleteEventArgs e)
@@ -325,8 +325,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.RoleDeleted(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.RoleDeleted(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildBanRemoved(DiscordClient sender, GuildBanRemoveEventArgs e)
@@ -335,8 +335,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, e.Member);
 
-            actionlogEvents.BanRemoved(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.BanRemoved(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task GuildUpdated(DiscordClient sender, GuildUpdateEventArgs e)
@@ -345,8 +345,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.GuildAfter);
 
-            actionlogEvents.GuildUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.GuildUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ChannelCreated(DiscordClient sender, ChannelCreateEventArgs e)
@@ -355,9 +355,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.ChannelCreated(sender, e).Add(_bot.watcher);
-            voicePrivacyEvents.ChannelCreated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.ChannelCreated(sender, e).Add(this._bot.watcher);
+            this.voicePrivacyEvents.ChannelCreated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ChannelDeleted(DiscordClient sender, ChannelDeleteEventArgs e)
@@ -366,8 +366,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.ChannelDeleted(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.ChannelDeleted(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ChannelUpdated(DiscordClient sender, ChannelUpdateEventArgs e)
@@ -376,8 +376,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.ChannelUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.ChannelUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task InviteCreated(DiscordClient sender, InviteCreateEventArgs e)
@@ -386,9 +386,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.InviteCreated(sender, e).Add(_bot.watcher);
-            inviteTrackerEvents.InviteCreated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.InviteCreated(sender, e).Add(this._bot.watcher);
+            this.inviteTrackerEvents.InviteCreated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
@@ -397,10 +397,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            actionlogEvents.InviteDeleted(sender, e).Add(_bot.watcher);
-            inviteTrackerEvents.InviteDeleted(sender, e).Add(_bot.watcher);
-            inviteNoteEvents.InviteDeleted(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.InviteDeleted(sender, e).Add(this._bot.watcher);
+            this.inviteTrackerEvents.InviteDeleted(sender, e).Add(this._bot.watcher);
+            this.inviteNoteEvents.InviteDeleted(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task MessageReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)
@@ -409,9 +409,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.User);
 
-            bumpReminderEvents.ReactionAdded(sender, e).Add(_bot.watcher);
-            reactionRoleEvents.MessageReactionAdded(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.bumpReminderEvents.ReactionAdded(sender, e).Add(this._bot.watcher);
+            this.reactionRoleEvents.MessageReactionAdded(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task MessageReactionRemoved(DiscordClient sender, MessageReactionRemoveEventArgs e)
@@ -420,9 +420,9 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.User);
 
-            bumpReminderEvents.ReactionRemoved(sender, e).Add(_bot.watcher);
-            reactionRoleEvents.MessageReactionRemoved(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.bumpReminderEvents.ReactionRemoved(sender, e).Add(this._bot.watcher);
+            this.reactionRoleEvents.MessageReactionRemoved(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
@@ -431,10 +431,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild, user: e.User);
 
-            actionlogEvents.VoiceStateUpdated(sender, e).Add(_bot.watcher);
-            voicePrivacyEvents.VoiceStateUpdated(sender, e).Add(_bot.watcher);
-            vcCreatorEvents.VoiceStateUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.actionlogEvents.VoiceStateUpdated(sender, e).Add(this._bot.watcher);
+            this.voicePrivacyEvents.VoiceStateUpdated(sender, e).Add(this._bot.watcher);
+            this.vcCreatorEvents.VoiceStateUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ThreadCreated(DiscordClient sender, ThreadCreateEventArgs e)
@@ -443,8 +443,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            e.Thread.JoinWithQueue(_bot.threadJoinClient);
-        }).Add(_bot.watcher);
+            e.Thread.JoinWithQueue(this._bot.threadJoinClient);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ThreadDeleted(DiscordClient sender, ThreadDeleteEventArgs e)
@@ -452,7 +452,7 @@ internal sealed class DiscordEventHandler
         Task.Run(async () =>
         {
             FillDatabase(e.Guild);
-        }).Add(_bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ThreadMemberUpdated(DiscordClient sender, ThreadMemberUpdateEventArgs e)
@@ -462,8 +462,8 @@ internal sealed class DiscordEventHandler
             if (e.Thread.Guild is not null)
                 FillDatabase(e.Thread.Guild);
 
-            e.Thread.JoinWithQueue(_bot.threadJoinClient);
-        }).Add(_bot.watcher);
+            e.Thread.JoinWithQueue(this._bot.threadJoinClient);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ThreadMembersUpdated(DiscordClient sender, ThreadMembersUpdateEventArgs e)
@@ -472,8 +472,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            e.Thread.JoinWithQueue(_bot.threadJoinClient);
-        }).Add(_bot.watcher);
+            e.Thread.JoinWithQueue(this._bot.threadJoinClient);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ThreadListSynced(DiscordClient sender, ThreadListSyncEventArgs e)
@@ -482,10 +482,10 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            if (_bot.status.DiscordGuildDownloadCompleted)
+            if (this._bot.status.DiscordGuildDownloadCompleted)
                 foreach (var b in e.Threads)
-                    b.JoinWithQueue(_bot.threadJoinClient);
-        }).Add(_bot.watcher);
+                    b.JoinWithQueue(this._bot.threadJoinClient);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task ThreadUpdated(DiscordClient sender, ThreadUpdateEventArgs e)
@@ -494,8 +494,8 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(e.Guild);
 
-            autoUnarchiveEvents.ThreadUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.autoUnarchiveEvents.ThreadUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task UserUpdated(DiscordClient sender, UserUpdateEventArgs e)
@@ -504,7 +504,7 @@ internal sealed class DiscordEventHandler
         {
             FillDatabase(user: e.UserAfter);
 
-            nameNormalizerEvents.UserUpdated(sender, e).Add(_bot.watcher);
-        }).Add(_bot.watcher);
+            this.nameNormalizerEvents.UserUpdated(sender, e).Add(this._bot.watcher);
+        }).Add(this._bot.watcher);
     }
 }

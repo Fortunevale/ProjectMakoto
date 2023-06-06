@@ -24,8 +24,8 @@ internal sealed class ShareCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
@@ -41,9 +41,9 @@ internal sealed class ShareCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             {
-                Description = GetString(t.Commands.Music.Playlists.Share.Shared, true, 
+                Description = GetString(this.t.Commands.Music.Playlists.Share.Shared, true,
                 new TVar("Command", $"{ctx.Prefix}playlists load-share {ctx.User.Id} {ShareCode}")),
-            }.AsInfo(ctx, GetString(t.Commands.Music.Playlists.Title))));
+            }.AsInfo(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
 
             File.WriteAllText($"PlaylistShares/{ctx.User.Id}/{ShareCode}.json", JsonConvert.SerializeObject(SelectedPlaylist, Formatting.Indented));
         });

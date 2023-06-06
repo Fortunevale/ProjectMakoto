@@ -28,7 +28,7 @@ internal sealed class QueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -44,10 +44,10 @@ internal sealed class QueueCommand : BaseCommand
 
             async Task UpdateMessage()
             {
-                DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", GetString(t.Common.Refresh), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+                DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", GetString(this.t.Common.Refresh), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
 
-                DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", GetString(t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-                DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", GetString(t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 
                 LastInt = CurrentPage * 10;
 
@@ -58,13 +58,13 @@ internal sealed class QueueCommand : BaseCommand
                     TotalTimespan = TotalTimespan.Add(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue[i].Length);
                 }
 
-                var Description = $"{GetString(t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
-                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {GetString(t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
+                var Description = $"{GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
+                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
 
                 if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count > 0)
-                    Description += $"`{GetString(t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count / 10.0)}`\n\n";
+                    Description += $"`{GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count / 10.0)}`\n\n";
 
-                Description += $"`{GetString(t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : GetString(t.Commands.Music.Queue.NoSong))}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
+                Description += $"`{GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
                 Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
                 Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
                 Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";

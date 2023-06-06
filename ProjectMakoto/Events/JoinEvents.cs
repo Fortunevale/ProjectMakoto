@@ -20,35 +20,35 @@ internal sealed class JoinEvents
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        if (_bot.guilds[e.Guild.Id].Join.AutoBanGlobalBans)
+        if (this._bot.guilds[e.Guild.Id].Join.AutoBanGlobalBans)
         {
-            if (_bot.globalBans.TryGetValue(e.Member.Id, out GlobalBanDetails globalBanDetails))
+            if (this._bot.globalBans.TryGetValue(e.Member.Id, out GlobalBanDetails globalBanDetails))
             {
                 _ = e.Member.BanAsync(7, $"Globalban: {globalBanDetails.Reason}");
                 return;
             }
         }
 
-        if (_bot.guilds[e.Guild.Id].Join.AutoAssignRoleId != 0)
+        if (this._bot.guilds[e.Guild.Id].Join.AutoAssignRoleId != 0)
         {
-            if (e.Guild.Roles.ContainsKey(_bot.guilds[e.Guild.Id].Join.AutoAssignRoleId))
+            if (e.Guild.Roles.ContainsKey(this._bot.guilds[e.Guild.Id].Join.AutoAssignRoleId))
             {
-                _ = e.Member.GrantRoleAsync(e.Guild.GetRole(_bot.guilds[e.Guild.Id].Join.AutoAssignRoleId));
+                _ = e.Member.GrantRoleAsync(e.Guild.GetRole(this._bot.guilds[e.Guild.Id].Join.AutoAssignRoleId));
             }
         }
 
-        if (_bot.guilds[e.Guild.Id].Join.JoinlogChannelId != 0)
+        if (this._bot.guilds[e.Guild.Id].Join.JoinlogChannelId != 0)
         {
-            if (e.Guild.Channels.ContainsKey(_bot.guilds[e.Guild.Id].Join.JoinlogChannelId))
+            if (e.Guild.Channels.ContainsKey(this._bot.guilds[e.Guild.Id].Join.JoinlogChannelId))
             {
-                _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].Join.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
+                _ = e.Guild.GetChannel(this._bot.guilds[e.Guild.Id].Join.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new()
                     {
                         IconUrl = AuditLogIcons.UserAdded,
                         Name = e.Member.GetUsernameWithIdentifier()
                     },
-                    Description = $"has joined **{e.Guild.Name}**. Welcome! {_bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
+                    Description = $"has joined **{e.Guild.Name}**. Welcome! {this._bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
                     Color = EmbedColors.Success,
                     Thumbnail = new()
                     {
@@ -61,11 +61,11 @@ internal sealed class JoinEvents
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
     {
-        if (_bot.guilds[e.Guild.Id].Join.JoinlogChannelId != 0)
+        if (this._bot.guilds[e.Guild.Id].Join.JoinlogChannelId != 0)
         {
-            if (e.Guild.Channels.ContainsKey(_bot.guilds[e.Guild.Id].Join.JoinlogChannelId))
+            if (e.Guild.Channels.ContainsKey(this._bot.guilds[e.Guild.Id].Join.JoinlogChannelId))
             {
-                _ = e.Guild.GetChannel(_bot.guilds[e.Guild.Id].Join.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
+                _ = e.Guild.GetChannel(this._bot.guilds[e.Guild.Id].Join.JoinlogChannelId).SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Author = new()
                     {

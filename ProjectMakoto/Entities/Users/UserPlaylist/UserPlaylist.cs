@@ -16,13 +16,13 @@ public sealed class UserPlaylist
     private string _PlaylistName { get; set; } = "";
 
     [JsonProperty(Required = Required.Always)]
-    public string PlaylistName { get => _PlaylistName; set { _PlaylistName = value.TruncateWithIndication(256); } }
+    public string PlaylistName { get => this._PlaylistName; set { this._PlaylistName = value.TruncateWithIndication(256); } }
 
     private string _PlaylistColor { get; set; } = "#FFFFFF";
-    public string PlaylistColor { get => _PlaylistColor; set { _PlaylistColor = value.Truncate(7).IsValidHexColor(); } }
+    public string PlaylistColor { get => this._PlaylistColor; set { this._PlaylistColor = value.Truncate(7).IsValidHexColor(); } }
 
     private string _PlaylistThumbnail { get; set; } = "";
-    public string PlaylistThumbnail { get => _PlaylistThumbnail; set { _PlaylistThumbnail = value.Truncate(2048); } }
+    public string PlaylistThumbnail { get => this._PlaylistThumbnail; set { this._PlaylistThumbnail = value.Truncate(2048); } }
 
     [JsonProperty(Required = Required.Always)]
     public List<PlaylistEntry> List { get; set; } = new();

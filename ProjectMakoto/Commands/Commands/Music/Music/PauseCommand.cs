@@ -28,7 +28,7 @@ internal sealed class PauseCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -42,7 +42,7 @@ internal sealed class PauseCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? GetString(t.Commands.Music.Pause.Paused, true) : GetString(t.Commands.Music.Pause.Resumed, true)),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? GetString(this.t.Commands.Music.Pause.Paused, true) : GetString(this.t.Commands.Music.Pause.Resumed, true)),
             }.AsSuccess(ctx));
         });
     }

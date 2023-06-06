@@ -20,7 +20,7 @@ internal sealed class NameNormalizerEvents
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
+        if (!this._bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
             return;
 
         string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
@@ -34,7 +34,7 @@ internal sealed class NameNormalizerEvents
 
     internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
     {
-        if (!_bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
+        if (!this._bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
             return;
 
         if (e.NicknameBefore != e.NicknameAfter)
@@ -56,7 +56,7 @@ internal sealed class NameNormalizerEvents
 
         foreach (var guild in sender.Guilds)
         {
-            if (!_bot.guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
+            if (!this._bot.guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
                 return;
 
             var member = await e.UserAfter.ConvertToMember(guild.Value);

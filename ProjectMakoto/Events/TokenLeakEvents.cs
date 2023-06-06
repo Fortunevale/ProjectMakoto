@@ -22,13 +22,13 @@ internal sealed class TokenLeakEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(_bot.watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore?.Content != e.Message?.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(_bot.watcher);
+            CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
     }
 
     internal async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
@@ -37,7 +37,7 @@ internal sealed class TokenLeakEvents
 
         try
         {
-            prefix = _bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[guild.Id].PrefixSettings.Prefix;
+            prefix = this._bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[guild.Id].PrefixSettings.Prefix;
         }
         catch (Exception)
         {
@@ -52,7 +52,7 @@ internal sealed class TokenLeakEvents
         if (e.WebhookMessage || guild is null)
             return;
 
-        if (!_bot.guilds[guild.Id].TokenLeakDetection.DetectTokens)
+        if (!this._bot.guilds[guild.Id].TokenLeakDetection.DetectTokens)
             return;
 
         var matchCollection = RegexTemplates.Token.Matches(e.Content);
@@ -76,14 +76,14 @@ internal sealed class TokenLeakEvents
             }
             catch { }
 
-            string owner = _bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
-            string repo = _bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
+            string owner = this._bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
+            string repo = this._bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
             long seconds = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
 
             string fileName = $"token_leak_{e.Author.Id}_{guild.Id}_{e.Channel.Id}_{seconds}.md";
             string content = $"## Token of {botUser?.Id.ToString() ?? "unknown"} (Owner {e.Author.Id})\n\nBot {token}";
 
-            await _bot.githubClient.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
+            await this._bot.githubClient.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
             InvalidateCount++;
         }
 

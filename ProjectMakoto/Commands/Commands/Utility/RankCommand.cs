@@ -23,9 +23,9 @@ internal sealed class RankCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Leaderboard.Disabled, true,
+                    Description = GetString(this.t.Commands.Utility.Leaderboard.Disabled, true,
                         new TVar("Command", $"{ctx.Prefix}experiencesettings config"))
-                }.AsError(ctx, GetString(t.Commands.Utility.Rank.Title)));
+                }.AsError(ctx, GetString(this.t.Commands.Utility.Rank.Title)));
                 return;
             }
 
@@ -38,12 +38,12 @@ internal sealed class RankCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{(victim.Id == ctx.User.Id ? GetString(t.Commands.Utility.Rank.Self) : GetString(t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
-                              $"**{GetString(t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? GetString(this.t.Commands.Utility.Rank.Self) : GetString(this.t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
+                              $"**{GetString(this.t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{UniversalExtensions.GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
-            }.AsInfo(ctx, GetString(t.Commands.Utility.Rank.Title)));
+            }.AsInfo(ctx, GetString(this.t.Commands.Utility.Rank.Title)));
         });
     }
 }

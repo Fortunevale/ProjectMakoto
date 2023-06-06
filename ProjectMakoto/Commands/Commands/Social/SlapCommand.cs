@@ -20,8 +20,8 @@ internal sealed class SlapCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = t.Commands.Social.Slap.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Slap.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Slap.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Slap.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
@@ -39,8 +39,8 @@ internal sealed class SlapCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = phrases.SelectRandom().Build(
-                    new TVar("User1", ctx.User.Mention, false), 
-                    new TVar("User2", user.Mention, false), 
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false),
                     new TVar("Emoji", ctx.Bot.status.LoadedConfig.Emojis.Slap, false))
                     .Bold(),
                 ImageUrl = response.Item2,

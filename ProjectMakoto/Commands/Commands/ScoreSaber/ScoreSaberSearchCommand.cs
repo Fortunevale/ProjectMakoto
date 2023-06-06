@@ -22,12 +22,12 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
 
             DiscordStringSelectComponent GetContinents(string default_code)
             {
-                List<DiscordStringSelectComponentOption> continents = new() { new DiscordStringSelectComponentOption(GetString(t.Commands.ScoreSaber.Search.NoCountryFilter), "no_country", "", (default_code == "no_country")) };
+                List<DiscordStringSelectComponentOption> continents = new() { new DiscordStringSelectComponentOption(GetString(this.t.Commands.ScoreSaber.Search.NoCountryFilter), "no_country", "", (default_code == "no_country")) };
                 foreach (var b in ctx.Bot.countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
                 {
                     continents.Add(new DiscordStringSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
                 }
-                return new DiscordStringSelectComponent(GetString(t.Commands.ScoreSaber.Search.SelectContinentDropdown), continents as IEnumerable<DiscordStringSelectComponentOption>, "continent_selection");
+                return new DiscordStringSelectComponent(GetString(this.t.Commands.ScoreSaber.Search.SelectContinentDropdown), continents as IEnumerable<DiscordStringSelectComponentOption>, "continent_selection");
             }
 
             DiscordStringSelectComponent GetCountries(string continent_code, string default_country, int page)
@@ -43,18 +43,18 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                     catch (Exception) { flag_emote = DiscordEmoji.FromUnicode("⬜"); }
                     countries.Add(new DiscordStringSelectComponentOption($"{b.Value.Name}", b.Key, "", (b.Key == default_country), new DiscordComponentEmoji(flag_emote)));
                 }
-                return new DiscordStringSelectComponent(GetString(t.Commands.ScoreSaber.Search.SelectCountryDropdown), countries as IEnumerable<DiscordStringSelectComponentOption>, "country_selection");
+                return new DiscordStringSelectComponent(GetString(this.t.Commands.ScoreSaber.Search.SelectCountryDropdown), countries as IEnumerable<DiscordStringSelectComponentOption>, "country_selection");
             }
 
-            var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", GetString(t.Commands.ScoreSaber.Search.StartSearch), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔎")));
-            var next_step_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_step", GetString(t.Commands.ScoreSaber.Search.NextStep), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+            var start_search_button = new DiscordButtonComponent(ButtonStyle.Success, "start_search", GetString(this.t.Commands.ScoreSaber.Search.StartSearch), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔎")));
+            var next_step_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_step", GetString(this.t.Commands.ScoreSaber.Search.NextStep), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-            var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", GetString(t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-            var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", GetString(t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+            var previous_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "prev_page", GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+            var next_page_button = new DiscordButtonComponent(ButtonStyle.Primary, "next_page", GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.ScoreSaber.Search.SelectContinent, true)
+                Description = GetString(this.t.Commands.ScoreSaber.Search.SelectContinent, true)
             }.AsAwaitingInput(ctx, "Score Saber");
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(GetContinents("no_country")).AddComponents(start_search_button));
@@ -80,11 +80,11 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
 
                             async Task RefreshCountryList()
                             {
-                                embed.Description = GetString(t.Commands.ScoreSaber.Search.SelectCountry, true);
+                                embed.Description = GetString(this.t.Commands.ScoreSaber.Search.SelectCountry, true);
 
                                 if (selectedCountry != "no_country")
                                 {
-                                    embed.Description += $"\n`{GetString(t.Commands.ScoreSaber.Search.SelectedCountry)}: '{ctx.Bot.countryCodes.List[selectedCountry].Name}'`";
+                                    embed.Description += $"\n`{GetString(this.t.Commands.ScoreSaber.Search.SelectedCountry)}: '{ctx.Bot.countryCodes.List[selectedCountry].Name}'`";
                                 }
 
                                 var page = GetCountries(selectedContinent, selectedCountry, currentPage);
@@ -112,7 +112,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                             async Task RefreshPlayerList()
                             {
                                 ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
-                                embed.Description = GetString(t.Commands.ScoreSaber.Search.Searching, true);
+                                embed.Description = GetString(this.t.Commands.ScoreSaber.Search.Searching, true);
                                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx, "Score Saber")));
 
                                 if (currentFetchedPage != lastFetchedPage)
@@ -126,7 +126,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                                        embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
+                                        embed.Description = GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
@@ -135,7 +135,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
 
-                                        embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
+                                        embed.Description = GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
@@ -152,7 +152,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                                 {
                                     playerDropDownOptions.Add(new DiscordStringSelectComponentOption($"{b.name.FullSanitize()} | {b.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp", b.id, $"🌐 #{b.rank} | {b.country.IsoCountryCodeToFlagEmoji()} #{b.countryRank}"));
                                 }
-                                var player_dropdown = new DiscordStringSelectComponent(GetString(t.Commands.ScoreSaber.Search.SelectPlayer), playerDropDownOptions as IEnumerable<DiscordStringSelectComponentOption>, "player_selection");
+                                var player_dropdown = new DiscordStringSelectComponent(GetString(this.t.Commands.ScoreSaber.Search.SelectPlayer), playerDropDownOptions as IEnumerable<DiscordStringSelectComponentOption>, "player_selection");
 
                                 var builder = new DiscordMessageBuilder().AddComponents(player_dropdown);
 
@@ -174,7 +174,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
 
                                 ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 
-                                embed.Description = GetString(t.Commands.ScoreSaber.Search.FoundCount, true, new TVar("TotalCount", lastSearch.metadata.total));
+                                embed.Description = GetString(this.t.Commands.ScoreSaber.Search.FoundCount, true, new TVar("TotalCount", lastSearch.metadata.total));
                                 await RespondOrEdit(builder.WithEmbed(embed.AsSuccess(ctx, "Score Saber")));
                             }
 
@@ -282,7 +282,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                     }
                     catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
                     {
-                        embed.Description = GetString(t.Commands.ScoreSaber.Search.NoSearchResult, true);
+                        embed.Description = GetString(this.t.Commands.ScoreSaber.Search.NoSearchResult, true);
                         _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     }
                     catch (Exception)

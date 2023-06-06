@@ -44,7 +44,7 @@ internal sealed class JoinCommand : BaseCommand
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Join.Joined, true),
+                        Description = GetString(this.t.Commands.Music.Join.Joined, true),
                     }.AsSuccess(ctx));
                 return;
             }
@@ -53,7 +53,7 @@ internal sealed class JoinCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Join.AlreadyUsed, true),
+                    Description = GetString(this.t.Commands.Music.Join.AlreadyUsed, true),
                 }.AsError(ctx));
 
                 throw new CancelException();
@@ -68,7 +68,7 @@ internal sealed class JoinCommand : BaseCommand
             if (Announce)
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Join.Joined, true),
+                    Description = GetString(this.t.Commands.Music.Join.Joined, true),
                 }.AsSuccess(ctx));
         });
     }

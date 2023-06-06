@@ -60,7 +60,7 @@ internal sealed class ScoreSaberCommandAbstractions
                 RecentScoresButton
             };
 
-            List<DiscordComponent> RecentScoreInteractionRow = new() 
+            List<DiscordComponent> RecentScoreInteractionRow = new()
             {
                 OpenProfileInBrowser,
                 ShowProfileButton,
@@ -121,7 +121,7 @@ internal sealed class ScoreSaberCommandAbstractions
                                 embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-                                
+
                                 return;
                             }
                             catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)

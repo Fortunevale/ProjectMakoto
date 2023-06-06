@@ -29,26 +29,26 @@ internal sealed class VoicePrivacyEvents
             {
                 try
                 {
-                    while (JobsQueue.Count <= 0)
+                    while (this.JobsQueue.Count <= 0)
                         Thread.Sleep(1000);
 
-                    var task = JobsQueue[0];
-                    JobsQueue.Remove(task);
+                    var task = this.JobsQueue[0];
+                    this.JobsQueue.Remove(task);
 
                     task.Start();
-                    task.Add(_bot.watcher);
+                    task.Add(this._bot.watcher);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarn("Failed to run queue item", ex);
                 }
             }
-        }).Add(_bot.watcher);
+        }).Add(this._bot.watcher);
     }
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
-        if (_bot.guilds[e.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
+        if (this._bot.guilds[e.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
         {
             Task.Run(async () =>
             {
@@ -60,12 +60,12 @@ internal sealed class VoicePrivacyEvents
                     if (e.After is not null && e.After.Channel is not null)
                         await e.After?.Channel?.AddOverwriteAsync(await e.User.ConvertToMember(e.Guild), Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, "Joined VC while In-Voice Privacy Set permissions is turned on");
                 }
-            }).Add(_bot.watcher);
+            }).Add(this._bot.watcher);
         }
 
-        if (_bot.guilds[e.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled)
+        if (this._bot.guilds[e.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled)
         {
-            JobsQueue.Add(new Task(async () =>
+            this.JobsQueue.Add(new Task(async () =>
             {
                 try
                 {
@@ -188,7 +188,7 @@ internal sealed class VoicePrivacyEvents
     {
         Task.Run(async () =>
         {
-            if (_bot.guilds[e.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
+            if (this._bot.guilds[e.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
             {
                 if (!e.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
                     return;
@@ -202,6 +202,6 @@ internal sealed class VoicePrivacyEvents
                     _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, (present?.Allowed ?? Permissions.None), (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.SendMessages, "In-Voice Privacy is enabled");
                 }
             }
-        }).Add(_bot.watcher);
+        }).Add(this._bot.watcher);
     }
 }

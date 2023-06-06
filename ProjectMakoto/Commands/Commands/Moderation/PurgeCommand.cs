@@ -20,7 +20,7 @@ internal sealed class PurgeCommand : BaseCommand
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            var CommandKey = t.Commands.Moderation.Purge;
+            var CommandKey = this.t.Commands.Moderation.Purge;
 
             try
             {

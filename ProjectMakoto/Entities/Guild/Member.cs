@@ -13,11 +13,11 @@ public sealed class Member
 {
     public Member(Guild guild, ulong member)
     {
-        Guild = guild;
-        MemberId = member;
+        this.Guild = guild;
+        this.MemberId = member;
 
-        InviteTracker = new(this);
-        Experience = new(this);
+        this.InviteTracker = new(this);
+        this.Experience = new(this);
     }
 
     [JsonIgnore]
@@ -27,40 +27,40 @@ public sealed class Member
 
 
     private string _SavedNickname { get; set; } = "";
-    public string SavedNickname 
-    { 
-        get => _SavedNickname; 
-        set 
-        { 
-            _SavedNickname = value;
-            _ = Bot.DatabaseClient.UpdateValue(Guild.ServerId.ToString(), "userid", MemberId, "saved_nickname", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public string SavedNickname
+    {
+        get => this._SavedNickname;
+        set
+        {
+            this._SavedNickname = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Guild.ServerId.ToString(), "userid", this.MemberId, "saved_nickname", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 
 
 
     private DateTime _FirstJoinDate { get; set; } = DateTime.UnixEpoch;
-    public DateTime FirstJoinDate 
-    { 
-        get => _FirstJoinDate; 
-        set 
-        { 
-            _FirstJoinDate = value;
-            _ = Bot.DatabaseClient.UpdateValue(Guild.ServerId.ToString(), "userid", MemberId, "first_join", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public DateTime FirstJoinDate
+    {
+        get => this._FirstJoinDate;
+        set
+        {
+            this._FirstJoinDate = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Guild.ServerId.ToString(), "userid", this.MemberId, "first_join", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 
 
 
     private DateTime _LastLeaveDate { get; set; } = DateTime.UnixEpoch;
-    public DateTime LastLeaveDate 
-    { 
-        get => _LastLeaveDate; 
-        set 
-        { 
-            _LastLeaveDate = value;
-            _ = Bot.DatabaseClient.UpdateValue(Guild.ServerId.ToString(), "userid", MemberId, "last_leave", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public DateTime LastLeaveDate
+    {
+        get => this._LastLeaveDate;
+        set
+        {
+            this._LastLeaveDate = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Guild.ServerId.ToString(), "userid", this.MemberId, "last_leave", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 
 

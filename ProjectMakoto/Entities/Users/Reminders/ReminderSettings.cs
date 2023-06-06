@@ -13,26 +13,26 @@ public sealed class ReminderSettings
 {
     public ReminderSettings(User user, Bot bot)
     {
-        Parent = user;
-        _bot = bot;
+        this.Parent = user;
+        this._bot = bot;
 
-        ScheduledReminders.ItemsChanged += RemindersUpdated;
+        this.ScheduledReminders.ItemsChanged += RemindersUpdated;
     }
 
     ~ReminderSettings()
     {
-        ScheduledReminders.ItemsChanged -= RemindersUpdated;
+        this.ScheduledReminders.ItemsChanged -= RemindersUpdated;
     }
 
     private async void RemindersUpdated(object? sender, ObservableListUpdate<ReminderItem> e)
     {
-        while (!_bot.status.DiscordGuildDownloadCompleted)
+        while (!this._bot.status.DiscordGuildDownloadCompleted)
             await Task.Delay(1000);
 
-        if (ScheduledReminders.Count > 10)
-            ScheduledReminders.RemoveAt(0);
+        if (this.ScheduledReminders.Count > 10)
+            this.ScheduledReminders.RemoveAt(0);
 
-        foreach (var b in ScheduledReminders.ToList())
+        foreach (var b in this.ScheduledReminders.ToList())
             if (!UniversalExtensions.GetScheduledTasks().Any(x =>
             {
                 if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
@@ -46,7 +46,7 @@ public sealed class ReminderSettings
             {
                 Task task = new(async () =>
                 {
-                    var CommandKey = _bot.loadedTranslations.Commands.Utility.Reminders;
+                    var CommandKey = this._bot.loadedTranslations.Commands.Utility.Reminders;
 
                     this.ScheduledReminders.Remove(b);
 
@@ -54,11 +54,11 @@ public sealed class ReminderSettings
 
                     DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"> {b.Description.FullSanitize()}\n" +
-                        $"{CommandKey.CreatedOn.Get(_bot.users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
-                        $"{CommandKey.CreatedAt.Get(_bot.users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +
-                        $"{CommandKey.DueTime.Get(_bot.users[user.Id]).Build(new TVar("Relative", b.DueTime.ToTimestamp()), new TVar("DateTime", b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}\n" +
-                        $"{(b.DueTime.GetTimespanSince() > TimeSpan.FromMinutes(2) ? $"\n\n**{CommandKey.SentLate.Get(_bot.users[user.Id])}**" : "")}")
-                        .WithTitle(CommandKey.ReminderNotification.Get(_bot.users[user.Id]))
+                        $"{CommandKey.CreatedOn.Get(this._bot.users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
+                        $"{CommandKey.CreatedAt.Get(this._bot.users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +
+                        $"{CommandKey.DueTime.Get(this._bot.users[user.Id]).Build(new TVar("Relative", b.DueTime.ToTimestamp()), new TVar("DateTime", b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}\n" +
+                        $"{(b.DueTime.GetTimespanSince() > TimeSpan.FromMinutes(2) ? $"\n\n**{CommandKey.SentLate.Get(this._bot.users[user.Id])}**" : "")}")
+                        .WithTitle(CommandKey.ReminderNotification.Get(this._bot.users[user.Id]))
                         .WithColor(EmbedColors.Info));
 
                     var maxLength = 100 - JsonConvert.SerializeObject(new ReminderSnoozeButton(), new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include }).Length;
@@ -69,10 +69,10 @@ public sealed class ReminderSettings
                     var msg = await user.SendMessageAsync(builder.AddComponents(snoozeButton));
                 });
 
-                task.Add(_bot.watcher);
-                task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(Parent.UserId, b.UUID, "reminder"));
+                task.Add(this._bot.watcher);
+                task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.UserId, b.UUID, "reminder"));
 
-                _logger.LogDebug("Created scheduled task for reminder by '{User}'", Parent.UserId);
+                _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.UserId);
             }
 
         foreach (var b in UniversalExtensions.GetScheduledTasks())
@@ -80,11 +80,11 @@ public sealed class ReminderSettings
             if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                 continue;
 
-            if (scheduledTaskIdentifier.Snowflake == this.Parent.UserId && scheduledTaskIdentifier.Type == "reminder" && !ScheduledReminders.Any(x => x.UUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
+            if (scheduledTaskIdentifier.Snowflake == this.Parent.UserId && scheduledTaskIdentifier.Type == "reminder" && !this.ScheduledReminders.Any(x => x.UUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
             {
                 b.Delete();
 
-                _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", Parent.UserId);
+                _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", this.Parent.UserId);
             }
         }
     }

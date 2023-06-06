@@ -22,7 +22,7 @@ internal sealed class ClearBackupCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-        var CommandKey = t.Commands.Moderation.ClearBackup;
+            var CommandKey = this.t.Commands.Moderation.ClearBackup;
 
             if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))
             {

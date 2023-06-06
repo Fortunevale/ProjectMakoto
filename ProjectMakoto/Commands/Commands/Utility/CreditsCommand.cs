@@ -20,7 +20,7 @@ internal sealed class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.Credits.Fetching, true)
+                Description = GetString(this.t.Commands.Utility.Credits.Fetching, true)
             }.AsBotLoading(ctx));
 
             var contributors = await ctx.Bot.githubClient.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
@@ -34,7 +34,7 @@ internal sealed class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.Credits.Credits, false, false,
+                Description = GetString(this.t.Commands.Utility.Credits.Credits, false, false,
                 new TVar("BotName", ctx.CurrentUser.GetUsername(), false),
                 new TVar("Developer", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))", false),
                 new TVar("DiscordStaffList", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.GetUsernameWithIdentifier()}`]({x.ProfileUrl})")), false),

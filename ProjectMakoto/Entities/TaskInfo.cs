@@ -15,7 +15,7 @@ public sealed class TaskInfo
     {
         this.task = task;
     }
-    
+
     internal TaskInfo(Task task, CommandContext ctx = null)
     {
         this.CommandContext = ctx;
@@ -27,13 +27,13 @@ public sealed class TaskInfo
         this.InteractionContext = ctx;
         this.task = task;
     }
-    
+
     internal TaskInfo(Task task, SharedCommandContext ctx = null)
     {
         this.SharedCommandContext = ctx;
         this.task = task;
     }
-    
+
     internal TaskInfo(Task task, ContextMenuContext ctx = null)
     {
         this.ContextMenuContext = ctx;

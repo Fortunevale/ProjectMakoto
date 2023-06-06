@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.InviteNotes;
+            var CommandKey = this.t.Commands.Config.InviteNotes;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -70,8 +70,8 @@ internal sealed class ConfigCommand : BaseCommand
 
                     embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? GetString(t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
-                                      $"`{GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? GetString(t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
+                        Description = $"`{GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? GetString(this.t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
+                                      $"`{GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? GetString(this.t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
                     }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)

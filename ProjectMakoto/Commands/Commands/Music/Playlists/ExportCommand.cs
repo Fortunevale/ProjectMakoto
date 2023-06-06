@@ -24,8 +24,8 @@ internal sealed class ExportCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
@@ -35,8 +35,8 @@ internal sealed class ExportCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Export.Exported, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-                }.AsInfo(ctx, GetString(t.Commands.Music.Playlists.Title))).WithFile($"{Guid.NewGuid().ToString().Replace("-", "").ToLower()}.json", stream));
+                    Description = GetString(this.t.Commands.Music.Playlists.Export.Exported, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+                }.AsInfo(ctx, GetString(this.t.Commands.Music.Playlists.Title))).WithFile($"{Guid.NewGuid().ToString().Replace("-", "").ToLower()}.json", stream));
             }
         });
     }

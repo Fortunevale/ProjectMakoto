@@ -24,8 +24,8 @@ internal sealed class DeleteCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
@@ -33,15 +33,15 @@ internal sealed class DeleteCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-            }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                Description = GetString(this.t.Commands.Music.Playlists.Delete.Deleting, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
 
             ctx.DbUser.UserPlaylists.Remove(SelectedPlaylist);
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-            }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                Description = GetString(this.t.Commands.Music.Playlists.Delete.Deleted, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+            }.AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
             await Task.Delay(5000);
             return;
         });

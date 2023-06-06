@@ -14,7 +14,7 @@ public sealed class LanguageCodes
     internal LanguageCodes() { }
 
     public IReadOnlyList<LanguageInfo> List
-        => _List.AsReadOnly();
+        => this._List.AsReadOnly();
 
     internal List<LanguageInfo> _List = new();
 

@@ -13,7 +13,7 @@ public sealed class TokenLeakDetectionSettings
 {
     public TokenLeakDetectionSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -21,11 +21,11 @@ public sealed class TokenLeakDetectionSettings
     private bool _DetectTokens { get; set; } = true;
     public bool DetectTokens
     {
-        get => _DetectTokens;
+        get => this._DetectTokens;
         set
         {
-            _DetectTokens = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "tokens_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._DetectTokens = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "tokens_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

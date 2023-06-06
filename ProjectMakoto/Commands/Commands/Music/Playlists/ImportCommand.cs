@@ -22,18 +22,18 @@ internal sealed class ImportCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
-                }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                    Description = GetString(this.t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
+                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                 return;
             }
 
-            var Link = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Import.Link), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
-            var ExportedPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Import.ExportedPlaylist), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📂")));
+            var Link = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Import.Link), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
+            var ExportedPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Import.ExportedPlaylist), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📂")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.Playlists.Import.ImportMethod, true),
-            }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)))
+                Description = GetString(this.t.Commands.Music.Playlists.Import.ImportMethod, true),
+            }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)))
             .AddComponents(new List<DiscordComponent> { Link, ExportedPlaylist })
             .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -47,8 +47,8 @@ internal sealed class ImportCommand : BaseCommand
 
             if (Menu.GetCustomId() == Link.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Music.Playlists.Import.ImportPlaylist), Guid.NewGuid().ToString())
-                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", GetString(t.Commands.Music.Playlists.Import.PlaylistUrl), "", 1, 100, true));
+                var modal = new DiscordInteractionModalBuilder(GetString(this.t.Commands.Music.Playlists.Import.ImportPlaylist), Guid.NewGuid().ToString())
+                        .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "query", GetString(this.t.Commands.Music.Playlists.Import.PlaylistUrl), "", 1, 100, true));
 
                 var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, modal, false);
 
@@ -80,8 +80,8 @@ internal sealed class ImportCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.NotLoaded, true),
-                    }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.NotLoaded, true),
+                    }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                     return;
                 }
                 else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
@@ -90,15 +90,15 @@ internal sealed class ImportCommand : BaseCommand
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
-                        }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                            Description = GetString(this.t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
+                        }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                         return;
                     }
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.Creating, true),
-                    }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.Creating, true),
+                    }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
 
                     var v = new UserPlaylist
                     {
@@ -110,10 +110,10 @@ internal sealed class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.Created, true, 
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.Created, true,
                         new TVar("Name", v.PlaylistName),
                         new TVar("Count", v.List.Count)),
-                    }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                    }.AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;
                 }
@@ -121,8 +121,8 @@ internal sealed class ImportCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.NotLoaded, true),
-                    }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.NotLoaded, true),
+                    }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                     return;
                 }
             }
@@ -134,8 +134,8 @@ internal sealed class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.UploadExport, true, new TVar("Command", $"{ctx.Prefix}upload")),
-                    }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.UploadExport, true, new TVar("Command", $"{ctx.Prefix}upload")),
+                    }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
 
                     Stream stream;
 
@@ -155,8 +155,8 @@ internal sealed class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.Importing, true),
-                    }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.Importing, true),
+                    }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
 
                     var rawJson = new StreamReader(stream).ReadToEnd();
 
@@ -171,8 +171,8 @@ internal sealed class ImportCommand : BaseCommand
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = GetString(t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
-                        }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                            Description = GetString(this.t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
+                        }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                         return;
                     }
 
@@ -187,10 +187,10 @@ internal sealed class ImportCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.Created, true,
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.Created, true,
                         new TVar("Name", v.PlaylistName),
                         new TVar("Count", v.List.Count)),
-                    }.AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                    }.AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                     await Task.Delay(5000);
                     return;
                 }
@@ -198,8 +198,8 @@ internal sealed class ImportCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Playlists.Import.ImportFailed, true),
-                    }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title))));
+                        Description = GetString(this.t.Commands.Music.Playlists.Import.ImportFailed, true),
+                    }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
 
                     _logger.LogError("Failed to import a playlist", ex);
 

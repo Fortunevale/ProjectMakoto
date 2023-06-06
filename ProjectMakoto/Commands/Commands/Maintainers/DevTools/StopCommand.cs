@@ -20,7 +20,7 @@ internal sealed class StopCommand : BaseCommand
             var msg = await RespondOrEdit(new DiscordMessageBuilder().WithContent("Confirm?").AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, "Shutdown", "Confirm shutdown", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")))));
 
             var x = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
-            
+
             if (x.TimedOut)
             {
                 await RespondOrEdit("_Interaction timed out._");

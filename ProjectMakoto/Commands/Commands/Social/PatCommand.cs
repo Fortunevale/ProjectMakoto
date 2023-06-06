@@ -20,8 +20,8 @@ internal sealed class PatCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = t.Commands.Social.Pat.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Pat.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Pat.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Pat.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {

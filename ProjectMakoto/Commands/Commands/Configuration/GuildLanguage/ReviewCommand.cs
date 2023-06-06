@@ -23,7 +23,7 @@ internal sealed class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder()
             {
                 Description = GuildLanguageCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.Config.GuildLanguage.Title)));
+            }.AsInfo(ctx, GetString(this.t.Commands.Config.GuildLanguage.Title)));
         });
     }
 }

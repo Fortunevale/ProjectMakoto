@@ -35,7 +35,7 @@ internal sealed class UrbanDictionary
         {
             get
             {
-                return thumbs_up - thumbs_down;
+                return this.thumbs_up - this.thumbs_down;
             }
         }
     }

@@ -22,7 +22,7 @@ public sealed class LongText : BaseColumn
     public long MaxLength { get; private set; } = 4294967296;
 
     private string? _Value { get; set; }
-    public string Value { get => _Value.IsNullOrEmpty() ? "" : _Value; set { _Value = (value.Length.ToInt64() > MaxLength ? throw new ArgumentException($"The maximum length for this string is {MaxLength}") : value); } }
+    public string Value { get => this._Value.IsNullOrEmpty() ? "" : this._Value; set { this._Value = (value.Length.ToInt64() > this.MaxLength ? throw new ArgumentException($"The maximum length for this string is {this.MaxLength}") : value); } }
 
     public static implicit operator string(LongText b) => b.Value;
     public static implicit operator LongText(string v) => new() { Value = v };

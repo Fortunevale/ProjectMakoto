@@ -28,7 +28,7 @@ internal sealed class RepeatCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal sealed class RepeatCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? GetString(t.Commands.Music.Repeat.On, true) : GetString(t.Commands.Music.Repeat.Off, true)),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? GetString(this.t.Commands.Music.Repeat.On, true) : GetString(this.t.Commands.Music.Repeat.Off, true)),
             }.AsSuccess(ctx));
         });
     }

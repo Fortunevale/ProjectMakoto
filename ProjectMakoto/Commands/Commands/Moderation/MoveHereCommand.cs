@@ -19,7 +19,7 @@ internal sealed class MoveHereCommand : BaseCommand
         {
             DiscordChannel oldChannel = (DiscordChannel)arguments["oldChannel"];
 
-            var CommandKey = t.Commands.Moderation.Move;
+            var CommandKey = this.t.Commands.Moderation.Move;
 
             if (oldChannel.Type != ChannelType.Voice)
             {
@@ -28,7 +28,7 @@ internal sealed class MoveHereCommand : BaseCommand
                     .AsError(ctx));
                 return;
             }
-            
+
             if (!oldChannel.Users.IsNotNullAndNotEmpty())
             {
                 await RespondOrEdit(new DiscordEmbedBuilder()

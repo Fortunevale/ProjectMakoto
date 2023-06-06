@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.EmbedMessages;
+            var CommandKey = this.t.Commands.Config.EmbedMessages;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;

@@ -24,8 +24,8 @@ internal sealed class AddToQueueCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
@@ -33,8 +33,8 @@ internal sealed class AddToQueueCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.Play.Preparing, true),
-            }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                Description = GetString(this.t.Commands.Music.Play.Preparing, true),
+            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
             try
             {
@@ -52,21 +52,21 @@ internal sealed class AddToQueueCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.Playlists.AddToQueue.Adding, true, 
+                Description = GetString(this.t.Commands.Music.Playlists.AddToQueue.Adding, true,
                 new TVar("Name", SelectedPlaylist.PlaylistName),
                 new TVar("", SelectedPlaylist.List.Count)),
-            }.AsLoading(ctx, GetString(t.Commands.Music.Playlists.Title)));
+            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
             ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.Play.QueuedMultiple, true, 
+                Description = GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
                 new TVar("Count", SelectedPlaylist.List.Count),
                 new TVar("Playlist", SelectedPlaylist.PlaylistName))
             }
-            .AddField(new DiscordEmbedField($"📜 {GetString(t.Commands.Music.Play.QueuePositions)}", $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}"))
-            .AsSuccess(ctx, GetString(t.Commands.Music.Playlists.Title)));
+            .AddField(new DiscordEmbedField($"📜 {GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}"))
+            .AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
         });
     }
 }

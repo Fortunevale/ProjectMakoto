@@ -23,7 +23,7 @@ internal sealed class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = AutoCrosspostCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.Config.AutoCrosspost.Title)));
+            }.AsInfo(ctx, GetString(this.t.Commands.Config.AutoCrosspost.Title)));
         });
     }
 }

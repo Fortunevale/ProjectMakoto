@@ -18,8 +18,8 @@ internal sealed class ActionLogAbstractions
         if (ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0)
             return $"❌ {CommandKey.ActionlogDisabled.Get(ctx.DbUser).Build(true)}";
 
-        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.InviteModifications, CommandKey.VoiceChannelUpdates, CommandKey.ChannelModifications, CommandKey.ServerModifications, CommandKey.BanUpdates, 
-            CommandKey.RoleUpdates, CommandKey.MessageModifications, CommandKey.MessageModifications, CommandKey.UserProfileUpdates, CommandKey.UserRoleUpdates, CommandKey.UserStateUpdates, 
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.InviteModifications, CommandKey.VoiceChannelUpdates, CommandKey.ChannelModifications, CommandKey.ServerModifications, CommandKey.BanUpdates,
+            CommandKey.RoleUpdates, CommandKey.MessageModifications, CommandKey.MessageModifications, CommandKey.UserProfileUpdates, CommandKey.UserRoleUpdates, CommandKey.UserStateUpdates,
             CommandKey.AttemptGatheringMoreDetails, CommandKey.ActionLogChannel);
 
         return $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.ActionLogChannel.Get(ctx.DbUser).PadRight(pad)}` : <#{ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel}>\n\n" +

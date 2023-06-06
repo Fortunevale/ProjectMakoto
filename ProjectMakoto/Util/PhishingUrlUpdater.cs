@@ -31,20 +31,20 @@ internal sealed class PhishingUrlUpdater
 
         foreach (var b in urls)
         {
-            if (!_bot.phishingUrls.ContainsKey(b.Url))
+            if (!this._bot.phishingUrls.ContainsKey(b.Url))
             {
                 DatabaseUpdated = true;
-                _bot.phishingUrls.Add(b.Url, b);
+                this._bot.phishingUrls.Add(b.Url, b);
                 continue;
             }
 
-            if (_bot.phishingUrls.ContainsKey(b.Url))
+            if (this._bot.phishingUrls.ContainsKey(b.Url))
             {
-                if (_bot.phishingUrls[b.Url].Origin.Count != b.Origin.Count)
+                if (this._bot.phishingUrls[b.Url].Origin.Count != b.Origin.Count)
                 {
                     DatabaseUpdated = true;
-                    _bot.phishingUrls[ b.Url ].Origin = b.Origin;
-                    _bot.phishingUrls[ b.Url ].Submitter = b.Submitter;
+                    this._bot.phishingUrls[b.Url].Origin = b.Origin;
+                    this._bot.phishingUrls[b.Url].Submitter = b.Submitter;
                     continue;
                 }
             }
@@ -52,11 +52,11 @@ internal sealed class PhishingUrlUpdater
 
         List<string> dropUrls = new();
 
-        if (_bot.phishingUrls.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
-            foreach (var b in _bot.phishingUrls.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
+        if (this._bot.phishingUrls.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
+            foreach (var b in this._bot.phishingUrls.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
             {
                 DatabaseUpdated = true;
-                _bot.phishingUrls.Remove(b.Key);
+                this._bot.phishingUrls.Remove(b.Key);
                 dropUrls.Add(b.Key);
             }
 
@@ -79,7 +79,7 @@ internal sealed class PhishingUrlUpdater
 
     public async Task UpdateDatabase(List<string> dropUrls)
     {
-        if (UpdateRunning)
+        if (this.UpdateRunning)
         {
             _logger.LogWarn("A database update is already running, cancelling");
             return;
@@ -87,14 +87,14 @@ internal sealed class PhishingUrlUpdater
 
         try
         {
-            UpdateRunning = true;
+            this.UpdateRunning = true;
 
-            await _bot.databaseClient.FullSyncDatabase();
+            await this._bot.databaseClient.FullSyncDatabase();
 
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    await _bot.databaseClient._helper.DeleteRow(_bot.databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
+                    await this._bot.databaseClient._helper.DeleteRow(this._bot.databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
 
                     _logger.LogDebug("Dropped '{host}' from table 'scam_urls'.", b);
                 }
@@ -102,7 +102,7 @@ internal sealed class PhishingUrlUpdater
         catch (Exception)
         {
             GC.Collect();
-            UpdateRunning = false;
+            this.UpdateRunning = false;
             throw;
         }
         finally
@@ -111,10 +111,10 @@ internal sealed class PhishingUrlUpdater
             GC.Collect();
         }
 
-        UpdateRunning = false;
+        this.UpdateRunning = false;
     }
 
-    private async Task<List<PhishingUrlEntry>> GetUrls ()
+    private async Task<List<PhishingUrlEntry>> GetUrls()
     {
         List<string> WhitelistedDomains = new();
         Dictionary<string, List<string>> SanitizedMatches = new();

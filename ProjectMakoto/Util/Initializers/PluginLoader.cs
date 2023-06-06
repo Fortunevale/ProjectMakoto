@@ -7,12 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -141,7 +136,7 @@ internal sealed class PluginLoader
                     pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)))
                 {
                     _logger.LogInfo("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
-                    
+
                     foreach (var b in pluginInfo.CompiledCommands)
                     {
                         PluginLoadContext pluginLoadContext = new(b.Key);
@@ -225,7 +220,7 @@ internal sealed class PluginLoader
                                 compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
                                     .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
                                     .AddReferences(references)
-                                        .WithOptions(options), 
+                                        .WithOptions(options),
                                         new CompilationData("prefix_group", code, rawCommand));
                             }
                             else
@@ -510,7 +505,7 @@ internal sealed class PluginLoader
             }
             """;
     }
-    
+
     private static string GetGroupMethodCode(KeyValuePair<string, BasePlugin> PluginIdentifier, string ContextName, BasePluginCommand Command, BasePluginCommand Parent)
     {
         var TaskName = GetUniqueCodeCompatibleName();

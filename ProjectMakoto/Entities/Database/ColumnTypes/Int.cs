@@ -22,7 +22,7 @@ public sealed class Int : BaseColumn
     public int MaxValue { get; private set; } = 2147483647;
 
     private int? _Value { get; set; }
-    public int Value { get => _Value ?? 0; set { _Value = (value > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
+    public int Value { get => this._Value ?? 0; set { this._Value = (value > this.MaxValue ? throw new ArgumentException($"The maximum size for this int is {this.MaxValue}") : value); } }
 
     public static implicit operator int(Int b) => b.Value;
     public static implicit operator Int(int v) => new() { Value = v };

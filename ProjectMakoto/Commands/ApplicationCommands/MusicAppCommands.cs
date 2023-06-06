@@ -39,65 +39,65 @@ public sealed class MusicAppCommands : ApplicationCommandsModule
         }
 
         [SlashCommand("join", "The bot will join your channel if it's not already being used in this server.", dmPermission: false)]
-        public async Task Join(InteractionContext ctx) 
-            => new Commands.Music.JoinCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
-                { "announce", true } 
-            }).Add(_bot.watcher, ctx);
+        public async Task Join(InteractionContext ctx)
+            => new Commands.Music.JoinCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
+                { "announce", true }
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("disconnect", "Starts a voting to disconnect the bot.", dmPermission: false)]
-        public async Task Disconnect(InteractionContext ctx) 
-            => new Commands.Music.DisconnectCommand().ExecuteCommand(ctx, _bot, null, false).Add(_bot.watcher, ctx);
+        public async Task Disconnect(InteractionContext ctx)
+            => new Commands.Music.DisconnectCommand().ExecuteCommand(ctx, this._bot, null, false).Add(this._bot.watcher, ctx);
 
         [SlashCommand("forcedisconnect", "Forces the bot to disconnect. `DJ` role or Administrator permissions required.", dmPermission: false)]
-        public async Task ForceDisconnect(InteractionContext ctx) 
-            => new Commands.Music.ForceDisconnectCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task ForceDisconnect(InteractionContext ctx)
+            => new Commands.Music.ForceDisconnectCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("play", "Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.", dmPermission: false)]
-        public async Task Play(InteractionContext ctx, [Option("search", "Search Query/Url")] string search) 
-            => new Commands.Music.PlayCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
-                { "search", search } 
-            }).Add(_bot.watcher, ctx);
+        public async Task Play(InteractionContext ctx, [Option("search", "Search Query/Url")] string search)
+            => new Commands.Music.PlayCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
+                { "search", search }
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("pause", "Pause or unpause the current song.", dmPermission: false)]
-        public async Task Pause(InteractionContext ctx) 
-            => new Commands.Music.PauseCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task Pause(InteractionContext ctx)
+            => new Commands.Music.PauseCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("queue", "Displays the current queue.", dmPermission: false)]
-        public async Task Queue(InteractionContext ctx) 
-            => new Commands.Music.QueueCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task Queue(InteractionContext ctx)
+            => new Commands.Music.QueueCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("removequeue", "Remove a song from the queue.", dmPermission: false)]
-        public async Task RemoveQueue(InteractionContext ctx, [Autocomplete(typeof(SongQueueAutocompleteProvider))][Option("video", "The Index or Video Title", true)] string selection) 
-            => new Commands.Music.RemoveQueueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
-                { "selection", selection } 
-            }).Add(_bot.watcher, ctx);
+        public async Task RemoveQueue(InteractionContext ctx, [Autocomplete(typeof(SongQueueAutocompleteProvider))][Option("video", "The Index or Video Title", true)] string selection)
+            => new Commands.Music.RemoveQueueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
+                { "selection", selection }
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("skip", "Starts a voting to skip the current song.", dmPermission: false)]
-        public async Task Skip(InteractionContext ctx) 
-            => new Commands.Music.SkipCommand().ExecuteCommand(ctx, _bot, null, false).Add(_bot.watcher, ctx);
+        public async Task Skip(InteractionContext ctx)
+            => new Commands.Music.SkipCommand().ExecuteCommand(ctx, this._bot, null, false).Add(this._bot.watcher, ctx);
 
         [SlashCommand("forceskip", "Forces skipping of the current song. `DJ` role or Administrator permissions required.", dmPermission: false)]
-        public async Task ForceSkip(InteractionContext ctx) 
-            => new Commands.Music.ForceSkipCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task ForceSkip(InteractionContext ctx)
+            => new Commands.Music.ForceSkipCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("clearqueue", "Starts a voting to clear the current queue.", dmPermission: false)]
-        public async Task ClearQueue(InteractionContext ctx) 
-            => new Commands.Music.ClearQueueCommand().ExecuteCommand(ctx, _bot, null, false).Add(_bot.watcher, ctx);
+        public async Task ClearQueue(InteractionContext ctx)
+            => new Commands.Music.ClearQueueCommand().ExecuteCommand(ctx, this._bot, null, false).Add(this._bot.watcher, ctx);
 
         [SlashCommand("forceclearqueue", "Forces clearing the current queue. `DJ` role or Administrator permissions required.", dmPermission: false)]
-        public async Task ForceClearQueue(InteractionContext ctx) 
-            => new Commands.Music.ForceClearQueueCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task ForceClearQueue(InteractionContext ctx)
+            => new Commands.Music.ForceClearQueueCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("shuffle", "Toggles shuffling of the current queue.", dmPermission: false)]
-        public async Task Shuffle(InteractionContext ctx) 
-            => new Commands.Music.ShuffleCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task Shuffle(InteractionContext ctx)
+            => new Commands.Music.ShuffleCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("repeat", "Toggles repeating the current queue.", dmPermission: false)]
-        public async Task Repeat(InteractionContext ctx) 
-            => new Commands.Music.RepeatCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task Repeat(InteractionContext ctx)
+            => new Commands.Music.RepeatCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
     }
 
     [SlashCommandGroup("playlists", "Allows you to manage your personal playlists.", dmPermission: false)]
@@ -127,62 +127,62 @@ public sealed class MusicAppCommands : ApplicationCommandsModule
         public Bot _bot { private get; set; }
 
         [SlashCommand("manage", "Allows you to use and manage your playlists.", dmPermission: false)]
-        public async Task Manage(InteractionContext ctx) 
-            => new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task Manage(InteractionContext ctx)
+            => new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("add-to-queue", "Adds a playlist to the current song queue.", dmPermission: false)]
-        public async Task AddToQueue(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id) 
-            => new Commands.Playlists.AddToQueueCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
-                { "id", id }, 
-            }).Add(_bot.watcher, ctx);
+        public async Task AddToQueue(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+            => new Commands.Playlists.AddToQueueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
+                { "id", id },
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("share", "Share one of your playlists.", dmPermission: false)]
-        public async Task Share(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id) 
-            => new Commands.Playlists.ShareCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
+        public async Task Share(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+            => new Commands.Playlists.ShareCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
             {
-                { "id", id }, 
-            }).Add(_bot.watcher, ctx);
+                { "id", id },
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("export", "Export one of your playlists.", dmPermission: false)]
-        public async Task Export(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id) 
-            => new Commands.Playlists.ExportCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
-                { "id", id }, 
-            }).Add(_bot.watcher, ctx);
+        public async Task Export(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+            => new Commands.Playlists.ExportCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
+                { "id", id },
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("modify", "Modify one of your playlists.", dmPermission: false)]
-        public async Task Modify(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id) 
-            => new Commands.Playlists.ModifyCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
+        public async Task Modify(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+            => new Commands.Playlists.ModifyCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
                 { "id", id },
-            }).Add(_bot.watcher, ctx);
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("delete", "Delete one of your playlists.", dmPermission: false)]
-        public async Task Delete(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id) 
-            => new Commands.Playlists.DeleteCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
+        public async Task Delete(InteractionContext ctx, [Autocomplete(typeof(PlaylistsAutoCompleteProvider))][Option("playlist", "The Playlist Id", true)] string id)
+            => new Commands.Playlists.DeleteCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
             {
-                { "id", id }, 
-            }).Add(_bot.watcher, ctx);
+                { "id", id },
+            }).Add(this._bot.watcher, ctx);
 
         [SlashCommand("create-new", "Create a new playlist from scratch.", dmPermission: false)]
-        public async Task CreateNew(InteractionContext ctx) 
-            => new Commands.Playlists.NewPlaylistCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task CreateNew(InteractionContext ctx)
+            => new Commands.Playlists.NewPlaylistCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("save-queue", "Save the current queue as playlist.", dmPermission: false)]
-        public async Task SaveQueue(InteractionContext ctx) 
-            => new Commands.Playlists.SaveCurrentCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task SaveQueue(InteractionContext ctx)
+            => new Commands.Playlists.SaveCurrentCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("import", "Import a playlists from another platform or from a previously exported playlist.", dmPermission: false)]
-        public async Task Import(InteractionContext ctx) 
-            => new Commands.Playlists.ImportCommand().ExecuteCommand(ctx, _bot).Add(_bot.watcher, ctx);
+        public async Task Import(InteractionContext ctx)
+            => new Commands.Playlists.ImportCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
 
         [SlashCommand("load-share", "Loads a playlist share.", dmPermission: false)]
-        public async Task LoadShare(InteractionContext ctx, [Option("user", "The user")] DiscordUser userid, [Option("Id", "The Id")] string id) 
-            => new Commands.Playlists.LoadShareCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object> 
-            { 
-                { "userid", userid.Id }, 
-                { "id", id }, 
-            }).Add(_bot.watcher, ctx);
+        public async Task LoadShare(InteractionContext ctx, [Option("user", "The user")] DiscordUser userid, [Option("Id", "The Id")] string id)
+            => new Commands.Playlists.LoadShareCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            {
+                { "userid", userid.Id },
+                { "id", id },
+            }).Add(this._bot.watcher, ctx);
     }
 }

@@ -233,7 +233,7 @@ internal sealed class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));  if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                 ],
                                 datasets: 
                                 [

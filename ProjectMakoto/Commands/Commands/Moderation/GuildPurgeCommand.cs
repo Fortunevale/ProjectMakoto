@@ -17,7 +17,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Moderation.GuildPurge;
+            var CommandKey = this.t.Commands.Moderation.GuildPurge;
 
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];

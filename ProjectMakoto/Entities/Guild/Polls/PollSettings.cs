@@ -16,27 +16,27 @@ public sealed class PollSettings
         this._bot = bot;
         this.Parent = guild;
 
-        _RunningPolls.ItemsChanged += RunningPollsUpdatedAsync;
+        this._RunningPolls.ItemsChanged += RunningPollsUpdatedAsync;
     }
 
     private Guild Parent { get; set; }
 
     private Bot _bot { get; set; }
 
-    public ObservableList<PollEntry> RunningPolls { get => _RunningPolls; set { _RunningPolls = value; _RunningPolls.ItemsChanged += RunningPollsUpdatedAsync; } }
+    public ObservableList<PollEntry> RunningPolls { get => this._RunningPolls; set { this._RunningPolls = value; this._RunningPolls.ItemsChanged += RunningPollsUpdatedAsync; } }
     private ObservableList<PollEntry> _RunningPolls { get; set; } = new();
 
     private async void RunningPollsUpdatedAsync(object? sender, ObservableListUpdate<PollEntry> e)
     {
-        var CommandKey = _bot.loadedTranslations.Commands.Moderation.Poll;
+        var CommandKey = this._bot.loadedTranslations.Commands.Moderation.Poll;
 
-        while (RunningPolls.Count > 10)
-            RunningPolls.RemoveAt(0);
+        while (this.RunningPolls.Count > 10)
+            this.RunningPolls.RemoveAt(0);
 
-        while (!_bot.status.DiscordGuildDownloadCompleted)
+        while (!this._bot.status.DiscordGuildDownloadCompleted)
             await Task.Delay(1000);
 
-        foreach (var b in RunningPolls.ToList())
+        foreach (var b in this.RunningPolls.ToList())
             if (!UniversalExtensions.GetScheduledTasks().Any(x =>
             {
                 if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
@@ -63,18 +63,18 @@ public sealed class PollSettings
                                 if (b.Votes.TryGetValue(e.User.Id, out List<string> currentVotes))
                                 {
                                     b.Votes[e.User.Id] = new List<string>(e.Values);
-                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))))}"));
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"🔁 {CommandKey.VoteUpdated.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{currentVotes}'"))))}"));
                                     return;
                                 }
 
                                 b.Votes.Add(e.User.Id, new List<string>(e.Values));
-                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"✅ {CommandKey.Voted.Get(Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))))}"));
+                                _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"✅ {CommandKey.Voted.Get(this.Parent).Build(true, new TVar("Options", string.Join(", ", e.Values.Select(x => $"'{b.Options[x]}'"))))}"));
                             }
                             else if (e.GetCustomId() == b.EndEarlyUUID)
                             {
                                 if (!(await e.User.ConvertToMember(e.Guild)).Permissions.HasPermission(Permissions.ManageMessages))
                                 {
-                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ {CommandKey.NoPerms.Get(_bot.users[e.User.Id]).Build(true)}"));
+                                    _ = e.Interaction.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"❌ {CommandKey.NoPerms.Get(this._bot.users[e.User.Id]).Build(true)}"));
                                     return;
                                 }
                                 _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
@@ -83,10 +83,10 @@ public sealed class PollSettings
                                 await Task.Delay(5000);
                                 this.RunningPolls.Add(b);
                                 cancellationTokenSource.Cancel();
-                                _ = e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"✅ {CommandKey.PollEnded.Get(_bot.users[e.User.Id]).Build(true)}"));
+                                _ = e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"✅ {CommandKey.PollEnded.Get(this._bot.users[e.User.Id]).Build(true)}"));
                             }
                         }
-                    }).Add(_bot.watcher);
+                    }).Add(this._bot.watcher);
                 }
 
                 async Task MessageDeletionHandling(DiscordClient client, MessageDeleteEventArgs e)
@@ -95,12 +95,12 @@ public sealed class PollSettings
                     {
                         if (e.Message?.Id == b.MessageId)
                         {
-                            _bot.discordClient.ComponentInteractionCreated -= VoteHandling;
-                            _bot.discordClient.MessageDeleted -= MessageDeletionHandling;
-                            _bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
+                            this._bot.discordClient.ComponentInteractionCreated -= VoteHandling;
+                            this._bot.discordClient.MessageDeleted -= MessageDeletionHandling;
+                            this._bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
                             this.RunningPolls.Remove(b);
                         }
-                    }).Add(_bot.watcher);
+                    }).Add(this._bot.watcher);
                 }
 
                 async Task ChannelDeletionHandling(DiscordClient client, ChannelDeleteEventArgs e)
@@ -109,12 +109,12 @@ public sealed class PollSettings
                     {
                         if (e.Channel?.Id == b.ChannelId)
                         {
-                            _bot.discordClient.ComponentInteractionCreated -= VoteHandling;
-                            _bot.discordClient.MessageDeleted -= MessageDeletionHandling;
-                            _bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
+                            this._bot.discordClient.ComponentInteractionCreated -= VoteHandling;
+                            this._bot.discordClient.MessageDeleted -= MessageDeletionHandling;
+                            this._bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
                             this.RunningPolls.Remove(b);
                         }
-                    }).Add(_bot.watcher);
+                    }).Add(this._bot.watcher);
                 }
 
                 Task task = new(async () =>
@@ -123,13 +123,13 @@ public sealed class PollSettings
 
                     await Task.Delay(1000);
 
-                    _bot.discordClient.ComponentInteractionCreated -= VoteHandling;
-                    _bot.discordClient.MessageDeleted -= MessageDeletionHandling;
-                    _bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
+                    this._bot.discordClient.ComponentInteractionCreated -= VoteHandling;
+                    this._bot.discordClient.MessageDeleted -= MessageDeletionHandling;
+                    this._bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
 
                     this.RunningPolls.Remove(b);
 
-                    var channel = await _bot.discordClient.GetChannelAsync(b.ChannelId);
+                    var channel = await this._bot.discordClient.GetChannelAsync(b.ChannelId);
                     var message = await channel.GetMessageAsync(b.MessageId, true);
 
                     Dictionary<string, int> votes = new();
@@ -147,8 +147,8 @@ public sealed class PollSettings
                     { _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(message.Embeds?.ElementAt(0))); }
                     catch { }
                     await message.RespondAsync(new DiscordEmbedBuilder()
-                        .WithDescription($"{CommandKey.PollEnded.Get(Parent).Build(true)}\n\n**{CommandKey.Results.Get(Parent).Build()}**\n{(votes.Count <= 0 ? CommandKey.NoVotes.Get(Parent).Build(true) : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n{CommandKey.Votes.Get(Parent).Build(true, new TVar("Count", x.Value))}")))}")
-                        .WithAuthor($"{CommandKey.Poll.Get(Parent)} • {channel.Guild.Name}", null, channel.Guild.IconUrl)
+                        .WithDescription($"{CommandKey.PollEnded.Get(this.Parent).Build(true)}\n\n**{CommandKey.Results.Get(this.Parent).Build()}**\n{(votes.Count <= 0 ? CommandKey.NoVotes.Get(this.Parent).Build(true) : string.Join("\n\n", votes.OrderByDescending(x => x.Value).Select(x => $"> **{b.Options[x.Key].FullSanitize()}**\n{CommandKey.Votes.Get(this.Parent).Build(true, new TVar("Count", x.Value))}")))}")
+                        .WithAuthor($"{CommandKey.Poll.Get(this.Parent)} • {channel.Guild.Name}", null, channel.Guild.IconUrl)
                         .WithColor(EmbedColors.Success));
                 });
 
@@ -162,28 +162,30 @@ public sealed class PollSettings
                         {
                             LastTotalVotes = b.Votes.Count;
 
-                            var channel = await _bot.discordClient.GetChannelAsync(b.ChannelId);
+                            var channel = await this._bot.discordClient.GetChannelAsync(b.ChannelId);
                             var message = await channel.GetMessageAsync(b.MessageId, true);
 
-                            await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(Parent).Build(true, new TVar("Count", b.Votes.Count))}").Build());
+                            await message.ModifyAsync(new DiscordEmbedBuilder(message.Embeds.ElementAt(0)).WithDescription($"> **{b.PollText}**\n\n_{CommandKey.PollEnding.Get(this.Parent).Build(new TVar("Timestamp", b.DueTime.ToTimestamp()))}._\n\n{CommandKey.TotalVotes.Get(this.Parent).Build(true, new TVar("Count", b.Votes.Count))}").Build());
                         }
 
                         if (cancellationTokenSource.IsCancellationRequested)
                             return;
 
-                        try { await Task.Delay(TimeSpan.FromMinutes(2), cancellationTokenSource.Token); } catch { }
+                        try
+                        { await Task.Delay(TimeSpan.FromMinutes(2), cancellationTokenSource.Token); }
+                        catch { }
                     }
-                }).Add(_bot.watcher);
+                }).Add(this._bot.watcher);
 
-                _bot.discordClient.ComponentInteractionCreated += VoteHandling;
+                this._bot.discordClient.ComponentInteractionCreated += VoteHandling;
 
-                task.Add(_bot.watcher);
-                taskuid = task.CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(Parent.ServerId, b.SelectUUID, "poll"));
+                task.Add(this._bot.watcher);
+                taskuid = task.CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(this.Parent.ServerId, b.SelectUUID, "poll"));
 
-                _bot.discordClient.MessageDeleted += MessageDeletionHandling;
-                _bot.discordClient.ChannelDeleted += ChannelDeletionHandling;
+                this._bot.discordClient.MessageDeleted += MessageDeletionHandling;
+                this._bot.discordClient.ChannelDeleted += ChannelDeletionHandling;
 
-                _logger.LogDebug("Created scheduled task for poll by '{Guild}'", Parent.ServerId);
+                _logger.LogDebug("Created scheduled task for poll by '{Guild}'", this.Parent.ServerId);
             }
 
         foreach (var b in UniversalExtensions.GetScheduledTasks())
@@ -191,11 +193,11 @@ public sealed class PollSettings
             if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                 continue;
 
-            if (scheduledTaskIdentifier.Snowflake == this.Parent.ServerId && scheduledTaskIdentifier.Type == "poll" && !RunningPolls.Any(x => x.SelectUUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
+            if (scheduledTaskIdentifier.Snowflake == this.Parent.ServerId && scheduledTaskIdentifier.Type == "poll" && !this.RunningPolls.Any(x => x.SelectUUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
             {
                 b.Delete();
 
-                _logger.LogDebug("Deleted scheduled task for poll by '{Guild}'", Parent.ServerId);
+                _logger.LogDebug("Deleted scheduled task for poll by '{Guild}'", this.Parent.ServerId);
             }
         }
     }

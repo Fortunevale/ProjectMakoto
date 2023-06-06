@@ -22,7 +22,7 @@ internal static class UserExtensions
         return false;
     }
 
-    internal static bool IsMaintenance(this DiscordMember member, Status _status) 
+    internal static bool IsMaintenance(this DiscordMember member, Status _status)
         => (member as DiscordUser).IsMaintenance(_status);
 
     internal static bool IsMaintenance(this DiscordUser user, Status _status)

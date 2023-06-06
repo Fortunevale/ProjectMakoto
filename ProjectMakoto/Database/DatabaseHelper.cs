@@ -8,11 +8,6 @@
 // but WITHOUT ANY WARRANTY
 
 using ProjectMakoto.Entities.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectMakoto.Database;
 internal sealed class DatabaseHelper
@@ -26,7 +21,7 @@ internal sealed class DatabaseHelper
 
     public string GetLoadCommand(string table, string? propertyname = null)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         return $"SELECT {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == (propertyname ?? table)).GetProperties().Select(x => x.Name))} FROM `{table}`";
@@ -34,7 +29,7 @@ internal sealed class DatabaseHelper
 
     public string GetSaveCommand(string table, string? propertyname = null)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         return $"INSERT INTO `{table}` ( {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == (propertyname ?? table)).GetProperties().Select(x => x.Name))} ) VALUES ";
@@ -42,7 +37,7 @@ internal sealed class DatabaseHelper
 
     public string GetValueCommand(string propertyname, int i)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         return $"( {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"@{x.Name}{i}"))} ), ";
@@ -50,7 +45,7 @@ internal sealed class DatabaseHelper
 
     public string GetOverwriteCommand(string propertyname)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         return $" ON DUPLICATE KEY UPDATE {string.Join(", ", typeof(TableDefinitions).GetNestedTypes().First(x => x.Name == propertyname).GetProperties().Select(x => $"{x.Name}=values({x.Name})"))}";
@@ -58,7 +53,7 @@ internal sealed class DatabaseHelper
 
     public string GetUpdateValueCommand(string table, string columnKey, object rowKey, string columnToEdit, object newValue)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         if (newValue.GetType() == typeof(bool))
@@ -77,7 +72,7 @@ internal sealed class DatabaseHelper
 
     public async Task<IEnumerable<string>> ListTables(MySqlConnection connection)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         try
@@ -103,7 +98,7 @@ internal sealed class DatabaseHelper
 
     public async Task<Dictionary<string, string>> ListColumns(MySqlConnection connection, string table)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         try
@@ -129,29 +124,29 @@ internal sealed class DatabaseHelper
 
     public async Task DeleteRow(MySqlConnection connection, string table, string row_match, string value)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DELETE FROM `{table}` WHERE {row_match}='{value}'";
         cmd.Connection = connection;
-        await _databaseClient._queue.RunCommand(cmd);
+        await this._databaseClient._queue.RunCommand(cmd);
     }
 
     public async Task DropTable(MySqlConnection connection, string table)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DROP TABLE IF EXISTS `{table}`";
         cmd.Connection = connection;
-        await _databaseClient._queue.RunCommand(cmd);
+        await this._databaseClient._queue.RunCommand(cmd);
     }
 
     public async Task SelectDatabase(MySqlConnection connection, string databaseName, bool CreateIfNotExist = false)
     {
-        if (_databaseClient.IsDisposed())
+        if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
 
         if (CreateIfNotExist)

@@ -33,7 +33,7 @@ internal sealed class RemoveTimeoutCommand : BaseCommand
                 throw;
             }
 
-            var CommandKey = t.Commands.Moderation.RemoveTimeout;
+            var CommandKey = this.t.Commands.Moderation.RemoveTimeout;
 
             await RespondOrEdit(new DiscordEmbedBuilder()
                 .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))

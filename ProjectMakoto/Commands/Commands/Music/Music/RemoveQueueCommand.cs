@@ -36,7 +36,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -51,7 +51,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)),
+                        Description = GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)),
                     }.AsError(ctx));
                     return;
                 }
@@ -64,7 +64,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.RemoveQueue.NoSong, true),
+                        Description = GetString(this.t.Commands.Music.RemoveQueue.NoSong, true),
                     }.AsError(ctx));
                     return;
                 }
@@ -76,7 +76,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.RemoveQueue.NoSong, true),
+                    Description = GetString(this.t.Commands.Music.RemoveQueue.NoSong, true),
                 }.AsError(ctx));
                 return;
             }
@@ -85,7 +85,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.RemoveQueue.Removed, true, new TVar("Track", $"`[`{info.VideoTitle}`]({info.Url})`")),
+                Description = GetString(this.t.Commands.Music.RemoveQueue.Removed, true, new TVar("Track", $"`[`{info.VideoTitle}`]({info.Url})`")),
             }.AsSuccess(ctx));
         });
     }

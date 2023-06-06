@@ -28,7 +28,7 @@ internal sealed class ShuffleCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal sealed class ShuffleCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? GetString(t.Commands.Music.Shuffle.On, true) : GetString(t.Commands.Music.Shuffle.Off, true)),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? GetString(this.t.Commands.Music.Shuffle.On, true) : GetString(this.t.Commands.Music.Shuffle.Off, true)),
             }.AsSuccess(ctx));
         });
     }

@@ -180,9 +180,9 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
 
     [SlashCommand("developertools", "Developer Tools used to manage Makoto.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "<Pending>")]
-    public async Task DevTools(InteractionContext ctx, 
-        [Autocomplete(typeof(MaintainerAutoComplete))] [Option("command", "The command to run.", true)]string command, 
-        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument1", "Argument 1, if required", true)] string argument1 = "", 
+    public async Task DevTools(InteractionContext ctx,
+        [Autocomplete(typeof(MaintainerAutoComplete))][Option("command", "The command to run.", true)] string command,
+        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument1", "Argument 1, if required", true)] string argument1 = "",
         [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument2", "Argument 2, if required", true)] string argument2 = "",
         [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument3", "Argument 3, if required", true)] string argument3 = "")
     {

@@ -20,8 +20,8 @@ internal sealed class CuddleCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = t.Commands.Social.Cuddle.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Cuddle.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Cuddle.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Cuddle.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {

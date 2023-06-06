@@ -31,11 +31,11 @@ public sealed class Bot
     internal GitHubClient githubClient { get; set; }
 
     public IReadOnlyDictionary<string, BasePlugin> Plugins
-        => _Plugins.AsReadOnly();
+        => this._Plugins.AsReadOnly();
     internal Dictionary<string, BasePlugin> _Plugins { get; set; } = new();
 
     public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
-        => _PluginCommands.AsReadOnly();
+        => this._PluginCommands.AsReadOnly();
     internal Dictionary<string, List<BasePluginCommand>> _PluginCommands { get; set; } = new();
 
     #endregion Clients
@@ -122,9 +122,9 @@ public sealed class Bot
 
         Console.ResetColor();
 
-        status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
+        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
 
-        _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", status.RunningVersion);
+        _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
 
         if (args.Contains("--debug"))
         {
@@ -176,7 +176,7 @@ public sealed class Bot
                 this.monitorClient = new MonitorClient(this);
                 this.abuseIpDbClient = new AbuseIpDbClient(this);
 
-                this.githubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", status.RunningVersion));
+                this.githubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion));
                 this.githubClient.Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token);
 
                 DatabaseInit _databaseInit = new(this);
@@ -191,7 +191,7 @@ public sealed class Bot
             }
 
             _ = new PhishingUrlUpdater(this).UpdatePhishingUrlDatabase();
-        }).Add(watcher).IsVital();
+        }).Add(this.watcher).IsVital();
 
         await loadDatabase.task.WaitAsync(TimeSpan.FromSeconds(600));
 
@@ -199,7 +199,7 @@ public sealed class Bot
         {
             _ = Task.Delay(60000).ContinueWith(t =>
             {
-                if (!status.DiscordInitialized)
+                if (!this.status.DiscordInitialized)
                 {
                     _logger.LogError("An exception occurred while trying to log into discord: {0}", "The log in took longer than 60 seconds");
                     Environment.Exit((int)ExitCodes.FailedDiscordLogin);
@@ -217,17 +217,17 @@ public sealed class Bot
 
             _ = Task.Run(async () =>
             {
-                if (this.status.LoadedConfig.DontModify.LastStartedVersion == status.RunningVersion)
+                if (this.status.LoadedConfig.DontModify.LastStartedVersion == this.status.RunningVersion)
                     return;
 
-                this.status.LoadedConfig.DontModify.LastStartedVersion = status.RunningVersion;
+                this.status.LoadedConfig.DontModify.LastStartedVersion = this.status.RunningVersion;
                 this.status.LoadedConfig.Save();
 
                 var channel = await this.discordClient.GetChannelAsync(this.status.LoadedConfig.Channels.GithubLog);
                 await channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Color = EmbedColors.Success,
-                    Title = $"Successfully updated to `{status.RunningVersion}`."
+                    Title = $"Successfully updated to `{this.status.RunningVersion}`."
                 });
             });
 
@@ -260,7 +260,7 @@ public sealed class Bot
             });
 
             ProcessDeletionRequests().Add(this.watcher);
-        }).Add(watcher).IsVital();
+        }).Add(this.watcher).IsVital();
 
         while (!loadDatabase.task.IsCompleted || !logInToDiscord.task.IsCompleted)
             await Task.Delay(100);
@@ -304,7 +304,7 @@ public sealed class Bot
 
                 await Task.Delay(1000);
             }
-        }).Add(watcher).IsVital();
+        }).Add(this.watcher).IsVital();
 
         await Task.Delay(-1);
     }

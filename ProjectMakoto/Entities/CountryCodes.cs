@@ -14,9 +14,9 @@ public sealed class CountryCodes
     internal CountryCodes() { }
 
     public IReadOnlyDictionary<string, CountryInfo> List
-        => _List.AsReadOnly();
+        => this._List.AsReadOnly();
 
-    internal Dictionary<string, CountryInfo> _List { get;  set; } = new();
+    internal Dictionary<string, CountryInfo> _List { get; set; } = new();
 
     public sealed class CountryInfo
     {

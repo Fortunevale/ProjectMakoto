@@ -12,7 +12,7 @@ public sealed class PrefixSettings
 {
     public PrefixSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -20,20 +20,20 @@ public sealed class PrefixSettings
     private string _Prefix { get; set; }
     public string Prefix
     {
-        get => _Prefix.IsNullOrWhiteSpace() ? Parent._bot.Prefix : _Prefix; set
+        get => this._Prefix.IsNullOrWhiteSpace() ? this.Parent._bot.Prefix : this._Prefix; set
         {
-            _Prefix = value.IsNullOrWhiteSpace() ? Parent._bot.Prefix : value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "prefix", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._Prefix = value.IsNullOrWhiteSpace() ? this.Parent._bot.Prefix : value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "prefix", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
     private bool _PrefixDisabled { get; set; } = false;
     public bool PrefixDisabled
     {
-        get => _PrefixDisabled; set
+        get => this._PrefixDisabled; set
         {
-            _PrefixDisabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "prefix_disabled", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._PrefixDisabled = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "prefix_disabled", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

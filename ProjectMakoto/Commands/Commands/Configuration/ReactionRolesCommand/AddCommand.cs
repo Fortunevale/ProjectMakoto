@@ -108,7 +108,7 @@ internal sealed class AddCommand : BaseCommand
                         throw new ArgumentException("Interaction expected");
                 }
             }
-            
+
             if (arguments?.ContainsKey("emoji_parameter") ?? false)
             {
                 emoji_parameter = (DiscordEmoji)arguments["emoji_parameter"];

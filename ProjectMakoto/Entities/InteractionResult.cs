@@ -13,23 +13,23 @@ public sealed class InteractionResult<T>
 {
     public InteractionResult(T result)
     {
-        Result = result;
+        this.Result = result;
     }
-    
+
     public InteractionResult(Exception exception)
     {
-        Exception = exception;
+        this.Exception = exception;
     }
 
     public T Result { get; set; }
 
-    public bool Failed { get { return TimedOut || Cancelled; } }
+    public bool Failed { get { return this.TimedOut || this.Cancelled; } }
 
-    public bool TimedOut { get { return (Exception is not null && Exception.GetType() == typeof(TimedOutException)); } }
+    public bool TimedOut { get { return (this.Exception is not null && this.Exception.GetType() == typeof(TimedOutException)); } }
 
-    public bool Cancelled { get { return (Exception is not null && Exception.GetType() == typeof(CancelException)); } }
+    public bool Cancelled { get { return (this.Exception is not null && this.Exception.GetType() == typeof(CancelException)); } }
 
-    public bool Errored { get { return Exception is not null; } }
+    public bool Errored { get { return this.Exception is not null; } }
 
     public Exception Exception { get; set; }
 }

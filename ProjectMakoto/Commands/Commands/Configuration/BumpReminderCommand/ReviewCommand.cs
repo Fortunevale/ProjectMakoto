@@ -23,7 +23,7 @@ internal sealed class ReviewCommand : BaseCommand
             var ListEmbed = new DiscordEmbedBuilder
             {
                 Description = BumpReminderCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.Config.BumpReminder.Title));
+            }.AsInfo(ctx, GetString(this.t.Commands.Config.BumpReminder.Title));
             await RespondOrEdit(ListEmbed);
         });
     }

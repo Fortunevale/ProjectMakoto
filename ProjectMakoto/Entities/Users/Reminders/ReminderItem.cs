@@ -18,13 +18,13 @@ public sealed class ReminderItem
     private string _Description { get; set; }
     public string Description
     {
-        get => _Description;
+        get => this._Description;
         set
         {
             if (value.Length > 512)
                 throw new ArgumentException("The description cannot be longer than 512 characters.");
 
-            _Description = value;
+            this._Description = value;
         }
     }
 

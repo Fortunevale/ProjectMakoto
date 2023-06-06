@@ -12,7 +12,7 @@ internal sealed class MessageComponents
 {
     public static DiscordButtonComponent GetCancelButton(User user, Bot _bot)
         => new(ButtonStyle.Secondary, "cancel", _bot.loadedTranslations.Common.Cancel.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
-    
+
     public static DiscordButtonComponent GetBackButton(User user, Bot _bot)
         => new(ButtonStyle.Secondary, "back", _bot.loadedTranslations.Common.Back.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 }

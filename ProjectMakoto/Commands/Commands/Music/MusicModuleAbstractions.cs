@@ -40,7 +40,7 @@ internal sealed class MusicModuleAbstractions
 
                 load = load.Replace(value, "");
             }
-            
+
             if (Regex.IsMatch(load, @"((\?|&)start_radio=\d+)(&*)"))
             {
                 Group group = Regex.Match(load, @"((\?|&)start_radio=\d+)(&*)", RegexOptions.ExplicitCapture);
@@ -51,7 +51,7 @@ internal sealed class MusicModuleAbstractions
 
                 load = load.Replace(value, "");
             }
-                
+
             var AndIndex = load.IndexOf("&");
 
             if (!load.Contains('?') && AndIndex != -1)
@@ -74,7 +74,7 @@ internal sealed class MusicModuleAbstractions
         {
             embed.Description = t.Commands.Music.Play.PlatformSelect.Get(ctx.DbUser).Build(true);
             embed.AsAwaitingInput(ctx);
-            
+
             var YouTube = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "YouTube", false, new DiscordComponentEmoji(EmojiTemplates.GetYouTube(ctx.Bot)));
             var SoundCloud = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Soundcloud", false, new DiscordComponentEmoji(EmojiTemplates.GetSoundcloud(ctx.Bot)));
 
@@ -90,7 +90,7 @@ internal sealed class MusicModuleAbstractions
 
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, 
+            await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true,
                 new TVar("Search", load),
                 new TVar("Platform", (Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")))).AsLoading(ctx));
 

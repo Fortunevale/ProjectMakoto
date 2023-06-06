@@ -28,8 +28,8 @@ public sealed class SystemInfo
 
         public float Total
         {
-            get { return Available + Used; }
-            set { Available = value - Used; }
+            get { return this.Available + this.Used; }
+            set { this.Available = value - this.Used; }
         }
     }
 

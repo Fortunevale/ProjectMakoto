@@ -22,7 +22,7 @@ public sealed class TinyInt : BaseColumn
     public uint MaxValue { get; private set; } = 127;
 
     private int? _Value { get; set; }
-    public int Value { get => _Value ?? 0; set { _Value = (value > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
+    public int Value { get => this._Value ?? 0; set { this._Value = (value > this.MaxValue ? throw new ArgumentException($"The maximum size for this int is {this.MaxValue}") : value); } }
 
     public static implicit operator int(TinyInt b) => b.Value;
     public static implicit operator uint(TinyInt b) => (uint)b.Value;

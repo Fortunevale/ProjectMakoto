@@ -17,7 +17,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Moderation.CustomEmbed;
+            var CommandKey = this.t.Commands.Moderation.CustomEmbed;
 
             var GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.New));
 

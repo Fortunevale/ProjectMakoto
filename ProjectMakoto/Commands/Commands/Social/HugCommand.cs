@@ -23,8 +23,8 @@ internal sealed class HugCommand : BaseCommand
             string[] PositiveEmojis = { "♥", ctx.Bot.status.LoadedConfig.Emojis.Hug };
             string[] NegativeEmojis = { "😢", "😓" };
 
-            string[] phrases = t.Commands.Social.Hug.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Hug.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Hug.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Hug.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {

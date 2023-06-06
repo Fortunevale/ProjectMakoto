@@ -19,7 +19,7 @@ internal sealed class UnbanCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            var CommandKey = t.Commands.Moderation.Unban;
+            var CommandKey = this.t.Commands.Moderation.Unban;
 
             await RespondOrEdit(new DiscordEmbedBuilder()
                 .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))

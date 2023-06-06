@@ -21,7 +21,9 @@ public sealed class TableDefinitions
 
     public sealed class scam_urls
     {
-        [Primary][Collation("utf8_unicode_ci")][MaxValue(500)]
+        [Primary]
+        [Collation("utf8_unicode_ci")]
+        [MaxValue(500)]
         public VarChar url { get; set; }
 
         [Collation("utf8_unicode_ci")]
@@ -61,7 +63,7 @@ public sealed class TableDefinitions
 
         public BigInt timestamp { get; set; }
     }
-    
+
     public sealed class banned_guilds
     {
         [Primary]
@@ -111,7 +113,8 @@ public sealed class TableDefinitions
         [Primary]
         public BigInt messageid { get; set; }
 
-        [Collation("utf8_unicode_ci")][MaxValue(500)]
+        [Collation("utf8_unicode_ci")]
+        [MaxValue(500)]
         public VarChar url { get; set; }
 
         public BigInt submitter { get; set; }
@@ -162,7 +165,7 @@ public sealed class TableDefinitions
 
         [Collation("utf8_unicode_ci")]
         public Text last_libretranslate_target { get; set; }
-        
+
         [Collation("utf8_unicode_ci")]
         public Text current_locale { get; set; }
 
@@ -183,7 +186,8 @@ public sealed class TableDefinitions
 
         public BigInt auto_assign_role_id { get; set; }
 
-        [Collation("utf8_unicode_ci")] [Default(";;")]
+        [Collation("utf8_unicode_ci")]
+        [Default(";;")]
         public Text prefix { get; set; }
 
         [MaxValue(1)]
@@ -409,7 +413,7 @@ public sealed class TableDefinitions
         typeof(submission_user_bans),
         typeof(submission_guild_bans),
         typeof(active_url_submissions),
-        
+
         typeof(objected_users),
     };
 }

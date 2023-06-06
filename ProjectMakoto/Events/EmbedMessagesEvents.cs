@@ -29,10 +29,10 @@ internal sealed class EmbedMessagesEvents
         {
             if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
             {
-                if (!_bot.guilds[e.Guild.Id].EmbedMessage.UseEmbedding)
+                if (!this._bot.guilds[e.Guild.Id].EmbedMessage.UseEmbedding)
                     break;
 
-                if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, _bot, "message_embed"), true))
+                if (await this._bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this._bot, "message_embed"), true))
                     break;
 
                 var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
@@ -69,15 +69,15 @@ internal sealed class EmbedMessagesEvents
                         Timestamp = message.Timestamp,
                     }).AddComponents(Delete));
                 }
-            } 
+            }
         } while (false);
 
         if (RegexTemplates.GitHubUrl.IsMatch(e.Message.Content))
         {
-            if (!_bot.guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
+            if (!this._bot.guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
                 return;
 
-            if (await _bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, _bot, "github_embed"), true))
+            if (await this._bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this._bot, "github_embed"), true))
                 return;
 
             var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);
@@ -160,7 +160,7 @@ internal sealed class EmbedMessagesEvents
 
             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-            if ((fullMsg.Reference is not null && fullMsg.ReferencedMessage is null) || 
+            if ((fullMsg.Reference is not null && fullMsg.ReferencedMessage is null) ||
             (fullMsg.ReferencedMessage is not null && fullMsg.ReferencedMessage.Author.Id == e.Interaction.User.Id) ||
             (await e.User.ConvertToMember(e.Interaction.Guild)).Roles.Any(x => (x.CheckPermission(Permissions.ManageMessages) == PermissionLevel.Allowed) || (x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed)))
             {

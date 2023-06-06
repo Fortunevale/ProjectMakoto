@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.Join;
+            var CommandKey = this.t.Commands.Config.Join;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -106,7 +106,7 @@ internal sealed class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoChannels)));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels)));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -138,7 +138,7 @@ internal sealed class ConfigCommand : BaseCommand
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoRoles)));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoRoles)));
                         await Task.Delay(3000);
                         return;
                     }

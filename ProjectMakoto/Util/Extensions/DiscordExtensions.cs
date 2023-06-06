@@ -46,7 +46,7 @@ internal static class DiscordExtensions
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0101:[Discord] InExperiment", Justification = "<Pending>")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "DCS0103:[Discord] Unreleased", Justification = "<Pending>")]
-    private static SingleTranslationKey GetTranslationObject(Permissions perm, Bot _bot) 
+    private static SingleTranslationKey GetTranslationObject(Permissions perm, Bot _bot)
         => perm switch
         {
             Permissions.None => _bot.loadedTranslations.Common.Permissions.None,
@@ -113,30 +113,30 @@ internal static class DiscordExtensions
     internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
 
-    internal static async Task<DiscordMessage> Refetch(this DiscordMessage msg) 
+    internal static async Task<DiscordMessage> Refetch(this DiscordMessage msg)
         => await msg.Channel.GetMessageAsync(msg.Id, true);
 
-    internal static int GetRoleHighestPosition(this DiscordMember member) 
+    internal static int GetRoleHighestPosition(this DiscordMember member)
         => member is null ? -1 : (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
 
     internal static string GetUniqueDiscordName(this DiscordEmoji emoji)
         => $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
 
-    internal static DiscordEmoji ToEmote(this bool b, Bot client) 
+    internal static DiscordEmoji ToEmote(this bool b, Bot client)
         => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetWhiteXMark(client);
-    
-    internal static DiscordEmoji ToPillEmote(this bool b, Bot client) 
+
+    internal static DiscordEmoji ToPillEmote(this bool b, Bot client)
         => b ? EmojiTemplates.GetPillOn(client) : EmojiTemplates.GetPillOff(client);
 
-    internal static string ToEmotes(this long i) 
+    internal static string ToEmotes(this long i)
         => DigitsToEmotes(i.ToString());
 
-    internal static string ToEmotes(this int i) 
+    internal static string ToEmotes(this int i)
         => DigitsToEmotes(i.ToString());
 
     internal static string ToTimestamp(this DateTime dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
         => Formatter.Timestamp(dateTime, format);
-    
+
     internal static string ToTimestamp(this DateTimeOffset dateTime, TimestampFormat format = TimestampFormat.RelativeTime)
         => Formatter.Timestamp(dateTime, format);
 

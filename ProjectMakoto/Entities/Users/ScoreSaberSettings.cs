@@ -13,20 +13,20 @@ public sealed class ScoreSaberSettings
 {
     public ScoreSaberSettings(User user)
     {
-        Parent = user;
+        this.Parent = user;
     }
     private User Parent { get; set; }
 
 
 
     private ulong _Id { get; set; } = 0;
-    public ulong Id 
-    { 
-        get => _Id; 
-        set 
-        { 
-            _Id = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "scoresaber_id", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public ulong Id
+    {
+        get => this._Id;
+        set
+        {
+            this._Id = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "scoresaber_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 }

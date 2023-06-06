@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.AutoCrosspost;
+            var CommandKey = this.t.Commands.Config.AutoCrosspost;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -133,7 +133,7 @@ internal sealed class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoChannels, true)));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -144,7 +144,7 @@ internal sealed class ConfigCommand : BaseCommand
 
                 if (ChannelResult.Result.Type != ChannelType.News)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(t.Commands.Common.Errors.NoChannels, true)).AsError(ctx, GetString(CommandKey.Title))));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)).AsError(ctx, GetString(CommandKey.Title))));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;

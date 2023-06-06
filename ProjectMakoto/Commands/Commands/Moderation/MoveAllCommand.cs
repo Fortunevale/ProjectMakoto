@@ -19,7 +19,7 @@ internal sealed class MoveAllCommand : BaseCommand
         {
             DiscordChannel newChannel = (DiscordChannel)arguments["newChannel"];
 
-            var CommandKey = t.Commands.Moderation.Move;
+            var CommandKey = this.t.Commands.Moderation.Move;
 
             if (newChannel.Type != ChannelType.Voice)
             {
@@ -30,7 +30,7 @@ internal sealed class MoveAllCommand : BaseCommand
             }
 
             await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Moving, true, 
+                .WithDescription(GetString(CommandKey.Moving, true,
                     new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
                     new TVar("Origin", ctx.Member.VoiceState.Channel.Mention),
                     new TVar("Destination", newChannel.Mention)))

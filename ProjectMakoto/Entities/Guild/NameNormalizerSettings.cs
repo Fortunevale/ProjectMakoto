@@ -13,7 +13,7 @@ public sealed class NameNormalizerSettings
 {
     public NameNormalizerSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -21,14 +21,14 @@ public sealed class NameNormalizerSettings
 
 
     private bool _NameNormalizerEnabled { get; set; } = false;
-    public bool NameNormalizerEnabled 
-    { 
-        get => _NameNormalizerEnabled; 
-        set 
-        { 
-            _NameNormalizerEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public bool NameNormalizerEnabled
+    {
+        get => this._NameNormalizerEnabled;
+        set
+        {
+            this._NameNormalizerEnabled = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
     public bool NameNormalizerRunning = false;

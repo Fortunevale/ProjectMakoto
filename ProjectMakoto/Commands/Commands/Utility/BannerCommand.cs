@@ -26,8 +26,8 @@ internal sealed class BannerCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.BannerUrl,
-                Description = victim.BannerUrl.IsNullOrWhiteSpace() ? GetString(t.Commands.Utility.Banner.NoBanner, true) : ""
-            }.AsInfo(ctx, GetString(t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.GetUsernameWithIdentifier())));
+                Description = victim.BannerUrl.IsNullOrWhiteSpace() ? GetString(this.t.Commands.Utility.Banner.NoBanner, true) : ""
+            }.AsInfo(ctx, GetString(this.t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.GetUsernameWithIdentifier())));
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 

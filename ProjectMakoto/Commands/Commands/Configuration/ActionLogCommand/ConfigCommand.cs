@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.ActionLog;
+            var CommandKey = this.t.Commands.Config.ActionLog;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -84,7 +84,7 @@ internal sealed class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoChannels, true)));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;

@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.Experience;
+            var CommandKey = this.t.Commands.Config.Experience;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;

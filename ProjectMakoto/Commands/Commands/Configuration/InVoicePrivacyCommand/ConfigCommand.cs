@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.InVoicePrivacy;
+            var CommandKey = this.t.Commands.Config.InVoicePrivacy;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;

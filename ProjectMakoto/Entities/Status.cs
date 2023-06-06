@@ -26,7 +26,7 @@ public sealed class Status
 
     public ulong TeamOwner { get; internal set; } = new();
     public IReadOnlyList<ulong> TeamMembers
-        => _TeamMembers.AsReadOnly();
+        => this._TeamMembers.AsReadOnly();
     internal List<ulong> _TeamMembers { get; set; } = new();
 
     internal long DiscordDisconnections = 0;
@@ -39,10 +39,10 @@ public sealed class Status
     {
         get
         {
-            if (LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace())
+            if (this.LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace())
                 return "Invite not set.";
 
-            return LoadedConfig.SupportServerInvite;
+            return this.LoadedConfig.SupportServerInvite;
         }
     }
 

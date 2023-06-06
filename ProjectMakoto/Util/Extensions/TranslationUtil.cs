@@ -62,7 +62,7 @@ public static class TranslationUtil
 
         if (str.StartsWith("``"))
             str = str[1..];
-        
+
         if (str.EndsWith("``"))
             str = str[..(str.Length - 1)];
 

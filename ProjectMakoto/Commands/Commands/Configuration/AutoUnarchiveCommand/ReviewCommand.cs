@@ -23,7 +23,7 @@ internal sealed class ReviewCommand : BaseCommand
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = AutoUnarchiveCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.Config.AutoUnarchive.Title)));
+            }.AsInfo(ctx, GetString(this.t.Commands.Config.AutoUnarchive.Title)));
         });
     }
 }

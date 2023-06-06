@@ -20,8 +20,8 @@ internal sealed class BoopCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = t.Commands.Social.Boop.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Boop.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Boop.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Boop.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {

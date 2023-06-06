@@ -17,7 +17,7 @@ internal sealed class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.InviteTracker;
+            var CommandKey = this.t.Commands.Config.InviteTracker;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;

@@ -13,7 +13,7 @@ public sealed class TaskWatcher
 {
     internal TaskWatcher()
     {
-        this.Watcher();
+        Watcher();
     }
 
     private List<TaskInfo> tasks = new();
@@ -22,7 +22,7 @@ public sealed class TaskWatcher
     {
         while (true)
         {
-            foreach (var b in tasks.ToList())
+            foreach (var b in this.tasks.ToList())
             {
                 if (b is null)
                     continue;
@@ -62,7 +62,7 @@ public sealed class TaskWatcher
                             ContextMenuContext?.User?.Id,
                             ContextMenuContext?.Guild?.Id);
 
-                    tasks.Remove(b);
+                    this.tasks.Remove(b);
                     continue;
                 }
 
@@ -104,9 +104,15 @@ public sealed class TaskWatcher
 
                 if (ExceptionType == typeof(DisCatSharp.Exceptions.BadRequestException))
                 {
-                    try { _logger.LogError("WebRequestUrl: {Url}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest.Url); } catch { }
-                    try { _logger.LogError("WebRequest: {Request}", JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest, Formatting.Indented).Replace("\\", "")); } catch { }
-                    try { _logger.LogError("WebResponse: {Response}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebResponse.Response); } catch { }
+                    try
+                    { _logger.LogError("WebRequestUrl: {Url}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest.Url); }
+                    catch { }
+                    try
+                    { _logger.LogError("WebRequest: {Request}", JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest, Formatting.Indented).Replace("\\", "")); }
+                    catch { }
+                    try
+                    { _logger.LogError("WebResponse: {Response}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebResponse.Response); }
+                    catch { }
                 }
 
                 if (SharedCommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
@@ -167,7 +173,7 @@ public sealed class TaskWatcher
                         });
                     }
                     catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
-                
+
                 if (ContextMenuContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
                     try
                     {
@@ -187,7 +193,7 @@ public sealed class TaskWatcher
                     }
                     catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
-                tasks.Remove(b);
+                this.tasks.Remove(b);
             }
 
             await Task.Delay(500);
@@ -196,7 +202,7 @@ public sealed class TaskWatcher
 
     internal TaskInfo AddToList(TaskInfo taskInfo)
     {
-        tasks.Add(taskInfo);
+        this.tasks.Add(taskInfo);
         return taskInfo;
     }
 

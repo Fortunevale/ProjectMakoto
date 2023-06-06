@@ -194,7 +194,7 @@ internal static class PreMadeEmbedsExtensions
 
         if (!string.IsNullOrWhiteSpace(CustomText))
             embed.Description += CustomText;
-        
+
         if (!string.IsNullOrWhiteSpace(CustomImageUrl))
             embed.ImageUrl += CustomImageUrl;
 
@@ -220,7 +220,7 @@ internal static class PreMadeEmbedsExtensions
         };
 
         if (ctx.Client.GetCommandsNext()
-            .RegisteredCommands[ ctx.Command.Name ].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
+            .RegisteredCommands[ctx.Command.Name].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
             embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -286,7 +286,7 @@ internal static class PreMadeEmbedsExtensions
         }
         return Usage.SanitizeForCode();
     }
-    
+
     public static string GenerateUsage(this DiscordApplicationCommandOption cmd, string? locale = null)
     {
         string Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;

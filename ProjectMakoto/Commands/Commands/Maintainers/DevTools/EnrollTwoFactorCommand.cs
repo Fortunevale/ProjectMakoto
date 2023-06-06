@@ -13,7 +13,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class EnrollTwoFactorCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) 
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx)
         => await CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)

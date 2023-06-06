@@ -22,23 +22,23 @@ internal sealed class DatabaseInit
 
     internal async Task LoadValuesFromDatabase()
     {
-        IEnumerable<TableDefinitions.scam_urls> scam_urls = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.scam_urls>(_bot.databaseClient._helper.GetLoadCommand("scam_urls"));
+        IEnumerable<TableDefinitions.scam_urls> scam_urls = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.scam_urls>(this._bot.databaseClient._helper.GetLoadCommand("scam_urls"));
 
         foreach (var b in scam_urls)
-            _bot.phishingUrls.Add(b.url, new PhishingUrlEntry
+            this._bot.phishingUrls.Add(b.url, new PhishingUrlEntry
             {
                 Url = b.url,
                 Origin = JsonConvert.DeserializeObject<List<string>>(b.origin),
                 Submitter = b.submitter
             });
-        _logger.LogDebug("Loaded {Count} malicious urls", _bot.phishingUrls.Count);
+        _logger.LogDebug("Loaded {Count} malicious urls", this._bot.phishingUrls.Count);
 
-        IEnumerable<TableDefinitions.guilds> guilds = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.guilds>(_bot.databaseClient._helper.GetLoadCommand("guilds"));
+        IEnumerable<TableDefinitions.guilds> guilds = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.guilds>(this._bot.databaseClient._helper.GetLoadCommand("guilds"));
 
         foreach (var b in guilds)
         {
-            var DbGuild = new Guild(b.serverid, _bot);
-            _bot.guilds.Add(b.serverid, DbGuild);
+            var DbGuild = new Guild(b.serverid, this._bot);
+            this._bot.guilds.Add(b.serverid, DbGuild);
 
             DbGuild.PrefixSettings = new(DbGuild)
             {
@@ -135,7 +135,7 @@ internal sealed class DatabaseInit
             {
                 NameNormalizerEnabled = b.normalizenames
             };
-            
+
             DbGuild.EmbedMessage = new(DbGuild)
             {
                 UseEmbedding = b.embed_messages,
@@ -156,11 +156,11 @@ internal sealed class DatabaseInit
             else
                 DbGuild.MusicModule = new(DbGuild);
 
-            DbGuild.Polls = new(DbGuild, _bot);
+            DbGuild.Polls = new(DbGuild, this._bot);
             foreach (var c in JsonConvert.DeserializeObject<List<PollEntry>>(b.polls) ?? new())
                 DbGuild.Polls.RunningPolls.Add(c);
 
-            DbGuild.VcCreator = new(DbGuild, _bot)
+            DbGuild.VcCreator = new(DbGuild, this._bot)
             {
                 Channel = b.vccreator_channelid
             };
@@ -176,26 +176,26 @@ internal sealed class DatabaseInit
             DbGuild.CurrentLocale = b.current_locale;
             DbGuild.OverrideLocale = b.override_locale;
         }
-        _logger.LogDebug("Loaded {Count} guilds", _bot.guilds.Count);
+        _logger.LogDebug("Loaded {Count} guilds", this._bot.guilds.Count);
 
 
-        foreach (var table in await _bot.databaseClient._helper.ListTables(_bot.databaseClient.guildDatabaseConnection))
+        foreach (var table in await this._bot.databaseClient._helper.ListTables(this._bot.databaseClient.guildDatabaseConnection))
         {
             if (table.IsDigitsOnly())
             {
-                IEnumerable<TableDefinitions.guild_users> memberList = _bot.databaseClient.guildDatabaseConnection.Query<TableDefinitions.guild_users>(_bot.databaseClient._helper.GetLoadCommand(table, "guild_users"));
+                IEnumerable<TableDefinitions.guild_users> memberList = this._bot.databaseClient.guildDatabaseConnection.Query<TableDefinitions.guild_users>(this._bot.databaseClient._helper.GetLoadCommand(table, "guild_users"));
 
-                if (!_bot.guilds.ContainsKey(Convert.ToUInt64(table)))
+                if (!this._bot.guilds.ContainsKey(Convert.ToUInt64(table)))
                 {
                     _logger.LogWarn("Table '{table}' has no server attached to it. Dropping table.", table);
-                    await _bot.databaseClient._helper.DropTable(_bot.databaseClient.guildDatabaseConnection, table);
+                    await this._bot.databaseClient._helper.DropTable(this._bot.databaseClient.guildDatabaseConnection, table);
                     continue;
                 }
 
                 foreach (var b in memberList)
                 {
-                    Member DbUser = new(_bot.guilds[Convert.ToUInt64(table)], b.userid);
-                    _bot.guilds[Convert.ToUInt64(table)].Members.Add(b.userid, DbUser);
+                    Member DbUser = new(this._bot.guilds[Convert.ToUInt64(table)], b.userid);
+                    this._bot.guilds[Convert.ToUInt64(table)].Members.Add(b.userid, DbUser);
 
                     DbUser.Experience = new(DbUser)
                     {
@@ -214,18 +214,18 @@ internal sealed class DatabaseInit
                     DbUser.SavedNickname = b.saved_nickname ?? "";
                 }
 
-                _logger.LogDebug("Loaded {MemberCount} members for {table}", _bot.guilds[Convert.ToUInt64(table)].Members.Count, table);
+                _logger.LogDebug("Loaded {MemberCount} members for {table}", this._bot.guilds[Convert.ToUInt64(table)].Members.Count, table);
             }
         }
 
 
-        IEnumerable<TableDefinitions.users> users = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.users>(_bot.databaseClient._helper.GetLoadCommand("users"));
+        IEnumerable<TableDefinitions.users> users = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.users>(this._bot.databaseClient._helper.GetLoadCommand("users"));
 
         foreach (var b in users)
         {
-            _bot.users.Add(b.userid, new User(_bot, b.userid));
+            this._bot.users.Add(b.userid, new User(this._bot, b.userid));
 
-            var DbUser = _bot.users[b.userid];
+            var DbUser = this._bot.users[b.userid];
 
             DbUser.UrlSubmissions = new(DbUser)
             {
@@ -269,88 +269,88 @@ internal sealed class DatabaseInit
             foreach (var c in JsonConvert.DeserializeObject<List<ReminderItem>>(b.reminders) ?? new())
                 DbUser.Reminders.ScheduledReminders.Add(c);
         }
-        _logger.LogDebug("Loaded {Count} users", _bot.users.Count);
+        _logger.LogDebug("Loaded {Count} users", this._bot.users.Count);
 
-        IEnumerable<ulong> objected_users = _bot.databaseClient.mainDatabaseConnection.Query<ulong>(_bot.databaseClient._helper.GetLoadCommand("objected_users"));
+        IEnumerable<ulong> objected_users = this._bot.databaseClient.mainDatabaseConnection.Query<ulong>(this._bot.databaseClient._helper.GetLoadCommand("objected_users"));
 
-        _bot.objectedUsers = objected_users.ToList();
-        _logger.LogDebug("Loaded {Count} objected users", _bot.objectedUsers.Count);
+        this._bot.objectedUsers = objected_users.ToList();
+        _logger.LogDebug("Loaded {Count} objected users", this._bot.objectedUsers.Count);
 
-        IEnumerable<TableDefinitions.globalbans> globalbans = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalbans>(_bot.databaseClient._helper.GetLoadCommand("globalbans"));
+        IEnumerable<TableDefinitions.globalbans> globalbans = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalbans>(this._bot.databaseClient._helper.GetLoadCommand("globalbans"));
 
         foreach (var b in globalbans)
-            _bot.globalBans.Add(b.id, new GlobalBanDetails
+            this._bot.globalBans.Add(b.id, new GlobalBanDetails
             {
                 Reason = b.reason,
                 Moderator = b.moderator,
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
-        _logger.LogDebug("Loaded {Count} global bans", _bot.globalBans.Count);
+        _logger.LogDebug("Loaded {Count} global bans", this._bot.globalBans.Count);
 
-        IEnumerable<TableDefinitions.globalnotes> globalnotes = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalnotes>(_bot.databaseClient._helper.GetLoadCommand("globalnotes"));
+        IEnumerable<TableDefinitions.globalnotes> globalnotes = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.globalnotes>(this._bot.databaseClient._helper.GetLoadCommand("globalnotes"));
 
         foreach (var b in globalnotes)
-            _bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<GlobalBanDetails>>(b.notes) ?? new());
-        _logger.LogDebug("Loaded {Count} global notes", _bot.globalBans.Count);
+            this._bot.globalNotes.Add(b.id, JsonConvert.DeserializeObject<List<GlobalBanDetails>>(b.notes) ?? new());
+        _logger.LogDebug("Loaded {Count} global notes", this._bot.globalBans.Count);
 
-        IEnumerable<TableDefinitions.banned_users> banned_users = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.banned_users>(_bot.databaseClient._helper.GetLoadCommand("banned_users"));
+        IEnumerable<TableDefinitions.banned_users> banned_users = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.banned_users>(this._bot.databaseClient._helper.GetLoadCommand("banned_users"));
 
         foreach (var b in banned_users)
-            _bot.bannedUsers.Add(b.id, new BlacklistEntry
+            this._bot.bannedUsers.Add(b.id, new BlacklistEntry
             {
                 Reason = b.reason,
                 Moderator = b.moderator,
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
 
-        _logger.LogDebug("Loaded {Count} user bans", _bot.bannedUsers.Count);
-        
-        IEnumerable<TableDefinitions.banned_guilds> banned_guilds = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.banned_guilds>(_bot.databaseClient._helper.GetLoadCommand("banned_guilds"));
+        _logger.LogDebug("Loaded {Count} user bans", this._bot.bannedUsers.Count);
+
+        IEnumerable<TableDefinitions.banned_guilds> banned_guilds = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.banned_guilds>(this._bot.databaseClient._helper.GetLoadCommand("banned_guilds"));
 
         foreach (var b in banned_guilds)
-            _bot.bannedGuilds.Add(b.id, new BlacklistEntry
+            this._bot.bannedGuilds.Add(b.id, new BlacklistEntry
             {
                 Reason = b.reason,
                 Moderator = b.moderator,
                 Timestamp = (b.timestamp == 0 ? DateTime.UtcNow : new DateTime().ToUniversalTime().AddTicks((long)b.timestamp)),
             });
-        _logger.LogDebug("Loaded {Count} guild bans", _bot.bannedGuilds.Count);
+        _logger.LogDebug("Loaded {Count} guild bans", this._bot.bannedGuilds.Count);
 
 
-        IEnumerable<TableDefinitions.submission_user_bans> submission_user_bans = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.submission_user_bans>(_bot.databaseClient._helper.GetLoadCommand("submission_user_bans"));
+        IEnumerable<TableDefinitions.submission_user_bans> submission_user_bans = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.submission_user_bans>(this._bot.databaseClient._helper.GetLoadCommand("submission_user_bans"));
 
         foreach (var b in submission_user_bans)
-            _bot.phishingUrlSubmissionUserBans.Add(b.id, new PhishingSubmissionBanDetails
+            this._bot.phishingUrlSubmissionUserBans.Add(b.id, new PhishingSubmissionBanDetails
             {
                 Reason = b.reason,
                 Moderator = b.moderator
             });
 
-        _logger.LogDebug("Loaded {Count} user submission bans", _bot.phishingUrlSubmissionUserBans.Count);
+        _logger.LogDebug("Loaded {Count} user submission bans", this._bot.phishingUrlSubmissionUserBans.Count);
 
 
-        IEnumerable<TableDefinitions.submission_guild_bans> submission_guild_bans = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.submission_guild_bans>(_bot.databaseClient._helper.GetLoadCommand("submission_guild_bans"));
+        IEnumerable<TableDefinitions.submission_guild_bans> submission_guild_bans = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.submission_guild_bans>(this._bot.databaseClient._helper.GetLoadCommand("submission_guild_bans"));
 
         foreach (var b in submission_guild_bans)
-            _bot.phishingUrlSubmissionGuildBans.Add(b.id, new PhishingSubmissionBanDetails
+            this._bot.phishingUrlSubmissionGuildBans.Add(b.id, new PhishingSubmissionBanDetails
             {
                 Reason = b.reason,
                 Moderator = b.moderator
             });
 
-        _logger.LogDebug("Loaded {Count} guild submission bans", _bot.phishingUrlSubmissionGuildBans.Count);
+        _logger.LogDebug("Loaded {Count} guild submission bans", this._bot.phishingUrlSubmissionGuildBans.Count);
 
 
-        IEnumerable<TableDefinitions.active_url_submissions> active_url_submissions = _bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.active_url_submissions>(_bot.databaseClient._helper.GetLoadCommand("active_url_submissions"));
+        IEnumerable<TableDefinitions.active_url_submissions> active_url_submissions = this._bot.databaseClient.mainDatabaseConnection.Query<TableDefinitions.active_url_submissions>(this._bot.databaseClient._helper.GetLoadCommand("active_url_submissions"));
 
         foreach (var b in active_url_submissions)
-            _bot.submittedUrls.Add(b.messageid, new SubmittedUrlEntry
+            this._bot.submittedUrls.Add(b.messageid, new SubmittedUrlEntry
             {
                 Url = b.url,
                 Submitter = b.submitter,
                 GuildOrigin = b.guild
             });
 
-        _logger.LogDebug("Loaded {Count} active submissions", _bot.submittedUrls.Count);
+        _logger.LogDebug("Loaded {Count} active submissions", this._bot.submittedUrls.Count);
     }
 }

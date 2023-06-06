@@ -28,7 +28,7 @@ internal sealed class ForceSkipCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal sealed class ForceSkipCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
+                    Description = GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
                 }.AsError(ctx));
                 return;
             }
@@ -46,7 +46,7 @@ internal sealed class ForceSkipCommand : BaseCommand
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.ForceSkip.Skipped, true),
+                Description = GetString(this.t.Commands.Music.ForceSkip.Skipped, true),
             }.AsSuccess(ctx));
         });
     }

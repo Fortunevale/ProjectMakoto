@@ -13,7 +13,7 @@ public sealed class InVoiceTextPrivacySettings
 {
     public InVoiceTextPrivacySettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -21,24 +21,24 @@ public sealed class InVoiceTextPrivacySettings
 
 
     private bool _ClearTextEnabled { get; set; } = false;
-    public bool ClearTextEnabled 
-    { 
-        get => _ClearTextEnabled; 
-        set 
-        { 
-            _ClearTextEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "vc_privacy_clear", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public bool ClearTextEnabled
+    {
+        get => this._ClearTextEnabled;
+        set
+        {
+            this._ClearTextEnabled = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "vc_privacy_clear", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
     private bool _SetPermissionsEnabled { get; set; } = false;
-    public bool SetPermissionsEnabled 
-    { 
-        get => _SetPermissionsEnabled; 
-        set 
-        { 
-            _SetPermissionsEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "vc_privacy_perms", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public bool SetPermissionsEnabled
+    {
+        get => this._SetPermissionsEnabled;
+        set
+        {
+            this._SetPermissionsEnabled = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "vc_privacy_perms", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 }

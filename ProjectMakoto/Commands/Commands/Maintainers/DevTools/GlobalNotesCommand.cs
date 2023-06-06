@@ -87,7 +87,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
                 }
 
                 user.Add(new GlobalBanDetails { Moderator = ctx.User.Id, Reason = note });
-                
+
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
