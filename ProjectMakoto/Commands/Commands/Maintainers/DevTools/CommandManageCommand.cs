@@ -26,7 +26,7 @@ internal class CommandManageCommand : BaseCommand
                     .WithDescription($"{(ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Any() ? string.Join(", ", ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Select(x => $"`{x}`")) : "`No commands disabled.`")}")
                     .AsAwaitingInput(ctx))
                 .AddComponents(EnableCommandButton, DisableCommandButton)
-                .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -132,7 +132,7 @@ internal class CommandManageCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

@@ -38,7 +38,7 @@ internal class ConfigCommand : BaseCommand
             {
                 { ChangeChannel },
                 { ChangeRole }
-            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -128,7 +128,7 @@ internal class ConfigCommand : BaseCommand
             {
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminder = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
-                foreach (var b in GetScheduledTasks())
+                foreach (var b in UniversalExtensions.GetScheduledTasks())
                 {
                     if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                         continue;
@@ -207,7 +207,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

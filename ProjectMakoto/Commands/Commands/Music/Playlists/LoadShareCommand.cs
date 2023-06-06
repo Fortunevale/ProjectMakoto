@@ -62,7 +62,7 @@ internal class LoadShareCommand : BaseCommand
 
             DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { Confirm, MessageComponents.GetCancelButton(ctx.DbUser) }));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { Confirm, MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 

@@ -36,7 +36,7 @@ internal class EnrollTwoFactorCommand : BaseCommand
                 $"\n\n`{Secret}`\n\n" +
                 $"When you're done, please press the button below to confirm the success of the registration.")
                 .WithFile("2fa.png", QrCode, false, "This is a QR Code for an Authenticator App.")
-                .AddComponents(ConfirmButton, MessageComponents.GetCancelButton(ctx.DbUser)));
+                .AddComponents(ConfirmButton, MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             _ = Task.Delay(120000).ContinueWith((_) =>
             {
@@ -73,7 +73,7 @@ internal class EnrollTwoFactorCommand : BaseCommand
 
                                 throw new Exception("Invalid Code");
                             }
-                            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                             {
                                 throw new Exception("Cancelled");
                             }

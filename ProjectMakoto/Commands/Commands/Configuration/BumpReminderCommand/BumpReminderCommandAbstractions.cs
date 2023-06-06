@@ -13,7 +13,7 @@ internal class BumpReminderCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.BumpReminder;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.BumpReminder;
 
         if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
             return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser)}` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}";

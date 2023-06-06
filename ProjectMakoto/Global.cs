@@ -7,7 +7,26 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-global using Dapper;
+global using System;
+global using System.Collections.Generic;
+global using System.Data;
+global using System.Diagnostics;
+global using System.Drawing;
+global using System.Globalization;
+global using System.IO;
+global using System.IO.Compression;
+global using System.Linq;
+global using System.Net;
+global using System.Net.Http;
+global using System.Runtime.InteropServices;
+global using System.Security.Cryptography;
+global using System.Text;
+global using System.Text.RegularExpressions;
+global using System.Threading;
+global using System.Threading.Tasks;
+global using System.Collections;
+global using System.Reflection;
+
 global using DisCatSharp;
 global using DisCatSharp.ApplicationCommands;
 global using DisCatSharp.ApplicationCommands.Attributes;
@@ -26,11 +45,10 @@ global using DisCatSharp.Net;
 global using DisCatSharp.Extensions.TwoFactorCommands;
 global using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
 global using DisCatSharp.Extensions.TwoFactorCommands.Entities;
+
 global using Microsoft.Extensions.DependencyInjection;
-global using Microsoft.Extensions.Logging;
-global using MySql.Data.MySqlClient;
-global using Newtonsoft.Json;
-global using Octokit;
+
+global using ProjectMakoto;
 global using ProjectMakoto.Commands;
 global using ProjectMakoto.Database;
 global using ProjectMakoto.Entities;
@@ -38,42 +56,23 @@ global using ProjectMakoto.Enums;
 global using ProjectMakoto.Events;
 global using ProjectMakoto.Exceptions;
 global using ProjectMakoto.Util;
-global using ProjectMakoto;
-global using QuickChart;
-global using System;
-global using System.Collections.Generic;
-global using System.Data;
-global using System.Diagnostics;
-global using System.Drawing;
-global using System.Globalization;
-global using System.IO;
-global using System.IO.Compression;
-global using System.Linq;
-global using System.Net;
-global using System.Net.Http;
-global using System.Runtime.InteropServices;
-global using System.Security.Cryptography;
-global using System.Text;
-global using System.Text.RegularExpressions;
-global using System.Threading;
-global using System.Threading.Tasks;
-global using Xorog.Logger;
-global using Xorog.ScoreSaber;
-global using Xorog.ScoreSaber.Objects;
-global using Xorog.UniversalExtensions;
-global using Xorog.UniversalExtensions.Entities;
 global using ProjectMakoto.Plugins;
 global using ProjectMakoto.PrefixCommands;
 global using ProjectMakoto.Util.SystemMonitor;
-global using System.Collections;
-global using System.Reflection;
 global using ProjectMakoto.Util.JsonSerializers;
 global using static ProjectMakoto.Util.Log;
-global using static Xorog.Logger.Logger;
-global using static Xorog.UniversalExtensions.UniversalExtensions;
-global using static Xorog.UniversalExtensions.UniversalExtensionsEnums;
-global using PermissionLevel = DisCatSharp.Enums.PermissionLevel;
-global using User = ProjectMakoto.Entities.User;
-global using FileMode = System.IO.FileMode;
-global using LogLevel = Xorog.Logger.Enums.LogLevel;
-global using RequestParameters = Xorog.ScoreSaber.Objects.RequestParameters;
+
+global using Xorog.Logger;
+global using Xorog.Logger.EventArgs;
+
+global using Xorog.ScoreSaber;
+global using Xorog.ScoreSaber.Objects;
+
+global using Xorog.UniversalExtensions;
+global using Xorog.UniversalExtensions.Entities;
+global using Xorog.UniversalExtensions.Enums;
+
+global using Dapper;
+global using MySql.Data.MySqlClient;
+global using Newtonsoft.Json;
+global using QuickChart;

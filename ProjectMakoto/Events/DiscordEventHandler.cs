@@ -1,41 +1,89 @@
 // Project Makoto
 // Copyright (C) 2023  Fortunevale
-// This program is free software: you can redistribute it and/or modify
+// handler program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// This program is distributed in the hope that it will be useful,
+// handler program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Events;
 
 internal class DiscordEventHandler
 {
-    internal DiscordEventHandler(Bot _bot)
-    {
-        this._bot = _bot;
+    private DiscordEventHandler() { }
 
-        genericGuildEvents = new(_bot);
-        commandEvents = new(_bot);
-        afkEvents = new(_bot);
-        crosspostEvents = new(_bot);
-        phishingProtectionEvents = new(_bot);
-        submissionEvents = new(_bot);
-        discordEvents = new(_bot);
-        actionlogEvents = new(_bot);
-        joinEvents = new(_bot);
-        bumpReminderEvents = new(_bot);
-        experienceEvents = new(_bot);
-        reactionRoleEvents = new(_bot);
-        voicePrivacyEvents = new(_bot);
-        inviteTrackerEvents = new(_bot);
-        inviteNoteEvents = new(_bot);
-        autoUnarchiveEvents = new(_bot);
-        nameNormalizerEvents = new(_bot);
-        embedMessagesEvents = new(_bot);
-        tokenLeakEvents = new(_bot);
-        vcCreatorEvents = new(_bot);
-        reminderEvents = new(_bot);
+    public static void SetupEvents(Bot _bot)
+    {
+        DiscordEventHandler handler = new();
+
+        _logger.LogDebug("Registering DisCatSharp EventHandler..");
+        handler._bot = _bot;
+
+        handler.genericGuildEvents = new(_bot);
+        handler.commandEvents = new(_bot);
+        handler.afkEvents = new(_bot);
+        handler.crosspostEvents = new(_bot);
+        handler.phishingProtectionEvents = new(_bot);
+        handler.submissionEvents = new(_bot);
+        handler.discordEvents = new(_bot);
+        handler.actionlogEvents = new(_bot);
+        handler.joinEvents = new(_bot);
+        handler.bumpReminderEvents = new(_bot);
+        handler.experienceEvents = new(_bot);
+        handler.reactionRoleEvents = new(_bot);
+        handler.voicePrivacyEvents = new(_bot);
+        handler.inviteTrackerEvents = new(_bot);
+        handler.inviteNoteEvents = new(_bot);
+        handler.autoUnarchiveEvents = new(_bot);
+        handler.nameNormalizerEvents = new(_bot);
+        handler.embedMessagesEvents = new(_bot);
+        handler.tokenLeakEvents = new(_bot);
+        handler.vcCreatorEvents = new(_bot);
+        handler.reminderEvents = new(_bot);
+
+        _bot.discordClient.GuildCreated += handler.GuildCreated;
+        _bot.discordClient.GuildUpdated += handler.GuildUpdated;
+
+        _bot.discordClient.ChannelCreated += handler.ChannelCreated;
+        _bot.discordClient.ChannelDeleted += handler.ChannelDeleted;
+        _bot.discordClient.ChannelUpdated += handler.ChannelUpdated;
+
+        _bot.discordClient.GuildMemberAdded += handler.GuildMemberAdded;
+        _bot.discordClient.GuildMemberRemoved += handler.GuildMemberRemoved;
+        _bot.discordClient.GuildMemberUpdated += handler.GuildMemberUpdated;
+        _bot.discordClient.GuildBanAdded += handler.GuildBanAdded;
+        _bot.discordClient.GuildBanRemoved += handler.GuildBanRemoved;
+
+        _bot.discordClient.InviteCreated += handler.InviteCreated;
+        _bot.discordClient.InviteDeleted += handler.InviteDeleted;
+
+        _bot.discordClient.MessageCreated += handler.MessageCreated;
+        _bot.discordClient.MessageDeleted += handler.MessageDeleted;
+        _bot.discordClient.MessagesBulkDeleted += handler.MessagesBulkDeleted;
+        _bot.discordClient.MessageUpdated += handler.MessageUpdated;
+
+        _bot.discordClient.MessageReactionAdded += handler.MessageReactionAdded;
+        _bot.discordClient.MessageReactionRemoved += handler.MessageReactionRemoved;
+
+        _bot.discordClient.ComponentInteractionCreated += handler.ComponentInteractionCreated;
+
+        _bot.discordClient.GuildRoleCreated += handler.GuildRoleCreated;
+        _bot.discordClient.GuildRoleDeleted += handler.GuildRoleDeleted;
+        _bot.discordClient.GuildRoleUpdated += handler.GuildRoleUpdated;
+
+        _bot.discordClient.VoiceStateUpdated += handler.VoiceStateUpdated;
+
+        _bot.discordClient.ThreadCreated += handler.ThreadCreated;
+        _bot.discordClient.ThreadDeleted += handler.ThreadDeleted;
+        _bot.discordClient.ThreadMemberUpdated += handler.ThreadMemberUpdated;
+        _bot.discordClient.ThreadMembersUpdated += handler.ThreadMembersUpdated;
+        _bot.discordClient.ThreadUpdated += handler.ThreadUpdated;
+        _bot.discordClient.ThreadListSynced += handler.ThreadListSynced;
+        _bot.discordClient.UserUpdated += handler.UserUpdated;
+
+        _bot.discordClient.GetCommandsNext().CommandExecuted += handler.CommandExecuted;
+        _bot.discordClient.GetCommandsNext().CommandErrored += handler.CommandError;
     }
 
 
@@ -63,7 +111,7 @@ internal class DiscordEventHandler
     TokenLeakEvents tokenLeakEvents { get; set; }
     ReminderEvents reminderEvents { get; set; }
 
-    internal void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
+    private void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
         if (guild is not null)
         {
@@ -177,7 +225,18 @@ internal class DiscordEventHandler
 
             if (!e.Message.Content.IsNullOrWhiteSpace() && (e.Message.Content == $"<@{sender.CurrentUser.Id}>" || e.Message.Content == $"<@!{sender.CurrentUser.Id}>"))
             {
-                _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Makoto. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type `;;help` or do a `/` and filter by me.\n" +
+                string prefix;
+
+                try
+                {
+                    prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
+                }
+                catch (Exception)
+                {
+                    prefix = ";;";
+                }
+
+                _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Makoto. I support Slash Commands, but additionally you can use me via `{prefix}`. To get a list of all commands, type `;;help` or do a `/` and filter by me.\n" +
                                 $"If you need help, feel free to join our Support and Development Server: <{_bot.status.DevelopmentServerInvite}>\n\n" +
                                 $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/makoto>.");
             }

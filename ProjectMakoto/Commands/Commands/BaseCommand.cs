@@ -142,7 +142,7 @@ public abstract class BaseCommand
 
     private async Task<bool> BasePreExecutionCheck()
     {
-        t = Bot.loadedTranslations;
+        t = ctx.Bot.loadedTranslations;
         if (ctx.Bot.users.ContainsKey(ctx.User.Id) && !ctx.User.Locale.IsNullOrWhiteSpace() && ctx.DbUser.CurrentLocale != ctx.User.Locale)
         {
             ctx.DbUser.CurrentLocale = ctx.User.Locale;
@@ -464,7 +464,7 @@ public abstract class BaseCommand
             if (components.Any())
                 builder.AddComponents(components);
 
-            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser), ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot), ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -525,7 +525,7 @@ public abstract class BaseCommand
                             FinalSelection = this.ctx.Guild.GetRole(Convert.ToUInt64(Selected));
                             FinishedSelection = true;
                         }
-                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                             throw new CancelException();
                     }
                 }
@@ -603,7 +603,7 @@ public abstract class BaseCommand
             if (components.Any())
                 builder.AddComponents(components);
 
-            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser), ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot), ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -648,7 +648,7 @@ public abstract class BaseCommand
                             FinalSelection = ctx.Guild.GetChannel(Convert.ToUInt64(Selected));
                             FinishedSelection = true;
                         }
-                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                             throw new CancelException();
                     }
                 }
@@ -718,7 +718,7 @@ public abstract class BaseCommand
             else
                 ConfirmSelectionButton.Enable();
 
-            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser), ConfirmSelectionButton);
+            builder.AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot), ConfirmSelectionButton);
 
             await RespondOrEdit(builder);
         }
@@ -762,7 +762,7 @@ public abstract class BaseCommand
                             CurrentPage++;
                             await RefreshMessage();
                         }
-                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                             throw new CancelException();
                     }
                 }
@@ -811,7 +811,7 @@ public abstract class BaseCommand
         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
             Description = GetString(t.Commands.Common.Prompts.WaitingForModalResponse, true)
-        }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(ctx.DbUser) }));
+        }.AsAwaitingInput(ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
@@ -846,7 +846,7 @@ public abstract class BaseCommand
                         {
                             await e.Interaction.CreateInteractionModalResponseAsync(builder);
                         }
-                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                        else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             throw new CancelException();
@@ -1207,7 +1207,7 @@ public abstract class BaseCommand
     public void SendPermissionError(Permissions perms)
         => _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToTranslatedPermissionString(ctx.DbUser))),
+            Description = GetString(t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToTranslatedPermissionString(ctx.DbUser, ctx.Bot))),
         }.AsError(ctx));
 
     public void SendVoiceStateError()
@@ -1268,7 +1268,7 @@ public abstract class BaseCommand
 
         _ = RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToTranslatedPermissionString(ctx.DbUser)))
+            Description = GetString(t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToTranslatedPermissionString(ctx.DbUser, ctx.Bot)))
         }.AsError(ctx));
     }
 

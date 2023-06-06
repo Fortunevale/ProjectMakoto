@@ -88,7 +88,7 @@ internal class ModifyCommand : BaseCommand
                     .AddComponents(new List<DiscordComponent> { PreviousPage, NextPage })
                     .AddComponents(new List<DiscordComponent> { AddSong, RemoveSong, RemoveDuplicates })
                     .AddComponents(new List<DiscordComponent> { PlaylistName, ChangePlaylistColor, ChangePlaylistThumbnail })
-                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
                 return;
             }

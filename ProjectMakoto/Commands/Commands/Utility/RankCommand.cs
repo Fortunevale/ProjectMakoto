@@ -41,7 +41,7 @@ internal class RankCommand : BaseCommand
                 Description = $"{(victim.Id == ctx.User.Id ? GetString(t.Commands.Utility.Rank.Self) : GetString(t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
                               $"**{GetString(t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
-                              $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
+                              $"`{UniversalExtensions.GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
             }.AsInfo(ctx, GetString(t.Commands.Utility.Rank.Title)));
         });

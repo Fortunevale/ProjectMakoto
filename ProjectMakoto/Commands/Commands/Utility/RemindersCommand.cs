@@ -38,7 +38,7 @@ internal class RemindersCommand : BaseCommand
                          $"**⚠ {GetString(t.Commands.Utility.Reminders.Notice)}**")
                         .AsInfo(ctx, GetString(t.Commands.Utility.Reminders.Title)))
                     .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
-                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
                 var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -80,7 +80,7 @@ internal class RemindersCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectDescriptionButton, SelectDueDateButton, Finish })
-                        .AddComponents(MessageComponents.GetBackButton(ctx.DbUser)));
+                        .AddComponents(MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot)));
 
                     var Menu = await ctx.WaitForButtonAsync();
 
@@ -165,7 +165,7 @@ internal class RemindersCommand : BaseCommand
                         await ExecuteCommand(ctx, null);
                         return;
                     }
-                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -204,7 +204,7 @@ internal class RemindersCommand : BaseCommand
                 await ExecuteCommand(ctx, null);
                 return;
             }
-            else if (SelectedCustomId == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (SelectedCustomId == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

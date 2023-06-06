@@ -208,6 +208,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 return true;
         }
 
+#pragma warning disable CS8321 // Local function is declared but never used
         bool Require3()
         {
             if (argument3.IsNullOrWhiteSpace())
@@ -369,7 +370,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
                         await new LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
-                            { "Level", (LogLevel)Enum.Parse(typeof(LogLevel), argument1) },
+                            { "Level", (CustomLogLevel)Enum.Parse(typeof(CustomLogLevel), argument1) },
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;

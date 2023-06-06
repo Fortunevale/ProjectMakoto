@@ -24,10 +24,26 @@ internal class AfkEvents
             if (_bot.objectedUsers.Contains(e.Author.Id) || _bot.bannedUsers.ContainsKey(e.Author.Id) || _bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
                 return;
 
-            if (e.Guild == null || e.Channel.IsPrivate || e.Message.Content.StartsWith(">>") || e.Message.Content.StartsWith(";;") || e.Author.IsBot)
+            string prefix;
+
+            try
+            {
+                prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
+            }
+            catch (Exception)
+            {
+                prefix = ";;";
+            }
+
+            if (e.Message.Content.StartsWith(prefix))
+                foreach (var command in sender.GetCommandsNext().RegisteredCommands)
+                    if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
+                        return;
+
+            if (e.Guild == null || e.Channel.IsPrivate || e.Author.IsBot)
                 return;
 
-            var AfkKey = Bot.loadedTranslations.Commands.Social.Afk;
+            var AfkKey = _bot.loadedTranslations.Commands.Social.Afk;
 
             if (_bot.users[e.Author.Id].AfkStatus.TimeStamp != DateTime.UnixEpoch && _bot.users[e.Author.Id].AfkStatus.LastMentionTrigger.AddSeconds(10) < DateTime.UtcNow)
             {

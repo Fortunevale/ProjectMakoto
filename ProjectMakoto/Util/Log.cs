@@ -11,5 +11,5 @@ namespace ProjectMakoto.Util;
 
 public class Log
 {
-    public static Logger _logger { get; set; }
+    public static LoggerClient _logger { get; set; }
 }

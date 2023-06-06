@@ -55,7 +55,7 @@ internal class SaveCurrentCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                     .AddComponents(new List<DiscordComponent> { SelectName, Finish })
-                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
                 var Menu = await ctx.WaitForButtonAsync();
 
@@ -133,7 +133,7 @@ internal class SaveCurrentCommand : BaseCommand
                     });
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                 {
                     if (!ctx.Transferred)
                         DeleteOrInvalidate();

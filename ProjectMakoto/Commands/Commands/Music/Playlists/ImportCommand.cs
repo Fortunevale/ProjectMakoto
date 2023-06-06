@@ -35,7 +35,7 @@ internal class ImportCommand : BaseCommand
                 Description = GetString(t.Commands.Music.Playlists.Import.ImportMethod, true),
             }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)))
             .AddComponents(new List<DiscordComponent> { Link, ExportedPlaylist })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var Menu = await ctx.WaitForButtonAsync();
 
@@ -206,7 +206,7 @@ internal class ImportCommand : BaseCommand
                     return;
                 }
             }
-            else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                 return;

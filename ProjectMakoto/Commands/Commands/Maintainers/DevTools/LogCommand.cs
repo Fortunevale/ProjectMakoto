@@ -17,13 +17,13 @@ internal class LogCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            LogLevel Level = (LogLevel)arguments["Level"];
+            CustomLogLevel Level = (CustomLogLevel)arguments["Level"];
 
-            if (Level > Xorog.Logger.Enums.LogLevel.TRACE2)
+            if (Level > CustomLogLevel.Trace2)
                 throw new Exception("Invalid Log Level");
 
             _logger.ChangeLogLevel(Level);
-            await RespondOrEdit($"`Changed LogLevel to '{(LogLevel)Level}'`");
+            await RespondOrEdit($"`Changed LogLevel to '{(CustomLogLevel)Level}'`");
         });
     }
 }

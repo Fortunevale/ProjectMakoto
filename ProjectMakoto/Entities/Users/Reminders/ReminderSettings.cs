@@ -33,7 +33,7 @@ public class ReminderSettings
             ScheduledReminders.RemoveAt(0);
 
         foreach (var b in ScheduledReminders.ToList())
-            if (!GetScheduledTasks().Any(x =>
+            if (!UniversalExtensions.GetScheduledTasks().Any(x =>
             {
                 if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
                 scheduledTaskIdentifier.Snowflake != this.Parent.UserId ||
@@ -46,7 +46,7 @@ public class ReminderSettings
             {
                 Task task = new(async () =>
                 {
-                    var CommandKey = Bot.loadedTranslations.Commands.Utility.Reminders;
+                    var CommandKey = _bot.loadedTranslations.Commands.Utility.Reminders;
 
                     this.ScheduledReminders.Remove(b);
 
@@ -75,7 +75,7 @@ public class ReminderSettings
                 _logger.LogDebug("Created scheduled task for reminder by '{User}'", Parent.UserId);
             }
 
-        foreach (var b in GetScheduledTasks())
+        foreach (var b in UniversalExtensions.GetScheduledTasks())
         {
             if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                 continue;

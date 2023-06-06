@@ -28,7 +28,7 @@ public class PollSettings
 
     private async void RunningPollsUpdatedAsync(object? sender, ObservableListUpdate<PollEntry> e)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Moderation.Poll;
+        var CommandKey = _bot.loadedTranslations.Commands.Moderation.Poll;
 
         while (RunningPolls.Count > 10)
             RunningPolls.RemoveAt(0);
@@ -37,7 +37,7 @@ public class PollSettings
             await Task.Delay(1000);
 
         foreach (var b in RunningPolls.ToList())
-            if (!GetScheduledTasks().Any(x =>
+            if (!UniversalExtensions.GetScheduledTasks().Any(x =>
             {
                 if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
                 scheduledTaskIdentifier.Snowflake != this.Parent.ServerId ||
@@ -186,7 +186,7 @@ public class PollSettings
                 _logger.LogDebug("Created scheduled task for poll by '{Guild}'", Parent.ServerId);
             }
 
-        foreach (var b in GetScheduledTasks())
+        foreach (var b in UniversalExtensions.GetScheduledTasks())
         {
             if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                 continue;

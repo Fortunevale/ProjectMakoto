@@ -19,11 +19,11 @@ using Microsoft.CodeAnalysis.Emit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class Plugins
+internal class PluginLoader
 {
     private static string CachedUsings = "";
 
-    public static async Task LoadPlugins(Bot _bot)
+    internal static async Task LoadPlugins(Bot _bot)
     {
         if (_bot.status.LoadedConfig.EnablePlugins)
         {
@@ -121,15 +121,15 @@ internal class Plugins
         }
     }
 
-    public static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
+    internal static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
     {
-        var applicationHash = ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+        var applicationHash = UniversalExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
 
         foreach (var plugin in _bot.Plugins)
         {
             try
             {
-                var pluginHash = ComputeSHA256Hash(plugin.Value.LoadedFile);
+                var pluginHash = UniversalExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
                 Dictionary<Assembly, string> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
@@ -160,7 +160,7 @@ internal class Plugins
                 pluginInfo.LastKnownHash = pluginHash;
 
                 if (pluginInfo.CompiledCommands.Any())
-                    _ = CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
+                    _ = UniversalExtensions.CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
 
                 pluginInfo.CompiledCommands = new();
 

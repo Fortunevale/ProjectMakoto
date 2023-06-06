@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Octokit;
+
 namespace ProjectMakoto.Events;
 
 internal class TokenLeakEvents
@@ -51,11 +53,6 @@ internal class TokenLeakEvents
 
         _ = e.DeleteAsync();
 
-        var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
-
-        var tokenAuth = new Credentials(_bot.status.LoadedConfig.Secrets.Github.Token);
-        client.Credentials = tokenAuth;
-
         int InvalidateCount = 0;
 
         foreach (var token in filtered_matches)
@@ -75,7 +72,7 @@ internal class TokenLeakEvents
             string fileName = $"token_leak_{e.Author.Id}_{guild.Id}_{e.Channel.Id}_{seconds}.md";
             string content = $"## Token of {botUser?.Id.ToString() ?? "unknown"} (Owner {e.Author.Id})\n\nBot {token}";
 
-            await client.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
+            await _bot.githubClient.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
             InvalidateCount++;
         }
 

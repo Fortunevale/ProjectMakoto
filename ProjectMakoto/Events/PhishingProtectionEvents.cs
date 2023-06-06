@@ -163,7 +163,7 @@ internal class PhishingProtectionEvents
             {
                 try
                 {
-                    var unshortened_url = await UnshortenUrl(match.Value);
+                    var unshortened_url = await UniversalExtensions.UnshortenUrl(match.Value);
                     var parsedUri = new UriBuilder(unshortened_url);
 
                     CheckDb(parsedUri.Uri);

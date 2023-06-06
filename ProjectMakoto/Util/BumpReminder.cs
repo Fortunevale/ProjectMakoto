@@ -57,7 +57,7 @@ internal class BumpReminder
 
         try
         {
-            foreach (var b in GetScheduledTasks())
+            foreach (var b in UniversalExtensions.GetScheduledTasks())
             {
                 if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                     continue;

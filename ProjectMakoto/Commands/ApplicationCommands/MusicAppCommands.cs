@@ -113,7 +113,7 @@ public class MusicAppCommands : ApplicationCommandsModule
                     IEnumerable<UserPlaylist> Queue = bot.users[ctx.User.Id].UserPlaylists
                         .Where(x => x.PlaylistName.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
 
-                    List<DiscordApplicationCommandAutocompleteChoice> options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Count} {Bot.loadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
+                    List<DiscordApplicationCommandAutocompleteChoice> options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Count} {bot.loadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
                     return options.AsEnumerable();
                 }
                 catch (Exception ex)

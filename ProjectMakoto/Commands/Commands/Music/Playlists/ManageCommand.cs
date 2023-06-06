@@ -58,7 +58,7 @@ internal class ManageCommand : BaseCommand
                 ModifyPlaylist,
                 DeletePlaylist
             })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 

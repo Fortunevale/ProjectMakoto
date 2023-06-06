@@ -13,7 +13,7 @@ internal class InVoicePrivacyCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.InVoicePrivacy;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.InVoicePrivacy;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ClearMessagesOnLeave, CommandKey.SetPermissions);
 

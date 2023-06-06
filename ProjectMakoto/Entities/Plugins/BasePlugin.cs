@@ -7,6 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Octokit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Plugins;
@@ -15,27 +16,42 @@ public abstract class BasePlugin
 {
     public BasePlugin()
     {
-        this._logger = Log._logger;
+        this._logger = new(Log._logger, this);
     }
 
     internal FileInfo LoadedFile { get; set; }
 
     public Bot _bot { get; set; }
-    public Logger _logger { get; set; }
+    public PluginLoggerClient _logger { get; set; }
     public ApplicationCommandsExtension DiscordCommandsModule { get; set; }
     
+    /// <summary>
+    /// Whether the client logged into discord.
+    /// </summary>
     public bool DiscordInitialized
         => _bot.status.DiscordInitialized;
     
+    /// <summary>
+    /// Whether the guild download has been completed.
+    /// </summary>
     public bool DiscordGuildDownloadCompleted
         => _bot.status.DiscordGuildDownloadCompleted;
     
+    /// <summary>
+    /// Whether the commands have been registered.
+    /// </summary>
     public bool DiscordCommandsRegistered
         => _bot.status.DiscordCommandsRegistered;
 
+    /// <summary>
+    /// Whether the database connection has been established.
+    /// </summary>
     public bool DatabaseInitialized
         => _bot.status.DatabaseInitialized;
 
+    /// <summary>
+    /// Whether the database content has loaded.
+    /// </summary>
     public bool DatabaseInitialLoadCompleted
         => _bot.status.DatabaseInitialLoadCompleted;
 
@@ -135,7 +151,7 @@ public abstract class BasePlugin
         var Owner = regex.Groups[1].Value;
         var Repository = regex.Groups[2].Value;
 
-        GitHubClient client = new(new ProductHeaderValue("ProjectMakoto"));
+        GitHubClient client = new(new ProductHeaderValue("ProjectMakoto", _bot.status.RunningVersion));
 
         if (this.UpdateUrlCredentials is not null)
             client.Credentials = this.UpdateUrlCredentials;
@@ -158,7 +174,7 @@ public abstract class BasePlugin
 
                     var asset = release.Assets.First(x => x.Name.EndsWith(".dll"));
 
-                    using (var fileStream = new FileStream($"UpdatedPlugins/{asset.Name}", FileMode.Create, FileAccess.ReadWrite))
+                    using (var fileStream = new FileStream($"UpdatedPlugins/{asset.Name}", System.IO.FileMode.Create, FileAccess.ReadWrite))
                     {
                         var downloadStream = await downloadClient.GetStreamAsync(asset.BrowserDownloadUrl);
                         await downloadStream.CopyToAsync(fileStream);

@@ -12,3 +12,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS8625")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS8601")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS1998")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(null, "CS8981")]

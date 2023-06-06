@@ -13,7 +13,7 @@ internal class ExperienceCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.Experience;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.Experience;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ExperienceEnabled, CommandKey.ExperienceBoostForBumpers);
 

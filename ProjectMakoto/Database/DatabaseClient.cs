@@ -26,6 +26,8 @@ internal class DatabaseClient
 
     public static async Task<DatabaseClient> InitializeDatabase(Bot _bot)
     {
+        _logger.LogInfo("Connecting to database..");
+
         var databaseClient = new DatabaseClient
         {
             _bot = _bot,
@@ -122,6 +124,9 @@ internal class DatabaseClient
             _ = databaseClient.CheckDatabaseConnection(databaseClient.guildDatabaseConnection);
         })).CreateScheduledTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
 
+        Bot.DatabaseClient = databaseClient;
+        _bot.status.DatabaseInitialized = true;
+        _logger.LogInfo("Connected to database.");
         return databaseClient;
     }
 
@@ -638,7 +643,7 @@ internal class DatabaseClient
 
     public async Task Dispose()
     {
-        foreach (var b in GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
+        foreach (var b in UniversalExtensions.GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
             b.Delete();
 
         int timeout = 0;

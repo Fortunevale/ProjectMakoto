@@ -13,7 +13,7 @@ internal class ActionLogAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.ActionLog;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.ActionLog;
 
         if (ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0)
             return $"❌ {CommandKey.ActionlogDisabled.Get(ctx.DbUser).Build(true)}";

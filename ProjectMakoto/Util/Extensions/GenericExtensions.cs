@@ -8,41 +8,42 @@
 // but WITHOUT ANY WARRANTY
 
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
-    internal static string Log(this string str, LogLevel lvl, string additionalInfo)
+    internal static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
     {
         switch (lvl)
         {
-            case LogLevel.NONE:
+            case CustomLogLevel.None:
                 _logger.LogNone($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.FATAL:
+            case CustomLogLevel.Fatal:
                 _logger.LogFatal($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.ERROR:
+            case CustomLogLevel.Error:
                 _logger.LogError($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.WARN:
+            case CustomLogLevel.Warn:
                 _logger.LogWarn($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.INFO:
+            case CustomLogLevel.Info:
                 _logger.LogInfo($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.DEBUG:
+            case CustomLogLevel.Debug:
                 _logger.LogDebug($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.DEBUG2:
+            case CustomLogLevel.Debug2:
                 _logger.LogDebug2($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.TRACE:
+            case CustomLogLevel.Trace:
                 _logger.LogTrace($"String {{0}} logged: {additionalInfo}", str);
                 break;
-            case LogLevel.TRACE2:
+            case CustomLogLevel.Trace2:
                 _logger.Log(Microsoft.Extensions.Logging.LogLevel.Trace, $"String {{0}} logged: {additionalInfo}", str);
                 break;
             default:

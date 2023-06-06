@@ -13,7 +13,7 @@ internal class AutoCrosspostCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.AutoCrosspost;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.AutoCrosspost;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ExcludeBots, CommandKey.DelayBeforePosting);
 

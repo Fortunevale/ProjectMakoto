@@ -11,14 +11,10 @@ namespace ProjectMakoto.Util;
 
 internal class AbuseIpDbClient
 {
-    public static AbuseIpDbClient Initialize(Bot bot)
+    public AbuseIpDbClient(Bot bot)
     {
-        AbuseIpDbClient abuseIpDbClient = new();
-
-        abuseIpDbClient._bot = bot;
-
-        _ = abuseIpDbClient.QueueHandler();
-        return abuseIpDbClient;
+        this._bot = bot;
+        _ = this.QueueHandler();
     }
 
     private Bot _bot { get; set; }

@@ -166,11 +166,21 @@ internal class ActionlogEvents
             if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
                 return;
 
-            if (!string.IsNullOrEmpty(e.Message.Content))
-                if (e.Message.Content.ToLower().StartsWith($";;"))
-                    foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                        if (e.Message.Content.ToLower().StartsWith($";;{command.Key}"))
-                            return;
+            string prefix;
+
+            try
+            {
+                prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
+            }
+            catch (Exception)
+            {
+                prefix = ";;";
+            }
+
+            if (e.Message.Content.StartsWith(prefix))
+                foreach (var command in sender.GetCommandsNext().RegisteredCommands)
+                    if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
+                        return;
 
             DiscordEmbedBuilder embed = new()
             {
@@ -356,11 +366,21 @@ internal class ActionlogEvents
             if (!await ValidateServer(e.Guild) || !_bot.guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message is null || e.Message.WebhookMessage || e.Message.Author is null || e.Message.Author.IsBot)
                 return;
 
-            if (!string.IsNullOrEmpty(e.Message.Content))
-                if (e.Message.Content.StartsWith($";;"))
-                    foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                        if (e.Message.Content.StartsWith($";;{command.Key}") || e.Message.Content.StartsWith($">>{command.Key}"))
-                            return;
+            string prefix;
+
+            try
+            {
+                prefix = _bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
+            }
+            catch (Exception)
+            {
+                prefix = ";;";
+            }
+
+            if (e.Message.Content.StartsWith(prefix))
+                foreach (var command in sender.GetCommandsNext().RegisteredCommands)
+                    if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
+                        return;
 
             DiscordEmbedBuilder embed = new()
             {
@@ -632,7 +652,7 @@ internal class ActionlogEvents
                 Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
                 Timestamp = DateTime.UtcNow,
                 Description = $"**Role**: {e.Role.Mention} `{e.Role.Name}`\n" +
-                                            $"**Color**: `{ToHex(e.Role.Color.R, e.Role.Color.G, e.Role.Color.B)}`\n" +
+                                            $"**Color**: `{UniversalExtensions.ToHex(e.Role.Color.R, e.Role.Color.G, e.Role.Color.B)}`\n" +
                                             $"{(e.Role.IsManaged ? "\n`This role belongs to an integration and cannot be deleted.`\n" : "")}" +
                                             $"{Integration}" +
                                             $"{(e.Role.IsMentionable ? "`Everyone can mention this role.`\n" : "")}" +

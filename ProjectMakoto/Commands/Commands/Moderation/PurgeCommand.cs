@@ -121,7 +121,7 @@ internal class PurgeCommand : BaseCommand
 
                 while (!deletionOperations.All(x => x.IsCompleted))
                 {
-                    await RespondOrEdit($"`{GenerateASCIIProgressbar(deleted, total)} {CalculatePercentage(deleted, total),3}%`");
+                    await RespondOrEdit($"`{UniversalExtensions.GenerateASCIIProgressbar(deleted, total)} {UniversalExtensions.CalculatePercentage(deleted, total),3}%`");
                 }
 
                 await RespondOrEdit(new DiscordEmbedBuilder().

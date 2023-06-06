@@ -13,7 +13,7 @@ internal class EmbedMessageCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.EmbedMessages;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.EmbedMessages;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.EmbedGithubCode, CommandKey.EmbedMessageLinks);
 

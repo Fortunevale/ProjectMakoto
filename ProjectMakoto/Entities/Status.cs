@@ -13,6 +13,8 @@ internal class Status
 {
     internal DateTime startupTime { get; set; } = DateTime.UtcNow;
 
+    internal string RunningVersion { get; set; }
+
     internal bool DiscordInitialized { get; set; } = false;
     internal bool DiscordGuildDownloadCompleted { get; set; } = false;
     internal bool DiscordCommandsRegistered { get; set; } = false;

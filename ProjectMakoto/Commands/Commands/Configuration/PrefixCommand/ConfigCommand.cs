@@ -33,7 +33,7 @@ internal class ConfigCommand : BaseCommand
             {
                 { TogglePrefixCommands },
                 { ChangePrefix },
-            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -55,7 +55,7 @@ internal class ConfigCommand : BaseCommand
             {
                 var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
 
-                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.Config.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
+                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.Config.PrefixConfigCommand.NewPrefix), ctx.Bot.Prefix, 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
 
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
@@ -86,7 +86,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
             }

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class TaskInfo
+public class TaskInfo
 {
     internal TaskInfo(Task task)
     {
@@ -40,11 +40,12 @@ internal class TaskInfo
         this.task = task;
     }
 
-    internal string uuid { get; private set; } = Guid.NewGuid().ToString();
-    internal CommandContext? CommandContext { get; private set; } = null;
-    internal InteractionContext? InteractionContext { get; private set; } = null;
-    internal SharedCommandContext? SharedCommandContext { get; private set; } = null;
-    internal ContextMenuContext? ContextMenuContext { get; private set; } = null;
-    internal Task task { get; private set; }
-    internal DateTime CreationTimestamp { get; private set; } = DateTime.UtcNow;
+    public string uuid { get; private set; } = Guid.NewGuid().ToString();
+    public CommandContext? CommandContext { get; private set; } = null;
+    public InteractionContext? InteractionContext { get; private set; } = null;
+    public SharedCommandContext? SharedCommandContext { get; private set; } = null;
+    public ContextMenuContext? ContextMenuContext { get; private set; } = null;
+    public Task task { get; private set; }
+    public DateTime CreationTimestamp { get; private set; } = DateTime.UtcNow;
+    public bool IsVital { get; internal set; } = false;
 }

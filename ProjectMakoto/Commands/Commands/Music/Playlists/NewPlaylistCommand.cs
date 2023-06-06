@@ -47,7 +47,7 @@ internal class NewPlaylistCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                     .AddComponents(new List<DiscordComponent> { SelectName, SelectFirstTracks, Finish })
-                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                    .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
                 var Menu = await ctx.WaitForButtonAsync();
 
@@ -161,7 +161,7 @@ internal class NewPlaylistCommand : BaseCommand
                     });
                     return;
                 }
-                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                 {
                     if (!ctx.Transferred)
                         DeleteOrInvalidate();

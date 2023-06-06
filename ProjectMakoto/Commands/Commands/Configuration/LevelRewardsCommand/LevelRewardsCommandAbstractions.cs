@@ -13,7 +13,7 @@ internal class LevelRewardsCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.LevelRewards;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.LevelRewards;
 
         string str = "";
         if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count != 0)

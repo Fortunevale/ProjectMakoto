@@ -39,7 +39,6 @@ public class Config
     public DiscordConfig Discord = new();
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();
-    public LavalinkConfig Lavalink = new();
     public AccountIdsConfig Accounts = new();
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
@@ -66,13 +65,6 @@ public class Config
         public ulong OtherAssets = 0;
 
         public ulong ExceptionLog = 0;
-    }
-
-    public class LavalinkConfig
-    {
-        public bool UseAutoUpdater = false;
-        public bool DownloadPreRelease = true;
-        public string JarFolderPath = "";
     }
 
     public class EmojiConfig

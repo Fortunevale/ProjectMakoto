@@ -119,7 +119,7 @@ internal class ReportHostCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent>
             {
                 { ContinueButton },
-                { MessageComponents.GetCancelButton(ctx.DbUser) }
+                { MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }
             }));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
@@ -204,7 +204,7 @@ internal class ReportHostCommand : BaseCommand
                 embed.AsSuccess(ctx, GetString(t.Commands.Utility.ReportHost.Title));
                 await RespondOrEdit(embed);
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
             }
