@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Config
+public sealed class Config
 {
     public void Save(int retry = 0)
     {
@@ -39,7 +39,6 @@ public class Config
     public DiscordConfig Discord = new();
     public ChannelsConfig Channels = new();
     public EmojiConfig Emojis = new();
-    public LavalinkConfig Lavalink = new();
     public AccountIdsConfig Accounts = new();
     public SecretsConfig Secrets = new();
     public DontModifyConfig DontModify = new();
@@ -47,12 +46,13 @@ public class Config
     public Dictionary<string, PluginInfo> PluginCache = new();
     public Dictionary<string, object> PluginData = new();
 
-    public class DiscordConfig
+    public sealed class DiscordConfig
     {
         public uint MaxUploadSize = 8388608;
+        public List<string> DisabledCommands = new();
     }
 
-    public class ChannelsConfig
+    public sealed class ChannelsConfig
     {
         public ulong GlobalBanAnnouncements = 0;
         public ulong GithubLog = 0;
@@ -67,14 +67,7 @@ public class Config
         public ulong ExceptionLog = 0;
     }
 
-    public class LavalinkConfig
-    {
-        public bool UseAutoUpdater = false;
-        public bool DownloadPreRelease = true;
-        public string JarFolderPath = "";
-    }
-
-    public class EmojiConfig
+    public sealed class EmojiConfig
     {
         public string Dot = "🅿";
 
@@ -118,12 +111,12 @@ public class Config
         public ulong AbuseIPDBId = 1022142812659126334;
     }
 
-    public class AccountIdsConfig
+    public sealed class AccountIdsConfig
     {
         public ulong Disboard = 302050872383242240;
     }
 
-    public class SecretsConfig
+    public sealed class SecretsConfig
     {
         public string KawaiiRedToken = "";
         public string AbuseIpDbToken = "";
@@ -133,7 +126,7 @@ public class Config
         public DatabaseSecrets Database = new();
         public LavalinkSecrets Lavalink = new();
 
-        public class GithubSecrets
+        public sealed class GithubSecrets
         {
             public string Token = "";
             public DateTimeOffset TokenExperiation = new(0001, 01, 01, 15, 00, 00, TimeSpan.Zero);
@@ -143,7 +136,7 @@ public class Config
             public string TokenLeakRepo = "";
         }
 
-        public class DatabaseSecrets
+        public sealed class DatabaseSecrets
         {
             public string Host = "127.0.0.1";
             public int Port = 3306;
@@ -154,7 +147,7 @@ public class Config
             public string GuildDatabaseName = "";
         }
 
-        public class LavalinkSecrets
+        public sealed class LavalinkSecrets
         {
             public string Host = "127.0.0.1";
             public int Port = 2333;
@@ -162,13 +155,13 @@ public class Config
         }
     }
 
-    public class DontModifyConfig
+    public sealed class DontModifyConfig
     {
         public string LastStartedVersion = "UNIDENTIFIED";
         public string LastKnownHash = "";
     }
 
-    public class PluginInfo
+    public sealed class PluginInfo
     {
         public string? LastKnownHash = null;
         public Dictionary<string, string> CompiledCommands = new();

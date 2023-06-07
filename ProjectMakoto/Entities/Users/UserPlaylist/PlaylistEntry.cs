@@ -9,18 +9,18 @@
 
 namespace ProjectMakoto.Entities;
 
-public class PlaylistEntry
+public sealed class PlaylistEntry
 {
     private string _Title { get; set; }
     [JsonProperty(Required = Required.Always)]
-    public string Title { get => _Title; set => _Title = value.TruncateWithIndication(100); }
-    
+    public string Title { get => this._Title; set => this._Title = value.TruncateWithIndication(100); }
+
     private TimeSpan? _Length { get; set; }
-    public TimeSpan? Length { get => _Length; set => _Length = value; }
+    public TimeSpan? Length { get => this._Length; set => this._Length = value; }
 
     private string _Url { get; set; }
     [JsonProperty(Required = Required.Always)]
-    public string Url { get => _Url; set => _Url = value.TruncateWithIndication(2048); }
+    public string Url { get => this._Url; set => this._Url = value.TruncateWithIndication(2048); }
 
     public DateTime AddedTime { get; set; } = DateTime.UtcNow;
 }

@@ -9,19 +9,25 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class Status
+public sealed class Status
 {
-    internal DateTime startupTime { get; set; } = DateTime.UtcNow;
+    internal Status() { }
 
-    internal bool DiscordInitialized { get; set; } = false;
-    internal bool DiscordGuildDownloadCompleted { get; set; } = false;
-    internal bool DiscordCommandsRegistered { get; set; } = false;
-    internal bool LavalinkInitialized { get; set; } = false;
-    internal bool DatabaseInitialized { get; set; } = false;
-    internal bool DatabaseInitialLoadCompleted { get; set; } = false;
+    public DateTime startupTime { get; internal set; } = DateTime.UtcNow;
 
-    internal ulong TeamOwner { get; set; } = new();
-    internal List<ulong> TeamMembers { get; set; } = new();
+    public string RunningVersion { get; internal set; }
+
+    public bool DiscordInitialized { get; internal set; } = false;
+    public bool DiscordGuildDownloadCompleted { get; internal set; } = false;
+    public bool DiscordCommandsRegistered { get; internal set; } = false;
+    public bool LavalinkInitialized { get; internal set; } = false;
+    public bool DatabaseInitialized { get; internal set; } = false;
+    public bool DatabaseInitialLoadCompleted { get; internal set; } = false;
+
+    public ulong TeamOwner { get; internal set; } = new();
+    public IReadOnlyList<ulong> TeamMembers
+        => this._TeamMembers.AsReadOnly();
+    internal List<ulong> _TeamMembers { get; set; } = new();
 
     internal long DiscordDisconnections = 0;
 
@@ -33,10 +39,10 @@ internal class Status
     {
         get
         {
-            if (LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace())
+            if (this.LoadedConfig.SupportServerInvite.IsNullOrWhiteSpace())
                 return "Invite not set.";
 
-            return LoadedConfig.SupportServerInvite;
+            return this.LoadedConfig.SupportServerInvite;
         }
     }
 

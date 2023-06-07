@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.PrefixCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -23,17 +23,17 @@ internal class ConfigCommand : BaseCommand
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
                 Description = PrefixCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(t.Commands.Config.PrefixConfigCommand.Title));
+            }.AsAwaitingInput(ctx, GetString(this.t.Commands.Config.PrefixConfigCommand.Title));
 
-            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
-            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
+            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
+            var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { TogglePrefixCommands },
                 { ChangePrefix },
-            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -53,9 +53,9 @@ internal class ConfigCommand : BaseCommand
             }
             else if (Button.GetCustomId() == ChangePrefix.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder(GetString(t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
+                var modal = new DiscordInteractionModalBuilder(GetString(this.t.Commands.Config.PrefixConfigCommand.NewPrefixModalTitle), Guid.NewGuid().ToString());
 
-                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(t.Commands.Config.PrefixConfigCommand.NewPrefix), ";;", 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
+                modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "newPrefix", GetString(this.t.Commands.Config.PrefixConfigCommand.NewPrefix), ctx.Bot.Prefix, 1, 4, true, ctx.DbGuild.PrefixSettings.Prefix));
 
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
@@ -86,7 +86,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
             }

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -11,22 +11,22 @@ using ProjectMakoto.Entities.SystemMonitor;
 
 namespace ProjectMakoto.Util.SystemMonitor;
 
-internal class MonitorClient
+public sealed class MonitorClient
 {
     internal MonitorClient(Bot bot)
     {
         if (!bot.status.LoadedConfig.MonitorSystemStatus)
             return;
 
-        this.InitializeMonitor();
+        InitializeMonitor();
     }
 
-    internal IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
+    public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
-        return History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
+        return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
-    
-    internal async Task<SystemInfo> GetCurrent()
+
+    public async Task<SystemInfo> GetCurrent()
     {
         return await ReadSystemInfoAsync();
     }
@@ -51,7 +51,7 @@ internal class MonitorClient
             {
                 try
                 {
-                    LastScanStart = DateTime.UtcNow;
+                    this.LastScanStart = DateTime.UtcNow;
                     var sensors = await ReadSystemInfoAsync();
 
                     _logger.LogDebug(JsonConvert.SerializeObject(sensors, Formatting.Indented));
@@ -59,18 +59,18 @@ internal class MonitorClient
                     if (this.History.Count >= 180)
                         this.History.Remove(this.History.Min(x => x.Key));
 
-                    
+
                     this.History.Add(DateTime.UtcNow, sensors);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarn("Failed to fetch system info", ex);
 
-                    LastScanStart = DateTime.UtcNow;
+                    this.LastScanStart = DateTime.UtcNow;
                     this.History.Add(DateTime.UtcNow, null);
                 }
 
-                var waitTime = LastScanStart.AddSeconds(20).GetTimespanUntil();
+                var waitTime = this.LastScanStart.AddSeconds(20).GetTimespanUntil();
 
                 if (waitTime < TimeSpan.FromSeconds(1))
                     waitTime = TimeSpan.FromSeconds(1);
@@ -85,7 +85,7 @@ internal class MonitorClient
         return await Task.Run<SystemInfo>(() =>
         {
             SystemInfo systemInfo = new();
-            
+
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
                 try

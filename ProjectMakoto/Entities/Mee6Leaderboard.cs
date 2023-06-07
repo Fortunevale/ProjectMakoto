@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class Mee6Leaderboard
+internal sealed class Mee6Leaderboard
 {
     public bool admin { get; set; }
     public string banner_url { get; set; }
@@ -24,7 +24,7 @@ internal class Mee6Leaderboard
     public int[] xp_per_message { get; set; }
     public float xp_rate { get; set; }
 
-    public class Guild
+    public sealed class Guild
     {
         public bool allow_join { get; set; }
         public string icon { get; set; }
@@ -35,7 +35,7 @@ internal class Mee6Leaderboard
         public bool premium { get; set; }
     }
 
-    public class Player
+    public sealed class Player
     {
         public string avatar { get; set; }
         public int[] detailed_xp { get; set; }

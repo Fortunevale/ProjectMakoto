@@ -11,5 +11,5 @@ namespace TranslationSourceGenerator;
 
 internal class Log
 {
-    internal static Logger _logger { get; set; }
+    internal static LoggerClient _logger { get; set; }
 }

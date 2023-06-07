@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,17 +9,17 @@
 
 namespace ProjectMakoto.Commands.ActionLogCommand;
 
-internal class ActionLogAbstractions
+internal sealed class ActionLogAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.ActionLog;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.ActionLog;
 
         if (ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel == 0)
             return $"❌ {CommandKey.ActionlogDisabled.Get(ctx.DbUser).Build(true)}";
 
-        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.InviteModifications, CommandKey.VoiceChannelUpdates, CommandKey.ChannelModifications, CommandKey.ServerModifications, CommandKey.BanUpdates, 
-            CommandKey.RoleUpdates, CommandKey.MessageModifications, CommandKey.MessageModifications, CommandKey.UserProfileUpdates, CommandKey.UserRoleUpdates, CommandKey.UserStateUpdates, 
+        var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.InviteModifications, CommandKey.VoiceChannelUpdates, CommandKey.ChannelModifications, CommandKey.ServerModifications, CommandKey.BanUpdates,
+            CommandKey.RoleUpdates, CommandKey.MessageModifications, CommandKey.MessageModifications, CommandKey.UserProfileUpdates, CommandKey.UserRoleUpdates, CommandKey.UserStateUpdates,
             CommandKey.AttemptGatheringMoreDetails, CommandKey.ActionLogChannel);
 
         return $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.ActionLogChannel.Get(ctx.DbUser).PadRight(pad)}` : <#{ctx.Bot.guilds[ctx.Guild.Id].ActionLog.Channel}>\n\n" +

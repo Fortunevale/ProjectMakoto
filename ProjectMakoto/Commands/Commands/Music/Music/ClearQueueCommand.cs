@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Music;
 
-internal class ClearQueueCommand : BaseCommand
+internal sealed class ClearQueueCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
 
@@ -28,7 +28,7 @@ internal class ClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal class ClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.ClearQueue.AlreadyVoted, true),
+                    Description = GetString(this.t.Commands.Music.ClearQueue.AlreadyVoted, true),
                 }.AsError(ctx));
                 return;
             }
@@ -51,19 +51,19 @@ internal class ClearQueueCommand : BaseCommand
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.ClearQueue.Cleared, true),
+                    Description = GetString(this.t.Commands.Music.ClearQueue.Cleared, true),
                 }.AsSuccess(ctx));
                 return;
             }
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(t.Commands.Music.ClearQueue.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(this.t.Commands.Music.ClearQueue.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
             builder.AddComponents(DisconnectVote);
 
             await RespondOrEdit(builder);
@@ -89,7 +89,7 @@ internal class ClearQueueCommand : BaseCommand
 
                         if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Contains(e.User.Id))
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(t.Commands.Music.ClearQueue.AlreadyVoted, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.ClearQueue.AlreadyVoted, true)}").AsEphemeral());
                             return;
                         }
 
@@ -97,7 +97,7 @@ internal class ClearQueueCommand : BaseCommand
 
                         if (member.VoiceState is null || member.VoiceState.Channel.Id != conn.Channel.Id)
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
                             return;
                         }
 
@@ -110,12 +110,12 @@ internal class ClearQueueCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetString(t.Commands.Music.ClearQueue.Cleared, true),
+                                Description = GetString(this.t.Commands.Music.ClearQueue.Cleared, true),
                             }.AsSuccess(ctx)));
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot.watcher);

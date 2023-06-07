@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,16 +12,18 @@ using ProjectMakoto.Entities.Database.ColumnTypes;
 
 namespace ProjectMakoto.Entities.Database;
 
-public class TableDefinitions
+public sealed class TableDefinitions
 {
-    public class writetester
+    public sealed class writetester
     {
         [Primary][MaxValue(1)] public TinyInt aaa { get; set; }
     }
 
-    public class scam_urls
+    public sealed class scam_urls
     {
-        [Primary][Collation("utf8_unicode_ci")][MaxValue(500)]
+        [Primary]
+        [Collation("utf8_unicode_ci")]
+        [MaxValue(500)]
         public VarChar url { get; set; }
 
         [Collation("utf8_unicode_ci")]
@@ -30,39 +32,13 @@ public class TableDefinitions
         public BigInt submitter { get; set; }
     }
 
-    public class objected_users
+    public sealed class objected_users
     {
         [Primary]
         public BigInt id { get; set; }
     }
 
-    public class globalbans
-    {
-        [Primary]
-        public BigInt id { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text reason { get; set; }
-
-        public BigInt moderator { get; set; }
-
-        public BigInt timestamp { get; set; }
-    }
-
-    public class banned_users
-    {
-        [Primary]
-        public BigInt id { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text reason { get; set; }
-
-        public BigInt moderator { get; set; }
-
-        public BigInt timestamp { get; set; }
-    }
-    
-    public class banned_guilds
+    public sealed class globalbans
     {
         [Primary]
         public BigInt id { get; set; }
@@ -75,7 +51,33 @@ public class TableDefinitions
         public BigInt timestamp { get; set; }
     }
 
-    public class globalnotes
+    public sealed class banned_users
+    {
+        [Primary]
+        public BigInt id { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text reason { get; set; }
+
+        public BigInt moderator { get; set; }
+
+        public BigInt timestamp { get; set; }
+    }
+
+    public sealed class banned_guilds
+    {
+        [Primary]
+        public BigInt id { get; set; }
+
+        [Collation("utf8_unicode_ci")]
+        public Text reason { get; set; }
+
+        public BigInt moderator { get; set; }
+
+        public BigInt timestamp { get; set; }
+    }
+
+    public sealed class globalnotes
     {
         [Primary]
         public BigInt id { get; set; }
@@ -84,7 +86,7 @@ public class TableDefinitions
         public LongText notes { get; set; }
     }
 
-    public class submission_user_bans
+    public sealed class submission_user_bans
     {
         [Primary]
         public BigInt id { get; set; }
@@ -95,7 +97,7 @@ public class TableDefinitions
         public BigInt moderator { get; set; }
     }
 
-    public class submission_guild_bans
+    public sealed class submission_guild_bans
     {
         [Primary]
         public BigInt id { get; set; }
@@ -106,19 +108,20 @@ public class TableDefinitions
         public BigInt moderator { get; set; }
     }
 
-    public class active_url_submissions
+    public sealed class active_url_submissions
     {
         [Primary]
         public BigInt messageid { get; set; }
 
-        [Collation("utf8_unicode_ci")][MaxValue(500)]
+        [Collation("utf8_unicode_ci")]
+        [MaxValue(500)]
         public VarChar url { get; set; }
 
         public BigInt submitter { get; set; }
         public BigInt guild { get; set; }
     }
 
-    public class users
+    public sealed class users
     {
         [Primary]
         public BigInt userid { get; set; }
@@ -162,7 +165,7 @@ public class TableDefinitions
 
         [Collation("utf8_unicode_ci")]
         public Text last_libretranslate_target { get; set; }
-        
+
         [Collation("utf8_unicode_ci")]
         public Text current_locale { get; set; }
 
@@ -176,14 +179,15 @@ public class TableDefinitions
         public BigInt last_data_request { get; set; }
     }
 
-    public class guilds
+    public sealed class guilds
     {
         [Primary]
         public BigInt serverid { get; set; }
 
         public BigInt auto_assign_role_id { get; set; }
 
-        [Collation("utf8_unicode_ci")] [Default(";;")]
+        [Collation("utf8_unicode_ci")]
+        [Default(";;")]
         public Text prefix { get; set; }
 
         [MaxValue(1)]
@@ -364,7 +368,7 @@ public class TableDefinitions
         public Text override_locale { get; set; }
     }
 
-    public class guild_users
+    public sealed class guild_users
     {
         [Primary]
         public BigInt userid { get; set; }
@@ -409,7 +413,7 @@ public class TableDefinitions
         typeof(submission_user_bans),
         typeof(submission_guild_bans),
         typeof(active_url_submissions),
-        
+
         typeof(objected_users),
     };
 }

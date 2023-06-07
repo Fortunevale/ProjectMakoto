@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,26 +7,21 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Loader;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectMakoto.Plugins;
-internal class PluginLoadContext : AssemblyLoadContext
+internal sealed class PluginLoadContext : AssemblyLoadContext
 {
     private AssemblyDependencyResolver _resolver;
 
     public PluginLoadContext(string pluginPath)
     {
-        _resolver = new AssemblyDependencyResolver(pluginPath);
+        this._resolver = new AssemblyDependencyResolver(pluginPath);
     }
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
-        string assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        string assemblyPath = this._resolver.ResolveAssemblyToPath(assemblyName);
         if (assemblyPath != null)
         {
             return LoadFromAssemblyPath(assemblyPath);
@@ -37,7 +32,7 @@ internal class PluginLoadContext : AssemblyLoadContext
 
     protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
     {
-        string libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+        string libraryPath = this._resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
         if (libraryPath != null)
         {
             return LoadUnmanagedDllFromPath(libraryPath);

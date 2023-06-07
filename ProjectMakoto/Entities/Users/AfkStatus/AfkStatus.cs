@@ -9,50 +9,50 @@
 
 namespace ProjectMakoto.Entities;
 
-public class AfkStatus
+public sealed class AfkStatus
 {
     public AfkStatus(User user)
     {
-        Parent = user;
+        this.Parent = user;
     }
     private User Parent { get; set; }
 
 
 
     private string _Reason { get; set; } = "";
-    public string Reason 
-    { 
-        get => _Reason; 
-        set 
-        { 
-            _Reason = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "afk_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public string Reason
+    {
+        get => this._Reason;
+        set
+        {
+            this._Reason = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "afk_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
 
 
     private DateTime _TimeStamp { get; set; } = DateTime.UnixEpoch;
-    public DateTime TimeStamp 
-    { 
-        get => _TimeStamp; 
-        set 
-        { 
-            _TimeStamp = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "afk_since", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public DateTime TimeStamp
+    {
+        get => this._TimeStamp;
+        set
+        {
+            this._TimeStamp = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "afk_since", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
 
     private long _MessagesAmount { get; set; } = 0;
-    public long MessagesAmount 
-    { 
-        get => _MessagesAmount; 
-        set 
-        { 
-            _MessagesAmount = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "afk_pingamount", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public long MessagesAmount
+    {
+        get => this._MessagesAmount;
+        set
+        {
+            this._MessagesAmount = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "afk_pingamount", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
 
@@ -62,14 +62,14 @@ public class AfkStatus
     {
         get
         {
-            _Messages ??= new();
+            this._Messages ??= new();
 
-            return _Messages;
+            return this._Messages;
         }
 
         set
         {
-            _Messages = value;
+            this._Messages = value;
         }
     }
 

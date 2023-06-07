@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class PhishingProtectionEvents
+internal sealed class PhishingProtectionEvents
 {
     internal PhishingProtectionEvents(Bot _bot)
     {
@@ -22,13 +22,13 @@ internal class PhishingProtectionEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(_bot.watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore?.Content != e.Message?.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(_bot.watcher);
+            CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
     }
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
@@ -37,7 +37,7 @@ internal class PhishingProtectionEvents
 
         try
         {
-            prefix = _bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : _bot.guilds[guild.Id].PrefixSettings.Prefix;
+            prefix = this._bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[guild.Id].PrefixSettings.Prefix;
         }
         catch (Exception)
         {
@@ -52,14 +52,14 @@ internal class PhishingProtectionEvents
         if (e.WebhookMessage || guild is null || e.Author?.Id == sender.CurrentUser.Id)
             return;
 
-        if (!_bot.guilds[guild.Id].PhishingDetection.DetectPhishing)
+        if (!this._bot.guilds[guild.Id].PhishingDetection.DetectPhishing)
             return;
 
         DiscordMember member = await guild.GetMemberAsync(e.Author.Id);
 
         async void CheckDb(Uri uri)
         {
-            if (!_bot.guilds[guild.Id].PhishingDetection.AbuseIpDbReports)
+            if (!this._bot.guilds[guild.Id].PhishingDetection.AbuseIpDbReports)
                 return;
 
             var task = Dns.GetHostAddressesAsync(uri.Host);
@@ -69,13 +69,13 @@ internal class PhishingProtectionEvents
                 task.Wait();
             }
             catch { }
-            
+
             if (task.IsFaulted || task.Result.Length <= 0)
                 return;
 
             var parsedIp = task.Result;
 
-            var query = await _bot.abuseIpDbClient.QueryIp(parsedIp[0].ToString());
+            var query = await this._bot.abuseIpDbClient.QueryIp(parsedIp[0].ToString());
 
             if (query.data.abuseConfidenceScore.HasValue && query.data.abuseConfidenceScore.Value > 60)
             {
@@ -107,7 +107,7 @@ internal class PhishingProtectionEvents
 
         var parsedWords = e.Content.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        foreach (var url in _bot.phishingUrls)
+        foreach (var url in this._bot.phishingUrls)
         {
             foreach (var word in parsedWords)
             {
@@ -143,7 +143,7 @@ internal class PhishingProtectionEvents
             CheckDb(match.Uri);
         }
 
-        foreach (var url in _bot.phishingUrls)
+        foreach (var url in this._bot.phishingUrls)
         {
             foreach (var match in parsedMatches)
             {
@@ -163,14 +163,14 @@ internal class PhishingProtectionEvents
             {
                 try
                 {
-                    var unshortened_url = await UnshortenUrl(match.Value);
+                    var unshortened_url = await UniversalExtensions.UnshortenUrl(match.Value);
                     var parsedUri = new UriBuilder(unshortened_url);
 
                     CheckDb(parsedUri.Uri);
 
                     if (unshortened_url != match.Value)
                     {
-                        foreach (var url in _bot.phishingUrls)
+                        foreach (var url in this._bot.phishingUrls)
                         {
                             if (parsedUri.Host.ToLower() == url.Key.ToLower())
                             {
@@ -179,13 +179,13 @@ internal class PhishingProtectionEvents
                             }
                         }
 
-                        if (!recentlyResolvedUrls.ContainsKey(unshortened_url) || recentlyResolvedUrls[unshortened_url].AddSeconds(10) < DateTime.UtcNow)
+                        if (!this.recentlyResolvedUrls.ContainsKey(unshortened_url) || this.recentlyResolvedUrls[unshortened_url].AddSeconds(10) < DateTime.UtcNow)
                             redirectUrls.Add(match.Value, unshortened_url);
                     }
                 }
                 catch (TimeoutException)
                 {
-                    if (_bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
+                    if (this._bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                         {
                             Title = $":no_entry: Couldn't check this link for malicious redirects, the request timed out.",
@@ -195,7 +195,7 @@ internal class PhishingProtectionEvents
                 catch (HttpRequestException ex)
                 {
                     if (ex.Message.Contains("Cannot write more bytes"))
-                        if (_bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
+                        if (this._bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                             _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                             {
                                 Title = $":no_entry: Couldn't check this link for malicious redirects. Please proceed with caution.",
@@ -206,7 +206,7 @@ internal class PhishingProtectionEvents
                 {
                     _logger.LogError("An exception occurred while trying to unshorten url '{url}'", ex, match);
 
-                    if (_bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
+                    if (this._bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                         {
                             Title = $":no_entry: An unknown error occurred while trying to check for malicious redirects. Please proceed with caution.",
@@ -218,12 +218,12 @@ internal class PhishingProtectionEvents
             if (redirectUrls.Count > 0)
             {
                 foreach (var b in redirectUrls)
-                    if (!recentlyResolvedUrls.ContainsKey(b.Value))
-                        recentlyResolvedUrls.Add(b.Value, DateTime.UtcNow);
+                    if (!this.recentlyResolvedUrls.ContainsKey(b.Value))
+                        this.recentlyResolvedUrls.Add(b.Value, DateTime.UtcNow);
                     else
-                        recentlyResolvedUrls[b.Value] = DateTime.UtcNow;
+                        this.recentlyResolvedUrls[b.Value] = DateTime.UtcNow;
 
-                if (_bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
+                if (this._bot.guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                     _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                     {
                         Title = $":warning: Found at least one (or more) redirected URLs in this message.",
@@ -236,10 +236,10 @@ internal class PhishingProtectionEvents
 
     private async Task PunishMember(DiscordGuild guild, DiscordMember member, DiscordMessage e, string url)
     {
-        if (!_bot.guilds[guild.Id].PhishingDetection.DetectPhishing)
+        if (!this._bot.guilds[guild.Id].PhishingDetection.DetectPhishing)
             return;
 
-        switch (_bot.guilds[guild.Id].PhishingDetection.PunishmentType)
+        switch (this._bot.guilds[guild.Id].PhishingDetection.PunishmentType)
         {
             case PhishingPunishmentType.DELETE:
             {
@@ -249,19 +249,19 @@ internal class PhishingProtectionEvents
             case PhishingPunishmentType.TIMEOUT:
             {
                 _ = e.DeleteAsync();
-                _ = member.TimeoutAsync(_bot.guilds[guild.Id].PhishingDetection.CustomPunishmentLength, _bot.guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
+                _ = member.TimeoutAsync(this._bot.guilds[guild.Id].PhishingDetection.CustomPunishmentLength, this._bot.guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
             case PhishingPunishmentType.KICK:
             {
                 _ = e.DeleteAsync();
-                _ = member.RemoveAsync(_bot.guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
+                _ = member.RemoveAsync(this._bot.guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
             case PhishingPunishmentType.BAN:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, _bot.guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
+                _ = member.BanAsync(7, this._bot.guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
         }

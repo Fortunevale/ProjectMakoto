@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,11 +8,11 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-internal class MessageComponents
+internal sealed class MessageComponents
 {
-    public static DiscordButtonComponent GetCancelButton(User user)
-        => new(ButtonStyle.Secondary, "cancel", Bot.loadedTranslations.Common.Cancel.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
-    
-    public static DiscordButtonComponent GetBackButton(User user)
-        => new(ButtonStyle.Secondary, "back", Bot.loadedTranslations.Common.Back.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+    public static DiscordButtonComponent GetCancelButton(User user, Bot _bot)
+        => new(ButtonStyle.Secondary, "cancel", _bot.loadedTranslations.Common.Cancel.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+
+    public static DiscordButtonComponent GetBackButton(User user, Bot _bot)
+        => new(ButtonStyle.Secondary, "back", _bot.loadedTranslations.Common.Back.Get(user), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 }

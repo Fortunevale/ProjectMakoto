@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Plugins.Commands;
 
-public class BasePluginCommand
+public sealed class BasePluginCommand
 {
     private BasePluginCommand() { }
 
@@ -27,7 +27,7 @@ public class BasePluginCommand
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
 
-        if (Description.IsNullOrWhiteSpace()) 
+        if (Description.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Description));
 
         if (Module.IsNullOrWhiteSpace())
@@ -65,14 +65,14 @@ public class BasePluginCommand
         if ((Commands?.Length ?? 0) == 0)
             throw new ArgumentNullException(nameof(Commands));
 
-        if (UseDefaultHelp && Commands.Any(x => x.Name == "help"))
+        if (this.UseDefaultHelp && Commands.Any(x => x.Name == "help"))
             throw new ArgumentException("You cannot provide a help command if the default help is enabled.");
 
         this.Name = Name.Trim();
         this.Description = Description.Trim();
         this.Module = Module.Trim();
         this.SubCommands = Commands;
-        this.Overloads = Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
+        this.Overloads = this.Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
         this.UseDefaultHelp = true;
     }
 
@@ -106,7 +106,7 @@ public class BasePluginCommand
     /// Whether this command is a group.
     /// </summary>
     public bool IsGroup
-        => (Command is null && SubCommands is not null);
+        => (this.Command is null && this.SubCommands is not null);
 
     /// <summary>
     /// The command to execute.

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class SoftBanCommand : BaseCommand
+internal sealed class SoftBanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
 
@@ -21,7 +21,7 @@ internal class SoftBanCommand : BaseCommand
             int deleteMessageDays = (int)arguments["days"] > 7 ? 7 : ((int)arguments["days"] < 0 ? 0 : (int)arguments["days"]);
             string reason = (string)arguments["reason"];
 
-            var CommandKey = t.Commands.Moderation.Softban;
+            var CommandKey = this.t.Commands.Moderation.Softban;
 
             DiscordMember bMember = null;
 
@@ -42,7 +42,7 @@ internal class SoftBanCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= bMember.GetRoleHighestPosition())
                     throw new Exception();
 
-                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(t.Commands.Moderation.NoReason) : reason);
+                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(this.t.Commands.Moderation.NoReason) : reason);
                 await ctx.Guild.BanMemberAsync(victim.Id, deleteMessageDays, GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
                 await ctx.Guild.UnbanMemberAsync(victim, GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
 

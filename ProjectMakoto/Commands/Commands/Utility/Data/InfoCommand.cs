@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Data;
 
-internal class InfoCommand : BaseCommand
+internal sealed class InfoCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -22,7 +22,7 @@ internal class InfoCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.GetUsername())),
+                    Description = GetString(this.t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.GetUsername())),
                 }.AsBotError(ctx));
                 return;
             }

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class AutoUnarchiveEvents
+internal sealed class AutoUnarchiveEvents
 {
     internal AutoUnarchiveEvents(Bot _bot)
     {
@@ -20,14 +20,11 @@ internal class AutoUnarchiveEvents
 
     internal async Task ThreadUpdated(DiscordClient sender, ThreadUpdateEventArgs e)
     {
-        Task.Run(async () =>
+        await Task.Delay(5000);
+        if (this._bot.guilds[e.Guild.Id].AutoUnarchiveThreads.Contains(e.ThreadAfter.Parent.Id))
         {
-            await Task.Delay(5000);
-            if (_bot.guilds[e.Guild.Id].AutoUnarchiveThreads.Contains(e.ThreadAfter.Parent.Id))
-            {
-                if (e.ThreadAfter.ThreadMetadata.Archived && (!e.ThreadAfter.ThreadMetadata.Locked ?? false))
-                    _ = e.ThreadAfter.UnarchiveAsync();
-            }
-        }).Add(_bot.watcher);
+            if (e.ThreadAfter.ThreadMetadata.Archived && (!e.ThreadAfter.ThreadMetadata.Locked ?? false))
+                _ = e.ThreadAfter.UnarchiveAsync();
+        }
     }
 }

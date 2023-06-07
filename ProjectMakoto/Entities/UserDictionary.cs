@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,12 +7,11 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public class UserDictionary : IDictionary<ulong, User>
+public sealed class UserDictionary : IDictionary<ulong, User>
 {
     public UserDictionary(Bot _bot)
     {
@@ -27,47 +26,47 @@ public class UserDictionary : IDictionary<ulong, User>
     {
         get
         {
-            if (!_items.ContainsKey(key) && key != 0)
-                _items.Add(key, new(_bot, key));
+            if (!this._items.ContainsKey(key) && key != 0)
+                this._items.Add(key, new(this._bot, key));
 
-            return _items[key];
+            return this._items[key];
         }
 
         set
         {
-            if (!_items.ContainsKey(key) && key != 0)
-                _items.Add(key, new(_bot, key));
+            if (!this._items.ContainsKey(key) && key != 0)
+                this._items.Add(key, new(this._bot, key));
 
-            _items[key] = value;
+            this._items[key] = value;
         }
     }
 
     public ICollection<ulong> Keys
-        => _items.Keys;
+        => this._items.Keys;
 
     public ICollection<User> Values
-        => _items.Values;
+        => this._items.Values;
 
     public int Count
-        => _items.Count;
+        => this._items.Count;
 
     public bool IsReadOnly
         => false;
 
     public void Add(ulong key, User value)
-        => _items.Add(key, value);
+        => this._items.Add(key, value);
 
     public void Add(KeyValuePair<ulong, User> item)
-        => _items.Add(item.Key, item.Value);
+        => this._items.Add(item.Key, item.Value);
 
     public void Clear()
-        => _items.Clear();
+        => this._items.Clear();
 
     public bool Remove(ulong key)
-        => _items.Remove(key);
+        => this._items.Remove(key);
 
     public bool Remove(KeyValuePair<ulong, User> item)
-        => _items.Remove(item.Key);
+        => this._items.Remove(item.Key);
 
     public void CopyTo(KeyValuePair<ulong, User>[] array, int arrayIndex)
     {
@@ -75,17 +74,17 @@ public class UserDictionary : IDictionary<ulong, User>
     }
 
     public bool Contains(KeyValuePair<ulong, User> item)
-        => _items.Contains(item);
+        => this._items.Contains(item);
 
     public bool ContainsKey(ulong key)
-        => _items.ContainsKey(key);
+        => this._items.ContainsKey(key);
 
     public IEnumerator<KeyValuePair<ulong, User>> GetEnumerator()
-        => _items.GetEnumerator();
+        => this._items.GetEnumerator();
 
     public bool TryGetValue(ulong key, [MaybeNullWhen(false)] out User value)
-        => _items.TryGetValue(key, out value);
+        => this._items.TryGetValue(key, out value);
 
     IEnumerator IEnumerable.GetEnumerator()
-        => _items.GetEnumerator();
+        => this._items.GetEnumerator();
 }

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -11,45 +11,45 @@ using CommandType = ProjectMakoto.Enums.CommandType;
 
 namespace ProjectMakoto.Entities;
 
-public class SharedCommandContext
+public sealed class SharedCommandContext
 {
     public SharedCommandContext(BaseCommand cmd, CommandContext ctx, Bot _bot)
     {
-        CommandType = CommandType.PrefixCommand;
+        this.CommandType = CommandType.PrefixCommand;
 
-        Member = ctx.Member;
-        User = ctx.User;
-        Guild = ctx.Guild;
-        Channel = ctx.Channel;
-        Client = ctx.Client;
+        this.Member = ctx.Member;
+        this.User = ctx.User;
+        this.Guild = ctx.Guild;
+        this.Channel = ctx.Channel;
+        this.Client = ctx.Client;
 
-        CurrentMember = ctx.Guild?.CurrentMember;
-        CurrentUser = ctx.Client.CurrentUser;
+        this.CurrentMember = ctx.Guild?.CurrentMember;
+        this.CurrentUser = ctx.Client.CurrentUser;
 
-        OriginalCommandContext = ctx;
+        this.OriginalCommandContext = ctx;
 
-        Bot = _bot;
+        this.Bot = _bot;
 
-        Prefix = ctx.Prefix;
-        CommandName = ctx.Command.Name;
+        this.Prefix = ctx.Prefix;
+        this.CommandName = ctx.Command.Name;
 
         if (ctx.Command.Parent != null)
-            CommandName = CommandName.Insert(0, $"{ctx.Command.Parent.Name} ");
+            this.CommandName = this.CommandName.Insert(0, $"{ctx.Command.Parent.Name} ");
 
-        BaseCommand = cmd;
+        this.BaseCommand = cmd;
 
         try
         {
-            DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.users[ctx.User.Id];
         }
         catch (Exception ex)
         {
             _logger.LogWarn("Unable to fetch database user entry for '{User}'\n{ex}", ctx.User.Id, ex);
         }
-        
+
         try
         {
-            DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -59,27 +59,27 @@ public class SharedCommandContext
 
     public SharedCommandContext(DiscordMessage message, Bot _bot, string CommandIdentifier)
     {
-        CommandType = CommandType.Custom;
+        this.CommandType = CommandType.Custom;
 
-        User = message.Author;
-        Guild = message.Channel.Guild;
-        Channel = message.Channel;
+        this.User = message.Author;
+        this.Guild = message.Channel.Guild;
+        this.Channel = message.Channel;
 
-        CurrentMember = message.Channel?.Guild?.CurrentMember;
-        CurrentUser = _bot.discordClient.CurrentUser;
+        this.CurrentMember = message.Channel?.Guild?.CurrentMember;
+        this.CurrentUser = _bot.discordClient.CurrentUser;
 
-        Bot = _bot;
+        this.Bot = _bot;
 
-        CommandName = CommandIdentifier;
+        this.CommandName = CommandIdentifier;
 
-        BaseCommand = new DummyCommand()
+        this.BaseCommand = new DummyCommand()
         {
             ctx = this
         };
 
         try
         {
-            DbUser = _bot.users[message.Author.Id];
+            this.DbUser = _bot.users[message.Author.Id];
         }
         catch (Exception ex)
         {
@@ -88,7 +88,7 @@ public class SharedCommandContext
 
         try
         {
-            DbGuild = _bot.guilds[message.Channel.Guild.Id];
+            this.DbGuild = _bot.guilds[message.Channel.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -98,29 +98,30 @@ public class SharedCommandContext
 
     public SharedCommandContext(BaseCommand cmd, InteractionContext ctx, Bot _bot)
     {
-        CommandType = CommandType.ApplicationCommand;
+        this.CommandType = CommandType.ApplicationCommand;
 
-        Member = ctx.Member;
-        User = ctx.User;
-        Guild = ctx.Guild;
-        Channel = ctx.Channel;
-        Client = ctx.Client;
+        this.Member = ctx.Member;
+        this.User = ctx.User;
+        this.Guild = ctx.Guild;
+        this.Channel = ctx.Channel;
+        this.Client = ctx.Client;
 
-        CurrentMember = ctx.Guild?.CurrentMember;
-        CurrentUser = ctx.Client.CurrentUser;
+        this.CurrentMember = ctx.Guild?.CurrentMember;
+        this.CurrentUser = ctx.Client.CurrentUser;
 
-        OriginalInteractionContext = ctx;
+        this.OriginalInteractionContext = ctx;
 
-        Prefix = "/";
-        CommandName = ctx.FullCommandName;
+        this.Prefix = "/";
+        this.CommandName = ctx.FullCommandName;
+        this.ParentCommandName = ctx.CommandName;
 
-        Bot = _bot;
+        this.Bot = _bot;
 
-        BaseCommand = cmd;
+        this.BaseCommand = cmd;
 
         try
         {
-            DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -129,7 +130,7 @@ public class SharedCommandContext
 
         try
         {
-            DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -139,30 +140,32 @@ public class SharedCommandContext
 
     public SharedCommandContext(BaseCommand cmd, ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot)
     {
-        CommandType = CommandType.Event;
+        this.CommandType = CommandType.Event;
 
-        User = ctx.User;
-        Guild = ctx.Guild;
-        Channel = ctx.Channel;
-        Client = client;
+        this.User = ctx.User;
+        this.Guild = ctx.Guild;
+        this.Channel = ctx.Channel;
+        this.Client = client;
 
-        try { if (ctx.Guild is not null) Member = ctx.User.ConvertToMember(ctx.Guild).GetAwaiter().GetResult(); } catch { }
+        try
+        { if (ctx.Guild is not null) this.Member = ctx.User.ConvertToMember(ctx.Guild).GetAwaiter().GetResult(); }
+        catch { }
 
-        CurrentMember = ctx.Guild?.CurrentMember;
-        CurrentUser = client.CurrentUser;
+        this.CurrentMember = ctx.Guild?.CurrentMember;
+        this.CurrentUser = client.CurrentUser;
 
-        OriginalComponentInteractionCreateEventArgs = ctx;
+        this.OriginalComponentInteractionCreateEventArgs = ctx;
 
-        Prefix = "/";
-        CommandName = commandName;
+        this.Prefix = "/";
+        this.CommandName = commandName;
 
-        Bot = _bot;
+        this.Bot = _bot;
 
-        BaseCommand = cmd;
+        this.BaseCommand = cmd;
 
         try
         {
-            DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -171,7 +174,7 @@ public class SharedCommandContext
 
         try
         {
-            DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -181,29 +184,30 @@ public class SharedCommandContext
 
     public SharedCommandContext(BaseCommand cmd, ContextMenuContext ctx, Bot _bot)
     {
-        CommandType = CommandType.ContextMenu;
+        this.CommandType = CommandType.ContextMenu;
 
-        Member = ctx.Member;
-        User = ctx.User;
-        Guild = ctx.Guild;
-        Channel = ctx.Channel;
-        Client = ctx.Client;
+        this.Member = ctx.Member;
+        this.User = ctx.User;
+        this.Guild = ctx.Guild;
+        this.Channel = ctx.Channel;
+        this.Client = ctx.Client;
 
-        CurrentMember = ctx.Guild?.CurrentMember;
-        CurrentUser = ctx.Client.CurrentUser;
+        this.CurrentMember = ctx.Guild?.CurrentMember;
+        this.CurrentUser = ctx.Client.CurrentUser;
 
-        OriginalContextMenuContext = ctx;
+        this.OriginalContextMenuContext = ctx;
 
-        Prefix = "";
-        CommandName = ctx.FullCommandName;
+        this.Prefix = "";
+        this.CommandName = ctx.FullCommandName;
+        this.ParentCommandName = ctx.CommandName;
 
-        Bot = _bot;
+        this.Bot = _bot;
 
-        BaseCommand = cmd;
+        this.BaseCommand = cmd;
 
         try
         {
-            DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -212,7 +216,7 @@ public class SharedCommandContext
 
         try
         {
-            DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -241,6 +245,11 @@ public class SharedCommandContext
     public string CommandName { get; set; }
 
     /// <summary>
+    /// The name of the command used.
+    /// </summary>
+    public string ParentCommandName { get; set; }
+
+    /// <summary>
     /// What Bot Instance was used to execute this command.
     /// </summary>
     public Bot Bot { get; set; }
@@ -252,8 +261,8 @@ public class SharedCommandContext
 
     /// <inheritdoc cref="Client"/>
     public DiscordClient Discord
-        => Client;
-    
+        => this.Client;
+
 
     /// <summary>
     /// The member that executed this command.
@@ -336,9 +345,9 @@ public class SharedCommandContext
     public DiscordInteraction Interaction
         => this.CommandType switch
         {
-            CommandType.ApplicationCommand => OriginalInteractionContext.Interaction,
-            CommandType.Event => OriginalComponentInteractionCreateEventArgs.Interaction,
-            CommandType.ContextMenu => OriginalContextMenuContext.Interaction,
+            CommandType.ApplicationCommand => this.OriginalInteractionContext.Interaction,
+            CommandType.Event => this.OriginalComponentInteractionCreateEventArgs.Interaction,
+            CommandType.ContextMenu => this.OriginalContextMenuContext.Interaction,
             _ => null
         };
 }

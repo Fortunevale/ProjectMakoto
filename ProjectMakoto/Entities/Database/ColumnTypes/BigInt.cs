@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class BigInt : BaseColumn
+public sealed class BigInt : BaseColumn
 {
     public BigInt(long MaxValue = 9223372036854775807)
     {
@@ -22,7 +22,7 @@ public class BigInt : BaseColumn
     public long MaxValue { get; private set; } = 9223372036854775807;
 
     private long? _Value { get; set; }
-    public long Value { get => _Value ?? 0; set { _Value = (value.ToInt64() > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
+    public long Value { get => this._Value ?? 0; set { this._Value = (value.ToInt64() > this.MaxValue ? throw new ArgumentException($"The maximum size for this int is {this.MaxValue}") : value); } }
 
     public static implicit operator long(BigInt b) => b.Value;
     public static implicit operator ulong(BigInt b) => (ulong)b.Value;

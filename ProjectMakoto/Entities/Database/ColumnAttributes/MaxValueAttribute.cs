@@ -10,7 +10,7 @@
 namespace ProjectMakoto.Entities.Database.ColumnAttributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public class MaxValueAttribute : Attribute
+public sealed class MaxValueAttribute : Attribute
 {
     public readonly long MaxValue;
 

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Commands.LevelRewardsCommand;
 
-internal class LevelRewardsCommandAbstractions
+internal sealed class LevelRewardsCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.LevelRewards;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.LevelRewards;
 
         string str = "";
         if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count != 0)

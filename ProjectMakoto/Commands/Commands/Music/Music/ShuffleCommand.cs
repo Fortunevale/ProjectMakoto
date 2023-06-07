@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Music;
 
-internal class ShuffleCommand : BaseCommand
+internal sealed class ShuffleCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
 
@@ -28,7 +28,7 @@ internal class ShuffleCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal class ShuffleCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? GetString(t.Commands.Music.Shuffle.On, true) : GetString(t.Commands.Music.Shuffle.Off, true)),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? GetString(this.t.Commands.Music.Shuffle.On, true) : GetString(this.t.Commands.Music.Shuffle.Off, true)),
             }.AsSuccess(ctx));
         });
     }

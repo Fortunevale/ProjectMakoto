@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class CommandEvents
+internal sealed class CommandEvents
 {
     internal CommandEvents(Bot _bot)
     {
@@ -20,30 +20,27 @@ internal class CommandEvents
 
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
     {
-        Task.Run(async () =>
+        _logger.LogDebug("Successfully started execution of '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+        e.Context.Prefix,
+        (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
+        e.Context.User.Id,
+        e.Context.Guild?.Id,
+        e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
+
+        try
         {
-            _logger.LogDebug("Successfully started execution of '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)", 
-            e.Context.Prefix, 
-            (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name, 
-            e.Context.User.Id,
-            e.Context.Guild?.Id,
-            e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
-
-            try
+            if (e.Command.CustomAttributes.Any(x => x.GetType() == typeof(PreventCommandDeletionAttribute)))
             {
-                if (e.Command.CustomAttributes.Any(x => x.GetType() == typeof(PreventCommandDeletionAttribute)))
-                {
-                    if (e.Command.CustomAttributes.OfType<PreventCommandDeletionAttribute>().FirstOrDefault().PreventDeleteCommandMessage)
-                        return;
-                }
+                if (e.Command.CustomAttributes.OfType<PreventCommandDeletionAttribute>().FirstOrDefault().PreventDeleteCommandMessage)
+                    return;
             }
-            catch { }
+        }
+        catch { }
 
-            _ = Task.Delay(2000).ContinueWith(x =>
-            {
-                _ = e.Context.Message.DeleteAsync();
-            });
-        }).Add(_bot.watcher);
+        _ = Task.Delay(2000).ContinueWith(x =>
+        {
+            _ = e.Context.Message.DeleteAsync();
+        });
     }
 
     internal async Task CommandError(CommandsNextExtension sender, CommandErrorEventArgs e)
@@ -51,23 +48,20 @@ internal class CommandEvents
         if (e.Command is not null)
             if (e.Exception.GetType() == typeof(ArgumentException))
             {
-                Task.Run(async () =>
+                if (e.Command is not null)
+                    _logger.LogWarn("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+                        e.Context.Prefix,
+                        (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
+                        e.Context.User.Id,
+                        e.Context.Guild?.Id,
+                        e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
+
+                _ = e.Context.SendSyntaxError();
+
+                _ = Task.Delay(2000).ContinueWith(x =>
                 {
-                    if (e.Command is not null)
-                        _logger.LogWarn("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
-                            e.Context.Prefix,
-                            (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
-                            e.Context.User.Id,
-                            e.Context.Guild?.Id,
-                            e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
-
-                    _ = e.Context.SendSyntaxError();
-
-                    _ = Task.Delay(2000).ContinueWith(x =>
-                    {
-                        _ = e.Context.Message.DeleteAsync();
-                    });
-                }).Add(_bot.watcher);
+                    _ = e.Context.Message.DeleteAsync();
+                });
             }
             else if (e.Exception.GetType() == typeof(CancelException))
             {
@@ -75,26 +69,23 @@ internal class CommandEvents
             }
             else
             {
-                Task.Run(async () =>
+                _logger.LogError("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
+                    e.Context.Prefix,
+                    (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
+                    e.Context.User.Id,
+                    e.Context.Guild?.Id,
+                    e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
+
+                try
                 {
-                    _logger.LogError("Failed to execute '{Prefix}{Name}' for {User} on {Guild} ({ResponseTime}ms)",
-                        e.Context.Prefix,
-                        (e.Command.Parent is not null ? $"{e.Command.Parent.Name} " : "") + e.Command.Name,
-                        e.Context.User.Id,
-                        e.Context.Guild?.Id,
-                        e.Context.Message.CreationTimestamp.GetTimespanSince().Milliseconds);
+                    _ = e.Context.Channel.SendMessageAsync($"{e.Context.User.Mention}\n:warning: `I'm sorry but an unhandled exception occurred while trying to execute your command.`");
+                }
+                catch { }
 
-                    try
-                    {
-                        _ = e.Context.Channel.SendMessageAsync($"{e.Context.User.Mention}\n:warning: `I'm sorry but an unhandled exception occurred while trying to execute your command.`");
-                    }
-                    catch { }
-
-                    _ = Task.Delay(2000).ContinueWith(x =>
-                    {
-                        _ = e.Context.Message.DeleteAsync();
-                    });
-                }).Add(_bot.watcher);
+                _ = Task.Delay(2000).ContinueWith(x =>
+                {
+                    _ = e.Context.Message.DeleteAsync();
+                });
             }
     }
 }

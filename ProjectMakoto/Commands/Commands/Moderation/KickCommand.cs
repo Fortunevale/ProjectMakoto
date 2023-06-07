@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class KickCommand : BaseCommand
+internal sealed class KickCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.KickMembers) && await CheckOwnPermissions(Permissions.KickMembers));
 
@@ -20,7 +20,7 @@ internal class KickCommand : BaseCommand
             DiscordUser victim = (DiscordUser)arguments["victim"];
             string reason = (string)arguments["reason"];
 
-            var CommandKey = t.Commands.Moderation.Kick;
+            var CommandKey = this.t.Commands.Moderation.Kick;
 
             DiscordMember bMember = null;
 
@@ -49,7 +49,7 @@ internal class KickCommand : BaseCommand
                 if (ctx.Member.GetRoleHighestPosition() <= bMember.GetRoleHighestPosition())
                     throw new Exception();
 
-                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(t.Commands.Moderation.NoReason) : reason);
+                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(this.t.Commands.Moderation.NoReason) : reason);
                 await bMember.RemoveAsync(GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
 
                 embed = embed.WithDescription(GetString(CommandKey.Kicked, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);

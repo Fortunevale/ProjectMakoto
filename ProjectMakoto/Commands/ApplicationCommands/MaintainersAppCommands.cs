@@ -9,34 +9,35 @@
 
 namespace ProjectMakoto.ApplicationCommands;
 
-public class MaintainersAppCommands : ApplicationCommandsModule
+public sealed class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
     internal enum Commands
     {
         Info,
-        RawGuild,
+        Log,
+        Save,
+        Stop,
         BotNick,
+        Evaluate,
+        CreateIssue,
+        Enroll2FA,
+        Quit2FASession,
+        Disenroll2FAUser,
+        ManageCommands,
+        GlobalBan,
+        GlobalUnban,
+        GlobalNotes,
         BanUser,
         UnbanUser,
         BanGuild,
         UnbanGuild,
-        GlobalBan,
-        GlobalUnban,
-        GlobalNotes,
-        Log,
-        Stop,
-        Save,
         BatchLookup,
-        CreateIssue,
-        Evaluate,
-        Enroll2FA,
-        Quit2FASession,
-        Disenroll2FAUser,
+        RawGuild,
     };
 
-    public class MaintainerAutoComplete : IAutocompleteProvider
+    public sealed class MaintainerAutoComplete : IAutocompleteProvider
     {
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
@@ -54,14 +55,14 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                     .Select(x => new DiscordApplicationCommandAutocompleteChoice(x, x)).ToList();
                 return options.AsEnumerable();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
             }
         }
     }
 
-    public class ArgumentAutoComplete : IAutocompleteProvider
+    public sealed class ArgumentAutoComplete : IAutocompleteProvider
     {
         public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
         {
@@ -170,7 +171,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
                 return new List<DiscordApplicationCommandAutocompleteChoice>() { };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
             }
@@ -179,9 +180,9 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
     [SlashCommand("developertools", "Developer Tools used to manage Makoto.", dmPermission: false, defaultMemberPermissions: (long)Permissions.None)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "<Pending>")]
-    public async Task DevTools(InteractionContext ctx, 
-        [Autocomplete(typeof(MaintainerAutoComplete))] [Option("command", "The command to run.", true)]string command, 
-        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument1", "Argument 1, if required", true)] string argument1 = "", 
+    public async Task DevTools(InteractionContext ctx,
+        [Autocomplete(typeof(MaintainerAutoComplete))][Option("command", "The command to run.", true)] string command,
+        [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument1", "Argument 1, if required", true)] string argument1 = "",
         [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument2", "Argument 2, if required", true)] string argument2 = "",
         [Autocomplete(typeof(ArgumentAutoComplete))][Option("argument3", "Argument 3, if required", true)] string argument3 = "")
     {
@@ -207,6 +208,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                 return true;
         }
 
+#pragma warning disable CS8321 // Local function is declared but never used
         bool Require3()
         {
             if (argument3.IsNullOrWhiteSpace())
@@ -368,7 +370,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
                         await new LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
-                            { "Level", (LogLevel)Enum.Parse(typeof(LogLevel), argument1) },
+                            { "Level", (CustomLogLevel)Enum.Parse(typeof(CustomLogLevel), argument1) },
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
@@ -445,6 +447,12 @@ public class MaintainersAppCommands : ApplicationCommandsModule
                         });
                     }).Add(this._bot.watcher, ctx);
                     break;
+                case Commands.ManageCommands:
+                    Task.Run(async () =>
+                    {
+                        await new CommandManageCommand().ExecuteCommand(ctx, this._bot);
+                    }).Add(this._bot.watcher, ctx);
+                    break;
             }
         }
         catch (Exception)
@@ -455,7 +463,7 @@ public class MaintainersAppCommands : ApplicationCommandsModule
 
 #if DEBUG
     [SlashCommandGroup("debug", "Debug commands, only registered in this server.")]
-    public class Debug : ApplicationCommandsModule
+    public sealed class Debug : ApplicationCommandsModule
     {
         public Bot _bot { private get; set; }
 

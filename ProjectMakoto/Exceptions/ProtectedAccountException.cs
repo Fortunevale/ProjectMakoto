@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Exceptions;
 
-internal class ProtectedAccountException : Exception
+internal sealed class ProtectedAccountException : Exception
 {
     public ProtectedAccountException(string message) : base(message)
     {

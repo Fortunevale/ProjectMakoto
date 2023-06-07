@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.AutoUnarchiveCommand;
 
-internal class AutoUnarchiveCommandAbstractions
+internal sealed class AutoUnarchiveCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
@@ -19,6 +19,6 @@ internal class AutoUnarchiveCommandAbstractions
                 ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Remove(b);
         }
 
-        return $"{(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : Bot.loadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
+        return $"{(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.loadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
     }
 }

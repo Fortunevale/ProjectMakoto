@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class RequestData
+internal sealed class RequestData
 {
     public User User { get; set; }
     public Dictionary<ulong, Member> GuildData { get; set; } = new();

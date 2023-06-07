@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities.Plugins.Commands;
-public class BaseOverload
+public sealed class BaseOverload
 {
     /// <summary>
     /// Creates a new required overload for a command.
@@ -46,7 +46,7 @@ public class BaseOverload
     /// If the overload is required.
     /// </summary>
     public bool Required { get; set; }
-    
+
     /// <summary>
     /// If the overload is required.
     /// </summary>

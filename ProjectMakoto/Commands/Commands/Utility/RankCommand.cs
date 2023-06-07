@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands;
-internal class RankCommand : BaseCommand
+internal sealed class RankCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -23,9 +23,9 @@ internal class RankCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Leaderboard.Disabled, true,
+                    Description = GetString(this.t.Commands.Utility.Leaderboard.Disabled, true,
                         new TVar("Command", $"{ctx.Prefix}experiencesettings config"))
-                }.AsError(ctx, GetString(t.Commands.Utility.Rank.Title)));
+                }.AsError(ctx, GetString(this.t.Commands.Utility.Rank.Title)));
                 return;
             }
 
@@ -38,12 +38,12 @@ internal class RankCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{(victim.Id == ctx.User.Id ? GetString(t.Commands.Utility.Rank.Self) : GetString(t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
-                              $"**{GetString(t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? GetString(this.t.Commands.Utility.Rank.Self) : GetString(this.t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
+                              $"**{GetString(this.t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
-                              $"`{GenerateASCIIProgressbar(current, max, 44)}` " +
+                              $"`{UniversalExtensions.GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",
-            }.AsInfo(ctx, GetString(t.Commands.Utility.Rank.Title)));
+            }.AsInfo(ctx, GetString(this.t.Commands.Utility.Rank.Title)));
         });
     }
 }

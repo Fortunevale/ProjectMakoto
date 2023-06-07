@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.TokenDetectionCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -25,14 +25,14 @@ internal class ConfigCommand : BaseCommand
                 Description = TokenDetectionCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, "Token Detection");
 
-            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Token Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Token Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Toggle
             })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -51,7 +51,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

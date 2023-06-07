@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class PurgeCommand : BaseCommand
+internal sealed class PurgeCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages) && await CheckOwnPermissions(Permissions.ManageMessages));
 
@@ -20,7 +20,7 @@ internal class PurgeCommand : BaseCommand
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            var CommandKey = t.Commands.Moderation.Purge;
+            var CommandKey = this.t.Commands.Moderation.Purge;
 
             try
             {
@@ -121,7 +121,7 @@ internal class PurgeCommand : BaseCommand
 
                 while (!deletionOperations.All(x => x.IsCompleted))
                 {
-                    await RespondOrEdit($"`{GenerateASCIIProgressbar(deleted, total)} {CalculatePercentage(deleted, total),3}%`");
+                    await RespondOrEdit($"`{UniversalExtensions.GenerateASCIIProgressbar(deleted, total)} {UniversalExtensions.CalculatePercentage(deleted, total),3}%`");
                 }
 
                 await RespondOrEdit(new DiscordEmbedBuilder().

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Commands.BumpReminderCommand;
 
-internal class BumpReminderCommandAbstractions
+internal sealed class BumpReminderCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.BumpReminder;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.BumpReminder;
 
         if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
             return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser)}` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}";

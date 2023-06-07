@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class LibreTranslateLanguage
+internal sealed class LibreTranslateLanguage
 {
     public string code { get; set; }
     public string name { get; set; }

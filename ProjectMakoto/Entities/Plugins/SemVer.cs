@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.Plugins;
 
-public class SemVer
+public sealed class SemVer
 {
-    public SemVer(int major, int minor, int patch) 
+    public SemVer(int major, int minor, int patch)
     {
         this.Major = major;
         this.Minor = minor;
@@ -34,15 +34,15 @@ public class SemVer
     public int Minor { get; set; }
     public int Patch { get; set; }
 
-    public override string ToString() 
-        => $"{Major}.{Minor}.{Patch}";
+    public override string ToString()
+        => $"{this.Major}.{this.Minor}.{this.Patch}";
 
-    public static implicit operator string(SemVer v) 
+    public static implicit operator string(SemVer v)
         => $"{v.Major}.{v.Minor}.{v.Patch}";
-    
-    public static implicit operator int(SemVer v) 
+
+    public static implicit operator int(SemVer v)
         => (v.Major * 1000) + (v.Minor * 100) + v.Patch;
-    
-    public static implicit operator SemVer(string v) 
+
+    public static implicit operator SemVer(string v)
         => new(v);
 }

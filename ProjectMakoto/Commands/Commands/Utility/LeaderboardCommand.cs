@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands;
-internal class LeaderboardCommand : BaseCommand
+internal sealed class LeaderboardCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -23,9 +23,9 @@ internal class LeaderboardCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Leaderboard.Disabled, true,
+                    Description = GetString(this.t.Commands.Utility.Leaderboard.Disabled, true,
                         new TVar("Command", $"{ctx.Prefix}experiencesettings config"))
-                }.AsError(ctx, GetString(t.Commands.Utility.Leaderboard.Title)));
+                }.AsError(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title)));
                 return;
             }
 
@@ -37,8 +37,8 @@ internal class LeaderboardCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.Leaderboard.Fetching, true),
-            }.AsLoading(ctx, GetString(t.Commands.Utility.Leaderboard.Title));
+                Description = GetString(this.t.Commands.Utility.Leaderboard.Fetching, true),
+            }.AsLoading(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title));
 
             await RespondOrEdit(embed: embed);
 
@@ -77,7 +77,7 @@ internal class LeaderboardCommand : BaseCommand
 
                     count++;
 
-                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.GetUsernameWithIdentifier()}` ({GetString(t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
+                    Board.Add(new KeyValuePair<string, string>("󠂪 󠂪 ", $"**{count.ToEmotes()}**. <@{b.Key}> `{bMember.GetUsernameWithIdentifier()}` ({GetString(this.t.Commands.Utility.Leaderboard.Level, true, new TVar("Level", b.Value.Experience.Level), new TVar("Points", b.Value.Experience.Points))}"));
 
                     if (count >= ShowAmount)
                         break;
@@ -93,13 +93,13 @@ internal class LeaderboardCommand : BaseCommand
             if (count != 0)
             {
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
-                embed.Description = GetString(t.Commands.Utility.Leaderboard.Placement, new TVar("Placement", currentuserplacement));
-                await RespondOrEdit(embed.AsInfo(ctx, GetString(t.Commands.Utility.Leaderboard.Title)));
+                embed.Description = GetString(this.t.Commands.Utility.Leaderboard.Placement, new TVar("Placement", currentuserplacement));
+                await RespondOrEdit(embed.AsInfo(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title)));
             }
             else
             {
-                embed.Description = $":no_entry_sign: {GetString(t.Commands.Utility.Leaderboard.NoPoints, true)}";
-                await RespondOrEdit(embed.AsInfo(ctx, GetString(t.Commands.Utility.Leaderboard.Title)));
+                embed.Description = $":no_entry_sign: {GetString(this.t.Commands.Utility.Leaderboard.NoPoints, true)}";
+                await RespondOrEdit(embed.AsInfo(ctx, GetString(this.t.Commands.Utility.Leaderboard.Title)));
             }
         });
     }

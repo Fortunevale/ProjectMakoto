@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class CreditsCommand : BaseCommand
+internal sealed class CreditsCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -20,17 +20,12 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.Credits.Fetching, true)
+                Description = GetString(this.t.Commands.Utility.Credits.Fetching, true)
             }.AsBotLoading(ctx));
 
-            var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
-
-            var tokenAuth = new Credentials(ctx.Bot.status.LoadedConfig.Secrets.Github.Token);
-            client.Credentials = tokenAuth;
-
-            var contributors = await client.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
-            var contributorsdcs = await client.Repository.GetAllContributors("Aiko-IT-Systems", "DisCatSharp");
-            var contributorslava = await client.Repository.GetAllContributors("freyacodes", "Lavalink");
+            var contributors = await ctx.Bot.githubClient.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
+            var contributorsdcs = await ctx.Bot.githubClient.Repository.GetAllContributors("Aiko-IT-Systems", "DisCatSharp");
+            var contributorslava = await ctx.Bot.githubClient.Repository.GetAllContributors("freyacodes", "Lavalink");
 
             List<DiscordUser> userlist = new();
 
@@ -39,7 +34,7 @@ internal class CreditsCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.Credits.Credits, false, false,
+                Description = GetString(this.t.Commands.Utility.Credits.Credits, false, false,
                 new TVar("BotName", ctx.CurrentUser.GetUsername(), false),
                 new TVar("Developer", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))", false),
                 new TVar("DiscordStaffList", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.GetUsernameWithIdentifier()}`]({x.ProfileUrl})")), false),

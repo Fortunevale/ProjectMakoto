@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class AfkCommand : BaseCommand
+internal sealed class AfkCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -31,8 +31,8 @@ internal class AfkCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{ctx.User.Mention} {GetString(t.Commands.Social.Afk.SetAfk, true)}"
-            }.AsSuccess(ctx, GetString(t.Commands.Social.Afk.Title)));
+                Description = $"{ctx.User.Mention} {GetString(this.t.Commands.Social.Afk.SetAfk, true)}"
+            }.AsSuccess(ctx, GetString(this.t.Commands.Social.Afk.Title)));
             await Task.Delay(10000);
             _ = ctx.ResponseMessage.DeleteAsync();
         });

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ReactionRoleEntry
+public sealed class ReactionRoleEntry
 {
     public string UUID = Guid.NewGuid().ToString();
     public ulong EmojiId { get; set; }
@@ -17,10 +17,10 @@ public class ReactionRoleEntry
 
     public DiscordEmoji GetEmoji(DiscordClient client)
     {
-        if (EmojiId == 0)
-            return DiscordEmoji.FromName(client, $":{EmojiName.Remove(EmojiName.LastIndexOf(":"), EmojiName.Length - EmojiName.LastIndexOf(":"))}:");
+        if (this.EmojiId == 0)
+            return DiscordEmoji.FromName(client, $":{this.EmojiName.Remove(this.EmojiName.LastIndexOf(":"), this.EmojiName.Length - this.EmojiName.LastIndexOf(":"))}:");
 
-        return DiscordEmoji.FromGuildEmote(client, EmojiId);
+        return DiscordEmoji.FromGuildEmote(client, this.EmojiId);
     }
 
     public ulong RoleId { get; set; }

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ExperienceMember
+public sealed class ExperienceMember
 {
     public ExperienceMember(Member member)
     {
-        Parent = member;
+        this.Parent = member;
     }
 
     private Member Parent { get; set; }
@@ -21,25 +21,25 @@ public class ExperienceMember
 
 
     private DateTime _Last_Message { get; set; } = DateTime.UnixEpoch;
-    public DateTime Last_Message 
-    { 
-        get => _Last_Message; 
-        set 
-        { 
-            _Last_Message = value;
-            _ = Bot.DatabaseClient.UpdateValue(Parent.Guild.ServerId.ToString(), "userid", Parent.MemberId, "experience_last_message", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public DateTime Last_Message
+    {
+        get => this._Last_Message;
+        set
+        {
+            this._Last_Message = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "experience_last_message", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 
     private long _Points { get; set; } = 1;
-    public long Points 
-    { 
-        get => _Points; 
-        set 
-        { 
-            _Points = value;
-            _ = Bot.DatabaseClient.UpdateValue(Parent.Guild.ServerId.ToString(), "userid", Parent.MemberId, "experience", value, Bot.DatabaseClient.guildDatabaseConnection);
-        } 
+    public long Points
+    {
+        get => this._Points;
+        set
+        {
+            this._Points = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "experience", value, Bot.DatabaseClient.guildDatabaseConnection);
+        }
     }
 
     private long _Level { get; set; } = 1;
@@ -47,15 +47,15 @@ public class ExperienceMember
     {
         get
         {
-            if (_Level <= 0)
+            if (this._Level <= 0)
                 return 1;
 
-            return _Level;
+            return this._Level;
         }
-        set 
-        { 
-            _Level = value;
-            _ = Bot.DatabaseClient.UpdateValue(Parent.Guild.ServerId.ToString(), "userid", Parent.MemberId, "experience_level", value, Bot.DatabaseClient.guildDatabaseConnection);
+        set
+        {
+            this._Level = value;
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "experience_level", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 }

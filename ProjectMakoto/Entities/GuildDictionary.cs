@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,12 +7,11 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public class GuildDictionary : IDictionary<ulong, Guild>
+public sealed class GuildDictionary : IDictionary<ulong, Guild>
 {
     public GuildDictionary(Bot _bot)
     {
@@ -25,49 +24,49 @@ public class GuildDictionary : IDictionary<ulong, Guild>
 
     public Guild this[ulong key]
     {
-        get 
+        get
         {
-            if (!_items.ContainsKey(key) && key != 0)
-                _items.Add(key, new(key, _bot));
+            if (!this._items.ContainsKey(key) && key != 0)
+                this._items.Add(key, new(key, this._bot));
 
-            return _items[key]; 
+            return this._items[key];
         }
 
         set
         {
-            if (!_items.ContainsKey(key) && key != 0)
-                _items.Add(key, new(key, _bot));
+            if (!this._items.ContainsKey(key) && key != 0)
+                this._items.Add(key, new(key, this._bot));
 
-            _items[key] = value;
+            this._items[key] = value;
         }
     }
 
-    public ICollection<ulong> Keys 
-        => _items.Keys;
+    public ICollection<ulong> Keys
+        => this._items.Keys;
 
-    public ICollection<Guild> Values 
-        => _items.Values;
+    public ICollection<Guild> Values
+        => this._items.Values;
 
-    public int Count 
-        => _items.Count;
+    public int Count
+        => this._items.Count;
 
-    public bool IsReadOnly 
+    public bool IsReadOnly
         => false;
 
-    public void Add(ulong key, Guild value) 
-        => _items.Add(key, value);
+    public void Add(ulong key, Guild value)
+        => this._items.Add(key, value);
 
-    public void Add(KeyValuePair<ulong, Guild> item) 
-        => _items.Add(item.Key, item.Value);
+    public void Add(KeyValuePair<ulong, Guild> item)
+        => this._items.Add(item.Key, item.Value);
 
-    public void Clear() 
-        => _items.Clear();
+    public void Clear()
+        => this._items.Clear();
 
-    public bool Remove(ulong key) 
-        => _items.Remove(key);
+    public bool Remove(ulong key)
+        => this._items.Remove(key);
 
-    public bool Remove(KeyValuePair<ulong, Guild> item) 
-        => _items.Remove(item.Key);
+    public bool Remove(KeyValuePair<ulong, Guild> item)
+        => this._items.Remove(item.Key);
 
     public void CopyTo(KeyValuePair<ulong, Guild>[] array, int arrayIndex)
     {
@@ -75,17 +74,17 @@ public class GuildDictionary : IDictionary<ulong, Guild>
     }
 
     public bool Contains(KeyValuePair<ulong, Guild> item)
-        => _items.Contains(item);
+        => this._items.Contains(item);
 
     public bool ContainsKey(ulong key)
-        => _items.ContainsKey(key);
+        => this._items.ContainsKey(key);
 
     public IEnumerator<KeyValuePair<ulong, Guild>> GetEnumerator()
-        => _items.GetEnumerator();
+        => this._items.GetEnumerator();
 
     public bool TryGetValue(ulong key, [MaybeNullWhen(false)] out Guild value)
-        => _items.TryGetValue(key, out value);
+        => this._items.TryGetValue(key, out value);
 
     IEnumerator IEnumerable.GetEnumerator()
-        => _items.GetEnumerator();
+        => this._items.GetEnumerator();
 }

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class EmojiStealerCommand : BaseCommand
+internal sealed class EmojiStealerCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -51,7 +51,7 @@ internal class EmojiStealerCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.EmojiStealer.DownloadingPre, true),
+                Description = GetString(this.t.Commands.Utility.EmojiStealer.DownloadingPre, true),
             }.AsLoading(ctx);
             await RespondOrEdit(embed);
 
@@ -66,17 +66,15 @@ internal class EmojiStealerCommand : BaseCommand
                 {
                     Name = b.Item2,
                     Animated = b.Item3,
-                    Type = EmojiType.EMOJI
+                    EntryType = EmojiType.EMOJI
                 });
 
             if (!Emotes.Any() && (bMessage.Stickers is null || bMessage.Stickers.Count == 0))
             {
-                embed.Description = GetString(t.Commands.Utility.EmojiStealer.NoEmojis, true);
+                embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.NoEmojis, true);
                 await RespondOrEdit(embed.AsError(ctx));
                 return;
             }
-
-            bool ContainsStickers = bMessage.Stickers.Count > 0;
 
             string guid = Guid.NewGuid().ToString().MakeValidFileName();
 
@@ -84,7 +82,7 @@ internal class EmojiStealerCommand : BaseCommand
             {
                 if (SanitizedEmoteList.Count > 0)
                 {
-                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.DownloadingEmojis, true, new TVar("Count", SanitizedEmoteList.Count));
+                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.DownloadingEmojis, true, new TVar("Count", SanitizedEmoteList.Count));
                     await RespondOrEdit(embed);
 
                     foreach (var b in SanitizedEmoteList.ToList())
@@ -107,44 +105,62 @@ internal class EmojiStealerCommand : BaseCommand
                             }
 
                             b.Value.Data.Name = Name;
-                            await EmoteStream.CopyToAsync(b.Value.Data.Stream);
-                            b.Value.Data.Stream.Seek(0, SeekOrigin.Begin);
+                            EmoteStream.CopyTo(b.Value.Data.Stream);
+                            b.Value.Data.Stream.Position = 0;
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError("Failed to download an emote", ex);
+
                             SanitizedEmoteList.Remove(b.Key);
                         }
                     }
                 }
 
-                if (ContainsStickers)
+                if (bMessage.Stickers.Count > 0)
                 {
-                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.DownloadingEmojis, true, new TVar("Count", bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()).Count()));
+                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.DownloadingStickers, true, new TVar("Count", bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()).Count()));
                     await RespondOrEdit(embed);
 
                     foreach (var b in bMessage.Stickers.GroupBy(x => x.Url).Select(x => x.First()))
                     {
-                        var newEntry = new EmojiEntry { Animated = false, Name = b.Name, Type = EmojiType.STICKER };
-
-                        var StickerStream = await client.GetStreamAsync(b.Url);
-
-                        string NameExists = "";
-                        int NameExistsInt = 1;
-
-                        string Name = $"{b.Name}{NameExists}.png".MakeValidFileName('_');
-
-                        while (SanitizedEmoteList.Any(x => x.Value.Data.Name == Name))
+                        var newEntry = new EmojiEntry
                         {
-                            NameExistsInt++;
-                            NameExists = $" ({NameExistsInt})";
+                            Animated = false,
+                            Name = b.Name,
+                            Description = b.Description,
+                            Emoji = "🤖".UnicodeToEmoji(),
+                            StickerFormat = b.FormatType,
+                            EntryType = EmojiType.STICKER
+                        };
 
-                            Name = $"{newEntry.Name}{NameExists}.png".MakeValidFileName('_');
+                        try
+                        {
+                            var StickerStream = await client.GetStreamAsync(b.Url);
+
+                            string NameExists = "";
+                            int NameExistsInt = 1;
+
+                            string Name = $"{b.Name}{NameExists}.png".MakeValidFileName('_');
+
+                            while (SanitizedEmoteList.Any(x => x.Value.Data.Name == Name))
+                            {
+                                NameExistsInt++;
+                                NameExists = $" ({NameExistsInt})";
+
+                                Name = $"{newEntry.Name}{NameExists}.png".MakeValidFileName('_');
+                            }
+
+                            newEntry.Data.Name = Name;
+                            StickerStream.CopyTo(newEntry.Data.Stream);
+                            newEntry.Data.Stream.Position = 0;
                         }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError("Failed to download an emote", ex);
 
-                        newEntry.Data.Name = Name;
-                        await StickerStream.CopyToAsync(newEntry.Data.Stream);
-                        newEntry.Data.Stream.Seek(0, SeekOrigin.Begin);
+                            SanitizedEmoteList.Remove(b.Id);
+                        }
 
                         SanitizedEmoteList.Add(b.Id, newEntry);
                     }
@@ -152,7 +168,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                 if (SanitizedEmoteList.Count == 0)
                 {
-                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.NoSuccessfulDownload, true);
+                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.NoSuccessfulDownload, true);
                     await RespondOrEdit(embed.AsError(ctx));
 
                     return;
@@ -160,31 +176,31 @@ internal class EmojiStealerCommand : BaseCommand
 
                 string emojiText = "";
 
-                if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI))
-                    emojiText += GetString(t.Commands.Utility.EmojiStealer.Emoji);
+                if (SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.EMOJI))
+                    emojiText += GetString(this.t.Commands.Utility.EmojiStealer.Emoji);
 
-                if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.STICKER))
-                    emojiText += $"{(emojiText.Length > 0 ? $" & {GetString(t.Commands.Utility.EmojiStealer.Sticker)}" : GetString(t.Commands.Utility.EmojiStealer.Sticker))}";
+                if (SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.STICKER))
+                    emojiText += $"{(emojiText.Length > 0 ? $" & {GetString(this.t.Commands.Utility.EmojiStealer.Sticker)}" : GetString(this.t.Commands.Utility.EmojiStealer.Sticker))}";
 
-                embed.Description = GetString(t.Commands.Utility.EmojiStealer.ReceivePrompt, true, new TVar("Type", emojiText));
+                embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.ReceivePrompt, true, new TVar("Type", emojiText));
                 embed.AsAwaitingInput(ctx);
 
                 bool IncludeStickers = false;
 
-                if (!SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI))
+                if (!SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.EMOJI))
                     IncludeStickers = true;
 
-                var IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", GetString(t.Commands.Utility.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
+                var IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", GetString(this.t.Commands.Utility.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
 
-                var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(t.Commands.Utility.EmojiStealer.AddToServer), (!ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions) || !ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageGuildExpressions) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                var ZipPrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "ZipPrivateMessage", GetString(t.Commands.Utility.EmojiStealer.DirectMessageZip), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
-                var SinglePrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "SinglePrivateMessage", GetString(t.Commands.Utility.EmojiStealer.DirectMessageSingle), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📱")));
+                var AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisToServer), !ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                var ZipPrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "ZipPrivateMessage", GetString(this.t.Commands.Utility.EmojiStealer.DirectMessageZip), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+                var SinglePrivateMessageButton = new DiscordButtonComponent(ButtonStyle.Primary, "SinglePrivateMessage", GetString(this.t.Commands.Utility.EmojiStealer.DirectMessageSingle), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📱")));
 
-                var SendHereButton = new DiscordButtonComponent(ButtonStyle.Secondary, "SendHere", GetString(t.Commands.Utility.EmojiStealer.CurrentChatZip), !(ctx.Member.Permissions.HasPermission(Permissions.AttachFiles)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+                var SendHereButton = new DiscordButtonComponent(ButtonStyle.Secondary, "SendHere", GetString(this.t.Commands.Utility.EmojiStealer.CurrentChatZip), !(ctx.Member.Permissions.HasPermission(Permissions.AttachFiles)), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
                 var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.STICKER))
+                if (SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.STICKER))
                     builder.AddComponents(IncludeStickersButton);
 
                 builder.AddComponents(new List<DiscordComponent> { AddToServerButton, ZipPrivateMessageButton, SinglePrivateMessageButton, SendHereButton });
@@ -246,20 +262,11 @@ internal class EmojiStealerCommand : BaseCommand
                                         return;
                                     }
 
-                                    if (IncludeStickers)
-                                    {
-                                        embed.Description = GetString(t.Commands.Utility.EmojiStealer.AddToServerStickerError, true);
-                                        embed.AsError(ctx);
-                                        await RespondOrEdit(embed);
-
-                                        return;
-                                    }
-
                                     bool DiscordWarning = false;
 
-                                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.AddToServerLoading, true,
+                                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisToServerLoading, true,
                                         new TVar("Min", 0),
-                                        new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())));
+                                        new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count())));
                                     embed.AsLoading(ctx);
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
@@ -269,38 +276,69 @@ internal class EmojiStealerCommand : BaseCommand
                                         {
                                             Task task;
 
-                                            if (SanitizedEmoteList.ElementAt(i).Value.Type != EmojiType.EMOJI)
-                                                continue;
-
-                                            task = ctx.Guild.CreateEmojiAsync(SanitizedEmoteList.ElementAt(i).Value.Name, SanitizedEmoteList.ElementAt(i).Value.Data.Stream);
-
-                                            int WaitSeconds = 0;
-
-                                            while (task.Status == TaskStatus.WaitingForActivation)
+                                            switch (SanitizedEmoteList.ElementAt(i).Value.EntryType)
                                             {
-                                                WaitSeconds++;
-
-                                                if (WaitSeconds > 10 && !DiscordWarning)
+                                                case EmojiType.STICKER:
                                                 {
-                                                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.AddToServerLoading, true,
-                                                        new TVar("Min", 0),
-                                                        new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count()))) +
-                                                                        $"\n{GetString(t.Commands.Utility.EmojiStealer.AddToServerLoadingNotice)}";
-                                                    await RespondOrEdit(embed);
+                                                    var sticker = SanitizedEmoteList.ElementAt(i).Value;
 
-                                                    DiscordWarning = true;
+                                                    task = ctx.Guild.CreateStickerAsync(sticker.Name, sticker.Description ?? sticker.Name, sticker.Emoji, sticker.Data.Stream, sticker.StickerFormat);
+
+                                                    int WaitSeconds = 0;
+
+                                                    while (task.Status == TaskStatus.WaitingForActivation)
+                                                    {
+                                                        WaitSeconds++;
+
+                                                        if (WaitSeconds > 10 && !DiscordWarning)
+                                                        {
+                                                            embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.AddStickersToServerLoading, true,
+                                                                new TVar("Min", 0),
+                                                                new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count()))) +
+                                                                                $"\n{GetString(this.t.Commands.Utility.EmojiStealer.AddToServerLoadingNotice)}";
+                                                            await RespondOrEdit(embed);
+
+                                                            DiscordWarning = true;
+                                                        }
+                                                        await Task.Delay(1000);
+                                                    }
+
+                                                    if (task.IsFaulted)
+                                                        throw task.Exception.InnerException;
+                                                    break;
                                                 }
-                                                await Task.Delay(1000);
+                                                case EmojiType.EMOJI:
+                                                {
+                                                    var emoji = SanitizedEmoteList.ElementAt(i);
+
+                                                    task = ctx.Guild.CreateEmojiAsync(SanitizedEmoteList.ElementAt(i).Value.Name, emoji.Value.Data.Stream);
+
+                                                    int WaitSeconds = 0;
+
+                                                    while (task.Status == TaskStatus.WaitingForActivation)
+                                                    {
+                                                        WaitSeconds++;
+
+                                                        if (WaitSeconds > 10 && !DiscordWarning)
+                                                        {
+                                                            embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisToServerLoading, true,
+                                                                new TVar("Min", 0),
+                                                                new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count()))) +
+                                                                                $"\n{GetString(this.t.Commands.Utility.EmojiStealer.AddToServerLoadingNotice)}";
+                                                            await RespondOrEdit(embed);
+
+                                                            DiscordWarning = true;
+                                                        }
+                                                        await Task.Delay(1000);
+                                                    }
+
+                                                    if (task.IsFaulted)
+                                                        throw task.Exception.InnerException;
+                                                    break;
+                                                }
+                                                default:
+                                                    throw new NotImplementedException();
                                             }
-
-                                            if (task.IsFaulted)
-                                                throw task.Exception.InnerException;
-
-                                            embed.Description = GetString(t.Commands.Utility.EmojiStealer.AddToServerLoading, true,
-                                                new TVar("Min", 0),
-                                                new TVar("Max", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())));
-                                            embed.AsSuccess(ctx);
-                                            await RespondOrEdit(embed);
                                         }
                                         catch (DisCatSharp.Exceptions.BadRequestException ex)
                                         {
@@ -308,7 +346,7 @@ internal class EmojiStealerCommand : BaseCommand
 
                                             if (regex.Groups[3].Value == "30008")
                                             {
-                                                embed.Description = GetString(t.Commands.Utility.EmojiStealer.NoMoreRoom, true, new TVar("Count", i));
+                                                embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.NoMoreRoom, true, new TVar("Count", i));
                                                 embed.AsError(ctx);
                                                 await RespondOrEdit(embed);
                                                 return;
@@ -318,8 +356,8 @@ internal class EmojiStealerCommand : BaseCommand
                                         }
                                     }
 
-                                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.SuccessAdded, true,
-                                        new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())));
+                                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SuccessAdded, true,
+                                        new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count())));
                                     embed.AsSuccess(ctx);
                                     await RespondOrEdit(embed);
                                     return;
@@ -329,18 +367,18 @@ internal class EmojiStealerCommand : BaseCommand
                                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
                                     cancellationTokenSource.Cancel();
 
-                                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.SendingDm, true, new TVar("Type", emojiText));
+                                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SendingDm, true, new TVar("Type", emojiText));
                                     embed.AsLoading(ctx);
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
                                     try
                                     {
-                                        var totalCount = IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count();
+                                        var totalCount = IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count();
 
                                         for (int i = 0; i < SanitizedEmoteList.Count; i++)
                                         {
                                             if (!IncludeStickers)
-                                                if (SanitizedEmoteList.ElementAt(i).Value.Type != EmojiType.EMOJI)
+                                                if (SanitizedEmoteList.ElementAt(i).Value.EntryType != EmojiType.EMOJI)
                                                     continue;
 
                                             var current = SanitizedEmoteList.ElementAt(i);
@@ -354,7 +392,7 @@ internal class EmojiStealerCommand : BaseCommand
                                             await Task.Delay(1000);
                                         }
 
-                                        await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithContent(GetString(t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
+                                        await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithContent(GetString(this.t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
                                     }
                                     catch (DisCatSharp.Exceptions.UnauthorizedException)
                                     {
@@ -366,8 +404,8 @@ internal class EmojiStealerCommand : BaseCommand
                                         throw;
                                     }
 
-                                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.SuccessDmMain, true,
-                                        new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())),
+                                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SuccessDmMain, true,
+                                        new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count())),
                                         new TVar("Type", emojiText));
                                     await RespondOrEdit(embed.AsSuccess(ctx));
                                     return;
@@ -377,7 +415,7 @@ internal class EmojiStealerCommand : BaseCommand
                                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
                                     cancellationTokenSource.Cancel();
 
-                                    embed.Description = GetString(t.Commands.Utility.EmojiStealer.PreparingZip, true);
+                                    embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.PreparingZip, true);
                                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx)));
 
                                     using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create, true))
@@ -385,7 +423,7 @@ internal class EmojiStealerCommand : BaseCommand
                                         for (int i = 0; i < SanitizedEmoteList.Count; i++)
                                         {
                                             if (!IncludeStickers)
-                                                if (SanitizedEmoteList.ElementAt(i).Value.Type != EmojiType.EMOJI)
+                                                if (SanitizedEmoteList.ElementAt(i).Value.EntryType != EmojiType.EMOJI)
                                                     continue;
 
                                             var current = SanitizedEmoteList.ElementAt(i);
@@ -399,13 +437,13 @@ internal class EmojiStealerCommand : BaseCommand
 
                                     if (e.GetCustomId() == ZipPrivateMessageButton.CustomId)
                                     {
-                                        embed.Description = GetString(t.Commands.Utility.EmojiStealer.SendingZipDm, true);
+                                        embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SendingZipDm, true);
                                         await RespondOrEdit(embed);
 
                                         try
                                         {
                                             zipFileStream.Seek(0, SeekOrigin.Begin);
-                                            await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emojis.zip", zipFileStream).WithContent(GetString(t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
+                                            await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithFile($"Emojis.zip", zipFileStream).WithContent(GetString(this.t.Commands.Utility.EmojiStealer.SuccessDm, new TVar("Type", emojiText))));
                                         }
                                         catch (DisCatSharp.Exceptions.UnauthorizedException)
                                         {
@@ -417,8 +455,8 @@ internal class EmojiStealerCommand : BaseCommand
                                             throw;
                                         }
 
-                                        embed.Description = GetString(t.Commands.Utility.EmojiStealer.SuccessDmMain, true,
-                                            new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())),
+                                        embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SuccessDmMain, true,
+                                            new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count())),
                                             new TVar("Type", emojiText));
                                         await RespondOrEdit(embed.AsSuccess(ctx));
                                     }
@@ -430,11 +468,11 @@ internal class EmojiStealerCommand : BaseCommand
                                             return;
                                         }
 
-                                        embed.Description = GetString(t.Commands.Utility.EmojiStealer.SendingZipChat, true);
+                                        embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SendingZipChat, true);
                                         await RespondOrEdit(embed);
 
-                                        embed.Description = GetString(t.Commands.Utility.EmojiStealer.SuccessChat, true,
-                                            new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.Type == EmojiType.EMOJI).Count())),
+                                        embed.Description = GetString(this.t.Commands.Utility.EmojiStealer.SuccessChat, true,
+                                            new TVar("Count", (IncludeStickers ? SanitizedEmoteList.Count : SanitizedEmoteList.Where(x => x.Value.EntryType == EmojiType.EMOJI).Count())),
                                             new TVar("Type", emojiText));
 
                                         zipFileStream.Seek(0, SeekOrigin.Begin);
@@ -448,16 +486,16 @@ internal class EmojiStealerCommand : BaseCommand
 
                                     if (!IncludeStickers)
                                     {
-                                        if (!SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI))
+                                        if (!SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.EMOJI))
                                             IncludeStickers = true;
                                     }
 
-                                    IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", GetString(t.Commands.Utility.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
-                                    AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", GetString(t.Commands.Utility.EmojiStealer.AddToServer), (!ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions) || !ctx.CurrentMember.Permissions.HasPermission(Permissions.ManageGuildExpressions) || IncludeStickers), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                                    IncludeStickersButton = new DiscordButtonComponent((IncludeStickers ? ButtonStyle.Success : ButtonStyle.Danger), "ToggleStickers", GetString(this.t.Commands.Utility.EmojiStealer.ToggleStickers), !SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.EMOJI), new DiscordComponentEmoji(DiscordEmoji.FromGuildEmote(ctx.Client, (ulong)(IncludeStickers ? 970278964755038248 : 970278964079767574))));
+                                    AddToServerButton = new DiscordButtonComponent(ButtonStyle.Success, "AddToServer", (IncludeStickers ? GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisAndStickerToServer) : GetString(this.t.Commands.Utility.EmojiStealer.AddEmojisToServer)), !ctx.Member.Permissions.HasPermission(Permissions.ManageGuildExpressions), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
 
                                     var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                                    if (SanitizedEmoteList.Any(x => x.Value.Type == EmojiType.STICKER))
+                                    if (SanitizedEmoteList.Any(x => x.Value.EntryType == EmojiType.STICKER))
                                         builder.AddComponents(IncludeStickersButton);
 
                                     builder.AddComponents(new List<DiscordComponent> { AddToServerButton, ZipPrivateMessageButton, SinglePrivateMessageButton, SendHereButton });
@@ -468,7 +506,8 @@ internal class EmojiStealerCommand : BaseCommand
                         }
                         finally
                         {
-                            FinishedInteraction = true;
+                            if (e.GetCustomId() != IncludeStickersButton.CustomId)
+                                FinishedInteraction = true;
                         }
                     }).Add(ctx.Bot.watcher, ctx);
                 }
@@ -478,9 +517,13 @@ internal class EmojiStealerCommand : BaseCommand
                 while (!FinishedInteraction)
                     await Task.Delay(1000);
 
-                try { await zipFileStream.DisposeAsync(); } catch { }
+                try
+                { await zipFileStream.DisposeAsync(); }
+                catch { }
                 foreach (var b in SanitizedEmoteList)
-                    try { await b.Value.Data.Stream.DisposeAsync(); } catch { }
+                    try
+                    { await b.Value.Data.Stream.DisposeAsync(); }
+                    catch { }
             }
         });
     }

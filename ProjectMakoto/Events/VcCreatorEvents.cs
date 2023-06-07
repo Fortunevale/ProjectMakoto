@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class VcCreatorEvents
+internal sealed class VcCreatorEvents
 {
     internal VcCreatorEvents(Bot _bot)
     {
@@ -20,30 +20,30 @@ internal class VcCreatorEvents
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
-        if (e.After?.Channel?.Id == _bot.guilds[e.Guild.Id].VcCreator.Channel)
+        if (e.After?.Channel?.Id == this._bot.guilds[e.Guild.Id].VcCreator.Channel)
         {
             try
             {
                 DiscordMember member = await e.User.ConvertToMember(e.Guild);
 
-                if (!_bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel.ContainsKey(e.User.Id))
-                    _bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel.Add(e.User.Id, DateTime.MinValue);
+                if (!this._bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel.ContainsKey(e.User.Id))
+                    this._bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel.Add(e.User.Id, DateTime.MinValue);
 
-                if (e.After.Channel.Parent is null || e.After.Channel.Parent.Children.Count >= 50 || _bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id].GetTimespanSince() < TimeSpan.FromSeconds(30))
+                if (e.After.Channel.Parent is null || e.After.Channel.Parent.Children.Count >= 50 || this._bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id].GetTimespanSince() < TimeSpan.FromSeconds(30))
                 {
                     await member.DisconnectFromVoiceAsync();
                     return;
                 }
 
-                _bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id] = DateTime.UtcNow;
+                this._bot.guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id] = DateTime.UtcNow;
 
                 var name = $"{member.DisplayName.SanitizeForCode()}'s Channel";
 
-                foreach (var b in _bot.profanityList)
+                foreach (var b in this._bot.profanityList)
                     name = name.Replace(b, new String('*', b.Length));
 
                 var newChannel = await e.Guild.CreateChannelAsync(name, ChannelType.Voice, e.After.Channel.Parent, default, null, 8);
-                _bot.guilds[e.Guild.Id].VcCreator.CreatedChannels.Add(newChannel.Id, new VcCreatorDetails
+                this._bot.guilds[e.Guild.Id].VcCreator.CreatedChannels.Add(newChannel.Id, new VcCreatorDetails
                 {
                     OwnerId = member.Id
                 });

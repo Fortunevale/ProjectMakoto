@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class SlapCommand : BaseCommand
+internal sealed class SlapCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -20,8 +20,8 @@ internal class SlapCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = t.Commands.Social.Slap.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Slap.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Slap.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Slap.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
@@ -39,8 +39,8 @@ internal class SlapCommand : BaseCommand
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = phrases.SelectRandom().Build(
-                    new TVar("User1", ctx.User.Mention, false), 
-                    new TVar("User2", user.Mention, false), 
+                    new TVar("User1", ctx.User.Mention, false),
+                    new TVar("User2", user.Mention, false),
                     new TVar("Emoji", ctx.Bot.status.LoadedConfig.Emojis.Slap, false))
                     .Bold(),
                 ImageUrl = response.Item2,

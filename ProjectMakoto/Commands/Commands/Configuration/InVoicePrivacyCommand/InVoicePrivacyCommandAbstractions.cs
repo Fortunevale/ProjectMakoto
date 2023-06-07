@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Commands.InVoicePrivacyCommand;
 
-internal class InVoicePrivacyCommandAbstractions
+internal sealed class InVoicePrivacyCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = Bot.loadedTranslations.Commands.Config.InVoicePrivacy;
+        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.InVoicePrivacy;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ClearMessagesOnLeave, CommandKey.SetPermissions);
 

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class KissCommand : BaseCommand
+internal sealed class KissCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -20,8 +20,8 @@ internal class KissCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            string[] phrases = t.Commands.Social.Kiss.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Kiss.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Kiss.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Kiss.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {

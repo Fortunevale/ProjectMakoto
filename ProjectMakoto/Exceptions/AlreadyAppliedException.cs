@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Exceptions;
 
-internal class AlreadyAppliedException : Exception
+internal sealed class AlreadyAppliedException : Exception
 {
     public AlreadyAppliedException(string message) : base(message)
     {

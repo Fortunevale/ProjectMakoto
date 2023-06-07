@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,9 +7,11 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Octokit;
+
 namespace ProjectMakoto.Commands;
 
-internal class CreateIssueCommand : BaseCommand
+internal sealed class CreateIssueCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckMaintenance() && await CheckSource(Enums.CommandType.ApplicationCommand));
 
@@ -25,12 +27,7 @@ internal class CreateIssueCommand : BaseCommand
                 return;
             }
 
-            var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
-
-            var tokenAuth = new Credentials(ctx.Bot.status.LoadedConfig.Secrets.Github.Token);
-            client.Credentials = tokenAuth;
-
-            var labels = await client.Issue.Labels.GetAllForRepository(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
+            var labels = await ctx.Bot.githubClient.Issue.Labels.GetAllForRepository(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
 
             var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                 .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
@@ -80,10 +77,10 @@ internal class CreateIssueCommand : BaseCommand
                             return;
                         }
 
-                        var issue = await client.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.GetUsernameWithIdentifier()}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
+                        var issue = await ctx.Bot.githubClient.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.GetUsernameWithIdentifier()}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
 
                         if (labels.Count > 0)
-                            await client.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());
+                            await ctx.Bot.githubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());
 
                         _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"✅ `Issue submitted:` {issue.HtmlUrl}"));
                     }

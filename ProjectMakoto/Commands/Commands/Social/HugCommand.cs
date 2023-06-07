@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class HugCommand : BaseCommand
+internal sealed class HugCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -23,8 +23,8 @@ internal class HugCommand : BaseCommand
             string[] PositiveEmojis = { "♥", ctx.Bot.status.LoadedConfig.Emojis.Hug };
             string[] NegativeEmojis = { "😢", "😓" };
 
-            string[] phrases = t.Commands.Social.Hug.Other.Get(ctx.DbGuild);
-            string[] self_phrases = t.Commands.Social.Hug.Self.Get(ctx.DbGuild);
+            string[] phrases = this.t.Commands.Social.Hug.Other.Get(ctx.DbGuild);
+            string[] self_phrases = this.t.Commands.Social.Hug.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {

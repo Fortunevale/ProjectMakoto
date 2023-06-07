@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Music;
 
-internal class SkipCommand : BaseCommand
+internal sealed class SkipCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
 
@@ -28,7 +28,7 @@ internal class SkipCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal class SkipCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Skip.AlreadyVoted),
+                    Description = GetString(this.t.Commands.Music.Skip.AlreadyVoted),
                 }.AsError(ctx));
                 return;
             }
@@ -50,19 +50,19 @@ internal class SkipCommand : BaseCommand
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Skip.Skipped, true),
+                    Description = GetString(this.t.Commands.Music.Skip.Skipped, true),
                 }.AsSuccess(ctx));
                 return;
             }
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            DiscordButtonComponent SkipSongVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(t.Commands.Music.Skip.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
+            DiscordButtonComponent SkipSongVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(this.t.Commands.Music.Skip.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⏩")));
             builder.AddComponents(SkipSongVote);
 
             await RespondOrEdit(builder);
@@ -88,7 +88,7 @@ internal class SkipCommand : BaseCommand
 
                         if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Contains(e.User.Id))
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(t.Commands.Music.Skip.AlreadyVoted, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.Skip.AlreadyVoted, true)}").AsEphemeral());
                             return;
                         }
 
@@ -96,7 +96,7 @@ internal class SkipCommand : BaseCommand
 
                         if (member.VoiceState is null || member.VoiceState.Channel.Id != conn.Channel.Id)
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
                             return;
                         }
 
@@ -108,12 +108,12 @@ internal class SkipCommand : BaseCommand
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetString(t.Commands.Music.Skip.Skipped),
+                                Description = GetString(this.t.Commands.Music.Skip.Skipped),
                             }.AsSuccess(ctx)));
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot.watcher);

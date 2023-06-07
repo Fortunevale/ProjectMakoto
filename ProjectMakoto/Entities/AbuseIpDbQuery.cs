@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class AbuseIpDbQuery
+public sealed class AbuseIpDbQuery
 {
     public Data data { get; set; }
 
-    public class Data
+    public sealed class Data
     {
         public string? ipAddress { get; set; }
         public bool? isPublic { get; set; }
@@ -32,7 +32,7 @@ public class AbuseIpDbQuery
         public Report[]? reports { get; set; }
     }
 
-    public class Report
+    public sealed class Report
     {
         public DateTime? reportedAt { get; set; }
         public string? comment { get; set; }

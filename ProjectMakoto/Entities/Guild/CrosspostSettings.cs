@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class CrosspostSettings
+public sealed class CrosspostSettings
 {
     public CrosspostSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -21,25 +21,25 @@ public class CrosspostSettings
 
 
     private int _DelayBeforePosting { get; set; } = 0;
-    public int DelayBeforePosting 
-    { 
-        get => _DelayBeforePosting; 
-        set 
-        { 
-            _DelayBeforePosting = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "crosspostdelay", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public int DelayBeforePosting
+    {
+        get => this._DelayBeforePosting;
+        set
+        {
+            this._DelayBeforePosting = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "crosspostdelay", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
-    
+
     private bool _ExcludeBots { get; set; } = false;
-    public bool ExcludeBots 
-    { 
-        get => _ExcludeBots; 
-        set 
-        { 
-            _ExcludeBots = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "crosspostexcludebots", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public bool ExcludeBots
+    {
+        get => this._ExcludeBots;
+        set
+        {
+            this._ExcludeBots = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "crosspostexcludebots", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
     public List<ulong> CrosspostChannels { get; set; } = new();
@@ -51,8 +51,8 @@ public class CrosspostSettings
 
     public async Task CrosspostQueue()
     {
-        QueueInitialized = true;
-        _logger.LogDebug("Initializing crosspost queue for '{Guild}'", Parent.ServerId);
+        this.QueueInitialized = true;
+        _logger.LogDebug("Initializing crosspost queue for '{Guild}'", this.Parent.ServerId);
 
         while (true)
         {
@@ -63,28 +63,28 @@ public class CrosspostSettings
 
             try
             {
-                while (!_queue.IsNotNullAndNotEmpty())
+                while (!this._queue.IsNotNullAndNotEmpty())
                     await Task.Delay(1000);
 
-                _ = _queue.First();
+                _ = this._queue.First();
                 channel = _.Value;
                 message = _.Key;
             }
-            catch (Exception) 
+            catch (Exception)
             {
-                _queue ??= new();
-                continue; 
+                this._queue ??= new();
+                continue;
             }
 
             try
             {
-                if (!CrosspostRatelimits.ContainsKey(channel.Id))
+                if (!this.CrosspostRatelimits.ContainsKey(channel.Id))
                 {
                     _logger.LogDebug("Initialized new crosspost ratelimit for '{Channel}'", channel.Id);
-                    CrosspostRatelimits.Add(channel.Id, new());
+                    this.CrosspostRatelimits.Add(channel.Id, new());
                 }
 
-                var r = CrosspostRatelimits[channel.Id];
+                var r = this.CrosspostRatelimits[channel.Id];
 
                 _logger.LogDebug("Crosspost Ratelimit '{Channel}': First: {First}; Remaining: {Remaining}", channel.Id, r.FirstPost, r.PostsRemaining);
 
@@ -115,7 +115,7 @@ public class CrosspostSettings
                     while (!task.IsCompleted)
                         task.Wait();
 
-                    _queue.Remove(message);
+                    this._queue.Remove(message);
                     _logger.LogDebug("Crossposted message in '{Channel}': {Message}", channel.Id, message.Id);
                 }
 
@@ -152,20 +152,20 @@ public class CrosspostSettings
             }
             catch (Exception ex)
             {
-                _queue.Remove(message);
+                this._queue.Remove(message);
                 _logger.LogError("Failed to process crosspost queue", ex);
-            } 
+            }
         }
     }
 
     public async Task CrosspostWithRatelimit(DiscordChannel channel, DiscordMessage message)
     {
-        if (!QueueInitialized)
+        if (!this.QueueInitialized)
             _ = CrosspostQueue();
 
-        _queue.Add(message, channel);
+        this._queue.Add(message, channel);
 
-        while (_queue.ContainsKey(message))
+        while (this._queue.ContainsKey(message))
         {
             await Task.Delay(1000);
         }

@@ -17,6 +17,7 @@
     <PackageProjectUrl>https://github.com/TheXorog/Project-Makoto</PackageProjectUrl>
     <AnalysisLevel>latest</AnalysisLevel>
     <NeutralLanguage>en</NeutralLanguage>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

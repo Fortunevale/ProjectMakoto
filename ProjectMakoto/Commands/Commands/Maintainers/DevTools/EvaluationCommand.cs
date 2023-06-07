@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,13 +8,12 @@
 // but WITHOUT ANY WARRANTY
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
 namespace ProjectMakoto.Commands;
 
-internal class EvaluationCommand : BaseCommand
+internal sealed class EvaluationCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckBotOwner();
 
@@ -47,23 +46,23 @@ internal class EvaluationCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`No code block was found.`").AsBotError(ctx));
                 return;
-            }    
+            }
 
             try
             {
                 var options = ScriptOptions.Default;
                 options = options.WithImports(
-                    "System", 
-                    "System.Collections.Generic", 
-                    "System.Linq", 
-                    "System.Text", 
-                    "System.Threading.Tasks", 
-                    "DisCatSharp", 
-                    "DisCatSharp.Entities", 
-                    "DisCatSharp.Interactivity", 
-                    "DisCatSharp.Interactivity.Extensions", 
-                    "DisCatSharp.Interactivity.Enums", 
-                    "DisCatSharp.Enums", 
+                    "System",
+                    "System.Collections.Generic",
+                    "System.Linq",
+                    "System.Text",
+                    "System.Threading.Tasks",
+                    "DisCatSharp",
+                    "DisCatSharp.Entities",
+                    "DisCatSharp.Interactivity",
+                    "DisCatSharp.Interactivity.Extensions",
+                    "DisCatSharp.Interactivity.Enums",
+                    "DisCatSharp.Enums",
                     "Newtonsoft.Json"
                     );
                 options = options.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(x => !x.IsDynamic && !x.Location.IsNullOrWhiteSpace()));

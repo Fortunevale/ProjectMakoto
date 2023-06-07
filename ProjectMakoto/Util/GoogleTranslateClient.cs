@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,9 +9,11 @@
 
 namespace ProjectMakoto.Util;
 
-internal class GoogleTranslateClient
+public sealed class GoogleTranslateClient
 {
-    public static GoogleTranslateClient Initialize()
+    internal GoogleTranslateClient() { }
+
+    internal static GoogleTranslateClient Initialize()
     {
         GoogleTranslateClient translationClient = new();
         _ = translationClient.QueueHandler();
@@ -29,19 +31,19 @@ internal class GoogleTranslateClient
 
         while (true)
         {
-            if (Queue.Count == 0 || !Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
             {
                 await Task.Delay(100);
                 continue;
             }
 
-            var b = Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
+            var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
 
             try
             {
                 var response = await client.PostAsync(b.Value.Url, null);
 
-                Queue[b.Key].StatusCode = response.StatusCode;
+                this.Queue[b.Key].StatusCode = response.StatusCode;
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -58,17 +60,17 @@ internal class GoogleTranslateClient
                 }
 
 
-                Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
-                Queue[b.Key].Resolved = true;
+                this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
+                this.Queue[b.Key].Resolved = true;
             }
             catch (Exception ex)
             {
-                Queue[b.Key].Failed = true;
-                Queue[b.Key].Exception = ex;
+                this.Queue[b.Key].Failed = true;
+                this.Queue[b.Key].Exception = ex;
             }
             finally
             {
-                LastRequest = DateTime.UtcNow;
+                this.LastRequest = DateTime.UtcNow;
                 await Task.Delay(10000);
             }
         }
@@ -77,16 +79,16 @@ internal class GoogleTranslateClient
     private async Task<string> MakeRequest(string url)
     {
         string key = Guid.NewGuid().ToString();
-        Queue.Add(key, new RequestItem { Url = url });
+        this.Queue.Add(key, new RequestItem { Url = url });
 
-        while (Queue.ContainsKey(key) && !Queue[key].Resolved && !Queue[key].Failed)
+        while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);
 
-        if (!Queue.ContainsKey(key))
+        if (!this.Queue.ContainsKey(key))
             throw new Exception("The request has been removed from the queue prematurely.");
 
-        var response = Queue[key];
-        Queue.Remove(key);
+        var response = this.Queue[key];
+        this.Queue.Remove(key);
 
         if (response.Resolved)
             return response.Response;
@@ -97,15 +99,15 @@ internal class GoogleTranslateClient
         throw new Exception("This exception should be impossible to get.");
     }
 
-    public async Task<Tuple<string, string>> Translate_a(string sl, string tl, string q)
+    public async Task<Tuple<string, string>> Translate(string SourceLanguage, string TargetLanguage, string Query)
     {
         string query;
 
         using (var content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                    { "sl", sl },
-                    { "tl", tl },
-                    { "q", q },
+                    { "sl", SourceLanguage },
+                    { "tl", TargetLanguage },
+                    { "q", Query },
                 }))
         {
             query = await content.ReadAsStringAsync();
@@ -119,11 +121,11 @@ internal class GoogleTranslateClient
 
         string translationSource = "";
 
-        if (sl == "auto")
+        if (SourceLanguage == "auto")
         {
             var parsedLanguageStep1 = JsonConvert.DeserializeObject<object[]>(parsedResponse[8].ToString());
             var parsedLanguageStep2 = JsonConvert.DeserializeObject<object[]>(parsedLanguageStep1[0].ToString());
-            translationSource = parsedLanguageStep2[0].ToString(); 
+            translationSource = parsedLanguageStep2[0].ToString();
         }
 
         return new Tuple<string, string>(translatedText, translationSource);

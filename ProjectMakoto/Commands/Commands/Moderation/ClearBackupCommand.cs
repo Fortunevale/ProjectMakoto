@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ClearBackupCommand : BaseCommand
+internal sealed class ClearBackupCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageRoles));
 
@@ -22,7 +22,7 @@ internal class ClearBackupCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-        var CommandKey = t.Commands.Moderation.ClearBackup;
+            var CommandKey = this.t.Commands.Moderation.ClearBackup;
 
             if ((await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == victim.Id))
             {

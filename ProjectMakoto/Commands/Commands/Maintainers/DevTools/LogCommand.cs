@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class LogCommand : BaseCommand
+internal sealed class LogCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 
@@ -17,13 +17,13 @@ internal class LogCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            LogLevel Level = (LogLevel)arguments["Level"];
+            CustomLogLevel Level = (CustomLogLevel)arguments["Level"];
 
-            if (Level > Xorog.Logger.Enums.LogLevel.TRACE2)
+            if (Level > CustomLogLevel.Trace2)
                 throw new Exception("Invalid Log Level");
 
             _logger.ChangeLogLevel(Level);
-            await RespondOrEdit($"`Changed LogLevel to '{(LogLevel)Level}'`");
+            await RespondOrEdit($"`Changed LogLevel to '{(CustomLogLevel)Level}'`");
         });
     }
 }

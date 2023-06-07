@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.InviteNotesCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -17,7 +17,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.InviteNotes;
+            var CommandKey = this.t.Commands.Config.InviteNotes;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -37,12 +37,12 @@ internal class ConfigCommand : BaseCommand
                 {
                     AddButton,
                     RemoveButton,
-                }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
-                    .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                    .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
             }
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
@@ -70,13 +70,13 @@ internal class ConfigCommand : BaseCommand
 
                     embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? GetString(t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
-                                      $"`{GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? GetString(t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
+                        Description = $"`{GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? GetString(this.t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
+                                      $"`{GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? GetString(this.t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
                     }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })
-                        .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                        .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
                     var Menu = await ctx.WaitForButtonAsync();
 
@@ -174,7 +174,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

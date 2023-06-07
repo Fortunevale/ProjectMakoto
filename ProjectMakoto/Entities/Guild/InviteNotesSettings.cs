@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class InviteNotesSettings
+public sealed class InviteNotesSettings
 {
     public InviteNotesSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }

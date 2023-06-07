@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class TinyInt : BaseColumn
+public sealed class TinyInt : BaseColumn
 {
     public TinyInt(uint MaxValue = 127)
     {
@@ -22,7 +22,7 @@ public class TinyInt : BaseColumn
     public uint MaxValue { get; private set; } = 127;
 
     private int? _Value { get; set; }
-    public int Value { get => _Value ?? 0; set { _Value = (value > MaxValue ? throw new ArgumentException($"The maximum size for this int is {MaxValue}") : value); } }
+    public int Value { get => this._Value ?? 0; set { this._Value = (value > this.MaxValue ? throw new ArgumentException($"The maximum size for this int is {this.MaxValue}") : value); } }
 
     public static implicit operator int(TinyInt b) => b.Value;
     public static implicit operator uint(TinyInt b) => (uint)b.Value;

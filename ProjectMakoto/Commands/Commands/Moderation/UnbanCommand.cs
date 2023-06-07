@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class UnbanCommand : BaseCommand
+internal sealed class UnbanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.BanMembers) && await CheckOwnPermissions(Permissions.BanMembers));
 
@@ -19,7 +19,7 @@ internal class UnbanCommand : BaseCommand
         {
             DiscordUser victim = (DiscordUser)arguments["victim"];
 
-            var CommandKey = t.Commands.Moderation.Unban;
+            var CommandKey = this.t.Commands.Moderation.Unban;
 
             await RespondOrEdit(new DiscordEmbedBuilder()
                 .WithDescription(GetString(CommandKey.Removing, true, new TVar("Victim", victim.Mention)))

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class InviteNoteEvents
+internal sealed class InviteNoteEvents
 {
     internal InviteNoteEvents(Bot _bot)
     {
@@ -20,9 +20,6 @@ internal class InviteNoteEvents
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        Task.Run(async () =>
-        {
-            _bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
-        }).Add(_bot.watcher);
+        this._bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
     }
 }

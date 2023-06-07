@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.BumpReminderCommand;
 
-internal class ReviewCommand : BaseCommand
+internal sealed class ReviewCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -23,7 +23,7 @@ internal class ReviewCommand : BaseCommand
             var ListEmbed = new DiscordEmbedBuilder
             {
                 Description = BumpReminderCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(t.Commands.Config.BumpReminder.Title));
+            }.AsInfo(ctx, GetString(this.t.Commands.Config.BumpReminder.Title));
             await RespondOrEdit(ListEmbed);
         });
     }

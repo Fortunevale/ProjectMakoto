@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,30 +9,30 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Guild
+public sealed class Guild
 {
     public Guild(ulong serverId, Bot bot)
     {
-        _bot = bot;
+        this._bot = bot;
 
-        ServerId = serverId;
+        this.ServerId = serverId;
 
-        TokenLeakDetection = new(this);
-        PhishingDetection = new(this);
-        BumpReminder = new(this);
-        Join = new(this);
-        Experience = new(this);
-        Crosspost = new(this);
-        ActionLog = new(this);
-        InVoiceTextPrivacy = new(this);
-        InviteTracker = new(this);
-        InviteNotes = new(this);
-        NameNormalizer = new(this);
-        EmbedMessage = new(this);
-        MusicModule = new(this);
-        Polls = new(this, bot);
-        VcCreator = new(this, bot);
-        PrefixSettings = new(this);
+        this.TokenLeakDetection = new(this);
+        this.PhishingDetection = new(this);
+        this.BumpReminder = new(this);
+        this.Join = new(this);
+        this.Experience = new(this);
+        this.Crosspost = new(this);
+        this.ActionLog = new(this);
+        this.InVoiceTextPrivacy = new(this);
+        this.InviteTracker = new(this);
+        this.InviteNotes = new(this);
+        this.NameNormalizer = new(this);
+        this.EmbedMessage = new(this);
+        this.MusicModule = new(this);
+        this.Polls = new(this, bot);
+        this.VcCreator = new(this, bot);
+        this.PrefixSettings = new(this);
     }
 
     public Bot _bot { get; set; }

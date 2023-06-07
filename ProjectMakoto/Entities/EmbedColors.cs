@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class EmbedColors
+internal sealed class EmbedColors
 {
     public static DiscordColor Error => new("dd2e44");
     public static DiscordColor StrongPunishment => DiscordColor.DarkRed;

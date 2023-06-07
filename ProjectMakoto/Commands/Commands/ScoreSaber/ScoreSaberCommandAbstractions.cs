@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ScoreSaberCommandAbstractions
+internal sealed class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
@@ -60,7 +60,7 @@ internal class ScoreSaberCommandAbstractions
                 RecentScoresButton
             };
 
-            List<DiscordComponent> RecentScoreInteractionRow = new() 
+            List<DiscordComponent> RecentScoreInteractionRow = new()
             {
                 OpenProfileInBrowser,
                 ShowProfileButton,
@@ -121,7 +121,7 @@ internal class ScoreSaberCommandAbstractions
                                 embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
                                 await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
-                                
+
                                 return;
                             }
                             catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)

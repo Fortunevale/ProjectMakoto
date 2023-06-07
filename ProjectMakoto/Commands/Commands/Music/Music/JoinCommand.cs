@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Music;
 
-internal class JoinCommand : BaseCommand
+internal sealed class JoinCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckVoiceState() && await CheckOwnPermissions(Permissions.UseVoice) && await CheckOwnPermissions(Permissions.UseVoiceDetection));
 
@@ -44,7 +44,7 @@ internal class JoinCommand : BaseCommand
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.Music.Join.Joined, true),
+                        Description = GetString(this.t.Commands.Music.Join.Joined, true),
                     }.AsSuccess(ctx));
                 return;
             }
@@ -53,7 +53,7 @@ internal class JoinCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Join.AlreadyUsed, true),
+                    Description = GetString(this.t.Commands.Music.Join.AlreadyUsed, true),
                 }.AsError(ctx));
 
                 throw new CancelException();
@@ -68,7 +68,7 @@ internal class JoinCommand : BaseCommand
             if (Announce)
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Join.Joined, true),
+                    Description = GetString(this.t.Commands.Music.Join.Joined, true),
                 }.AsSuccess(ctx));
         });
     }

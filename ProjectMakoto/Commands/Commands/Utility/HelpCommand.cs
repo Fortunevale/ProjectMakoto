@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@ using CommandType = ProjectMakoto.Enums.CommandType;
 
 namespace ProjectMakoto.Commands;
 
-internal class HelpCommand : BaseCommand
+internal sealed class HelpCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -39,7 +39,7 @@ internal class HelpCommand : BaseCommand
                             string commandName = command.NameLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedName) ?? false ? localizedName : command.Name;
                             var commandDescription = command.DescriptionLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedDescription) ?? false ? localizedDescription : command.Description;
 
-                            var descBuilder = $"{GetString(t.Commands.Utility.Help.Disclaimer)}\n\n" +
+                            var descBuilder = $"{GetString(this.t.Commands.Utility.Help.Disclaimer)}\n\n" +
                                        $"`{ctx.Prefix}{command.GenerateUsage(ctx.User.Locale)}` - _{commandDescription}_\n";
 
                             if (command.Options.Any(x => x.Type == ApplicationCommandOptionType.SubCommand))
@@ -57,7 +57,7 @@ internal class HelpCommand : BaseCommand
                         }
                         else
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
                             return;
                         }
                     case CommandType.PrefixCommand:
@@ -65,7 +65,7 @@ internal class HelpCommand : BaseCommand
                         {
                             var command = PrefixCommandsList.First(x => x.Value.Name.ToLower() == command_filter.ToLower());
 
-                            var desc = $"{GetString(t.Commands.Utility.Help.Disclaimer)}\n\n" +
+                            var desc = $"{GetString(this.t.Commands.Utility.Help.Disclaimer)}\n\n" +
                                         $"`{ctx.Prefix}{command.Value.GenerateUsage()}` - _{command.Value.Description}{command.Value.Aliases.GenerateAliases()}_\n";
 
                             try
@@ -79,7 +79,7 @@ internal class HelpCommand : BaseCommand
                         }
                         else
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
+                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
                             return;
                         }
                 }
@@ -114,11 +114,11 @@ internal class HelpCommand : BaseCommand
                     var commandDescription = cmd.DescriptionLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedDescription) ?? false ? localizedDescription : cmd.Description;
                     var commandModuleName = module.ToLower() switch
                     {
-                        "utility" => GetString(t.Commands.ModuleNames.Utility),
-                        "social" => GetString(t.Commands.ModuleNames.Social),
-                        "music" => GetString(t.Commands.ModuleNames.Music),
-                        "moderation" => GetString(t.Commands.ModuleNames.Moderation),
-                        "configuration" => GetString(t.Commands.ModuleNames.Configuration),
+                        "utility" => GetString(this.t.Commands.ModuleNames.Utility),
+                        "social" => GetString(this.t.Commands.ModuleNames.Social),
+                        "music" => GetString(this.t.Commands.ModuleNames.Music),
+                        "moderation" => GetString(this.t.Commands.ModuleNames.Moderation),
+                        "configuration" => GetString(this.t.Commands.ModuleNames.Configuration),
                         _ => module.FirstLetterToUpper(),
                     };
                     Commands.Add(new KeyValuePair<string, string>($"{commandModuleName}", $"{cmd.Mention} - _{commandDescription}_"));
@@ -133,10 +133,10 @@ internal class HelpCommand : BaseCommand
             foreach (var b in Fields)
             {
                 if (!discordEmbeds.ContainsKey(b.Key))
-                    discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx));
+                    discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx));
 
                 if (!discordEmbeds[b.Key].Fields.Any())
-                    discordEmbeds[b.Key].AddField(new DiscordEmbedField(GetString(t.Commands.Utility.Help.Module, new TVar("Module", b.Key)), b.Value));
+                    discordEmbeds[b.Key].AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.Help.Module, new TVar("Module", b.Key)), b.Value));
                 else
                     discordEmbeds[b.Key].AddField(new DiscordEmbedField("󠂪 󠂪", b.Value));
             }
@@ -145,8 +145,8 @@ internal class HelpCommand : BaseCommand
 
             while (true)
             {
-                var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
-                var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
+                var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
+                var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page).Value).AddComponents(PreviousButton, NextButton));
 

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,23 +7,18 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Util.Initializers;
-internal class Plugins
+internal sealed class PluginLoader
 {
     private static string CachedUsings = "";
 
-    public static async Task LoadPlugins(Bot _bot)
+    internal static async Task LoadPlugins(Bot _bot)
     {
         if (_bot.status.LoadedConfig.EnablePlugins)
         {
@@ -48,7 +43,7 @@ internal class Plugins
                         count++;
                         BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
                         result.LoadedFile = new FileInfo(pluginPath);
-                        _bot.Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                        _bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
                     }
                 }
 
@@ -121,19 +116,19 @@ internal class Plugins
         }
     }
 
-    public static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
+    internal static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
     {
-        var applicationHash = ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+        var applicationHash = UniversalExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
 
         foreach (var plugin in _bot.Plugins)
         {
             try
             {
-                var pluginHash = ComputeSHA256Hash(plugin.Value.LoadedFile);
+                var pluginHash = UniversalExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
                 Dictionary<Assembly, string> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
-                _bot.PluginCommands.Add(plugin.Key, pluginCommands.ToList());
+                _bot._PluginCommands.Add(plugin.Key, pluginCommands.ToList());
 
                 if (_bot.status.LoadedConfig.PluginCache.TryGetValue(plugin.Key, out var pluginInfo) &&
                     pluginHash == pluginInfo.LastKnownHash &&
@@ -141,7 +136,7 @@ internal class Plugins
                     pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)))
                 {
                     _logger.LogInfo("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
-                    
+
                     foreach (var b in pluginInfo.CompiledCommands)
                     {
                         PluginLoadContext pluginLoadContext = new(b.Key);
@@ -160,7 +155,7 @@ internal class Plugins
                 pluginInfo.LastKnownHash = pluginHash;
 
                 if (pluginInfo.CompiledCommands.Any())
-                    _ = CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
+                    _ = UniversalExtensions.CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
 
                 pluginInfo.CompiledCommands = new();
 
@@ -187,7 +182,7 @@ internal class Plugins
                                 {{classUsings}}
 
                                 [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
                                 {
                                     public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -225,7 +220,7 @@ internal class Plugins
                                 compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
                                     .AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(code))
                                     .AddReferences(references)
-                                        .WithOptions(options), 
+                                        .WithOptions(options),
                                         new CompilationData("prefix_group", code, rawCommand));
                             }
                             else
@@ -234,7 +229,7 @@ internal class Plugins
                                 $$"""
                                 {{classUsings}}
 
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
                                 {
                                     public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -256,10 +251,10 @@ internal class Plugins
                                 $$"""
                                 {{classUsings}}
 
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                 {
                                     [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}"{{(rawCommand.RequiredPermissions is null ? "" : $", {(long)rawCommand.RequiredPermissions}")}}, dmPermission: {{rawCommand.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{rawCommand.IsNsfw.ToString().ToLower()}})]
-                                    public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                    public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                     {
                                         public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -290,7 +285,7 @@ internal class Plugins
                                 $$"""
                                 {{classUsings}}
 
-                                public class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
                                 {
                                     public {{nameof(Bot)}} _bot { private get; set; }
 
@@ -510,7 +505,7 @@ internal class Plugins
             }
             """;
     }
-    
+
     private static string GetGroupMethodCode(KeyValuePair<string, BasePlugin> PluginIdentifier, string ContextName, BasePluginCommand Command, BasePluginCommand Parent)
     {
         var TaskName = GetUniqueCodeCompatibleName();

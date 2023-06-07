@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,6 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Octokit;
 using ProjectMakoto.Entities.Plugins.Commands;
 
 namespace ProjectMakoto.Plugins;
@@ -15,29 +16,47 @@ public abstract class BasePlugin
 {
     public BasePlugin()
     {
-        this._logger = Log._logger;
+        this._logger = new(Log._logger, this);
     }
 
     internal FileInfo LoadedFile { get; set; }
 
     public Bot _bot { get; set; }
-    public Logger _logger { get; set; }
-    public ApplicationCommandsExtension DiscordCommandsModule { get; set; }
-    
+
+    /// <summary>
+    /// Allows you to log events.
+    /// </summary>
+    public PluginLoggerClient _logger { get; set; }
+
+    /// <summary>
+    /// Whether the client logged into discord.
+    /// </summary>
     public bool DiscordInitialized
-        => _bot.status.DiscordInitialized;
-    
+        => this._bot.status.DiscordInitialized;
+
+    /// <summary>
+    /// Whether the guild download has been completed.
+    /// </summary>
     public bool DiscordGuildDownloadCompleted
-        => _bot.status.DiscordGuildDownloadCompleted;
-    
+        => this._bot.status.DiscordGuildDownloadCompleted;
+
+    /// <summary>
+    /// Whether the commands have been registered.
+    /// </summary>
     public bool DiscordCommandsRegistered
-        => _bot.status.DiscordCommandsRegistered;
+        => this._bot.status.DiscordCommandsRegistered;
 
+    /// <summary>
+    /// Whether the database connection has been established.
+    /// </summary>
     public bool DatabaseInitialized
-        => _bot.status.DatabaseInitialized;
+        => this._bot.status.DatabaseInitialized;
 
+    /// <summary>
+    /// Whether the database content has loaded.
+    /// </summary>
     public bool DatabaseInitialLoadCompleted
-        => _bot.status.DatabaseInitialLoadCompleted;
+        => this._bot.status.DatabaseInitialLoadCompleted;
 
     /// <summary>
     /// The name of this plugin.
@@ -77,16 +96,14 @@ public abstract class BasePlugin
     public void Load(Bot bot)
     {
         this._bot = bot;
-        this.Initialize();
+        Initialize();
 
         _ = _ = Task.Run(async () =>
         {
-            while (!DiscordInitialized)
+            while (!this.DiscordInitialized)
             {
                 await Task.Delay(1000);
             }
-
-            this.DiscordCommandsModule = bot.discordClient.GetApplicationCommands();
         });
     }
 
@@ -108,19 +125,19 @@ public abstract class BasePlugin
     }
 
     public object GetConfig()
-        => (_bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
+        => (this._bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
 
     public void WriteConfig(object configObject)
     {
-        if (!_bot.status.LoadedConfig.PluginData.ContainsKey(this.Name))
-            _bot.status.LoadedConfig.PluginData.Add(this.Name, null);
+        if (!this._bot.status.LoadedConfig.PluginData.ContainsKey(this.Name))
+            this._bot.status.LoadedConfig.PluginData.Add(this.Name, null);
 
-        _bot.status.LoadedConfig.PluginData[this.Name] = configObject;
-        _bot.status.LoadedConfig.Save();
+        this._bot.status.LoadedConfig.PluginData[this.Name] = configObject;
+        this._bot.status.LoadedConfig.Save();
     }
 
-    public bool CheckIfConfigExists() 
-        => _bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
+    public bool CheckIfConfigExists()
+        => this._bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
 
     internal async Task CheckForUpdates()
     {
@@ -135,7 +152,7 @@ public abstract class BasePlugin
         var Owner = regex.Groups[1].Value;
         var Repository = regex.Groups[2].Value;
 
-        GitHubClient client = new(new ProductHeaderValue("ProjectMakoto"));
+        GitHubClient client = new(new ProductHeaderValue("ProjectMakoto", this._bot.status.RunningVersion));
 
         if (this.UpdateUrlCredentials is not null)
             client.Credentials = this.UpdateUrlCredentials;
@@ -148,17 +165,17 @@ public abstract class BasePlugin
 
             if ((int)latestVersion > (int)currentVersion)
             {
-                _logger.LogWarn("Plugin '{PluginName}' has an update available. The installed version is '{CurrentVersion}' and the latest version is '{LatestVersion}'.", this.Name, currentVersion, latestVersion);
+                this._logger.LogWarn("Update found. The installed version is '{CurrentVersion}' and the latest version is '{LatestVersion}'.", currentVersion, latestVersion);
 
-                if (UpdateUrlCredentials is not null)
+                if (this.UpdateUrlCredentials is not null)
                 {
-                    _logger.LogInfo("Plugin '{PluginName}' has a private repository. Downloading latest version to 'UpdatedPlugins' Directory..", this.Name);
+                    this._logger.LogInfo("Private repository detected. Downloading latest version to 'UpdatedPlugins' Directory..");
                     Directory.CreateDirectory("UpdatedPlugins");
                     HttpClient downloadClient = new();
 
                     var asset = release.Assets.First(x => x.Name.EndsWith(".dll"));
 
-                    using (var fileStream = new FileStream($"UpdatedPlugins/{asset.Name}", FileMode.Create, FileAccess.ReadWrite))
+                    using (var fileStream = new FileStream($"UpdatedPlugins/{asset.Name}", System.IO.FileMode.Create, FileAccess.ReadWrite))
                     {
                         var downloadStream = await downloadClient.GetStreamAsync(asset.BrowserDownloadUrl);
                         await downloadStream.CopyToAsync(fileStream);
@@ -166,17 +183,17 @@ public abstract class BasePlugin
                 }
                 else
                 {
-                    _logger.LogWarn("You can find the update for '{PluginName}' at '{LatestReleaseUrl}'", this.Name, release.HtmlUrl);
+                    this._logger.LogWarn("You can download the update at '{LatestReleaseUrl}'", release.HtmlUrl);
                 }
             }
         }
         catch (ApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            _logger.LogError("The repository of '{PluginName}' could not be found at '{RepoUrl}', the repo is private or the credentials are outdated.", this.Name, this.UpdateUrl);
+            this._logger.LogError("The repository could not be found at '{RepoUrl}', is the repo private, the credentials outdated or no release published?", this.UpdateUrl);
         }
         catch (Exception ex)
         {
-            _logger.LogError("Could not check for a new version of '{PluginName}'", ex, this.Name);
+            this._logger.LogError("Could not check for a new version", ex);
         }
     }
 }

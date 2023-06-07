@@ -9,22 +9,22 @@
 
 namespace ProjectMakoto.Entities;
 
-public class User
+public sealed class User
 {
     public User(Bot _bot, ulong userId)
     {
         if (_bot.objectedUsers.Contains(userId))
             throw new InvalidOperationException($"User {userId} has objected to having their data processed.");
 
-        Cooldown = new(_bot);
-        UserId = userId;
+        this.Cooldown = new(_bot);
+        this.UserId = userId;
 
-        UrlSubmissions = new(this);
-        AfkStatus = new(this);
-        ScoreSaber = new(this);
-        ExperienceUser = new(this);
-        Reminders = new(this, _bot);
-        Translation = new(this);
+        this.UrlSubmissions = new(this);
+        this.AfkStatus = new(this);
+        this.ScoreSaber = new(this);
+        this.ExperienceUser = new(this);
+        this.Reminders = new(this, _bot);
+        this.Translation = new(this);
     }
 
     [JsonIgnore]

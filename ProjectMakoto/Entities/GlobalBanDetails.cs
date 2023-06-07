@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class GlobalBanDetails
+internal sealed class GlobalBanDetails
 {
     public string Reason { get; set; }
 

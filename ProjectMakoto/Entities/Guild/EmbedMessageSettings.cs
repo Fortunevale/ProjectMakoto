@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class EmbedMessageSettings
+public sealed class EmbedMessageSettings
 {
     public EmbedMessageSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -23,22 +23,22 @@ public class EmbedMessageSettings
     private bool _UseEmbedding { get; set; } = false;
     public bool UseEmbedding
     {
-        get => _UseEmbedding;
+        get => this._UseEmbedding;
         set
         {
-            _UseEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "embed_messages", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._UseEmbedding = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "embed_messages", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
     private bool _UseGithubEmbedding { get; set; } = false;
     public bool UseGithubEmbedding
     {
-        get => _UseGithubEmbedding;
+        get => this._UseGithubEmbedding;
         set
         {
-            _UseGithubEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "embed_github", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._UseGithubEmbedding = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "embed_github", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

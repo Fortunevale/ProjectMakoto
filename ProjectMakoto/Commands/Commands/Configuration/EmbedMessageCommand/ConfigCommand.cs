@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.EmbedMessageCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -17,7 +17,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.EmbedMessages;
+            var CommandKey = this.t.Commands.Config.EmbedMessages;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -36,7 +36,7 @@ internal class ConfigCommand : BaseCommand
                 ToggleMsg,
                 ToggleGithub
             })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -62,7 +62,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

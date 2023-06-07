@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class StatusIndicatorIcons
+internal sealed class StatusIndicatorIcons
 {
     public static readonly string Loading = "https://media.discordapp.net/attachments/1005430437952356423/1006676441343201370/Loading.gif";
     public static readonly string Success = "https://media.discordapp.net/attachments/1005430437952356423/1006676420770136114/CheckMark_Icon.png";

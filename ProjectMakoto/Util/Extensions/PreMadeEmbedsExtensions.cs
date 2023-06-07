@@ -17,7 +17,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -29,7 +29,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Loading;
 
         b.Color = EmbedColors.Processing;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -40,7 +40,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
 
         b.Color = EmbedColors.Info;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -51,7 +51,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
 
         b.Color = EmbedColors.Info;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -62,7 +62,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author = ctx.Channel?.IsPrivate ?? false ? MakeDefaultBotAuthor(ctx.Client, CustomText) : MakeDefaultAuthor(ctx.Guild, CustomText);
 
         b.Color = EmbedColors.AwaitingInput;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -73,7 +73,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author = MakeDefaultBotAuthor(ctx.Client, CustomText);
 
         b.Color = EmbedColors.AwaitingInput;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -85,7 +85,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -97,7 +97,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Error;
 
         b.Color = EmbedColors.Error;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -109,7 +109,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -121,7 +121,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Warning;
 
         b.Color = EmbedColors.Warning;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -133,7 +133,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -145,7 +145,7 @@ internal static class PreMadeEmbedsExtensions
         b.Author.IconUrl = StatusIndicatorIcons.Success;
 
         b.Color = EmbedColors.Success;
-        b.Footer = ctx.User.GenerateUsedByFooter(ctx.DbUser, CustomFooterText);
+        b.Footer = ctx.GenerateUsedByFooter(CustomFooterText);
         b.Timestamp = DateTime.UtcNow;
 
         return b;
@@ -164,20 +164,17 @@ internal static class PreMadeEmbedsExtensions
     };
 
     public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this SharedCommandContext ctx, string addText = "", string customIcon = "")
-        => ctx.User.GenerateUsedByFooter(ctx.DbUser, addText, customIcon);
-
-    public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this DiscordUser user, User dbUser, string addText = "", string customIcon = "") 
         => new()
         {
-            IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : user.AvatarUrl),
-            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(dbUser).Build(new TVar("User", user.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
+            Text = $"{ctx.Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.DbUser).Build(new TVar("User", ctx.User.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
     public static DiscordEmbedBuilder.EmbedFooter GenerateUsedByFooter(this CommandContext ctx, string addText = "", string customIcon = "")
         => new()
         {
             IconUrl = (!customIcon.IsNullOrWhiteSpace() ? customIcon : ctx.User.AvatarUrl),
-            Text = $"{Bot.loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Build(new TVar("User", ctx.User.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
+            Text = $"{((Bot)ctx.Services.GetService(typeof(Bot))).loadedTranslations.Commands.Common.UsedByFooter.Get(ctx.User).Build(new TVar("User", ctx.User.GetUsernameWithIdentifier()))}{(string.IsNullOrEmpty(addText) ? "" : $" • {addText}")}"
         };
 
     public static async Task<DiscordMessage> SendCommandGroupHelp(this IReadOnlyList<Command> cmds, CommandContext ctx, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
@@ -197,7 +194,7 @@ internal static class PreMadeEmbedsExtensions
 
         if (!string.IsNullOrWhiteSpace(CustomText))
             embed.Description += CustomText;
-        
+
         if (!string.IsNullOrWhiteSpace(CustomImageUrl))
             embed.ImageUrl += CustomImageUrl;
 
@@ -223,7 +220,7 @@ internal static class PreMadeEmbedsExtensions
         };
 
         if (ctx.Client.GetCommandsNext()
-            .RegisteredCommands[ ctx.Command.Name ].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
+            .RegisteredCommands[ctx.Command.Name].Overloads[0].Arguments[0].Type.Name is "DiscordUser" or "DiscordMember")
             embed.Description += "\n\n_Tip: Make sure you copied the user id and not a server, channel or message id._";
 
         var msg = await ctx.Channel.SendMessageAsync(embed: embed, content: ctx.User.Mention);
@@ -289,7 +286,7 @@ internal static class PreMadeEmbedsExtensions
         }
         return Usage.SanitizeForCode();
     }
-    
+
     public static string GenerateUsage(this DiscordApplicationCommandOption cmd, string? locale = null)
     {
         string Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;

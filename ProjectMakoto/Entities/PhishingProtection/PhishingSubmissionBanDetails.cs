@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto;
 
-internal class PhishingSubmissionBanDetails
+internal sealed class PhishingSubmissionBanDetails
 {
     public string Reason { get; set; }
 

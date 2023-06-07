@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,31 +9,31 @@
 
 namespace ProjectMakoto.Entities.SystemMonitor;
 
-public class SystemInfo
+public sealed class SystemInfo
 {
     public CpuInfo Cpu { get; set; } = new();
     public MemoryInfo Memory { get; set; } = new();
     public NetworkInfo Network { get; set; } = new();
 
-    public class CpuInfo
+    public sealed class CpuInfo
     {
         public float Load { get; set; } = 0;
         public float Temperature { get; set; } = 0;
     }
 
-    public class MemoryInfo
+    public sealed class MemoryInfo
     {
         public float Available { get; set; } = 0;
         public float Used { get; set; } = 0;
 
         public float Total
         {
-            get { return Available + Used; }
-            set { Available = value - Used; }
+            get { return this.Available + this.Used; }
+            set { this.Available = value - this.Used; }
         }
     }
 
-    public class NetworkInfo
+    public sealed class NetworkInfo
     {
         public float TotalDownloaded { get; set; } = 0;
         public float TotalUploaded { get; set; } = 0;

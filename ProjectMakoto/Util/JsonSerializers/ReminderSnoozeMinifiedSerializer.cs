@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,7 +10,7 @@
 using Newtonsoft.Json.Linq;
 
 namespace ProjectMakoto.Util.JsonSerializers;
-public class ReminderSnoozeMinifiedSerializer : JsonConverter
+public sealed class ReminderSnoozeMinifiedSerializer : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {

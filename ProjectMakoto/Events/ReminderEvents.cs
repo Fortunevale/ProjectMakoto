@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Events;
-internal class ReminderEvents
+internal sealed class ReminderEvents
 {
     internal ReminderEvents(Bot _bot)
     {
@@ -29,19 +29,16 @@ internal class ReminderEvents
             if (privateButtonType != PrivateButtonType.ReminderSnooze)
                 return;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return;
         }
 
         ReminderSnoozeButton reminder = JsonConvert.DeserializeObject<ReminderSnoozeButton>(e.Id);
 
-        Task.Run(async () =>
+        new RemindersCommand().ExecuteCommand(e, sender, "reminders", this._bot, new Dictionary<string, object>
         {
-            await new RemindersCommand().ExecuteCommand(e, sender, "reminders", _bot, new Dictionary<string, object>
-                {
-                    { "description", reminder.Description },
-                });
-        }).Add(_bot.watcher);
+            { "description", reminder.Description },
+        }).Add(this._bot.watcher);
     }
 }

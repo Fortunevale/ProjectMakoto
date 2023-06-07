@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,14 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ProjectMakoto.PrefixCommands;
-public class PrefixCommandUtil
+public sealed class PrefixCommandUtil
 {
     public static async Task SendGroupHelp(Bot _bot, CommandContext ctx, string CommandName, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
     {

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Music;
 
-internal class ForceClearQueueCommand : BaseCommand
+internal sealed class ForceClearQueueCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
 
@@ -28,7 +28,7 @@ internal class ForceClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -37,7 +37,7 @@ internal class ForceClearQueueCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
+                    Description = GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
                 }.AsError(ctx));
                 return;
             }
@@ -47,7 +47,7 @@ internal class ForceClearQueueCommand : BaseCommand
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Music.ForceClearQueue.Cleared, true),
+                Description = GetString(this.t.Commands.Music.ForceClearQueue.Cleared, true),
             }.AsSuccess(ctx));
         });
     }

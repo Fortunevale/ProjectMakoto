@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.JoinCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -17,7 +17,7 @@ internal class ConfigCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.Join;
+            var CommandKey = this.t.Commands.Config.Join;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -47,7 +47,7 @@ internal class ConfigCommand : BaseCommand
                 ChangeJoinlogChannel,
                 ChangeRoleOnJoin,
             })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -106,7 +106,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoChannels)));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels)));
                         await Task.Delay(3000);
                         await ExecuteCommand(ctx, arguments);
                         return;
@@ -138,7 +138,7 @@ internal class ConfigCommand : BaseCommand
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(t.Commands.Common.Errors.NoRoles)));
+                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoRoles)));
                         await Task.Delay(3000);
                         return;
                     }
@@ -159,7 +159,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
             }

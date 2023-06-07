@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ScoreSaberUnlinkCommand : BaseCommand
+internal sealed class ScoreSaberUnlinkCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -24,14 +24,14 @@ internal class ScoreSaberUnlinkCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.ScoreSaber.Unlink.Unlinked, true)
+                    Description = GetString(this.t.Commands.ScoreSaber.Unlink.Unlinked, true)
                 }.AsSuccess(ctx, "Score Saber")));
             }
             else
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.ScoreSaber.Unlink.NoLink, true)
+                    Description = GetString(this.t.Commands.ScoreSaber.Unlink.NoLink, true)
                 }.AsError(ctx, "Score Saber")));
             }
         });

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities.Database.ColumnTypes;
 
-public class Text : BaseColumn
+public sealed class Text : BaseColumn
 {
     public Text(long MaxLength = 65535)
     {
@@ -22,7 +22,7 @@ public class Text : BaseColumn
     public long MaxLength { get; private set; } = 65535;
 
     private string? _Value { get; set; } = "";
-    public string Value { get => _Value.IsNullOrEmpty() ? "" : _Value; set { _Value = (value.Length.ToInt64() > MaxLength ? throw new ArgumentException($"The maximum length for this string is {MaxLength}") : value); } }
+    public string Value { get => this._Value.IsNullOrEmpty() ? "" : this._Value; set { this._Value = (value.Length.ToInt64() > this.MaxLength ? throw new ArgumentException($"The maximum length for this string is {this.MaxLength}") : value); } }
 
     public static implicit operator string(Text b) => b.Value;
     public static implicit operator Text(string v) => new() { Value = v ?? "" };

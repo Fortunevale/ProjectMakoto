@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ internal static class UserExtensions
         return false;
     }
 
-    internal static bool IsMaintenance(this DiscordMember member, Status _status) 
+    internal static bool IsMaintenance(this DiscordMember member, Status _status)
         => (member as DiscordUser).IsMaintenance(_status);
 
     internal static bool IsMaintenance(this DiscordUser user, Status _status)

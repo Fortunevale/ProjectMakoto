@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class EmojiTemplates
+internal sealed class EmojiTemplates
 {
     public static DiscordEmoji GetCheckboxTickedRed(Bot bot) => DiscordEmoji.FromGuildEmote(bot.discordClient, bot.status.LoadedConfig.Emojis.CheckboxTickedRedId);
     public static DiscordEmoji GetCheckboxUntickedRed(Bot bot) => DiscordEmoji.FromGuildEmote(bot.discordClient, bot.status.LoadedConfig.Emojis.CheckboxUntickedRedId);

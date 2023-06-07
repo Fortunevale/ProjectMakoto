@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class CustomEmbedCommand : BaseCommand
+internal sealed class CustomEmbedCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.EmbedLinks));
 
@@ -17,7 +17,7 @@ internal class CustomEmbedCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Moderation.CustomEmbed;
+            var CommandKey = this.t.Commands.Moderation.CustomEmbed;
 
             var GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.New));
 
@@ -49,7 +49,7 @@ internal class CustomEmbedCommand : BaseCommand
                                         .AddComponents(new List<DiscordComponent> { SetDescription, SetImage, SetColor })
                                         .AddComponents(new List<DiscordComponent> { SetFooter, SetTimestamp })
                                         .AddComponents(new List<DiscordComponent> { AddField, ModifyField, RemoveField })
-                                        .AddComponents(new List<DiscordComponent> { FinishAndSend, MessageComponents.GetCancelButton(ctx.DbUser) }));
+                                        .AddComponents(new List<DiscordComponent> { FinishAndSend, MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }));
                     }
                     catch (Exception)
                     {
@@ -122,7 +122,7 @@ internal class CustomEmbedCommand : BaseCommand
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetName, SetUrl, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
-                            .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser) }));
+                            .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot) }));
 
                         var Menu2 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
@@ -275,7 +275,7 @@ internal class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser).CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot).CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -428,7 +428,7 @@ internal class CustomEmbedCommand : BaseCommand
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetText, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
-                            .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser) }));
+                            .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot) }));
 
                         var Menu2 = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(15));
 
@@ -548,7 +548,7 @@ internal class CustomEmbedCommand : BaseCommand
                             };
                             continue;
                         }
-                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser).CustomId)
+                        else if (Menu2.GetCustomId() == MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot).CustomId)
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                             continue;
@@ -735,7 +735,7 @@ internal class CustomEmbedCommand : BaseCommand
                         DeleteOrInvalidate();
                         return;
                     }
-                    else if (Menu1.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                    else if (Menu1.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
                         DeleteOrInvalidate();

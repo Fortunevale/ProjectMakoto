@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
-internal class AddCommand : BaseCommand
+internal sealed class AddCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -108,7 +108,7 @@ internal class AddCommand : BaseCommand
                         throw new ArgumentException("Interaction expected");
                 }
             }
-            
+
             if (arguments?.ContainsKey("emoji_parameter") ?? false)
             {
                 emoji_parameter = (DiscordEmoji)arguments["emoji_parameter"];

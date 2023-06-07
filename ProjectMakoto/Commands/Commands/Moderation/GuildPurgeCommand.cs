@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class GuildPurgeCommand : BaseCommand
+internal sealed class GuildPurgeCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ManageMessages) && await CheckPermissions(Permissions.ManageChannels) && await CheckOwnPermissions(Permissions.ManageMessages));
 
@@ -17,7 +17,7 @@ internal class GuildPurgeCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Moderation.GuildPurge;
+            var CommandKey = this.t.Commands.Moderation.GuildPurge;
 
             int number = (int)arguments["number"];
             DiscordUser victim = (DiscordUser)arguments["victim"];
@@ -51,7 +51,7 @@ internal class GuildPurgeCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
                     WithDescription($"{GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention))}\n" +
-                                    $"`{GenerateASCIIProgressbar(currentProg, maxProg)} {CalculatePercentage(currentProg, maxProg),3}%`")
+                                    $"`{UniversalExtensions.GenerateASCIIProgressbar(currentProg, maxProg)} {UniversalExtensions.CalculatePercentage(currentProg, maxProg),3}%`")
                     .AsLoading(ctx)));
 
                 int MessageInt = number;
@@ -120,7 +120,7 @@ internal class GuildPurgeCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
-                                 $"`{GenerateASCIIProgressbar(currentProg, maxProg)} {CalculatePercentage(currentProg, maxProg)}%`")
+                                 $"`{UniversalExtensions.GenerateASCIIProgressbar(currentProg, maxProg)} {UniversalExtensions.CalculatePercentage(currentProg, maxProg)}%`")
                 .AsLoading(ctx)));
 
             currentProg = 0;
@@ -135,7 +135,7 @@ internal class GuildPurgeCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
-                                         $"`{GenerateASCIIProgressbar(currentProg, maxProg)} {CalculatePercentage(currentProg, maxProg)}%`")
+                                         $"`{UniversalExtensions.GenerateASCIIProgressbar(currentProg, maxProg)} {UniversalExtensions.CalculatePercentage(currentProg, maxProg)}%`")
                         .AsLoading(ctx)));
 
                     while (channel.Value.Count > 0)

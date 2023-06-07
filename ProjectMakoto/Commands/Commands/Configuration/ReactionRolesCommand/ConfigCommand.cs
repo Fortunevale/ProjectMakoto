@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -40,7 +40,7 @@ internal class ConfigCommand : BaseCommand
             {
                 AddButton, RemoveButton
             })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -84,7 +84,7 @@ internal class ConfigCommand : BaseCommand
 
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(action_embed)
                         .AddComponents(new List<DiscordComponent> { SelectMessage, SelectEmoji, SelectRole, Finish })
-                        .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                        .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
                     var Menu = await ctx.WaitForButtonAsync();
 
@@ -302,7 +302,7 @@ internal class ConfigCommand : BaseCommand
                         await ExecuteCommand(ctx, arguments);
                         return;
                     }
-                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+                    else if (Menu.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
@@ -338,7 +338,7 @@ internal class ConfigCommand : BaseCommand
                 if (ctx.Guild.GetChannel(obj.Value.ChannelId).TryGetMessage(obj.Key, out var reactionMessage))
                     _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-                var role = ctx.Guild.GetRole(obj.Value.RoleId);                
+                var role = ctx.Guild.GetRole(obj.Value.RoleId);
 
                 ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(obj);
 
@@ -348,7 +348,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

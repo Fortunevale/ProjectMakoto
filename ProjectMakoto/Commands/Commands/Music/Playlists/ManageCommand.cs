@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Playlists;
 
-internal class ManageCommand : BaseCommand
+internal sealed class ManageCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -28,18 +28,18 @@ internal class ManageCommand : BaseCommand
 
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
             {
-                Description = $"{(ctx.DbUser.UserPlaylists.Count > 0 ? string.Join("\n", ctx.DbUser.UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCode()}`: `{x.List.Count} {GetString(t.Commands.Music.Playlists.Tracks)}`")) : GetString(t.Commands.Music.Playlists.Manage.NoPlaylists, true))}"
-            }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                Description = $"{(ctx.DbUser.UserPlaylists.Count > 0 ? string.Join("\n", ctx.DbUser.UserPlaylists.Select(x => $"**{GetCount()}**. `{x.PlaylistName.SanitizeForCode()}`: `{x.List.Count} {GetString(this.t.Commands.Music.Playlists.Tracks)}`")) : GetString(this.t.Commands.Music.Playlists.Manage.NoPlaylists, true))}"
+            }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
-            var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.AddToQueueButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
-            var SharePlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.ShareButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📎")));
-            var ExportPlaylist = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.ExportButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
+            var AddToQueue = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.AddToQueueButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📤")));
+            var SharePlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.ShareButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📎")));
+            var ExportPlaylist = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.ExportButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
 
-            var ImportPlaylist = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
-            var SaveCurrent = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.SaveCurrentButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💾")));
-            var NewPlaylist = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.CreateNewButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var ModifyPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.ModifyButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚙")));
-            var DeletePlaylist = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(t.Commands.Music.Playlists.Manage.DeleteButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            var ImportPlaylist = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
+            var SaveCurrent = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.SaveCurrentButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💾")));
+            var NewPlaylist = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.CreateNewButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var ModifyPlaylist = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.ModifyButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚙")));
+            var DeletePlaylist = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.Manage.DeleteButton), (ctx.DbUser.UserPlaylists.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
             await RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent> {
@@ -58,7 +58,7 @@ internal class ManageCommand : BaseCommand
                 ModifyPlaylist,
                 DeletePlaylist
             })
-            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
@@ -74,8 +74,8 @@ internal class ManageCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Manage.PlaylistSelectorQueue, true)
-                }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.Manage.PlaylistSelectorQueue, true)
+                }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
                 var PlaylistResult = await PromptCustomSelection(GetPlaylistOptions());
 
@@ -104,8 +104,8 @@ internal class ManageCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Manage.PlaylistSelectorShare, true)
-                }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.Manage.PlaylistSelectorShare, true)
+                }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
                 var PlaylistResult = await PromptCustomSelection(GetPlaylistOptions());
 
@@ -134,8 +134,8 @@ internal class ManageCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Manage.PlaylistSelectorExport, true)
-                }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.Manage.PlaylistSelectorExport, true)
+                }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
                 var PlaylistResult = await PromptCustomSelection(GetPlaylistOptions());
 
@@ -181,8 +181,8 @@ internal class ManageCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Manage.PlaylistSelectorModify, true)
-                }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.Manage.PlaylistSelectorModify, true)
+                }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
                 var PlaylistResult = await PromptCustomSelection(GetPlaylistOptions());
 
@@ -211,8 +211,8 @@ internal class ManageCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Manage.PlaylistSelectorDelete, true)
-                }.AsAwaitingInput(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.Manage.PlaylistSelectorDelete, true)
+                }.AsAwaitingInput(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
                 var PlaylistResult = await PromptCustomSelection(GetPlaylistOptions());
 
@@ -245,7 +245,7 @@ internal class ManageCommand : BaseCommand
             }
 
             List<DiscordStringSelectComponentOption> GetPlaylistOptions()
-            => ctx.DbUser.UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} {GetString(t.Commands.Music.Playlists.Tracks)}")).ToList();
+            => ctx.DbUser.UserPlaylists.Select(x => new DiscordStringSelectComponentOption($"{x.PlaylistName}", x.PlaylistId, $"{x.List.Count} {GetString(this.t.Commands.Music.Playlists.Tracks)}")).ToList();
         });
     }
 }

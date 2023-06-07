@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ScoreSaberProfileCommand : BaseCommand
+internal sealed class ScoreSaberProfileCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -36,7 +36,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                         {
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetString(t.Commands.ScoreSaber.Profile.InvalidInput, true)
+                                Description = GetString(this.t.Commands.ScoreSaber.Profile.InvalidInput, true)
                             }.AsError(ctx, "Score Saber")));
                             return;
                         }
@@ -48,7 +48,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.ScoreSaber.Profile.NoUser, true)
+                        Description = GetString(this.t.Commands.ScoreSaber.Profile.NoUser, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }
@@ -62,7 +62,7 @@ internal class ScoreSaberProfileCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(t.Commands.ScoreSaber.Profile.NoProfile, true)
+                        Description = GetString(this.t.Commands.ScoreSaber.Profile.NoProfile, true)
                     }.AsError(ctx, "Score Saber")));
                     return;
                 }

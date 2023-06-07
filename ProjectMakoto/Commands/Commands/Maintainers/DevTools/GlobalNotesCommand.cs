@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class GlobalNotesCommand : BaseCommand
+internal sealed class GlobalNotesCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 
@@ -48,7 +48,7 @@ internal class GlobalNotesCommand : BaseCommand
                     .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var list) ? list.Count : 0)} global notes.`")
                     .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
                 .AddComponents(new List<DiscordComponent> { AddButton, RemoveButton })
-                .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+                .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -87,7 +87,7 @@ internal class GlobalNotesCommand : BaseCommand
                 }
 
                 user.Add(new GlobalBanDetails { Moderator = ctx.User.Id, Reason = note });
-                
+
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -117,7 +117,7 @@ internal class GlobalNotesCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
                 return;

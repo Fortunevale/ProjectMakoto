@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class TimeoutCommand : BaseCommand
+internal sealed class TimeoutCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.ModerateMembers) && await CheckOwnPermissions(Permissions.ModerateMembers));
 
@@ -35,7 +35,7 @@ internal class TimeoutCommand : BaseCommand
                 throw;
             }
 
-            var CommandKey = t.Commands.Moderation.Timeout;
+            var CommandKey = this.t.Commands.Moderation.Timeout;
 
             await RespondOrEdit(new DiscordEmbedBuilder()
                 .WithDescription(GetString(CommandKey.TimingOut, true, new TVar("Victim", victim.Mention)))

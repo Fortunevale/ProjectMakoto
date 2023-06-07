@@ -10,7 +10,7 @@
 namespace ProjectMakoto.Entities;
 
 [AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
-public class CommandModuleAttribute : Attribute
+public sealed class CommandModuleAttribute : Attribute
 {
     public readonly string ModuleString;
 

@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Events;
 
-internal class GenericGuildEvents
+internal sealed class GenericGuildEvents
 {
     internal GenericGuildEvents(Bot _bot)
     {
@@ -20,120 +20,98 @@ internal class GenericGuildEvents
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        Task.Run(async () =>
+        if (!this._bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this._bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this._bot.guilds[e.Guild.Id], e.Member.Id));
+
+
+        if (this._bot.guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate == DateTime.UnixEpoch)
+            this._bot.guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate = e.Member.JoinedAt.UtcDateTime;
+
+        if (this._bot.guilds[e.Guild.Id].Join.ReApplyNickname)
+            if (this._bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate.ToUniversalTime().GetTimespanSince().TotalDays < 60)
+                e.Member.ModifyAsync(x => x.Nickname = this._bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname).Add(this._bot.watcher);
+
+        this._bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UnixEpoch;
+
+        if (!this._bot.guilds[e.Guild.Id].Join.ReApplyRoles)
+            return;
+
+        if (e.Member.IsBot)
+            return;
+
+        if (this._bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate.ToUniversalTime().GetTimespanSince().TotalDays > 60)
+            return;
+
+        if (this._bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles.Count > 0)
         {
-            if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
+            var HighestRoleOnBot = (await e.Guild.GetMemberAsync(sender.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
 
+            List<MemberRole> disallowedRoles = new();
+            List<MemberRole> deletedRoles = new();
 
-            if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate == DateTime.UnixEpoch)
-                _bot.guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate = e.Member.JoinedAt.UtcDateTime;
+            List<DiscordRole> rolesToApply = new();
 
-            if (_bot.guilds[e.Guild.Id].Join.ReApplyNickname)
-                if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate.ToUniversalTime().GetTimespanSince().TotalDays < 60)
-                    e.Member.ModifyAsync(x => x.Nickname = _bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname).Add(_bot.watcher);
-
-            Task task = Task.Run(async () =>
+            foreach (var b in this._bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles)
             {
-                if (!_bot.guilds[e.Guild.Id].Join.ReApplyRoles)
-                    return;
-
-                if (e.Member.IsBot)
-                    return;
-
-                if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate.ToUniversalTime().GetTimespanSince().TotalDays > 60)
-                    return;
-
-                if (_bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles.Count > 0)
+                if (!e.Guild.Roles.ContainsKey(b.Id))
                 {
-                    var HighestRoleOnBot = (await e.Guild.GetMemberAsync(sender.CurrentUser.Id)).Roles.OrderByDescending(x => x.Position).First().Position;
+                    deletedRoles.Add(b);
+                    continue;
+                }
 
-                    List<MemberRole> disallowedRoles = new();
-                    List<MemberRole> deletedRoles = new();
+                var role = e.Guild.GetRole(b.Id);
 
-                    List<DiscordRole> rolesToApply = new();
-
-                    foreach (var b in _bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles)
+                foreach (var perm in Resources.ProtectedPermissions)
+                    if (role.CheckPermission(perm) == PermissionLevel.Allowed)
                     {
-                        if (!e.Guild.Roles.ContainsKey(b.Id))
-                        {
-                            deletedRoles.Add(b);
-                            continue;
-                        }
-
-                        var role = e.Guild.GetRole(b.Id);
-
-                        foreach (var perm in Resources.ProtectedPermissions)
-                            if (role.CheckPermission(perm) == PermissionLevel.Allowed)
-                            {
-                                disallowedRoles.Add(b);
-                                continue;
-                            }
-
-                        if (role.IsManaged || role.Position >= HighestRoleOnBot)
-                        {
-                            disallowedRoles.Add(b);
-                            continue;
-                        }
-
-                        rolesToApply.Add(role);
+                        disallowedRoles.Add(b);
+                        continue;
                     }
 
-                    if (rolesToApply.Count > 0)
-                        e.Member.ReplaceRolesAsync(rolesToApply, "Role Backup").Add(_bot.watcher);
+                if (role.IsManaged || role.Position >= HighestRoleOnBot)
+                {
+                    disallowedRoles.Add(b);
+                    continue;
                 }
-            });
-            task.Add(_bot.watcher);
 
-            try
-            {
-                await task.WaitAsync(TimeSpan.FromSeconds(60));
+                rolesToApply.Add(role);
             }
-            catch { }
 
-            _bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UnixEpoch;
-        }).Add(_bot.watcher);
+            if (rolesToApply.Count > 0)
+                e.Member.ReplaceRolesAsync(rolesToApply, "Role Backup").Add(this._bot.watcher);
+        }
     }
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
     {
-        Task.Run(async () =>
-        {
-            if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
+        if (!this._bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this._bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this._bot.guilds[e.Guild.Id], e.Member.Id));
 
-            _bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UtcNow;
-        }).Add(_bot.watcher);
+        this._bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UtcNow;
     }
 
     internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
     {
-        Task.Run(async () =>
+        await Task.Delay(2000);
+
+        if (!this._bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this._bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this._bot.guilds[e.Guild.Id], e.Member.Id));
+
+        this._bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles = e.Member.Roles.Select(x => new MemberRole
         {
-            await Task.Delay(5000);
+            Id = x.Id,
+            Name = x.Name,
+        }).ToList();
 
-            if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
-
-            _bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles = e.Member.Roles.Select(x => new MemberRole
-            {
-                Id = x.Id,
-                Name = x.Name,
-            }).ToList();
-
-            _bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname = e.Member.Nickname;
-        }).Add(_bot.watcher);
+        this._bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname = e.Member.Nickname;
     }
 
     internal async Task GuildMemberBanned(DiscordClient sender, GuildBanAddEventArgs e)
     {
-        Task.Run(async () =>
-        {
-            if (!_bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                _bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(_bot.guilds[e.Guild.Id], e.Member.Id));
+        if (!this._bot.guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this._bot.guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this._bot.guilds[e.Guild.Id], e.Member.Id));
 
-            _bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles.Clear();
-            _bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname = "";
-        }).Add(_bot.watcher);
+        this._bot.guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles.Clear();
+        this._bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname = "";
     }
 }

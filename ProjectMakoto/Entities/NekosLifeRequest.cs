@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class NekosLifeRequest
+public sealed class NekosLifeRequest
 {
     public string url { get; set; }
 }

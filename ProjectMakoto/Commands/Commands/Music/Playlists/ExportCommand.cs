@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Playlists;
 
-internal class ExportCommand : BaseCommand
+internal sealed class ExportCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -24,8 +24,8 @@ internal class ExportCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(t.Commands.Music.Playlists.Title)));
+                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
@@ -35,8 +35,8 @@ internal class ExportCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 {
-                    Description = GetString(t.Commands.Music.Playlists.Export.Exported, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
-                }.AsInfo(ctx, GetString(t.Commands.Music.Playlists.Title))).WithFile($"{Guid.NewGuid().ToString().Replace("-", "").ToLower()}.json", stream));
+                    Description = GetString(this.t.Commands.Music.Playlists.Export.Exported, true, new TVar("Name", SelectedPlaylist.PlaylistName)),
+                }.AsInfo(ctx, GetString(this.t.Commands.Music.Playlists.Title))).WithFile($"{Guid.NewGuid().ToString().Replace("-", "").ToLower()}.json", stream));
             }
         });
     }

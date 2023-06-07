@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class MoveHereCommand : BaseCommand
+internal sealed class MoveHereCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.MoveMembers) && await CheckOwnPermissions(Permissions.MoveMembers) && await CheckVoiceState());
 
@@ -19,7 +19,7 @@ internal class MoveHereCommand : BaseCommand
         {
             DiscordChannel oldChannel = (DiscordChannel)arguments["oldChannel"];
 
-            var CommandKey = t.Commands.Moderation.Move;
+            var CommandKey = this.t.Commands.Moderation.Move;
 
             if (oldChannel.Type != ChannelType.Voice)
             {
@@ -28,7 +28,7 @@ internal class MoveHereCommand : BaseCommand
                     .AsError(ctx));
                 return;
             }
-            
+
             if (!oldChannel.Users.IsNotNullAndNotEmpty())
             {
                 await RespondOrEdit(new DiscordEmbedBuilder()

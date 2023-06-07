@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Commands;
-internal class BannerCommand : BaseCommand
+internal sealed class BannerCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,8 +26,8 @@ internal class BannerCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 ImageUrl = victim.BannerUrl,
-                Description = victim.BannerUrl.IsNullOrWhiteSpace() ? GetString(t.Commands.Utility.Banner.NoBanner, true) : ""
-            }.AsInfo(ctx, GetString(t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.GetUsernameWithIdentifier())));
+                Description = victim.BannerUrl.IsNullOrWhiteSpace() ? GetString(this.t.Commands.Utility.Banner.NoBanner, true) : ""
+            }.AsInfo(ctx, GetString(this.t.Commands.Utility.Banner.Banner, false, new TVar("User", victim.GetUsernameWithIdentifier())));
 
             DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 

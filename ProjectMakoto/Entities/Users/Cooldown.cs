@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class Cooldown
+public sealed class Cooldown
 {
     internal Cooldown(Bot _bot)
     {
@@ -23,10 +23,10 @@ public class Cooldown
 
     private async Task<bool> Wait(SharedCommandContext ctx, int CooldownTime, bool IgnoreStaff)
     {
-        if (_bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
+        if (this._bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
-        if (WaitingList.Contains(ctx.CommandName))
+        if (this.WaitingList.Contains(ctx.CommandName))
         {
             var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} 🛑 `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.SlowDown)}`"));
             await Task.Delay(3000);
@@ -34,12 +34,12 @@ public class Cooldown
             return true;
         }
 
-        if (!LastUseByCommand.ContainsKey(ctx.CommandName))
-            LastUseByCommand.Add(ctx.CommandName, DateTime.MinValue);
+        if (!this.LastUseByCommand.ContainsKey(ctx.CommandName))
+            this.LastUseByCommand.Add(ctx.CommandName, DateTime.MinValue);
 
-        if (LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTotalSecondsUntil() <= 0)
+        if (this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTotalSecondsUntil() <= 0)
         {
-            LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
+            this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
             return false;
         }
 
@@ -48,7 +48,7 @@ public class Cooldown
         var Cancelled = false;
 
         var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton));
 
         Task.Run(async () =>
@@ -65,11 +65,11 @@ public class Cooldown
             cancellationTokenSource.Cancel();
         }).Add(ctx.Bot.watcher);
 
-        double milliseconds = LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
+        double milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
         if (milliseconds <= 0)
             milliseconds = 500;
 
-        WaitingList.Add(ctx.CommandName);
+        this.WaitingList.Add(ctx.CommandName);
         try
         {
             await Task.Delay(Convert.ToInt32(Math.Round(milliseconds, 0)), cancellationTokenSource.Token);
@@ -77,13 +77,13 @@ public class Cooldown
         catch { }
         finally
         {
-            WaitingList.Remove(ctx.CommandName);
+            this.WaitingList.Remove(ctx.CommandName);
         }
 
         try
         {
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton.Disable()));
         }
         catch { }
@@ -94,11 +94,11 @@ public class Cooldown
         if (ctx.CommandType == Enums.CommandType.Custom)
             ctx.BaseCommand.DeleteOrInvalidate();
 
-        LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
+        this.LastUseByCommand[ctx.CommandName] = DateTime.UtcNow.ToUniversalTime();
         return false;
     }
 
-    public async Task<bool> WaitForLight(SharedCommandContext ctx, bool IgnoreStaff = false) 
+    public async Task<bool> WaitForLight(SharedCommandContext ctx, bool IgnoreStaff = false)
         => await Wait(ctx, 1, IgnoreStaff);
 
     public async Task<bool> WaitForModerate(SharedCommandContext ctx, bool IgnoreStaff = false)

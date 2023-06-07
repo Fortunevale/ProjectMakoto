@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.PhishingCommand;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -44,7 +44,7 @@ internal class ConfigCommand : BaseCommand
                 { ChangePunishmentButton },
                 { ChangeReasonButton },
                 { ChangeTimeoutLengthButton }
-            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser)));
+            }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
             var Button = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(2));
 
@@ -187,7 +187,7 @@ internal class ConfigCommand : BaseCommand
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
-            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser).CustomId)
+            else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
                 DeleteOrInvalidate();
             }

@@ -11,10 +11,7 @@ global using Xorog.Logger;
 global using Xorog.UniversalExtensions;
 global using Xorog.UniversalExtensions.Entities;
 global using static TranslationSourceGenerator.Log;
-global using static Xorog.Logger.Logger;
 global using static Xorog.UniversalExtensions.UniversalExtensions;
-global using static Xorog.UniversalExtensions.UniversalExtensionsEnums;
-global using Xorog.Logger.Enums;
 global using Newtonsoft.Json;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
@@ -63,7 +60,7 @@ public class Translations
         if (!Directory.Exists($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs"))
             Directory.CreateDirectory($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs");
 
-        _logger = StartLogger($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", LogLevel.DEBUG, DateTime.UtcNow.AddDays(-3), false);
+        _logger = LoggerClient.StartLogger($"{new FileInfo(Assembly.GetExecutingAssembly().FullName).Directory.FullName}/logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Debug, DateTime.UtcNow.AddDays(-3), false);
 
         _ = Task.Run(async () =>
         {

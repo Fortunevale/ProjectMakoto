@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class RegexTemplates
+internal sealed class RegexTemplates
 {
     public static readonly Regex UserMention = new(@"((<@(\d+)>)|(<@!(\d+)>))", RegexOptions.Compiled);
     public static readonly Regex ChannelMention = new(@"(<#\d+>)", RegexOptions.Compiled);
@@ -27,7 +27,7 @@ internal class RegexTemplates
 
     public static readonly Regex Code = new(@"(?:```)(?:cs)?((.|\n)*)(?:```)", RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    public static readonly Regex AllowedNickname = new(@"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", RegexOptions.IgnoreCase| RegexOptions.Compiled);
+    public static readonly Regex AllowedNickname = new(@"[^a-zA-Z0-9 _\-!.,:;#+*~´`?^°<>|""§$%&\/\\()={\[\]}²³€@_]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public static readonly Regex GitHubRepoUrl = new(@"https:\/\/github\.com\/([^\/]*)\/([^\/]*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     public static readonly Regex SemVer = new(@"^(\d*)\.(\d*)\.(\d*)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);

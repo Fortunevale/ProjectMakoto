@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.GuildLanguage;
 
-internal class ConfigCommand : BaseCommand
+internal sealed class ConfigCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
 
@@ -20,12 +20,12 @@ internal class ConfigCommand : BaseCommand
             await RespondOrEdit((new DiscordEmbedBuilder()
             {
                 Description = GuildLanguageCommandAbstractions.GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(t.Commands.Config.GuildLanguage.Title))));
+            }.AsAwaitingInput(ctx, GetString(this.t.Commands.Config.GuildLanguage.Title))));
 
             List<DiscordStringSelectComponentOption> options = new();
             List<DiscordStringSelectComponentOption> newOptions = new();
 
-            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(t.Commands.Config.GuildLanguage.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
+            newOptions.Add(new DiscordStringSelectComponentOption("Disable Override", "_", GetString(this.t.Commands.Config.GuildLanguage.DisableOverride), false, DiscordEmoji.FromUnicode("❌").ToComponent()));
 
             options.Add(new DiscordStringSelectComponentOption("English", "en", "English"));
             options.Add(new DiscordStringSelectComponentOption("German", "de", "Deutsch"));
@@ -59,9 +59,9 @@ internal class ConfigCommand : BaseCommand
             options.Add(new DiscordStringSelectComponentOption("Korean", "ko", "한국어"));
 
             foreach (var b in options)
-                if (t.Progress.TryGetValue(b.Value, out var value))
+                if (this.t.Progress.TryGetValue(b.Value, out var value))
                 {
-                    var perc = (value / (decimal)t.Progress["en"] * 100);
+                    var perc = (value / (decimal)this.t.Progress["en"] * 100);
                     DiscordComponentEmoji emoji = null;
 
                     if (perc >= 100)
@@ -74,7 +74,7 @@ internal class ConfigCommand : BaseCommand
                     newOptions.Add(new DiscordStringSelectComponentOption(b.Label, b.Value, b.Description.Insert(0, $"{perc.ToString("N1", CultureInfo.CreateSpecificCulture("en-US"))}% | "), false, emoji));
                 }
 
-            var SelectionResult = await PromptCustomSelection(newOptions, GetString(t.Commands.Config.GuildLanguage.Selector));
+            var SelectionResult = await PromptCustomSelection(newOptions, GetString(this.t.Commands.Config.GuildLanguage.Selector));
 
             if (SelectionResult.TimedOut)
             {

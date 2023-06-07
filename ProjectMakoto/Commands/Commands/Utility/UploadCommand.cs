@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class UploadCommand : BaseCommand
+internal sealed class UploadCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -22,16 +22,16 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Upload.NoInteraction, true)
+                    Description = GetString(this.t.Commands.Utility.Upload.NoInteraction, true)
                 }.AsError(ctx));
                 return;
             }
-            
+
             if (ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Upload.AlreadyUploaded, true)
+                    Description = GetString(this.t.Commands.Utility.Upload.AlreadyUploaded, true)
                 }.AsError(ctx));
                 return;
             }
@@ -40,7 +40,7 @@ internal class UploadCommand : BaseCommand
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Utility.Upload.TimedOut, true,
+                    Description = GetString(this.t.Commands.Utility.Upload.TimedOut, true,
                         new TVar("Timestamp", ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()))
                 }.AsError(ctx));
                 ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
@@ -53,7 +53,7 @@ internal class UploadCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(t.Commands.Utility.Upload.Uploaded, true)
+                Description = GetString(this.t.Commands.Utility.Upload.Uploaded, true)
             }.AsSuccess(ctx));
 
             await Task.Delay(500);

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class InfoCommand : BaseCommand
+internal sealed class InfoCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
 
@@ -233,7 +233,7 @@ internal class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"));  if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                 ],
                                 datasets: 
                                 [

@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-internal class UrbanDictionary
+internal sealed class UrbanDictionary
 {
     public List[] list { get; set; }
 
-    public class List
+    public sealed class List
     {
         public string definition { get; set; }
         public string permalink { get; set; }
@@ -35,7 +35,7 @@ internal class UrbanDictionary
         {
             get
             {
-                return thumbs_up - thumbs_down;
+                return this.thumbs_up - this.thumbs_down;
             }
         }
     }

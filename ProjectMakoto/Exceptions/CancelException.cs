@@ -7,14 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace ProjectMakoto.Exceptions;
-internal class CancelException : Exception
+internal sealed class CancelException : Exception
 {
     public CancelException(string message = null) : base(message)
     {

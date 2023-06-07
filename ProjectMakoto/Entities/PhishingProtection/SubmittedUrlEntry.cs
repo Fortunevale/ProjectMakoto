@@ -8,7 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto;
-internal class SubmittedUrlEntry
+internal sealed class SubmittedUrlEntry
 {
     public string Url { get; set; }
     public ulong Submitter { get; set; }

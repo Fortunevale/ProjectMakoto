@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands.Music;
 
-internal class PauseCommand : BaseCommand
+internal sealed class PauseCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
 
@@ -28,7 +28,7 @@ internal class PauseCommand : BaseCommand
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(t.Commands.Music.NotSameChannel, true),
+                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
@@ -42,7 +42,7 @@ internal class PauseCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? GetString(t.Commands.Music.Pause.Paused, true) : GetString(t.Commands.Music.Pause.Resumed, true)),
+                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? GetString(this.t.Commands.Music.Pause.Paused, true) : GetString(this.t.Commands.Music.Pause.Resumed, true)),
             }.AsSuccess(ctx));
         });
     }

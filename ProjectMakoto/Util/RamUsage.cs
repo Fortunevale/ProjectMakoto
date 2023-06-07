@@ -9,19 +9,19 @@
 
 namespace ProjectMakoto.Util;
 
-public class MemoryMetrics
+public sealed class MemoryMetrics
 {
     public double Total;
     public double Used;
     public double Free;
 }
 
-public class MemoryMetricsClient
+public sealed class MemoryMetricsClient
 {
-    public static MemoryMetrics GetMetrics() 
+    public static MemoryMetrics GetMetrics()
         => IsUnix() ? GetUnixMetrics() : GetWindowsMetrics();
 
-    private static bool IsUnix() 
+    private static bool IsUnix()
         => RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
     private static MemoryMetrics GetWindowsMetrics()
@@ -46,8 +46,8 @@ public class MemoryMetricsClient
 
         var metrics = new MemoryMetrics
         {
-            Total = Math.Round(double.Parse(totalMemoryParts[ 1 ]) / 1024, 0),
-            Free = Math.Round(double.Parse(freeMemoryParts[ 1 ]) / 1024, 0)
+            Total = Math.Round(double.Parse(totalMemoryParts[1]) / 1024, 0),
+            Free = Math.Round(double.Parse(freeMemoryParts[1]) / 1024, 0)
         };
         metrics.Used = metrics.Total - metrics.Free;
 
@@ -78,9 +78,9 @@ public class MemoryMetricsClient
 
         var metrics = new MemoryMetrics
         {
-            Total = double.Parse(memory[ 1 ]),
-            Used = double.Parse(memory[ 2 ]),
-            Free = double.Parse(memory[ 3 ])
+            Total = double.Parse(memory[1]),
+            Used = double.Parse(memory[2]),
+            Free = double.Parse(memory[3])
         };
 
         return metrics;

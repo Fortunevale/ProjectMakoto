@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class TranslationSettings
+public sealed class TranslationSettings
 {
     public TranslationSettings(User user)
     {
-        Parent = user;
+        this.Parent = user;
     }
     private User Parent { get; set; }
 
@@ -22,22 +22,22 @@ public class TranslationSettings
     private string _LastGoogleSource { get; set; } = "";
     public string LastGoogleSource
     {
-        get => _LastGoogleSource;
+        get => this._LastGoogleSource;
         set
         {
-            _LastGoogleSource = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "last_google_source", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._LastGoogleSource = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_google_source", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
     private string _LastGoogleTarget { get; set; } = "";
     public string LastGoogleTarget
     {
-        get => _LastGoogleTarget;
+        get => this._LastGoogleTarget;
         set
         {
-            _LastGoogleTarget = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "last_google_target", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._LastGoogleTarget = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_google_target", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -45,22 +45,22 @@ public class TranslationSettings
     private string _LastLibreTranslateSource { get; set; } = "";
     public string LastLibreTranslateSource
     {
-        get => _LastLibreTranslateSource;
+        get => this._LastLibreTranslateSource;
         set
         {
-            _LastLibreTranslateSource = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "last_libretranslate_source", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._LastLibreTranslateSource = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_libretranslate_source", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
     private string _LastLibreTranslateTarget { get; set; } = "";
     public string LastLibreTranslateTarget
     {
-        get => _LastLibreTranslateTarget;
+        get => this._LastLibreTranslateTarget;
         set
         {
-            _LastLibreTranslateTarget = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", Parent.UserId, "last_libretranslate_target", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._LastLibreTranslateTarget = value;
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_libretranslate_target", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

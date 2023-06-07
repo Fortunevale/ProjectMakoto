@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,11 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public class NameNormalizerSettings
+public sealed class NameNormalizerSettings
 {
     public NameNormalizerSettings(Guild guild)
     {
-        Parent = guild;
+        this.Parent = guild;
     }
 
     private Guild Parent { get; set; }
@@ -21,14 +21,14 @@ public class NameNormalizerSettings
 
 
     private bool _NameNormalizerEnabled { get; set; } = false;
-    public bool NameNormalizerEnabled 
-    { 
-        get => _NameNormalizerEnabled; 
-        set 
-        { 
-            _NameNormalizerEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", Parent.ServerId, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
-        } 
+    public bool NameNormalizerEnabled
+    {
+        get => this._NameNormalizerEnabled;
+        set
+        {
+            this._NameNormalizerEnabled = value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
+        }
     }
 
     public bool NameNormalizerRunning = false;

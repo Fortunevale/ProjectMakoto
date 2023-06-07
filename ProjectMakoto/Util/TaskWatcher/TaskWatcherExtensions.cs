@@ -16,7 +16,7 @@ public static class TaskWatcherExtensions
     /// </summary>
     /// <param name="task">The task</param>
     /// <param name="watcher">The current Watcher Instance</param>
-    public static void Add(this Task task, TaskWatcher watcher) => watcher.AddToList(new TaskInfo(task));
+    public static TaskInfo Add(this Task task, TaskWatcher watcher) => watcher.AddToList(new TaskInfo(task));
 
     /// <summary>
     /// Add Task to Watcher with CommandContext
@@ -24,7 +24,7 @@ public static class TaskWatcherExtensions
     /// <param name="task">The task</param>
     /// <param name="watcher">The current Watcher Instance</param>
     /// <param name="ctx">The CommandContext</param>
-    public static void Add(this Task task, TaskWatcher watcher, CommandContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
+    public static TaskInfo Add(this Task task, TaskWatcher watcher, CommandContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
 
     /// <summary>
     /// Add Task to Watcher with InteractionContext
@@ -32,7 +32,7 @@ public static class TaskWatcherExtensions
     /// <param name="task">The task</param>
     /// <param name="watcher">The current Watcher Instance</param>
     /// <param name="ctx">The InteractionContext</param>
-    public static void Add(this Task task, TaskWatcher watcher, InteractionContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
+    public static TaskInfo Add(this Task task, TaskWatcher watcher, InteractionContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
 
     /// <summary>
     /// Add Task to Watcher with InteractionContext
@@ -40,7 +40,7 @@ public static class TaskWatcherExtensions
     /// <param name="task">The task</param>
     /// <param name="watcher">The current Watcher Instance</param>
     /// <param name="ctx">The InteractionContext</param>
-    public static void Add(this Task task, TaskWatcher watcher, ContextMenuContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
+    public static TaskInfo Add(this Task task, TaskWatcher watcher, ContextMenuContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
 
 
     /// <summary>
@@ -49,5 +49,16 @@ public static class TaskWatcherExtensions
     /// <param name="task">The task</param>
     /// <param name="watcher">The current Watcher Instance</param>
     /// <param name="ctx">The InteractionContext</param>
-    public static void Add(this Task task, TaskWatcher watcher, SharedCommandContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
+    public static TaskInfo Add(this Task task, TaskWatcher watcher, SharedCommandContext ctx = null) => watcher.AddToList(new TaskInfo(task, ctx));
+
+    /// <summary>
+    /// Mark this Task as vital to the operation of this program. Program will exit if failed.
+    /// </summary>
+    /// <param name="info"></param>
+    /// <returns></returns>
+    internal static TaskInfo IsVital(this TaskInfo info)
+    {
+        info.IsVital = true;
+        return info;
+    }
 }

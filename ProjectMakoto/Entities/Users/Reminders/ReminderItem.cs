@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public class ReminderItem
+public sealed class ReminderItem
 {
     public string UUID { get; set; } = Guid.NewGuid().ToString();
 
@@ -18,13 +18,13 @@ public class ReminderItem
     private string _Description { get; set; }
     public string Description
     {
-        get => _Description;
+        get => this._Description;
         set
         {
             if (value.Length > 512)
                 throw new ArgumentException("The description cannot be longer than 512 characters.");
 
-            _Description = value;
+            this._Description = value;
         }
     }
 

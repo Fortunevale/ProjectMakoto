@@ -1,4 +1,4 @@
-﻿// Project Makoto
+// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,9 +7,11 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Octokit;
+
 namespace ProjectMakoto.Events;
 
-internal class TokenLeakEvents
+internal sealed class TokenLeakEvents
 {
     internal TokenLeakEvents(Bot _bot)
     {
@@ -20,26 +22,37 @@ internal class TokenLeakEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(_bot.watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore?.Content != e.Message?.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(_bot.watcher);
+            CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
     }
 
     internal async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        if (e.Content.StartsWith($";;"))
+        string prefix;
+
+        try
+        {
+            prefix = this._bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[guild.Id].PrefixSettings.Prefix;
+        }
+        catch (Exception)
+        {
+            prefix = ";;";
+        }
+
+        if (e.Content.StartsWith(prefix))
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
-                if (e.Content.StartsWith($";;{command.Key}"))
+                if (e.Content.StartsWith($"{prefix}{command.Key}"))
                     return;
 
         if (e.WebhookMessage || guild is null)
             return;
 
-        if (!_bot.guilds[guild.Id].TokenLeakDetection.DetectTokens)
+        if (!this._bot.guilds[guild.Id].TokenLeakDetection.DetectTokens)
             return;
 
         var matchCollection = RegexTemplates.Token.Matches(e.Content);
@@ -50,11 +63,6 @@ internal class TokenLeakEvents
         var filtered_matches = matchCollection.GroupBy(x => x.Value).Select<IGrouping<string, Match>, Match>(x => x.First());
 
         _ = e.DeleteAsync();
-
-        var client = new GitHubClient(new ProductHeaderValue("Project-Makoto"));
-
-        var tokenAuth = new Credentials(_bot.status.LoadedConfig.Secrets.Github.Token);
-        client.Credentials = tokenAuth;
 
         int InvalidateCount = 0;
 
@@ -68,14 +76,14 @@ internal class TokenLeakEvents
             }
             catch { }
 
-            string owner = _bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
-            string repo = _bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
+            string owner = this._bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
+            string repo = this._bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
             long seconds = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
 
             string fileName = $"token_leak_{e.Author.Id}_{guild.Id}_{e.Channel.Id}_{seconds}.md";
             string content = $"## Token of {botUser?.Id.ToString() ?? "unknown"} (Owner {e.Author.Id})\n\nBot {token}";
 
-            await client.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
+            await this._bot.githubClient.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
             InvalidateCount++;
         }
 
