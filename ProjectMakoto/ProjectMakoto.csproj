@@ -18,6 +18,7 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <NeutralLanguage>en</NeutralLanguage>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<Platforms>x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,13 +29,17 @@
     <WarningLevel>1</WarningLevel>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='x64|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="DisCatSharp" Version="10.4.1-sentry-022" />
-    <PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.4.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.1-sentry-022" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.1-sentry-022" />
     <PackageReference Include="DisCatSharp.Common" Version="10.4.1-sentry-022" />
@@ -47,6 +52,10 @@
     <PackageReference Include="Octokit" Version="6.0.0" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
+	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.4.0">
+		<PrivateAssets>all</PrivateAssets>
+		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
   </ItemGroup>
 
   <ItemGroup>
