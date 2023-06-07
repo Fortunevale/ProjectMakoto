@@ -15,7 +15,7 @@ internal static class DiscordExtensions
     {
         try
         {
-            return bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : bot.guilds[guild.Id].PrefixSettings.Prefix;
+            return bot?.guilds[guild?.Id ?? 0]?.PrefixSettings?.Prefix?.IsNullOrWhiteSpace() ?? true ? ";;" : bot.guilds[guild.Id].PrefixSettings.Prefix;
         }
         catch (Exception)
         {

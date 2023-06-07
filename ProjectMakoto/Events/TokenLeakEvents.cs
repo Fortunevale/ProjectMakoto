@@ -22,29 +22,20 @@ internal sealed class TokenLeakEvents
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
+        CheckMessage(sender, e.Guild, e.Message).Add(this._bot);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore?.Content != e.Message?.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(this._bot.watcher);
+            CheckMessage(sender, e.Guild, e.Message).Add(this._bot);
     }
 
     internal async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        string prefix;
+        string prefix = guild.GetGuildPrefix(_bot);
 
-        try
-        {
-            prefix = this._bot.guilds[guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[guild.Id].PrefixSettings.Prefix;
-        }
-        catch (Exception)
-        {
-            prefix = ";;";
-        }
-
-        if (e.Content.StartsWith(prefix))
+        if (e?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Content.StartsWith($"{prefix}{command.Key}"))
                     return;

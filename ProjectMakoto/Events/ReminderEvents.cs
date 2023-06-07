@@ -39,6 +39,6 @@ internal sealed class ReminderEvents
         new RemindersCommand().ExecuteCommand(e, sender, "reminders", this._bot, new Dictionary<string, object>
         {
             { "description", reminder.Description },
-        }).Add(this._bot.watcher);
+        }).Add(this._bot);
     }
 }

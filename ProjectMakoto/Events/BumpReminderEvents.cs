@@ -103,7 +103,7 @@ internal sealed class BumpReminderEvents
                         this._bot.guilds[e.Guild.Id].BumpReminder.LastUserId = 0;
 
                         e.Channel.SendMessageAsync($"⚠ It seems the last bump was not registered properly.\n" +
-                            $"The last time the server was bumped was determined to be around {Formatter.Timestamp(this._bot.guilds[e.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}.").Add(this._bot.watcher);
+                            $"The last time the server was bumped was determined to be around {Formatter.Timestamp(this._bot.guilds[e.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}.").Add(this._bot);
 
                         this._bot.bumpReminder.ScheduleBump(sender, e.Guild.Id);
                     }

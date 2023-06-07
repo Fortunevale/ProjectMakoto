@@ -133,7 +133,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                         }
                         catch { }
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
 
             async Task SendPage(int internalPage, int scoreSaberPage)

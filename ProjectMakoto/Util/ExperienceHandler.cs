@@ -175,7 +175,7 @@ internal sealed class ExperienceHandler
 
                                 await (await user.CreateDmChannelAsync()).SendMessageAsync($"Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run `;;levelrewards-optin` on any _bot._guilds with {this._bot.discordClient.CurrentUser.Mention}.");
                             }
-                        }).Add(this._bot.watcher);
+                        }).Add(this._bot);
                     }
 
                     IEnumerable<DiscordComponent> discordComponents = new List<DiscordComponent>

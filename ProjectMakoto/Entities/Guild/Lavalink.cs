@@ -205,7 +205,7 @@ public sealed class Lavalink
                                     }
                                 });
                         }
-                    }).Add(_bot.watcher);
+                    }).Add(_bot);
 
                     Task.Run(async () =>
                     {
@@ -218,7 +218,7 @@ public sealed class Lavalink
                                 return;
                             }
                         }
-                    }).Add(_bot.watcher);
+                    }).Add(_bot);
                 }
 
                 async Task PlayerUpdated(LavalinkGuildConnection sender, PlayerUpdateEventArgs e)
@@ -323,6 +323,6 @@ public sealed class Lavalink
                 Dispose(_bot, this.Guild.Id, "Exception");
                 throw;
             }
-        }).Add(_bot.watcher);
+        }).Add(_bot);
     }
 }

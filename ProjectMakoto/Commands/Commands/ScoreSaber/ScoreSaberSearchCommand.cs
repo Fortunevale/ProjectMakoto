@@ -290,7 +290,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
                         throw;
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
             ctx.Client.ComponentInteractionCreated += RunDropdownInteraction;
 

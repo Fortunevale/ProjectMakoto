@@ -53,7 +53,7 @@ internal sealed class ConfigLoader
                     await Task.Delay(10000);
                 }
             }
-        }).Add(bot.watcher);
+        }).Add(bot);
 
         while (bot.status.LoadedConfig is null)
             await Task.Delay(100);

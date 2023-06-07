@@ -509,7 +509,7 @@ internal sealed class EmojiStealerCommand : BaseCommand
                             if (e.GetCustomId() != IncludeStickersButton.CustomId)
                                 FinishedInteraction = true;
                         }
-                    }).Add(ctx.Bot.watcher, ctx);
+                    }).Add(ctx.Bot, ctx);
                 }
             }
             finally

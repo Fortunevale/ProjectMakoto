@@ -408,7 +408,7 @@ internal sealed class ConfigCommand : BaseCommand
                             return;
                         }
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
 
             await RefreshMessage();

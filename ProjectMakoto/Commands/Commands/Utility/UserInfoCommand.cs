@@ -234,7 +234,7 @@ internal sealed class UserInfoCommand : BaseCommand
                     });
 
                     return;
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
         });
     }

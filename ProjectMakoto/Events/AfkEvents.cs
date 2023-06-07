@@ -22,18 +22,9 @@ internal sealed class AfkEvents
         if (this._bot.objectedUsers.Contains(e.Author.Id) || this._bot.bannedUsers.ContainsKey(e.Author.Id) || this._bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
             return;
 
-        string prefix;
+        string prefix = e.Guild.GetGuildPrefix(_bot);
 
-        try
-        {
-            prefix = this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
-        }
-        catch (Exception)
-        {
-            prefix = ";;";
-        }
-
-        if (e.Message.Content.StartsWith(prefix))
+        if (e?.Message?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
                     return;

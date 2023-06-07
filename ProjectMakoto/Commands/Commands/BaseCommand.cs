@@ -44,100 +44,115 @@ public abstract class BaseCommand
 
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
-        if (InitiateInteraction)
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = Ephemeral
-            });
-
         this.ctx = new SharedCommandContext(this, ctx, _bot);
 
-        this.ctx.RespondedToInitial = InitiateInteraction;
+        Task.Run(async () =>
+        {
+            if (InitiateInteraction)
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = Ephemeral
+                });
 
-        if (InteractionInitiated)
-            this.ctx.RespondedToInitial = true;
+            this.ctx.RespondedToInitial = InitiateInteraction;
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+            if (InteractionInitiated)
+                this.ctx.RespondedToInitial = true;
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommandWith2FA(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.ctx.RespondedToInitial = false;
 
-        if (!this.ctx.Bot.status.LoadedConfig.IsDev)
-            if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
-            {
-                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
+        Task.Run(async () =>
+        {
+            this.ctx.RespondedToInitial = false;
+
+            if (!this.ctx.Bot.status.LoadedConfig.IsDev)
+                if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
                 {
-                    Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
-                }.AsBotError(this.ctx)).AsEphemeral());
-                return;
-            }
-            else
-            {
-                if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
-                {
-                    this.ctx.RespondedToInitial = true;
-                    var tfa = await ctx.RequestTwoFactorAsync();
-
-                    if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
-                        await SwitchToEvent(tfa.ComponentInteraction);
-
-                    if (tfa.Result != TwoFactorResult.ValidCode)
+                    _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
                     {
-                        _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
-                        return;
-                    }
-                    _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                        Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
+                    }.AsBotError(this.ctx)).AsEphemeral());
+                    return;
                 }
-            }
+                else
+                {
+                    if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
+                    {
+                        this.ctx.RespondedToInitial = true;
+                        var tfa = await ctx.RequestTwoFactorAsync();
 
-        if (!this.ctx.RespondedToInitial)
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = true
-            });
+                        if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
+                            await SwitchToEvent(tfa.ComponentInteraction);
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+                        if (tfa.Result != TwoFactorResult.ValidCode)
+                        {
+                            _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
+                            return;
+                        }
+                        _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                    }
+                }
+
+            if (!this.ctx.RespondedToInitial)
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = true
+                });
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
-        if (InitiateInteraction)
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = Ephemeral
-            });
-
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.ctx.RespondedToInitial = InitiateInteraction;
 
-        if (InteractionInitiated)
-            this.ctx.RespondedToInitial = true;
+        Task.Run(async () =>
+        {
+            if (InitiateInteraction)
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = Ephemeral
+                });
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+            this.ctx.RespondedToInitial = InitiateInteraction;
+
+            if (InteractionInitiated)
+                this.ctx.RespondedToInitial = true;
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
-        if (InitiateInteraction)
-            await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = Ephemeral
-            });
-
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
-        this.ctx.RespondedToInitial = InitiateInteraction;
 
-        if (InteractionInitiated)
-            this.ctx.RespondedToInitial = true;
+        Task.Run(async () =>
+        {
+            if (InitiateInteraction)
+                await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = Ephemeral
+                });
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+            this.ctx.RespondedToInitial = InitiateInteraction;
+
+            if (InteractionInitiated)
+                this.ctx.RespondedToInitial = true;
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, ctx);
     }
 
     private async Task<bool> BasePreExecutionCheck()
@@ -857,7 +872,7 @@ public abstract class BaseCommand
                     ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
-            }).Add(this.ctx.Bot.watcher, this.ctx);
+            }).Add(this.ctx.Bot, this.ctx);
         }
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);

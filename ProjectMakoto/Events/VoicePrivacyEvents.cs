@@ -36,14 +36,14 @@ internal sealed class VoicePrivacyEvents
                     this.JobsQueue.Remove(task);
 
                     task.Start();
-                    task.Add(this._bot.watcher);
+                    task.Add(this._bot);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarn("Failed to run queue item", ex);
                 }
             }
-        }).Add(this._bot.watcher);
+        }).Add(this._bot);
     }
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
@@ -60,7 +60,7 @@ internal sealed class VoicePrivacyEvents
                     if (e.After is not null && e.After.Channel is not null)
                         await e.After?.Channel?.AddOverwriteAsync(await e.User.ConvertToMember(e.Guild), Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, "Joined VC while In-Voice Privacy Set permissions is turned on");
                 }
-            }).Add(this._bot.watcher);
+            }).Add(this._bot);
         }
 
         if (this._bot.guilds[e.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled)
@@ -202,6 +202,6 @@ internal sealed class VoicePrivacyEvents
                     _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, (present?.Allowed ?? Permissions.None), (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.SendMessages, "In-Voice Privacy is enabled");
                 }
             }
-        }).Add(this._bot.watcher);
+        }).Add(this._bot);
     }
 }

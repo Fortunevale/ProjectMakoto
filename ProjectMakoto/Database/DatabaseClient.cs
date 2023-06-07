@@ -594,7 +594,7 @@ public sealed class DatabaseClient
 
         var check = CheckGuildTables();
         try
-        { check.Add(this._bot.watcher); await check.WaitAsync(TimeSpan.FromSeconds(120)); }
+        { check.Add(this._bot); await check.WaitAsync(TimeSpan.FromSeconds(120)); }
         catch { }
 
         lock (this._bot.guilds)
@@ -641,7 +641,7 @@ public sealed class DatabaseClient
         if (!this._bot.status.DatabaseInitialLoadCompleted)
             return;
 
-        this._queue.RunCommand(new MySqlCommand(this._helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(this._bot.watcher);
+        this._queue.RunCommand(new MySqlCommand(this._helper.GetUpdateValueCommand(table, columnKey, rowKey, columnToEdit, newValue), connection), QueuePriority.Low).Add(this._bot);
         return;
     }
 

@@ -130,7 +130,7 @@ internal sealed class QueueCommand : BaseCommand
                             }
                         }
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
         });
     }

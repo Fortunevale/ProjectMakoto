@@ -151,13 +151,13 @@ internal static class PreMadeEmbedsExtensions
         return b;
     }
 
-    private static DiscordEmbedBuilder.EmbedAuthor MakeDefaultAuthor(DiscordGuild guild, string CustomText = "") => new()
+    public static DiscordEmbedBuilder.EmbedAuthor MakeDefaultAuthor(DiscordGuild guild, string CustomText = "") => new()
     {
         Name = $"{(CustomText.IsNullOrWhiteSpace() ? "" : $"{CustomText} • ")}{guild.Name}",
         IconUrl = (guild.IconHash.IsNullOrWhiteSpace() ? AuditLogIcons.QuestionMark : guild.IconUrl)
     };
 
-    private static DiscordEmbedBuilder.EmbedAuthor MakeDefaultBotAuthor(DiscordClient client, string CustomText = "") => new()
+    public static DiscordEmbedBuilder.EmbedAuthor MakeDefaultBotAuthor(DiscordClient client, string CustomText = "") => new()
     {
         Name = client.CurrentUser.GetUsername(),
         IconUrl = client.CurrentUser.AvatarUrl

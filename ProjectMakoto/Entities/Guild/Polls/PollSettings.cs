@@ -86,7 +86,7 @@ public sealed class PollSettings
                                 _ = e.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"✅ {CommandKey.PollEnded.Get(this._bot.users[e.User.Id]).Build(true)}"));
                             }
                         }
-                    }).Add(this._bot.watcher);
+                    }).Add(this._bot);
                 }
 
                 async Task MessageDeletionHandling(DiscordClient client, MessageDeleteEventArgs e)
@@ -100,7 +100,7 @@ public sealed class PollSettings
                             this._bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
                             this.RunningPolls.Remove(b);
                         }
-                    }).Add(this._bot.watcher);
+                    }).Add(this._bot);
                 }
 
                 async Task ChannelDeletionHandling(DiscordClient client, ChannelDeleteEventArgs e)
@@ -114,7 +114,7 @@ public sealed class PollSettings
                             this._bot.discordClient.ChannelDeleted -= ChannelDeletionHandling;
                             this.RunningPolls.Remove(b);
                         }
-                    }).Add(this._bot.watcher);
+                    }).Add(this._bot);
                 }
 
                 Task task = new(async () =>
@@ -175,11 +175,11 @@ public sealed class PollSettings
                         { await Task.Delay(TimeSpan.FromMinutes(2), cancellationTokenSource.Token); }
                         catch { }
                     }
-                }).Add(this._bot.watcher);
+                }).Add(this._bot);
 
                 this._bot.discordClient.ComponentInteractionCreated += VoteHandling;
 
-                task.Add(this._bot.watcher);
+                task.Add(this._bot);
                 taskuid = task.CreateScheduledTask(b.DueTime.ToUniversalTime(), new ScheduledTaskIdentifier(this.Parent.ServerId, b.SelectUUID, "poll"));
 
                 this._bot.discordClient.MessageDeleted += MessageDeletionHandling;

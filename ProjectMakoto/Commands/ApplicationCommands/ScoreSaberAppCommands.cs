@@ -18,29 +18,29 @@ public sealed class ScoreSaberAppCommands : ApplicationCommandsModule
 
         [SlashCommand("profile", "Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.", dmPermission: false)]
         public async Task ScoreSaberC(InteractionContext ctx, [Option("profile", "Id|@User")] string id = "")
-            => new ScoreSaberProfileCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            => _ = new ScoreSaberProfileCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
             {
                 { "id", id }
-            }).Add(this._bot.watcher, ctx);
+            });
 
         [SlashCommand("search", "Search a user on Score Saber by name.", dmPermission: false)]
         public async Task ScoreSaberSearch(InteractionContext ctx, [Option("name", "The name to search for")] string name)
-            => new ScoreSaberSearchCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            => _ = new ScoreSaberSearchCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
             {
                 { "name", name }
-            }).Add(this._bot.watcher, ctx);
+            });
 
         [SlashCommand("map-leaderboard", "Display the leaderboard off a specific map.", dmPermission: false)]
         public async Task ScoreSaberMapLeaderboard(InteractionContext ctx, [Option("LeaderboardId", "The LeaderboardId")] int boardId, [Option("Page", "The page")] int Page = 1, [Option("internal_page", "The internal page")] int Internal_Page = 0)
-            => new ScoreSaberMapLeaderboardCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+            => _ = new ScoreSaberMapLeaderboardCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
             {
                 { "boardId", boardId },
                 { "Page", Page },
                 { "Internal_Page", Internal_Page },
-            }).Add(this._bot.watcher, ctx);
+            });
 
         [SlashCommand("unlink", "Allows you to remove the saved ScoreSaber profile from your Discord account.", dmPermission: false)]
         public async Task ScoreSaberUnlink(InteractionContext ctx)
-            => new ScoreSaberUnlinkCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new ScoreSaberUnlinkCommand().ExecuteCommand(ctx, this._bot);
     }
 }

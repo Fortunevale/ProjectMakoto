@@ -29,6 +29,9 @@ public sealed class GuildDictionary : IDictionary<ulong, Guild>
             if (!this._items.ContainsKey(key) && key != 0)
                 this._items.Add(key, new(key, this._bot));
 
+            if (key == 0)
+                return null;
+
             return this._items[key];
         }
 
@@ -36,6 +39,9 @@ public sealed class GuildDictionary : IDictionary<ulong, Guild>
         {
             if (!this._items.ContainsKey(key) && key != 0)
                 this._items.Add(key, new(key, this._bot));
+
+            if (key == 0)
+                return;
 
             this._items[key] = value;
         }

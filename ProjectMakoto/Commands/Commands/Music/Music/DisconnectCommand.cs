@@ -124,7 +124,7 @@ internal sealed class DisconnectCommand : BaseCommand
                         embed.Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
-                }).Add(ctx.Bot.watcher);
+                }).Add(ctx.Bot);
             }
         });
     }

@@ -120,7 +120,7 @@ public sealed class VcCreatorSettings
                                     }
                                 }
                             }
-                        }).Add(this._bot.watcher);
+                        }).Add(this._bot);
                     }
 
                     Task.Run(async () =>
@@ -137,7 +137,7 @@ public sealed class VcCreatorSettings
                             this.CreatedChannels.Remove(b.Key);
                             return;
                         }
-                    }).Add(this._bot.watcher);
+                    }).Add(this._bot);
 
                     this._bot.discordClient.VoiceStateUpdated += VoiceStateUpdated;
                     _logger.LogDebug("Created VcCreator Event for '{Channel}'", b.Key);
@@ -147,7 +147,7 @@ public sealed class VcCreatorSettings
 
                     this._bot.discordClient.VoiceStateUpdated -= VoiceStateUpdated;
                     _logger.LogDebug("Deleted VcCreator Event for '{Channel}'", b.Key);
-                }).Add(this._bot.watcher);
+                }).Add(this._bot);
             }
 
     }

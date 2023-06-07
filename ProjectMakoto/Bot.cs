@@ -191,9 +191,9 @@ public sealed class Bot
             }
 
             _ = new PhishingUrlUpdater(this).UpdatePhishingUrlDatabase();
-        }).Add(this.watcher).IsVital();
+        }).Add(this).IsVital();
 
-        await loadDatabase.task.WaitAsync(TimeSpan.FromSeconds(600));
+        await loadDatabase.Task.WaitAsync(TimeSpan.FromSeconds(600));
 
         var logInToDiscord = Task.Run(async () =>
         {
@@ -259,22 +259,22 @@ public sealed class Bot
                 }
             });
 
-            ProcessDeletionRequests().Add(this.watcher);
-        }).Add(this.watcher).IsVital();
+            ProcessDeletionRequests().Add(this);
+        }).Add(this).IsVital();
 
-        while (!loadDatabase.task.IsCompleted || !logInToDiscord.task.IsCompleted)
+        while (!loadDatabase.Task.IsCompleted || !logInToDiscord.Task.IsCompleted)
             await Task.Delay(100);
 
-        if (!loadDatabase.task.IsCompletedSuccessfully)
+        if (!loadDatabase.Task.IsCompletedSuccessfully)
         {
-            _logger.LogFatal("An uncaught exception occurred while initializing the database.", loadDatabase.task.Exception);
+            _logger.LogFatal("An uncaught exception occurred while initializing the database.", loadDatabase.Task.Exception);
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.FailedDatabaseLoad);
         }
 
-        if (!logInToDiscord.task.IsCompletedSuccessfully)
+        if (!logInToDiscord.Task.IsCompletedSuccessfully)
         {
-            _logger.LogFatal("An uncaught exception occurred while initializing the discord client.", logInToDiscord.task.Exception);
+            _logger.LogFatal("An uncaught exception occurred while initializing the discord client.", logInToDiscord.Task.Exception);
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.FailedDiscordLogin);
         }
@@ -304,7 +304,7 @@ public sealed class Bot
 
                 await Task.Delay(1000);
             }
-        }).Add(this.watcher).IsVital();
+        }).Add(this).IsVital();
 
         await Task.Delay(-1);
     }
@@ -419,7 +419,7 @@ public sealed class Bot
     {
         new Task(new Action(async () =>
         {
-            ProcessDeletionRequests().Add(this.watcher);
+            ProcessDeletionRequests().Add(this);
         })).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
 
         lock (this.users)
@@ -431,12 +431,12 @@ public sealed class Bot
                     _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
 
                     this.users.Remove(b.Key);
-                    this.databaseClient._helper.DeleteRow(this.databaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this.watcher);
+                    this.databaseClient._helper.DeleteRow(this.databaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
                     this.objectedUsers.Add(b.Key);
                     foreach (var c in this.discordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
                     {
                         try
-                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); c.Value.LeaveAsync().Add(this.watcher); }
+                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); c.Value.LeaveAsync().Add(this); }
                         catch { }
                     }
                 }

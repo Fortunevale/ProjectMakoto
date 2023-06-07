@@ -29,7 +29,7 @@ internal sealed class GenericGuildEvents
 
         if (this._bot.guilds[e.Guild.Id].Join.ReApplyNickname)
             if (this._bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate.ToUniversalTime().GetTimespanSince().TotalDays < 60)
-                e.Member.ModifyAsync(x => x.Nickname = this._bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname).Add(this._bot.watcher);
+                e.Member.ModifyAsync(x => x.Nickname = this._bot.guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname).Add(this._bot);
 
         this._bot.guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UnixEpoch;
 
@@ -78,7 +78,7 @@ internal sealed class GenericGuildEvents
             }
 
             if (rolesToApply.Count > 0)
-                e.Member.ReplaceRolesAsync(rolesToApply, "Role Backup").Add(this._bot.watcher);
+                e.Member.ReplaceRolesAsync(rolesToApply, "Role Backup").Add(this._bot);
         }
     }
 

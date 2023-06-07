@@ -211,7 +211,7 @@ internal sealed class PluginLoader
 
                                     [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
                                     public async Task Help(CommandContext ctx)
-                                        => PrefixCommandUtil.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot.watcher, ctx);
+                                        => PrefixCommandUtil.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot, ctx);
                                     """);
                                 }
 
@@ -485,7 +485,7 @@ internal sealed class PluginLoader
                             }{{(ContextName == nameof(InteractionContext) ? ", true, true, false" : "")}}
                         });
 
-                    t.Add(_bot.watcher, ctx);
+                    t.Add(_bot, ctx);
                 }
                 catch (Exception ex)
                 {
@@ -541,7 +541,7 @@ internal sealed class PluginLoader
                                 }{{(ContextName == nameof(InteractionContext) ? ", true, true, false" : "")}}
                             });
                     
-                    TaskWatcherExtensions.Add(t, _bot.watcher, ctx);
+                    t.Add(_bot, ctx);
                 }
                 catch (Exception ex)
                 {

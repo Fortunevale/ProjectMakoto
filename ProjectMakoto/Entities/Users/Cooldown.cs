@@ -63,7 +63,7 @@ public sealed class Cooldown
             await result.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             ctx.BaseCommand.DeleteOrInvalidate();
             cancellationTokenSource.Cancel();
-        }).Add(ctx.Bot.watcher);
+        }).Add(ctx.Bot);
 
         double milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
         if (milliseconds <= 0)

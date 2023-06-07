@@ -248,13 +248,13 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
             switch (Command)
             {
                 case Commands.Info:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new InfoCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.RawGuild:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -263,19 +263,19 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "guild", argument1 is not null ? Convert.ToUInt64(argument1) : null }
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.BotNick:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new BotnickCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "newNickname", argument1 }
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.BanUser:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
@@ -285,10 +285,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "reason", argument2 },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.UnbanUser:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -297,10 +297,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.BanGuild:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
@@ -310,10 +310,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                             { "guild", Convert.ToUInt64(argument1) },
                             { "reason", argument2 }
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.UnbanGuild:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -322,10 +322,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "guild", Convert.ToUInt64(argument1) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.GlobalBan:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
@@ -335,10 +335,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "reason", argument2 },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.GlobalUnban:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
@@ -348,10 +348,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "UnbanFromGuilds", bool.Parse(argument2) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.GlobalNotes:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -360,10 +360,10 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.Log:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -372,22 +372,22 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "Level", (CustomLogLevel)Enum.Parse(typeof(CustomLogLevel), argument1) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.Stop:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new StopCommand().ExecuteCommandWith2FA(ctx, this._bot, null);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.Save:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new SaveCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.BatchLookup:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -396,19 +396,19 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "IDs", argument1 },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.CreateIssue:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new CreateIssueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "UseOldTagsSelector", (bool.TryParse(argument1, out var result) ? result : true) },
                         }, InitiateInteraction: false);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.Evaluate:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -420,23 +420,23 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "code", message.Content },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.Enroll2FA:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new EnrollTwoFactorCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.Quit2FASession:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new Quit2FASessionCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
 
                 case Commands.Disenroll2FAUser:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -445,13 +445,13 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
                 case Commands.ManageCommands:
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
                         await new CommandManageCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
             }
         }
@@ -469,23 +469,17 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
 
         [SlashCommand("throw", "Throw.")]
         public async Task Throw(InteractionContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-                throw new InvalidCastException();
-            }).Add(this._bot.watcher, ctx);
-        }
+            => _ = new ThrowCommand().ExecuteCommand(ctx, _bot);
 
         [SlashCommand("test", "Test.")]
         public async Task Test(InteractionContext ctx)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
                 await ctx.Channel.ModifyAsync(x => x.PermissionOverwrites = ctx.Channel.PermissionOverwrites.Merge(ctx.Member, Permissions.UseExternalEmojis, Permissions.None));
                 await ctx.Channel.ModifyAsync(x => x.PermissionOverwrites = ctx.Channel.PermissionOverwrites.Merge(ctx.Member, Permissions.None, Permissions.UseExternalEmojis));
-            }).Add(this._bot.watcher, ctx);
+            });
         }
     }
 #endif

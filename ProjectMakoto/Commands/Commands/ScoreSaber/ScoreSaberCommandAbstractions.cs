@@ -88,7 +88,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         if (e.GetCustomId() == "thats_me")
                         {
                             AddLinkButton = false;
-                            ShowProfile().Add(ctx.Bot.watcher, ctx);
+                            ShowProfile().Add(ctx.Bot, ctx);
                             ctx.DbUser.ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -111,7 +111,7 @@ internal sealed class ScoreSaberCommandAbstractions
                             {
                                 CachedTopScores ??= await ctx.Bot.scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
 
-                                ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot.watcher, ctx);
+                                ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot, ctx);
                             }
                             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                             {
@@ -145,7 +145,7 @@ internal sealed class ScoreSaberCommandAbstractions
                             {
                                 CachedRecentScores ??= await ctx.Bot.scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
 
-                                ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot.watcher, ctx);
+                                ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot, ctx);
                             }
                             catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                             {
@@ -174,7 +174,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         }
                         else if (e.GetCustomId() == "getmain")
                         {
-                            ShowProfile().Add(ctx.Bot.watcher, ctx);
+                            ShowProfile().Add(ctx.Bot, ctx);
                         }
 
                         cancellationTokenSource.Cancel();
@@ -190,7 +190,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         }
                         catch { }
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
 
             async Task ShowScores(PlayerScores scores, RequestParameters.ScoreType scoreType)
@@ -362,7 +362,7 @@ internal sealed class ScoreSaberCommandAbstractions
                 catch { }
             }
 
-            ShowProfile().Add(ctx.Bot.watcher, ctx);
+            ShowProfile().Add(ctx.Bot, ctx);
 
             ctx.Client.ComponentInteractionCreated += RunInteraction;
 

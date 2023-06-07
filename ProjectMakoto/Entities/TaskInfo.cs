@@ -13,39 +13,18 @@ public sealed class TaskInfo
 {
     internal TaskInfo(Task task)
     {
-        this.task = task;
+        this.Task = task;
     }
 
-    internal TaskInfo(Task task, CommandContext ctx = null)
+    internal TaskInfo(Task task, object? customData = null)
     {
-        this.CommandContext = ctx;
-        this.task = task;
+        this.CustomData = customData;
+        this.Task = task;
     }
-
-    internal TaskInfo(Task task, InteractionContext ctx = null)
-    {
-        this.InteractionContext = ctx;
-        this.task = task;
-    }
-
-    internal TaskInfo(Task task, SharedCommandContext ctx = null)
-    {
-        this.SharedCommandContext = ctx;
-        this.task = task;
-    }
-
-    internal TaskInfo(Task task, ContextMenuContext ctx = null)
-    {
-        this.ContextMenuContext = ctx;
-        this.task = task;
-    }
-
-    public string uuid { get; private set; } = Guid.NewGuid().ToString();
-    public CommandContext? CommandContext { get; private set; } = null;
-    public InteractionContext? InteractionContext { get; private set; } = null;
-    public SharedCommandContext? SharedCommandContext { get; private set; } = null;
-    public ContextMenuContext? ContextMenuContext { get; private set; } = null;
-    public Task task { get; private set; }
-    public DateTime CreationTimestamp { get; private set; } = DateTime.UtcNow;
+    public string Uuid { get; private set; } = Guid.NewGuid().ToString();
+    public Task Task { get; private set; }
+    public DateTime CreationTime { get; private set; } = DateTime.UtcNow;
     public bool IsVital { get; internal set; } = false;
+
+    public object? CustomData { get; internal set;} = null;
 }

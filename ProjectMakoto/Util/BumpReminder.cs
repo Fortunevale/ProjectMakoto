@@ -44,7 +44,7 @@ internal sealed class BumpReminder
             if (x.IsCompletedSuccessfully)
             {
                 try
-                { (await channel.GetMessageAsync(this._bot.guilds[channel.Guild.Id].BumpReminder.PersistentMessageId)).DeleteAsync().Add(this._bot.watcher); }
+                { (await channel.GetMessageAsync(this._bot.guilds[channel.Guild.Id].BumpReminder.PersistentMessageId)).DeleteAsync().Add(this._bot); }
                 catch { }
                 this._bot.guilds[channel.Guild.Id].BumpReminder.PersistentMessageId = x.Result.Id;
 

@@ -157,18 +157,9 @@ internal sealed class ActionlogEvents
         if (!await ValidateServer(e.Guild) || !this._bot.guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message.WebhookMessage || e.Message is null || e.Message.Author is null || e.Message.Author.IsBot)
             return;
 
-        string prefix;
+        string prefix = e.Guild.GetGuildPrefix(_bot);
 
-        try
-        {
-            prefix = this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
-        }
-        catch (Exception)
-        {
-            prefix = ";;";
-        }
-
-        if (e.Message.Content.StartsWith(prefix))
+        if (e?.Message?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
                     return;
@@ -347,18 +338,9 @@ internal sealed class ActionlogEvents
         if (!await ValidateServer(e.Guild) || !this._bot.guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message is null || e.Message.WebhookMessage || e.Message.Author is null || e.Message.Author.IsBot)
             return;
 
-        string prefix;
+        string prefix = e.Guild.GetGuildPrefix(_bot);
 
-        try
-        {
-            prefix = this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix.IsNullOrWhiteSpace() ? ";;" : this._bot.guilds[e.Guild.Id].PrefixSettings.Prefix;
-        }
-        catch (Exception)
-        {
-            prefix = ";;";
-        }
-
-        if (e.Message.Content.StartsWith(prefix))
+        if (e?.Message?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
                 if (e.Message.Content.StartsWith($"{prefix}{command.Key}"))
                     return;

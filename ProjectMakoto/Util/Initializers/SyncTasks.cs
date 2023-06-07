@@ -55,7 +55,7 @@ internal sealed class SyncTasks
                         }
                     }
                 }
-            }).Add(bot.watcher);
+            }).Add(bot);
 
             for (int i = 0; i < 501; i++)
             {
@@ -133,7 +133,7 @@ internal sealed class SyncTasks
                                         task.Wait();
                                 }
                         }
-                    }).Add(bot.watcher);
+                    }).Add(bot);
                 }
             }
 
@@ -232,7 +232,7 @@ internal sealed class SyncTasks
 
                 await Task.Delay(1000);
             }
-        }).Add(bot.watcher);
+        }).Add(bot);
     }
 
     internal static async Task ExecuteSyncTasks(Bot bot, IReadOnlyDictionary<ulong, DiscordGuild> Guilds)
@@ -244,7 +244,7 @@ internal sealed class SyncTasks
             if (e is not null && e.NewItems is not null)
                 foreach (Task b in e.NewItems)
                 {
-                    b.Add(bot.watcher);
+                    b.Add(bot);
                 }
         }
 

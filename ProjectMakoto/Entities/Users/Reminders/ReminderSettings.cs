@@ -69,7 +69,7 @@ public sealed class ReminderSettings
                     var msg = await user.SendMessageAsync(builder.AddComponents(snoozeButton));
                 });
 
-                task.Add(this._bot.watcher);
+                task.Add(this._bot);
                 task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.UserId, b.UUID, "reminder"));
 
                 _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.UserId);

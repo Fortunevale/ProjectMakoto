@@ -116,7 +116,7 @@ internal sealed class SkipCommand : BaseCommand
                         embed.Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
-                }).Add(ctx.Bot.watcher);
+                }).Add(ctx.Bot);
             }
         });
     }

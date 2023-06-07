@@ -157,7 +157,7 @@ internal sealed class DatabaseQueue
                 _ = QueueHandler();
                 throw;
             }
-        }).Add(this._bot.watcher);
+        }).Add(this._bot);
     }
 
     internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal, int depth = 0)
