@@ -707,11 +707,9 @@ public abstract class BaseCommand
             var dropdown = new DiscordStringSelectComponent(CustomPlaceHolder, options.Skip(CurrentPage * 25).Take(25).Select(x => new DiscordStringSelectComponentOption(x.Label, x.Value, x.Description, (x.Value == Selected), x.Emoji)), SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
-            if (options.Skip(CurrentPage * 25).Count() > 25)
-                builder.AddComponents(NextPageButton);
-
-            if (CurrentPage != 0)
-                builder.AddComponents(PrevPageButton);
+            NextPageButton.Disabled = options.Skip(CurrentPage * 25).Count() <= 25;
+            PrevPageButton.Disabled = CurrentPage == 0;
+            builder.AddComponents(PrevPageButton, NextPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
                 ConfirmSelectionButton.Disable();
