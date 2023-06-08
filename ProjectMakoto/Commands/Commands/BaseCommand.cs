@@ -26,6 +26,7 @@ public abstract class BaseCommand
 
     public async Task TransferCommand(SharedCommandContext ctx, Dictionary<string, object> arguments = null)
     {
+        this.t = ctx.Bot.loadedTranslations;
         this.ctx = ctx;
 
         ctx.Transferred = true;
@@ -37,6 +38,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.t = _bot.loadedTranslations;
 
         if (await BasePreExecutionCheck())
             await ExecuteCommand(this.ctx, arguments);
@@ -45,6 +47,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.t = _bot.loadedTranslations;
 
         Task.Run(async () =>
         {
@@ -67,6 +70,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommandWith2FA(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.t = _bot.loadedTranslations;
 
         Task.Run(async () =>
         {
@@ -114,6 +118,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.t = _bot.loadedTranslations;
 
         Task.Run(async () =>
         {
@@ -136,6 +141,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
+        this.t = _bot.loadedTranslations;
 
         Task.Run(async () =>
         {
@@ -157,7 +163,12 @@ public abstract class BaseCommand
 
     private async Task<bool> BasePreExecutionCheck()
     {
-        this.t = this.ctx.Bot.loadedTranslations;
+        if (t is null)
+        {
+            _logger.LogWarn($"The translation were not set before the BasePreExecutionCheck()!");
+            this.t = ctx.Bot.loadedTranslations;
+        }
+
         if (this.ctx.Bot.users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
         {
             this.ctx.DbUser.CurrentLocale = this.ctx.User.Locale;

@@ -119,10 +119,9 @@ public sealed class TaskWatcher
                                 _ = sctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
                                     .WithContent(sctx.User.Mention)
                                     .AddEmbed(new DiscordEmbedBuilder()
-                                        .WithDescription($"`An unhandled exception occured while trying to execute your command.`\n" +
-                                                         $"`The exception has been reported and we will be working on a resolution soon.`\n" +
-                                                         $"```diff\n-{(Exception?.Message?.SanitizeForCode() ?? "No message captured.")}\n```\n\n" +
-                                                         $"_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")
+                                        .WithDescription(sctx.BaseCommand.GetString(sctx.BaseCommand.t.Commands.Common.Errors.UnhandledException, true, 
+                                            new TVar("Message", $"```diff\n-{(Exception?.Message?.SanitizeForCode() ?? "No message captured.")}\n```"),
+                                            new TVar("Timestamp", DateTime.UtcNow.AddSeconds(11).ToTimestamp())))
                                         .AsBotError(sctx)))
                                 .ContinueWith(x =>
                                 {
@@ -139,7 +138,7 @@ public sealed class TaskWatcher
                         }
                         else
                         {
-                            _logger.LogError("Task '{UUID}' failed to execute\n{CustomData}", b.Task.Exception, b.Uuid, JsonConvert.SerializeObject(b.CustomData));
+                            _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.Uuid);
                         }
                     }
                     else

@@ -33,8 +33,10 @@ public static class TranslationUtil
         if (str.IsNullOrEmpty())
             return str;
 
-        if (Code)
+        if (Code && !str.StartsWith('_'))
             str = $"`{str}`";
+        else
+            Code = false;
 
         vars ??= Array.Empty<TVar>();
 

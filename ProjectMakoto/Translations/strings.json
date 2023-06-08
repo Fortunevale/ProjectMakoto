@@ -325,6 +325,20 @@
         "CommandDisabled": {
           "en": "The command '{Command}' is currently disabled.",
           "de": "Der Befehl '{Command}' ist aktuell deaktiviert."
+        },
+        "UnhandledException": {
+          "en": [
+            "An unhandled exception occured while trying to execute your command.",
+            "The exception has been reported and we will be working on a resolution soon.",
+            "{Message}",
+            "_The message will be deleted {Timestamp}._"
+          ],
+          "de": [
+            "Es ist eine unerwarteter Fehler aufgetreten.",
+            "Der Fehler wurde gemeldet und wir werden an einer Lösung arbeiten.",
+            "{Message}",
+            "_Diese Nachricht wird {Timestamp} gelöscht._"
+          ]
         }
       },
       "Prompts": {
