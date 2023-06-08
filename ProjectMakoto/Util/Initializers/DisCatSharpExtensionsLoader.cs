@@ -52,7 +52,7 @@ internal sealed class DisCatSharpExtensionsLoader
             Intents = DiscordIntents.All,
             LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
             AutoReconnect = true,
-            LoggerFactory = new LoggerFactory(new ILoggerProvider[] { _logger._provider }),
+            LoggerFactory = new LoggerFactory(new ILoggerProvider[] { _logger.Provider }),
             HttpTimeout = TimeSpan.FromSeconds(60),
             MessageCacheSize = 4096,
             EnableSentry = true,
