@@ -118,13 +118,13 @@ internal sealed class PluginLoader
 
     internal static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
     {
-        var applicationHash = UniversalExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
+        var applicationHash = HashingExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
 
         foreach (var plugin in _bot.Plugins)
         {
             try
             {
-                var pluginHash = UniversalExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
+                var pluginHash = HashingExtensions.ComputeSHA256Hash(plugin.Value.LoadedFile);
                 Dictionary<Assembly, string> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
@@ -155,7 +155,7 @@ internal sealed class PluginLoader
                 pluginInfo.LastKnownHash = pluginHash;
 
                 if (pluginInfo.CompiledCommands.Any())
-                    _ = UniversalExtensions.CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
+                    _ = FileExtensions.CleanupFilesAndDirectories(new(), pluginInfo.CompiledCommands.Select(x => x.Key).ToList());
 
                 pluginInfo.CompiledCommands = new();
 

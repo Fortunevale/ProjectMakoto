@@ -51,7 +51,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder().
                     WithDescription($"{GetString(CommandKey.Scanning, true, new TVar("Victim", victim.Mention))}\n" +
-                                    $"`{UniversalExtensions.GenerateASCIIProgressbar(currentProg, maxProg)} {UniversalExtensions.CalculatePercentage(currentProg, maxProg),3}%`")
+                                    $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg),3}%`")
                     .AsLoading(ctx)));
 
                 int MessageInt = number;
@@ -120,7 +120,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
-                                 $"`{UniversalExtensions.GenerateASCIIProgressbar(currentProg, maxProg)} {UniversalExtensions.CalculatePercentage(currentProg, maxProg)}%`")
+                                 $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg)}%`")
                 .AsLoading(ctx)));
 
             currentProg = 0;
@@ -135,7 +135,7 @@ internal sealed class GuildPurgeCommand : BaseCommand
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"{GetString(CommandKey.Deleting, true, new TVar("Victim", victim.Mention), new TVar("Count", allMsg))}\n" +
-                                         $"`{UniversalExtensions.GenerateASCIIProgressbar(currentProg, maxProg)} {UniversalExtensions.CalculatePercentage(currentProg, maxProg)}%`")
+                                         $"`{StringTools.GenerateASCIIProgressbar(currentProg, maxProg)} {MathTools.CalculatePercentage(currentProg, maxProg)}%`")
                         .AsLoading(ctx)));
 
                     while (channel.Value.Count > 0)

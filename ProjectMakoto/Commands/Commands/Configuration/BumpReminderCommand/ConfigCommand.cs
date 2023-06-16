@@ -128,7 +128,7 @@ internal sealed class ConfigCommand : BaseCommand
             {
                 ctx.Bot.guilds[ctx.Guild.Id].BumpReminder = new(ctx.Bot.guilds[ctx.Guild.Id]);
 
-                foreach (var b in UniversalExtensions.GetScheduledTasks())
+                foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
                 {
                     if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                         continue;

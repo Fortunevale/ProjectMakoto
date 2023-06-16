@@ -647,7 +647,7 @@ public sealed class DatabaseClient
 
     internal async Task Dispose()
     {
-        foreach (var b in UniversalExtensions.GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
+        foreach (var b in ScheduledTaskExtensions.GetScheduledTasks().Where(x => x.CustomData?.ToString() == "database-connection-watcher"))
             b.Delete();
 
         int timeout = 0;

@@ -71,6 +71,7 @@ global using Xorog.ScoreSaber.Objects;
 global using Xorog.UniversalExtensions;
 global using Xorog.UniversalExtensions.Entities;
 global using Xorog.UniversalExtensions.Enums;
+global using Xorog.UniversalExtensions.Converters;
 
 global using Dapper;
 global using MySql.Data.MySqlClient;

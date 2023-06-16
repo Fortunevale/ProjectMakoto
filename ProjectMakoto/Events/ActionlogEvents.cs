@@ -607,7 +607,7 @@ internal sealed class ActionlogEvents
             Footer = new DiscordEmbedBuilder.EmbedFooter { Text = $"Role-Id: {e.Role.Id}" },
             Timestamp = DateTime.UtcNow,
             Description = $"**Role**: {e.Role.Mention} `{e.Role.Name}`\n" +
-                                        $"**Color**: `{UniversalExtensions.ToHex(e.Role.Color.R, e.Role.Color.G, e.Role.Color.B)}`\n" +
+                                        $"**Color**: `{ColorTools.ToHex(e.Role.Color.R, e.Role.Color.G, e.Role.Color.B)}`\n" +
                                         $"{(e.Role.IsManaged ? "\n`This role belongs to an integration and cannot be deleted.`\n" : "")}" +
                                         $"{Integration}" +
                                         $"{(e.Role.IsMentionable ? "`Everyone can mention this role.`\n" : "")}" +

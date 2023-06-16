@@ -240,7 +240,7 @@ internal static class DiscordExtensions
             { Color.FromArgb(253, 203, 88)  , ":yellow_circle:" },
         };
 
-        var color = UniversalExtensions.GetClosestColor(colorArray.Select(x => x.Key).ToList(), Color.FromArgb(discordColor.R, discordColor.G, discordColor.B));
+        var color = ColorTools.GetClosestColor(colorArray.Select(x => x.Key).ToList(), Color.FromArgb(discordColor.R, discordColor.G, discordColor.B));
 
         return DiscordEmoji.FromName(client, colorArray[color]);
     }

@@ -37,7 +37,7 @@ public sealed class PollSettings
             await Task.Delay(1000);
 
         foreach (var b in this.RunningPolls.ToList())
-            if (!UniversalExtensions.GetScheduledTasks().Any(x =>
+            if (!ScheduledTaskExtensions.GetScheduledTasks().Any(x =>
             {
                 if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
                 scheduledTaskIdentifier.Snowflake != this.Parent.ServerId ||
@@ -188,7 +188,7 @@ public sealed class PollSettings
                 _logger.LogDebug("Created scheduled task for poll by '{Guild}'", this.Parent.ServerId);
             }
 
-        foreach (var b in UniversalExtensions.GetScheduledTasks())
+        foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
         {
             if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                 continue;
