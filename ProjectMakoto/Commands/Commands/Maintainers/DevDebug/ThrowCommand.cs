@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Commands;
 
-internal class ThrowCommand : BaseCommand
+internal sealed class ThrowCommand : BaseCommand
 {
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
