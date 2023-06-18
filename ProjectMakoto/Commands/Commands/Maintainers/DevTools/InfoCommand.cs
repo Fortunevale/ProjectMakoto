@@ -22,8 +22,8 @@ internal sealed class InfoCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsBotLoading(ctx));
 
-            var currentSystemStats = await ctx.Bot.monitorClient.GetCurrent();
-            var history = ctx.Bot.monitorClient.GetHistory();
+            var currentSystemStats = await ctx.Bot.MonitorClient.GetCurrent();
+            var history = ctx.Bot.MonitorClient.GetHistory();
 
             string ServerUptime = "";
             if (Environment.OSVersion.Platform == PlatformID.Unix)

@@ -8,14 +8,11 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Events;
-internal sealed class ReminderEvents
+internal sealed class ReminderEvents : RequiresTranslation
 {
-    internal ReminderEvents(Bot _bot)
+    public ReminderEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
     {
@@ -36,9 +33,9 @@ internal sealed class ReminderEvents
 
         ReminderSnoozeButton reminder = JsonConvert.DeserializeObject<ReminderSnoozeButton>(e.Id);
 
-        new RemindersCommand().ExecuteCommand(e, sender, "reminders", this._bot, new Dictionary<string, object>
+        new RemindersCommand().ExecuteCommand(e, sender, "reminders", this.Bot, new Dictionary<string, object>
         {
             { "description", reminder.Description },
-        }).Add(this._bot);
+        }).Add(this.Bot);
     }
 }

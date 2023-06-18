@@ -190,7 +190,7 @@ public sealed class TaskWatcher
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.discordClient.Guilds[bot.status.LoadedConfig.Channels.Assets].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Channels.Assets].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
 
                         DiscordEmbedBuilder template = new DiscordEmbedBuilder()
                                                     .WithColor(e.LogEntry.LogLevel == CustomLogLevel.Fatal ? new DiscordColor("#FF0000") : EmbedColors.Error)
@@ -286,7 +286,7 @@ public sealed class TaskWatcher
                     {
                         try
                         {
-                            await bot.discordClient.ConnectAsync();
+                            await bot.DiscordClient.ConnectAsync();
                         }
                         catch (Exception ex)
                         {

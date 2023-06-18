@@ -41,7 +41,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
         try
         {
-            var player = await ctx.Bot.scoreSaberClient.GetPlayerById(id);
+            var player = await ctx.Bot.ScoreSaberClient.GetPlayerById(id);
 
             CancellationTokenSource cancellationTokenSource = new();
 
@@ -109,7 +109,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                CachedTopScores ??= await ctx.Bot.scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
+                                CachedTopScores ??= await ctx.Bot.ScoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.TOP);
 
                                 ShowScores(CachedTopScores, RequestParameters.ScoreType.TOP).Add(ctx.Bot, ctx);
                             }
@@ -143,7 +143,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         {
                             try
                             {
-                                CachedRecentScores ??= await ctx.Bot.scoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
+                                CachedRecentScores ??= await ctx.Bot.ScoreSaberClient.GetScoresById(id, RequestParameters.ScoreType.RECENT);
 
                                 ShowScores(CachedRecentScores, RequestParameters.ScoreType.RECENT).Add(ctx.Bot, ctx);
                             }

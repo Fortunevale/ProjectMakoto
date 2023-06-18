@@ -36,12 +36,12 @@ internal sealed class RequestCommand : BaseCommand
 
             RequestData requestData = new();
 
-            if (ctx.Bot.users.ContainsKey(ctx.User.Id))
+            if (ctx.Bot.Users.ContainsKey(ctx.User.Id))
             {
                 requestData.User = ctx.DbUser;
             }
 
-            foreach (var guild in ctx.Bot.guilds)
+            foreach (var guild in ctx.Bot.Guilds)
             {
                 if (guild.Value.Members.TryGetValue(ctx.User.Id, out Member member))
                 {

@@ -9,34 +9,29 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Guild
+public sealed class Guild : BaseSelfFillingList
 {
-    public Guild(ulong serverId, Bot bot)
+    public Guild(ulong serverId, Bot bot) : base(bot, serverId)
     {
-        this._bot = bot;
+        this.TokenLeakDetection = new(bot, this);
+        this.PhishingDetection = new(bot, this);
+        this.BumpReminder = new(bot, this);
+        this.Join = new(bot, this);
+        this.Experience = new(bot, this);
+        this.Crosspost = new(bot, this);
+        this.ActionLog = new(bot, this);
+        this.InVoiceTextPrivacy = new(bot, this);
+        this.InviteTracker = new(bot, this);
+        this.InviteNotes = new(bot, this);
+        this.NameNormalizer = new(bot, this);
+        this.EmbedMessage = new(bot, this);
+        this.MusicModule = new(bot, this);
+        this.Polls = new(bot, this);
+        this.VcCreator = new(bot, this);
+        this.PrefixSettings = new(bot, this);
 
-        this.ServerId = serverId;
-
-        this.TokenLeakDetection = new(this);
-        this.PhishingDetection = new(this);
-        this.BumpReminder = new(this);
-        this.Join = new(this);
-        this.Experience = new(this);
-        this.Crosspost = new(this);
-        this.ActionLog = new(this);
-        this.InVoiceTextPrivacy = new(this);
-        this.InviteTracker = new(this);
-        this.InviteNotes = new(this);
-        this.NameNormalizer = new(this);
-        this.EmbedMessage = new(this);
-        this.MusicModule = new(this);
-        this.Polls = new(this, bot);
-        this.VcCreator = new(this, bot);
-        this.PrefixSettings = new(this);
+        this.Members = new(bot);
     }
-
-    public Bot _bot { get; set; }
-    public ulong ServerId { get; set; }
 
     public TokenLeakDetectionSettings TokenLeakDetection { get; set; }
     public PhishingDetectionSettings PhishingDetection { get; set; }
@@ -58,7 +53,7 @@ public sealed class Guild
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
     public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
 
-    public Dictionary<ulong, Member> Members { get; set; } = new();
+    public SelfFillingDictionary<Member> Members { get; set; }
 
     public Lavalink MusicModule { get; set; }
 

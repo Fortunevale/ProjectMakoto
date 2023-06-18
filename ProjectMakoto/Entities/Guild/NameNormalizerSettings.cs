@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class NameNormalizerSettings
+public sealed class NameNormalizerSettings : RequiresParent<Guild>
 {
-    public NameNormalizerSettings(Guild guild)
+    public NameNormalizerSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private bool _NameNormalizerEnabled { get; set; } = false;
     public bool NameNormalizerEnabled
@@ -27,7 +22,7 @@ public sealed class NameNormalizerSettings
         set
         {
             this._NameNormalizerEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "normalizenames", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

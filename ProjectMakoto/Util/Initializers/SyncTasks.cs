@@ -25,7 +25,7 @@ internal sealed class SyncTasks
 
                 Dictionary<string, TimeSpan> VideoLengthCache = new();
 
-                foreach (var user in bot.users)
+                foreach (var user in bot.Users)
                 {
                     foreach (var list in user.Value.UserPlaylists)
                     {
@@ -37,7 +37,7 @@ internal sealed class SyncTasks
                                 {
                                     _logger.LogInfo("Fetching video length for '{Url}'", b.Url);
 
-                                    var track = await bot.discordClient.GetLavalink().ConnectedNodes.First(x => x.Value.IsConnected).Value.Rest.GetTracksAsync(b.Url, LavalinkSearchType.Plain);
+                                    var track = await bot.DiscordClient.GetLavalink().ConnectedNodes.First(x => x.Value.IsConnected).Value.Rest.GetTracksAsync(b.Url, LavalinkSearchType.Plain);
 
                                     if (track.LoadResultType != LavalinkLoadResultType.TrackLoaded)
                                     {
@@ -59,39 +59,34 @@ internal sealed class SyncTasks
 
             for (int i = 0; i < 501; i++)
             {
-                bot.experienceHandler.CalculateLevelRequirement(i);
+                bot.ExperienceHandler.CalculateLevelRequirement(i);
             }
 
             foreach (var guild in e.Guilds)
             {
-                if (!bot.guilds.ContainsKey(guild.Key))
-                    bot.guilds.Add(guild.Key, new Guild(guild.Key, bot));
+                if (!bot.Guilds.ContainsKey(guild.Key))
+                    bot.Guilds.Add(guild.Key, new Guild(guild.Key, bot));
 
-                if (bot.guilds[guild.Key].BumpReminder.Enabled)
+                if (bot.Guilds[guild.Key].BumpReminder.Enabled)
                 {
-                    bot.bumpReminder.ScheduleBump(sender, guild.Key);
+                    bot.BumpReminder.ScheduleBump(sender, guild.Key);
                 }
 
                 foreach (var member in guild.Value.Members)
                 {
-                    if (!bot.guilds[guild.Key].Members.ContainsKey(member.Value.Id))
-                    {
-                        bot.guilds[guild.Key].Members.Add(member.Value.Id, new(bot.guilds[guild.Key], member.Value.Id));
-                    }
-
-                    bot.experienceHandler.CheckExperience(member.Key, guild.Value);
+                    bot.ExperienceHandler.CheckExperience(member.Key, guild.Value);
                 }
 
-                if (bot.guilds[guild.Key].Crosspost.CrosspostChannels.Any())
+                if (bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Any())
                 {
                     Task.Run(async () =>
                     {
-                        for (int i = 0; i < bot.guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
+                        for (int i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
                         {
                             if (guild.Value is null)
                                 return;
 
-                            var ChannelId = bot.guilds[guild.Key].Crosspost.CrosspostChannels[i];
+                            var ChannelId = bot.Guilds[guild.Key].Crosspost.CrosspostChannels[i];
 
                             _logger.LogDebug("Checking channel '{ChannelId}' for missing crossposts..", ChannelId);
 
@@ -105,17 +100,17 @@ internal sealed class SyncTasks
                                 {
                                     _logger.LogDebug("Handling missing crosspost message '{msg}' in '{ChannelId}' for '{guild}'..", msg.Id, msg.ChannelId, guild.Key);
 
-                                    var WaitTime = bot.guilds[guild.Value.Id].Crosspost.DelayBeforePosting - msg.Id.GetSnowflakeTime().GetTotalSecondsSince();
+                                    var WaitTime = bot.Guilds[guild.Value.Id].Crosspost.DelayBeforePosting - msg.Id.GetSnowflakeTime().GetTotalSecondsSince();
 
                                     if (WaitTime > 0)
                                         await Task.Delay(TimeSpan.FromSeconds(WaitTime));
 
-                                    if (bot.guilds[guild.Value.Id].Crosspost.DelayBeforePosting > 3)
+                                    if (bot.Guilds[guild.Value.Id].Crosspost.DelayBeforePosting > 3)
                                         _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
                                     bool ReactionAdded = false;
 
-                                    var task = bot.guilds[guild.Value.Id].Crosspost.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
+                                    var task = bot.Guilds[guild.Value.Id].Crosspost.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
                                     {
                                         if (ReactionAdded)
                                             _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
@@ -139,7 +134,7 @@ internal sealed class SyncTasks
 
             try
             {
-                await ExecuteSyncTasks(bot, bot.discordClient.Guilds);
+                await ExecuteSyncTasks(bot, bot.DiscordClient.Guilds);
             }
             catch (Exception ex)
             {
@@ -159,24 +154,24 @@ internal sealed class SyncTasks
                 {
                     try
                     {
-                        if (bot.guilds[guild.Key].MusicModule.ChannelId != 0)
+                        if (bot.Guilds[guild.Key].MusicModule.ChannelId != 0)
                         {
-                            if (!guild.Value.Channels.ContainsKey(bot.guilds[guild.Key].MusicModule.ChannelId))
+                            if (!guild.Value.Channels.ContainsKey(bot.Guilds[guild.Key].MusicModule.ChannelId))
                                 throw new Exception("Channel no longer exists");
 
-                            if (bot.guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("localhost") || bot.guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("127.0.0.1"))
+                            if (bot.Guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("localhost") || bot.Guilds[guild.Key].MusicModule.CurrentVideo.ToLower().Contains("127.0.0.1"))
                                 throw new Exception("Localhost?");
 
-                            var channel = guild.Value.GetChannel(bot.guilds[guild.Key].MusicModule.ChannelId);
+                            var channel = guild.Value.GetChannel(bot.Guilds[guild.Key].MusicModule.ChannelId);
 
                             if (!channel.Users.Where(x => !x.IsBot).Any())
                                 throw new Exception("Channel empty");
 
-                            if (bot.guilds[guild.Key].MusicModule.SongQueue.Count > 0)
+                            if (bot.Guilds[guild.Key].MusicModule.SongQueue.Count > 0)
                             {
-                                for (var i = 0; i < bot.guilds[guild.Key].MusicModule.SongQueue.Count; i++)
+                                for (var i = 0; i < bot.Guilds[guild.Key].MusicModule.SongQueue.Count; i++)
                                 {
-                                    Lavalink.QueueInfo b = bot.guilds[guild.Key].MusicModule.SongQueue[i];
+                                    Lavalink.QueueInfo b = bot.Guilds[guild.Key].MusicModule.SongQueue[i];
 
                                     _logger.LogDebug("Fixing queue info for '{Url}'", b.Url);
 
@@ -185,14 +180,14 @@ internal sealed class SyncTasks
                                     if (!UserCache.Any(x => x.Id == b.UserId))
                                     {
                                         _logger.LogDebug("Fetching user '{UserId}'", b.UserId);
-                                        UserCache.Add(await bot.discordClient.GetUserAsync(b.UserId));
+                                        UserCache.Add(await bot.DiscordClient.GetUserAsync(b.UserId));
                                     }
 
                                     b.user = UserCache.First(x => x.Id == b.UserId);
                                 }
                             }
 
-                            var lava = bot.discordClient.GetLavalink();
+                            var lava = bot.DiscordClient.GetLavalink();
 
                             while (!lava.ConnectedNodes.Values.Any(x => x.IsConnected))
                                 await Task.Delay(1000);
@@ -210,7 +205,7 @@ internal sealed class SyncTasks
                                 conn = await node.ConnectAsync(channel);
                             }
 
-                            var loadResult = await node.Rest.GetTracksAsync(bot.guilds[guild.Key].MusicModule.CurrentVideo, LavalinkSearchType.Plain);
+                            var loadResult = await node.Rest.GetTracksAsync(bot.Guilds[guild.Key].MusicModule.CurrentVideo, LavalinkSearchType.Plain);
 
                             if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
                                 return;
@@ -218,15 +213,15 @@ internal sealed class SyncTasks
                             await conn.PlayAsync(loadResult.Tracks.First());
 
                             await Task.Delay(2000);
-                            await conn.SeekAsync(TimeSpan.FromSeconds(bot.guilds[guild.Key].MusicModule.CurrentVideoPosition));
+                            await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
 
-                            bot.guilds[guild.Key].MusicModule.QueueHandler(bot, bot.discordClient, node, conn);
+                            bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient, node, conn);
                         }
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError("An exception occurred while trying to continue music playback for '{guild}'", ex, guild.Key);
-                        bot.guilds[guild.Key].MusicModule = new(bot.guilds[guild.Key]);
+                        bot.Guilds[guild.Key].MusicModule = new(bot, bot.Guilds[guild.Key]);
                     }
                 });
 
@@ -277,46 +272,43 @@ internal sealed class SyncTasks
 
                 foreach (var member in guildMembers)
                 {
-                    if (!bot.guilds[guild.Key].Members.ContainsKey(member.Id))
-                        bot.guilds[guild.Key].Members.Add(member.Id, new(bot.guilds[guild.Key], member.Id));
+                    if (bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
+                        bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
 
-                    if (bot.guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
-                        bot.guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
+                    if (bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
+                        bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
 
-                    if (bot.guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
-                        bot.guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
-
-                    bot.guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
+                    bot.Guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
                     {
                         Id = x.Id,
                         Name = x.Name,
                     }).ToList();
 
-                    bot.guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
+                    bot.Guilds[guild.Key].Members[member.Id].SavedNickname = member.Nickname;
                 }
 
-                foreach (var databaseMember in bot.guilds[guild.Key].Members.ToList())
+                foreach (var databaseMember in bot.Guilds[guild.Key].Members.ToList())
                 {
                     if (!guildMembers.Any(x => x.Id == databaseMember.Key))
                     {
-                        if (bot.guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
-                            bot.guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
+                        if (bot.Guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate == DateTime.UnixEpoch)
+                            bot.Guilds[guild.Key].Members[databaseMember.Key].LastLeaveDate = DateTime.UtcNow;
                     }
                 }
 
                 foreach (var banEntry in guildBans)
                 {
-                    if (!bot.guilds[guild.Key].Members.ContainsKey(banEntry.User.Id))
+                    if (!bot.Guilds[guild.Key].Members.ContainsKey(banEntry.User.Id))
                         continue;
 
-                    if (bot.guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
-                        bot.guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
+                    if (bot.Guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Count > 0)
+                        bot.Guilds[guild.Key].Members[banEntry.User.Id].MemberRoles.Clear();
 
-                    if (bot.guilds[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
-                        bot.guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
+                    if (bot.Guilds[guild.Key].Members[banEntry.User.Id].SavedNickname != "")
+                        bot.Guilds[guild.Key].Members[banEntry.User.Id].SavedNickname = "";
                 }
 
-                if (bot.guilds[guild.Key].InviteTracker.Enabled)
+                if (bot.Guilds[guild.Key].InviteTracker.Enabled)
                 {
                     await InviteTrackerEvents.UpdateCachedInvites(bot, guild.Value);
                 }
@@ -350,7 +342,7 @@ internal sealed class SyncTasks
                 foreach (var b in Threads.Where(x => x.CurrentMember is null))
                 {
                     _logger.LogDebug("Joining thread on '{guild}': {thread}", guild.Key, b.Id);
-                    b.JoinWithQueue(bot.threadJoinClient);
+                    b.JoinWithQueue(bot.ThreadJoinClient);
                 }
             }
             catch (Exception ex)
@@ -366,6 +358,6 @@ internal sealed class SyncTasks
         runningTasks.Clear();
 
         _logger.LogInfo("Sync Tasks successfully finished for {startupTasksSuccess}/{GuildCount} guilds.", startupTasksSuccess, Guilds.Count);
-        _ = bot.databaseClient.FullSyncDatabase();
+        _ = bot.DatabaseClient.FullSyncDatabase();
     }
 }

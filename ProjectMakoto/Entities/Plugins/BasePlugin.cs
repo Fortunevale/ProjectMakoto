@@ -21,7 +21,7 @@ public abstract class BasePlugin
 
     internal FileInfo LoadedFile { get; set; }
 
-    public Bot _bot { get; set; }
+    public Bot Bot { get; set; }
 
     /// <summary>
     /// Allows you to log events.
@@ -32,31 +32,31 @@ public abstract class BasePlugin
     /// Whether the client logged into discord.
     /// </summary>
     public bool DiscordInitialized
-        => this._bot.status.DiscordInitialized;
+        => this.Bot.status.DiscordInitialized;
 
     /// <summary>
     /// Whether the guild download has been completed.
     /// </summary>
     public bool DiscordGuildDownloadCompleted
-        => this._bot.status.DiscordGuildDownloadCompleted;
+        => this.Bot.status.DiscordGuildDownloadCompleted;
 
     /// <summary>
     /// Whether the commands have been registered.
     /// </summary>
     public bool DiscordCommandsRegistered
-        => this._bot.status.DiscordCommandsRegistered;
+        => this.Bot.status.DiscordCommandsRegistered;
 
     /// <summary>
     /// Whether the database connection has been established.
     /// </summary>
     public bool DatabaseInitialized
-        => this._bot.status.DatabaseInitialized;
+        => this.Bot.status.DatabaseInitialized;
 
     /// <summary>
     /// Whether the database content has loaded.
     /// </summary>
     public bool DatabaseInitialLoadCompleted
-        => this._bot.status.DatabaseInitialLoadCompleted;
+        => this.Bot.status.DatabaseInitialLoadCompleted;
 
     /// <summary>
     /// The name of this plugin.
@@ -95,7 +95,7 @@ public abstract class BasePlugin
 
     public void Load(Bot bot)
     {
-        this._bot = bot;
+        this.Bot = bot;
         Initialize();
 
         _ = _ = Task.Run(async () =>
@@ -125,19 +125,19 @@ public abstract class BasePlugin
     }
 
     public object GetConfig()
-        => (this._bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
+        => (this.Bot.status.LoadedConfig.PluginData.TryGetValue(this.Name, out var val) ? val : null);
 
     public void WriteConfig(object configObject)
     {
-        if (!this._bot.status.LoadedConfig.PluginData.ContainsKey(this.Name))
-            this._bot.status.LoadedConfig.PluginData.Add(this.Name, null);
+        if (!this.Bot.status.LoadedConfig.PluginData.ContainsKey(this.Name))
+            this.Bot.status.LoadedConfig.PluginData.Add(this.Name, null);
 
-        this._bot.status.LoadedConfig.PluginData[this.Name] = configObject;
-        this._bot.status.LoadedConfig.Save();
+        this.Bot.status.LoadedConfig.PluginData[this.Name] = configObject;
+        this.Bot.status.LoadedConfig.Save();
     }
 
     public bool CheckIfConfigExists()
-        => this._bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
+        => this.Bot.status.LoadedConfig.PluginData.ContainsKey(this.Name);
 
     internal async Task CheckForUpdates()
     {
@@ -152,7 +152,7 @@ public abstract class BasePlugin
         var Owner = regex.Groups[1].Value;
         var Repository = regex.Groups[2].Value;
 
-        GitHubClient client = new(new ProductHeaderValue("ProjectMakoto", this._bot.status.RunningVersion));
+        GitHubClient client = new(new ProductHeaderValue("ProjectMakoto", this.Bot.status.RunningVersion));
 
         if (this.UpdateUrlCredentials is not null)
             client.Credentials = this.UpdateUrlCredentials;

@@ -9,17 +9,14 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class InviteNoteEvents
+internal sealed class InviteNoteEvents : RequiresTranslation
 {
-    internal InviteNoteEvents(Bot _bot)
+    public InviteNoteEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        this._bot.guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
+        this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.Remove(e.Invite.Code);
     }
 }

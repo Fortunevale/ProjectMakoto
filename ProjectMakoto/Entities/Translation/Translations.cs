@@ -924,8 +924,6 @@ public sealed class Translations
                 public SingleTranslationKey DatabaseCheck;
                 public SingleTranslationKey ConfirmHost;
                 public SingleTranslationKey InvalidHost;
-                public SingleTranslationKey GuildBan;
-                public SingleTranslationKey UserBan;
                 public SingleTranslationKey LimitError;
                 public SingleTranslationKey CooldownError;
                 public SingleTranslationKey Processing;

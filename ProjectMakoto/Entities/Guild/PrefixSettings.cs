@@ -8,22 +8,19 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities;
-public sealed class PrefixSettings
+public sealed class PrefixSettings : RequiresParent<Guild>
 {
-    public PrefixSettings(Guild guild)
+    public PrefixSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
 
     private string _Prefix { get; set; }
     public string Prefix
     {
-        get => this._Prefix.IsNullOrWhiteSpace() ? this.Parent._bot.Prefix : this._Prefix; set
+        get => this._Prefix.IsNullOrWhiteSpace() ? this.Bot.Prefix : this._Prefix; set
         {
-            this._Prefix = value.IsNullOrWhiteSpace() ? this.Parent._bot.Prefix : value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "prefix", value, Bot.DatabaseClient.mainDatabaseConnection);
+            this._Prefix = value.IsNullOrWhiteSpace() ? this.Bot.Prefix : value;
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "prefix", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +30,7 @@ public sealed class PrefixSettings
         get => this._PrefixDisabled; set
         {
             this._PrefixDisabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "prefix_disabled", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "prefix_disabled", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class ExperienceMember
+public sealed class ExperienceMember : RequiresParent<Member>
 {
-    public ExperienceMember(Member member)
+    public ExperienceMember(Bot bot, Member parent) : base(bot, parent)
     {
-        this.Parent = member;
     }
-
-    private Member Parent { get; set; }
-
-
 
     private DateTime _Last_Message { get; set; } = DateTime.UnixEpoch;
     public DateTime Last_Message
@@ -27,7 +22,7 @@ public sealed class ExperienceMember
         set
         {
             this._Last_Message = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "experience_last_message", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience_last_message", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -38,7 +33,7 @@ public sealed class ExperienceMember
         set
         {
             this._Points = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "experience", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -55,7 +50,7 @@ public sealed class ExperienceMember
         set
         {
             this._Level = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "experience_level", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "experience_level", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 }

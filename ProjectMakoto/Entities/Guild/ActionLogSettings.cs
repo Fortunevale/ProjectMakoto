@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class ActionLogSettings
+public sealed class ActionLogSettings : RequiresParent<Guild>
 {
-    public ActionLogSettings(Guild guild)
+    public ActionLogSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
-
-        this._ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated;
     }
-
-    private Guild Parent { get; set; }
 
     public ObservableList<ulong> ProcessedAuditLogs { get => this._ProcessedAuditLogs; set { this._ProcessedAuditLogs = value; this._ProcessedAuditLogs.ItemsChanged += AuditLogCollectionUpdated; } }
     private ObservableList<ulong> _ProcessedAuditLogs { get; set; } = new();
@@ -29,7 +24,7 @@ public sealed class ActionLogSettings
         get => this._Channel; set
         {
             this._Channel = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_channel", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_channel", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -40,7 +35,7 @@ public sealed class ActionLogSettings
         set
         {
             this._AttemptGettingMoreDetails = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_attempt_further_detail", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_attempt_further_detail", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -51,7 +46,7 @@ public sealed class ActionLogSettings
         set
         {
             this._MembersModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_members_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_members_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -62,7 +57,7 @@ public sealed class ActionLogSettings
         set
         {
             this._MemberModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_member_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_member_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -73,7 +68,7 @@ public sealed class ActionLogSettings
         set
         {
             this._MemberProfileModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_memberprofile_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_memberprofile_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -84,7 +79,7 @@ public sealed class ActionLogSettings
         set
         {
             this._MessageDeleted = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_message_deleted", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_message_deleted", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -95,7 +90,7 @@ public sealed class ActionLogSettings
         set
         {
             this._MessageModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_message_updated", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_message_updated", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -106,7 +101,7 @@ public sealed class ActionLogSettings
         set
         {
             this._RolesModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_roles_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_roles_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -117,7 +112,7 @@ public sealed class ActionLogSettings
         set
         {
             this._BanlistModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_banlist_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_banlist_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -128,7 +123,7 @@ public sealed class ActionLogSettings
         set
         {
             this._GuildModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_guild_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_guild_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -139,7 +134,7 @@ public sealed class ActionLogSettings
         set
         {
             this._ChannelsModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_channels_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_channels_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -150,7 +145,7 @@ public sealed class ActionLogSettings
         set
         {
             this._VoiceStateUpdated = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_voice_state", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_voice_state", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -161,7 +156,7 @@ public sealed class ActionLogSettings
         set
         {
             this._InvitesModified = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "actionlog_log_invites_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "actionlog_log_invites_modified", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

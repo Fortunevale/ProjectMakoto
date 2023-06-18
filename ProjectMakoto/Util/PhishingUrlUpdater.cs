@@ -9,14 +9,11 @@
 
 namespace ProjectMakoto.Util;
 
-internal sealed class PhishingUrlUpdater
+internal sealed class PhishingUrlUpdater : RequiresBotReference
 {
-    internal PhishingUrlUpdater(Bot _bot)
+    public PhishingUrlUpdater(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     public async Task UpdatePhishingUrlDatabase()
     {
@@ -31,20 +28,20 @@ internal sealed class PhishingUrlUpdater
 
         foreach (var b in urls)
         {
-            if (!this._bot.phishingUrls.ContainsKey(b.Url))
+            if (!this.Bot.PhishingHosts.ContainsKey(b.Url))
             {
                 DatabaseUpdated = true;
-                this._bot.phishingUrls.Add(b.Url, b);
+                this.Bot.PhishingHosts.Add(b.Url, b);
                 continue;
             }
 
-            if (this._bot.phishingUrls.ContainsKey(b.Url))
+            if (this.Bot.PhishingHosts.ContainsKey(b.Url))
             {
-                if (this._bot.phishingUrls[b.Url].Origin.Count != b.Origin.Count)
+                if (this.Bot.PhishingHosts[b.Url].Origin.Count != b.Origin.Count)
                 {
                     DatabaseUpdated = true;
-                    this._bot.phishingUrls[b.Url].Origin = b.Origin;
-                    this._bot.phishingUrls[b.Url].Submitter = b.Submitter;
+                    this.Bot.PhishingHosts[b.Url].Origin = b.Origin;
+                    this.Bot.PhishingHosts[b.Url].Submitter = b.Submitter;
                     continue;
                 }
             }
@@ -52,11 +49,11 @@ internal sealed class PhishingUrlUpdater
 
         List<string> dropUrls = new();
 
-        if (this._bot.phishingUrls.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
-            foreach (var b in this._bot.phishingUrls.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
+        if (this.Bot.PhishingHosts.Any(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)))
+            foreach (var b in this.Bot.PhishingHosts.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
             {
                 DatabaseUpdated = true;
-                this._bot.phishingUrls.Remove(b.Key);
+                this.Bot.PhishingHosts.Remove(b.Key);
                 dropUrls.Add(b.Key);
             }
 
@@ -89,12 +86,12 @@ internal sealed class PhishingUrlUpdater
         {
             this.UpdateRunning = true;
 
-            await this._bot.databaseClient.FullSyncDatabase();
+            await this.Bot.DatabaseClient.FullSyncDatabase();
 
             if (dropUrls.Count != 0)
                 foreach (var b in dropUrls)
                 {
-                    await this._bot.databaseClient._helper.DeleteRow(this._bot.databaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
+                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "scam_urls", "url", $"{b}");
 
                     _logger.LogDebug("Dropped '{host}' from table 'scam_urls'.", b);
                 }

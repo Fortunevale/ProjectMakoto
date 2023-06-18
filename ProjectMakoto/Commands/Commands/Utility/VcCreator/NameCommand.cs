@@ -23,29 +23,29 @@ internal sealed class NameCommand : BaseCommand
 
             newName = (newName.IsNullOrWhiteSpace() ? GetGuildString(this.t.Commands.Utility.VoiceChannelCreator.Events.DefaultChannelName, new TVar("User", ctx.Member.DisplayName)) : newName);
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename.GetTimespanSince() < TimeSpan.FromMinutes(5))
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].LastRename.GetTimespanSince() < TimeSpan.FromMinutes(5))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Name.Cooldown, true,
-                    new TVar("Timestamp", ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename.AddMinutes(5).ToTimestamp()))).AsError(ctx));
+                    new TVar("Timestamp", ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].LastRename.AddMinutes(5).ToTimestamp()))).AsError(ctx));
                 return;
             }
 
-            foreach (var b in ctx.Bot.profanityList)
+            foreach (var b in ctx.Bot.ProfanityList)
                 newName = newName.Replace(b, new String('*', b.Length));
 
-            ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].LastRename = DateTime.UtcNow;
+            ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].LastRename = DateTime.UtcNow;
             await channel.ModifyAsync(x => x.Name = newName.TruncateWithIndication(25));
             _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Name.Success, true,
                 new TVar("Name", newName, true))).AsSuccess(ctx));

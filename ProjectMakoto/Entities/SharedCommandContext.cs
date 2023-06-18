@@ -40,7 +40,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.Users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -49,7 +49,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.Guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -66,7 +66,7 @@ public sealed class SharedCommandContext
         this.Channel = message.Channel;
 
         this.CurrentMember = message.Channel?.Guild?.CurrentMember;
-        this.CurrentUser = _bot.discordClient.CurrentUser;
+        this.CurrentUser = _bot.DiscordClient.CurrentUser;
 
         this.Bot = _bot;
 
@@ -79,7 +79,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbUser = _bot.users[message.Author.Id];
+            this.DbUser = _bot.Users[message.Author.Id];
         }
         catch (Exception ex)
         {
@@ -88,7 +88,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbGuild = _bot.guilds[message.Channel.Guild.Id];
+            this.DbGuild = _bot.Guilds[message.Channel.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -121,7 +121,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.Users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -130,7 +130,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.Guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -165,7 +165,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.Users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -174,7 +174,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.Guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {
@@ -207,7 +207,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbUser = _bot.users[ctx.User.Id];
+            this.DbUser = _bot.Users[ctx.User.Id];
         }
         catch (Exception ex)
         {
@@ -216,7 +216,7 @@ public sealed class SharedCommandContext
 
         try
         {
-            this.DbGuild = _bot.guilds[ctx.Guild.Id];
+            this.DbGuild = _bot.Guilds[ctx.Guild.Id];
         }
         catch (Exception ex)
         {

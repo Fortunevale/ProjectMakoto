@@ -75,15 +75,15 @@ internal sealed class ConfigCommand : BaseCommand
                     throw ChannelResult.Exception;
                 }
 
-                if (!ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelResult.Result.Id))
-                    ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Add(ChannelResult.Result.Id);
+                if (!ctx.DbGuild.AutoUnarchiveThreads.Contains(ChannelResult.Result.Id))
+                    ctx.DbGuild.AutoUnarchiveThreads.Add(ChannelResult.Result.Id);
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == Remove.CustomId)
             {
-                var ChannelResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads
+                var ChannelResult = await PromptCustomSelection(ctx.DbGuild.AutoUnarchiveThreads
                         .Select(x => new DiscordStringSelectComponentOption($"#{ctx.Guild.GetChannel(x).Name} ({x})", x.ToString(), $"{(ctx.Guild.GetChannel(x).Parent is not null ? $"{ctx.Guild.GetChannel(x).Parent.Name}" : "")}")).ToList());
 
                 if (ChannelResult.TimedOut)
@@ -103,8 +103,8 @@ internal sealed class ConfigCommand : BaseCommand
 
                 ulong ChannelToRemove = Convert.ToUInt64(ChannelResult.Result);
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Contains(ChannelToRemove))
-                    ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Remove(ChannelToRemove);
+                if (ctx.DbGuild.AutoUnarchiveThreads.Contains(ChannelToRemove))
+                    ctx.DbGuild.AutoUnarchiveThreads.Remove(ChannelToRemove);
 
                 await ExecuteCommand(ctx, arguments);
                 return;

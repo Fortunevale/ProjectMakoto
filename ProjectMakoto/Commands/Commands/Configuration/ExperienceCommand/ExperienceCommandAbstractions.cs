@@ -13,11 +13,11 @@ internal sealed class ExperienceCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.Experience;
+        var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.Experience;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ExperienceEnabled, CommandKey.ExperienceBoostForBumpers);
 
-        return $"{"✨".UnicodeToEmoji()} `{CommandKey.ExperienceEnabled.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience.ToEmote(ctx.Bot)}\n" +
-               $"{"⏫".UnicodeToEmoji()} `{CommandKey.ExperienceBoostForBumpers.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].Experience.BoostXpForBumpReminder.ToEmote(ctx.Bot)}";
+        return $"{"✨".UnicodeToEmoji()} `{CommandKey.ExperienceEnabled.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Experience.UseExperience.ToEmote(ctx.Bot)}\n" +
+               $"{"⏫".UnicodeToEmoji()} `{CommandKey.ExperienceBoostForBumpers.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Experience.BoostXpForBumpReminder.ToEmote(ctx.Bot)}";
     }
 }

@@ -25,7 +25,7 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = NameNormalizerCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, "Name Normalizer");
 
-            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Name Normalizer", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var Toggle = new DiscordButtonComponent((ctx.DbGuild.NameNormalizer.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Name Normalizer", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var SearchAllNames = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Normalize Everyone's Names", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -48,14 +48,14 @@ internal sealed class ConfigCommand : BaseCommand
 
             if (e.GetCustomId() == Toggle.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled = !ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled;
+                ctx.DbGuild.NameNormalizer.NameNormalizerEnabled = !ctx.DbGuild.NameNormalizer.NameNormalizerEnabled;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == SearchAllNames.CustomId)
             {
-                if (ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning)
+                if (ctx.DbGuild.NameNormalizer.NameNormalizerRunning)
                 {
                     embed = embed.AsError(ctx, "Name Normalizer");
                     embed.Description = $"`A normalizer is already running.`";
@@ -68,7 +68,7 @@ internal sealed class ConfigCommand : BaseCommand
                 if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                     return;
 
-                ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning = true;
+                ctx.DbGuild.NameNormalizer.NameNormalizerRunning = true;
 
                 try
                 {
@@ -100,11 +100,11 @@ internal sealed class ConfigCommand : BaseCommand
                     embed.Description = $"`Renamed {Renamed} members.`";
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                     await Task.Delay(5000);
-                    ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning = false;
+                    ctx.DbGuild.NameNormalizer.NameNormalizerRunning = false;
                 }
                 catch (Exception)
                 {
-                    ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerRunning = false;
+                    ctx.DbGuild.NameNormalizer.NameNormalizerRunning = false;
                     throw;
                 }
 

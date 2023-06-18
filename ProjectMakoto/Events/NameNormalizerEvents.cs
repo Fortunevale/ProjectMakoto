@@ -9,18 +9,15 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class NameNormalizerEvents
+internal sealed class NameNormalizerEvents : RequiresTranslation
 {
-    internal NameNormalizerEvents(Bot _bot)
+    public NameNormalizerEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        if (!this._bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
+        if (!this.Bot.Guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
             return;
 
         string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
@@ -34,7 +31,7 @@ internal sealed class NameNormalizerEvents
 
     internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
     {
-        if (!this._bot.guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
+        if (!this.Bot.Guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
             return;
 
         if (e.NicknameBefore != e.NicknameAfter)
@@ -56,7 +53,7 @@ internal sealed class NameNormalizerEvents
 
         foreach (var guild in sender.Guilds)
         {
-            if (!this._bot.guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
+            if (!this.Bot.Guilds[guild.Key].NameNormalizer.NameNormalizerEnabled)
                 return;
 
             var member = await e.UserAfter.ConvertToMember(guild.Value);

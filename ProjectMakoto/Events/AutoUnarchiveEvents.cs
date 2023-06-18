@@ -9,19 +9,16 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class AutoUnarchiveEvents
+internal sealed class AutoUnarchiveEvents : RequiresTranslation
 {
-    internal AutoUnarchiveEvents(Bot _bot)
+    public AutoUnarchiveEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task ThreadUpdated(DiscordClient sender, ThreadUpdateEventArgs e)
     {
         await Task.Delay(5000);
-        if (this._bot.guilds[e.Guild.Id].AutoUnarchiveThreads.Contains(e.ThreadAfter.Parent.Id))
+        if (this.Bot.Guilds[e.Guild.Id].AutoUnarchiveThreads.Contains(e.ThreadAfter.Parent.Id))
         {
             if (e.ThreadAfter.ThreadMetadata.Archived && (!e.ThreadAfter.ThreadMetadata.Locked ?? false))
                 _ = e.ThreadAfter.UnarchiveAsync();

@@ -33,11 +33,11 @@ internal sealed class ShuffleCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle = !ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle;
+            ctx.DbGuild.MusicModule.Shuffle = !ctx.DbGuild.MusicModule.Shuffle;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? GetString(this.t.Commands.Music.Shuffle.On, true) : GetString(this.t.Commands.Music.Shuffle.Off, true)),
+                Description = (ctx.DbGuild.MusicModule.Shuffle ? GetString(this.t.Commands.Music.Shuffle.On, true) : GetString(this.t.Commands.Music.Shuffle.Off, true)),
             }.AsSuccess(ctx));
         });
     }

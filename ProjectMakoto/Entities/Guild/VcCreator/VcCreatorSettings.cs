@@ -9,20 +9,13 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class VcCreatorSettings
+public sealed class VcCreatorSettings : RequiresParent<Guild>
 {
-    public VcCreatorSettings(Guild guild, Bot bot)
+    public VcCreatorSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
-
-        this._bot = bot;
-        this._CreatedChannels.ItemsChanged += CreatedChannelsUpdated;
     }
 
-    private Guild Parent { get; set; }
     private DiscordGuild cachedGuild { get; set; }
-
-    private Bot _bot { get; set; }
 
     private ulong _Channel { get; set; } = 0;
     public ulong Channel
@@ -30,7 +23,7 @@ public sealed class VcCreatorSettings
         get => this._Channel; set
         {
             this._Channel = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "vccreator_channelid", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vccreator_channelid", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -42,10 +35,10 @@ public sealed class VcCreatorSettings
 
     private async void CreatedChannelsUpdated(object? sender, ObservableListUpdate<KeyValuePair<ulong, VcCreatorDetails>> e)
     {
-        while (!this._bot.status.DiscordGuildDownloadCompleted)
+        while (!this.Bot.status.DiscordGuildDownloadCompleted)
             await Task.Delay(1000);
 
-        this.cachedGuild ??= await this._bot.discordClient.GetGuildAsync(this.Parent.ServerId);
+        this.cachedGuild ??= await this.Bot.DiscordClient.GetGuildAsync(this.Parent.Id);
 
         await Task.Delay(5000);
 
@@ -120,14 +113,14 @@ public sealed class VcCreatorSettings
                                     }
                                 }
                             }
-                        }).Add(this._bot);
+                        }).Add(this.Bot);
                     }
 
                     Task.Run(async () =>
                     {
                         await Task.Delay(5000);
 
-                        var channel = await this._bot.discordClient.GetChannelAsync(b.Key);
+                        var channel = await this.Bot.DiscordClient.GetChannelAsync(b.Key);
 
                         if (channel.Users.Count <= 0)
                         {
@@ -137,17 +130,17 @@ public sealed class VcCreatorSettings
                             this.CreatedChannels.Remove(b.Key);
                             return;
                         }
-                    }).Add(this._bot);
+                    }).Add(this.Bot);
 
-                    this._bot.discordClient.VoiceStateUpdated += VoiceStateUpdated;
+                    this.Bot.DiscordClient.VoiceStateUpdated += VoiceStateUpdated;
                     _logger.LogDebug("Created VcCreator Event for '{Channel}'", b.Key);
 
                     while (this.CreatedChannels.ContainsKey(b.Key))
                         await Task.Delay(500);
 
-                    this._bot.discordClient.VoiceStateUpdated -= VoiceStateUpdated;
+                    this.Bot.DiscordClient.VoiceStateUpdated -= VoiceStateUpdated;
                     _logger.LogDebug("Deleted VcCreator Event for '{Channel}'", b.Key);
-                }).Add(this._bot);
+                }).Add(this.Bot);
             }
 
     }

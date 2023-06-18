@@ -9,55 +9,52 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class InviteTrackerEvents
+internal sealed class InviteTrackerEvents : RequiresTranslation
 {
-    internal InviteTrackerEvents(Bot _bot)
+    public InviteTrackerEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
 
-    public Bot _bot { private get; set; }
-
-    public static async Task UpdateCachedInvites(Bot _bot, DiscordGuild guild)
+    public async static Task UpdateCachedInvites(Bot bot, DiscordGuild guild)
     {
         _logger.LogDebug("Fetching invites for {Guild}", guild.Id);
 
         var Invites = await guild.GetInvitesAsync();
 
-        _bot.guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToList();
+        bot.Guilds[guild.Id].InviteTracker.Cache = Invites.Select(x => new InviteTrackerCacheItem { Code = x.Code, CreatorId = x.Inviter?.Id ?? 0, Uses = x.Uses }).ToList();
 
-        _logger.LogDebug("Fetched {Count} invites for {Guild}", _bot.guilds[guild.Id].InviteTracker.Cache.Count, guild.Id);
+        _logger.LogDebug("Fetched {Count} invites for {Guild}", bot.Guilds[guild.Id].InviteTracker.Cache.Count, guild.Id);
     }
 
 
 
     internal async Task GuildCreated(DiscordClient sender, GuildCreateEventArgs e)
     {
-        if (!this._bot.guilds[e.Guild.Id].InviteTracker.Enabled)
+        if (!this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
             return;
 
-        await UpdateCachedInvites(this._bot, e.Guild);
+        await UpdateCachedInvites(this.Bot, e.Guild);
     }
 
     internal async Task InviteCreated(DiscordClient sender, InviteCreateEventArgs e)
     {
-        if (!this._bot.guilds[e.Guild.Id].InviteTracker.Enabled)
+        if (!this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
             return;
 
-        await UpdateCachedInvites(this._bot, e.Guild);
+        await UpdateCachedInvites(this.Bot, e.Guild);
     }
 
     internal async Task InviteDeleted(DiscordClient sender, InviteDeleteEventArgs e)
     {
-        if (!this._bot.guilds[e.Guild.Id].InviteTracker.Enabled)
+        if (!this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
             return;
 
-        await UpdateCachedInvites(this._bot, e.Guild);
+        await UpdateCachedInvites(this.Bot, e.Guild);
     }
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
-        if (!this._bot.guilds[e.Guild.Id].InviteTracker.Enabled)
+        if (!this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
             return;
 
         _logger.LogDebug("User '{User}' joined '{Guild}', trying to track invite used..", e.Member.Id, e.Guild.Id);
@@ -65,28 +62,28 @@ internal sealed class InviteTrackerEvents
         List<InviteTrackerCacheItem> InvitesBefore = new();
         List<InviteTrackerCacheItem> InvitesAfter = new();
 
-        foreach (var b in this._bot.guilds[e.Guild.Id].InviteTracker.Cache)
+        foreach (var b in this.Bot.Guilds[e.Guild.Id].InviteTracker.Cache)
             InvitesBefore.Add(b);
 
-        await UpdateCachedInvites(this._bot, e.Guild);
+        await UpdateCachedInvites(this.Bot, e.Guild);
 
-        foreach (var b in this._bot.guilds[e.Guild.Id].InviteTracker.Cache)
+        foreach (var b in this.Bot.Guilds[e.Guild.Id].InviteTracker.Cache)
             InvitesAfter.Add(b);
 
         foreach (var b in InvitesBefore)
         {
             if (!InvitesAfter.Any(x => x.Code == b.Code))
             {
-                this._bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
-                this._bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
+                this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
+                this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
                 _logger.LogDebug("User '{User}' joined '{Guild}' with now deleted '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
                 return;
             }
 
             if (InvitesAfter.First(x => x.Code == b.Code).Uses > b.Uses)
             {
-                this._bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
-                this._bot.guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
+                this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
+                this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
                 _logger.LogDebug("User '{User}' joined '{Guild}' with '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
                 return;
             }

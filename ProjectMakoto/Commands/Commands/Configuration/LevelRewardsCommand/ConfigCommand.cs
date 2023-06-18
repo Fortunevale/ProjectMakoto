@@ -41,11 +41,11 @@ internal sealed class ConfigCommand : BaseCommand
 
                 embed.Description = "";
 
-                foreach (var reward in ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.ToList().OrderBy(x => x.Level))
+                foreach (var reward in ctx.DbGuild.LevelRewards.ToList().OrderBy(x => x.Level))
                 {
                     if (!ctx.Guild.Roles.ContainsKey(reward.RoleId))
                     {
-                        ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Remove(reward);
+                        ctx.DbGuild.LevelRewards.Remove(reward);
                         continue;
                     }
 
@@ -203,7 +203,7 @@ internal sealed class ConfigCommand : BaseCommand
                                         throw RoleResult.Exception;
                                     }
 
-                                    if (RoleResult.Result.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                                    if (RoleResult.Result.Id == ctx.DbGuild.BumpReminder.RoleId)
                                     {
                                         await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
                                         await Task.Delay(3000);
@@ -294,7 +294,7 @@ internal sealed class ConfigCommand : BaseCommand
                                 }
                                 else if (Menu.GetCustomId() == Finish.CustomId)
                                 {
-                                    if (selectedRole.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                                    if (selectedRole.Id == ctx.DbGuild.BumpReminder.RoleId)
                                     {
                                         await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
                                         await Task.Delay(3000);
@@ -302,7 +302,7 @@ internal sealed class ConfigCommand : BaseCommand
                                         return;
                                     }
 
-                                    ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Add(new Entities.LevelRewardEntry
+                                    ctx.DbGuild.LevelRewards.Add(new Entities.LevelRewardEntry
                                     {
                                         Level = selectedLevel,
                                         RoleId = selectedRole.Id,
@@ -334,7 +334,7 @@ internal sealed class ConfigCommand : BaseCommand
                             var modal = new DiscordInteractionModalBuilder()
                                 .WithTitle(GetString(CommandKey.Title))
                                 .WithCustomId(Guid.NewGuid().ToString())
-                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", GetString(CommandKey.Message), null, 0, 256, false, ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
+                                .AddTextComponents(new DiscordTextComponent(TextComponentStyle.Small, "new_text", GetString(CommandKey.Message), null, 0, 256, false, ctx.DbGuild.LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message));
                             ;
 
                             var ModalResult = await PromptModalWithRetry(e.Interaction, modal, false);
@@ -365,7 +365,7 @@ internal sealed class ConfigCommand : BaseCommand
                                 return;
                             }
 
-                            ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result;
+                            ctx.DbGuild.LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)).Message = result;
 
                             await RefreshMessage();
                         }
@@ -373,9 +373,9 @@ internal sealed class ConfigCommand : BaseCommand
                         {
                             _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Remove(ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
+                            ctx.DbGuild.LevelRewards.Remove(ctx.DbGuild.LevelRewards.First(x => x.RoleId == Convert.ToUInt64(selected)));
 
-                            if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count == 0)
+                            if (ctx.DbGuild.LevelRewards.Count == 0)
                             {
                                 await ExecuteCommand(ctx, arguments);
                                 return;

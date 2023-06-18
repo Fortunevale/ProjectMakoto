@@ -13,9 +13,9 @@ internal sealed class InviteNotesCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        if (!ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Any())
+        if (!ctx.DbGuild.InviteNotes.Notes.Any())
             return ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.InviteNotes.NoNotesDefined, true);
 
-        return $"{string.Join('\n', ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => $"> `{x.Key}`\n{x.Value.Note.FullSanitize()}"))}";
+        return $"{string.Join('\n', ctx.DbGuild.InviteNotes.Notes.Select(x => $"> `{x.Key}`\n{x.Value.Note.FullSanitize()}"))}";
     }
 }

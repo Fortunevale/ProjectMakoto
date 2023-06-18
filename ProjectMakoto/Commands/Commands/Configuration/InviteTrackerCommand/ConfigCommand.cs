@@ -27,7 +27,7 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = InviteTrackerCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleInviteTrackerButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
+            var Toggle = new DiscordButtonComponent((ctx.DbGuild.InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleInviteTrackerButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -48,9 +48,9 @@ internal sealed class ConfigCommand : BaseCommand
 
             if (e.GetCustomId() == Toggle.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled = !ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled;
+                ctx.DbGuild.InviteTracker.Enabled = !ctx.DbGuild.InviteTracker.Enabled;
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled)
+                if (ctx.DbGuild.InviteTracker.Enabled)
                     _ = InviteTrackerEvents.UpdateCachedInvites(ctx.Bot, ctx.Guild);
 
                 await ExecuteCommand(ctx, arguments);

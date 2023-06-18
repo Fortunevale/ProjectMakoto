@@ -16,45 +16,43 @@ public sealed class Bot
 {
     #region Clients
 
-    internal static DatabaseClient DatabaseClient { get; set; }
-    public DatabaseClient databaseClient
-        => Bot.DatabaseClient;
+    public DatabaseClient DatabaseClient { get; set; }
 
-    public DiscordClient discordClient { get; internal set; }
+    public DiscordClient DiscordClient { get; internal set; }
     internal LavalinkNodeConnection LavalinkNodeConnection;
 
-    internal ScoreSaberClient scoreSaberClient { get; set; }
-    public GoogleTranslateClient translationClient { get; internal set; }
-    public ThreadJoinClient threadJoinClient { get; internal set; }
-    public AbuseIpDbClient abuseIpDbClient { get; internal set; }
-    public MonitorClient monitorClient { get; internal set; }
-    internal GitHubClient githubClient { get; set; }
+    internal ScoreSaberClient ScoreSaberClient { get; set; }
+    public GoogleTranslateClient TranslationClient { get; internal set; }
+    public ThreadJoinClient ThreadJoinClient { get; internal set; }
+    public AbuseIpDbClient AbuseIpDbClient { get; internal set; }
+    public MonitorClient MonitorClient { get; internal set; }
+    internal GitHubClient GithubClient { get; set; }
 
+    #endregion Clients
+
+    #region Plugins
     public IReadOnlyDictionary<string, BasePlugin> Plugins
-        => this._Plugins.AsReadOnly();
+    => this._Plugins.AsReadOnly();
     internal Dictionary<string, BasePlugin> _Plugins { get; set; } = new();
 
     public IReadOnlyDictionary<string, List<BasePluginCommand>> PluginCommands
         => this._PluginCommands.AsReadOnly();
     internal Dictionary<string, List<BasePluginCommand>> _PluginCommands { get; set; } = new();
-
-    #endregion Clients
-
+    #endregion
 
     #region Util
 
-    internal Translations loadedTranslations { get; set; }
+    internal Translations LoadedTranslations { get; set; }
 
-    public CountryCodes countryCodes { get; internal set; }
-    public LanguageCodes languageCodes { get; internal set; }
-    internal IReadOnlyList<string> profanityList { get; set; }
+    public CountryCodes CountryCodes { get; internal set; }
+    public LanguageCodes LanguageCodes { get; internal set; }
+    internal IReadOnlyList<string> ProfanityList { get; set; }
 
-    internal BumpReminder bumpReminder { get; set; }
-    internal ExperienceHandler experienceHandler { get; set; }
-    public TaskWatcher watcher { get; internal set; } = new();
-    internal Dictionary<ulong, UserUpload> uploadInteractions { get; set; } = new();
-    internal Dictionary<string, PhishingUrlEntry> phishingUrls = new();
-    internal Dictionary<ulong, SubmittedUrlEntry> submittedUrls = new();
+    internal BumpReminder BumpReminder { get; set; }
+    internal ExperienceHandler ExperienceHandler { get; set; }
+    public TaskWatcher Watcher { get; internal set; } = new();
+    internal Dictionary<string, PhishingUrlEntry> PhishingHosts = new();
+    internal Dictionary<ulong, SubmittedUrlEntry> SubmittedHosts = new();
 
     #endregion Util
 
@@ -62,21 +60,18 @@ public sealed class Bot
     #region Bans
 
     internal List<ulong> objectedUsers = new();
-    internal Dictionary<ulong, BlacklistEntry> bannedUsers = new();
-    internal Dictionary<ulong, BlacklistEntry> bannedGuilds = new();
+    internal Dictionary<ulong, BanDetails> bannedUsers = new();
+    internal Dictionary<ulong, BanDetails> bannedGuilds = new();
 
-    internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionUserBans = new();
-    internal Dictionary<ulong, PhishingSubmissionBanDetails> phishingUrlSubmissionGuildBans = new();
-
-    internal Dictionary<ulong, GlobalBanDetails> globalBans = new();
-    internal Dictionary<ulong, List<GlobalBanDetails>> globalNotes = new();
+    internal Dictionary<ulong, BanDetails> globalBans = new();
+    internal Dictionary<ulong, List<BanDetails>> globalNotes = new();
 
     #endregion Bans
 
 
     public Status status = new();
-    internal GuildDictionary guilds = null;
-    internal UserDictionary users = null;
+    internal SelfFillingDictionary<Entities.Guild> Guilds = null;
+    internal SelfFillingDictionary<Entities.User> Users = null;
 
     internal string RawFetchedPrivacyPolicy = "";
     internal string Prefix { get; private set; } = ";;";
@@ -159,25 +154,25 @@ public sealed class Bot
             {
                 await Util.Initializers.ConfigLoader.Load(this);
 
-                this.users = new(this);
-                this.guilds = new(this);
+                this.Users = new(this);
+                this.Guilds = new(this);
                 await DatabaseClient.InitializeDatabase(this);
 
-                this.bumpReminder = new(this);
+                this.BumpReminder = new(this);
 
-                this.scoreSaberClient = ScoreSaberClient.InitializeScoresaber();
-                this.translationClient = GoogleTranslateClient.Initialize();
-                this.threadJoinClient = ThreadJoinClient.Initialize();
+                this.ScoreSaberClient = ScoreSaberClient.InitializeScoresaber();
+                this.TranslationClient = GoogleTranslateClient.Initialize();
+                this.ThreadJoinClient = ThreadJoinClient.Initialize();
 
                 await Util.Initializers.ListLoader.Load(this);
                 await Util.Initializers.TranslationLoader.Load(this);
                 await Util.Initializers.PluginLoader.LoadPlugins(this);
 
-                this.monitorClient = new MonitorClient(this);
-                this.abuseIpDbClient = new AbuseIpDbClient(this);
+                this.MonitorClient = new MonitorClient(this);
+                this.AbuseIpDbClient = new AbuseIpDbClient(this);
 
-                this.githubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion));
-                this.githubClient.Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token);
+                this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion));
+                this.GithubClient.Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token);
 
                 DatabaseInit _databaseInit = new(this);
 
@@ -210,7 +205,7 @@ public sealed class Bot
             await Util.Initializers.DisCatSharpExtensionsLoader.Load(this, args);
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
-            await this.discordClient.ConnectAsync();
+            await this.DiscordClient.ConnectAsync();
             _logger.LogInfo("Connected and authenticated with Discord.");
 
             this.status.DiscordInitialized = true;
@@ -223,7 +218,7 @@ public sealed class Bot
                 this.status.LoadedConfig.DontModify.LastStartedVersion = this.status.RunningVersion;
                 this.status.LoadedConfig.Save();
 
-                var channel = await this.discordClient.GetChannelAsync(this.status.LoadedConfig.Channels.GithubLog);
+                var channel = await this.DiscordClient.GetChannelAsync(this.status.LoadedConfig.Channels.GithubLog);
                 await channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Color = EmbedColors.Success,
@@ -235,10 +230,10 @@ public sealed class Bot
             {
                 try
                 {
-                    this.status.TeamOwner = this.discordClient.CurrentApplication.Team.Owner.Id;
+                    this.status.TeamOwner = this.DiscordClient.CurrentApplication.Team.Owner.Id;
                     _logger.LogInfo("Set {TeamOwner} as owner of the bot", this.status.TeamOwner);
 
-                    this.status._TeamMembers.AddRange(this.discordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
+                    this.status._TeamMembers.AddRange(this.DiscordClient.CurrentApplication.Team.Members.Select(x => x.User.Id));
                     _logger.LogInfo("Added {Count} users to administrator list", this.status.TeamMembers.Count);
                 }
                 catch (Exception ex)
@@ -248,10 +243,10 @@ public sealed class Bot
 
                 try
                 {
-                    if (this.discordClient.CurrentApplication.PrivacyPolicyUrl.IsNullOrWhiteSpace())
+                    if (this.DiscordClient.CurrentApplication.PrivacyPolicyUrl.IsNullOrWhiteSpace())
                         throw new Exception("No privacy policy was defined.");
 
-                    this.RawFetchedPrivacyPolicy = await new HttpClient().GetStringAsync(this.discordClient.CurrentApplication.PrivacyPolicyUrl);
+                    this.RawFetchedPrivacyPolicy = await new HttpClient().GetStringAsync(this.DiscordClient.CurrentApplication.PrivacyPolicyUrl);
                 }
                 catch (Exception ex)
                 {
@@ -317,7 +312,7 @@ public sealed class Bot
             //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
             //        return -1;
 
-            string currentPrefix = this.guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.PrefixSettings.Prefix : this.Prefix;
+            string currentPrefix = this.Guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.PrefixSettings.Prefix : this.Prefix;
 
             int CommandStart = -1;
 
@@ -325,7 +320,7 @@ public sealed class Bot
                 CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, currentPrefix);
 
             if (CommandStart == -1)
-                CommandStart = CommandsNextUtilities.GetMentionPrefixLength(message, this.discordClient.CurrentUser);
+                CommandStart = CommandsNextUtilities.GetMentionPrefixLength(message, this.DiscordClient.CurrentUser);
 
             return CommandStart;
         });
@@ -340,7 +335,7 @@ public sealed class Bot
                 Environment.Exit((int)ExitCodes.ExitTasksTimeout);
         });
 
-        if (DatabaseClient.IsDisposed() || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
+        if (this.DatabaseClient.IsDisposed() || this.ExitCalled) // When the Database Client has been disposed, the Exit Call has already been made.
             return;
 
         this.ExitCalled = true;
@@ -366,7 +361,7 @@ public sealed class Bot
                 while (!this.status.DiscordCommandsRegistered && sw.ElapsedMilliseconds < TimeSpan.FromMinutes(5).TotalMilliseconds)
                     await Task.Delay(500);
 
-                await Util.Initializers.SyncTasks.ExecuteSyncTasks(this, this.discordClient.Guilds);
+                await Util.Initializers.SyncTasks.ExecuteSyncTasks(this, this.DiscordClient.Guilds);
             }
             catch (Exception ex)
             {
@@ -377,8 +372,8 @@ public sealed class Bot
             {
                 _logger.LogInfo("Closing Discord Client..");
 
-                await this.discordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-                await this.discordClient.DisconnectAsync();
+                await this.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+                await this.DiscordClient.DisconnectAsync();
 
                 _logger.LogDebug("Closed Discord Client.");
             }
@@ -393,13 +388,13 @@ public sealed class Bot
             try
             {
                 _logger.LogInfo("Flushing to database..");
-                await this.databaseClient.FullSyncDatabase(true);
+                await this.DatabaseClient.FullSyncDatabase(true);
                 _logger.LogDebug("Flushed to database.");
 
                 Thread.Sleep(500);
 
                 _logger.LogInfo("Closing database..");
-                await DatabaseClient.Dispose();
+                await this.DatabaseClient.Dispose();
                 _logger.LogDebug("Closed database.");
             }
             catch (Exception ex)
@@ -422,18 +417,18 @@ public sealed class Bot
             ProcessDeletionRequests().Add(this);
         })).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
 
-        lock (this.users)
+        lock (this.Users)
         {
-            foreach (var b in this.users)
+            foreach (var b in this.Users)
             {
                 if ((b.Value?.Data?.DeletionRequested ?? false) && b.Value?.Data?.DeletionRequestDate.GetTimespanUntil() < TimeSpan.Zero)
                 {
                     _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
 
-                    this.users.Remove(b.Key);
-                    this.databaseClient._helper.DeleteRow(this.databaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
+                    this.Users.Remove(b.Key);
+                    this.DatabaseClient._helper.DeleteRow(this.DatabaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
                     this.objectedUsers.Add(b.Key);
-                    foreach (var c in this.discordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
+                    foreach (var c in this.DiscordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
                     {
                         try
                         { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); c.Value.LeaveAsync().Add(this); }

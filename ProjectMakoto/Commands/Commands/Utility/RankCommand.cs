@@ -19,7 +19,7 @@ internal sealed class RankCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].Experience.UseExperience)
+            if (!ctx.DbGuild.Experience.UseExperience)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -33,13 +33,13 @@ internal sealed class RankCommand : BaseCommand
 
             victim = await victim.GetFromApiAsync();
 
-            long current = (long)Math.Floor((decimal)(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points - ctx.Bot.experienceHandler.CalculateLevelRequirement(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level - 1)));
-            long max = (long)Math.Floor((decimal)(ctx.Bot.experienceHandler.CalculateLevelRequirement(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level) - ctx.Bot.experienceHandler.CalculateLevelRequirement(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level - 1)));
+            long current = (long)Math.Floor((decimal)(ctx.DbGuild.Members[victim.Id].Experience.Points - ctx.Bot.ExperienceHandler.CalculateLevelRequirement(ctx.DbGuild.Members[victim.Id].Experience.Level - 1)));
+            long max = (long)Math.Floor((decimal)(ctx.Bot.ExperienceHandler.CalculateLevelRequirement(ctx.DbGuild.Members[victim.Id].Experience.Level) - ctx.Bot.ExperienceHandler.CalculateLevelRequirement(ctx.DbGuild.Members[victim.Id].Experience.Level - 1)));
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{(victim.Id == ctx.User.Id ? GetString(this.t.Commands.Utility.Rank.Self) : GetString(this.t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
-                              $"**{GetString(this.t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? GetString(this.t.Commands.Utility.Rank.Self) : GetString(this.t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.DbGuild.Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.DbGuild.Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
+                              $"**{GetString(this.t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.DbGuild.Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{StringTools.GenerateASCIIProgressbar(current, max, 44)}` " +
                               $"`{current}/{max} XP`",

@@ -13,6 +13,6 @@ internal sealed class NameNormalizerCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"💬 `Name Normalizer Enabled`: {ctx.Bot.guilds[ctx.Guild.Id].NameNormalizer.NameNormalizerEnabled.ToEmote(ctx.Bot)}";
+        return $"💬 `Name Normalizer Enabled`: {ctx.DbGuild.NameNormalizer.NameNormalizerEnabled.ToEmote(ctx.Bot)}";
     }
 }

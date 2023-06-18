@@ -48,8 +48,8 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 
             try
             {
-                leaderboard = await ctx.Bot.scoreSaberClient.GetScoreboardById(boardId.ToString());
-                LeaderboardScores scores = await ctx.Bot.scoreSaberClient.GetScoreboardScoresById(boardId.ToString());
+                leaderboard = await ctx.Bot.ScoreSaberClient.GetScoreboardById(boardId.ToString());
+                LeaderboardScores scores = await ctx.Bot.ScoreSaberClient.GetScoreboardScoresById(boardId.ToString());
 
                 TotalPages = scores.metadata.total / scores.metadata.itemsPerPage;
             }
@@ -149,7 +149,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                 try
                 {
                     if (!cachedPages.ContainsKey(scoreSaberPage))
-                        cachedPages.Add(scoreSaberPage, await ctx.Bot.scoreSaberClient.GetScoreboardScoresById(boardId.ToString(), scoreSaberPage));
+                        cachedPages.Add(scoreSaberPage, await ctx.Bot.ScoreSaberClient.GetScoreboardScoresById(boardId.ToString(), scoreSaberPage));
 
                     scores = cachedPages[scoreSaberPage];
                 }

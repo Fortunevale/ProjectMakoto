@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,12 +9,12 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class BlacklistEntry
+public abstract class RequiresBotReference
 {
-    public string Reason { get; set; }
+    public RequiresBotReference(Bot bot)
+    {
+        this.Bot = bot;
+    }
 
-    public ulong Moderator { get; set; }
-
-
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    protected Bot Bot { get; set; }
 }

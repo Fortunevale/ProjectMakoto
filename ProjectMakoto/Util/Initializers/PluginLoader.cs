@@ -18,9 +18,9 @@ internal sealed class PluginLoader
 {
     private static string CachedUsings = "";
 
-    internal static async Task LoadPlugins(Bot _bot)
+    internal static async Task LoadPlugins(Bot bot)
     {
-        if (_bot.status.LoadedConfig.EnablePlugins)
+        if (bot.status.LoadedConfig.EnablePlugins)
         {
             _logger.LogDebug("Loading Plugins..");
             List<string> pluginsToLoad = new();
@@ -43,7 +43,7 @@ internal sealed class PluginLoader
                         count++;
                         BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
                         result.LoadedFile = new FileInfo(pluginPath);
-                        _bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
+                        bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
                     }
                 }
 
@@ -57,10 +57,10 @@ internal sealed class PluginLoader
                 _logger.LogInfo("Loaded Plugin from '{0}'", pluginPath);
             }
 
-            _logger.LogInfo("Loaded {0} Plugins.", _bot.Plugins.Count);
+            _logger.LogInfo("Loaded {0} Plugins.", bot.Plugins.Count);
         }
 
-        foreach (var b in _bot.Plugins)
+        foreach (var b in bot.Plugins)
         {
             if (b.Value.Name.IsNullOrWhiteSpace())
             {
@@ -96,7 +96,7 @@ internal sealed class PluginLoader
 
             try
             {
-                b.Value.Load(_bot);
+                b.Value.Load(bot);
                 _logger.LogInfo("Initialized Plugin from '{0}': '{1}' (v{2}).", b.Key, b.Value.Name, b.Value.Version.ToString());
             }
             catch (Exception ex)
@@ -116,11 +116,11 @@ internal sealed class PluginLoader
         }
     }
 
-    internal static async Task LoadPluginCommands(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
+    internal static async Task LoadPluginCommands(Bot bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands)
     {
         var applicationHash = HashingExtensions.ComputeSHA256Hash(new FileInfo(Assembly.GetExecutingAssembly().Location));
 
-        foreach (var plugin in _bot.Plugins)
+        foreach (var plugin in bot.Plugins)
         {
             try
             {
@@ -128,11 +128,11 @@ internal sealed class PluginLoader
                 Dictionary<Assembly, string> assemblyList = new();
 
                 var pluginCommands = await plugin.Value.RegisterCommands();
-                _bot._PluginCommands.Add(plugin.Key, pluginCommands.ToList());
+                bot._PluginCommands.Add(plugin.Key, pluginCommands.ToList());
 
-                if (_bot.status.LoadedConfig.PluginCache.TryGetValue(plugin.Key, out var pluginInfo) &&
+                if (bot.status.LoadedConfig.PluginCache.TryGetValue(plugin.Key, out var pluginInfo) &&
                     pluginHash == pluginInfo.LastKnownHash &&
-                    applicationHash == _bot.status.LoadedConfig.DontModify.LastKnownHash &&
+                    applicationHash == bot.status.LoadedConfig.DontModify.LastKnownHash &&
                     pluginInfo.CompiledCommands.All(x => File.Exists(x.Key)))
                 {
                     _logger.LogInfo("Loading {0} Commands from Plugin from '{1}' ({2}) from compiled assemblies..", pluginInfo.CompiledCommands.Count, plugin.Value.Name, plugin.Value.Version.ToString());
@@ -145,12 +145,12 @@ internal sealed class PluginLoader
                         assemblyList.Add(assembly, b.Value);
                     }
 
-                    RegisterAssemblies(_bot, cNext, appCommands, plugin.Value, assemblyList);
+                    RegisterAssemblies(bot, cNext, appCommands, plugin.Value, assemblyList);
                     continue;
                 }
 
-                _bot.status.LoadedConfig.PluginCache.TryAdd(plugin.Key, new());
-                pluginInfo = _bot.status.LoadedConfig.PluginCache[plugin.Key];
+                bot.status.LoadedConfig.PluginCache.TryAdd(plugin.Key, new());
+                pluginInfo = bot.status.LoadedConfig.PluginCache[plugin.Key];
 
                 pluginInfo.LastKnownHash = pluginHash;
 
@@ -379,7 +379,7 @@ internal sealed class PluginLoader
                         }
                     }
 
-                    RegisterAssemblies(_bot, cNext, appCommands, plugin.Value, assemblyList);
+                    RegisterAssemblies(bot, cNext, appCommands, plugin.Value, assemblyList);
                 }
             }
             catch (Exception ex)
@@ -389,8 +389,8 @@ internal sealed class PluginLoader
             }
         }
 
-        _bot.status.LoadedConfig.DontModify.LastKnownHash = applicationHash;
-        _bot.status.LoadedConfig.Save();
+        bot.status.LoadedConfig.DontModify.LastKnownHash = applicationHash;
+        bot.status.LoadedConfig.Save();
     }
 
     private static void RegisterAssemblies(Bot _bot, CommandsNextExtension cNext, ApplicationCommandsExtension appCommands, BasePlugin plugin, Dictionary<Assembly, string> assemblyList)

@@ -70,30 +70,14 @@ internal sealed class ReportHostCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.submittedUrls.Any(x => x.Value.Submitter == ctx.User.Id) && !ctx.User.IsMaintenance(ctx.Bot.status))
+            if (ctx.Bot.SubmittedHosts.Any(x => x.Value.Submitter == ctx.User.Id) && !ctx.User.IsMaintenance(ctx.Bot.status))
             {
-                if (ctx.Bot.submittedUrls.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
+                if (ctx.Bot.SubmittedHosts.Where(x => x.Value.Submitter == ctx.User.Id).Count() >= 5)
                 {
                     embed.Description = GetString(this.t.Commands.Utility.ReportHost.LimitError, true);
                     _ = RespondOrEdit(embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title)));
                     return;
                 }
-            }
-
-            if (ctx.Bot.phishingUrlSubmissionUserBans.TryGetValue(ctx.User.Id, out PhishingSubmissionBanDetails userBan))
-            {
-                embed.Description = $"`{GetString(this.t.Commands.Utility.ReportHost.UserBan)}`\n" +
-                                    $"`{GetString(this.t.Common.Reason)}: {userBan.Reason}`";
-                _ = RespondOrEdit(embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title)));
-                return;
-            }
-
-            if (ctx.Bot.phishingUrlSubmissionGuildBans.TryGetValue(ctx.Guild.Id, out PhishingSubmissionBanDetails guildBan))
-            {
-                embed.Description = $"`{GetString(this.t.Commands.Utility.ReportHost.GuildBan)}`\n" +
-                                    $"`{GetString(this.t.Common.Reason)}: {guildBan.Reason}`";
-                _ = RespondOrEdit(embed.AsError(ctx, GetString(this.t.Commands.Utility.ReportHost.Title)));
-                return;
             }
 
             string host;
@@ -139,7 +123,7 @@ internal sealed class ReportHostCommand : BaseCommand
                 embed.Description = GetString(this.t.Commands.Utility.ReportHost.DatabaseCheck, true);
                 await RespondOrEdit(embed);
 
-                foreach (var b in ctx.Bot.phishingUrls)
+                foreach (var b in ctx.Bot.PhishingHosts)
                 {
                     if (host.Contains(b.Key))
                     {
@@ -153,7 +137,7 @@ internal sealed class ReportHostCommand : BaseCommand
                 embed.Description = GetString(this.t.Commands.Utility.ReportHost.SubmissionCheck, true);
                 await RespondOrEdit(embed);
 
-                foreach (var b in ctx.Bot.submittedUrls)
+                foreach (var b in ctx.Bot.SubmittedHosts)
                 {
                     if (b.Value.Url == host)
                     {
@@ -191,7 +175,7 @@ internal sealed class ReportHostCommand : BaseCommand
                     { BanGuildButton },
                 }));
 
-                ctx.Bot.submittedUrls.Add(subbmited_msg.Id, new SubmittedUrlEntry
+                ctx.Bot.SubmittedHosts.Add(subbmited_msg.Id, new SubmittedUrlEntry
                 {
                     Url = host,
                     Submitter = ctx.User.Id,

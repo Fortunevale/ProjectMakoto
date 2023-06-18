@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class TranslationSettings
+public sealed class TranslationSettings : RequiresParent<User>
 {
-    public TranslationSettings(User user)
+    public TranslationSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this.Parent = user;
     }
-    private User Parent { get; set; }
-
-
 
     private string _LastGoogleSource { get; set; } = "";
     public string LastGoogleSource
@@ -26,7 +22,7 @@ public sealed class TranslationSettings
         set
         {
             this._LastGoogleSource = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_google_source", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_source", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -37,7 +33,7 @@ public sealed class TranslationSettings
         set
         {
             this._LastGoogleTarget = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_google_target", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_google_target", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -49,7 +45,7 @@ public sealed class TranslationSettings
         set
         {
             this._LastLibreTranslateSource = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_libretranslate_source", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_source", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -60,7 +56,7 @@ public sealed class TranslationSettings
         set
         {
             this._LastLibreTranslateTarget = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "last_libretranslate_target", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "last_libretranslate_target", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

@@ -21,25 +21,25 @@ internal sealed class UnbanCommand : BaseCommand
             DiscordMember victim = (DiscordMember)arguments["victim"];
             DiscordChannel channel = ctx.Member.VoiceState?.Channel;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Contains(victim.Id))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Unban.VictimNotBanned, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].BannedUsers.Remove(victim.Id);
+            ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].BannedUsers.Remove(victim.Id);
             await channel.AddOverwriteAsync(victim, deny: Permissions.None);
             _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Unban.VictimUnbanned, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });

@@ -26,7 +26,7 @@ internal sealed class UnbanGuildCommand : BaseCommand
             }
 
             ctx.Bot.bannedGuilds.Remove(guild);
-            await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "banned_guilds", "id", $"{guild}");
+            await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "banned_guilds", "id", $"{guild}");
             await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was unbanned from using the bot.`").AsSuccess(ctx));
         });
     }

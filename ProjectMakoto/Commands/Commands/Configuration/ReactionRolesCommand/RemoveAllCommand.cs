@@ -63,15 +63,15 @@ internal sealed class RemoveAllCommand : BaseCommand
             await RespondOrEdit(embed);
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Key == message.Id))
+            if (!ctx.DbGuild.ReactionRoles.Any(x => x.Key == message.Id))
             {
                 embed.Description = $"`The specified message doesn't contain any reaction roles.`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
                 return;
             }
 
-            foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Where(x => x.Key == message.Id).ToList())
-                ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Remove(b);
+            foreach (var b in ctx.DbGuild.ReactionRoles.Where(x => x.Key == message.Id).ToList())
+                ctx.DbGuild.ReactionRoles.Remove(b);
 
             _ = message.DeleteAllReactionsAsync();
 

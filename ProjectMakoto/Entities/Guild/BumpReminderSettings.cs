@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class BumpReminderSettings
+public sealed class BumpReminderSettings : RequiresParent<Guild>
 {
-    public BumpReminderSettings(Guild guild)
+    public BumpReminderSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private bool _Enabled { get; set; } = false;
     public bool Enabled
@@ -27,7 +22,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._Enabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_enabled", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_enabled", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -39,7 +34,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._RoleId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_role", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_role", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -51,7 +46,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._ChannelId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_channel", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_channel", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -63,7 +58,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._MessageId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_message", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_message", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -75,7 +70,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._PersistentMessageId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_persistent_msg", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_persistent_msg", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -87,7 +82,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._LastUserId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_last_user", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_last_user", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -99,7 +94,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._LastBump = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_last_time", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_last_time", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -111,7 +106,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._LastReminder = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_last_reminder", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_last_reminder", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -122,7 +117,7 @@ public sealed class BumpReminderSettings
         set
         {
             this._BumpsMissed = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "bump_missed", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "bump_missed", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

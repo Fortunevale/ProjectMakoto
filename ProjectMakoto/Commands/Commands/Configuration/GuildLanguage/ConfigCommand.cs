@@ -95,12 +95,12 @@ internal sealed class ConfigCommand : BaseCommand
             {
                 case "_":
                 {
-                    ctx.Bot.guilds[ctx.Guild.Id].OverrideLocale = null;
+                    ctx.DbGuild.OverrideLocale = null;
                     break;
                 }
                 default:
                 {
-                    ctx.Bot.guilds[ctx.Guild.Id].OverrideLocale = SelectionResult.Result;
+                    ctx.DbGuild.OverrideLocale = SelectionResult.Result;
                     break;
                 }
             }

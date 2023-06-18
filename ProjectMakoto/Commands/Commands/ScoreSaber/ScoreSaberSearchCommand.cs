@@ -23,7 +23,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
             DiscordStringSelectComponent GetContinents(string default_code)
             {
                 List<DiscordStringSelectComponentOption> continents = new() { new DiscordStringSelectComponentOption(GetString(this.t.Commands.ScoreSaber.Search.NoCountryFilter), "no_country", "", (default_code == "no_country")) };
-                foreach (var b in ctx.Bot.countryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
+                foreach (var b in ctx.Bot.CountryCodes.List.GroupBy(x => x.Value.ContinentCode).Select(x => x.First()).Take(24))
                 {
                     continents.Add(new DiscordStringSelectComponentOption($"{b.Value.ContinentName}", b.Value.ContinentCode, "", (default_code == b.Value.ContinentCode)));
                 }
@@ -33,7 +33,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
             DiscordStringSelectComponent GetCountries(string continent_code, string default_country, int page)
             {
                 List<DiscordStringSelectComponentOption> countries = new();
-                var currentCountryList = ctx.Bot.countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == continent_code.ToLower()).Skip((page - 1) * 25).Take(25).ToList();
+                var currentCountryList = ctx.Bot.CountryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == continent_code.ToLower()).Skip((page - 1) * 25).Take(25).ToList();
 
                 foreach (var b in currentCountryList)
                 {
@@ -84,20 +84,20 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
 
                                 if (selectedCountry != "no_country")
                                 {
-                                    embed.Description += $"\n`{GetString(this.t.Commands.ScoreSaber.Search.SelectedCountry)}: '{ctx.Bot.countryCodes.List[selectedCountry].Name}'`";
+                                    embed.Description += $"\n`{GetString(this.t.Commands.ScoreSaber.Search.SelectedCountry)}: '{ctx.Bot.CountryCodes.List[selectedCountry].Name}'`";
                                 }
 
                                 var page = GetCountries(selectedContinent, selectedCountry, currentPage);
                                 var builder = new DiscordMessageBuilder().WithEmbed(embed).AddComponents(page);
 
-                                if (currentPage == 1 && ctx.Bot.countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Count() > 25)
+                                if (currentPage == 1 && ctx.Bot.CountryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Count() > 25)
                                 {
                                     builder.AddComponents(next_page_button);
                                 }
 
                                 if (currentPage != 1)
                                 {
-                                    if (ctx.Bot.countryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Skip((currentPage - 1) * 25).Count() > 25)
+                                    if (ctx.Bot.CountryCodes.List.Where(x => x.Value.ContinentCode.ToLower() == selectedContinent.ToLower()).Skip((currentPage - 1) * 25).Count() > 25)
                                         builder.AddComponents(next_page_button);
 
                                     builder.AddComponents(previous_page_button);
@@ -119,7 +119,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                                 {
                                     try
                                     {
-                                        lastSearch = await ctx.Bot.scoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
+                                        lastSearch = await ctx.Bot.ScoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
                                     }
                                     catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
                                     {

@@ -26,7 +26,7 @@ public abstract class BaseCommand
 
     public async Task TransferCommand(SharedCommandContext ctx, Dictionary<string, object> arguments = null)
     {
-        this.t = ctx.Bot.loadedTranslations;
+        this.t = ctx.Bot.LoadedTranslations;
         this.ctx = ctx;
 
         ctx.Transferred = true;
@@ -38,7 +38,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.t = _bot.loadedTranslations;
+        this.t = _bot.LoadedTranslations;
 
         if (await BasePreExecutionCheck())
             await ExecuteCommand(this.ctx, arguments);
@@ -47,7 +47,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.t = _bot.loadedTranslations;
+        this.t = _bot.LoadedTranslations;
 
         Task.Run(async () =>
         {
@@ -70,7 +70,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommandWith2FA(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.t = _bot.loadedTranslations;
+        this.t = _bot.LoadedTranslations;
 
         Task.Run(async () =>
         {
@@ -87,7 +87,7 @@ public abstract class BaseCommand
                 }
                 else
                 {
-                    if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
+                    if (_bot.Users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
                     {
                         this.ctx.RespondedToInitial = true;
                         var tfa = await ctx.RequestTwoFactorAsync();
@@ -100,7 +100,7 @@ public abstract class BaseCommand
                             _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
                             return;
                         }
-                        _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                        _bot.Users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
                     }
                 }
 
@@ -118,7 +118,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.t = _bot.loadedTranslations;
+        this.t = _bot.LoadedTranslations;
 
         Task.Run(async () =>
         {
@@ -141,7 +141,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
-        this.t = _bot.loadedTranslations;
+        this.t = _bot.LoadedTranslations;
 
         Task.Run(async () =>
         {
@@ -166,10 +166,10 @@ public abstract class BaseCommand
         if (t is null)
         {
             _logger.LogWarn($"The translation were not set before the BasePreExecutionCheck()!");
-            this.t = ctx.Bot.loadedTranslations;
+            this.t = ctx.Bot.LoadedTranslations;
         }
 
-        if (this.ctx.Bot.users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
+        if (this.ctx.Bot.Users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
         {
             this.ctx.DbUser.CurrentLocale = this.ctx.User.Locale;
             _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", this.ctx.User.Id, this.ctx.User.Locale);
@@ -189,9 +189,9 @@ public abstract class BaseCommand
 
         if (!this.ctx.Channel.IsPrivate)
         {
-            if (this.ctx.Bot.guilds.ContainsKey(this.ctx.Guild.Id) && !this.ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && this.ctx.Bot.guilds[this.ctx.Guild.Id].CurrentLocale != this.ctx.Guild.PreferredLocale)
+            if (this.ctx.Bot.Guilds.ContainsKey(this.ctx.Guild.Id) && !this.ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && this.ctx.Bot.Guilds[this.ctx.Guild.Id].CurrentLocale != this.ctx.Guild.PreferredLocale)
             {
-                this.ctx.Bot.guilds[this.ctx.Guild.Id].CurrentLocale = this.ctx.Guild.PreferredLocale;
+                this.ctx.Bot.Guilds[this.ctx.Guild.Id].CurrentLocale = this.ctx.Guild.PreferredLocale;
                 _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", this.ctx.Guild.Id, this.ctx.Guild.PreferredLocale);
             }
 
@@ -223,13 +223,13 @@ public abstract class BaseCommand
             return false;
         }
 
-        if (this.ctx.Bot.bannedUsers.TryGetValue(this.ctx.User.Id, out BlacklistEntry blacklistedUserDetails))
+        if (this.ctx.Bot.bannedUsers.TryGetValue(this.ctx.User.Id, out BanDetails blacklistedUserDetails))
         {
             SendUserBanError(blacklistedUserDetails);
             return false;
         }
 
-        if (this.ctx.Bot.bannedGuilds.TryGetValue(this.ctx.Guild?.Id ?? 0, out BlacklistEntry blacklistedGuildDetails))
+        if (this.ctx.Bot.bannedGuilds.TryGetValue(this.ctx.Guild?.Id ?? 0, out BanDetails blacklistedGuildDetails))
         {
             SendGuildBanError(blacklistedGuildDetails);
             return false;
@@ -1040,9 +1040,9 @@ public abstract class BaseCommand
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
-        if (this.ctx.Bot.uploadInteractions.ContainsKey(this.ctx.User.Id))
+        if (this.ctx.DbUser.PendingUserUpload is not null)
         {
-            if (this.ctx.Bot.uploadInteractions[this.ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !this.ctx.Bot.uploadInteractions[this.ctx.User.Id].InteractionHandled)
+            if (this.ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() > 0 && !this.ctx.DbUser.PendingUserUpload.InteractionHandled)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -1052,26 +1052,26 @@ public abstract class BaseCommand
                 throw new AlreadyAppliedException("");
             }
 
-            this.ctx.Bot.uploadInteractions.Remove(this.ctx.User.Id);
+            this.ctx.DbUser.PendingUserUpload = null;
         }
 
-        this.ctx.Bot.uploadInteractions.Add(this.ctx.User.Id, new UserUpload
+        this.ctx.DbUser.PendingUserUpload = new UserUpload
         {
             TimeOut = DateTime.UtcNow.Add(timeOutOverride.Value)
-        });
+        };
 
-        while (this.ctx.Bot.uploadInteractions.ContainsKey(this.ctx.User.Id) && !this.ctx.Bot.uploadInteractions[this.ctx.User.Id].InteractionHandled && this.ctx.Bot.uploadInteractions[this.ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
+        while (this.ctx.DbUser.PendingUserUpload is not null && !this.ctx.DbUser.PendingUserUpload.InteractionHandled && this.ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() > 0)
         {
             await Task.Delay(500);
         }
 
-        if (!this.ctx.Bot.uploadInteractions[this.ctx.User.Id].InteractionHandled)
+        if (!this.ctx.DbUser.PendingUserUpload?.InteractionHandled ?? true)
             throw new ArgumentException("");
 
-        int size = this.ctx.Bot.uploadInteractions[this.ctx.User.Id].FileSize;
-        Stream stream = this.ctx.Bot.uploadInteractions[this.ctx.User.Id].UploadedData;
+        int size = this.ctx.DbUser.PendingUserUpload.FileSize;
+        Stream stream = this.ctx.DbUser.PendingUserUpload.UploadedData;
 
-        this.ctx.Bot.uploadInteractions.Remove(this.ctx.User.Id);
+        this.ctx.DbUser.PendingUserUpload = null;
         return (stream, size);
     }
 
@@ -1240,13 +1240,13 @@ public abstract class BaseCommand
             Description = GetString(this.t.Commands.Common.Errors.VoiceChannel).Build(true),
         }.AsError(this.ctx)));
 
-    public void SendUserBanError(BlacklistEntry entry)
+    public void SendUserBanError(BanDetails entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
-    public void SendGuildBanError(BlacklistEntry entry)
+    public void SendGuildBanError(BanDetails entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = GetString(this.t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),

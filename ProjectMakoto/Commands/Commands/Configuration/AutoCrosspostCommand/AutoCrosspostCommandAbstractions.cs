@@ -13,12 +13,12 @@ internal sealed class AutoCrosspostCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.AutoCrosspost;
+        var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.AutoCrosspost;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ExcludeBots, CommandKey.DelayBeforePosting);
 
-        return $"🤖 `{CommandKey.ExcludeBots.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].Crosspost.ExcludeBots.ToEmote(ctx.Bot)}\n" +
-               $"🕒 `{CommandKey.DelayBeforePosting.Get(ctx.DbUser).PadRight(pad)}`: `{TimeSpan.FromSeconds(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.DelayBeforePosting).GetHumanReadable()}`\n\n" +
-               $"{(ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Count != 0 ? string.Join("\n\n", ctx.Bot.guilds[ctx.Guild.Id].Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
+        return $"🤖 `{CommandKey.ExcludeBots.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.Crosspost.ExcludeBots.ToEmote(ctx.Bot)}\n" +
+               $"🕒 `{CommandKey.DelayBeforePosting.Get(ctx.DbUser).PadRight(pad)}`: `{TimeSpan.FromSeconds(ctx.DbGuild.Crosspost.DelayBeforePosting).GetHumanReadable()}`\n\n" +
+               $"{(ctx.DbGuild.Crosspost.CrosspostChannels.Count != 0 ? string.Join("\n\n", ctx.DbGuild.Crosspost.CrosspostChannels.Select(x => $"<#{x}> `[#{ctx.Guild.GetChannel(x).Name}]`")) : CommandKey.NoCrosspostChannels.Get(ctx.DbUser).Build(true))}";
     }
 }

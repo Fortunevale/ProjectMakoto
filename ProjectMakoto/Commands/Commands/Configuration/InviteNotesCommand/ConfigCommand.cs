@@ -30,7 +30,7 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = InviteNotesCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsInfo(ctx, GetString(CommandKey.Title));
 
-            if (!(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Count > 19))
+            if (!(ctx.DbGuild.InviteNotes.Notes.Count > 19))
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
@@ -114,7 +114,7 @@ internal sealed class ConfigCommand : BaseCommand
 
                         var invites = await ctx.Guild.GetInvitesAsync();
 
-                        var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.ContainsKey(x.Code))
+                        var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.DbGuild.InviteNotes.Notes.ContainsKey(x.Code))
                             .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, GetString(CommandKey.InviteDescription, new TVar("Uses", x.Uses), new TVar("Creator", x.Inviter.GetUsernameWithIdentifier())))).ToList());
 
                         if (SelectionResult.TimedOut)
@@ -138,7 +138,7 @@ internal sealed class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Add(SelectedInvite.Code, new InviteNotesDetails()
+                        ctx.DbGuild.InviteNotes.Notes.Add(SelectedInvite.Code, new InviteNotesDetails()
                         {
                             Invite = SelectedInvite.Code,
                             Moderator = ctx.User.Id,
@@ -152,7 +152,7 @@ internal sealed class ConfigCommand : BaseCommand
             }
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
-                var SelectionResult = await PromptCustomSelection(ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
+                var SelectionResult = await PromptCustomSelection(ctx.DbGuild.InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
@@ -169,7 +169,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw SelectionResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].InviteNotes.Notes.Remove(SelectionResult.Result);
+                ctx.DbGuild.InviteNotes.Notes.Remove(SelectionResult.Result);
 
                 await ExecuteCommand(ctx, arguments);
                 return;

@@ -1069,14 +1069,6 @@
           "en": "You have 5 open host submissions. Please wait before trying to submit another host.",
           "de": "Du hast 5 offene Host Meldungen. Bitte warte bis du weitere Hosts meldest."
         },
-        "UserBan": {
-          "en": "You are banned from submitting hosts.",
-          "de": "Du bist gebannt vom weiteren Melden von Hosts."
-        },
-        "GuildBan": {
-          "en": "This server is banned from submitting hosts.",
-          "de": "Dieser Server ist vom Melden weiterer Hosts gebannt."
-        },
         "InvalidHost": {
           "en": "The host '{Host}' is invalid.",
           "de": "Der Host '{Host}' ist ungültig."

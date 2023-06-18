@@ -9,14 +9,14 @@
 
 namespace ProjectMakoto.Entities;
 
-internal enum ExitCodes
+public sealed class WebRequestItem
 {
-    VitalTaskFailed = 1,
-    ExitTasksTimeout = 21,
+    public string Url { get; set; }
 
-    NoToken = 8,
-    FailedDiscordLogin = 9,
+    public string Response { get; set; }
 
-    FailedDatabaseLoad = 18,
-    FailedDatabaseLogin = 19,
+    public bool Resolved { get; set; }
+    public bool Failed { get; set; }
+    public HttpStatusCode StatusCode { get; set; }
+    public Exception Exception { get; set; }
 }

@@ -42,8 +42,8 @@ internal sealed class ForceClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Clear();
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Clear();
+            ctx.DbGuild.MusicModule.SongQueue.Clear();
+            ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {

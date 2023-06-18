@@ -19,7 +19,7 @@ internal sealed class ManualBumpCommand : BaseCommand
         {
             var CommandKey = this.t.Commands.Moderation.ManualBump;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
+            if (!ctx.DbGuild.BumpReminder.Enabled)
             {
                 _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.NotSetUp, true)).AsError(ctx));
                 return;
@@ -39,15 +39,15 @@ internal sealed class ManualBumpCommand : BaseCommand
                 return;
             }
 
-            DiscordChannel channel = ctx.Guild.GetChannel(ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId);
+            DiscordChannel channel = ctx.Guild.GetChannel(ctx.DbGuild.BumpReminder.ChannelId);
 
-            ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastBump = DateTime.UtcNow;
-            ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastReminder = DateTime.UtcNow;
-            ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.BumpsMissed = 0;
-            ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastUserId = 0;
-            ctx.Bot.bumpReminder.ScheduleBump(ctx.Client, ctx.Guild.Id);
+            ctx.DbGuild.BumpReminder.LastBump = DateTime.UtcNow;
+            ctx.DbGuild.BumpReminder.LastReminder = DateTime.UtcNow;
+            ctx.DbGuild.BumpReminder.BumpsMissed = 0;
+            ctx.DbGuild.BumpReminder.LastUserId = 0;
+            ctx.Bot.BumpReminder.ScheduleBump(ctx.Client, ctx.Guild.Id);
 
-            _ = channel.DeleteMessageAsync(await channel.GetMessageAsync(ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.PersistentMessageId));
+            _ = channel.DeleteMessageAsync(await channel.GetMessageAsync(ctx.DbGuild.BumpReminder.PersistentMessageId));
             DeleteOrInvalidate();
         });
     }

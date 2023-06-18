@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class ExperienceUserSettings
+public sealed class ExperienceUserSettings : RequiresParent<User>
 {
-    public ExperienceUserSettings(User user)
+    public ExperienceUserSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this.Parent = user;
     }
-    private User Parent { get; set; }
-
-
 
     private bool _DirectMessageOptOut { get; set; } = false;
     public bool DirectMessageOptOut
@@ -26,7 +22,7 @@ public sealed class ExperienceUserSettings
         set
         {
             this._DirectMessageOptOut = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "experience_directmessageoptout", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "experience_directmessageoptout", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

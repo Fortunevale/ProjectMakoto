@@ -33,7 +33,7 @@ internal sealed class DisconnectCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Contains(ctx.User.Id))
+            if (ctx.DbGuild.MusicModule.collectedDisconnectVotes.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,12 +42,11 @@ internal sealed class DisconnectCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Add(ctx.User.Id);
+            ctx.DbGuild.MusicModule.collectedDisconnectVotes.Add(ctx.User.Id);
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-                ctx.Bot.guilds[ctx.Guild.Id].MusicModule = new(ctx.Bot.guilds[ctx.Guild.Id]);
+                ctx.DbGuild.MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
 
                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
                 await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();
@@ -61,7 +60,7 @@ internal sealed class DisconnectCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -90,7 +89,7 @@ internal sealed class DisconnectCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Contains(e.User.Id))
+                        if (ctx.DbGuild.MusicModule.collectedDisconnectVotes.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.Disconnect.AlreadyVoted, true)}").AsEphemeral());
                             return;
@@ -104,12 +103,11 @@ internal sealed class DisconnectCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Add(e.User.Id);
+                        ctx.DbGuild.MusicModule.collectedDisconnectVotes.Add(e.User.Id);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
-                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule = new(ctx.Bot.guilds[ctx.Guild.Id]);
+                            ctx.DbGuild.MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
 
                             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).StopAsync();
                             await ctx.Client.GetLavalink().GetGuildConnection(ctx.Guild).DisconnectAsync();
@@ -121,7 +119,7 @@ internal sealed class DisconnectCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot);

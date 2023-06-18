@@ -13,11 +13,11 @@ internal sealed class InVoicePrivacyCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.InVoicePrivacy;
+        var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.InVoicePrivacy;
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.ClearMessagesOnLeave, CommandKey.SetPermissions);
 
-        return $"{"🗑".UnicodeToEmoji()} `{CommandKey.ClearMessagesOnLeave.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled.ToEmote(ctx.Bot)}\n" +
-               $"{"📋".UnicodeToEmoji()} `{CommandKey.SetPermissions.Get(ctx.DbUser).PadRight(pad)}`: {ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled.ToEmote(ctx.Bot)}";
+        return $"{"🗑".UnicodeToEmoji()} `{CommandKey.ClearMessagesOnLeave.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled.ToEmote(ctx.Bot)}\n" +
+               $"{"📋".UnicodeToEmoji()} `{CommandKey.SetPermissions.Get(ctx.DbUser).PadRight(pad)}`: {ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled.ToEmote(ctx.Bot)}";
     }
 }

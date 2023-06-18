@@ -13,16 +13,16 @@ internal sealed class LevelRewardsCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.LevelRewards;
+        var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.LevelRewards;
 
         string str = "";
-        if (ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Count != 0)
+        if (ctx.DbGuild.LevelRewards.Count != 0)
         {
-            foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.OrderBy(x => x.Level))
+            foreach (var b in ctx.DbGuild.LevelRewards.OrderBy(x => x.Level))
             {
                 if (!ctx.Guild.Roles.ContainsKey(b.RoleId))
                 {
-                    ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Remove(b);
+                    ctx.DbGuild.LevelRewards.Remove(b);
                     continue;
                 }
 

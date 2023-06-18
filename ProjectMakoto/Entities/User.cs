@@ -9,26 +9,22 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class User
+public sealed class User : BaseSelfFillingList
 {
-    public User(Bot _bot, ulong userId)
+    public User(Bot bot, ulong userId) : base(bot, userId)
     {
-        if (_bot.objectedUsers.Contains(userId))
+        if (bot.objectedUsers.Contains(userId))
             throw new InvalidOperationException($"User {userId} has objected to having their data processed.");
 
-        this.Cooldown = new(_bot);
-        this.UserId = userId;
+        this.Cooldown = new(bot, this);
 
-        this.UrlSubmissions = new(this);
-        this.AfkStatus = new(this);
-        this.ScoreSaber = new(this);
-        this.ExperienceUser = new(this);
-        this.Reminders = new(this, _bot);
-        this.Translation = new(this);
+        this.UrlSubmissions = new(bot, this);
+        this.AfkStatus = new(bot, this);
+        this.ScoreSaber = new(bot, this);
+        this.ExperienceUser = new(bot, this);
+        this.Reminders = new(bot, this);
+        this.Translation = new(bot, this);
     }
-
-    [JsonIgnore]
-    public ulong UserId { get; set; }
 
     [JsonIgnore]
     public DataSettings Data { get; set; } = new();
@@ -50,4 +46,7 @@ public sealed class User
 
     [JsonIgnore]
     public DateTime LastSuccessful2FA { get; set; } = DateTime.MinValue;
+
+    [JsonIgnore]
+    public UserUpload PendingUserUpload { get; set; } = null;
 }

@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -9,10 +9,12 @@
 
 namespace ProjectMakoto.Entities;
 
-internal sealed class UserUpload
+public class BaseSelfFillingList : RequiresBotReference
 {
-    public bool InteractionHandled { get; set; } = false;
-    public DateTime TimeOut { get; set; } = DateTime.Now;
-    public Stream UploadedData { get; set; }
-    public int FileSize { get; set; } = 0;
+    public BaseSelfFillingList(Bot bot, ulong key) : base(bot)
+    {
+        this.Id = key;
+    }
+
+    internal ulong Id { get; set; }
 }

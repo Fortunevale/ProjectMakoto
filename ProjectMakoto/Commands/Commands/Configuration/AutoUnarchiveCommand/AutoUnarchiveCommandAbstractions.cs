@@ -13,12 +13,12 @@ internal sealed class AutoUnarchiveCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.ToList())
+        foreach (var b in ctx.DbGuild.AutoUnarchiveThreads.ToList())
         {
             if (!ctx.Guild.Channels.ContainsKey(b))
-                ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Remove(b);
+                ctx.DbGuild.AutoUnarchiveThreads.Remove(b);
         }
 
-        return $"{(ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.loadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
+        return $"{(ctx.DbGuild.AutoUnarchiveThreads.Any() ? string.Join("\n", ctx.DbGuild.AutoUnarchiveThreads.Select(x => $"{ctx.Guild.GetChannel(x).Mention} [`#{ctx.Guild.GetChannel(x).Name}`] (`{x}`)")) : ctx.Bot.LoadedTranslations.Commands.Config.AutoUnarchive.NoChannels.Get(ctx.DbUser).Build(true))}";
     }
 }

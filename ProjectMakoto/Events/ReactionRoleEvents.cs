@@ -9,25 +9,22 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class ReactionRoleEvents
+internal sealed class ReactionRoleEvents : RequiresTranslation
 {
-    internal ReactionRoleEvents(Bot _bot)
+    public ReactionRoleEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task MessageReactionAdded(DiscordClient sender, MessageReactionAddEventArgs e)
     {
         if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate)
             return;
 
-        if (this._bot.guilds[e.Guild.Id].ReactionRoles.Any(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
+        if (this.Bot.Guilds[e.Guild.Id].ReactionRoles.Any(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
         {
-            var obj = this._bot.guilds[e.Guild.Id].ReactionRoles.First(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
+            var obj = this.Bot.Guilds[e.Guild.Id].ReactionRoles.First(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
 
-            if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != this._bot.discordClient.CurrentUser.Id)
+            if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != this.Bot.DiscordClient.CurrentUser.Id)
                 await (await e.User.ConvertToMember(e.Guild)).GrantRoleAsync(e.Guild.GetRole(obj.Value.RoleId));
         }
     }
@@ -37,11 +34,11 @@ internal sealed class ReactionRoleEvents
         if (e.Guild == null || e.Channel.IsPrivate)
             return;
 
-        if (this._bot.guilds[e.Guild.Id].ReactionRoles.Any<KeyValuePair<ulong, ReactionRoleEntry>>(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
+        if (this.Bot.Guilds[e.Guild.Id].ReactionRoles.Any<KeyValuePair<ulong, ReactionRoleEntry>>(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName()))
         {
-            var obj = this._bot.guilds[e.Guild.Id].ReactionRoles.First<KeyValuePair<ulong, ReactionRoleEntry>>(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
+            var obj = this.Bot.Guilds[e.Guild.Id].ReactionRoles.First<KeyValuePair<ulong, ReactionRoleEntry>>(x => x.Key == e.Message.Id && x.Value.EmojiName == e.Emoji.GetUniqueDiscordName());
 
-            if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != this._bot.discordClient.CurrentUser.Id)
+            if (e.Guild.Roles.ContainsKey(obj.Value.RoleId) && e.User.Id != this.Bot.DiscordClient.CurrentUser.Id)
             {
                 DiscordMember member;
 

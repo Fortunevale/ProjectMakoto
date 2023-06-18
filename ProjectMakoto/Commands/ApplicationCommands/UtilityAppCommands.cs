@@ -21,7 +21,7 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
             {
                 Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
 
-                IEnumerable<DiscordApplicationCommand> filteredCommands = bot.discordClient.GetCommandList(bot)
+                IEnumerable<DiscordApplicationCommand> filteredCommands = bot.DiscordClient.GetCommandList(bot)
                     .Where(x => x.Name.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     .Where(x => !x.DefaultMemberPermissions.HasValue || ctx.Member.Permissions.HasPermission(x.DefaultMemberPermissions.Value))
                     .Where(x => x.Type == ApplicationCommandType.ChatInput)

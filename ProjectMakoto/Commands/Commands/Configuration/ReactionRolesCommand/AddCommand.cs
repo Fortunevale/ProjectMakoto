@@ -152,7 +152,7 @@ internal sealed class AddCommand : BaseCommand
 
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Count > 100)
+            if (ctx.DbGuild.ReactionRoles.Count > 100)
             {
                 embed.Description = $"`You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one.`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
@@ -166,14 +166,14 @@ internal sealed class AddCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => (x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
+            if (ctx.DbGuild.ReactionRoles.Any(x => (x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName())))
             {
                 embed.Description = $"`The specified emoji has already been used for a reaction role on the selected message.`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
+            if (ctx.DbGuild.ReactionRoles.Any(x => x.Value.RoleId == role_parameter.Id))
             {
                 embed.Description = $"`The specified role is already being used in another reaction role.`";
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
@@ -182,7 +182,7 @@ internal sealed class AddCommand : BaseCommand
 
             await message.CreateReactionAsync(emoji_parameter);
 
-            ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoleEntry>(message.Id, new Entities.ReactionRoleEntry
+            ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoleEntry>(message.Id, new Entities.ReactionRoleEntry
             {
                 ChannelId = message.Channel.Id,
                 RoleId = role_parameter.Id,

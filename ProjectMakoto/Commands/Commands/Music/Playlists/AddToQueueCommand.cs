@@ -57,7 +57,7 @@ internal sealed class AddToQueueCommand : BaseCommand
                 new TVar("", SelectedPlaylist.List.Count)),
             }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
+            ctx.DbGuild.MusicModule.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
@@ -65,7 +65,7 @@ internal sealed class AddToQueueCommand : BaseCommand
                 new TVar("Count", SelectedPlaylist.List.Count),
                 new TVar("Playlist", SelectedPlaylist.PlaylistName))
             }
-            .AddField(new DiscordEmbedField($"📜 {GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count}"))
+            .AddField(new DiscordEmbedField($"📜 {GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}"))
             .AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
         });
     }

@@ -86,28 +86,6 @@ public sealed class TableDefinitions
         public LongText notes { get; set; }
     }
 
-    public sealed class submission_user_bans
-    {
-        [Primary]
-        public BigInt id { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text reason { get; set; }
-
-        public BigInt moderator { get; set; }
-    }
-
-    public sealed class submission_guild_bans
-    {
-        [Primary]
-        public BigInt id { get; set; }
-
-        [Collation("utf8_unicode_ci")]
-        public Text reason { get; set; }
-
-        public BigInt moderator { get; set; }
-    }
-
     public sealed class active_url_submissions
     {
         [Primary]
@@ -410,8 +388,6 @@ public sealed class TableDefinitions
         typeof(globalbans),
         typeof(globalnotes),
 
-        typeof(submission_user_bans),
-        typeof(submission_guild_bans),
         typeof(active_url_submissions),
 
         typeof(objected_users),

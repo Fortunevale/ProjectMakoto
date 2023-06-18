@@ -33,7 +33,7 @@ internal sealed class SkipCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Contains(ctx.User.Id))
+            if (ctx.DbGuild.MusicModule.collectedSkips.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,9 +42,9 @@ internal sealed class SkipCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Add(ctx.User.Id);
+            ctx.DbGuild.MusicModule.collectedSkips.Add(ctx.User.Id);
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.DbGuild.MusicModule.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
                 await conn.StopAsync();
 
@@ -57,7 +57,7 @@ internal sealed class SkipCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -86,7 +86,7 @@ internal sealed class SkipCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Contains(e.User.Id))
+                        if (ctx.DbGuild.MusicModule.collectedSkips.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.Skip.AlreadyVoted, true)}").AsEphemeral());
                             return;
@@ -100,9 +100,9 @@ internal sealed class SkipCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Add(e.User.Id);
+                        ctx.DbGuild.MusicModule.collectedSkips.Add(e.User.Id);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.DbGuild.MusicModule.collectedSkips.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
                             await conn.StopAsync();
 
@@ -113,7 +113,7 @@ internal sealed class SkipCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Skip.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedSkips.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot);

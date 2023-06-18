@@ -7,16 +7,16 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities;
+namespace ProjectMakoto.Enums;
 
-public sealed class RequestItem
+internal enum ExitCodes
 {
-    public string Url { get; set; }
+    VitalTaskFailed = 1,
+    ExitTasksTimeout = 21,
 
-    public string Response { get; set; }
+    NoToken = 8,
+    FailedDiscordLogin = 9,
 
-    public bool Resolved { get; set; }
-    public bool Failed { get; set; }
-    public HttpStatusCode StatusCode { get; set; }
-    public Exception Exception { get; set; }
+    FailedDatabaseLoad = 18,
+    FailedDatabaseLogin = 19,
 }

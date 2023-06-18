@@ -19,7 +19,7 @@ public sealed class AbuseIpDbClient
 
     private Bot _bot { get; set; }
 
-    private readonly Dictionary<string, RequestItem> Queue = new();
+    private readonly Dictionary<string, WebRequestItem> Queue = new();
 
     private Dictionary<string, Tuple<AbuseIpDbQuery, DateTime>> Cache = new();
 
@@ -110,7 +110,7 @@ public sealed class AbuseIpDbClient
     private async Task<string> MakeRequest(string url)
     {
         string key = Guid.NewGuid().ToString();
-        this.Queue.Add(key, new RequestItem { Url = url });
+        this.Queue.Add(key, new WebRequestItem { Url = url });
 
         while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);

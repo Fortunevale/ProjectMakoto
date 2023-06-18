@@ -53,21 +53,21 @@ internal sealed class QueueCommand : BaseCommand
 
                 var TotalTimespan = TimeSpan.Zero;
 
-                for (int i = 0; i < ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count; i++)
+                for (int i = 0; i < ctx.DbGuild.MusicModule.SongQueue.Count; i++)
                 {
-                    TotalTimespan = TotalTimespan.Add(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue[i].Length);
+                    TotalTimespan = TotalTimespan.Add(ctx.DbGuild.MusicModule.SongQueue[i].Length);
                 }
 
-                var Description = $"{GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
-                Description += $"{string.Join("\n", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
+                var Description = $"{GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.DbGuild.MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
+                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
 
-                if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count > 0)
-                    Description += $"`{GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count / 10.0)}`\n\n";
+                if (ctx.DbGuild.MusicModule.SongQueue.Count > 0)
+                    Description += $"`{GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Count / 10.0)}`\n\n";
 
                 Description += $"`{GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
-                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
-                Description += $"{(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
-                Description += $" `|` {(ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
+                Description += $"{(ctx.DbGuild.MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
+                Description += $"{(ctx.DbGuild.MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
+                Description += $" `|` {(ctx.DbGuild.MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
 
                 if (conn.CurrentState.CurrentTrack is not null)
                 {
@@ -78,7 +78,7 @@ internal sealed class QueueCommand : BaseCommand
                 if (CurrentPage <= 0)
                     PreviousPage = PreviousPage.Disable();
 
-                if ((CurrentPage * 10) + 10 >= ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)
+                if ((CurrentPage * 10) + 10 >= ctx.DbGuild.MusicModule.SongQueue.Count)
                     NextPage = NextPage.Disable();
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder

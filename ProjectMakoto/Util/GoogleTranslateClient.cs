@@ -21,7 +21,7 @@ public sealed class GoogleTranslateClient
     }
 
     internal DateTime LastRequest = DateTime.MinValue;
-    internal readonly Dictionary<string, RequestItem> Queue = new();
+    internal readonly Dictionary<string, WebRequestItem> Queue = new();
 
     private async Task QueueHandler()
     {
@@ -79,7 +79,7 @@ public sealed class GoogleTranslateClient
     private async Task<string> MakeRequest(string url)
     {
         string key = Guid.NewGuid().ToString();
-        this.Queue.Add(key, new RequestItem { Url = url });
+        this.Queue.Add(key, new WebRequestItem { Url = url });
 
         while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);

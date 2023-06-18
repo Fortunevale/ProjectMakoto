@@ -9,14 +9,11 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class CommandEvents
+internal sealed class CommandEvents : RequiresTranslation
 {
-    internal CommandEvents(Bot _bot)
+    public CommandEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task CommandExecuted(CommandsNextExtension sender, CommandExecutionEventArgs e)
     {
