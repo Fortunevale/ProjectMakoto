@@ -9,7 +9,7 @@
 
 using DisCatSharp.Extensions.TwoFactorCommands.Enums;
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class EnrollTwoFactorCommand : BaseCommand
 {

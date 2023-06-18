@@ -9,7 +9,7 @@
 
 using Octokit;
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class CreateIssueCommand : BaseCommand
 {
