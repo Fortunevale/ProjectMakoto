@@ -65,6 +65,9 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
             int Wait = 0;
 
+            if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+                this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
             while (Wait < 10 && this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
             {
                 Wait++;

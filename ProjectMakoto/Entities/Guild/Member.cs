@@ -9,18 +9,16 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Member : BaseSelfFillingList
+public sealed class Member : RequiresParent<Guild>
 {
-    public Member(Bot bot, Guild guild, ulong key) : base(bot, key)
+    public Member(Bot bot, Guild guild, ulong key) : base(bot, guild)
     {
         this.InviteTracker = new(bot, this);
         this.Experience = new(bot, this);
-        this.Parent = guild;
+        this.Id = key;
     }
 
-    [JsonIgnore]
-    internal Guild Parent { get; set; }
-
+    internal ulong Id { get; set; }
 
     private string _SavedNickname { get; set; } = "";
     public string SavedNickname

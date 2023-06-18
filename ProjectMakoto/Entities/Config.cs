@@ -122,13 +122,26 @@ public sealed class Config
         public string AbuseIpDbToken = "";
         public string LibreTranslateHost = "127.0.0.1";
 
+        public DiscordSecrets Discord = new();
+        public TelegramSecrets Telegram = new();
         public GithubSecrets Github = new();
         public DatabaseSecrets Database = new();
         public LavalinkSecrets Lavalink = new();
 
+        public sealed class DiscordSecrets
+        {
+            public string Token = "";
+        }
+
+        public sealed class TelegramSecrets
+        {
+            public string Token = "";
+        }
+
         public sealed class GithubSecrets
         {
             public string Token = "";
+
             public DateTimeOffset TokenExperiation = new(0001, 01, 01, 15, 00, 00, TimeSpan.Zero);
             public string Username = "";
             public string Repository = "";

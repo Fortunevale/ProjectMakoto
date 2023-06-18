@@ -14,31 +14,13 @@ internal sealed class DisCatSharpExtensionsLoader
 {
     public static async Task Load(Bot bot, string[] args)
     {
-        string token = "";
-
-        try
+        if (bot.status.LoadedConfig.Secrets.Discord.Token.Length <= 0)
         {
-            if (args.Contains("--token"))
-                token = args[Array.IndexOf(args, "--token") + 1];
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("An exception occurred while trying to parse a token commandline argument", ex);
-        }
-
-        if (File.Exists("token.cfg") && !args.Contains("--token"))
-            token = File.ReadAllText("token.cfg");
-
-        if (!(token.Length > 0))
-        {
-            _logger.LogFatal("No token provided");
-            File.WriteAllText("token.cfg", "");
+            _logger.LogFatal("No discord token provided");
             await Task.Delay(1000);
             Environment.Exit((int)ExitCodes.NoToken);
             return;
         }
-
-        _logger.AddBlacklist(token);
 
         _logger.AddLogLevelBlacklist(CustomLogLevel.Trace2);
 
@@ -46,11 +28,10 @@ internal sealed class DisCatSharpExtensionsLoader
 
         bot.DiscordClient = new DiscordClient(new DiscordConfiguration
         {
-            Token = $"{token}",
+            Token = bot.status.LoadedConfig.Secrets.Discord.Token,
             TokenType = TokenType.Bot,
             MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Trace,
             Intents = DiscordIntents.All,
-            LogTimestampFormat = "dd.MM.yyyy HH:mm:ss",
             AutoReconnect = true,
             LoggerFactory = new LoggerFactory(new ILoggerProvider[] { _logger.Provider }),
             HttpTimeout = TimeSpan.FromSeconds(60),

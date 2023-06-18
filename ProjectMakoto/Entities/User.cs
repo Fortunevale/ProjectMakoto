@@ -9,8 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class User : BaseSelfFillingList
+public sealed class User : BaseSelfFillingListValue<User>
 {
+    public override User Convert(BaseSelfFillingListValue<User> oldValue)
+        => new(oldValue.Bot, oldValue.Id);
+
     public User(Bot bot, ulong userId) : base(bot, userId)
     {
         if (bot.objectedUsers.Contains(userId))
@@ -48,5 +51,5 @@ public sealed class User : BaseSelfFillingList
     public DateTime LastSuccessful2FA { get; set; } = DateTime.MinValue;
 
     [JsonIgnore]
-    public UserUpload PendingUserUpload { get; set; } = null;
+    public UserUpload? PendingUserUpload { get; set; } = null;
 }

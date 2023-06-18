@@ -16,5 +16,5 @@ public abstract class RequiresBotReference
         this.Bot = bot;
     }
 
-    protected Bot Bot { get; set; }
+    internal Bot Bot { get; set; }
 }

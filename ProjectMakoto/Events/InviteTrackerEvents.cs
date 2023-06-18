@@ -74,6 +74,9 @@ internal sealed class InviteTrackerEvents : RequiresTranslation
         {
             if (!InvitesAfter.Any(x => x.Code == b.Code))
             {
+                if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+                    this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
                 _logger.LogDebug("User '{User}' joined '{Guild}' with now deleted '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);
@@ -82,6 +85,9 @@ internal sealed class InviteTrackerEvents : RequiresTranslation
 
             if (InvitesAfter.First(x => x.Code == b.Code).Uses > b.Uses)
             {
+                if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+                    this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code = b.Code;
                 this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId = b.CreatorId;
                 _logger.LogDebug("User '{User}' joined '{Guild}' with '{Code}' created by '{Creator}'", e.Member.Id, e.Guild.Id, b.Code, b.CreatorId);

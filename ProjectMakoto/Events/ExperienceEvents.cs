@@ -23,6 +23,9 @@ internal sealed class ExperienceEvents : RequiresTranslation
         if (!this.Bot.Guilds[e.Guild.Id].Experience.UseExperience)
             return;
 
+        if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Author.Id))
+            this.Bot.Guilds[e.Guild.Id].Members.Add(e.Author.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Author.Id));
+
         if (this.Bot.Guilds[e.Guild.Id].Members[e.Author.Id].Experience.Last_Message.AddSeconds(20) < DateTime.UtcNow && !e.Message.Author.IsBot && !e.Channel.IsPrivate)
         {
             var exp = this.Bot.ExperienceHandler.CalculateMessageExperience(e.Message);

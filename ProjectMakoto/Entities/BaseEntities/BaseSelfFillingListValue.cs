@@ -9,12 +9,18 @@
 
 namespace ProjectMakoto.Entities;
 
-public class BaseSelfFillingList : RequiresBotReference
+public class BaseSelfFillingListValue<T> : RequiresBotReference
 {
-    public BaseSelfFillingList(Bot bot, ulong key) : base(bot)
+    public BaseSelfFillingListValue(Bot bot, ulong key) : base(bot)
     {
         this.Id = key;
     }
 
     internal ulong Id { get; set; }
+
+    public virtual T Convert(BaseSelfFillingListValue<T> oldValue)
+        => throw new NullReferenceException();
+
+    public static implicit operator BaseSelfFillingListValue<T>(Guild a) => a;
+    public static implicit operator BaseSelfFillingListValue<T>(User a) => a;
 }

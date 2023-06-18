@@ -72,11 +72,6 @@ internal sealed class SyncTasks
                     bot.BumpReminder.ScheduleBump(sender, guild.Key);
                 }
 
-                foreach (var member in guild.Value.Members)
-                {
-                    bot.ExperienceHandler.CheckExperience(member.Key, guild.Value);
-                }
-
                 if (bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Any())
                 {
                     Task.Run(async () =>
@@ -272,6 +267,11 @@ internal sealed class SyncTasks
 
                 foreach (var member in guildMembers)
                 {
+                    if (!bot.Guilds[guild.Key].Members.ContainsKey(member.Id))
+                        bot.Guilds[guild.Key].Members.Add(member.Id, new(bot, bot.Guilds[guild.Key], member.Id));
+
+                    bot.ExperienceHandler.CheckExperience(member.Id, guild.Value);
+
                     if (bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate == DateTime.UnixEpoch)
                         bot.Guilds[guild.Key].Members[member.Id].FirstJoinDate = member.JoinedAt.UtcDateTime;
 

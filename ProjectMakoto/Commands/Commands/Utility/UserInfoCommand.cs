@@ -55,6 +55,9 @@ internal sealed class UserInfoCommand : BaseCommand
             }
             else
             {
+                if (!ctx.DbGuild.Members.ContainsKey(victim.Id))
+                    ctx.DbGuild.Members.Add(victim.Id, new(ctx.Bot, ctx.DbGuild, victim.Id));
+
                 if (ctx.DbGuild.Members[victim.Id].MemberRoles.Count > 0)
                     GenerateRoles = string.Join(", ", ctx.DbGuild.Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
                 else

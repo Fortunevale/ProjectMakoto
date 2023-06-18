@@ -34,6 +34,9 @@ internal sealed class ClearBackupCommand : BaseCommand
                 return;
             }
 
+            if (!ctx.DbGuild.Members.ContainsKey(victim.Id))
+                ctx.DbGuild.Members.Add(victim.Id, new(ctx.Bot, ctx.DbGuild, victim.Id));
+
             ctx.DbGuild.Members[victim.Id].MemberRoles.Clear();
             ctx.DbGuild.Members[victim.Id].SavedNickname = "";
 

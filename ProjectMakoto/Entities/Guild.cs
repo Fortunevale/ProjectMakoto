@@ -9,8 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Guild : BaseSelfFillingList
+public sealed class Guild : BaseSelfFillingListValue<Guild>
 {
+    public override Guild Convert(BaseSelfFillingListValue<Guild> oldValue)
+        => new(oldValue.Id, oldValue.Bot);
+
     public Guild(ulong serverId, Bot bot) : base(bot, serverId)
     {
         this.TokenLeakDetection = new(bot, this);
@@ -30,7 +33,7 @@ public sealed class Guild : BaseSelfFillingList
         this.VcCreator = new(bot, this);
         this.PrefixSettings = new(bot, this);
 
-        this.Members = new(bot);
+        this.Members = new();
     }
 
     public TokenLeakDetectionSettings TokenLeakDetection { get; set; }
@@ -53,7 +56,7 @@ public sealed class Guild : BaseSelfFillingList
     public List<LevelRewardEntry> LevelRewards { get; set; } = new();
     public List<KeyValuePair<ulong, ReactionRoleEntry>> ReactionRoles { get; set; } = new();
 
-    public SelfFillingDictionary<Member> Members { get; set; }
+    public Dictionary<ulong, Member> Members { get; set; }
 
     public Lavalink MusicModule { get; set; }
 

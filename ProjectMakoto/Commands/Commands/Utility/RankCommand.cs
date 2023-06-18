@@ -33,6 +33,9 @@ internal sealed class RankCommand : BaseCommand
 
             victim = await victim.GetFromApiAsync();
 
+            if (!ctx.DbGuild.Members.ContainsKey(victim.Id))
+                ctx.DbGuild.Members.Add(victim.Id, new(ctx.Bot, ctx.DbGuild, victim.Id));
+
             long current = (long)Math.Floor((decimal)(ctx.DbGuild.Members[victim.Id].Experience.Points - ctx.Bot.ExperienceHandler.CalculateLevelRequirement(ctx.DbGuild.Members[victim.Id].Experience.Level - 1)));
             long max = (long)Math.Floor((decimal)(ctx.Bot.ExperienceHandler.CalculateLevelRequirement(ctx.DbGuild.Members[victim.Id].Experience.Level) - ctx.Bot.ExperienceHandler.CalculateLevelRequirement(ctx.DbGuild.Members[victim.Id].Experience.Level - 1)));
 

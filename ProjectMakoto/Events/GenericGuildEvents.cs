@@ -17,6 +17,9 @@ internal sealed class GenericGuildEvents : RequiresTranslation
 
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
+        if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
         if (this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate == DateTime.UnixEpoch)
             this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].FirstJoinDate = e.Member.JoinedAt.UtcDateTime;
 
@@ -77,11 +80,16 @@ internal sealed class GenericGuildEvents : RequiresTranslation
 
     internal async Task GuildMemberRemoved(DiscordClient sender, GuildMemberRemoveEventArgs e)
     {
+        if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
         this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].LastLeaveDate = DateTime.UtcNow;
     }
 
     internal async Task GuildMemberUpdated(DiscordClient sender, GuildMemberUpdateEventArgs e)
     {
+        if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
         await Task.Delay(2000);
 
         this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles = e.Member.Roles.Select(x => new MemberRole
@@ -95,6 +103,9 @@ internal sealed class GenericGuildEvents : RequiresTranslation
 
     internal async Task GuildMemberBanned(DiscordClient sender, GuildBanAddEventArgs e)
     {
+        if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
         this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].MemberRoles.Clear();
         this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].SavedNickname = "";
     }

@@ -16,5 +16,5 @@ public class RequiresParent<T> : RequiresBotReference
         this.Parent = parent;
     }
 
-    protected T Parent { get; set; }
+    internal T Parent { get; set; }
 }

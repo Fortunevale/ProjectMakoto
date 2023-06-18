@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary<ulong, T> where T : BaseSelfFillingList
+public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary<ulong, T> where T : BaseSelfFillingListValue<T>
 {
     public SelfFillingDictionary(Bot bot) : base(bot)
     {
@@ -24,7 +24,10 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
         get
         {
             if (!this._items.ContainsKey(key) && key != 0)
-                this._items.Add(key, (T)new BaseSelfFillingList(this.Bot, key));
+            {
+                var t = new BaseSelfFillingListValue<T>(this.Bot, key);
+                this._items.Add(key, t.Convert(t));
+            }
 
             return this._items[key];
         }
@@ -32,7 +35,10 @@ public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary
         set
         {
             if (!this._items.ContainsKey(key) && key != 0)
-                this._items.Add(key, (T)new BaseSelfFillingList(this.Bot, key));
+            {
+                var t = new BaseSelfFillingListValue<T>(this.Bot, key);
+                this._items.Add(key, t.Convert(t));
+            }
 
             this._items[key] = value;
         }

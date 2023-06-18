@@ -235,10 +235,10 @@ public sealed class DatabaseClient : RequiresBotReference
 
     private async Task CheckDatabaseConnection(MySqlConnection connection)
     {
-        new Task(new Action(async () =>
+        new Task(async () =>
         {
             _ = CheckDatabaseConnection(connection);
-        })).CreateScheduledTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
+        }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
 
         if (this.Disposed)
             return;
