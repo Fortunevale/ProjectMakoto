@@ -24,6 +24,8 @@ public sealed class TaskWatcher
         {
             while (true)
             {
+                Thread.Sleep(100);
+
                 if (TaskList is null)
                 {
                     Environment.Exit((int)ExitCodes.VitalTaskFailed);
@@ -31,7 +33,6 @@ public sealed class TaskWatcher
 
                 if (TaskList.Count <= 0)
                 {
-                    Thread.Sleep(50);
                     continue;
                 }
 
