@@ -127,6 +127,9 @@ public sealed class TableDefinitions
         public BigInt submission_last_datetime { get; set; }
 
         [Collation("utf8_unicode_ci")]
+        public LongText blocked_users { get; set; }
+
+        [Collation("utf8_unicode_ci")]
         public LongText playlists { get; set; }
 
         [Collation("utf8_unicode_ci")]

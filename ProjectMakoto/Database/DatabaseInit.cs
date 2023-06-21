@@ -262,6 +262,7 @@ internal sealed class DatabaseInit : RequiresBotReference
             DbUser.UserPlaylists = JsonConvert.DeserializeObject<List<UserPlaylist>>(b.playlists) ?? new();
             DbUser.CurrentLocale = b.current_locale;
             DbUser.OverrideLocale = b.override_locale;
+            DbUser.BlockedUsers = JsonConvert.DeserializeObject<List<ulong>>(b.blocked_users) ?? new();
 
             foreach (var c in JsonConvert.DeserializeObject<List<ReminderItem>>(b.reminders) ?? new())
                 DbUser.Reminders.ScheduledReminders.Add(c);

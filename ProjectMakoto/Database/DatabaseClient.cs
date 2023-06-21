@@ -513,7 +513,8 @@ public sealed class DatabaseClient : RequiresBotReference
                 override_locale = x.Value.OverrideLocale,
                 data_deletion_date = x.Value.Data.DeletionRequestDate.Ticks,
                 deletion_requested = x.Value.Data.DeletionRequested,
-                last_data_request = x.Value.Data.LastDataRequest.Ticks
+                last_data_request = x.Value.Data.LastDataRequest.Ticks,
+                blocked_users = JsonConvert.SerializeObject(x.Value.BlockedUsers),
             }).ToList()));
         }
 

@@ -39,6 +39,7 @@ public sealed class User : BaseSelfFillingListValue<User>
     public ReminderSettings Reminders { get; set; }
     public TranslationSettings Translation { get; set; }
 
+    public List<ulong> BlockedUsers { get; set; } = new();
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 
     public string? CurrentLocale { get; set; } = null;

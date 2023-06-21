@@ -11,6 +11,9 @@ namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
 {
+    internal static bool HasAnyPermission(this Permissions permissions, params Permissions[] list)
+        => list.Any(x => permissions.HasPermission(x));
+
     internal static string GetGuildPrefix(this DiscordGuild guild, Bot bot)
     {
         try

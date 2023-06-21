@@ -706,6 +706,8 @@ public sealed class Translations
                 public MultiTranslationKey Self;
                 public MultiTranslationKey Other;
             }
+            public SingleTranslationKey BlockedByVictim;
+            public SingleTranslationKey BlockedVictim;
             public afk Afk;
             public sealed class afk
             {
@@ -825,6 +827,19 @@ public sealed class Translations
                     public SingleTranslationKey Fetching;
                     public SingleTranslationKey TimeError;
                 }
+            }
+            public unblockUser UnblockUser;
+            public sealed class unblockUser
+            {
+                public SingleTranslationKey Unblocked;
+                public SingleTranslationKey NotBlocked;
+            }
+            public blockUser BlockUser;
+            public sealed class blockUser
+            {
+                public SingleTranslationKey CannotBlock;
+                public MultiTranslationKey Blocked;
+                public SingleTranslationKey AlreadyBlocked;
             }
             public userInfo UserInfo;
             public sealed class userInfo

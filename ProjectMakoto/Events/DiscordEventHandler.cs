@@ -39,6 +39,7 @@ internal sealed class DiscordEventHandler : RequiresBotReference
         handler.tokenLeakEvents = new(_bot);
         handler.vcCreatorEvents = new(_bot);
         handler.reminderEvents = new(_bot);
+        handler.userBlockEvents = new(_bot);
 
         _bot.DiscordClient.GuildCreated += handler.GuildCreated;
         _bot.DiscordClient.GuildUpdated += handler.GuildUpdated;
@@ -105,6 +106,7 @@ internal sealed class DiscordEventHandler : RequiresBotReference
     EmbedMessagesEvents embedMessagesEvents { get; set; }
     TokenLeakEvents tokenLeakEvents { get; set; }
     ReminderEvents reminderEvents { get; set; }
+    UserBlockEvents userBlockEvents { get; set; }
 
     private void FillDatabase(DiscordGuild guild = null, DiscordMember member = null, DiscordUser user = null)
     {
@@ -420,6 +422,7 @@ internal sealed class DiscordEventHandler : RequiresBotReference
             this.actionlogEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             this.voicePrivacyEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
             this.vcCreatorEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
+            this.userBlockEvents.VoiceStateUpdated(sender, e).Add(this.Bot);
         }).Add(this.Bot);
     }
 

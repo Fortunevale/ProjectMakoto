@@ -1400,6 +1400,36 @@
           "de": "Konnte den Nutzer '{User}' nicht abfragen."
         }
       },
+      "BlockUser": {
+        "AlreadyBlocked": {
+          "en": "This user is already blocked.",
+          "de": "Du hast diesen Nutzer bereits blockiert."
+        },
+        "Blocked": {
+          "en": [
+            "You blocked {User}. This user can no longer join voice chats while you are in them and use social commands with you.",
+            "Please keep in mind: Voice chat restrictions do not apply if {User} has any moderation permissions and you do not."
+          ],
+          "de": [
+            "Du hast {User} blockiert. Dieser Nutzer kann nicht mehr deinem Sprachkanal beitreten und nicht mehr Interaktionsbefehle mit dir als Ziel verwenden.",
+            "Sei gewarnt: {User} kann immernoch deinen Sprachkanal beitreten wenn er Moderationsrechte besitzt und du nicht."
+          ]
+        },
+        "CannotBlock": {
+          "en": "You cannot block this user.",
+            "de": "Du kannst diesen Nutzer nicht blockieren."
+        }
+      },
+      "UnblockUser": {
+        "NotBlocked": {
+          "en": "This user is not blocked.",
+          "de": "Du hast diesen Nutzer nicht blockiert."
+        },
+        "Unblocked": {
+          "en": "You unblocked {User}.",
+          "de": "Du hast {User} entblockiert."
+        }
+      },
       "Data": {
         "Request": {
           "TimeError": {
@@ -1642,6 +1672,14 @@
           "en": "You're now marked as afk. Next time you send a message, your afk status will be removed.",
           "de": "Du bist jetzt als AFK makiert. Nächstes mal wenn du eine Nachricht sendest wird dein AFK Status entfernt."
         }
+      },
+      "BlockedVictim": {
+        "en": "You have {User} blocked.",
+        "de": "Du hast {User} blockiert."
+      },
+      "BlockedByVictim": {
+        "en": "{User} has blocked you.",
+        "de": "{User} hat dich blockiert."
       },
       "Boop": {
         "Other": {

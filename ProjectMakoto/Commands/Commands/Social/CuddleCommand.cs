@@ -20,6 +20,18 @@ internal sealed class CuddleCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
+            if (ctx.DbUser.BlockedUsers.Contains(user.Id))
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Social.BlockedVictim, true, new TVar("User", user.Mention))).AsError(ctx));
+                return;
+            }
+
+            if (ctx.Bot.Users[user.Id].BlockedUsers.Contains(ctx.User.Id))
+            {
+                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Social.BlockedByVictim, true, new TVar("User", user.Mention))).AsError(ctx));
+                return;
+            }
+
             string[] phrases = this.t.Commands.Social.Cuddle.Other.Get(ctx.DbGuild);
             string[] self_phrases = this.t.Commands.Social.Cuddle.Self.Get(ctx.DbGuild);
 
