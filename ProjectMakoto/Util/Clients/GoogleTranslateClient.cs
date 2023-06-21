@@ -11,14 +11,17 @@ namespace ProjectMakoto.Util;
 
 public sealed class GoogleTranslateClient
 {
-    internal GoogleTranslateClient() { }
-
-    internal static GoogleTranslateClient Initialize()
+    internal GoogleTranslateClient()
     {
-        GoogleTranslateClient translationClient = new();
-        _ = translationClient.QueueHandler();
-        return translationClient;
+        _ = this.QueueHandler();
     }
+
+    ~GoogleTranslateClient()
+    {
+        _disposed = true;
+    }
+
+    bool _disposed = false;
 
     internal DateTime LastRequest = DateTime.MinValue;
     internal readonly Dictionary<string, WebRequestItem> Queue = new();
@@ -29,7 +32,7 @@ public sealed class GoogleTranslateClient
 
         client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36");
 
-        while (true)
+        while (!_disposed)
         {
             if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
             {

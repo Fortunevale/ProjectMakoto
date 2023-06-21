@@ -48,7 +48,7 @@ public sealed class Bot
     public LanguageCodes LanguageCodes { get; internal set; }
     internal IReadOnlyList<string> ProfanityList { get; set; }
 
-    internal BumpReminder BumpReminder { get; set; }
+    internal BumpReminderHandler BumpReminder { get; set; }
     internal ExperienceHandler ExperienceHandler { get; set; }
     public TaskWatcher Watcher { get; internal set; } = new();
     internal Dictionary<string, PhishingUrlEntry> PhishingHosts = new();
@@ -83,42 +83,9 @@ public sealed class Bot
 
         UniversalExtensions.AttachLogger(_logger);
 
-        try
-        {
-            string ASCII = File.ReadAllText("Assets/ASCII.txt");
-            Console.WriteLine();
-            foreach (var b in ASCII)
-            {
-                switch (b)
-                {
-                    case 'g':
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        break;
-                    case 'b':
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        break;
-                    case 'r':
-                        Console.ForegroundColor = ConsoleColor.White;
-                        break;
-                    case 'p':
-                        Console.ForegroundColor = ConsoleColor.DarkBlue;
-                        break;
-                    default:
-                        Console.Write(b);
-                        break;
-                }
-            }
-            Console.WriteLine("\n\n");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("Failed to render ASCII art", ex);
-        }
-
-        Console.ResetColor();
+        RenderAsciiArt();
 
         this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
-
         _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
 
         if (args.Contains("--debug"))
@@ -160,9 +127,9 @@ public sealed class Bot
 
                 this.BumpReminder = new(this);
 
-                this.ScoreSaberClient = ScoreSaberClient.InitializeScoresaber();
-                this.TranslationClient = GoogleTranslateClient.Initialize();
-                this.ThreadJoinClient = ThreadJoinClient.Initialize();
+                this.ScoreSaberClient = new ScoreSaberClient();
+                this.TranslationClient = new GoogleTranslateClient();
+                this.ThreadJoinClient = new ThreadJoinClient();
 
                 await Util.Initializers.ListLoader.Load(this);
                 await Util.Initializers.TranslationLoader.Load(this);
@@ -185,7 +152,7 @@ public sealed class Bot
                 Environment.Exit((int)ExitCodes.FailedDatabaseLogin);
             }
 
-            _ = new PhishingUrlUpdater(this).UpdatePhishingUrlDatabase();
+            _ = new PhishingUrlHandler(this).UpdatePhishingUrlDatabase();
         }).Add(this).IsVital();
 
         await loadDatabase.Task.WaitAsync(TimeSpan.FromSeconds(600));
@@ -302,6 +269,43 @@ public sealed class Bot
         }).Add(this).IsVital();
 
         await Task.Delay(-1);
+    }
+
+    private static void RenderAsciiArt()
+    {
+        try
+        {
+            string ASCII = File.ReadAllText("Assets/ASCII.txt");
+            Console.WriteLine();
+            foreach (var b in ASCII)
+            {
+                switch (b)
+                {
+                    case 'g':
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        break;
+                    case 'b':
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        break;
+                    case 'r':
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                    case 'p':
+                        Console.ForegroundColor = ConsoleColor.DarkBlue;
+                        break;
+                    default:
+                        Console.Write(b);
+                        break;
+                }
+            }
+            Console.WriteLine("\n\n");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to render ASCII art", ex);
+        }
+
+        Console.ResetColor();
     }
 
     internal Task<int> GetPrefix(DiscordMessage message)

@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.ScoreSaber;
+
 namespace ProjectMakoto.Commands;
 
 internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
@@ -16,7 +18,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
         return Task.Run(async () =>
         {
             int boardId = (int)arguments["boardId"];
-            int Page = (int)arguments["Page"];
+            uint Page = (uint)arguments["Page"];
             int Internal_Page = (int)arguments["Internal_Page"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
@@ -40,7 +42,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 
             int InternalPage = Internal_Page;
 
-            int scoreSaberPage = Page;
+            uint scoreSaberPage = Page;
 
             Leaderboard leaderboard;
 
@@ -51,21 +53,21 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                 leaderboard = await ctx.Bot.ScoreSaberClient.GetScoreboardById(boardId.ToString());
                 LeaderboardScores scores = await ctx.Bot.ScoreSaberClient.GetScoreboardScoresById(boardId.ToString());
 
-                TotalPages = scores.metadata.total / scores.metadata.itemsPerPage;
+                TotalPages = scores.Metadata.TotalPages / scores.Metadata.ItemCount;
             }
-            catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+            catch (InternalServerErrorException)
             {
                 embed.Description = GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
-            catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+            catch (NotFoundException)
             {
                 embed.Description = GetString(this.t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 throw;
             }
-            catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+            catch (ForbiddenException)
             {
                 embed.Description = GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
@@ -77,7 +79,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
             }
 
             CancellationTokenSource cancellationTokenSource = new();
-            Dictionary<int, LeaderboardScores> cachedPages = new();
+            Dictionary<uint, LeaderboardScores> cachedPages = new();
 
             ctx.Client.ComponentInteractionCreated += RunInteraction;
 
@@ -136,7 +138,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                 }).Add(ctx.Bot, ctx);
             }
 
-            async Task SendPage(int internalPage, int scoreSaberPage)
+            async Task SendPage(int internalPage, uint scoreSaberPage)
             {
                 if (scoreSaberPage > TotalPages)
                 {
@@ -153,19 +155,19 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 
                     scores = cachedPages[scoreSaberPage];
                 }
-                catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+                catch (InternalServerErrorException)
                 {
                     embed.Description = GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
-                catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+                catch (NotFoundException)
                 {
                     embed.Description = GetString(this.t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     throw;
                 }
-                catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+                catch (ForbiddenException)
                 {
                     embed.Description = GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
@@ -183,16 +185,16 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = leaderboard.leaderboardInfo.coverImage };
                 embed.Footer = ctx.GenerateUsedByFooter($"{GetString(this.t.Common.Page)} {scoreSaberPage}/{TotalPages}");
                 embed.ClearFields();
-                foreach (var score in scores.scores.ToList().Skip(internalPage * 6).Take(6))
+                foreach (var score in scores.Scores.ToList().Skip(internalPage * 6).Take(6))
                 {
-                    embed.AddField(new DiscordEmbedField($"**#{score.rank}** {score.leaderboardPlayerInfo.country.IsoCountryCodeToFlagEmoji()} `{score.leaderboardPlayerInfo.name.SanitizeForCode()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.timeSet, TimestampFormat.RelativeTime)}",
-                        $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.modifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
-                        $"`{score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.fullCombo ? "✅ `FC`" : $"{false.ToEmote(ctx.Bot)} `{score.missedNotes + score.badCuts}`")}**\n" +
-                        $"{GetString(this.t.Commands.ScoreSaber.MapLeaderboard.Profile)}: `{ctx.Prefix}scoresaber profile {score.leaderboardPlayerInfo.id}`"));
+                    embed.AddField(new DiscordEmbedField($"**#{score.Rank}** {score.Player.Country.IsoCountryCodeToFlagEmoji()} `{score.Player.Name.SanitizeForCode()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.Timestamp, TimestampFormat.RelativeTime)}",
+                        $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.ModifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.PP).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
+                        $"`{score.ModifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.FullCombo ? "✅ `FC`" : $"{false.ToEmote(ctx.Bot)} `{score.MissedNotes + score.BadCuts}`")}**\n" +
+                        $"{GetString(this.t.Commands.ScoreSaber.MapLeaderboard.Profile)}: `{ctx.Prefix}scoresaber profile {score.Player.Id}`"));
                 }
 
                 var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, GetString(this.t.Common.PreviousPage), (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, GetString(this.t.Common.NextPage), (scoreSaberPage + 1 > scores.metadata.total / scores.metadata.itemsPerPage), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, GetString(this.t.Common.NextPage), (scoreSaberPage + 1 > scores.Metadata.TotalPages / scores.Metadata.ItemCount), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
             };

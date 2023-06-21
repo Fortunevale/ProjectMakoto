@@ -17,6 +17,13 @@ public sealed class AbuseIpDbClient
         _ = QueueHandler();
     }
 
+    ~AbuseIpDbClient()
+    {
+        _disposed = true;
+    }
+
+    bool _disposed = false;
+
     private Bot _bot { get; set; }
 
     private readonly Dictionary<string, WebRequestItem> Queue = new();
@@ -37,7 +44,7 @@ public sealed class AbuseIpDbClient
         client.DefaultRequestHeaders.Add("Key", this._bot.status.LoadedConfig.Secrets.AbuseIpDbToken);
         client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-        while (true)
+        while (!_disposed)
         {
             while (this.RequestsRemaining <= 0)
             {

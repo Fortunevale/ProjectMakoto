@@ -45,7 +45,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
 
                 try
                 {
-                    _ = new PhishingUrlUpdater(this.Bot).UpdateDatabase(new());
+                    _ = new PhishingUrlHandler(this.Bot).UpdateDatabase(new());
                 }
                 catch (Exception ex)
                 {

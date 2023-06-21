@@ -8,9 +8,9 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto;
-internal sealed class BumpReminder : RequiresBotReference
+internal sealed class BumpReminderHandler: RequiresBotReference
 {
-    public BumpReminder(Bot bot) : base(bot)
+    public BumpReminderHandler(Bot bot) : base(bot)
     {
     }
 

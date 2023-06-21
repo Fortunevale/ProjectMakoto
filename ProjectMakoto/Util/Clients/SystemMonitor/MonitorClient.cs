@@ -21,6 +21,13 @@ public sealed class MonitorClient
         InitializeMonitor();
     }
 
+    ~MonitorClient()
+    {
+        _disposed = true;
+    }
+
+    bool _disposed = false;
+
     public IReadOnlyDictionary<DateTime, SystemInfo> GetHistory()
     {
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
@@ -47,7 +54,7 @@ public sealed class MonitorClient
 
         _ = Task.Run(async () =>
         {
-            while (true)
+            while (!_disposed)
             {
                 try
                 {

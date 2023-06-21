@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.ScoreSaber;
+
 namespace ProjectMakoto.Commands;
 
 internal sealed class ScoreSaberSearchCommand : BaseCommand
@@ -66,7 +68,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
             int currentPage = 1;
             int currentFetchedPage = 1;
             bool playerSelection = false;
-            PlayerSearch.SearchResult lastSearch = null;
+            PlayerSearch lastSearch = null;
 
             async Task RunDropdownInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
@@ -121,7 +123,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                                     {
                                         lastSearch = await ctx.Bot.ScoreSaberClient.SearchPlayer(name, currentFetchedPage, (selectedCountry != "no_country" ? selectedCountry : ""));
                                     }
-                                    catch (Xorog.ScoreSaber.Exceptions.InternalServerError)
+                                    catch (InternalServerErrorException)
                                     {
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
@@ -130,7 +132,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                                         return;
                                     }
-                                    catch (Xorog.ScoreSaber.Exceptions.ForbiddenException)
+                                    catch (ForbiddenException)
                                     {
                                         tokenSource.Cancel();
                                         ctx.Client.ComponentInteractionCreated -= RunDropdownInteraction;
@@ -280,7 +282,7 @@ internal sealed class ScoreSaberSearchCommand : BaseCommand
                             catch { }
                         }
                     }
-                    catch (Xorog.ScoreSaber.Exceptions.NotFoundException)
+                    catch (NotFoundException)
                     {
                         embed.Description = GetString(this.t.Commands.ScoreSaber.Search.NoSearchResult, true);
                         _ = await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));

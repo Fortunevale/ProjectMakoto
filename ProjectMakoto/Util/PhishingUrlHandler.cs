@@ -9,9 +9,9 @@
 
 namespace ProjectMakoto.Util;
 
-internal sealed class PhishingUrlUpdater : RequiresBotReference
+internal sealed class PhishingUrlHandler : RequiresBotReference
 {
-    public PhishingUrlUpdater(Bot bot) : base(bot)
+    public PhishingUrlHandler(Bot bot) : base(bot)
     {
     }
 
