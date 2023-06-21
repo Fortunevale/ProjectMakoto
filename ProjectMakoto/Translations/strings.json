@@ -325,6 +325,20 @@
         "CommandDisabled": {
           "en": "The command '{Command}' is currently disabled.",
           "de": "Der Befehl '{Command}' ist aktuell deaktiviert."
+        },
+        "UnhandledException": {
+          "en": [
+            "An unhandled exception occured while trying to execute your command.",
+            "The exception has been reported and we will be working on a resolution soon.",
+            "{Message}",
+            "_The message will be deleted {Timestamp}._"
+          ],
+          "de": [
+            "Es ist eine unerwarteter Fehler aufgetreten.",
+            "Der Fehler wurde gemeldet und wir werden an einer Lösung arbeiten.",
+            "{Message}",
+            "_Diese Nachricht wird {Timestamp} gelöscht._"
+          ]
         }
       },
       "Prompts": {
@@ -1055,14 +1069,6 @@
           "en": "You have 5 open host submissions. Please wait before trying to submit another host.",
           "de": "Du hast 5 offene Host Meldungen. Bitte warte bis du weitere Hosts meldest."
         },
-        "UserBan": {
-          "en": "You are banned from submitting hosts.",
-          "de": "Du bist gebannt vom weiteren Melden von Hosts."
-        },
-        "GuildBan": {
-          "en": "This server is banned from submitting hosts.",
-          "de": "Dieser Server ist vom Melden weiterer Hosts gebannt."
-        },
         "InvalidHost": {
           "en": "The host '{Host}' is invalid.",
           "de": "Der Host '{Host}' ist ungültig."
@@ -1394,6 +1400,36 @@
           "de": "Konnte den Nutzer '{User}' nicht abfragen."
         }
       },
+      "BlockUser": {
+        "AlreadyBlocked": {
+          "en": "This user is already blocked.",
+          "de": "Du hast diesen Nutzer bereits blockiert."
+        },
+        "Blocked": {
+          "en": [
+            "You blocked {User}. This user can no longer join voice chats while you are in them and use social commands with you.",
+            "Please keep in mind: Voice chat restrictions do not apply if {User} has any moderation permissions and you do not."
+          ],
+          "de": [
+            "Du hast {User} blockiert. Dieser Nutzer kann nicht mehr deinem Sprachkanal beitreten und nicht mehr Interaktionsbefehle mit dir als Ziel verwenden.",
+            "Sei gewarnt: {User} kann immernoch deinen Sprachkanal beitreten wenn er Moderationsrechte besitzt und du nicht."
+          ]
+        },
+        "CannotBlock": {
+          "en": "You cannot block this user.",
+            "de": "Du kannst diesen Nutzer nicht blockieren."
+        }
+      },
+      "UnblockUser": {
+        "NotBlocked": {
+          "en": "This user is not blocked.",
+          "de": "Du hast diesen Nutzer nicht blockiert."
+        },
+        "Unblocked": {
+          "en": "You unblocked {User}.",
+          "de": "Du hast {User} entblockiert."
+        }
+      },
       "Data": {
         "Request": {
           "TimeError": {
@@ -1636,6 +1672,14 @@
           "en": "You're now marked as afk. Next time you send a message, your afk status will be removed.",
           "de": "Du bist jetzt als AFK makiert. Nächstes mal wenn du eine Nachricht sendest wird dein AFK Status entfernt."
         }
+      },
+      "BlockedVictim": {
+        "en": "You have {User} blocked.",
+        "de": "Du hast {User} blockiert."
+      },
+      "BlockedByVictim": {
+        "en": "{User} has blocked you.",
+        "de": "{User} hat dich blockiert."
       },
       "Boop": {
         "Other": {

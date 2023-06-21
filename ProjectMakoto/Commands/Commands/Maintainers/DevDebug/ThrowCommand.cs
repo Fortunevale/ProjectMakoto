@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,12 +7,15 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities;
+namespace ProjectMakoto.Commands.Debug;
 
-internal sealed class UserUpload
+internal sealed class ThrowCommand : BaseCommand
 {
-    public bool InteractionHandled { get; set; } = false;
-    public DateTime TimeOut { get; set; } = DateTime.Now;
-    public Stream UploadedData { get; set; }
-    public int FileSize { get; set; } = 0;
+    public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
+    {
+        return Task.Run(async () =>
+        {
+            throw new InvalidCastException();
+        });
+    }
 }

@@ -9,26 +9,25 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class User
+public sealed class User : BaseSelfFillingListValue<User>
 {
-    public User(Bot _bot, ulong userId)
+    public override User Convert(BaseSelfFillingListValue<User> oldValue)
+        => new(oldValue.Bot, oldValue.Id);
+
+    public User(Bot bot, ulong userId) : base(bot, userId)
     {
-        if (_bot.objectedUsers.Contains(userId))
+        if (bot.objectedUsers.Contains(userId))
             throw new InvalidOperationException($"User {userId} has objected to having their data processed.");
 
-        this.Cooldown = new(_bot);
-        this.UserId = userId;
+        this.Cooldown = new(bot, this);
 
-        this.UrlSubmissions = new(this);
-        this.AfkStatus = new(this);
-        this.ScoreSaber = new(this);
-        this.ExperienceUser = new(this);
-        this.Reminders = new(this, _bot);
-        this.Translation = new(this);
+        this.UrlSubmissions = new(bot, this);
+        this.AfkStatus = new(bot, this);
+        this.ScoreSaber = new(bot, this);
+        this.ExperienceUser = new(bot, this);
+        this.Reminders = new(bot, this);
+        this.Translation = new(bot, this);
     }
-
-    [JsonIgnore]
-    public ulong UserId { get; set; }
 
     [JsonIgnore]
     public DataSettings Data { get; set; } = new();
@@ -40,6 +39,7 @@ public sealed class User
     public ReminderSettings Reminders { get; set; }
     public TranslationSettings Translation { get; set; }
 
+    public List<ulong> BlockedUsers { get; set; } = new();
     public List<UserPlaylist> UserPlaylists { get; set; } = new();
 
     public string? CurrentLocale { get; set; } = null;
@@ -50,4 +50,7 @@ public sealed class User
 
     [JsonIgnore]
     public DateTime LastSuccessful2FA { get; set; } = DateTime.MinValue;
+
+    [JsonIgnore]
+    public UserUpload? PendingUserUpload { get; set; } = null;
 }

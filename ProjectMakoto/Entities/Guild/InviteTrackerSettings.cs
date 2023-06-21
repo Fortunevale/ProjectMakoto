@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class InviteTrackerSettings
+public sealed class InviteTrackerSettings : RequiresParent<Guild>
 {
-    public InviteTrackerSettings(Guild guild)
+    public InviteTrackerSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
 
     private bool _Enabled { get; set; } = false;
     public bool Enabled
@@ -26,7 +22,7 @@ public sealed class InviteTrackerSettings
         set
         {
             this._Enabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "invitetracker_enabled", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -37,7 +33,7 @@ public sealed class InviteTrackerSettings
         set
         {
             this._Cache = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "invitetracker_cache", JsonConvert.SerializeObject(value), Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_cache", JsonConvert.SerializeObject(value), Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

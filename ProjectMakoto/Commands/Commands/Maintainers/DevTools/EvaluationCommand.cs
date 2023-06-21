@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class EvaluationCommand : BaseCommand
 {

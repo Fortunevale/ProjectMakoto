@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class Quit2FASessionCommand : BaseCommand
 {

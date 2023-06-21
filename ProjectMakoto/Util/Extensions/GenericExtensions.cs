@@ -104,7 +104,7 @@ internal static class GenericExtensions
         => !str.IsNullOrWhiteSpace() && Regex.IsMatch(str, @"^(#([a-fA-f0-9]{6}))$") ? str : Default;
 
     internal static string ToHex(this DiscordColor c)
-        => UniversalExtensions.ToHex(c.R, c.G, c.B);
+        => ColorTools.ToHex(c.R, c.G, c.B);
 
     internal static string SanitizeForCode(this string str)
         => str.Replace("`", "´");

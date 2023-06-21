@@ -47,20 +47,20 @@ internal sealed class RemoveQueueCommand : BaseCommand
             {
                 int Index = Convert.ToInt32(selection) - 1;
 
-                if (Index < 0 || Index >= ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)
+                if (Index < 0 || Index >= ctx.DbGuild.MusicModule.SongQueue.Count)
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Count)),
+                        Description = GetString(this.t.Commands.Music.RemoveQueue.OutOfRange, true, new TVar("Min", 1), new TVar("Max", ctx.DbGuild.MusicModule.SongQueue.Count)),
                     }.AsError(ctx));
                     return;
                 }
 
-                info = ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue[Index];
+                info = ctx.DbGuild.MusicModule.SongQueue[Index];
             }
             else
             {
-                if (!ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
+                if (!ctx.DbGuild.MusicModule.SongQueue.Any(x => x.VideoTitle.ToLower() == selection.ToLower()))
                 {
                     await RespondOrEdit(embed: new DiscordEmbedBuilder
                     {
@@ -69,7 +69,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
                     return;
                 }
 
-                info = ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.First(x => x.VideoTitle.ToLower() == selection.ToLower());
+                info = ctx.DbGuild.MusicModule.SongQueue.First(x => x.VideoTitle.ToLower() == selection.ToLower());
             }
 
             if (info is null)
@@ -81,7 +81,7 @@ internal sealed class RemoveQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Remove(info);
+            ctx.DbGuild.MusicModule.SongQueue.Remove(info);
 
             await RespondOrEdit(embed: new DiscordEmbedBuilder
             {

@@ -9,22 +9,16 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Member
+public sealed class Member : RequiresParent<Guild>
 {
-    public Member(Guild guild, ulong member)
+    public Member(Bot bot, Guild guild, ulong key) : base(bot, guild)
     {
-        this.Guild = guild;
-        this.MemberId = member;
-
-        this.InviteTracker = new(this);
-        this.Experience = new(this);
+        this.InviteTracker = new(bot, this);
+        this.Experience = new(bot, this);
+        this.Id = key;
     }
 
-    [JsonIgnore]
-    internal Guild Guild { get; set; }
-    [JsonIgnore]
-    internal ulong MemberId { get; set; }
-
+    internal ulong Id { get; set; }
 
     private string _SavedNickname { get; set; } = "";
     public string SavedNickname
@@ -33,7 +27,7 @@ public sealed class Member
         set
         {
             this._SavedNickname = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Guild.ServerId.ToString(), "userid", this.MemberId, "saved_nickname", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "saved_nickname", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -46,7 +40,7 @@ public sealed class Member
         set
         {
             this._FirstJoinDate = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Guild.ServerId.ToString(), "userid", this.MemberId, "first_join", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "first_join", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -59,7 +53,7 @@ public sealed class Member
         set
         {
             this._LastLeaveDate = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Guild.ServerId.ToString(), "userid", this.MemberId, "last_leave", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Id.ToString(), "userid", this.Id, "last_leave", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 

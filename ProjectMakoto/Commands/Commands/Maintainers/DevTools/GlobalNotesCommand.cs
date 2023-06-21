@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class GlobalNotesCommand : BaseCommand
 {
@@ -24,7 +24,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
 
             var ModeratorCache = new Dictionary<ulong, DiscordUser>();
 
-            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<GlobalBanDetails> globalNotes))
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<BanDetails> globalNotes))
                 foreach (var b in globalNotes)
                 {
                     if (ModeratorCache.ContainsKey(b.Moderator))
@@ -86,7 +86,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
                     user = ctx.Bot.globalNotes[victim.Id];
                 }
 
-                user.Add(new GlobalBanDetails { Moderator = ctx.User.Id, Reason = note });
+                user.Add(new BanDetails { Moderator = ctx.User.Id, Reason = note });
 
                 await ExecuteCommand(ctx, arguments);
                 return;

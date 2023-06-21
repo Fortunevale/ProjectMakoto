@@ -13,6 +13,6 @@ internal sealed class TokenDetectionCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"⚠ `Detect Tokens`: {ctx.Bot.guilds[ctx.Guild.Id].TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
+        return $"⚠ `Detect Tokens`: {ctx.DbGuild.TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
     }
 }

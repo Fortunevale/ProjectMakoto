@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,12 +7,10 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto;
+namespace ProjectMakoto.Enums.ScoreSaber;
 
-internal sealed class PhishingSubmissionBanDetails
+public enum ScoreType
 {
-    public string Reason { get; set; }
-
-
-    public ulong Moderator { get; set; }
+    Top = 0,
+    Recent = 1,
 }

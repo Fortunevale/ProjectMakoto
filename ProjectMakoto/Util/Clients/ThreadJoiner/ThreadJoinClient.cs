@@ -11,20 +11,23 @@ namespace ProjectMakoto.Util;
 
 public sealed class ThreadJoinClient
 {
-    internal ThreadJoinClient() { }
-
-    internal static ThreadJoinClient Initialize()
+    internal ThreadJoinClient()
     {
-        ThreadJoinClient threadJoinClient = new();
-        _ = threadJoinClient.QueueHandler();
-        return threadJoinClient;
+        _ = this.QueueHandler();
     }
+
+    ~ThreadJoinClient()
+    {
+        _disposed = true;
+    }
+
+    bool _disposed = false;
 
     internal readonly Dictionary<ulong, DiscordThreadChannel> Queue = new();
 
     private async Task QueueHandler()
     {
-        while (true)
+        while (!_disposed)
         {
             if (this.Queue.Count == 0)
             {

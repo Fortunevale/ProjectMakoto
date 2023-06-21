@@ -22,9 +22,6 @@ internal sealed class UserInfoCommand : BaseCommand
 
             victim ??= ctx.User;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                ctx.Bot.guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot.guilds[ctx.Guild.Id], victim.Id));
-
             victim = await victim.GetFromApiAsync();
 
             DiscordMember? bMember = null;
@@ -58,8 +55,11 @@ internal sealed class UserInfoCommand : BaseCommand
             }
             else
             {
-                if (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Count > 0)
-                    GenerateRoles = string.Join(", ", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
+                if (!ctx.DbGuild.Members.ContainsKey(victim.Id))
+                    ctx.DbGuild.Members.Add(victim.Id, new(ctx.Bot, ctx.DbGuild, victim.Id));
+
+                if (ctx.DbGuild.Members[victim.Id].MemberRoles.Count > 0)
+                    GenerateRoles = string.Join(", ", ctx.DbGuild.Members[victim.Id].MemberRoles.Where(x => ctx.Guild.Roles.ContainsKey(x.Id)).Select(x => $"{ctx.Guild.GetRole(x.Id).Mention}"));
                 else
                     GenerateRoles = "`User doesn't have any stored roles.`";
             }
@@ -87,7 +87,7 @@ internal sealed class UserInfoCommand : BaseCommand
                 {
                     Text = $"User-Id: {victim.Id}"
                 },
-                Description = $"{(bMember is null ? $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true) : $"{(isBanned ? GetString(this.t.Commands.Utility.UserInfo.IsBanned, true) : GetString(this.t.Commands.Utility.UserInfo.JoinedBefore, true))}")}\n\n" : "")}" +
+                Description = $"{(bMember is null ? $"{(ctx.DbGuild.Members[victim.Id].FirstJoinDate == DateTime.UnixEpoch ? GetString(this.t.Commands.Utility.UserInfo.NeverJoined, true) : $"{(isBanned ? GetString(this.t.Commands.Utility.UserInfo.IsBanned, true) : GetString(this.t.Commands.Utility.UserInfo.JoinedBefore, true))}")}\n\n" : "")}" +
                         $"{(ctx.Bot.globalBans.ContainsKey(victim.Id) ? $"💀 **{GetString(this.t.Commands.Utility.UserInfo.GlobalBanned, true)}**\n" : "")}" +
                         $"{(ctx.Bot.status.TeamOwner == victim.Id ? $"👑 **{GetString(this.t.Commands.Utility.UserInfo.BotOwner, true)}**\n" : "")}" +
                         $"{(ctx.Bot.status.TeamMembers.Contains(victim.Id) ? $"🔏 **{GetString(this.t.Commands.Utility.UserInfo.BotStaff, true)}**\n\n" : "")}" +
@@ -100,12 +100,12 @@ internal sealed class UserInfoCommand : BaseCommand
                         $"\n**{(bMember is null ? $"{GetString(this.t.Commands.Utility.UserInfo.Roles)} ({GetString(this.t.Commands.Utility.UserInfo.Backup)})" : GetString(this.t.Commands.Utility.UserInfo.Roles))}**\n{GenerateRoles}"
             };
 
-            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<GlobalBanDetails> globalNotes) && globalNotes.Any())
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<BanDetails> globalNotes) && globalNotes.Any())
             {
                 embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.BotNotes), $"{string.Join("\n\n", ctx.Bot.globalNotes[victim.Id].Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
             }
 
-            if (ctx.Bot.globalBans.TryGetValue(victim.Id, out GlobalBanDetails globalBanDetails))
+            if (ctx.Bot.globalBans.TryGetValue(victim.Id, out BanDetails globalBanDetails))
             {
                 var gBanMod = await ctx.Client.GetUserAsync(ctx.Bot.globalBans[victim.Id].Moderator);
 
@@ -119,12 +119,12 @@ internal sealed class UserInfoCommand : BaseCommand
 
             bool InviterButtonAdded = false;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].InviteTracker.Enabled)
+            if (ctx.DbGuild.InviteTracker.Enabled)
             {
-                embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.InvitedBy), $"{(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? GetString(this.t.Commands.Utility.UserInfo.NoInviter, true) : $"<@{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}> (`{ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId}`)")}", true));
-                embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.UsersInvited), $"`{(ctx.Bot.guilds[ctx.Guild.Id].Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
+                embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.InvitedBy), $"{(ctx.DbGuild.Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace() ? GetString(this.t.Commands.Utility.UserInfo.NoInviter, true) : $"<@{ctx.DbGuild.Members[victim.Id].InviteTracker.UserId}> (`{ctx.DbGuild.Members[victim.Id].InviteTracker.UserId}`)")}", true));
+                embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.UsersInvited), $"`{(ctx.DbGuild.Members.Where(b => b.Value.InviteTracker.UserId == victim.Id)).Count()}`", true));
 
-                if (!ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace())
+                if (!ctx.DbGuild.Members[victim.Id].InviteTracker.Code.IsNullOrWhiteSpace())
                 {
                     InviterButtonAdded = true;
                     builder.AddComponents(new DiscordButtonComponent(ButtonStyle.Secondary, $"userinfo-inviter", GetString(this.t.Commands.Utility.UserInfo.ShowProfileInviter), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤"))));
@@ -134,9 +134,9 @@ internal sealed class UserInfoCommand : BaseCommand
             if (bMember is not null)
                 embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.ServerJoinDate), $"{Formatter.Timestamp(bMember.JoinedAt, TimestampFormat.LongDateTime)}", true));
             else
-                embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.ServerLeaveDate), (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].LastLeaveDate)})" : "`User never joined this server.`"), true));
+                embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.ServerLeaveDate), (ctx.DbGuild.Members[victim.Id].LastLeaveDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].LastLeaveDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].LastLeaveDate)})" : "`User never joined this server.`"), true));
 
-            embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.FirstJoinDate), (ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].FirstJoinDate)})" : "`User never joined this server.`"), true));
+            embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.FirstJoinDate), (ctx.DbGuild.Members[victim.Id].FirstJoinDate != DateTime.UnixEpoch ? $"{Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].FirstJoinDate, TimestampFormat.LongDateTime)} ({Formatter.Timestamp(ctx.DbGuild.Members[victim.Id].FirstJoinDate)})" : "`User never joined this server.`"), true));
 
             embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.UserInfo.AccountCreationDate), $"{Formatter.Timestamp(victim.CreationTimestamp, TimestampFormat.LongDateTime)}", true));
 
@@ -219,12 +219,12 @@ internal sealed class UserInfoCommand : BaseCommand
 
                     try
                     {
-                        newVictim = await ctx.Client.GetUserAsync(ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId);
+                        newVictim = await ctx.Client.GetUserAsync(ctx.DbGuild.Members[victim.Id].InviteTracker.UserId);
                     }
                     catch (Exception)
                     {
                         _ = e.Result.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder()
-                            .AddEmbed(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.UserInfo.FetchUserError, true, new TVar("User", ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].InviteTracker.UserId))).AsError(ctx)));
+                            .AddEmbed(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.UserInfo.FetchUserError, true, new TVar("User", ctx.DbGuild.Members[victim.Id].InviteTracker.UserId))).AsError(ctx)));
                         return;
                     }
 
@@ -234,7 +234,7 @@ internal sealed class UserInfoCommand : BaseCommand
                     });
 
                     return;
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
         });
     }

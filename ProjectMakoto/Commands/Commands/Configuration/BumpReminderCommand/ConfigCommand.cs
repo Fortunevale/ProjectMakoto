@@ -22,10 +22,10 @@ internal sealed class ConfigCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SetupBumpReminderButton), ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.DisableBumpReminderButton), !ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-            var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeChannelButton), !ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var ChangeRole = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeRoleButton), !ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SetupBumpReminderButton), ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.DisableBumpReminderButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeChannelButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ChangeRole = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeRoleButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                 .WithDescription(BumpReminderCommandAbstractions.GetCurrentConfiguration(ctx)).AsAwaitingInput(ctx, GetString(CommandKey.Title)))
@@ -93,7 +93,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw RoleResult.Exception;
                 }
 
-                if (RoleResult.Result.Id == ctx.Bot.guilds[ctx.Guild.Id].Join.AutoAssignRoleId || ctx.Bot.guilds[ctx.Guild.Id].LevelRewards.Any(x => x.RoleId == RoleResult.Result.Id))
+                if (RoleResult.Result.Id == ctx.DbGuild.Join.AutoAssignRoleId || ctx.DbGuild.LevelRewards.Any(x => x.RoleId == RoleResult.Result.Id))
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
                     await Task.Delay(3000);
@@ -106,29 +106,29 @@ internal sealed class ConfigCommand : BaseCommand
 
                 _ = ctx.Channel.DeleteMessagesAsync((await ctx.Channel.GetMessagesAsync(2)).Where(x => x.Author.Id == ctx.Client.CurrentUser.Id && x.MessageType == MessageType.ChannelPinnedMessage));
 
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId = RoleResult.Result.Id;
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId = ctx.Channel.Id;
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.MessageId = bump_reaction_msg.Id;
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastBump = DateTime.UtcNow.AddHours(-2);
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastReminder = DateTime.UtcNow.AddHours(-2);
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.LastUserId = 0;
+                ctx.DbGuild.BumpReminder.RoleId = RoleResult.Result.Id;
+                ctx.DbGuild.BumpReminder.ChannelId = ctx.Channel.Id;
+                ctx.DbGuild.BumpReminder.MessageId = bump_reaction_msg.Id;
+                ctx.DbGuild.BumpReminder.LastBump = DateTime.UtcNow.AddHours(-2);
+                ctx.DbGuild.BumpReminder.LastReminder = DateTime.UtcNow.AddHours(-2);
+                ctx.DbGuild.BumpReminder.LastUserId = 0;
 
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled = true;
+                ctx.DbGuild.BumpReminder.Enabled = true;
 
                 await RespondOrEdit(new DiscordEmbedBuilder()
                     .WithDescription(GetString(CommandKey.SetupComplete, true))
                     .AsSuccess(ctx, GetString(CommandKey.Title)));
 
                 await Task.Delay(5000);
-                ctx.Bot.bumpReminder.SendPersistentMessage(ctx.Client, ctx.Channel, null);
+                ctx.Bot.BumpReminder.SendPersistentMessage(ctx.Client, ctx.Channel, null);
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == Disable.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder = new(ctx.Bot.guilds[ctx.Guild.Id]);
+                ctx.DbGuild.BumpReminder = new(ctx.Bot, ctx.DbGuild);
 
-                foreach (var b in UniversalExtensions.GetScheduledTasks())
+                foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
                 {
                     if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                         continue;
@@ -172,7 +172,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw ChannelResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId = ChannelResult.Result.Id;
+                ctx.DbGuild.BumpReminder.ChannelId = ChannelResult.Result.Id;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -203,7 +203,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw RoleResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId = RoleResult.Result.Id;
+                ctx.DbGuild.BumpReminder.RoleId = RoleResult.Result.Id;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }

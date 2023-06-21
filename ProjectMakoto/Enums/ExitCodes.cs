@@ -7,14 +7,16 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities;
+namespace ProjectMakoto.Enums;
 
-public sealed class BlacklistEntry
+internal enum ExitCodes
 {
-    public string Reason { get; set; }
+    VitalTaskFailed = 1,
+    ExitTasksTimeout = 21,
 
-    public ulong Moderator { get; set; }
+    NoToken = 8,
+    FailedDiscordLogin = 9,
 
-
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    FailedDatabaseLoad = 18,
+    FailedDatabaseLogin = 19,
 }

@@ -21,13 +21,13 @@ internal sealed class ChangeOwnerCommand : BaseCommand
             DiscordMember victim = (DiscordMember)arguments["victim"];
             DiscordChannel channel = ctx.Member.VoiceState?.Channel;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
@@ -39,17 +39,17 @@ internal sealed class ChangeOwnerCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.ChangeOwner.AlreadyOwner, true, new TVar("User", victim.Mention))).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
                 if (ctx.Member.Permissions.HasPermission(Permissions.ManageChannels))
                 {
-                    ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId = victim.Id;
+                    ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId = victim.Id;
                     _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.ChangeOwner.ForceAssign, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
                     return;
                 }
@@ -58,7 +58,7 @@ internal sealed class ChangeOwnerCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId = victim.Id;
+            ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId = victim.Id;
             _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.ChangeOwner.Success, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });
     }

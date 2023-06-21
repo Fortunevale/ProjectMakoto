@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class CrosspostSettings
+public sealed class CrosspostSettings : RequiresParent<Guild>
 {
-    public CrosspostSettings(Guild guild)
+    public CrosspostSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private int _DelayBeforePosting { get; set; } = 0;
     public int DelayBeforePosting
@@ -27,7 +22,7 @@ public sealed class CrosspostSettings
         set
         {
             this._DelayBeforePosting = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "crosspostdelay", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostdelay", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -38,7 +33,7 @@ public sealed class CrosspostSettings
         set
         {
             this._ExcludeBots = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "crosspostexcludebots", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "crosspostexcludebots", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -52,12 +47,10 @@ public sealed class CrosspostSettings
     public async Task CrosspostQueue()
     {
         this.QueueInitialized = true;
-        _logger.LogDebug("Initializing crosspost queue for '{Guild}'", this.Parent.ServerId);
+        _logger.LogDebug("Initializing crosspost queue for '{Guild}'", this.Parent.Id);
 
         while (true)
         {
-            KeyValuePair<DiscordMessage, DiscordChannel> _;
-
             DiscordChannel channel;
             DiscordMessage message;
 
@@ -66,9 +59,9 @@ public sealed class CrosspostSettings
                 while (!this._queue.IsNotNullAndNotEmpty())
                     await Task.Delay(1000);
 
-                _ = this._queue.First();
-                channel = _.Value;
-                message = _.Key;
+                KeyValuePair <DiscordMessage, DiscordChannel> keyValuePair = this._queue.First();
+                channel = keyValuePair.Value;
+                message = keyValuePair.Key;
             }
             catch (Exception)
             {

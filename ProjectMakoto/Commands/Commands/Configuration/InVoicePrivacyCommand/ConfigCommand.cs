@@ -27,8 +27,8 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = InVoicePrivacyCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var ToggleDeletion = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleMessageDeletionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
-            var TogglePermission = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.TogglePermissionProtectionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
+            var ToggleDeletion = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleMessageDeletionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+            var TogglePermission = new DiscordButtonComponent((ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.TogglePermissionProtectionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📋")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -50,18 +50,18 @@ internal sealed class ConfigCommand : BaseCommand
 
             if (e.GetCustomId() == ToggleDeletion.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled = !ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled;
+                ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled = !ctx.DbGuild.InVoiceTextPrivacy.ClearTextEnabled;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == TogglePermission.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled = !ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled;
+                ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled = !ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled;
 
                 _ = Task.Run(async () =>
                 {
-                    if (ctx.Bot.guilds[ctx.Guild.Id].InVoiceTextPrivacy.SetPermissionsEnabled)
+                    if (ctx.DbGuild.InVoiceTextPrivacy.SetPermissionsEnabled)
                     {
                         if (!ctx.Guild.Channels.Any(x => x.Value.Type == ChannelType.Voice))
                             return;

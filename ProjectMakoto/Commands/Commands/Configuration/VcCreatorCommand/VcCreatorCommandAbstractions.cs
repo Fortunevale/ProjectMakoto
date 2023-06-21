@@ -13,6 +13,6 @@ internal sealed class VcCreatorCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        return $"{EmojiTemplates.GetChannel(ctx.Bot)} `Voice Channel Creator`: {(ctx.Bot.guilds[ctx.Guild.Id].VcCreator.Channel == 0 ? false.ToEmote(ctx.Bot) : $"<#{ctx.Bot.guilds[ctx.Guild.Id].VcCreator.Channel}>")}";
+        return $"{EmojiTemplates.GetChannel(ctx.Bot)} `Voice Channel Creator`: {(ctx.DbGuild.VcCreator.Channel == 0 ? false.ToEmote(ctx.Bot) : $"<#{ctx.DbGuild.VcCreator.Channel}>")}";
     }
 }

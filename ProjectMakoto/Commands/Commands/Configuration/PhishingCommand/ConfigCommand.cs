@@ -25,9 +25,9 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = PhishingCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, "Phishing Protection");
 
-            var ToggleDetectionButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
-            var ToggleWarningButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
-            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle AbuseIPDB Reports", false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Bot)));
+            var ToggleDetectionButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
+            var ToggleWarningButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Redirect Warning", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle AbuseIPDB Reports", false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Bot)));
             var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Change Punishment", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
             var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Reason", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
             var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), "Change Timeout Length", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
@@ -58,7 +58,7 @@ internal sealed class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.DetectPhishing = !ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.DetectPhishing;
+                ctx.DbGuild.PhishingDetection.DetectPhishing = !ctx.DbGuild.PhishingDetection.DetectPhishing;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -66,7 +66,7 @@ internal sealed class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.WarnOnRedirect = !ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.WarnOnRedirect;
+                ctx.DbGuild.PhishingDetection.WarnOnRedirect = !ctx.DbGuild.PhishingDetection.WarnOnRedirect;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -74,7 +74,7 @@ internal sealed class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.AbuseIpDbReports = !ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.AbuseIpDbReports;
+                ctx.DbGuild.PhishingDetection.AbuseIpDbReports = !ctx.DbGuild.PhishingDetection.AbuseIpDbReports;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -103,16 +103,16 @@ internal sealed class ConfigCommand : BaseCommand
                 switch (e.Result.Values.First())
                 {
                     case "Ban":
-                        ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType = PhishingPunishmentType.BAN;
+                        ctx.DbGuild.PhishingDetection.PunishmentType = PhishingPunishmentType.BAN;
                         break;
                     case "Kick":
-                        ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType = PhishingPunishmentType.KICK;
+                        ctx.DbGuild.PhishingDetection.PunishmentType = PhishingPunishmentType.KICK;
                         break;
                     case "Timeout":
-                        ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType = PhishingPunishmentType.TIMEOUT;
+                        ctx.DbGuild.PhishingDetection.PunishmentType = PhishingPunishmentType.TIMEOUT;
                         break;
                     case "Delete":
-                        ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType = PhishingPunishmentType.DELETE;
+                        ctx.DbGuild.PhishingDetection.PunishmentType = PhishingPunishmentType.DELETE;
                         break;
                 }
 
@@ -122,7 +122,7 @@ internal sealed class ConfigCommand : BaseCommand
             else if (Button.GetCustomId() == ChangeReasonButton.CustomId)
             {
                 var modal = new DiscordInteractionModalBuilder("Define a new reason", Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.CustomPunishmentReason));
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", "New reason | Use %R to insert default reason", "", null, null, true, ctx.DbGuild.PhishingDetection.CustomPunishmentReason));
 
                 var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
@@ -141,14 +141,14 @@ internal sealed class ConfigCommand : BaseCommand
                     throw ModalResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.CustomPunishmentReason = ModalResult.Result.Interaction.GetModalValueByCustomId("new_reason");
+                ctx.DbGuild.PhishingDetection.CustomPunishmentReason = ModalResult.Result.Interaction.GetModalValueByCustomId("new_reason");
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangeTimeoutLengthButton.CustomId)
             {
-                if (ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.PunishmentType != PhishingPunishmentType.TIMEOUT)
+                if (ctx.DbGuild.PhishingDetection.PunishmentType != PhishingPunishmentType.TIMEOUT)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription("`You aren't using 'Timeout' as your Punishment`")));
                     await Task.Delay(5000);
@@ -157,7 +157,7 @@ internal sealed class ConfigCommand : BaseCommand
                 }
 
 
-                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.CustomPunishmentLength, false);
+                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
 
                 if (ModalResult.TimedOut)
                 {
@@ -182,7 +182,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw ModalResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].PhishingDetection.CustomPunishmentLength = ModalResult.Result;
+                ctx.DbGuild.PhishingDetection.CustomPunishmentLength = ModalResult.Result;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

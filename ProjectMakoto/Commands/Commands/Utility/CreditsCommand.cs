@@ -23,9 +23,9 @@ internal sealed class CreditsCommand : BaseCommand
                 Description = GetString(this.t.Commands.Utility.Credits.Fetching, true)
             }.AsBotLoading(ctx));
 
-            var contributors = await ctx.Bot.githubClient.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
-            var contributorsdcs = await ctx.Bot.githubClient.Repository.GetAllContributors("Aiko-IT-Systems", "DisCatSharp");
-            var contributorslava = await ctx.Bot.githubClient.Repository.GetAllContributors("freyacodes", "Lavalink");
+            var contributors = await ctx.Bot.GithubClient.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
+            var contributorsdcs = await ctx.Bot.GithubClient.Repository.GetAllContributors("Aiko-IT-Systems", "DisCatSharp");
+            var contributorslava = await ctx.Bot.GithubClient.Repository.GetAllContributors("freyacodes", "Lavalink");
 
             List<DiscordUser> userlist = new();
 

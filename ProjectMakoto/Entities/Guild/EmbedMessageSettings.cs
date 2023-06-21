@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class EmbedMessageSettings
+public sealed class EmbedMessageSettings : RequiresParent<Guild>
 {
-    public EmbedMessageSettings(Guild guild)
+    public EmbedMessageSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private bool _UseEmbedding { get; set; } = false;
     public bool UseEmbedding
@@ -27,7 +22,7 @@ public sealed class EmbedMessageSettings
         set
         {
             this._UseEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "embed_messages", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_messages", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -38,7 +33,7 @@ public sealed class EmbedMessageSettings
         set
         {
             this._UseGithubEmbedding = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "embed_github", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "embed_github", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

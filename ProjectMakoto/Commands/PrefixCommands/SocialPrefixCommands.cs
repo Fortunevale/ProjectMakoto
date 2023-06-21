@@ -17,19 +17,19 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.")]
     public async Task Afk(CommandContext ctx, [RemainingText][Description("Text (<128 characters)")] string reason = "-")
-        => new AfkCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new AfkCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "reason", reason }
-        }).Add(this._bot.watcher, ctx);
+        });
 
     [Command("cuddle"), PreventCommandDeletion,
     CommandModule("social"),
     Description("Cuddle with another user.")]
     public async Task Cuddle(CommandContext ctx, DiscordUser user)
-        => new CuddleCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new CuddleCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -37,10 +37,10 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Kiss another user.")]
     public async Task Kiss(CommandContext ctx, DiscordUser user)
-        => new KissCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new KissCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -48,10 +48,10 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Slap another user.")]
     public async Task Slap(CommandContext ctx, DiscordUser user)
-        => new SlapCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new SlapCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -59,10 +59,10 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Kill another user..?")]
     public async Task Kill(CommandContext ctx, DiscordUser user)
-        => new KillCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new KillCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -70,10 +70,10 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Give another user a boop!")]
     public async Task Boop(CommandContext ctx, DiscordUser user)
-        => new BoopCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new BoopCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -81,10 +81,10 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Give a high five!")]
     public async Task Highfive(CommandContext ctx, DiscordUser user)
-        => new HighFiveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new HighFiveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -92,10 +92,10 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Hug another user!")]
     public async Task Hug(CommandContext ctx, DiscordUser user)
-        => new HugCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new HugCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 
 
 
@@ -103,8 +103,8 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     CommandModule("social"),
     Description("Give someone some headpats!")]
     public async Task Pat(CommandContext ctx, DiscordUser user)
-        => new PatCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new PatCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }).Add(this._bot.watcher, ctx);
+        });
 }

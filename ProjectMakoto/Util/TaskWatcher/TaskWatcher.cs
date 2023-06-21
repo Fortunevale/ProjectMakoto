@@ -13,196 +13,164 @@ public sealed class TaskWatcher
 {
     internal TaskWatcher()
     {
-        Watcher();
+        Start();
     }
 
-    private List<TaskInfo> tasks = new();
+    private List<TaskInfo> TaskList = new();
 
-    internal async void Watcher()
+    internal async void Start()
     {
-        while (true)
+        _ = Task.Run(async () =>
         {
-            foreach (var b in this.tasks.ToList())
+            while (true)
             {
-                if (b is null)
-                    continue;
-
-                if (!b.task.IsCompleted)
-                    continue;
-
-                var CommandContext = b.CommandContext;
-                var InteractionContext = b.InteractionContext;
-                var SharedCommandContext = b.SharedCommandContext;
-                var ContextMenuContext = b.ContextMenuContext;
-
-                if (b.task.IsCompletedSuccessfully)
+                if (TaskList is null)
                 {
-                    _logger.LogTrace("Successfully executed task:{Id} '{Uuid}' in {Elapsed}ms", b.task.Id, b.uuid, b.CreationTimestamp.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")));
-
-                    if (SharedCommandContext is not null)
-                        _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
-                            SharedCommandContext?.Prefix,
-                            SharedCommandContext?.CommandName,
-                            SharedCommandContext?.User?.Id,
-                            SharedCommandContext?.Guild?.Id);
-                    else if (CommandContext is not null)
-                        _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
-                            CommandContext?.Prefix,
-                            CommandContext?.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
-                            CommandContext?.User?.Id,
-                            CommandContext?.Guild?.Id);
-                    else if (InteractionContext is not null)
-                        _logger.LogInfo("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
-                            InteractionContext?.FullCommandName,
-                            InteractionContext?.User?.Id,
-                            InteractionContext?.Guild?.Id);
-                    else if (ContextMenuContext is not null)
-                        _logger.LogInfo("Successfully executed '{Name}' for '{User}' on '{Guild}'",
-                            ContextMenuContext?.FullCommandName,
-                            ContextMenuContext?.User?.Id,
-                            ContextMenuContext?.Guild?.Id);
-
-                    this.tasks.Remove(b);
-                    continue;
-                }
-
-                if (SharedCommandContext != null)
-                    _logger.LogError("Failed to execute '{Prefix}{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                        SharedCommandContext?.Prefix,
-                        SharedCommandContext?.CommandName,
-                        SharedCommandContext?.User?.Id,
-                        SharedCommandContext?.Guild?.Id);
-                else if (CommandContext != null)
-                    _logger.LogError("Failed to executed '{Prefix}{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            CommandContext?.Prefix,
-                            CommandContext?.Command.Parent is not null ? $"{CommandContext.Command.Parent.Name} " : "" + CommandContext.Command.Name,
-                            CommandContext?.User?.Id,
-                            CommandContext?.Guild?.Id);
-                else if (InteractionContext != null)
-                    _logger.LogError("Failed to execute '/{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            InteractionContext?.FullCommandName,
-                            InteractionContext?.User?.Id,
-                            InteractionContext?.Guild?.Id);
-                else if (ContextMenuContext != null)
-                    _logger.LogError("Failed to execute '{Name}' for '{User}' on '{Guild}'", b.task.Exception,
-                            ContextMenuContext?.FullCommandName,
-                            ContextMenuContext?.User?.Id,
-                            ContextMenuContext?.Guild?.Id);
-                else
-                    _logger.LogError("A task failed to execute", b.task.Exception);
-
-                if (b.IsVital)
-                {
-                    await Task.Delay(1000);
                     Environment.Exit((int)ExitCodes.VitalTaskFailed);
-                    return;
                 }
 
-                var ExceptionType = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception?.GetType() : b.task.Exception?.InnerException.GetType());
-                var Exception = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception : b.task.Exception.InnerException);
-                string ExceptionMessage = (b.task.Exception?.GetType() != typeof(AggregateException) ? b.task.Exception?.Message : b.task.Exception.InnerException?.Message);
-
-                if (ExceptionType == typeof(DisCatSharp.Exceptions.BadRequestException))
+                if (TaskList.Count <= 0)
                 {
-                    try
-                    { _logger.LogError("WebRequestUrl: {Url}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest.Url); }
-                    catch { }
-                    try
-                    { _logger.LogError("WebRequest: {Request}", JsonConvert.SerializeObject(((DisCatSharp.Exceptions.BadRequestException)Exception).WebRequest, Formatting.Indented).Replace("\\", "")); }
-                    catch { }
-                    try
-                    { _logger.LogError("WebResponse: {Response}", ((DisCatSharp.Exceptions.BadRequestException)Exception).WebResponse.Response); }
-                    catch { }
+                    Thread.Sleep(50);
+                    continue;
                 }
 
-                if (SharedCommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
-                    try
+                for (int i = 0; i < TaskList.Count; i++)
+                {
+                    var b = TaskList[i];
+
+                    if (b is null)
                     {
-                        _ = SharedCommandContext.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-                        .WithContent($"{SharedCommandContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCode()}'`\n" +
-                        $"`The exception has been automatically reported.`\n\n" +
-                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
-                        {
-                            if (!x.IsCompletedSuccessfully)
-                                return;
-
-                            _ = Task.Delay(10000).ContinueWith(_ =>
-                            {
-                                SharedCommandContext.BaseCommand.DeleteOrInvalidate();
-                            });
-                        });
+                        lock (this.TaskList) { this.TaskList.Remove(b); }
+                        i--;
+                        continue;
                     }
-                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
-                // Backup handling in case the exception isn't caused via a command
+                    if (!b.Task.IsCompleted)
+                        continue;
 
-                if (CommandContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
-                    try
+                    lock (this.TaskList) { this.TaskList.Remove(b); }
+                    i--;
+
+                    if (b.Task.IsCompletedSuccessfully)
                     {
-                        _ = CommandContext.Channel.SendMessageAsync(new DiscordMessageBuilder()
-                        .WithContent($"{CommandContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCode()}'`\n" +
-                        $"`The exception has been automatically reported.`\n\n" +
-                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        _logger.LogTrace("Successfully executed Task:{Id} '{Uuid}' in {Elapsed}ms, Task Count now at {Count}.", 
+                            b.Task.Id, b.Uuid, b.CreationTime.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")), TaskList.Count);
+
+                        if (b.CustomData is SharedCommandContext sctx)
                         {
-                            if (!x.IsCompletedSuccessfully)
-                                return;
+                            _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
+                                sctx?.Prefix,
+                                sctx?.CommandName,
+                                sctx?.User?.Id,
+                                sctx?.Guild?.Id);
+                        }
+                        else if (b.CustomData is CommandContext cctx)
+                        {
+                            _logger.LogInfo("Successfully executed '{Prefix}{Name}' for '{User}' on '{Guild}'",
+                                cctx?.Prefix,
+                                cctx?.Command.Parent is not null ? $"{cctx.Command.Parent.Name} " : "" + cctx.Command.Name,
+                                cctx?.User?.Id,
+                                cctx?.Guild?.Id);
+                        }
+                        else if (b.CustomData is InteractionContext ictx)
+                        {
+                            _logger.LogInfo("Successfully executed '/{Name}' for '{User}' on '{Guild}'",
+                                ictx?.FullCommandName,
+                                ictx?.User?.Id,
+                                ictx?.Guild?.Id);
+                        }
+                        else if (b.CustomData is ContextMenuContext cmctx)
+                        {
+                            _logger.LogInfo("Successfully executed '{Name}' for '{User}' on '{Guild}'",
+                                cmctx?.FullCommandName,
+                                cmctx?.User?.Id,
+                                cmctx?.Guild?.Id);
+                        }
 
-                            _ = Task.Delay(10000).ContinueWith(_ =>
-                            {
-                                _ = x.Result.DeleteAsync();
-                            });
-                        });
+                        continue;
                     }
-                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
-                if (InteractionContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
-                    try
+                    if (b.CustomData is not null)
                     {
-                        _ = InteractionContext.EditResponseAsync(new DiscordWebhookBuilder()
-                        .WithContent($"{InteractionContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCode()}'`\n" +
-                        $"`The exception has been automatically reported.`\n\n" +
-                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
+                        var Exception = (b.Task.Exception?.GetType() != typeof(AggregateException) ? b.Task.Exception : b.Task.Exception.InnerException);
+
+                        if (Exception is DisCatSharp.Exceptions.BadRequestException badReq)
                         {
-                            if (!x.IsCompletedSuccessfully)
-                                return;
+                            try
+                            { _logger.LogError("Web Request: {Request}", (JsonConvert.SerializeObject(badReq?.WebRequest, Formatting.Indented).Replace("\\", ""))); }
+                            catch { }
+                            try
+                            { _logger.LogError("Web Response: {Response}", badReq.WebResponse.Response.Replace("\\", "")); }
+                            catch { }
+                        }
 
-                            _ = Task.Delay(10000).ContinueWith(_ =>
+                        if (b.CustomData is SharedCommandContext sctx)
+                        {
+                            _logger.LogError("Failed to execute '{Prefix}{Name}' for '{User}' on '{Guild}', Task Count now at {Count}.", b.Task.Exception,
+                                sctx?.Prefix,
+                                sctx?.CommandName,
+                                sctx?.User?.Id,
+                                sctx?.Guild?.Id,
+                                TaskList.Count);
+
+                            try
                             {
-                                _ = InteractionContext.DeleteResponseAsync();
-                            });
-                        });
-                    }
-                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
+                                _ = sctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
+                                    .WithContent(sctx.User.Mention)
+                                    .AddEmbed(new DiscordEmbedBuilder()
+                                        .WithDescription(sctx.BaseCommand.GetString(sctx.BaseCommand.t.Commands.Common.Errors.UnhandledException, true, 
+                                            new TVar("Message", $"```diff\n-{(Exception?.Message?.SanitizeForCode() ?? "No message captured.")}\n```"),
+                                            new TVar("Timestamp", DateTime.UtcNow.AddSeconds(11).ToTimestamp())))
+                                        .AsBotError(sctx)))
+                                .ContinueWith(x =>
+                                {
+                                    if (!x.IsCompletedSuccessfully)
+                                        return;
 
-                if (ContextMenuContext != null && ExceptionType != typeof(DisCatSharp.Exceptions.NotFoundException))
-                    try
+                                    _ = Task.Delay(10000).ContinueWith(_ =>
+                                    {
+                                        sctx.BaseCommand.DeleteOrInvalidate();
+                                    });
+                                });
+                            }
+                            catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
+                        }
+                        else
+                        {
+                            _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.Uuid);
+                        }
+                    }
+                    else
                     {
-                        _ = ContextMenuContext.EditResponseAsync(new DiscordWebhookBuilder()
-                        .WithContent($"{ContextMenuContext.User.Mention}\n⚠ `An unhandled exception occurred while trying to execute your command: '{ExceptionMessage.SanitizeForCode()}'`\n" +
-                        $"`The exception has been automatically reported.`\n\n" +
-                        $"\n\n_This message will be deleted {Formatter.Timestamp(DateTime.UtcNow.AddSeconds(11))}._")).ContinueWith(x =>
-                        {
-                            if (!x.IsCompletedSuccessfully)
-                                return;
-
-                            _ = Task.Delay(10000).ContinueWith(_ =>
-                            {
-                                _ = ContextMenuContext.DeleteResponseAsync();
-                            });
-                        });
+                        _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.Uuid);
                     }
-                    catch (Exception ex) { _logger.LogError("Failed to notify user about unhandled exception.", ex); }
 
-                this.tasks.Remove(b);
+                    if (b.IsVital)
+                    {
+                        await Task.Delay(1000);
+                        Environment.Exit((int)ExitCodes.VitalTaskFailed);
+                        return;
+                    }
+                }
             }
-
-            await Task.Delay(500);
-        }
+        }).ContinueWith(async x =>
+        {
+            if (!x.IsCompletedSuccessfully)
+            {
+                _logger.LogError("TaskWatcher failed to execute", x.Exception);
+                await Task.Delay(1000);
+                Environment.Exit((int)ExitCodes.VitalTaskFailed);
+                return;
+            }
+        });
     }
 
     internal TaskInfo AddToList(TaskInfo taskInfo)
     {
-        this.tasks.Add(taskInfo);
+        _logger.LogTrace("Started Task:{uuid}, Task Count now at {Count}.", taskInfo.Uuid, this.TaskList.Count + 1);
+        lock (this.TaskList) { this.TaskList.Add(taskInfo); }
+
         return taskInfo;
     }
 
@@ -222,7 +190,7 @@ public sealed class TaskWatcher
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.discordClient.Guilds[bot.status.LoadedConfig.Channels.Assets].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Channels.Assets].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
 
                         DiscordEmbedBuilder template = new DiscordEmbedBuilder()
                                                     .WithColor(e.LogEntry.LogLevel == CustomLogLevel.Fatal ? new DiscordColor("#FF0000") : EmbedColors.Error)
@@ -318,7 +286,7 @@ public sealed class TaskWatcher
                     {
                         try
                         {
-                            await bot.discordClient.ConnectAsync();
+                            await bot.DiscordClient.ConnectAsync();
                         }
                         catch (Exception ex)
                         {

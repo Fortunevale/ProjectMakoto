@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class InviteNotesSettings
+public sealed class InviteNotesSettings : RequiresParent<Guild>
 {
-    public InviteNotesSettings(Guild guild)
+    public InviteNotesSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
 
     public Dictionary<string, InviteNotesDetails> Notes { get; set; } = new();
 }

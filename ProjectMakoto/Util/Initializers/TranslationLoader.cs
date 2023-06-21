@@ -12,7 +12,7 @@ internal sealed class TranslationLoader
 {
     internal static async Task Load(Bot _bot)
     {
-        _bot.loadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
+        _bot.LoadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
         _logger.LogDebug("Loaded translations");
 
         Dictionary<string, int> CalculateTranslationProgress(object? obj)
@@ -106,7 +106,7 @@ internal sealed class TranslationLoader
 
             return counts;
         }
-        _bot.loadedTranslations.Progress = CalculateTranslationProgress(_bot.loadedTranslations);
-        _logger.LogDebug("Loaded translations: {0}", string.Join("; ", _bot.loadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
+        _bot.LoadedTranslations.Progress = CalculateTranslationProgress(_bot.LoadedTranslations);
+        _logger.LogDebug("Loaded translations: {0}", string.Join("; ", _bot.LoadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
     }
 }

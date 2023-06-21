@@ -65,12 +65,10 @@ global using static ProjectMakoto.Util.Log;
 global using Xorog.Logger;
 global using Xorog.Logger.EventArgs;
 
-global using Xorog.ScoreSaber;
-global using Xorog.ScoreSaber.Objects;
-
 global using Xorog.UniversalExtensions;
 global using Xorog.UniversalExtensions.Entities;
 global using Xorog.UniversalExtensions.Enums;
+global using Xorog.UniversalExtensions.Converters;
 
 global using Dapper;
 global using MySql.Data.MySqlClient;

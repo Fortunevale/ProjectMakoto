@@ -39,7 +39,7 @@ internal sealed class JoinCommand : BaseCommand
                 }
 
                 conn = await node.ConnectAsync(ctx.Member.VoiceState.Channel);
-                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.QueueHandler(ctx.Bot, ctx.Client, node, conn);
+                ctx.DbGuild.MusicModule.QueueHandler(ctx.Bot, ctx.Client, node, conn);
 
                 if (Announce)
                     await RespondOrEdit(new DiscordEmbedBuilder

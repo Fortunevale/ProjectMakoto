@@ -9,14 +9,10 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class ReminderSettings
+public sealed class ReminderSettings : RequiresParent<User>
 {
-    public ReminderSettings(User user, Bot bot)
+    public ReminderSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this.Parent = user;
-        this._bot = bot;
-
-        this.ScheduledReminders.ItemsChanged += RemindersUpdated;
     }
 
     ~ReminderSettings()
@@ -26,17 +22,17 @@ public sealed class ReminderSettings
 
     private async void RemindersUpdated(object? sender, ObservableListUpdate<ReminderItem> e)
     {
-        while (!this._bot.status.DiscordGuildDownloadCompleted)
+        while (!this.Bot.status.DiscordGuildDownloadCompleted)
             await Task.Delay(1000);
 
         if (this.ScheduledReminders.Count > 10)
             this.ScheduledReminders.RemoveAt(0);
 
         foreach (var b in this.ScheduledReminders.ToList())
-            if (!UniversalExtensions.GetScheduledTasks().Any(x =>
+            if (!ScheduledTaskExtensions.GetScheduledTasks().Any(x =>
             {
                 if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
-                scheduledTaskIdentifier.Snowflake != this.Parent.UserId ||
+                scheduledTaskIdentifier.Snowflake != this.Parent.Id ||
                 scheduledTaskIdentifier.Type != "reminder" ||
                 scheduledTaskIdentifier.Id != b.UUID)
                     return false;
@@ -46,19 +42,19 @@ public sealed class ReminderSettings
             {
                 Task task = new(async () =>
                 {
-                    var CommandKey = this._bot.loadedTranslations.Commands.Utility.Reminders;
+                    var CommandKey = this.Bot.LoadedTranslations.Commands.Utility.Reminders;
 
                     this.ScheduledReminders.Remove(b);
 
-                    var user = await this._bot.discordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.UserId)).Value.GetMemberAsync(this.Parent.UserId);
+                    var user = await this.Bot.DiscordClient.Guilds.First<KeyValuePair<ulong, DiscordGuild>>(x => x.Value.Members.ContainsKey(this.Parent.Id)).Value.GetMemberAsync(this.Parent.Id);
 
                     DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithDescription($"> {b.Description.FullSanitize()}\n" +
-                        $"{CommandKey.CreatedOn.Get(this._bot.users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
-                        $"{CommandKey.CreatedAt.Get(this._bot.users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +
-                        $"{CommandKey.DueTime.Get(this._bot.users[user.Id]).Build(new TVar("Relative", b.DueTime.ToTimestamp()), new TVar("DateTime", b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}\n" +
-                        $"{(b.DueTime.GetTimespanSince() > TimeSpan.FromMinutes(2) ? $"\n\n**{CommandKey.SentLate.Get(this._bot.users[user.Id])}**" : "")}")
-                        .WithTitle(CommandKey.ReminderNotification.Get(this._bot.users[user.Id]))
+                        $"{CommandKey.CreatedOn.Get(this.Bot.Users[user.Id]).Build(new TVar("Guild", b.CreationPlace))}\n" +
+                        $"{CommandKey.CreatedAt.Get(this.Bot.Users[user.Id]).Build(new TVar("Timestamp", $"{b.CreationTime.ToTimestamp()} ({b.CreationTime.ToTimestamp(TimestampFormat.LongDateTime)})"))}\n" +
+                        $"{CommandKey.DueTime.Get(this.Bot.Users[user.Id]).Build(new TVar("Relative", b.DueTime.ToTimestamp()), new TVar("DateTime", b.DueTime.ToTimestamp(TimestampFormat.LongDateTime)))}\n" +
+                        $"{(b.DueTime.GetTimespanSince() > TimeSpan.FromMinutes(2) ? $"\n\n**{CommandKey.SentLate.Get(this.Bot.Users[user.Id])}**" : "")}")
+                        .WithTitle(CommandKey.ReminderNotification.Get(this.Bot.Users[user.Id]))
                         .WithColor(EmbedColors.Info));
 
                     var maxLength = 100 - JsonConvert.SerializeObject(new ReminderSnoozeButton(), new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include }).Length;
@@ -69,28 +65,25 @@ public sealed class ReminderSettings
                     var msg = await user.SendMessageAsync(builder.AddComponents(snoozeButton));
                 });
 
-                task.Add(this._bot.watcher);
-                task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.UserId, b.UUID, "reminder"));
+                task.Add(this.Bot);
+                task.CreateScheduledTask(b.DueTime, new ScheduledTaskIdentifier(this.Parent.Id, b.UUID, "reminder"));
 
-                _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.UserId);
+                _logger.LogDebug("Created scheduled task for reminder by '{User}'", this.Parent.Id);
             }
 
-        foreach (var b in UniversalExtensions.GetScheduledTasks())
+        foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
         {
             if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                 continue;
 
-            if (scheduledTaskIdentifier.Snowflake == this.Parent.UserId && scheduledTaskIdentifier.Type == "reminder" && !this.ScheduledReminders.Any(x => x.UUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
+            if (scheduledTaskIdentifier.Snowflake == this.Parent.Id && scheduledTaskIdentifier.Type == "reminder" && !this.ScheduledReminders.Any(x => x.UUID == ((ScheduledTaskIdentifier)b.CustomData).Id))
             {
                 b.Delete();
 
-                _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", this.Parent.UserId);
+                _logger.LogDebug("Deleted scheduled task for reminder by '{User}'", this.Parent.Id);
             }
         }
     }
-
-    private User Parent { get; set; }
-    private Bot _bot { get; set; }
 
     public ObservableList<ReminderItem> ScheduledReminders = new();
 }

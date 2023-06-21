@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class InviteTrackerMember
+public sealed class InviteTrackerMember : RequiresParent<Member>
 {
-    public InviteTrackerMember(Member member)
+    public InviteTrackerMember(Bot bot, Member parent) : base(bot, parent)
     {
-        this.Parent = member;
     }
-
-    private Member Parent { get; set; }
-
-
 
     private ulong _UserId { get; set; } = 0;
     public ulong UserId
@@ -27,7 +22,7 @@ public sealed class InviteTrackerMember
         set
         {
             this._UserId = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "invite_user", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_user", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 
@@ -38,7 +33,7 @@ public sealed class InviteTrackerMember
         set
         {
             this._Code = value;
-            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Guild.ServerId.ToString(), "userid", this.Parent.MemberId, "invite_code", value, Bot.DatabaseClient.guildDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue(this.Parent.Parent.Id.ToString(), "userid", this.Parent.Id, "invite_code", value, Bot.DatabaseClient.guildDatabaseConnection);
         }
     }
 }

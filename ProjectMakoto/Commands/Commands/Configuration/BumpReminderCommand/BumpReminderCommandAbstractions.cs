@@ -13,15 +13,15 @@ internal sealed class BumpReminderCommandAbstractions
 {
     internal static string GetCurrentConfiguration(SharedCommandContext ctx)
     {
-        var CommandKey = ctx.Bot.loadedTranslations.Commands.Config.BumpReminder;
+        var CommandKey = ctx.Bot.LoadedTranslations.Commands.Config.BumpReminder;
 
-        if (!ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled)
-            return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser)}` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}";
+        if (!ctx.DbGuild.BumpReminder.Enabled)
+            return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser)}` : {ctx.DbGuild.BumpReminder.Enabled.ToEmote(ctx.Bot)}";
 
         var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.BumpReminderEnabled, CommandKey.BumpReminderChannel, CommandKey.BumpReminderRole);
 
-        return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser).PadRight(pad)}` : {ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.Enabled.ToEmote(ctx.Bot)}\n" +
-               $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.BumpReminderChannel.Get(ctx.DbUser).PadRight(pad)}` : <#{ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId}> `({ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.ChannelId})`\n" +
-               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.BumpReminderRole.Get(ctx.DbUser).PadRight(pad)}` : <@&{ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId}> `({ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId})`";
+        return $"{EmojiTemplates.GetQuestionMark(ctx.Bot)} `{CommandKey.BumpReminderEnabled.Get(ctx.DbUser).PadRight(pad)}` : {ctx.DbGuild.BumpReminder.Enabled.ToEmote(ctx.Bot)}\n" +
+               $"{EmojiTemplates.GetChannel(ctx.Bot)} `{CommandKey.BumpReminderChannel.Get(ctx.DbUser).PadRight(pad)}` : <#{ctx.DbGuild.BumpReminder.ChannelId}> `({ctx.DbGuild.BumpReminder.ChannelId})`\n" +
+               $"{EmojiTemplates.GetUser(ctx.Bot)} `{CommandKey.BumpReminderRole.Get(ctx.DbUser).PadRight(pad)}` : <@&{ctx.DbGuild.BumpReminder.RoleId}> `({ctx.DbGuild.BumpReminder.RoleId})`";
     }
 }

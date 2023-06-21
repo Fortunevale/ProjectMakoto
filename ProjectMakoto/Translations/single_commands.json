@@ -14,7 +14,7 @@
         "name": "command",
         "description": "The command to show help for",
         "name_translations": {
-          "de":  "befehl"
+          "de": "befehl"
         },
         "description_translations": {
           "de": "Der Befehl für den die Hilfe angezeigt werden soll"
@@ -259,6 +259,48 @@
     "description_translations": {
       "de": "Zeigt dir wer Makoto unterstützt hat."
     }
+  },
+  {
+    "name": "block-user",
+    "description": "Allows you to block a user",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": {
+      "de": "Erlaubt es dir einen Nutzer zu blockieren."
+    },
+    "options": [
+      {
+        "name": "target",
+        "description": "The user to block.",
+        "name_translations": {
+          "de": "ziel"
+        },
+        "description_translations": {
+          "de": "Den Nutzer den du blockieren möchtest."
+        }
+      }
+    ]
+  },
+  {
+    "name": "unblock-user",
+    "description": "Allows you to unblock a user",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": {
+      "de": "Erlaubt es dir einen Nutzer zu entblockieren."
+    },
+    "options": [
+      {
+        "name": "target",
+        "description": "The user to unblock.",
+        "name_translations": {
+          "de": "ziel"
+        },
+        "description_translations": {
+          "de": "Den Nutzer den du entblockieren möchtest."
+        }
+      }
+    ]
   },
   {
     "name": "Steal Emojis",

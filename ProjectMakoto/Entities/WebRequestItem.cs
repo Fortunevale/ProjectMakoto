@@ -9,7 +9,7 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class RequestItem
+public sealed class WebRequestItem
 {
     public string Url { get; set; }
 

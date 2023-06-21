@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class JoinSettings
+public sealed class JoinSettings : RequiresParent<Guild>
 {
-    public JoinSettings(Guild guild)
+    public JoinSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private ulong _AutoAssignRoleId { get; set; } = 0;
     public ulong AutoAssignRoleId
@@ -27,7 +22,7 @@ public sealed class JoinSettings
         set
         {
             this._AutoAssignRoleId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "auto_assign_role_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "auto_assign_role_id", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -39,7 +34,7 @@ public sealed class JoinSettings
         set
         {
             this._JoinlogChannelId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "joinlog_channel_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -51,7 +46,7 @@ public sealed class JoinSettings
         set
         {
             this._AutoBanGlobalBans = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "autoban_global_ban", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "autoban_global_ban", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -64,7 +59,7 @@ public sealed class JoinSettings
         set
         {
             this._ReApplyRoles = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "reapplyroles", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplyroles", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -77,7 +72,7 @@ public sealed class JoinSettings
         set
         {
             this._ReApplyNickname = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "reapplynickname", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplynickname", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

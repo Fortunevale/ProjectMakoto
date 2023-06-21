@@ -85,7 +85,7 @@ internal sealed class AvatarCommand : BaseCommand
                             _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(ServerProfilePictureButton));
                         }
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
         });
     }

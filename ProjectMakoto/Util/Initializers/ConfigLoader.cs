@@ -53,12 +53,14 @@ internal sealed class ConfigLoader
                     await Task.Delay(10000);
                 }
             }
-        }).Add(bot.watcher);
+        }).Add(bot);
 
         while (bot.status.LoadedConfig is null)
             await Task.Delay(100);
 
         _logger.AddBlacklist(bot.status.LoadedConfig.Secrets.Database.Password,
+            bot.status.LoadedConfig.Secrets.Discord.Token,
+            bot.status.LoadedConfig.Secrets.Telegram.Token,
             bot.status.LoadedConfig.Secrets.Lavalink.Password,
             bot.status.LoadedConfig.Secrets.Github.Token,
             bot.status.LoadedConfig.Secrets.KawaiiRedToken);

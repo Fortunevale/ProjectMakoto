@@ -53,9 +53,9 @@ internal sealed class ScoreSaberProfileCommand : BaseCommand
                     return;
                 }
 
-                if (ctx.Bot.users[user.Id].ScoreSaber.Id != 0)
+                if (ctx.Bot.Users[user.Id].ScoreSaber.Id != 0)
                 {
-                    id = ctx.Bot.users[user.Id].ScoreSaber.Id.ToString();
+                    id = ctx.Bot.Users[user.Id].ScoreSaber.Id.ToString();
                     AddLinkButton = false;
                 }
                 else

@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Util;
 
-internal sealed class ExperienceHandler
+internal sealed class ExperienceHandler : RequiresBotReference
 {
-    internal ExperienceHandler(Bot _bot)
+    internal ExperienceHandler(Bot _bot) : base(_bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
-
 
     private Dictionary<long, long> LevelCache = new();
 
@@ -79,41 +75,41 @@ internal sealed class ExperienceHandler
         if (user.IsBot)
             return;
 
-        if (!this._bot.guilds[guild.Id].Experience.UseExperience)
+        if (!this.Bot.Guilds[guild.Id].Experience.UseExperience)
             return;
 
-        if (this._bot.guilds[guild.Id].Members[user.Id].Experience.Points is > (long.MaxValue - 10000) or < (long.MinValue + 10000))
+        if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points is > (long.MaxValue - 10000) or < (long.MinValue + 10000))
         {
             _logger.LogWarn("Member '{User}' on '{Guild}' is within 10000 points of the experience limit. Resetting.", user.Id, guild.Id);
-            this._bot.guilds[guild.Id].Members[user.Id].Experience.Points = 1;
+            this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points = 1;
         }
 
-        this._bot.guilds[guild.Id].Members[user.Id].Experience.Points += Amount;
+        this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points += Amount;
 
-        long PreviousLevel = this._bot.guilds[guild.Id].Members[user.Id].Experience.Level;
+        long PreviousLevel = this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level;
 
         CheckExperience(user.Id, guild);
 
-        if (this._bot.guilds[guild.Id].Members[user.Id].Experience.Level != PreviousLevel && channel != null && channel.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread)
+        if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level != PreviousLevel && channel != null && channel.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread)
         {
             DiscordEmbedBuilder embed = null;
 
-            if (this._bot.guilds[guild.Id].Members[user.Id].Experience.Level > PreviousLevel)
+            if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level > PreviousLevel)
             {
-                string build = $":stars: Congrats, {user.Mention}! You gained {(this._bot.guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel is 1 ? $"{this._bot.guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel} level" : $"{this._bot.guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel} levels")}.\n\n" +
-                                $"You're now on Level {this._bot.guilds[guild.Id].Members[user.Id].Experience.Level}.";
+                string build = $":stars: Congrats, {user.Mention}! You gained {(this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel is 1 ? $"{this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel} level" : $"{this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel} levels")}.\n\n" +
+                                $"You're now on Level {this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level}.";
 
                 int delete_delay = 10000;
 
-                if (this._bot.guilds[guild.Id].LevelRewards.Any(x => x.Level <= this._bot.guilds[guild.Id].Members[user.Id].Experience.Level))
+                if (this.Bot.Guilds[guild.Id].LevelRewards.Any(x => x.Level <= this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))
                 {
                     build += "\n\n";
 
-                    foreach (var reward in this._bot.guilds[guild.Id].LevelRewards.ToList().Where(x => x.Level <= this._bot.guilds[guild.Id].Members[user.Id].Experience.Level))
+                    foreach (var reward in this.Bot.Guilds[guild.Id].LevelRewards.ToList().Where(x => x.Level <= this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))
                     {
                         if (!guild.Roles.ContainsKey(reward.RoleId))
                         {
-                            this._bot.guilds[guild.Id].LevelRewards.Remove(reward);
+                            this.Bot.Guilds[guild.Id].LevelRewards.Remove(reward);
                             continue;
                         }
 
@@ -167,15 +163,15 @@ internal sealed class ExperienceHandler
                         {
                             if (msg.Id == e.Message.Id)
                             {
-                                this._bot.discordClient.ComponentInteractionCreated -= RunInteraction;
+                                this.Bot.DiscordClient.ComponentInteractionCreated -= RunInteraction;
 
-                                this._bot.users[user.Id].ExperienceUser.DirectMessageOptOut = true;
+                                this.Bot.Users[user.Id].ExperienceUser.DirectMessageOptOut = true;
 
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                await (await user.CreateDmChannelAsync()).SendMessageAsync($"Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run `;;levelrewards-optin` on any _bot._guilds with {this._bot.discordClient.CurrentUser.Mention}.");
+                                await (await user.CreateDmChannelAsync()).SendMessageAsync($"Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run `;;levelrewards-optin` on any _bot._guilds with {this.Bot.DiscordClient.CurrentUser.Mention}.");
                             }
-                        }).Add(this._bot.watcher);
+                        }).Add(this.Bot);
                     }
 
                     IEnumerable<DiscordComponent> discordComponents = new List<DiscordComponent>
@@ -185,7 +181,7 @@ internal sealed class ExperienceHandler
 
                     msg = await (await user.CreateDmChannelAsync()).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(discordComponents));
 
-                    this._bot.discordClient.ComponentInteractionCreated += RunInteraction;
+                    this.Bot.DiscordClient.ComponentInteractionCreated += RunInteraction;
 
                     try
                     {
@@ -193,7 +189,7 @@ internal sealed class ExperienceHandler
                         embed.Footer.Text += " • Interaction timed out";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                        this._bot.discordClient.ComponentInteractionCreated -= RunInteraction;
+                        this.Bot.DiscordClient.ComponentInteractionCreated -= RunInteraction;
                     }
                     catch { }
                 }
@@ -203,22 +199,22 @@ internal sealed class ExperienceHandler
 
     internal void CheckExperience(ulong user, DiscordGuild guild)
     {
-        long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this._bot.guilds[guild.Id].Members[user].Experience.Level - 1);
-        long RequiredRepuationForNextLevel = CalculateLevelRequirement(this._bot.guilds[guild.Id].Members[user].Experience.Level);
+        long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
+        long RequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level);
 
-        while (RequiredRepuationForNextLevel <= this._bot.guilds[guild.Id].Members[user].Experience.Points)
+        while (RequiredRepuationForNextLevel <= this.Bot.Guilds[guild.Id].Members[user].Experience.Points)
         {
-            this._bot.guilds[guild.Id].Members[user].Experience.Level++;
+            this.Bot.Guilds[guild.Id].Members[user].Experience.Level++;
 
-            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this._bot.guilds[guild.Id].Members[user].Experience.Level - 1);
-            RequiredRepuationForNextLevel = CalculateLevelRequirement(this._bot.guilds[guild.Id].Members[user].Experience.Level);
+            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
+            RequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level);
         }
 
-        while (PreviousRequiredRepuationForNextLevel >= this._bot.guilds[guild.Id].Members[user].Experience.Points)
+        while (PreviousRequiredRepuationForNextLevel >= this.Bot.Guilds[guild.Id].Members[user].Experience.Points)
         {
-            this._bot.guilds[guild.Id].Members[user].Experience.Level--;
+            this.Bot.Guilds[guild.Id].Members[user].Experience.Level--;
 
-            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this._bot.guilds[guild.Id].Members[user].Experience.Level - 1);
+            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
         }
     }
 

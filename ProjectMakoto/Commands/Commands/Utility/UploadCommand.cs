@@ -18,7 +18,7 @@ internal sealed class UploadCommand : BaseCommand
             Stream stream = (Stream)arguments["stream"];
             int filesize = (int)arguments["filesize"];
 
-            if (!ctx.Bot.uploadInteractions.ContainsKey(ctx.User.Id))
+            if (ctx.DbUser.PendingUserUpload is null)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -27,7 +27,7 @@ internal sealed class UploadCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled)
+            if (ctx.DbUser.PendingUserUpload.InteractionHandled)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -36,20 +36,20 @@ internal sealed class UploadCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.GetTotalSecondsUntil() < 0)
+            if (ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() < 0)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = GetString(this.t.Commands.Utility.Upload.TimedOut, true,
-                        new TVar("Timestamp", ctx.Bot.uploadInteractions[ctx.User.Id].TimeOut.ToTimestamp()))
+                        new TVar("Timestamp", ctx.DbUser.PendingUserUpload.TimeOut.ToTimestamp()))
                 }.AsError(ctx));
-                ctx.Bot.uploadInteractions.Remove(ctx.User.Id);
+                ctx.DbUser.PendingUserUpload = null;
                 return;
             }
 
-            ctx.Bot.uploadInteractions[ctx.User.Id].UploadedData = stream;
-            ctx.Bot.uploadInteractions[ctx.User.Id].FileSize = filesize;
-            ctx.Bot.uploadInteractions[ctx.User.Id].InteractionHandled = true;
+            ctx.DbUser.PendingUserUpload.UploadedData = stream;
+            ctx.DbUser.PendingUserUpload.FileSize = filesize;
+            ctx.DbUser.PendingUserUpload.InteractionHandled = true;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {

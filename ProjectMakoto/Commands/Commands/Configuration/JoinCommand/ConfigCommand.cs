@@ -29,11 +29,11 @@ internal sealed class ConfigCommand : BaseCommand
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            var ToggleGlobalban = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Join.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleGlobalBansButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
+            var ToggleGlobalban = new DiscordButtonComponent((ctx.DbGuild.Join.AutoBanGlobalBans ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleGlobalBansButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🌐")));
             var ChangeJoinlogChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeJoinlogChannelButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👋")));
             var ChangeRoleOnJoin = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeRoleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-            var ToggleReApplyRoles = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleReApplyRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
-            var ToggleReApplyName = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleReApplyNickname), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ToggleReApplyRoles = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyRoles ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleReApplyRole), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
+            var ToggleReApplyName = new DiscordButtonComponent((ctx.DbGuild.Join.ReApplyNickname ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleReApplyNickname), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
 
             await RespondOrEdit(builder
             .AddComponents(new List<DiscordComponent>
@@ -61,21 +61,21 @@ internal sealed class ConfigCommand : BaseCommand
 
             if (e.GetCustomId() == ToggleGlobalban.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].Join.AutoBanGlobalBans = !ctx.Bot.guilds[ctx.Guild.Id].Join.AutoBanGlobalBans;
+                ctx.DbGuild.Join.AutoBanGlobalBans = !ctx.DbGuild.Join.AutoBanGlobalBans;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ToggleReApplyRoles.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyRoles = !ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyRoles;
+                ctx.DbGuild.Join.ReApplyRoles = !ctx.DbGuild.Join.ReApplyRoles;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ToggleReApplyName.CustomId)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyNickname = !ctx.Bot.guilds[ctx.Guild.Id].Join.ReApplyNickname;
+                ctx.DbGuild.Join.ReApplyNickname = !ctx.DbGuild.Join.ReApplyNickname;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -115,7 +115,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw ChannelResult.Exception;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].Join.JoinlogChannelId = ChannelResult.Result is null ? 0 : ChannelResult.Result.Id;
+                ctx.DbGuild.Join.JoinlogChannelId = ChannelResult.Result is null ? 0 : ChannelResult.Result.Id;
 
                 await ExecuteCommand(ctx, arguments);
                 return;
@@ -146,7 +146,7 @@ internal sealed class ConfigCommand : BaseCommand
                     throw RoleResult.Exception;
                 }
 
-                if (RoleResult.Result?.Id == ctx.Bot.guilds[ctx.Guild.Id].BumpReminder.RoleId)
+                if (RoleResult.Result?.Id == ctx.DbGuild.BumpReminder.RoleId)
                 {
                     await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
                     await Task.Delay(3000);
@@ -154,7 +154,7 @@ internal sealed class ConfigCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].Join.AutoAssignRoleId = RoleResult.Result is null ? 0 : RoleResult.Result.Id;
+                ctx.DbGuild.Join.AutoAssignRoleId = RoleResult.Result is null ? 0 : RoleResult.Result.Id;
 
                 await ExecuteCommand(ctx, arguments);
                 return;

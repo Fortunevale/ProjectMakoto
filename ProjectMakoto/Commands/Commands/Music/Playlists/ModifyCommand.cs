@@ -398,7 +398,7 @@ internal sealed class ModifyCommand : BaseCommand
                             }
                         }
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
             return;
         });

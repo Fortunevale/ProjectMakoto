@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class ScoreSaberSettings
+public sealed class ScoreSaberSettings : RequiresParent<User>
 {
-    public ScoreSaberSettings(User user)
+    public ScoreSaberSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this.Parent = user;
     }
-    private User Parent { get; set; }
-
-
 
     private ulong _Id { get; set; } = 0;
     public ulong Id
@@ -26,7 +22,7 @@ public sealed class ScoreSaberSettings
         set
         {
             this._Id = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "scoresaber_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "scoresaber_id", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

@@ -33,7 +33,7 @@ internal sealed class ClearQueueCommand : BaseCommand
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Contains(ctx.User.Id))
+            if (ctx.DbGuild.MusicModule.collectedClearQueueVotes.Contains(ctx.User.Id))
             {
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -42,12 +42,12 @@ internal sealed class ClearQueueCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Add(ctx.User.Id);
+            ctx.DbGuild.MusicModule.collectedClearQueueVotes.Add(ctx.User.Id);
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+            if (ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
             {
-                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Clear();
-                ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Clear();
+                ctx.DbGuild.MusicModule.SongQueue.Clear();
+                ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
                 await RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
@@ -58,7 +58,7 @@ internal sealed class ClearQueueCommand : BaseCommand
 
             DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
@@ -87,7 +87,7 @@ internal sealed class ClearQueueCommand : BaseCommand
                     {
                         _ = e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Contains(e.User.Id))
+                        if (ctx.DbGuild.MusicModule.collectedClearQueueVotes.Contains(e.User.Id))
                         {
                             _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.ClearQueue.AlreadyVoted, true)}").AsEphemeral());
                             return;
@@ -101,12 +101,12 @@ internal sealed class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Add(e.User.Id);
+                        ctx.DbGuild.MusicModule.collectedClearQueueVotes.Add(e.User.Id);
 
-                        if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
+                        if (ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count >= (conn.Channel.Users.Count - 1) * 0.51)
                         {
-                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Clear();
-                            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Clear();
+                            ctx.DbGuild.MusicModule.SongQueue.Clear();
+                            ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
                             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
@@ -115,10 +115,10 @@ internal sealed class ClearQueueCommand : BaseCommand
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.Bot.guilds[ctx.Guild.Id].MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.ClearQueue.VoteStarted)} ({ctx.DbGuild.MusicModule.collectedClearQueueVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
                         await RespondOrEdit(embed.Build());
                     }
-                }).Add(ctx.Bot.watcher);
+                }).Add(ctx.Bot);
             }
         });
     }

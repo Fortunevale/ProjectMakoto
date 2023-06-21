@@ -8,14 +8,11 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto;
-internal sealed class BumpReminder
+internal sealed class BumpReminderHandler: RequiresBotReference
 {
-    internal BumpReminder(Bot _bot)
+    public BumpReminderHandler(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal void SendPersistentMessage(DiscordClient client, DiscordChannel channel, DiscordUser bUser = null)
     {
@@ -27,15 +24,15 @@ internal sealed class BumpReminder
                 Name = channel.Guild.Name
             },
             Color = EmbedColors.Info,
-            Description = $"**The server can be bumped {Formatter.Timestamp(this._bot.guilds[channel.Guild.Id].BumpReminder.LastBump.AddHours(2), TimestampFormat.RelativeTime)}.**\n\n" +
-                          $"The server was last bumped by <@{this._bot.guilds[channel.Guild.Id].BumpReminder.LastUserId}> {Formatter.Timestamp(this._bot.guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(this._bot.guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}",
+            Description = $"**The server can be bumped {Formatter.Timestamp(this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastBump.AddHours(2), TimestampFormat.RelativeTime)}.**\n\n" +
+                          $"The server was last bumped by <@{this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastUserId}> {Formatter.Timestamp(this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}",
             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = $"{(bUser is null ? AuditLogIcons.QuestionMark : bUser.AvatarUrl)}" }
         };
 
-        if (this._bot.guilds[channel.Guild.Id].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-2))
+        if (this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-2))
         {
             embed.Description = $"**The server can be bumped!**\n\n" +
-                          $"The server was last bumped by <@{this._bot.guilds[channel.Guild.Id].BumpReminder.LastUserId}> {Formatter.Timestamp(this._bot.guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(this._bot.guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}";
+                          $"The server was last bumped by <@{this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastUserId}> {Formatter.Timestamp(this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.RelativeTime)} at {Formatter.Timestamp(this.Bot.Guilds[channel.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}";
             embed.Color = EmbedColors.AwaitingInput;
         }
 
@@ -44,9 +41,9 @@ internal sealed class BumpReminder
             if (x.IsCompletedSuccessfully)
             {
                 try
-                { (await channel.GetMessageAsync(this._bot.guilds[channel.Guild.Id].BumpReminder.PersistentMessageId)).DeleteAsync().Add(this._bot.watcher); }
+                { (await channel.GetMessageAsync(this.Bot.Guilds[channel.Guild.Id].BumpReminder.PersistentMessageId)).DeleteAsync().Add(this.Bot); }
                 catch { }
-                this._bot.guilds[channel.Guild.Id].BumpReminder.PersistentMessageId = x.Result.Id;
+                this.Bot.Guilds[channel.Guild.Id].BumpReminder.PersistentMessageId = x.Result.Id;
 
                 _ = channel.DeleteMessagesAsync((await channel.GetMessagesAsync(100)).Where(y => y.Embeds.Any() && y.Author.Id == client.CurrentUser.Id && y.Id != x.Result.Id));
             }
@@ -59,7 +56,7 @@ internal sealed class BumpReminder
 
         try
         {
-            foreach (var b in UniversalExtensions.GetScheduledTasks())
+            foreach (var b in ScheduledTaskExtensions.GetScheduledTasks())
             {
                 if (b.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
                     continue;
@@ -78,20 +75,20 @@ internal sealed class BumpReminder
             _logger.LogDebug("Executing Bump Message for '{Guild}'", ServerId);
             var Guild = await client.GetGuildAsync(ServerId);
 
-            if (!Guild.Channels.ContainsKey(this._bot.guilds[ServerId].BumpReminder.ChannelId) || this._bot.guilds[ServerId].BumpReminder.BumpsMissed > 168)
+            if (!Guild.Channels.ContainsKey(this.Bot.Guilds[ServerId].BumpReminder.ChannelId) || this.Bot.Guilds[ServerId].BumpReminder.BumpsMissed > 168)
             {
                 _logger.LogDebug("'{Guild}' hasn't bumped 169 times. Disabling bump reminder..", ServerId);
-                this._bot.guilds[ServerId].BumpReminder = new(this._bot.guilds[ServerId]);
+                this.Bot.Guilds[ServerId].BumpReminder = new(this.Bot, this.Bot.Guilds[ServerId]);
                 return;
             }
 
-            var Channel = Guild.GetChannel(this._bot.guilds[ServerId].BumpReminder.ChannelId);
+            var Channel = Guild.GetChannel(this.Bot.Guilds[ServerId].BumpReminder.ChannelId);
 
             _logger.LogDebug("Checking if Self Role Message still exists, has it's reaction and is pinned in '{Guild}'", ServerId);
 
             try
             {
-                var msg = await Channel.GetMessageAsync(this._bot.guilds[ServerId].BumpReminder.MessageId);
+                var msg = await Channel.GetMessageAsync(this.Bot.Guilds[ServerId].BumpReminder.MessageId);
 
                 if (!msg.Reactions.Any(x => x.Emoji.ToString() == "✅"))
                     throw new CancelException("Self Role Message Reaction was removed.");
@@ -101,28 +98,28 @@ internal sealed class BumpReminder
             }
             catch (CancelException ex)
             {
-                this._bot.guilds[ServerId].BumpReminder = new(this._bot.guilds[ServerId]);
+                this.Bot.Guilds[ServerId].BumpReminder = new(this.Bot, this.Bot.Guilds[ServerId]);
                 _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `The bump reminder was disabled for the following reason: {ex.Message}`"));
                 return;
             }
             catch (DisCatSharp.Exceptions.NotFoundException)
             {
-                this._bot.guilds[ServerId].BumpReminder = new(this._bot.guilds[ServerId]);
+                this.Bot.Guilds[ServerId].BumpReminder = new(this.Bot, this.Bot.Guilds[ServerId]);
                 _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: `The bump reminder was disabled for the following reason: Self Role Message was deleted.`"));
                 return;
             }
 
-            if (this._bot.guilds[ServerId].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-3))
+            if (this.Bot.Guilds[ServerId].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-3))
             {
-                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: <@&{this._bot.guilds[ServerId].BumpReminder.RoleId}> The last bump was missed!"));
-                this._bot.guilds[ServerId].BumpReminder.BumpsMissed++;
+                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":warning: <@&{this.Bot.Guilds[ServerId].BumpReminder.RoleId}> The last bump was missed!"));
+                this.Bot.Guilds[ServerId].BumpReminder.BumpsMissed++;
             }
             else
-                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":bell: <@&{this._bot.guilds[ServerId].BumpReminder.RoleId}> The server can be bumped again!"));
+                _ = Channel.SendMessageAsync(new DiscordMessageBuilder().WithContent($":bell: <@&{this.Bot.Guilds[ServerId].BumpReminder.RoleId}> The server can be bumped again!"));
 
-            this._bot.guilds[ServerId].BumpReminder.LastReminder = DateTime.UtcNow;
+            this.Bot.Guilds[ServerId].BumpReminder.LastReminder = DateTime.UtcNow;
 
             ScheduleBump(client, ServerId);
-        })).CreateScheduledTask(this._bot.guilds[ServerId].BumpReminder.LastReminder.AddHours(2), new ScheduledTaskIdentifier(ServerId, "", "bumpmsg"));
+        })).CreateScheduledTask(this.Bot.Guilds[ServerId].BumpReminder.LastReminder.AddHours(2), new ScheduledTaskIdentifier(ServerId, "", "bumpmsg"));
     }
 }

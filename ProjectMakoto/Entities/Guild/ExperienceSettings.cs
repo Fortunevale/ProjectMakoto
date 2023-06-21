@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class ExperienceSettings
+public sealed class ExperienceSettings : RequiresParent<Guild>
 {
-    public ExperienceSettings(Guild guild)
+    public ExperienceSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private bool _UseExperience { get; set; } = false;
     public bool UseExperience
@@ -27,7 +22,7 @@ public sealed class ExperienceSettings
         set
         {
             this._UseExperience = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "experience_use", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_use", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -40,7 +35,7 @@ public sealed class ExperienceSettings
         set
         {
             this._BoostXpForBumpReminder = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "experience_boost_bumpreminder", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

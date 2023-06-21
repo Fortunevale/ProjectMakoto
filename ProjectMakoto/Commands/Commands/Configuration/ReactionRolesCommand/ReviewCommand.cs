@@ -29,7 +29,7 @@ internal sealed class ReviewCommand : BaseCommand
 
             List<string> Desc = new();
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles.Count == 0)
+            if (ctx.DbGuild.ReactionRoles.Count == 0)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder
                 {
@@ -38,7 +38,7 @@ internal sealed class ReviewCommand : BaseCommand
                 return;
             }
 
-            foreach (var b in ctx.Bot.guilds[ctx.Guild.Id].ReactionRoles)
+            foreach (var b in ctx.DbGuild.ReactionRoles)
             {
                 var channel = ctx.Guild.GetChannel(b.Value.ChannelId);
                 var role = ctx.Guild.GetRole(b.Value.RoleId);

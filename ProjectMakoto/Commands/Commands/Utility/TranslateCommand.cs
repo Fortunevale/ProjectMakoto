@@ -88,7 +88,7 @@ internal sealed class TranslateCommand : BaseCommand
                     Description = GetString(this.t.Commands.Utility.TranslateMessage.SelectSource, true),
                 }.AsAwaitingInput(ctx)));
 
-                var SourceResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.DbUser.Translation.LastGoogleSource))).ToList(), GetString(this.t.Commands.Utility.TranslateMessage.SelectSourceDropdown));
+                var SourceResult = await PromptCustomSelection(ctx.Bot.LanguageCodes.List.Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.DbUser.Translation.LastGoogleSource))).ToList(), GetString(this.t.Commands.Utility.TranslateMessage.SelectSourceDropdown));
 
                 if (SourceResult.TimedOut)
                 {
@@ -113,7 +113,7 @@ internal sealed class TranslateCommand : BaseCommand
                         new TVar("Source", SourceResult.Result)),
                 }.AsAwaitingInput(ctx)));
 
-                var TargetResult = await PromptCustomSelection(ctx.Bot.languageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.DbUser.Translation.LastGoogleTarget))).ToList(), GetString(this.t.Commands.Utility.TranslateMessage.SelectTargetDropdown));
+                var TargetResult = await PromptCustomSelection(ctx.Bot.LanguageCodes.List.Where(x => x.Code != "auto").Select(x => new DiscordStringSelectComponentOption(x.Name, x.Code, null, (x.Code == ctx.DbUser.Translation.LastGoogleTarget))).ToList(), GetString(this.t.Commands.Utility.TranslateMessage.SelectTargetDropdown));
 
                 if (TargetResult.TimedOut)
                 {
@@ -137,9 +137,9 @@ internal sealed class TranslateCommand : BaseCommand
                     Description = GetString(this.t.Commands.Utility.TranslateMessage.Translating, true),
                 }.AsLoading(ctx)));
 
-                var TranslationTask = ctx.Bot.translationClient.Translate(SourceResult.Result, TargetResult.Result, transSource);
+                var TranslationTask = ctx.Bot.TranslationClient.Translate(SourceResult.Result, TargetResult.Result, transSource);
 
-                int PosInQueue = ctx.Bot.translationClient.Queue.Count;
+                int PosInQueue = ctx.Bot.TranslationClient.Queue.Count;
 
                 bool Announced = false;
                 int Wait = 0;
@@ -152,7 +152,7 @@ internal sealed class TranslateCommand : BaseCommand
 
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = GetString(this.t.Commands.Utility.TranslateMessage.Queue).Build(true, new TVar("Position", PosInQueue), new TVar("Timestamp", Formatter.Timestamp(ctx.Bot.translationClient.LastRequest.AddSeconds(PosInQueue * 10)))),
+                            Description = GetString(this.t.Commands.Utility.TranslateMessage.Queue).Build(true, new TVar("Position", PosInQueue), new TVar("Timestamp", Formatter.Timestamp(ctx.Bot.TranslationClient.LastRequest.AddSeconds(PosInQueue * 10)))),
                         }.AsLoading(ctx)));
                     }
 
@@ -166,8 +166,8 @@ internal sealed class TranslateCommand : BaseCommand
                 {
                     Description = $"{Translation.Item1}",
                 }.AsInfo(ctx, "", GetString(this.t.Commands.Utility.TranslateMessage.Translated,
-                    new TVar("Source", (SourceResult.Result == "auto" ? $"{ctx.Bot.languageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot.languageCodes.List.First(x => x.Code == SourceResult.Result).Name)),
-                    new TVar("Target", ctx.Bot.languageCodes.List.First(x => x.Code == TargetResult.Result).Name),
+                    new TVar("Source", (SourceResult.Result == "auto" ? $"{ctx.Bot.LanguageCodes.List.First(x => x.Code == Translation.Item2).Name} (Auto)" : ctx.Bot.LanguageCodes.List.First(x => x.Code == SourceResult.Result).Name)),
+                    new TVar("Target", ctx.Bot.LanguageCodes.List.First(x => x.Code == TargetResult.Result).Name),
                     new TVar("Provider", "Google")))));
             }
             else if (e.GetCustomId() == LibreTranslateButton.CustomId)

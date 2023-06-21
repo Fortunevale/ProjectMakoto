@@ -22,7 +22,7 @@ internal sealed class PollCommand : BaseCommand
 
             var CommandKey = this.t.Commands.Moderation.Poll;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
+            if (ctx.DbGuild.Polls.RunningPolls.Count >= 10)
             {
                 await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.PollLimitReached, true)).AsError(ctx));
                 return;
@@ -328,7 +328,7 @@ internal sealed class PollCommand : BaseCommand
                         continue;
                     }
 
-                    if (ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Count >= 10)
+                    if (ctx.DbGuild.Polls.RunningPolls.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.PollLimitReached, true)).AsError(ctx));
                         return;
@@ -350,7 +350,7 @@ internal sealed class PollCommand : BaseCommand
                             .WithDescription($"> **{polltxt}**\n\n_{GetGuildString(CommandKey.PollEnding, new TVar("Timestamp", selectedDueDate.Value.ToTimestamp()))}._\n\n`{GetGuildString(CommandKey.TotalVotes, new TVar("Count", 0))}`"))
                         .AddComponents(select).AddComponents(endearly));
 
-                    ctx.Bot.guilds[ctx.Guild.Id].Polls.RunningPolls.Add(new PollEntry
+                    ctx.DbGuild.Polls.RunningPolls.Add(new PollEntry
                     {
                         PollText = polltxt,
                         ChannelId = SelectedChannel.Id,

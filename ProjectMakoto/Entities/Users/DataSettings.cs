@@ -11,7 +11,6 @@ namespace ProjectMakoto.Entities;
 public sealed class DataSettings
 {
     public DateTime LastDataRequest { get; set; } = DateTime.MinValue;
-
     public bool DeletionRequested { get; set; } = false;
     public DateTime DeletionRequestDate { get; set; } = DateTime.MinValue;
 }

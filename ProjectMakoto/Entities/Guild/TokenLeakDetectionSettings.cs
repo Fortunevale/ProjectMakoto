@@ -9,14 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class TokenLeakDetectionSettings
+public sealed class TokenLeakDetectionSettings : RequiresParent<Guild>
 {
-    public TokenLeakDetectionSettings(Guild guild)
+    public TokenLeakDetectionSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
 
     private bool _DetectTokens { get; set; } = true;
     public bool DetectTokens
@@ -25,7 +22,7 @@ public sealed class TokenLeakDetectionSettings
         set
         {
             this._DetectTokens = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "tokens_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "tokens_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

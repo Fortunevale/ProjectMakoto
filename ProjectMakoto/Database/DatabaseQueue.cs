@@ -9,16 +9,12 @@
 
 namespace ProjectMakoto.Database;
 
-internal sealed class DatabaseQueue
+internal sealed class DatabaseQueue : RequiresBotReference
 {
-    internal DatabaseQueue(Bot _bot)
+    internal DatabaseQueue(Bot _bot) : base(_bot)
     {
-        this._bot = _bot;
-
         _ = QueueHandler();
     }
-
-    public Bot _bot { get; private set; }
 
     internal async Task QueueHandler()
     {
@@ -150,14 +146,14 @@ internal sealed class DatabaseQueue
                 {
                     _logger.LogFatal("Queue Handler failed 20 times, terminating application.");
 
-                    _ = this._bot.ExitApplication(true);
+                    _ = this.Bot.ExitApplication(true);
                     throw;
                 }
 
                 _ = QueueHandler();
                 throw;
             }
-        }).Add(this._bot.watcher);
+        }).Add(this.Bot);
     }
 
     internal async Task RunCommand(MySqlCommand cmd, QueuePriority priority = QueuePriority.Normal, int depth = 0)

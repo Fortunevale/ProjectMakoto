@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class InVoiceTextPrivacySettings
+public sealed class InVoiceTextPrivacySettings : RequiresParent<Guild>
 {
-    public InVoiceTextPrivacySettings(Guild guild)
+    public InVoiceTextPrivacySettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private bool _ClearTextEnabled { get; set; } = false;
     public bool ClearTextEnabled
@@ -27,7 +22,7 @@ public sealed class InVoiceTextPrivacySettings
         set
         {
             this._ClearTextEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "vc_privacy_clear", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_clear", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -38,7 +33,7 @@ public sealed class InVoiceTextPrivacySettings
         set
         {
             this._SetPermissionsEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "vc_privacy_perms", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_perms", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

@@ -26,6 +26,7 @@ public abstract class BaseCommand
 
     public async Task TransferCommand(SharedCommandContext ctx, Dictionary<string, object> arguments = null)
     {
+        this.t = ctx.Bot.LoadedTranslations;
         this.ctx = ctx;
 
         ctx.Transferred = true;
@@ -37,6 +38,7 @@ public abstract class BaseCommand
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.t = _bot.LoadedTranslations;
 
         if (await BasePreExecutionCheck())
             await ExecuteCommand(this.ctx, arguments);
@@ -44,106 +46,130 @@ public abstract class BaseCommand
 
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
-        if (InitiateInteraction)
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = Ephemeral
-            });
-
         this.ctx = new SharedCommandContext(this, ctx, _bot);
+        this.t = _bot.LoadedTranslations;
 
-        this.ctx.RespondedToInitial = InitiateInteraction;
+        Task.Run(async () =>
+        {
+            if (InitiateInteraction)
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = Ephemeral
+                });
 
-        if (InteractionInitiated)
-            this.ctx.RespondedToInitial = true;
+            this.ctx.RespondedToInitial = InitiateInteraction;
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+            if (InteractionInitiated)
+                this.ctx.RespondedToInitial = true;
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommandWith2FA(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
     {
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.ctx.RespondedToInitial = false;
+        this.t = _bot.LoadedTranslations;
 
-        if (!this.ctx.Bot.status.LoadedConfig.IsDev)
-            if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
-            {
-                _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
+        Task.Run(async () =>
+        {
+            this.ctx.RespondedToInitial = false;
+
+            if (!this.ctx.Bot.status.LoadedConfig.IsDev)
+                if (!ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
                 {
-                    Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
-                }.AsBotError(this.ctx)).AsEphemeral());
-                return;
-            }
-            else
-            {
-                if (_bot.users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
-                {
-                    this.ctx.RespondedToInitial = true;
-                    var tfa = await ctx.RequestTwoFactorAsync();
-
-                    if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
-                        await SwitchToEvent(tfa.ComponentInteraction);
-
-                    if (tfa.Result != TwoFactorResult.ValidCode)
+                    _ = ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(new DiscordEmbedBuilder()
                     {
-                        _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
-                        return;
-                    }
-                    _bot.users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                        Description = "`Please enroll in Two Factor Authentication via 'Enroll2FA'.`"
+                    }.AsBotError(this.ctx)).AsEphemeral());
+                    return;
                 }
-            }
+                else
+                {
+                    if (_bot.Users[ctx.User.Id].LastSuccessful2FA.GetTimespanSince() > TimeSpan.FromMinutes(3))
+                    {
+                        this.ctx.RespondedToInitial = true;
+                        var tfa = await ctx.RequestTwoFactorAsync();
 
-        if (!this.ctx.RespondedToInitial)
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = true
-            });
+                        if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
+                            await SwitchToEvent(tfa.ComponentInteraction);
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+                        if (tfa.Result != TwoFactorResult.ValidCode)
+                        {
+                            _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
+                            return;
+                        }
+                        _bot.Users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
+                    }
+                }
+
+            if (!this.ctx.RespondedToInitial)
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = true
+                });
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(ContextMenuContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
-        if (InitiateInteraction)
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = Ephemeral
-            });
-
         this.ctx = new SharedCommandContext(this, ctx, _bot);
-        this.ctx.RespondedToInitial = InitiateInteraction;
+        this.t = _bot.LoadedTranslations;
 
-        if (InteractionInitiated)
-            this.ctx.RespondedToInitial = true;
+        Task.Run(async () =>
+        {
+            if (InitiateInteraction)
+                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = Ephemeral
+                });
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+            this.ctx.RespondedToInitial = InitiateInteraction;
+
+            if (InteractionInitiated)
+                this.ctx.RespondedToInitial = true;
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, this.ctx);
     }
 
     public async Task ExecuteCommand(ComponentInteractionCreateEventArgs ctx, DiscordClient client, string commandName, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
     {
-        if (InitiateInteraction)
-            await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
-            {
-                IsEphemeral = Ephemeral
-            });
-
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
-        this.ctx.RespondedToInitial = InitiateInteraction;
+        this.t = _bot.LoadedTranslations;
 
-        if (InteractionInitiated)
-            this.ctx.RespondedToInitial = true;
+        Task.Run(async () =>
+        {
+            if (InitiateInteraction)
+                await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
+                {
+                    IsEphemeral = Ephemeral
+                });
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+            this.ctx.RespondedToInitial = InitiateInteraction;
+
+            if (InteractionInitiated)
+                this.ctx.RespondedToInitial = true;
+
+            if (await BasePreExecutionCheck())
+                await ExecuteCommand(this.ctx, arguments);
+        }).Add(_bot, ctx);
     }
 
     private async Task<bool> BasePreExecutionCheck()
     {
-        this.t = this.ctx.Bot.loadedTranslations;
-        if (this.ctx.Bot.users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
+        if (t is null)
+        {
+            _logger.LogWarn($"The translation were not set before the BasePreExecutionCheck()!");
+            this.t = ctx.Bot.LoadedTranslations;
+        }
+
+        if (this.ctx.Bot.Users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
         {
             this.ctx.DbUser.CurrentLocale = this.ctx.User.Locale;
             _logger.LogDebug("Updated language for User '{User}' to '{Locale}'", this.ctx.User.Id, this.ctx.User.Locale);
@@ -163,9 +189,9 @@ public abstract class BaseCommand
 
         if (!this.ctx.Channel.IsPrivate)
         {
-            if (this.ctx.Bot.guilds.ContainsKey(this.ctx.Guild.Id) && !this.ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && this.ctx.Bot.guilds[this.ctx.Guild.Id].CurrentLocale != this.ctx.Guild.PreferredLocale)
+            if (this.ctx.Bot.Guilds.ContainsKey(this.ctx.Guild.Id) && !this.ctx.Guild.PreferredLocale.IsNullOrWhiteSpace() && this.ctx.Bot.Guilds[this.ctx.Guild.Id].CurrentLocale != this.ctx.Guild.PreferredLocale)
             {
-                this.ctx.Bot.guilds[this.ctx.Guild.Id].CurrentLocale = this.ctx.Guild.PreferredLocale;
+                this.ctx.Bot.Guilds[this.ctx.Guild.Id].CurrentLocale = this.ctx.Guild.PreferredLocale;
                 _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", this.ctx.Guild.Id, this.ctx.Guild.PreferredLocale);
             }
 
@@ -197,13 +223,13 @@ public abstract class BaseCommand
             return false;
         }
 
-        if (this.ctx.Bot.bannedUsers.TryGetValue(this.ctx.User.Id, out BlacklistEntry blacklistedUserDetails))
+        if (this.ctx.Bot.bannedUsers.TryGetValue(this.ctx.User.Id, out BanDetails blacklistedUserDetails))
         {
             SendUserBanError(blacklistedUserDetails);
             return false;
         }
 
-        if (this.ctx.Bot.bannedGuilds.TryGetValue(this.ctx.Guild?.Id ?? 0, out BlacklistEntry blacklistedGuildDetails))
+        if (this.ctx.Bot.bannedGuilds.TryGetValue(this.ctx.Guild?.Id ?? 0, out BanDetails blacklistedGuildDetails))
         {
             SendGuildBanError(blacklistedGuildDetails);
             return false;
@@ -857,7 +883,7 @@ public abstract class BaseCommand
                     ExceptionOccurred = true;
                     FinishedSelection = true;
                 }
-            }).Add(this.ctx.Bot.watcher, this.ctx);
+            }).Add(this.ctx.Bot, this.ctx);
         }
 
         int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
@@ -1014,9 +1040,9 @@ public abstract class BaseCommand
     {
         timeOutOverride ??= TimeSpan.FromMinutes(15);
 
-        if (this.ctx.Bot.uploadInteractions.ContainsKey(this.ctx.User.Id))
+        if (this.ctx.DbUser.PendingUserUpload is not null)
         {
-            if (this.ctx.Bot.uploadInteractions[this.ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0 && !this.ctx.Bot.uploadInteractions[this.ctx.User.Id].InteractionHandled)
+            if (this.ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() > 0 && !this.ctx.DbUser.PendingUserUpload.InteractionHandled)
             {
                 await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
@@ -1026,26 +1052,26 @@ public abstract class BaseCommand
                 throw new AlreadyAppliedException("");
             }
 
-            this.ctx.Bot.uploadInteractions.Remove(this.ctx.User.Id);
+            this.ctx.DbUser.PendingUserUpload = null;
         }
 
-        this.ctx.Bot.uploadInteractions.Add(this.ctx.User.Id, new UserUpload
+        this.ctx.DbUser.PendingUserUpload = new UserUpload
         {
             TimeOut = DateTime.UtcNow.Add(timeOutOverride.Value)
-        });
+        };
 
-        while (this.ctx.Bot.uploadInteractions.ContainsKey(this.ctx.User.Id) && !this.ctx.Bot.uploadInteractions[this.ctx.User.Id].InteractionHandled && this.ctx.Bot.uploadInteractions[this.ctx.User.Id].TimeOut.GetTotalSecondsUntil() > 0)
+        while (this.ctx.DbUser.PendingUserUpload is not null && !this.ctx.DbUser.PendingUserUpload.InteractionHandled && this.ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() > 0)
         {
             await Task.Delay(500);
         }
 
-        if (!this.ctx.Bot.uploadInteractions[this.ctx.User.Id].InteractionHandled)
+        if (!this.ctx.DbUser.PendingUserUpload?.InteractionHandled ?? true)
             throw new ArgumentException("");
 
-        int size = this.ctx.Bot.uploadInteractions[this.ctx.User.Id].FileSize;
-        Stream stream = this.ctx.Bot.uploadInteractions[this.ctx.User.Id].UploadedData;
+        int size = this.ctx.DbUser.PendingUserUpload.FileSize;
+        Stream stream = this.ctx.DbUser.PendingUserUpload.UploadedData;
 
-        this.ctx.Bot.uploadInteractions.Remove(this.ctx.User.Id);
+        this.ctx.DbUser.PendingUserUpload = null;
         return (stream, size);
     }
 
@@ -1214,13 +1240,13 @@ public abstract class BaseCommand
             Description = GetString(this.t.Commands.Common.Errors.VoiceChannel).Build(true),
         }.AsError(this.ctx)));
 
-    public void SendUserBanError(BlacklistEntry entry)
+    public void SendUserBanError(BanDetails entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
-    public void SendGuildBanError(BlacklistEntry entry)
+    public void SendGuildBanError(BanDetails entry)
         => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
             Description = GetString(this.t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),

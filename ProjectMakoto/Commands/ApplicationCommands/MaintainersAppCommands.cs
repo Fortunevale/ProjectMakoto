@@ -13,7 +13,7 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
 
-    internal enum Commands
+    internal enum DevCommands
     {
         Info,
         Log,
@@ -48,7 +48,7 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                 if (!ctx.User.IsMaintenance(bot.status))
                     return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
 
-                IEnumerable<string> filteredCommands = Enum.GetNames(typeof(Commands))
+                IEnumerable<string> filteredCommands = Enum.GetNames(typeof(DevCommands))
                     .Where(x => x.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
 
                 List<DiscordApplicationCommandAutocompleteChoice> options = filteredCommands
@@ -87,80 +87,80 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                     if (ctx.FocusedOption.Value.ToString().Length > 1)
                         return new List<DiscordApplicationCommandAutocompleteChoice>() { };
 
-                    Commands Command = (Commands)Enum.Parse(typeof(Commands), ctx.Options.First(x => x.Name == "command").Value.ToString());
+                    DevCommands Command = (DevCommands)Enum.Parse(typeof(DevCommands), ctx.Options.First(x => x.Name == "command").Value.ToString());
 
                     return Command switch
                     {
-                        Commands.RawGuild => currentArgument switch
+                        DevCommands.RawGuild => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.BotNick => currentArgument switch
+                        DevCommands.BotNick => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("NewNickName", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.BanUser => currentArgument switch
+                        DevCommands.BanUser => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
                             2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.UnbanUser => currentArgument switch
+                        DevCommands.UnbanUser => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.BanGuild => currentArgument switch
+                        DevCommands.BanGuild => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
                             2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.UnbanGuild => currentArgument switch
+                        DevCommands.UnbanGuild => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("GuildId", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.GlobalBan => currentArgument switch
+                        DevCommands.GlobalBan => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
                             2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("Reason", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.GlobalUnban => currentArgument switch
+                        DevCommands.GlobalUnban => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
                             2 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UnbanFromServers (True/False)", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.GlobalNotes => currentArgument switch
+                        DevCommands.GlobalNotes => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.Log => currentArgument switch
+                        DevCommands.Log => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("LogLevel", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.BatchLookup => currentArgument switch
+                        DevCommands.BatchLookup => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId, UserId, UserId, ...", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.CreateIssue => currentArgument switch
+                        DevCommands.CreateIssue => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UseOldSelector (True/False)", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.Evaluate => currentArgument switch
+                        DevCommands.Evaluate => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("MessageId", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
                         },
-                        Commands.Disenroll2FAUser => currentArgument switch
+                        DevCommands.Disenroll2FAUser => currentArgument switch
                         {
                             1 => new List<DiscordApplicationCommandAutocompleteChoice>() { new("UserId", "") },
                             _ => new List<DiscordApplicationCommandAutocompleteChoice>() { },
@@ -231,11 +231,11 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
             return;
         }
 
-        Commands Command;
+        DevCommands Command;
 
         try
         {
-            Command = (Commands)Enum.Parse(typeof(Commands), command);
+            Command = (DevCommands)Enum.Parse(typeof(DevCommands), command);
         }
         catch (Exception)
         {
@@ -247,168 +247,168 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
         {
             switch (Command)
             {
-                case Commands.Info:
-                    Task.Run(async () =>
+                case DevCommands.Info:
+                    _ = Task.Run(async () =>
                     {
-                        await new InfoCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                        await new Commands.DevTools.InfoCommand().ExecuteCommand(ctx, this._bot);
+                    });
                     break;
-                case Commands.RawGuild:
-                    Task.Run(async () =>
+                case DevCommands.RawGuild:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new RawGuildCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.RawGuildCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "guild", argument1 is not null ? Convert.ToUInt64(argument1) : null }
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.BotNick:
-                    Task.Run(async () =>
+                case DevCommands.BotNick:
+                    _ = Task.Run(async () =>
                     {
-                        await new BotnickCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.BotnickCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "newNickname", argument1 }
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.BanUser:
-                    Task.Run(async () =>
+                case DevCommands.BanUser:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
 
-                        await new BanUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.BanUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "reason", argument2 },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.UnbanUser:
-                    Task.Run(async () =>
+                case DevCommands.UnbanUser:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new UnbanUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.UnbanUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.BanGuild:
-                    Task.Run(async () =>
+                case DevCommands.BanGuild:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
 
-                        await new BanGuildCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.BanGuildCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "guild", Convert.ToUInt64(argument1) },
                             { "reason", argument2 }
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.UnbanGuild:
-                    Task.Run(async () =>
+                case DevCommands.UnbanGuild:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new UnbanGuildCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.UnbanGuildCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "guild", Convert.ToUInt64(argument1) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.GlobalBan:
-                    Task.Run(async () =>
+                case DevCommands.GlobalBan:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
 
-                        await new GlobalBanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.GlobalBanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "reason", argument2 },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.GlobalUnban:
-                    Task.Run(async () =>
+                case DevCommands.GlobalUnban:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1() || !Require2())
                             return;
 
-                        await new GlobalUnbanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.GlobalUnbanCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                             { "UnbanFromGuilds", bool.Parse(argument2) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.GlobalNotes:
-                    Task.Run(async () =>
+                case DevCommands.GlobalNotes:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new GlobalNotesCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.GlobalNotesCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.Log:
-                    Task.Run(async () =>
+                case DevCommands.Log:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.LogCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "Level", (CustomLogLevel)Enum.Parse(typeof(CustomLogLevel), argument1) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.Stop:
-                    Task.Run(async () =>
+                case DevCommands.Stop:
+                    _ = Task.Run(async () =>
                     {
-                        await new StopCommand().ExecuteCommandWith2FA(ctx, this._bot, null);
-                    }).Add(this._bot.watcher, ctx);
+                        await new Commands.DevTools.StopCommand().ExecuteCommandWith2FA(ctx, this._bot, null);
+                    });
                     break;
-                case Commands.Save:
-                    Task.Run(async () =>
+                case DevCommands.Save:
+                    _ = Task.Run(async () =>
                     {
-                        await new SaveCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                        await new Commands.DevTools.SaveCommand().ExecuteCommand(ctx, this._bot);
+                    });
                     break;
-                case Commands.BatchLookup:
-                    Task.Run(async () =>
+                case DevCommands.BatchLookup:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new BatchLookupCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.BatchLookupCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "IDs", argument1 },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.CreateIssue:
-                    Task.Run(async () =>
+                case DevCommands.CreateIssue:
+                    _ = Task.Run(async () =>
                     {
-                        await new CreateIssueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.CreateIssueCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "UseOldTagsSelector", (bool.TryParse(argument1, out var result) ? result : true) },
                         }, InitiateInteraction: false);
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.Evaluate:
-                    Task.Run(async () =>
+                case DevCommands.Evaluate:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
@@ -416,42 +416,42 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
                         var id = Convert.ToUInt64(argument1);
                         var message = await ctx.Channel.GetMessageAsync(id);
 
-                        await new EvaluationCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.EvaluationCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "code", message.Content },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.Enroll2FA:
-                    Task.Run(async () =>
+                case DevCommands.Enroll2FA:
+                    _ = Task.Run(async () =>
                     {
-                        await new EnrollTwoFactorCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                        await new Commands.DevTools.EnrollTwoFactorCommand().ExecuteCommand(ctx, this._bot);
+                    });
                     break;
-                case Commands.Quit2FASession:
-                    Task.Run(async () =>
+                case DevCommands.Quit2FASession:
+                    _ = Task.Run(async () =>
                     {
-                        await new Quit2FASessionCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                        await new Commands.DevTools.Quit2FASessionCommand().ExecuteCommand(ctx, this._bot);
+                    });
                     break;
 
-                case Commands.Disenroll2FAUser:
-                    Task.Run(async () =>
+                case DevCommands.Disenroll2FAUser:
+                    _ = Task.Run(async () =>
                     {
                         if (!Require1())
                             return;
 
-                        await new Disenroll2FAUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
+                        await new Commands.DevTools.Disenroll2FAUserCommand().ExecuteCommandWith2FA(ctx, this._bot, new Dictionary<string, object>
                         {
                             { "victim", await DiscordExtensions.ParseStringAsUser(argument1, ctx.Client) },
                         });
-                    }).Add(this._bot.watcher, ctx);
+                    });
                     break;
-                case Commands.ManageCommands:
-                    Task.Run(async () =>
+                case DevCommands.ManageCommands:
+                    _ = Task.Run(async () =>
                     {
-                        await new CommandManageCommand().ExecuteCommand(ctx, this._bot);
-                    }).Add(this._bot.watcher, ctx);
+                        await new Commands.DevTools.CommandManageCommand().ExecuteCommand(ctx, this._bot);
+                    });
                     break;
             }
         }
@@ -469,23 +469,17 @@ public sealed class MaintainersAppCommands : ApplicationCommandsModule
 
         [SlashCommand("throw", "Throw.")]
         public async Task Throw(InteractionContext ctx)
-        {
-            Task.Run(async () =>
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-                throw new InvalidCastException();
-            }).Add(this._bot.watcher, ctx);
-        }
+            => _ = new Commands.Debug.ThrowCommand().ExecuteCommand(ctx, _bot);
 
         [SlashCommand("test", "Test.")]
         public async Task Test(InteractionContext ctx)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
                 await ctx.Channel.ModifyAsync(x => x.PermissionOverwrites = ctx.Channel.PermissionOverwrites.Merge(ctx.Member, Permissions.UseExternalEmojis, Permissions.None));
                 await ctx.Channel.ModifyAsync(x => x.PermissionOverwrites = ctx.Channel.PermissionOverwrites.Merge(ctx.Member, Permissions.None, Permissions.UseExternalEmojis));
-            }).Add(this._bot.watcher, ctx);
+            });
         }
     }
 #endif

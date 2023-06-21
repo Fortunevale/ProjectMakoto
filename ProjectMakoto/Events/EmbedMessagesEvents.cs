@@ -9,14 +9,11 @@
 
 namespace ProjectMakoto.Events;
 
-internal sealed class EmbedMessagesEvents
+internal sealed class EmbedMessagesEvents : RequiresTranslation
 {
-    internal EmbedMessagesEvents(Bot _bot)
+    public EmbedMessagesEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
@@ -29,10 +26,10 @@ internal sealed class EmbedMessagesEvents
         {
             if (RegexTemplates.DiscordChannelUrl.IsMatch(e.Message.Content))
             {
-                if (!this._bot.guilds[e.Guild.Id].EmbedMessage.UseEmbedding)
+                if (!this.Bot.Guilds[e.Guild.Id].EmbedMessage.UseEmbedding)
                     break;
 
-                if (await this._bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this._bot, "message_embed"), true))
+                if (await this.Bot.Users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this.Bot, "message_embed"), true))
                     break;
 
                 var matches = RegexTemplates.DiscordChannelUrl.Matches(e.Message.Content);
@@ -74,10 +71,10 @@ internal sealed class EmbedMessagesEvents
 
         if (RegexTemplates.GitHubUrl.IsMatch(e.Message.Content))
         {
-            if (!this._bot.guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
+            if (!this.Bot.Guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
                 return;
 
-            if (await this._bot.users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this._bot, "github_embed"), true))
+            if (await this.Bot.Users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this.Bot, "github_embed"), true))
                 return;
 
             var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);

@@ -25,7 +25,7 @@ internal sealed class ConfigCommand : BaseCommand
                 Description = PrefixCommandAbstractions.GetCurrentConfiguration(ctx)
             }.AsAwaitingInput(ctx, GetString(this.t.Commands.Config.PrefixConfigCommand.Title));
 
-            var TogglePrefixCommands = new DiscordButtonComponent((ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
+            var TogglePrefixCommands = new DiscordButtonComponent((ctx.DbGuild.PrefixSettings.PrefixDisabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.TogglePrefixCommands), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⌨")));
             var ChangePrefix = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Config.PrefixConfigCommand.ChangePrefix), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗝")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
@@ -47,7 +47,7 @@ internal sealed class ConfigCommand : BaseCommand
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled = !ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.PrefixDisabled;
+                ctx.DbGuild.PrefixSettings.PrefixDisabled = !ctx.DbGuild.PrefixSettings.PrefixDisabled;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }
@@ -82,7 +82,7 @@ internal sealed class ConfigCommand : BaseCommand
                     return;
                 }
 
-                ctx.Bot.guilds[ctx.Guild.Id].PrefixSettings.Prefix = newPrefix;
+                ctx.DbGuild.PrefixSettings.Prefix = newPrefix;
                 await ExecuteCommand(ctx, arguments);
                 return;
             }

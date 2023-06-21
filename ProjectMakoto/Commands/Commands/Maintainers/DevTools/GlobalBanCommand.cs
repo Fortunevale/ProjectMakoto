@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 internal sealed class GlobalBanCommand : BaseCommand
 {
     public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
@@ -69,10 +69,10 @@ internal sealed class GlobalBanCommand : BaseCommand
 
             foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
             {
-                if (!ctx.Bot.guilds.ContainsKey(b.Key))
-                    ctx.Bot.guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
+                if (!ctx.Bot.Guilds.ContainsKey(b.Key))
+                    ctx.Bot.Guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
 
-                if (ctx.Bot.guilds[b.Key].Join.AutoBanGlobalBans)
+                if (ctx.Bot.Guilds[b.Key].Join.AutoBanGlobalBans)
                 {
                     try
                     {

@@ -14,78 +14,78 @@ public sealed class SocialAppCommands : ApplicationCommandsModule
 
     [SlashCommand("afk", "Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.", dmPermission: false)]
     public async Task UserInfo(InteractionContext ctx, [Option("reason", "The reason")] string reason = "-")
-        => new AfkCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new AfkCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "reason", reason }
-        }).Add(this._bot.watcher, ctx);
+        });
 
     [SlashCommand("cuddle", "Cuddle with another user.", dmPermission: false)]
     public async Task Cuddle(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new CuddleCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new CuddleCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("kiss", "Kiss another user.", dmPermission: false)]
     public async Task Kiss(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new KissCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new KissCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("slap", "Slap another user.", dmPermission: false)]
     public async Task Slap(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new SlapCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new SlapCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("kill", "Kill another user..?", dmPermission: false)]
     public async Task Kill(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new KillCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new KillCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("boop", "Give another user a boop!", dmPermission: false)]
     public async Task Boop(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new BoopCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new BoopCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("highfive", "Give a high five!", dmPermission: false)]
     public async Task Highfive(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new HighFiveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new HighFiveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("hug", "Hug another user!", dmPermission: false)]
     public async Task Hug(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new HugCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new HugCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 
 
 
     [SlashCommand("pat", "Give someone some headpats!", dmPermission: false)]
     public async Task Pat(InteractionContext ctx, [Option("user", "The user")] DiscordUser user)
-        => new PatCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        => _ = new PatCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
             { "user", user }
-        }, false, true).Add(this._bot.watcher, ctx);
+        }, false, true);
 }

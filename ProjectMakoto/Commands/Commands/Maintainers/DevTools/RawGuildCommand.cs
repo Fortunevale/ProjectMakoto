@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class RawGuildCommand : BaseCommand
 {
@@ -20,7 +20,7 @@ internal sealed class RawGuildCommand : BaseCommand
             ulong? guild = (ulong?)arguments["guild"];
             guild ??= ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithFile("guild.json", JsonConvert.SerializeObject(ctx.Bot.guilds[guild.Value], Formatting.Indented, new JsonSerializerSettings
+            await RespondOrEdit(new DiscordMessageBuilder().WithFile("guild.json", JsonConvert.SerializeObject(ctx.Bot.Guilds[guild.Value], Formatting.Indented, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             }).ToStream()));

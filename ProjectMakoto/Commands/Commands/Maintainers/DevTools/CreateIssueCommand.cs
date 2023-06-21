@@ -9,7 +9,7 @@
 
 using Octokit;
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class CreateIssueCommand : BaseCommand
 {
@@ -27,7 +27,7 @@ internal sealed class CreateIssueCommand : BaseCommand
                 return;
             }
 
-            var labels = await ctx.Bot.githubClient.Issue.Labels.GetAllForRepository(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
+            var labels = await ctx.Bot.GithubClient.Issue.Labels.GetAllForRepository(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
 
             var modal = new DiscordInteractionModalBuilder().WithCustomId(Guid.NewGuid().ToString()).WithTitle("Create new Issue on Github")
                 .AddModalComponents(new DiscordTextComponent(TextComponentStyle.Small, "title", "Title", "New issue", 4, 250, true))
@@ -77,14 +77,14 @@ internal sealed class CreateIssueCommand : BaseCommand
                             return;
                         }
 
-                        var issue = await ctx.Bot.githubClient.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.GetUsernameWithIdentifier()}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
+                        var issue = await ctx.Bot.GithubClient.Issue.Create(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, new NewIssue(title) { Body = $"{(description.IsNullOrWhiteSpace() ? "_No description provided_" : description)}\n\n<b/>\n\n##### <img align=\"left\" style=\"align:center;\" width=\"32\" height=\"32\" src=\"{ctx.User.AvatarUrl}\">_Submitted by [`{ctx.User.GetUsernameWithIdentifier()}`]({ctx.User.ProfileUrl}) (`{ctx.User.Id}`) via Discord._" });
 
                         if (labels.Count > 0)
-                            await ctx.Bot.githubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());
+                            await ctx.Bot.GithubClient.Issue.Labels.ReplaceAllForIssue(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository, issue.Number, labels.ToArray());
 
                         _ = e.Interaction.EditFollowupMessageAsync(followup.Id, new DiscordWebhookBuilder().WithContent($"✅ `Issue submitted:` {issue.HtmlUrl}"));
                     }
-                }).Add(ctx.Bot.watcher, ctx);
+                }).Add(ctx.Bot, ctx);
             }
 
             try

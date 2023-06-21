@@ -9,38 +9,35 @@
 
 namespace ProjectMakoto;
 
-internal sealed class PhishingSubmissionEvents
+internal sealed class PhishingSubmissionEvents : RequiresBotReference
 {
-    internal PhishingSubmissionEvents(Bot _bot)
+    public PhishingSubmissionEvents(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
-
-    public Bot _bot { private get; set; }
 
     internal async Task ComponentInteractionCreated(DiscordClient sender, ComponentInteractionCreateEventArgs e)
     {
-        if (this._bot.submittedUrls.ContainsKey(e.Message?.Id ?? 0))
+        if (this.Bot.SubmittedHosts.ContainsKey(e.Message?.Id ?? 0))
         {
-            if (!e.User.IsMaintenance(this._bot.status))
+            if (!e.User.IsMaintenance(this.Bot.status))
                 return;
 
             await e.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
             if (e.GetCustomId() == "accept_submission")
             {
-                this._bot.phishingUrls.Add(this._bot.submittedUrls[e.Message.Id].Url, new PhishingUrlEntry
+                this.Bot.PhishingHosts.Add(this.Bot.SubmittedHosts[e.Message.Id].Url, new PhishingUrlEntry
                 {
                     Origin = new(),
-                    Submitter = this._bot.submittedUrls[e.Message.Id].Submitter,
-                    Url = this._bot.submittedUrls[e.Message.Id].Url
+                    Submitter = this.Bot.SubmittedHosts[e.Message.Id].Submitter,
+                    Url = this.Bot.SubmittedHosts[e.Message.Id].Url
                 });
 
-                this._bot.submittedUrls.Remove(e.Message.Id);
+                this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 try
                 {
-                    await this._bot.databaseClient._helper.DeleteRow(this._bot.databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                 }
                 catch { }
 
@@ -48,7 +45,7 @@ internal sealed class PhishingSubmissionEvents
 
                 try
                 {
-                    _ = new PhishingUrlUpdater(this._bot).UpdateDatabase(new());
+                    _ = new PhishingUrlHandler(this.Bot).UpdateDatabase(new());
                 }
                 catch (Exception ex)
                 {
@@ -57,11 +54,11 @@ internal sealed class PhishingSubmissionEvents
             }
             else if (e.GetCustomId() == "deny_submission")
             {
-                this._bot.submittedUrls.Remove(e.Message.Id);
+                this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 try
                 {
-                    await this._bot.databaseClient._helper.DeleteRow(this._bot.databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                 }
                 catch { }
 
@@ -69,37 +66,37 @@ internal sealed class PhishingSubmissionEvents
             }
             else if (e.GetCustomId() == "ban_user")
             {
-                this._bot.phishingUrlSubmissionUserBans.Add(this._bot.submittedUrls[e.Message.Id].Submitter, new PhishingSubmissionBanDetails
+                this.Bot.bannedUsers.Add(this.Bot.SubmittedHosts[e.Message.Id].Submitter, new BanDetails
                 {
-                    Reason = "Too many denied requests | Manual ban",
+                    Reason = "Too many invalid reported hosts | Manual ban",
                     Moderator = e.User.Id
                 });
 
                 try
                 {
-                    await this._bot.databaseClient._helper.DeleteRow(this._bot.databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                 }
                 catch { }
 
-                this._bot.submittedUrls.Remove(e.Message.Id);
+                this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 _ = e.Message.DeleteAsync();
             }
             else if (e.GetCustomId() == "ban_guild")
             {
-                this._bot.phishingUrlSubmissionGuildBans.Add(this._bot.submittedUrls[e.Message.Id].GuildOrigin, new PhishingSubmissionBanDetails
+                this.Bot.bannedGuilds.Add(this.Bot.SubmittedHosts[e.Message.Id].GuildOrigin, new BanDetails
                 {
-                    Reason = "Too many denied requests | Manual ban",
+                    Reason = "Too many invalid reported hosts | Manual ban",
                     Moderator = e.User.Id
                 });
 
                 try
                 {
-                    await this._bot.databaseClient._helper.DeleteRow(this._bot.databaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
+                    await this.Bot.DatabaseClient._helper.DeleteRow(this.Bot.DatabaseClient.mainDatabaseConnection, "active_url_submissions", "messageid", $"{e.Message.Id}");
                 }
                 catch { }
 
-                this._bot.submittedUrls.Remove(e.Message.Id);
+                this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 _ = e.Message.DeleteAsync();
             }

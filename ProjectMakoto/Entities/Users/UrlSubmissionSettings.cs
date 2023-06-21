@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class UrlSubmissionSettings
+public sealed class UrlSubmissionSettings : RequiresParent<User>
 {
-    public UrlSubmissionSettings(User user)
+    public UrlSubmissionSettings(Bot bot, User parent) : base(bot, parent)
     {
-        this.Parent = user;
     }
-    private User Parent { get; set; }
-
-
 
     private int _AcceptedTOS { get; set; } = 0;
     public int AcceptedTOS
@@ -26,7 +22,7 @@ public sealed class UrlSubmissionSettings
         set
         {
             this._AcceptedTOS = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "submission_accepted_tos", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_accepted_tos", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -38,7 +34,7 @@ public sealed class UrlSubmissionSettings
         set
         {
             this._LastTime = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "submission_last_datetime", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_last_datetime", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

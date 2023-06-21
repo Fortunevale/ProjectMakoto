@@ -33,11 +33,11 @@ internal sealed class RepeatCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat = !ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat;
+            ctx.DbGuild.MusicModule.Repeat = !ctx.DbGuild.MusicModule.Repeat;
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.Repeat ? GetString(this.t.Commands.Music.Repeat.On, true) : GetString(this.t.Commands.Music.Repeat.Off, true)),
+                Description = (ctx.DbGuild.MusicModule.Repeat ? GetString(this.t.Commands.Music.Repeat.On, true) : GetString(this.t.Commands.Music.Repeat.Off, true)),
             }.AsSuccess(ctx));
         });
     }

@@ -11,23 +11,23 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ProjectMakoto.Entities;
 
-public sealed class UserDictionary : IDictionary<ulong, User>
+public sealed class SelfFillingDictionary<T> : RequiresBotReference, IDictionary<ulong, T> where T : BaseSelfFillingListValue<T>
 {
-    public UserDictionary(Bot _bot)
+    public SelfFillingDictionary(Bot bot) : base(bot)
     {
-        this._bot = _bot;
     }
 
-    private Dictionary<ulong, User> _items = new();
+    private Dictionary<ulong, T> _items = new();
 
-    private Bot _bot { get; set; }
-
-    public User this[ulong key]
+    public T this[ulong key]
     {
         get
         {
             if (!this._items.ContainsKey(key) && key != 0)
-                this._items.Add(key, new(this._bot, key));
+            {
+                var t = new BaseSelfFillingListValue<T>(this.Bot, key);
+                this._items.Add(key, t.Convert(t));
+            }
 
             return this._items[key];
         }
@@ -35,7 +35,10 @@ public sealed class UserDictionary : IDictionary<ulong, User>
         set
         {
             if (!this._items.ContainsKey(key) && key != 0)
-                this._items.Add(key, new(this._bot, key));
+            {
+                var t = new BaseSelfFillingListValue<T>(this.Bot, key);
+                this._items.Add(key, t.Convert(t));
+            }
 
             this._items[key] = value;
         }
@@ -44,7 +47,7 @@ public sealed class UserDictionary : IDictionary<ulong, User>
     public ICollection<ulong> Keys
         => this._items.Keys;
 
-    public ICollection<User> Values
+    public ICollection<T> Values
         => this._items.Values;
 
     public int Count
@@ -53,10 +56,10 @@ public sealed class UserDictionary : IDictionary<ulong, User>
     public bool IsReadOnly
         => false;
 
-    public void Add(ulong key, User value)
+    public void Add(ulong key, T value)
         => this._items.Add(key, value);
 
-    public void Add(KeyValuePair<ulong, User> item)
+    public void Add(KeyValuePair<ulong, T> item)
         => this._items.Add(item.Key, item.Value);
 
     public void Clear()
@@ -65,24 +68,24 @@ public sealed class UserDictionary : IDictionary<ulong, User>
     public bool Remove(ulong key)
         => this._items.Remove(key);
 
-    public bool Remove(KeyValuePair<ulong, User> item)
+    public bool Remove(KeyValuePair<ulong, T> item)
         => this._items.Remove(item.Key);
 
-    public void CopyTo(KeyValuePair<ulong, User>[] array, int arrayIndex)
+    public void CopyTo(KeyValuePair<ulong, T>[] array, int arrayIndex)
     {
         return;
     }
 
-    public bool Contains(KeyValuePair<ulong, User> item)
+    public bool Contains(KeyValuePair<ulong, T> item)
         => this._items.Contains(item);
 
     public bool ContainsKey(ulong key)
         => this._items.ContainsKey(key);
 
-    public IEnumerator<KeyValuePair<ulong, User>> GetEnumerator()
+    public IEnumerator<KeyValuePair<ulong, T>> GetEnumerator()
         => this._items.GetEnumerator();
 
-    public bool TryGetValue(ulong key, [MaybeNullWhen(false)] out User value)
+    public bool TryGetValue(ulong key, [MaybeNullWhen(false)] out T value)
         => this._items.TryGetValue(key, out value);
 
     IEnumerator IEnumerable.GetEnumerator()

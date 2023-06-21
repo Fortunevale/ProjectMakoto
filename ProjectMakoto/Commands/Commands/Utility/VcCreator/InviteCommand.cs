@@ -21,19 +21,19 @@ internal sealed class InviteCommand : BaseCommand
             DiscordMember victim = (DiscordMember)arguments["victim"];
             DiscordChannel channel = ctx.Member.VoiceState?.Channel;
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
+            if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
+            if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId == victim.Id)
             {
                 _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Invite.CannotInviteSelf, true)).AsError(ctx));
                 return;
@@ -55,7 +55,7 @@ internal sealed class InviteCommand : BaseCommand
 
             try
             {
-                await victim.SendMessageAsync(this.t.Commands.Utility.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.users[victim.Id]).Build(new TVar("Channel", channel.Mention)));
+                await victim.SendMessageAsync(this.t.Commands.Utility.VoiceChannelCreator.Invite.VictimMessage.Get(ctx.Bot.Users[victim.Id]).Build(new TVar("Channel", channel.Mention)));
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {

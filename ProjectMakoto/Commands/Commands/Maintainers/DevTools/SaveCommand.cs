@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class SaveCommand : BaseCommand
 {
@@ -18,7 +18,7 @@ internal sealed class SaveCommand : BaseCommand
         return Task.Run(async () =>
         {
             await RespondOrEdit("Saving all data to the database..");
-            await ctx.Bot.databaseClient.FullSyncDatabase(true);
+            await ctx.Bot.DatabaseClient.FullSyncDatabase(true);
             await RespondOrEdit("All data has been saved to the database.");
         });
     }

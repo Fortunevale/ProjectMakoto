@@ -34,11 +34,11 @@ internal sealed class ClearBackupCommand : BaseCommand
                 return;
             }
 
-            if (!ctx.Bot.guilds[ctx.Guild.Id].Members.ContainsKey(victim.Id))
-                ctx.Bot.guilds[ctx.Guild.Id].Members.Add(victim.Id, new(ctx.Bot.guilds[ctx.Guild.Id], victim.Id));
+            if (!ctx.DbGuild.Members.ContainsKey(victim.Id))
+                ctx.DbGuild.Members.Add(victim.Id, new(ctx.Bot, ctx.DbGuild, victim.Id));
 
-            ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].MemberRoles.Clear();
-            ctx.Bot.guilds[ctx.Guild.Id].Members[victim.Id].SavedNickname = "";
+            ctx.DbGuild.Members[victim.Id].MemberRoles.Clear();
+            ctx.DbGuild.Members[victim.Id].SavedNickname = "";
 
             await RespondOrEdit(new DiscordEmbedBuilder()
                 .WithDescription(GetString(CommandKey.Deleted, true, new TVar("Victim", victim.Mention)))

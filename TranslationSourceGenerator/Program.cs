@@ -32,7 +32,7 @@ internal class Program
 
 namespace ProjectMakoto.Entities;
 
-public class Translations
+public sealed class Translations
 {
     public Dictionary<string, int> Progress = new();
 
@@ -163,7 +163,7 @@ public class Translations
                                                 _logger.LogDebug("Found Group '{0}'", item.Key);
 
                                                 Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public {className} {fieldName};\n" +
-                                                    $"{new string(' ', depth * 4)}public class {className}\n" +
+                                                    $"{new string(' ', depth * 4)}public sealed class {className}\n" +
                                                     $"{new string(' ', depth * 4)}{{\n" +
                                                     $"{new string(' ', depth * 4)}// {entryPoint} InsertPoint\n" +
                                                     $"{new string(' ', depth * 4)}}}\n");
@@ -185,7 +185,7 @@ public class Translations
 
                             Insert = string.Join("\n", Insert.Split("\n").Where(x => !x.Contains("InsertPoint")));
 
-                            File.WriteAllText(TranslationCs, SourceOrigin.Replace("// InsertPoint", Insert));
+                            File.WriteAllText(TranslationCs, string.Join("\n", SourceOrigin.Replace("// InsertPoint", Insert).ReplaceLineEndings("\n").Split("\n", StringSplitOptions.RemoveEmptyEntries).Where(x => !x.IsNullOrWhiteSpace())));
 
                             _logger.LogDebug("Updated Translations.cs.");
                         }

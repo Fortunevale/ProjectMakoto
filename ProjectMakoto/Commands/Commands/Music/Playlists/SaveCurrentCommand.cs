@@ -28,7 +28,7 @@ internal sealed class SaveCurrentCommand : BaseCommand
             }
 
             string SelectedPlaylistName = "";
-            List<PlaylistEntry> SelectedTracks = ctx.Bot.guilds[ctx.Guild.Id].MusicModule.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToList();
+            List<PlaylistEntry> SelectedTracks = ctx.DbGuild.MusicModule.SongQueue.Select(x => new PlaylistEntry { Title = x.VideoTitle, Url = x.Url, Length = x.Length }).Take(250).ToList();
 
             while (true)
             {

@@ -33,16 +33,16 @@ internal sealed class PauseCommand : BaseCommand
                 return;
             }
 
-            ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused = !ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused;
+            ctx.DbGuild.MusicModule.IsPaused = !ctx.DbGuild.MusicModule.IsPaused;
 
-            if (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused)
+            if (ctx.DbGuild.MusicModule.IsPaused)
                 _ = conn.PauseAsync();
             else
                 _ = conn.ResumeAsync();
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.Bot.guilds[ctx.Guild.Id].MusicModule.IsPaused ? GetString(this.t.Commands.Music.Pause.Paused, true) : GetString(this.t.Commands.Music.Pause.Resumed, true)),
+                Description = (ctx.DbGuild.MusicModule.IsPaused ? GetString(this.t.Commands.Music.Pause.Paused, true) : GetString(this.t.Commands.Music.Pause.Resumed, true)),
             }.AsSuccess(ctx));
         });
     }

@@ -9,15 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class AfkStatus
+public sealed class AfkStatus : RequiresParent<User>
 {
-    public AfkStatus(User user)
+    public AfkStatus(Bot bot, User parent) : base(bot, parent)
     {
-        this.Parent = user;
     }
-    private User Parent { get; set; }
-
-
 
     private string _Reason { get; set; } = "";
     public string Reason
@@ -26,7 +22,7 @@ public sealed class AfkStatus
         set
         {
             this._Reason = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "afk_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -39,7 +35,7 @@ public sealed class AfkStatus
         set
         {
             this._TimeStamp = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "afk_since", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_since", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -51,7 +47,7 @@ public sealed class AfkStatus
         set
         {
             this._MessagesAmount = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.UserId, "afk_pingamount", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "afk_pingamount", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

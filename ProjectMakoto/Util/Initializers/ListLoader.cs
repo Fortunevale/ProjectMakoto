@@ -12,11 +12,11 @@ internal sealed class ListLoader
 {
     public static async Task Load(Bot bot)
     {
-        bot.countryCodes = new();
+        bot.CountryCodes = new();
         List<string[]> cc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Countries.json"));
         foreach (var b in cc)
         {
-            bot.countryCodes._List.Add(b[2], new CountryCodes.CountryInfo
+            bot.CountryCodes._List.Add(b[2], new CountryCodes.CountryInfo
             {
                 Name = b[0],
                 ContinentCode = b[1],
@@ -34,21 +34,21 @@ internal sealed class ListLoader
             });
         }
 
-        _logger.LogDebug("Loaded {Count} countries", bot.countryCodes.List.Count);
+        _logger.LogDebug("Loaded {Count} countries", bot.CountryCodes.List.Count);
 
-        bot.languageCodes = new();
+        bot.LanguageCodes = new();
         List<string[]> lc = JsonConvert.DeserializeObject<List<string[]>>(File.ReadAllText("Assets/Languages.json"));
         foreach (var b in lc)
         {
-            bot.languageCodes._List.Add(new LanguageCodes.LanguageInfo
+            bot.LanguageCodes._List.Add(new LanguageCodes.LanguageInfo
             {
                 Code = b[0],
                 Name = b[1],
             });
         }
-        _logger.LogDebug("Loaded {Count} languages", bot.languageCodes.List.Count);
+        _logger.LogDebug("Loaded {Count} languages", bot.LanguageCodes.List.Count);
 
-        bot.profanityList = JsonConvert.DeserializeObject<List<string>>(await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/zacanger/profane-words/master/words.json"));
-        _logger.LogDebug("Loaded {Count} profanity words", bot.profanityList.Count);
+        bot.ProfanityList = JsonConvert.DeserializeObject<List<string>>(await new HttpClient().GetStringAsync("https://raw.githubusercontent.com/zacanger/profane-words/master/words.json"));
+        _logger.LogDebug("Loaded {Count} profanity words", bot.ProfanityList.Count);
     }
 }

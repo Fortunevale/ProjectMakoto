@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
+namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class GlobalUnbanCommand : BaseCommand
 {
@@ -30,7 +30,7 @@ internal sealed class GlobalUnbanCommand : BaseCommand
             }
 
             ctx.Bot.globalBans.Remove(victim.Id);
-            await ctx.Bot.databaseClient._helper.DeleteRow(ctx.Bot.databaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
+            await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
             int Success = 0;
             int Failed = 0;
@@ -43,10 +43,10 @@ internal sealed class GlobalUnbanCommand : BaseCommand
             if (UnbanFromGuilds)
                 foreach (var b in ctx.Client.Guilds.OrderByDescending(x => x.Key == ctx.Guild.Id))
                 {
-                    if (!ctx.Bot.guilds.ContainsKey(b.Key))
-                        ctx.Bot.guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
+                    if (!ctx.Bot.Guilds.ContainsKey(b.Key))
+                        ctx.Bot.Guilds.Add(b.Key, new Guild(b.Key, ctx.Bot));
 
-                    if (ctx.Bot.guilds[b.Key].Join.AutoBanGlobalBans)
+                    if (ctx.Bot.Guilds[b.Key].Join.AutoBanGlobalBans)
                     {
                         try
                         {

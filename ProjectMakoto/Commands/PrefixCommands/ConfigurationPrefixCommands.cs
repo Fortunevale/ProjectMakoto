@@ -23,17 +23,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "join").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "join");
 
         [Command("review"), Aliases("list"),
         Description("Allows to review the currently used settings in the event somebody joins the server.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.JoinCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.JoinCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings in the event somebody joins the server.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.JoinCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.JoinCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("experience"), Aliases("experiencesettings", "experience-settings"),
@@ -45,17 +45,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "experience").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "experience");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to experience.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.ExperienceCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ExperienceCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to experience.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.ExperienceCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ExperienceCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("levelrewards"), Aliases("level-rewards", "rewards"),
@@ -67,17 +67,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "levelrewards").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "levelrewards");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently defined Level Rewards.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.LevelRewardsCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.LevelRewardsCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to add, remove and modify currently defined Level Rewards.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.LevelRewardsCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.LevelRewardsCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("phishing"), Aliases("phishingsettings", "phishing-settings"),
@@ -89,17 +89,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "phishing").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "phishing");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to phshing link protection.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.PhishingCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.PhishingCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to phishing link protection.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.PhishingCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.PhishingCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("bumpreminder"), Aliases("bump-reminder"),
@@ -111,17 +111,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "bumpreminder").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "bumpreminder");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to the Bump Reminder.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.BumpReminderCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.BumpReminderCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change currently used settings related to the Bump Reminder.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.BumpReminderCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.BumpReminderCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("actionlog"), Aliases("action-log"),
@@ -133,18 +133,18 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "actionlog").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "actionlog");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently used settings related to the actionlog.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.ActionLogCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ActionLogCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change currently used settings related to the actionlog.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.ActionLogCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ActionLogCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
@@ -156,17 +156,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "autocrosspost").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "autocrosspost");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently used settings related to automatic crossposting.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.AutoCrosspostCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.AutoCrosspostCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change currently used settings related to automatic crossposting.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.AutoCrosspostCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.AutoCrosspostCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
 
@@ -179,21 +179,21 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "reactionroles").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "reactionroles");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently registered Reaction Roles.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.ReactionRolesCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ReactionRolesCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to add and remove registered Reaction Roles.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.ReactionRolesCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ReactionRolesCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("add"), Description("Allows you to add a reaction role to a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message."), Priority(0)]
         public async Task Add(CommandContext ctx, DiscordEmoji emoji_parameter, DiscordRole role_parameter)
-            => new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "emoji_parameter", emoji_parameter }, { "role_parameter", role_parameter }, }).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "emoji_parameter", emoji_parameter }, { "role_parameter", role_parameter }, });
 
         [Command("add"), Description("Allows you to add a reaction role to a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message."), Priority(1)]
         public async Task Add2(CommandContext ctx, DiscordRole role_parameter, DiscordEmoji emoji_parameter)
@@ -201,11 +201,11 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [Command("remove"), Description("Allows you to remove a specific reaction role from a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message.")]
         public async Task Remove(CommandContext ctx, DiscordEmoji emoji_parameter)
-            => new Commands.ReactionRolesCommand.RemoveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "emoji_parameter", emoji_parameter }, }).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ReactionRolesCommand.RemoveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "emoji_parameter", emoji_parameter }, });
 
         [Command("removeall"), Description("Allows you to remove all reaction roles from a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message.")]
         public async Task RemoveAll(CommandContext ctx)
-            => new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, this._bot);
     }
 
 
@@ -218,17 +218,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "invoiceprivacy").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "invoiceprivacy");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently used settings related to In-Voice Text Channel Privacy.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.InVoicePrivacyCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.InVoicePrivacyCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change currently used settings related to In-Voice Text Channel Privacy.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.InVoicePrivacyCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.InVoicePrivacyCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
 
@@ -241,17 +241,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "invitetracker").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "invitetracker");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to Invite Tracking.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.InviteTrackerCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.InviteTrackerCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to Invite Tracking.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.InviteTrackerCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.InviteTrackerCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("namenormalizer"), Aliases("name-normalizer"),
@@ -263,17 +263,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "namenormalizer").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "namenormalizer");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to name normalization.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.NameNormalizerCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.NameNormalizerCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to name normalization.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.NameNormalizerCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.NameNormalizerCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("autounarchive"), Aliases("auto-unarchive"),
@@ -285,17 +285,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "tokendetection", "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "tokendetection", "\n\nThis module allows you to automatically unarchive threads of certain channels. **You will need to lock threads to actually archive them.**", "", "Auto Thread Unarchiver");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to automatic thread unarchiving.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.AutoUnarchiveCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.AutoUnarchiveCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to automatic thread unarchiving.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.AutoUnarchiveCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.AutoUnarchiveCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("embedmessages"),
@@ -307,17 +307,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "embedmessages").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "embedmessages");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to automatic message embedding.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.EmbedMessageCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.EmbedMessageCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to automatic message embedding.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.EmbedMessageCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.EmbedMessageCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("tokendetection"),
@@ -329,17 +329,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "tokendetection").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "tokendetection");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review the currently used settings related to automatic token invalidation.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.TokenDetectionCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.TokenDetectionCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change the currently used settings related to automatic token invalidation.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.TokenDetectionCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.TokenDetectionCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("invitenotes"),
@@ -351,15 +351,15 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "invitenotes").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "invitenotes");
 
         [Command("review"), Description("Allows you to review currently set up invite notes.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.InviteNotesCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.InviteNotesCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Description("Allows you to add and remove currently set up invite notes.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.InviteNotesCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.InviteNotesCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("vccreator"),
@@ -371,17 +371,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "vccreator").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "vccreator");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently used settings related to the Voice Channel Creator.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.VcCreatorCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.VcCreatorCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change currently used settings related to the Voice Channel Creator.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.VcCreatorCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.VcCreatorCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("guild-prefix"),
@@ -393,17 +393,17 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "guild-prefix").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "guild-prefix");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review settings related to the guild's prefix.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.PrefixCommand.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.PrefixCommand.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change settings related to the guild's prefix.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.PrefixCommand.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.PrefixCommand.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 
     [Group("guild-language"),
@@ -415,16 +415,16 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
         [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
         public async Task Help(CommandContext ctx)
-            => PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "guild-language").Add(this._bot.watcher, ctx);
+            => _ = PrefixCommandUtil.SendGroupHelp(this._bot, ctx, "guild-language");
 
         [Command("review"), Aliases("list"),
         Description("Allows you to review currently used settings related to the guild's selected language.")]
         public async Task Review(CommandContext ctx)
-            => new Commands.GuildLanguage.ReviewCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.GuildLanguage.ReviewCommand().ExecuteCommand(ctx, this._bot);
 
         [Command("config"), Aliases("configure", "settings", "list", "modify"),
         Description("Allows you to change currently used settings related to the guild's selected language.")]
         public async Task Config(CommandContext ctx)
-            => new Commands.GuildLanguage.ConfigCommand().ExecuteCommand(ctx, this._bot).Add(this._bot.watcher, ctx);
+            => _ = new Commands.GuildLanguage.ConfigCommand().ExecuteCommand(ctx, this._bot);
     }
 }

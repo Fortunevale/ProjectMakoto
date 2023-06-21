@@ -9,21 +9,18 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class Cooldown
+public sealed class Cooldown : RequiresParent<User>
 {
-    internal Cooldown(Bot _bot)
+    public Cooldown(Bot bot, User parent) : base(bot, parent)
     {
-        this._bot = _bot;
     }
-
-    private Bot _bot { get; set; }
 
     private Dictionary<string, DateTime> LastUseByCommand = new();
     private List<string> WaitingList = new();
 
     private async Task<bool> Wait(SharedCommandContext ctx, int CooldownTime, bool IgnoreStaff)
     {
-        if (this._bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
+        if (this.Bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;
 
         if (this.WaitingList.Contains(ctx.CommandName))
@@ -63,7 +60,7 @@ public sealed class Cooldown
             await result.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
             ctx.BaseCommand.DeleteOrInvalidate();
             cancellationTokenSource.Cancel();
-        }).Add(ctx.Bot.watcher);
+        }).Add(ctx.Bot);
 
         double milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
         if (milliseconds <= 0)

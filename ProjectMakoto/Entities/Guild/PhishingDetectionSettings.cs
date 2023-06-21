@@ -9,16 +9,11 @@
 
 namespace ProjectMakoto.Entities;
 
-public sealed class PhishingDetectionSettings
+public sealed class PhishingDetectionSettings : RequiresParent<Guild>
 {
-    public PhishingDetectionSettings(Guild guild)
+    public PhishingDetectionSettings(Bot bot, Guild parent) : base(bot, parent)
     {
-        this.Parent = guild;
     }
-
-    private Guild Parent { get; set; }
-
-
 
     private bool _DetectPhishing { get; set; } = true;
     public bool DetectPhishing
@@ -27,7 +22,7 @@ public sealed class PhishingDetectionSettings
         set
         {
             this._DetectPhishing = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "phishing_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_detect", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -39,7 +34,7 @@ public sealed class PhishingDetectionSettings
         set
         {
             this._WarnOnRedirect = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "phishing_warnonredirect", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_warnonredirect", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -50,7 +45,7 @@ public sealed class PhishingDetectionSettings
         set
         {
             this._AbuseIpDbReports = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "phishing_abuseipdb", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_abuseipdb", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -62,7 +57,7 @@ public sealed class PhishingDetectionSettings
         set
         {
             this._PunishmentType = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "phishing_type", Convert.ToInt32(value), Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_type", Convert.ToInt32(value), Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -74,7 +69,7 @@ public sealed class PhishingDetectionSettings
         set
         {
             this._CustomPunishmentReason = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "phishing_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_reason", value, Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -86,7 +81,7 @@ public sealed class PhishingDetectionSettings
         set
         {
             this._CustomPunishmentLength = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.ServerId, "phishing_time", Convert.ToInt64(value.TotalSeconds), Bot.DatabaseClient.mainDatabaseConnection);
+            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "phishing_time", Convert.ToInt64(value.TotalSeconds), Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }
