@@ -36,6 +36,17 @@ internal sealed class UserBlockEvents : RequiresTranslation
                     if (!memberBlocks.Any(x => (x.Permissions.HasAnyPermission(this.ModerationPermissions))))
                         return;
 
+                _ = member.SendMessageAsync(new DiscordEmbedBuilder()
+                    .WithDescription(t.Commands.Social.BlockedByVictim.Get(member.GetDbEntry(this.Bot))
+                        .Build(true, new TVar("User", memberBlocks.First().Mention)))
+                    .AsBotError(new SharedCommandContext()
+                    {
+                        Bot = this.Bot,
+                        User = e.User,
+                        Client = sender,
+                        DbUser = e.User.GetDbEntry(this.Bot),
+                    }).WithFooter());
+
                 if (e.Before?.Channel is not null)
                     await member.ModifyAsync(x => x.VoiceChannel = e.Before.Channel);
                 else
@@ -46,6 +57,17 @@ internal sealed class UserBlockEvents : RequiresTranslation
                 if (member.Permissions.HasAnyPermission(this.ModerationPermissions))
                     if (!e.Channel.Users.Where(x => this.Bot.Users[e.User.Id].BlockedUsers.Contains(x.Id)).Any(user => user.Permissions.HasAnyPermission(this.ModerationPermissions)))
                         return;
+
+                _ = member.SendMessageAsync(new DiscordEmbedBuilder()
+                    .WithDescription(t.Commands.Social.BlockedVictim.Get(member.GetDbEntry(this.Bot))
+                        .Build(true, new TVar("User", $"<@{this.Bot.Users[e.User.Id].BlockedUsers.First(blockedId => e.Channel.Users.Any(user => user.Id == blockedId))}>")))
+                    .AsBotError(new SharedCommandContext()
+                    {
+                        Bot = this.Bot,
+                        User = e.User,
+                        Client = sender,
+                        DbUser = e.User.GetDbEntry(this.Bot),
+                    }).WithFooter());
 
                 if (e.Before?.Channel is not null)
                     await member.ModifyAsync(x => x.VoiceChannel = e.Before.Channel);
