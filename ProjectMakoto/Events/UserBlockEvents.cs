@@ -27,6 +27,9 @@ internal sealed class UserBlockEvents : RequiresTranslation
     {
         if (e.After.Channel != null && !e.Channel.IsPrivate)
         {
+            if (e.User.IsBot)
+                return;
+
             var member = await e.User.ConvertToMember(e.Guild);
             var memberBlocks = e.After.Channel.Users.Where(x => this.Bot.Users[x.Id].BlockedUsers.Contains(e.User.Id));
 
