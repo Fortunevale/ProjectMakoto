@@ -13,6 +13,21 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    internal static bool ContainsTask(this IReadOnlyList<InternalSheduler.ScheduledTask>? tasks, string type, ulong snowflake, string id) 
+        => tasks.Where(x =>
+        {
+            if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
+                return false;
+
+            if (scheduledTaskIdentifier.Type != type)
+                return false;
+
+            if (scheduledTaskIdentifier.Snowflake != snowflake)
+                return false;
+
+            return true;
+        }).Any(x => ((ScheduledTaskIdentifier)x.CustomData).Id == id);
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
     internal static string Log(this string str, CustomLogLevel lvl, string additionalInfo)
     {

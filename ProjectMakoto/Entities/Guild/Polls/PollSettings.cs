@@ -13,6 +13,12 @@ public sealed class PollSettings : RequiresParent<Guild>
 {
     public PollSettings(Bot bot, Guild parent) : base(bot, parent)
     {
+        this._RunningPolls.ItemsChanged += RunningPollsUpdatedAsync;
+    }
+
+    ~PollSettings()
+    {
+        this._RunningPolls.ItemsChanged -= RunningPollsUpdatedAsync;
     }
 
     public ObservableList<PollEntry> RunningPolls { get => this._RunningPolls; set { this._RunningPolls = value; this._RunningPolls.ItemsChanged += RunningPollsUpdatedAsync; } }
@@ -29,16 +35,7 @@ public sealed class PollSettings : RequiresParent<Guild>
             await Task.Delay(1000);
 
         foreach (var b in this.RunningPolls.ToList())
-            if (!ScheduledTaskExtensions.GetScheduledTasks().Any(x =>
-            {
-                if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
-                scheduledTaskIdentifier.Snowflake != this.Parent.Id ||
-                scheduledTaskIdentifier.Type != "poll" ||
-                scheduledTaskIdentifier.Id != b.SelectUUID)
-                    return false;
-
-                return true;
-            }))
+            if (!ScheduledTaskExtensions.GetScheduledTasks().ContainsTask("poll", this.Parent.Id, b.SelectUUID))
             {
                 string taskuid = "";
                 CancellationTokenSource cancellationTokenSource = new();

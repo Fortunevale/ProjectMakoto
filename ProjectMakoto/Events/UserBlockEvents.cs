@@ -16,6 +16,7 @@ internal sealed class UserBlockEvents : RequiresTranslation
 
     internal readonly Permissions[] ModerationPermissions =
     {
+        Permissions.Administrator,
         Permissions.MuteMembers,
         Permissions.DeafenMembers,
         Permissions.ModerateMembers,
@@ -27,30 +28,65 @@ internal sealed class UserBlockEvents : RequiresTranslation
     {
         if (e.After.Channel != null && !e.Channel.IsPrivate)
         {
-            var member = await e.User.ConvertToMember(e.Guild);
-            var memberBlocks = e.After.Channel.Users.Where(x => this.Bot.Users[x.Id].BlockedUsers.Contains(e.User.Id));
+            if (e.User.IsBot)
+                return;
 
-            if (memberBlocks?.IsNotNullAndNotEmpty() ?? false)
+            var joiningMember = await e.User.ConvertToMember(e.Guild);
+            var membersWithBlocks = e.After.Channel.Users.Where(x => x.Id != joiningMember.Id).Where(x => this.Bot.Users[x.Id].BlockedUsers.Contains(e.User.Id));
+            var blockedMembers = e.After.Channel.Users.Where(x => x.Id != joiningMember.Id).Where(x => e.User.GetDbEntry(this.Bot).BlockedUsers.Contains(x.Id));
+
+            var memberWithBlocksHighestRole = membersWithBlocks?.MaxBy(x => GetModerationStatus(x));
+            var blockedMemberHighestRole = blockedMembers?.MaxBy(x => GetModerationStatus(x));
+            int GetModerationStatus(DiscordMember? member)
             {
-                if (member.Permissions.HasAnyPermission(this.ModerationPermissions))
-                    if (!memberBlocks.Any(x => (x.Permissions.HasAnyPermission(this.ModerationPermissions))))
-                        return;
+                int i = -1;
+
+                if (member is not null && member.Permissions.HasAnyPermission(this.ModerationPermissions))
+                    i = member.GetRoleHighestPosition();
+                return i;
+            }
+
+            if (membersWithBlocks?.IsNotNullAndNotEmpty() ?? false)
+            {
+                if (GetModerationStatus(joiningMember) > GetModerationStatus(memberWithBlocksHighestRole))
+                    return;
+
+                _ = joiningMember.SendMessageAsync(new DiscordEmbedBuilder()
+                    .WithDescription(t.Commands.Social.BlockedByVictim.Get(joiningMember.GetDbEntry(this.Bot))
+                        .Build(true, new TVar("User", membersWithBlocks.First().Mention)))
+                    .AsBotError(new SharedCommandContext()
+                    {
+                        Bot = this.Bot,
+                        User = e.User,
+                        Client = sender,
+                        DbUser = e.User.GetDbEntry(this.Bot),
+                    }).WithFooter());
 
                 if (e.Before?.Channel is not null)
-                    await member.ModifyAsync(x => x.VoiceChannel = e.Before.Channel);
+                    await joiningMember.ModifyAsync(x => x.VoiceChannel = e.Before.Channel);
                 else
-                    await member.DisconnectFromVoiceAsync();
+                    await joiningMember.DisconnectFromVoiceAsync();
             }
             else if (this.Bot.Users[e.User.Id].BlockedUsers.Any(blockedId => e.Channel.Users.Any(user => user.Id == blockedId)))
             {
-                if (member.Permissions.HasAnyPermission(this.ModerationPermissions))
-                    if (!e.Channel.Users.Where(x => this.Bot.Users[e.User.Id].BlockedUsers.Contains(x.Id)).Any(user => user.Permissions.HasAnyPermission(this.ModerationPermissions)))
-                        return;
+                if (GetModerationStatus(joiningMember) > GetModerationStatus(blockedMemberHighestRole))
+                    return;
+
+                _ = joiningMember.SendMessageAsync(new DiscordEmbedBuilder()
+                    .WithDescription(t.Commands.Social.BlockedVictim.Get(joiningMember.GetDbEntry(this.Bot))
+                        .Build(true, new TVar("User", $"<@{this.Bot.Users[e.User.Id].BlockedUsers.First(blockedId => e.Channel.Users.Any(user => user.Id == blockedId))}>")))
+                    .AsBotError(new SharedCommandContext()
+                    {
+                        Bot = this.Bot,
+                        User = e.User,
+                        Client = sender,
+                        DbUser = e.User.GetDbEntry(this.Bot),
+                    }).WithFooter());
 
                 if (e.Before?.Channel is not null)
-                    await member.ModifyAsync(x => x.VoiceChannel = e.Before.Channel);
+                    await joiningMember.ModifyAsync(x => x.VoiceChannel = e.Before.Channel);
                 else
-                    await member.DisconnectFromVoiceAsync();
+                    await joiningMember.DisconnectFromVoiceAsync();
             }
         }
     }

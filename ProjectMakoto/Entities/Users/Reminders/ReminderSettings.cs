@@ -13,12 +13,16 @@ public sealed class ReminderSettings : RequiresParent<User>
 {
     public ReminderSettings(Bot bot, User parent) : base(bot, parent)
     {
+        this._ScheduledReminders.ItemsChanged += RemindersUpdated;
     }
 
     ~ReminderSettings()
     {
         this.ScheduledReminders.ItemsChanged -= RemindersUpdated;
     }
+
+    public ObservableList<ReminderItem> ScheduledReminders { get => this._ScheduledReminders; set { this._ScheduledReminders = value; this._ScheduledReminders.ItemsChanged += RemindersUpdated; } }
+    private ObservableList<ReminderItem> _ScheduledReminders { get; set; } = new();
 
     private async void RemindersUpdated(object? sender, ObservableListUpdate<ReminderItem> e)
     {
@@ -29,16 +33,7 @@ public sealed class ReminderSettings : RequiresParent<User>
             this.ScheduledReminders.RemoveAt(0);
 
         foreach (var b in this.ScheduledReminders.ToList())
-            if (!ScheduledTaskExtensions.GetScheduledTasks().Any(x =>
-            {
-                if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier ||
-                scheduledTaskIdentifier.Snowflake != this.Parent.Id ||
-                scheduledTaskIdentifier.Type != "reminder" ||
-                scheduledTaskIdentifier.Id != b.UUID)
-                    return false;
-
-                return true;
-            }))
+            if (!ScheduledTaskExtensions.GetScheduledTasks().ContainsTask("reminder", this.Parent.Id, b.UUID))
             {
                 Task task = new(async () =>
                 {
@@ -84,6 +79,4 @@ public sealed class ReminderSettings : RequiresParent<User>
             }
         }
     }
-
-    public ObservableList<ReminderItem> ScheduledReminders = new();
 }

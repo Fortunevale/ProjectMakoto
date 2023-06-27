@@ -11,6 +11,12 @@ namespace ProjectMakoto.Util;
 
 internal static class DiscordExtensions
 {
+    internal static Guild GetDbEntry(this DiscordGuild guild, Bot bot)
+        => bot.Guilds[guild.Id];
+
+    internal static User GetDbEntry(this DiscordUser user, Bot bot)
+        => bot.Users[user.Id];
+
     internal static bool HasAnyPermission(this Permissions permissions, params Permissions[] list)
         => list.Any(x => permissions.HasPermission(x));
 
