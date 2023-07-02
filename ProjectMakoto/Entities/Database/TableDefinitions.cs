@@ -158,6 +158,10 @@ public sealed class TableDefinitions
         public BigInt data_deletion_date { get; set; }
 
         public BigInt last_data_request { get; set; }
+
+        public TinyInt translationreport_accepted_tos { get; set; }
+        public BigInt translationreport_ratelimit_first { get; set; }
+        public TinyInt translationreport_ratelimit_count { get; set; }
     }
 
     public sealed class guilds

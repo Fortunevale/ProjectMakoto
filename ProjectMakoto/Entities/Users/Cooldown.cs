@@ -18,7 +18,7 @@ public sealed class Cooldown : RequiresParent<User>
     private Dictionary<string, DateTime> LastUseByCommand = new();
     private List<string> WaitingList = new();
 
-    private async Task<bool> Wait(SharedCommandContext ctx, int CooldownTime, bool IgnoreStaff)
+    internal async Task<bool> Wait(SharedCommandContext ctx, int CooldownTime, bool IgnoreStaff)
     {
         if (this.Bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;

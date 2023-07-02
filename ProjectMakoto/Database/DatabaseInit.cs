@@ -255,6 +255,12 @@ internal sealed class DatabaseInit : RequiresBotReference
                 LastLibreTranslateSource = b.last_libretranslate_source,
                 LastLibreTranslateTarget = b.last_libretranslate_target
             };
+            DbUser.TranslationReports = new(this.Bot, DbUser)
+            {
+                AcceptedTOS = b.translationreport_accepted_tos,
+                FirstRequestTime = new DateTime(b.translationreport_ratelimit_first, DateTimeKind.Utc),
+                RequestCount = b.translationreport_ratelimit_count
+            };
             DbUser.Data = new()
             {
                 DeletionRequested = b.deletion_requested,

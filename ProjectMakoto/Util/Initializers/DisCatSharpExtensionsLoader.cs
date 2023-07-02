@@ -110,7 +110,8 @@ internal sealed class DisCatSharpExtensionsLoader
                                 .AddSingleton(bot)
                                 .BuildServiceProvider(),
             EnableDefaultHelp = false,
-            EnableLocalization = true
+            EnableLocalization = true,
+            DebugStartup = true
         });
 
         void GetCommandTranslations(ApplicationCommandsTranslationContext x)

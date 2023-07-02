@@ -1102,6 +1102,54 @@
           "de": "Host gemeldet. Vielen Dank für deine Unterstützung."
         }
       },
+      "ReportTranslation": {
+        "Title": {
+          "en": "Translation Error Reports",
+          "de": "Übersetzungsfehler Meldungen"
+        },
+        "AcceptTos": {
+          "en": "I accept these conditions",
+          "de": "Ich akzeptiere diese Regeln"
+        },
+        "Tos": {
+          "en": [
+            "{1}. You may not report correct translations.",
+            "{2}. You may not spam reports.",
+            "{3}. You accept that your user account and current server will be tracked and visible to Makoto staff.",
+            "{4}. You accept that Makoto staff may contact you through direct messages or this guild for additional information.",
+            "",
+            "We reserve the right to ban you for any reason that may not be listed.",
+            "**Failing to follow these conditions may get you or your guild blacklisted from using this bot.**",
+            "**This includes, but is not limited to, pre-existing guilds with your ownership and future guilds.**"
+          ],
+          "de": [
+            "{1}. Du darfst keine korrekten Text melden.",
+            "{2}. Du darfst Meldungen nicht wiederholt senden.",
+            "{3}. Du akzeptierst dass dein Benutzer Account und aktueller Server der Einsendung beigelegt sind.",
+            "{4}. Du akzeptierst dass das Team von Makoto dich eventuell per Direktnachrichten oder diesen Server kontaktiert für weitere Informationen.",
+            "",
+            "Wir behalten außerdem das Recht dich auch für jeden anderen Grund vom System auszuschließen.",
+            "**Das Brechen oder Umgehen diesen Regeln wird dazu führen dass du oder dieser Server von der Verwendung des Bots ausgeschlossen wirst.**",
+            "**Das beinhaltet, ist aber nicht limiert auf, bereits existierende Server die du besitzt und Server die du zukünftig erstellst.**"
+          ]
+        },
+        "TosChangedNotice": {
+          "en": "The report conditions have changed since you last accepted them. Please re-read them and agree to the new condiditions to continue.",
+          "de": "Die Meldungsbedingungen haben sich geändert. Bitte lese sie erneut und stimme ihnen zu um fortzufahren."
+        },
+        "ConfirmationPrompt": {
+          "en": "Please remember, we may follow up on this report through direct messages or this server for more information. Should the report be submitted?",
+          "de": "Bitte denk daran dass wir eventuell mehr Information benötigen und dich auf Grund dessen über Direktnachrichten oder diesen Server kontaktieren. Soll die Meldung eingereicht werden?"
+        },
+        "RatelimitReached": {
+          "en": "You've reached your maximum amount of reports per day. Please try again {Timestamp}.",
+          "de": "Du hast die maxmimale Anzahl an Meldungen pro Tag erreicht. Bitte versuche es erneut {Timestamp}."
+        },
+        "ReportSubmitted": {
+          "en": "Your report has been submitted. We will check your report as soon as possible. Please remember, we may follow up on this report for more information.",
+          "de": "Deine Meldung wurde eingereicht. Wir werden die Meldung überprüfen sobald es uns möglich ist. Bitte denk daran dass wir eventuell mehr Information benötigen und dich auf Grund dessen kontaktieren."
+        }
+      },
       "TranslateMessage": {
         "NoContent": {
           "en": "There is no content to translate in the message you selected.",
