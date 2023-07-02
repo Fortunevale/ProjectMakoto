@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Users;
+
 namespace ProjectMakoto.Events;
 internal sealed class ReminderEvents : RequiresTranslation
 {

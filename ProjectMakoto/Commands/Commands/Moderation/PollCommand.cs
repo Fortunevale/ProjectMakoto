@@ -350,7 +350,7 @@ internal sealed class PollCommand : BaseCommand
                             .WithDescription($"> **{polltxt}**\n\n_{GetGuildString(CommandKey.PollEnding, new TVar("Timestamp", selectedDueDate.Value.ToTimestamp()))}._\n\n`{GetGuildString(CommandKey.TotalVotes, new TVar("Count", 0))}`"))
                         .AddComponents(select).AddComponents(endearly));
 
-                    ctx.DbGuild.Polls.RunningPolls.Add(new PollEntry
+                    ctx.DbGuild.Polls.RunningPolls.Add(new()
                     {
                         PollText = polltxt,
                         ChannelId = SelectedChannel.Id,

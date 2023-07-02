@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Users;
+
 namespace ProjectMakoto.Commands.Playlists;
 
 internal sealed class ModifyCommand : BaseCommand
@@ -29,7 +31,7 @@ internal sealed class ModifyCommand : BaseCommand
                 return;
             }
 
-            UserPlaylist SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
+            var SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
             var embed = new DiscordEmbedBuilder().AsInfo(ctx);
 

@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Users;
+
 namespace ProjectMakoto.Commands;
 
 internal sealed class RemindersCommand : BaseCommand
@@ -155,7 +157,7 @@ internal sealed class RemindersCommand : BaseCommand
                             continue;
                         }
 
-                        rem.ScheduledReminders.Add(new ReminderItem
+                        rem.ScheduledReminders.Add(new()
                         {
                             Description = selectedDescription,
                             DueTime = selectedDueDate.Value.ToUniversalTime(),

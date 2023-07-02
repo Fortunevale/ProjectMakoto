@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Guilds;
+
 namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
 internal sealed class ConfigCommand : BaseCommand
@@ -286,7 +288,7 @@ internal sealed class ConfigCommand : BaseCommand
                             return;
                         }
 
-                        ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoleEntry>(selectedMessage.Id, new ReactionRoleEntry
+                        ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(selectedMessage.Id, new()
                         {
                             ChannelId = selectedMessage.Channel.Id,
                             RoleId = selectedRole.Id,

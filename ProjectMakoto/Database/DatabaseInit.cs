@@ -8,6 +8,9 @@
 // but WITHOUT ANY WARRANTY
 
 using ProjectMakoto.Entities.Database;
+using ProjectMakoto.Entities.Guilds;
+using ProjectMakoto.Entities.Members;
+using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.Database;
 

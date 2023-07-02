@@ -8,6 +8,7 @@
 // but WITHOUT ANY WARRANTY
 
 using Newtonsoft.Json.Linq;
+using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.Util.JsonSerializers;
 public sealed class ReminderSnoozeMinifiedSerializer : JsonConverter

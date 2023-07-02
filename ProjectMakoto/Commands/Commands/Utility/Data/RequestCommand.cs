@@ -43,7 +43,7 @@ internal sealed class RequestCommand : BaseCommand
 
             foreach (var guild in ctx.Bot.Guilds)
             {
-                if (guild.Value.Members.TryGetValue(ctx.User.Id, out Member member))
+                if (guild.Value.Members.TryGetValue(ctx.User.Id, out var member))
                 {
                     requestData.GuildData.Add(guild.Key, member);
                 }

@@ -29,7 +29,7 @@ internal sealed class ShareCommand : BaseCommand
                 return;
             }
 
-            UserPlaylist SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
+            var SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
             string ShareCode = $"{Guid.NewGuid()}";
 

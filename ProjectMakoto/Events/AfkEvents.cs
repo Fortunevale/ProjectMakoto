@@ -97,7 +97,7 @@ internal sealed class AfkEvents : RequiresTranslation
 
                     if (this.Bot.Users[b.Id].AfkStatus.Messages.Count < 5)
                     {
-                        this.Bot.Users[b.Id].AfkStatus.Messages.Add(new MessageDetails
+                        this.Bot.Users[b.Id].AfkStatus.Messages.Add(new()
                         {
                             AuthorId = e.Author.Id,
                             ChannelId = e.Channel.Id,

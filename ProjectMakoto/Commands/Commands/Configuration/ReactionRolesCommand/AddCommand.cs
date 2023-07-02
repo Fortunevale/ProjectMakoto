@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Guilds;
+
 namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
 internal sealed class AddCommand : BaseCommand
@@ -182,7 +184,7 @@ internal sealed class AddCommand : BaseCommand
 
             await message.CreateReactionAsync(emoji_parameter);
 
-            ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, Entities.ReactionRoleEntry>(message.Id, new Entities.ReactionRoleEntry
+            ctx.DbGuild.ReactionRoles.Add(new KeyValuePair<ulong, ReactionRoleEntry>(message.Id, new()
             {
                 ChannelId = message.Channel.Id,
                 RoleId = role_parameter.Id,
