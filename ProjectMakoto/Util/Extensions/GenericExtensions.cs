@@ -58,10 +58,10 @@ internal static class GenericExtensions
                 _logger.LogTrace($"String {{0}} logged: {additionalInfo}", str);
                 break;
             case CustomLogLevel.Trace2:
-                _logger.Log(Microsoft.Extensions.Logging.LogLevel.Trace, $"String {{0}} logged: {additionalInfo}", str);
+                _logger.Log(LogLevel.Trace, $"String {{str}} logged: {additionalInfo}", str);
                 break;
             default:
-                break;
+                throw new NotImplementedException("The specified log level is not implemented");
         }
         return str;
     }
