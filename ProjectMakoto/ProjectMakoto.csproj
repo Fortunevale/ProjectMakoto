@@ -49,7 +49,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.6.0" />
     <PackageReference Include="MySql.Data" Version="8.0.33" />
-    <PackageReference Include="Octokit" Version="6.2.1" />
+    <PackageReference Include="Octokit" Version="7.0.0" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
 	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.4.0">
