@@ -105,8 +105,59 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
     public async Task ReportHost(InteractionContext ctx, [Option("url", "The host")] string url)
         => _ = new ReportHostCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
         {
-            { "url", url } }
-        );
+            { "url", url }
+        });
+
+    public sealed class ReportTranslationAutoComplete : IAutocompleteProvider
+    {
+        public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
+        {
+            try
+            {
+                switch ((ReportTranslationType)Enum.Parse(typeof(ReportTranslationType), ctx.Options.First(x => x.Name == "affected_type").RawValue))
+                {
+                    case ReportTranslationType.Miscellaneous:
+                        return new List<DiscordApplicationCommandAutocompleteChoice>();
+                    case ReportTranslationType.Command:
+                        return await new HelpAutoComplete().Provider(ctx);
+                    case ReportTranslationType.Event:
+                    {
+                        var filteredTypes = Assembly.GetAssembly(this.GetType()).GetTypes()
+                            .Where(t => String.Equals(t.Namespace, "ProjectMakoto.Events", StringComparison.Ordinal))
+                            .Where(t => !t.Name.StartsWith("<"))
+                            .Where(x => x.Name.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            .Take(25);
+
+                        List<DiscordApplicationCommandAutocompleteChoice> options = filteredTypes
+                            .Select(x => new DiscordApplicationCommandAutocompleteChoice(x.Name.Replace("Events", ""), x.FullName))
+                            .ToList();
+
+                        return options;
+                    }
+                    default:
+                        return new List<DiscordApplicationCommandAutocompleteChoice>();
+                }
+            }
+            catch (Exception)
+            {
+                return new List<DiscordApplicationCommandAutocompleteChoice>();
+            }
+        }
+    }
+
+    [SlashCommand("report-translation", "Allows you to report missing, invalid or incorrect translations in Makoto.", dmPermission: false)]
+    public async Task ReportTranslation(InteractionContext ctx,
+        [Option("affected_type", "The type of module that is affected")] ReportTranslationType affectedType,
+        [Option("component", "The affected component", true)][Autocomplete(typeof(ReportTranslationAutoComplete))] string component,
+        [Option("report_type", "What type of issue you're reporting")] ReportTranslationReason reasonType,
+        [Option("additional_information", "Any additional information you can give us")] string? additionalInformation = null)
+        => _ = new ReportTranslationCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
+        {
+            { "affectedType", affectedType },
+            { "component", component },
+            { "reasonType", reasonType },
+            { "additionalInformation", additionalInformation },
+        });
 
     [SlashCommand("upload", "Upload a file to the bot. Only use when instructed to.", dmPermission: false)]
     public async Task Upload(InteractionContext ctx, [Option("file", "The file you want to upload.")] DiscordAttachment attachment)

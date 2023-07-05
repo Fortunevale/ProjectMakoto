@@ -138,7 +138,7 @@ internal sealed class ConfigCommand : BaseCommand
                     {
                         _ = Menu.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        ctx.DbGuild.InviteNotes.Notes.Add(SelectedInvite.Code, new InviteNotesDetails()
+                        ctx.DbGuild.InviteNotes.Notes.Add(SelectedInvite.Code, new()
                         {
                             Invite = SelectedInvite.Code,
                             Moderator = ctx.User.Id,

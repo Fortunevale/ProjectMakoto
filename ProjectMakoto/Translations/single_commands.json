@@ -195,6 +195,97 @@
     ]
   },
   {
+    "name": "report-translation",
+    "description": "Allows you to report missing, invalid or incorrect translations in Makoto.",
+    "type": 1,
+    "name_translations": {
+      "de": "übersetzung-melden"
+    },
+    "description_translations": {
+      "de": "Erlaubt es fehlende oder falsche Übersetzungen in Makoto zu melden."
+    },
+    "options": [
+      {
+        "name": "affected_type",
+        "description": "The type of module that is affected",
+        "name_translations": {
+          "de": "betroffener_typ"
+        },
+        "description_translations": {
+          "de": "Der Typ des Moduls was betroffen ist"
+        },
+        "choices": [
+          {
+            "name": "Miscellaneous",
+            "name_translations": {
+              "de": "Sonstiges"
+            }
+          },
+          {
+            "name": "Command",
+            "name_translations": {
+              "de": "Command"
+            }
+          },
+          {
+            "name": "Event",
+            "name_translations": {
+              "de": "Ereignis"
+            }
+          }
+        ]
+      },
+      {
+        "name": "component",
+        "description": "The affected component",
+        "name_translations": {
+          "de": "komponent"
+        },
+        "description_translations": {
+          "de": "Das Komponent was betroffen ist"
+        }
+      },
+      {
+        "name": "report_type",
+        "description": "What type of issue you're reporting",
+        "name_translations": {
+          "de": "meldungs_typ"
+        },
+        "description_translations": {
+          "de": "Was für eine Art von Meldung dies ist"
+        },
+        "choices": [
+          {
+            "name": "MissingTranslation",
+            "name_translations": null
+          },
+          {
+            "name": "IncorrectTranslation",
+            "name_translations": null
+          },
+          {
+            "name": "ValuesNotFilledIntoString",
+            "name_translations": null
+          },
+          {
+            "name": "Other",
+            "name_translations": null
+          }
+        ]
+      },
+      {
+        "name": "additional_information",
+        "description": "Any additional information you can give us",
+        "name_translations": {
+          "de": "weitere_informationen"
+        },
+        "description_translations": {
+          "de": "Jegliche weitere Informationen die du uns dazu geben kannst"
+        }
+      }
+    ]
+  },
+  {
     "name": "upload",
     "description": "Upload a file to the bot. Only use when instructed to.",
     "type": 1,

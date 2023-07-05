@@ -302,7 +302,7 @@ internal sealed class ConfigCommand : BaseCommand
                                         return;
                                     }
 
-                                    ctx.DbGuild.LevelRewards.Add(new Entities.LevelRewardEntry
+                                    ctx.DbGuild.LevelRewards.Add(new()
                                     {
                                         Level = selectedLevel,
                                         RoleId = selectedRole.Id,

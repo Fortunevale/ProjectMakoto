@@ -7,6 +7,9 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Guilds;
+using ProjectMakoto.Entities.Users;
+
 namespace ProjectMakoto.ApplicationCommands;
 public sealed class MusicAppCommands : ApplicationCommandsModule
 {

@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Members;
+
 namespace ProjectMakoto.Util.Initializers;
 internal sealed class SyncTasks
 {
@@ -166,7 +168,7 @@ internal sealed class SyncTasks
                             {
                                 for (var i = 0; i < bot.Guilds[guild.Key].MusicModule.SongQueue.Count; i++)
                                 {
-                                    Lavalink.QueueInfo b = bot.Guilds[guild.Key].MusicModule.SongQueue[i];
+                                    var b = bot.Guilds[guild.Key].MusicModule.SongQueue[i];
 
                                     _logger.LogDebug("Fixing queue info for '{Url}'", b.Url);
 
@@ -278,7 +280,7 @@ internal sealed class SyncTasks
                     if (bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate != DateTime.UnixEpoch)
                         bot.Guilds[guild.Key].Members[member.Id].LastLeaveDate = DateTime.UnixEpoch;
 
-                    bot.Guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole
+                    bot.Guilds[guild.Key].Members[member.Id].MemberRoles = member.Roles.Select(x => new MemberRole()
                     {
                         Id = x.Id,
                         Name = x.Name,

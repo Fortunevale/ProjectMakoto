@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using ProjectMakoto.Entities.Users;
+
 namespace ProjectMakoto.Entities;
 
 public sealed class User : BaseSelfFillingListValue<User>
@@ -27,6 +29,7 @@ public sealed class User : BaseSelfFillingListValue<User>
         this.ExperienceUser = new(bot, this);
         this.Reminders = new(bot, this);
         this.Translation = new(bot, this);
+        this.TranslationReports = new(bot, this);
     }
 
     [JsonIgnore]
@@ -38,6 +41,7 @@ public sealed class User : BaseSelfFillingListValue<User>
     public ExperienceUserSettings ExperienceUser { get; set; }
     public ReminderSettings Reminders { get; set; }
     public TranslationSettings Translation { get; set; }
+    public TranslationReportSettings TranslationReports { get; set; }
 
     public List<ulong> BlockedUsers { get; set; } = new();
     public List<UserPlaylist> UserPlaylists { get; set; } = new();

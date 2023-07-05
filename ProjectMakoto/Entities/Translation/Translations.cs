@@ -928,6 +928,17 @@ public sealed class Translations
                 public SingleTranslationKey SelectProvider;
                 public SingleTranslationKey NoContent;
             }
+            public reportTranslation ReportTranslation;
+            public sealed class reportTranslation
+            {
+                public SingleTranslationKey ReportSubmitted;
+                public SingleTranslationKey RatelimitReached;
+                public SingleTranslationKey ConfirmationPrompt;
+                public SingleTranslationKey TosChangedNotice;
+                public MultiTranslationKey Tos;
+                public SingleTranslationKey AcceptTos;
+                public SingleTranslationKey Title;
+            }
             public reportHost ReportHost;
             public sealed class reportHost
             {

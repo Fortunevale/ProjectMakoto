@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities;
+namespace ProjectMakoto.Entities.Users;
 
 public sealed class Cooldown : RequiresParent<User>
 {
@@ -18,7 +18,7 @@ public sealed class Cooldown : RequiresParent<User>
     private Dictionary<string, DateTime> LastUseByCommand = new();
     private List<string> WaitingList = new();
 
-    private async Task<bool> Wait(SharedCommandContext ctx, int CooldownTime, bool IgnoreStaff)
+    internal async Task<bool> Wait(SharedCommandContext ctx, int CooldownTime, bool IgnoreStaff)
     {
         if (this.Bot.status.TeamMembers.Contains(ctx.User.Id) && !IgnoreStaff)
             return false;

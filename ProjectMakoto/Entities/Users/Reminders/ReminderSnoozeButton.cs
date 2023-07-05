@@ -7,7 +7,7 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Entities;
+namespace ProjectMakoto.Entities.Users;
 
 [JsonConverter(typeof(ReminderSnoozeMinifiedSerializer))]
 public sealed class ReminderSnoozeButton

@@ -515,6 +515,9 @@ public sealed class DatabaseClient : RequiresBotReference
                 deletion_requested = x.Value.Data.DeletionRequested,
                 last_data_request = x.Value.Data.LastDataRequest.Ticks,
                 blocked_users = JsonConvert.SerializeObject(x.Value.BlockedUsers),
+                translationreport_accepted_tos = x.Value.TranslationReports.AcceptedTOS,
+                translationreport_ratelimit_first = x.Value.TranslationReports.FirstRequestTime.Ticks,
+                translationreport_ratelimit_count = x.Value.TranslationReports.RequestCount,
             }).ToList()));
         }
 

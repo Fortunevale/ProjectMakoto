@@ -108,6 +108,22 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
 
+    [Command("report-translation"),
+    CommandModule("utility"),
+    Description("Allows you to report missing, invalid or incorrect translations in Makoto.")]
+    public async Task ReportTranslation(CommandContext ctx,
+    [Description("Affected module")] ReportTranslationType affectedType,
+    [Description("Affected component")] string component,
+    [Description("Type of issue")] ReportTranslationReason reasonType,
+    [Description("Additional information")] string? additionalInformation = null)
+    {
+        DummyCommand dummyCommand = new();
+        await dummyCommand.ExecuteCommand(ctx, this._bot);
+
+        dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
+    }
+
+
 
     [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
     CommandModule("utility"),

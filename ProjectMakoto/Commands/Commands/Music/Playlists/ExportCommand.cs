@@ -29,7 +29,7 @@ internal sealed class ExportCommand : BaseCommand
                 return;
             }
 
-            UserPlaylist SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
+            var SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
             using (MemoryStream stream = new(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(SelectedPlaylist, Formatting.Indented))))
             {

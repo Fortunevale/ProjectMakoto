@@ -8,6 +8,9 @@
 // but WITHOUT ANY WARRANTY
 
 using ProjectMakoto.Entities.Database;
+using ProjectMakoto.Entities.Guilds;
+using ProjectMakoto.Entities.Members;
+using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.Database;
 
@@ -251,6 +254,12 @@ internal sealed class DatabaseInit : RequiresBotReference
                 LastGoogleTarget = b.last_google_target,
                 LastLibreTranslateSource = b.last_libretranslate_source,
                 LastLibreTranslateTarget = b.last_libretranslate_target
+            };
+            DbUser.TranslationReports = new(this.Bot, DbUser)
+            {
+                AcceptedTOS = b.translationreport_accepted_tos,
+                FirstRequestTime = new DateTime(b.translationreport_ratelimit_first, DateTimeKind.Utc),
+                RequestCount = b.translationreport_ratelimit_count
             };
             DbUser.Data = new()
             {

@@ -335,7 +335,13 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
-        if (!await ValidateServer(e.Guild) || !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted || e.Message is null || e.Message.WebhookMessage || e.Message.Author is null || e.Message.Author.IsBot)
+        if (!await ValidateServer(e.Guild) ||
+            !this.Bot.Guilds[e.Guild.Id].ActionLog.MessageDeleted ||
+            e.Message is null ||
+            e.MessageBefore is null ||
+            e.Message.WebhookMessage ||
+            e.Message.Author is null ||
+            e.Message.Author.IsBot)
             return;
 
         string prefix = e.Guild.GetGuildPrefix(Bot);
@@ -353,8 +359,8 @@ internal sealed class ActionlogEvents : RequiresTranslation
             Timestamp = DateTime.UtcNow,
             Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = e.Message.Author?.AvatarUrl },
             Description = $"**User**: {e.Message.Author?.Mention} `{e.Message.Author?.GetUsernameWithIdentifier()}`\n" +
-                            $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
-                            $"**Message**: [`Jump to message`]({e.Message.JumpLink})"
+                          $"**Channel**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
+                          $"**Message**: [`Jump to message`]({e.Message.JumpLink})"
         };
 
         if (e.MessageBefore.Content != e.Message.Content)
