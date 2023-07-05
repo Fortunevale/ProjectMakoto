@@ -47,8 +47,6 @@ public sealed class TaskWatcher
                         continue;
                     }
 
-                    _logger.LogTrace("'{Name}' running since {Time} with Status '{Status}'", b.GetName(), b.CreationTime.GetTimespanSince().GetHumanReadable(), b.Task.Status);
-
                     if (!b.Task.IsCompleted)
                         continue;
 
