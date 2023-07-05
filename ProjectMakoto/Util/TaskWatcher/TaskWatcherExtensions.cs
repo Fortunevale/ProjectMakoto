@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Runtime.CompilerServices;
+
 namespace ProjectMakoto.Util;
 
 public static class TaskWatcherExtensions
@@ -14,14 +16,24 @@ public static class TaskWatcherExtensions
     /// <summary>
     /// Add Task to Watcher without any Context
     /// </summary>
-    public static TaskInfo Add(this Task task, Bot bot)
-        => bot.Watcher.AddToList(new TaskInfo(task));
+    public static TaskInfo Add(this Task task, Bot bot, [CallerMemberName] string callingMember = "", [CallerFilePath] string callingFile = "", [CallerLineNumber] int callingLine = -1)
+        => bot.Watcher.AddToList(new TaskInfo(task)
+        {
+            CallingMethod = callingMember,
+            CallingFile = callingFile,
+            CallingLine = callingLine
+        });
 
     /// <summary>
     /// Add Task to Watcher with Custom Data
     /// </summary>
-    public static TaskInfo Add(this Task task, Bot bot, object? customData)
-        => bot.Watcher.AddToList(new TaskInfo(task, customData));
+    public static TaskInfo Add(this Task task, Bot bot, object? customData, [CallerMemberName] string callingMember = "", [CallerFilePath] string callingFile = "", [CallerLineNumber] int callingLine = -1)
+        => bot.Watcher.AddToList(new TaskInfo(task, customData)
+        {
+            CallingMethod = callingMember,
+            CallingFile = callingFile,
+            CallingLine = callingLine
+        });
 
     /// <summary>
     /// Mark this Task as vital to the operation of this program. Program will exit if failed.

@@ -56,7 +56,7 @@ public sealed class TaskWatcher
                     if (b.Task.IsCompletedSuccessfully)
                     {
                         _logger.LogTrace("Successfully executed Task:{Id} '{Uuid}' in {Elapsed}ms, Task Count now at {Count}.", 
-                            b.Task.Id, b.Uuid, b.CreationTime.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")), TaskList.Count);
+                            b.Task.Id, b.GetName(), b.CreationTime.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")), TaskList.Count);
 
                         if (b.CustomData is SharedCommandContext sctx)
                         {
@@ -139,12 +139,12 @@ public sealed class TaskWatcher
                         }
                         else
                         {
-                            _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.Uuid);
+                            _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.GetName());
                         }
                     }
                     else
                     {
-                        _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.Uuid);
+                        _logger.LogError("Task '{UUID}' failed to execute", b.Task.Exception, b.GetName());
                     }
 
                     if (b.IsVital)
@@ -169,7 +169,7 @@ public sealed class TaskWatcher
 
     internal TaskInfo AddToList(TaskInfo taskInfo)
     {
-        _logger.LogTrace("Started Task:{uuid}, Task Count now at {Count}.", taskInfo.Uuid, this.TaskList.Count + 1);
+        _logger.LogTrace("Started Task:{uuid}, Task Count now at {Count}.", taskInfo.GetName(), this.TaskList.Count + 1);
         lock (this.TaskList) { this.TaskList.Add(taskInfo); }
 
         return taskInfo;

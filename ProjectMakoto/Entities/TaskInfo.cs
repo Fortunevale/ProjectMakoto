@@ -26,5 +26,12 @@ public sealed class TaskInfo
     public DateTime CreationTime { get; private set; } = DateTime.UtcNow;
     public bool IsVital { get; internal set; } = false;
 
+    public string CallingMethod { get; init; } = string.Empty;
+    public string CallingFile { get; init; } = string.Empty;
+    public int CallingLine { get; init; } = -1;
+
     public object? CustomData { get; internal set;} = null;
+
+    public string GetName()
+        => $"{this.Uuid}/{this.CallingMethod}/{this.CallingFile}/L{this.CallingLine}";
 }

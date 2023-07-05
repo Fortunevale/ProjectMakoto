@@ -405,9 +405,9 @@ internal sealed class PluginLoader
                         method.Invoke(null, new object[] { _bot });
                 }
 
-                foreach (var subTypes in parentType.GetNestedTypes())
+                foreach (var subType in parentType.GetNestedTypes())
                 {
-                    foreach (var method in parentType.GetMethods())
+                    foreach (var method in subType.GetMethods())
                     {
                         if (method.Name.StartsWith("Populate"))
                             method.Invoke(null, new object[] { _bot });
