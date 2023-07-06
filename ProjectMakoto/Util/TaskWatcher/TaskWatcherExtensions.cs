@@ -20,7 +20,7 @@ public static class TaskWatcherExtensions
         => bot.Watcher.AddToList(new TaskInfo(task)
         {
             CallingMethod = callingMember,
-            CallingFile = callingFile,
+            CallingFile = Shorten(callingFile),
             CallingLine = callingLine
         });
 
@@ -31,7 +31,7 @@ public static class TaskWatcherExtensions
         => bot.Watcher.AddToList(new TaskInfo(task, customData)
         {
             CallingMethod = callingMember,
-            CallingFile = callingFile,
+            CallingFile = Shorten(callingFile),
             CallingLine = callingLine
         });
 
@@ -42,5 +42,15 @@ public static class TaskWatcherExtensions
     {
         info.IsVital = true;
         return info;
+    }
+
+    private static string Shorten(string callingFile)
+    {
+        var v = callingFile.LastIndexOf("ProjectMakoto");
+
+        if (v == -1)
+            return callingFile;
+
+        return callingFile[v..];
     }
 }
