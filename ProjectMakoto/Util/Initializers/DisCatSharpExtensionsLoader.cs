@@ -85,7 +85,8 @@ internal sealed class DisCatSharpExtensionsLoader
             {
                 ShowResponse = false,
                 AuthenticatorAccountPrefix = "Project Makoto"
-            }
+            },
+            Issuer = "Project Makoto",
         });
 
         DiscordEventHandler.SetupEvents(bot);

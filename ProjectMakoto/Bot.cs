@@ -90,7 +90,7 @@ public sealed class Bot
 
         if (args.Contains("--debug"))
         {
-            _logger.ChangeLogLevel(CustomLogLevel.Trace);
+            _logger.ChangeLogLevel(CustomLogLevel.Debug);
         }
 
         _logger.LogDebug("Environment Details\n\n" +
