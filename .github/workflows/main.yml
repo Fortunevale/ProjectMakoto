@@ -54,10 +54,19 @@ jobs:
         with:
           stringToTruncate: ${{ github.sha }}
           maxLength: 10
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          fromTag: ${{ github.ref_name }}
+          toTag: ${{ env.previousTag }}
+          writeToFile: false
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
         with:
           artifacts: "ProjectMakoto/ProjectMakoto/Release.zip"
+          body: ${{ steps.changelog.outputs.changes }}
           generateReleaseNotes: true
           prerelease: true
           tag: ${{ steps.truncatedString.outputs.string }}
