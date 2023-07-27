@@ -47,6 +47,17 @@ public static class TranslationUtil
 
             var newText = b.Replacement?.ToString() ?? "";
 
+            if (b.Replacement is EmbeddedLink embeddedLink)
+            {
+                newText = $"[{(Code ? $"`{embeddedLink.Text}`" : embeddedLink.Text)}]({embeddedLink.Url})";
+
+                if (b.Sanitize)
+                    newText = newText.SanitizeForCode();
+
+                str = str.Replace($"{{{b.ValName}}}", $"`{newText}`");
+                continue;
+            }
+
             if (newText.StartsWith("<") && newText.EndsWith(">") && Code)
             {
                 if (b.Sanitize)
@@ -69,6 +80,9 @@ public static class TranslationUtil
             str = str[..(str.Length - 1)];
 
         if (str.StartsWith("`<"))
+            str = str[1..];
+        
+        if (str.StartsWith("`[") && vars.Any(x => x.Replacement is EmbeddedLink))
             str = str[1..];
 
         if (str.EndsWith(">`"))

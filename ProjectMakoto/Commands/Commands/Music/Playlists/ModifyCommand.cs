@@ -183,7 +183,7 @@ internal sealed class ModifyCommand : BaseCommand
                                     return;
                                 }
 
-                                SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString(), Length = x.Length }));
+                                SelectedPlaylist.List.AddRange(Tracks.Take(250 - SelectedPlaylist.List.Count).Select(x => new PlaylistEntry { Title = x.Info.Title, Url = x.Info.Uri.ToString(), Length = x.Info.Length }));
 
                                 await UpdateMessage();
                                 break;

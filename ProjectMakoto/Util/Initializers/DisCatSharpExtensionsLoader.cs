@@ -165,14 +165,14 @@ internal sealed class DisCatSharpExtensionsLoader
             try
             {
                 _logger.LogInfo("Connecting and authenticating with Lavalink..");
-                bot.LavalinkNodeConnection = await bot.DiscordClient.GetLavalink().ConnectAsync(lavalinkConfig);
+                bot.LavalinkSession = await bot.DiscordClient.GetLavalink().ConnectAsync(lavalinkConfig);
                 _logger.LogInfo("Connected and authenticated with Lavalink.");
 
                 bot.status.LavalinkInitialized = true;
 
                 try
                 {
-                    _logger.LogInfo("Lavalink is running on {Version}.", await bot.LavalinkNodeConnection.Rest.GetVersionAsync());
+                    _logger.LogInfo("Lavalink is running on {Version}.", await bot.LavalinkSession.Rest.GetVersionAsync());
                 }
                 catch { }
             }

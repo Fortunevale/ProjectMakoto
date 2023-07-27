@@ -58,7 +58,7 @@ internal sealed class AfkEvents : RequiresTranslation
                                                 .Get(this.Bot.Users[e.Author.Id])
                                                 .Build(true,
                                                 new TVar("User", $"<@!{x.AuthorId}>"),
-                                                new TVar("Message", $"[`{AfkKey.Events.Message.Get(this.Bot.Users[e.Author.Id])}`](https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId})"))))}";
+                                                new TVar("Message", new EmbeddedLink($"https://discord.com/channels/{x.GuildId}/{x.ChannelId}/{x.MessageId}", AfkKey.Events.Message.Get(this.Bot.Users[e.Author.Id]))))))}";
 
                 ExtendDelay = true;
 

@@ -41,10 +41,11 @@ global using DisCatSharp.Interactivity;
 global using DisCatSharp.Interactivity.Extensions;
 global using DisCatSharp.Lavalink;
 global using DisCatSharp.Lavalink.EventArgs;
+global using DisCatSharp.Lavalink.Enums;
+global using DisCatSharp.Lavalink.Entities;
 global using DisCatSharp.Net;
 global using DisCatSharp.Extensions.TwoFactorCommands;
 global using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
-global using DisCatSharp.Extensions.TwoFactorCommands.Entities;
 
 global using Microsoft.Extensions.DependencyInjection;
 

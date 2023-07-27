@@ -21,8 +21,8 @@ internal sealed class QueueCommand : BaseCommand
                 return;
 
             var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
-            var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+            var session = lava.ConnectedSessions.Values.First(x => x.IsConnected);
+            var conn = session.GetGuildPlayer(ctx.Member.VoiceState.Guild);
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
@@ -64,15 +64,15 @@ internal sealed class QueueCommand : BaseCommand
                 if (ctx.DbGuild.MusicModule.SongQueue.Count > 0)
                     Description += $"`{GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Count / 10.0)}`\n\n";
 
-                Description += $"`{GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Title : GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.CurrentState.CurrentTrack is not null ? conn.CurrentState.CurrentTrack.Uri.ToString() : "")})\n";
+                Description += $"`{GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.Player.Track is not null ? conn.Player.Track.Info.Title : GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.Player.Track is not null ? conn.Player.Track.Info.Uri.ToString() : "")})\n";
                 Description += $"{(ctx.DbGuild.MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
                 Description += $"{(ctx.DbGuild.MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
-                Description += $" `|` {(ctx.DbGuild.MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.CurrentState.CurrentTrack is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
+                Description += $" `|` {(ctx.DbGuild.MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.Player.Track is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
 
-                if (conn.CurrentState.CurrentTrack is not null)
+                if (conn.CurrentTrack is not null)
                 {
-                    Description += $"`[{((long)Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}/{((long)Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}]` ";
-                    Description += $"`{StringTools.GenerateASCIIProgressbar(Math.Round(conn.CurrentState.PlaybackPosition.TotalSeconds, 0), Math.Round(conn.CurrentState.CurrentTrack.Length.TotalSeconds, 0))}`";
+                    Description += $"`[{((long)Math.Round(conn.Player.PlayerState.Position.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}/{((long)Math.Round(conn.Player.Track.Info.Length.TotalSeconds, 0)).GetShortHumanReadable(TimeFormat.MINUTES)}]` ";
+                    Description += $"`{StringTools.GenerateASCIIProgressbar(Math.Round(conn.Player.PlayerState.Position.TotalSeconds, 0), Math.Round(conn.Player.Track.Info.Length.TotalSeconds, 0))}`";
                 }
 
                 if (CurrentPage <= 0)

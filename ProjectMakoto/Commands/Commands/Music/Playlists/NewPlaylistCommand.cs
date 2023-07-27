@@ -117,9 +117,9 @@ internal sealed class NewPlaylistCommand : BaseCommand
 
                     SelectedTracks = Tracks.Select(x => new PlaylistEntry
                     {
-                        Title = x.Title,
-                        Url = x.Uri.ToString(),
-                        Length = x.Length
+                        Title = x.Info.Title,
+                        Url = x.Info.Uri.ToString(),
+                        Length = x.Info.Length
                     }).ToList();
                     continue;
                 }

@@ -48,10 +48,6 @@ internal sealed class AddToQueueCommand : BaseCommand
                 return;
             }
 
-            var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
-            var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
-
             await RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = GetString(this.t.Commands.Music.Playlists.AddToQueue.Adding, true,

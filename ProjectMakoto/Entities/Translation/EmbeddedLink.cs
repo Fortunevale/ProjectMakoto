@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,13 +7,11 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
-namespace ProjectMakoto.Commands;
-
-internal sealed class DummyCommand : BaseCommand
+namespace ProjectMakoto.Entities.Translation;
+public sealed record EmbeddedLink(string Url, string Text)
 {
-    public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
+    public override string ToString()
     {
-
-        return Task.CompletedTask;
+        return $"[{this.Text}]({this.Url})";
     }
 }
