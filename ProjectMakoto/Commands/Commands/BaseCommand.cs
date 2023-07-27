@@ -275,7 +275,7 @@ public abstract class BaseCommand
                 var files = new Dictionary<string, Stream>();
 
                 foreach (var b in discordMessageBuilder.Files)
-                    files.Add(b.FileName, b.Stream);
+                    files.Add(b.Filename, b.Stream);
 
                 discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
                 discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
@@ -294,7 +294,7 @@ public abstract class BaseCommand
                 var files = new Dictionary<string, Stream>();
 
                 foreach (var b in discordMessageBuilder.Files)
-                    files.Add(b.FileName, b.Stream);
+                    files.Add(b.Filename, b.Stream);
 
                 discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
                 discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
@@ -313,7 +313,7 @@ public abstract class BaseCommand
                 var files = new Dictionary<string, Stream>();
 
                 foreach (var b in discordMessageBuilder.Files)
-                    files.Add(b.FileName, b.Stream);
+                    files.Add(b.Filename, b.Stream);
 
                 discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
                 discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);

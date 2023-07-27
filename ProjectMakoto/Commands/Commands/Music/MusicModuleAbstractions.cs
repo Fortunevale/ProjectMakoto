@@ -11,64 +11,64 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class MusicModuleAbstractions
 {
-    public static async Task<(List<LavalinkTrack> Tracks, LavalinkLoadResult oriResult, bool Continue)> GetLoadResult(SharedCommandContext ctx, string load)
+    public static async Task<(List<LavalinkTrack> Tracks, LavalinkTrackLoadingResult oriResult, bool Continue)> GetLoadResult(SharedCommandContext ctx, string searchQuery)
     {
         var t = ctx.BaseCommand.t;
 
-        if (Regex.IsMatch(load, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+") || load.ToLower().Contains("localhost") || load.ToLower().Contains("127.0.0.1"))
+        if (Regex.IsMatch(searchQuery, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+") || searchQuery.ToLower().Contains("localhost") || searchQuery.ToLower().Contains("127.0.0.1"))
             throw new Exception();
 
         List<LavalinkTrack> Tracks = new();
 
         var lava = ctx.Client.GetLavalink();
-        var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
+        var session = lava.ConnectedSessions.Values.First(x => x.IsConnected);
 
         var embed = new DiscordEmbedBuilder(ctx.ResponseMessage.Embeds[0]);
-        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, new TVar("Search", load))).AsLoading(ctx));
+        await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true, new TVar("Search", searchQuery))).AsLoading(ctx));
 
-        LavalinkLoadResult loadResult;
+        LavalinkTrackLoadingResult loadResult;
 
-        if (RegexTemplates.YouTubeUrl.IsMatch(load))
+        if (RegexTemplates.YouTubeUrl.IsMatch(searchQuery))
         {
-            if (Regex.IsMatch(load, @"((\?|&)list=RDMM\w+)(&*)"))
+            if (Regex.IsMatch(searchQuery, @"((\?|&)list=RDMM\w+)(&*)"))
             {
-                Group group = Regex.Match(load, @"((\?|&)list=RDMM\w+)(&*)", RegexOptions.ExplicitCapture);
+                Group group = Regex.Match(searchQuery, @"((\?|&)list=RDMM\w+)(&*)", RegexOptions.ExplicitCapture);
                 var value = group.Value;
 
                 if (value.EndsWith("&"))
                     value = value[..^1];
 
-                load = load.Replace(value, "");
+                searchQuery = searchQuery.Replace(value, "");
             }
 
-            if (Regex.IsMatch(load, @"((\?|&)start_radio=\d+)(&*)"))
+            if (Regex.IsMatch(searchQuery, @"((\?|&)start_radio=\d+)(&*)"))
             {
-                Group group = Regex.Match(load, @"((\?|&)start_radio=\d+)(&*)", RegexOptions.ExplicitCapture);
+                Group group = Regex.Match(searchQuery, @"((\?|&)start_radio=\d+)(&*)", RegexOptions.ExplicitCapture);
                 var value = group.Value;
 
                 if (value.EndsWith("&"))
                     value = value[..^1];
 
-                load = load.Replace(value, "");
+                searchQuery = searchQuery.Replace(value, "");
             }
 
-            var AndIndex = load.IndexOf("&");
+            var AndIndex = searchQuery.IndexOf("&");
 
-            if (!load.Contains('?') && AndIndex != -1)
+            if (!searchQuery.Contains('?') && AndIndex != -1)
             {
-                load = load.Remove(AndIndex, 1);
-                load = load.Insert(AndIndex, "?");
+                searchQuery = searchQuery.Remove(AndIndex, 1);
+                searchQuery = searchQuery.Insert(AndIndex, "?");
             }
 
-            loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
+            loadResult = await session.LoadTracksAsync(LavalinkSearchType.Plain, searchQuery);
         }
-        else if (RegexTemplates.SoundcloudUrl.IsMatch(load))
+        else if (RegexTemplates.SoundcloudUrl.IsMatch(searchQuery))
         {
-            loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
+            loadResult = await session.LoadTracksAsync(LavalinkSearchType.Plain, searchQuery);
         }
-        else if (RegexTemplates.BandcampUrl.IsMatch(load))
+        else if (RegexTemplates.BandcampUrl.IsMatch(searchQuery))
         {
-            loadResult = await node.Rest.GetTracksAsync(load, LavalinkSearchType.Plain);
+            loadResult = await session.LoadTracksAsync(LavalinkSearchType.Plain, searchQuery);
         }
         else
         {
@@ -91,49 +91,49 @@ internal sealed class MusicModuleAbstractions
             _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
             await ctx.BaseCommand.RespondOrEdit(embed.WithDescription(t.Commands.Music.Play.LookingFor.Get(ctx.DbUser).Build(true,
-                new TVar("Search", load),
+                new TVar("Search", searchQuery),
                 new TVar("Platform", (Menu1.GetCustomId() == YouTube.CustomId ? "YouTube" : "SoundCloud")))).AsLoading(ctx));
 
-            loadResult = await node.Rest.GetTracksAsync(load, (Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud));
+            loadResult = await session.LoadTracksAsync((Menu1.GetCustomId() == YouTube.CustomId ? LavalinkSearchType.Youtube : LavalinkSearchType.SoundCloud), searchQuery);
         }
 
-        if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
+        if (loadResult.LoadType == LavalinkLoadResultType.Error)
         {
-            _logger.LogError("An exception occurred while trying to load lavalink track: {Exception}", loadResult.Exception.Message);
+            _logger.LogError("An exception occurred while trying to load lavalink track.");
             embed.Description = t.Commands.Music.Play.FailedToLoad.Get(ctx.DbUser).Build(true,
-                new TVar("Search", load));
+                new TVar("Search", searchQuery));
             embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
-        else if (loadResult.LoadResultType == LavalinkLoadResultType.NoMatches)
+        else if (loadResult.LoadType == LavalinkLoadResultType.Empty)
         {
             embed.Description = t.Commands.Music.Play.NoMatches.Get(ctx.DbUser).Build(true,
-                new TVar("Search", load));
+                new TVar("Search", searchQuery));
             embed.AsError(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
             return (null, loadResult, false);
         }
-        else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
+        else if (loadResult.LoadType == LavalinkLoadResultType.Playlist)
         {
-            return (loadResult.Tracks.ToList(), loadResult, true);
+            return (loadResult.GetResultAs<LavalinkPlaylist>().Tracks.ToList(), loadResult, true);
         }
-        else if (loadResult.LoadResultType == LavalinkLoadResultType.TrackLoaded)
+        else if (loadResult.LoadType == LavalinkLoadResultType.Track)
         {
-            Tracks.Add(loadResult.Tracks.First());
-
+            Tracks.Add(loadResult.GetResultAs<LavalinkTrack>());
             return (Tracks, loadResult, true);
         }
-        else if (loadResult.LoadResultType == LavalinkLoadResultType.SearchResult)
+        else if (loadResult.LoadType == LavalinkLoadResultType.Search)
         {
+            var searchResults = loadResult.GetResultAs<List<LavalinkTrack>>();
+
             embed.Description = t.Commands.Music.Play.SearchSuccess.Get(ctx.DbUser).Build(true,
-                new TVar("Count", loadResult.Tracks.Count));
-            ;
+                new TVar("Count", searchResults.Count));
             embed.AsAwaitingInput(ctx);
             await ctx.BaseCommand.RespondOrEdit(embed.Build());
 
-            var UriResult = await ctx.BaseCommand.PromptCustomSelection(loadResult.Tracks
-                .Select(x => new DiscordStringSelectComponentOption(x.Title.TruncateWithIndication(100), x.Uri.ToString(), $"🔼 {x.Author} | 🕒 {x.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
+            var UriResult = await ctx.BaseCommand.PromptCustomSelection(searchResults
+                .Select(x => new DiscordStringSelectComponentOption(x.Info.Title.TruncateWithIndication(100), x.Info.Uri.ToString(), $"🔼 {x.Info.Author} | 🕒 {x.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}")).ToList());
 
             if (UriResult.TimedOut)
             {
@@ -149,13 +149,13 @@ internal sealed class MusicModuleAbstractions
                 throw UriResult.Exception;
             }
 
-            Tracks.Add(loadResult.Tracks.First(x => x.Uri.ToString() == UriResult.Result));
+            Tracks.Add(searchResults.First(x => x.Info.Uri.ToString() == UriResult.Result));
 
             return (Tracks, loadResult, true);
         }
         else
         {
-            throw new Exception($"Unknown Load Result Type: {loadResult.LoadResultType}");
+            throw new Exception($"Unknown Load Result Type: {loadResult.LoadType}");
         }
     }
 }

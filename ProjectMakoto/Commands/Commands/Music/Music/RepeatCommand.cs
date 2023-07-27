@@ -21,8 +21,8 @@ internal sealed class RepeatCommand : BaseCommand
                 return;
 
             var lava = ctx.Client.GetLavalink();
-            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
-            var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+            var session = lava.ConnectedSessions.Values.First(x => x.IsConnected);
+            var conn = session.GetGuildPlayer(ctx.Member.VoiceState.Guild);
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {

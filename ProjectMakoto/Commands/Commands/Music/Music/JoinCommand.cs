@@ -25,15 +25,15 @@ internal sealed class JoinCommand : BaseCommand
 
             var lava = ctx.Client.GetLavalink();
 
-            while (!lava.ConnectedNodes.Values.Any(x => x.IsConnected))
+            while (!lava.ConnectedSessions.Values.Any(x => x.IsConnected))
                 await Task.Delay(1000);
 
-            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
-            var conn = node.GetGuildConnection(ctx.Member.VoiceState.Guild);
+            var node = lava.ConnectedSessions.Values.First(x => x.IsConnected);
+            var conn = node.GetGuildPlayer(ctx.Member.VoiceState.Guild);
 
             if (conn is null)
             {
-                if (!lava.ConnectedNodes.Any())
+                if (!lava.ConnectedSessions.Any())
                 {
                     throw new Exception("Lavalink connection isn't established.");
                 }

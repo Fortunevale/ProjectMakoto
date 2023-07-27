@@ -19,7 +19,7 @@ public sealed class Bot
     public DatabaseClient DatabaseClient { get; set; }
 
     public DiscordClient DiscordClient { get; internal set; }
-    internal LavalinkNodeConnection LavalinkNodeConnection;
+    internal LavalinkSession LavalinkSession;
 
     internal ScoreSaberClient ScoreSaberClient { get; set; }
     public GoogleTranslateClient TranslationClient { get; internal set; }

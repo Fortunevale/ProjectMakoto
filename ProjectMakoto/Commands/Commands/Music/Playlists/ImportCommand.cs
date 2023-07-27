@@ -71,14 +71,14 @@ internal sealed class ImportCommand : BaseCommand
                 var query = ModalResult.Result.Interaction.GetModalValueByCustomId("query");
 
                 var lava = ctx.Client.GetLavalink();
-                var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
+                var node = lava.ConnectedSessions.Values.First(x => x.IsConnected);
 
                 if (Regex.IsMatch(query, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+"))
                     throw new Exception();
 
-                LavalinkLoadResult loadResult = await node.Rest.GetTracksAsync(query, LavalinkSearchType.Plain);
+                LavalinkTrackLoadingResult loadResult = await node.LoadTracksAsync(LavalinkSearchType.Plain, query);
 
-                if (loadResult.LoadResultType == LavalinkLoadResultType.LoadFailed)
+                if (loadResult.LoadType == LavalinkLoadResultType.Error)
                 {
                     await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
@@ -86,8 +86,10 @@ internal sealed class ImportCommand : BaseCommand
                     }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
                     return;
                 }
-                else if (loadResult.LoadResultType == LavalinkLoadResultType.PlaylistLoaded)
+                else if (loadResult.LoadType == LavalinkLoadResultType.Playlist)
                 {
+                    var playlistResult = loadResult.GetResultAs<LavalinkPlaylist>();
+
                     if (ctx.DbUser.UserPlaylists.Count >= 10)
                     {
                         await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -104,8 +106,8 @@ internal sealed class ImportCommand : BaseCommand
 
                     var v = new UserPlaylist
                     {
-                        PlaylistName = loadResult.PlaylistInfo.Name,
-                        List = loadResult.Tracks.Select(x => new PlaylistEntry { Title = x.Title, Url = x.Uri.ToString(), Length = x.Length }).Take(250).ToList()
+                        PlaylistName = playlistResult.Info.Name,
+                        List = playlistResult.Tracks.Select(x => new PlaylistEntry { Title = x.Info.Title, Url = x.Info.Uri.ToString(), Length = x.Info.Length }).Take(250).ToList()
                     };
 
                     ctx.DbUser.UserPlaylists.Add(v);

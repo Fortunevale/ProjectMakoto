@@ -39,16 +39,17 @@ internal sealed class SyncTasks
                                 {
                                     _logger.LogInfo("Fetching video length for '{Url}'", b.Url);
 
-                                    var track = await bot.DiscordClient.GetLavalink().ConnectedNodes.First(x => x.Value.IsConnected).Value.Rest.GetTracksAsync(b.Url, LavalinkSearchType.Plain);
+                                    var loadResult = await bot.DiscordClient.GetLavalink().ConnectedSessions.First(x => x.Value.IsConnected).Value.LoadTracksAsync(LavalinkSearchType.Plain, b.Url);
+                                    var track = loadResult.GetResultAs<LavalinkTrack>();
 
-                                    if (track.LoadResultType != LavalinkLoadResultType.TrackLoaded)
+                                    if (loadResult.LoadType != LavalinkLoadResultType.Track)
                                     {
                                         list.List.Remove(b);
-                                        _logger.LogError("Failed to load video length for '{Url}'", track.Exception, b.Url);
+                                        _logger.LogError("Failed to load video length for '{Url}'", b.Url);
                                         continue;
                                     }
 
-                                    VideoLengthCache.Add(b.Url, track.Tracks.First().Length);
+                                    VideoLengthCache.Add(b.Url, track.Info.Length);
                                     await Task.Delay(100);
                                 }
 
@@ -186,15 +187,15 @@ internal sealed class SyncTasks
 
                             var lava = bot.DiscordClient.GetLavalink();
 
-                            while (!lava.ConnectedNodes.Values.Any(x => x.IsConnected))
+                            while (!lava.ConnectedSessions.Values.Any(x => x.IsConnected))
                                 await Task.Delay(1000);
 
-                            var node = lava.ConnectedNodes.Values.First(x => x.IsConnected);
-                            var conn = node.GetGuildConnection(guild.Value);
+                            var node = lava.ConnectedSessions.Values.First(x => x.IsConnected);
+                            var conn = node.GetGuildPlayer(guild.Value);
 
                             if (conn is null)
                             {
-                                if (!lava.ConnectedNodes.Any())
+                                if (!lava.ConnectedSessions.Any())
                                 {
                                     throw new Exception("Lavalink connection isn't established.");
                                 }
@@ -202,12 +203,12 @@ internal sealed class SyncTasks
                                 conn = await node.ConnectAsync(channel);
                             }
 
-                            var loadResult = await node.Rest.GetTracksAsync(bot.Guilds[guild.Key].MusicModule.CurrentVideo, LavalinkSearchType.Plain);
+                            var loadResult = await node.LoadTracksAsync(LavalinkSearchType.Plain, bot.Guilds[guild.Key].MusicModule.CurrentVideo);
 
-                            if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
+                            if (loadResult.LoadType is LavalinkLoadResultType.Error or LavalinkLoadResultType.Empty)
                                 return;
 
-                            await conn.PlayAsync(loadResult.Tracks.First());
+                            await conn.PlayAsync(loadResult.GetResultAs<LavalinkTrack>());
 
                             await Task.Delay(2000);
                             await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));

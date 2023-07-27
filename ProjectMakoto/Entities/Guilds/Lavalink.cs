@@ -151,7 +151,7 @@ public sealed class Lavalink : RequiresParent<Guild>
         _bot.Guilds[Id].MusicModule = new(this.Bot, this.Parent);
     }
 
-    public void QueueHandler(Bot _bot, DiscordClient sender, LavalinkNodeConnection nodeConnection, LavalinkGuildConnection guildConnection)
+    public void QueueHandler(Bot _bot, DiscordClient sender, LavalinkSession session, LavalinkGuildPlayer guildPlayer)
     {
         Task.Run(async () =>
         {
@@ -162,11 +162,11 @@ public sealed class Lavalink : RequiresParent<Guild>
 
                 this.Initialized = true;
 
-                this.Guild = guildConnection.Guild;
+                this.Guild = guildPlayer.Guild;
 
                 _logger.LogDebug("Initializing Player for {Guild}..", this.Guild.Id);
 
-                int UserAmount = guildConnection.Channel.Users.Count;
+                int UserAmount = guildPlayer.Channel.Users.Count;
                 CancellationTokenSource VoiceUpdateTokenSource = new();
                 async Task VoiceStateUpdated(DiscordClient s, VoiceStateUpdateEventArgs e)
                 {
@@ -175,7 +175,7 @@ public sealed class Lavalink : RequiresParent<Guild>
 
                     Task.Run(async () =>
                     {
-                        if (e.Channel?.Id == guildConnection.Channel?.Id || e.Before?.Channel?.Id == guildConnection.Channel?.Id)
+                        if (e.Channel?.Id == guildPlayer.Channel?.Id || e.Before?.Channel?.Id == guildPlayer.Channel?.Id)
                         {
                             VoiceUpdateTokenSource.Cancel();
                             VoiceUpdateTokenSource = new();
@@ -208,7 +208,7 @@ public sealed class Lavalink : RequiresParent<Guild>
                         {
                             if (e.After is null || e.After.Channel is null)
                             {
-                                _ = guildConnection.DisconnectAsync();
+                                _ = guildPlayer.DisconnectAsync();
                                 Dispose(_bot, e.Guild.Id, "Disconnected");
                                 return;
                             }
@@ -216,17 +216,17 @@ public sealed class Lavalink : RequiresParent<Guild>
                     }).Add(_bot);
                 }
 
-                async Task PlayerUpdated(LavalinkGuildConnection sender, PlayerUpdateEventArgs e)
+                async Task StateUpdated(LavalinkGuildPlayer sender, LavalinkPlayerStateUpdateEventArgs e)
                 {
-                    this.CurrentVideo = (e.Player?.CurrentState?.CurrentTrack?.Uri ?? new UriBuilder().Uri).ToString();
-                    this.CurrentVideoPosition = (Convert.ToInt64(e.Player?.CurrentState?.PlaybackPosition.TotalSeconds ?? -1d));
+                    this.CurrentVideo = (sender.CurrentTrack?.Info?.Uri ?? new UriBuilder().Uri).ToString();
+                    this.CurrentVideoPosition = (Convert.ToInt64(e.State?.Position.TotalSeconds ?? -1d));
                 }
 
                 _logger.LogDebug("Initializing VoiceStateUpdated Event for {Guild}..", this.Guild.Id);
                 sender.VoiceStateUpdated += VoiceStateUpdated;
 
                 _logger.LogDebug("Initializing PlayerUpdated Event for {Guild}..", this.Guild.Id);
-                guildConnection.PlayerUpdated += PlayerUpdated;
+                guildPlayer.StateUpdated += StateUpdated;
 
                 QueueInfo LastPlayedTrack = null;
 
@@ -234,9 +234,9 @@ public sealed class Lavalink : RequiresParent<Guild>
                 {
                     int WaitSeconds = 30;
 
-                    while ((guildConnection.CurrentState.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0) && !this.Disposed)
+                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0) && !this.Disposed)
                     {
-                        if (guildConnection.CurrentState.CurrentTrack is null && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0)
+                        if (guildPlayer.CurrentTrack is null && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0)
                         {
                             WaitSeconds--;
 
@@ -254,9 +254,9 @@ public sealed class Lavalink : RequiresParent<Guild>
                     {
                         _logger.LogDebug("Destroying Player for {Guild}..", this.Guild.Id);
                         sender.VoiceStateUpdated -= VoiceStateUpdated;
-                        guildConnection.PlayerUpdated -= PlayerUpdated;
+                        guildPlayer.StateUpdated -= StateUpdated;
 
-                        _ = guildConnection.DisconnectAsync();
+                        _ = guildPlayer.DisconnectAsync();
                         return;
                     }
 
@@ -281,24 +281,28 @@ public sealed class Lavalink : RequiresParent<Guild>
 
                     _bot.Guilds[this.Guild.Id].MusicModule.collectedSkips.Clear();
 
-                    var loadResult = await nodeConnection.Rest.GetTracksAsync(Track.Url, LavalinkSearchType.Plain);
+                    var loadResult = await session.LoadTracksAsync(LavalinkSearchType.Plain, Track.Url);
 
-                    if (loadResult.LoadResultType is LavalinkLoadResultType.LoadFailed or LavalinkLoadResultType.NoMatches)
+                    if (loadResult.LoadType is LavalinkLoadResultType.Error or LavalinkLoadResultType.Empty)
                     {
-                        if (loadResult.LoadResultType is LavalinkLoadResultType.NoMatches or LavalinkLoadResultType.LoadFailed)
-                            _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Remove(Track);
-
+                        _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Remove(Track);
                         continue;
                     }
 
-                    var loadedTrack = loadResult.Tracks.First();
-
-                    guildConnection = nodeConnection.GetGuildConnection(this.Guild);
-                    this.ChannelId = guildConnection.Channel.Id;
-
-                    if (guildConnection is not null)
+                    var loadedTrack = loadResult.LoadType switch
                     {
-                        await guildConnection.PlayAsync(loadedTrack);
+                        LavalinkLoadResultType.Track => loadResult.GetResultAs<LavalinkTrack>(),
+                        LavalinkLoadResultType.Playlist => loadResult.GetResultAs<LavalinkPlaylist>().Tracks.First(),
+                        LavalinkLoadResultType.Search => loadResult.GetResultAs<List<LavalinkTrack>>().First(),
+                        _ => throw new InvalidOperationException("Unexpected load result type.")
+                    };
+
+                    guildPlayer = session.GetGuildPlayer(this.Guild);
+                    this.ChannelId = guildPlayer.Channel.Id;
+
+                    if (guildPlayer is not null)
+                    {
+                        await guildPlayer.PlayAsync(loadedTrack);
                     }
                     else
                     {
@@ -314,7 +318,7 @@ public sealed class Lavalink : RequiresParent<Guild>
             {
                 _logger.LogError("An exception occurred while trying to handle music queue", ex);
 
-                _ = guildConnection.DisconnectAsync();
+                _ = guildPlayer.DisconnectAsync();
                 Dispose(_bot, this.Guild.Id, "Exception");
                 throw;
             }
