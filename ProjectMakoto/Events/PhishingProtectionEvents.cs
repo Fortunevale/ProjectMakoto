@@ -35,7 +35,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                 if (e.Content.StartsWith($"{prefix}{command.Key}"))
                     return;
 
-        if (e.WebhookMessage || guild is null || e.Author?.Id == sender.CurrentUser.Id)
+        if (e.WebhookMessage || guild is null || e.Author?.Id == sender.CurrentUser.Id || (e.Author?.IsBot ?? true))
             return;
 
         if (!this.Bot.Guilds[guild.Id].PhishingDetection.DetectPhishing)

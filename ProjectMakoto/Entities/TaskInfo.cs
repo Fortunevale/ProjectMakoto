@@ -33,5 +33,5 @@ public sealed class TaskInfo
     public object? CustomData { get; internal set;} = null;
 
     public string GetName()
-        => $"{this.Uuid}/{this.CallingMethod}/{this.CallingFile}/L{this.CallingLine}";
+        => $"{this.Uuid}; F:{this.CallingFile}:{this.CallingLine} (M:{this.CallingMethod})";
 }
