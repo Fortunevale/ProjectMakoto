@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -8,5 +8,10 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.Entities.Translation;
-
-public sealed record TVar(string ValName, object Replacement, bool Sanitize = false);
+public sealed record EmbeddedLink(string Url, string Text)
+{
+    public override string ToString()
+    {
+        return $"[{this.Text}]({this.Url})";
+    }
+}
