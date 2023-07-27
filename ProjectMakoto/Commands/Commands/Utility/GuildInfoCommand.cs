@@ -84,8 +84,8 @@ internal sealed class GuildInfoCommand : BaseCommand
 
                 await RespondOrEdit(embed);
             }
-            catch (Exception ex1) when (ex1 is DisCatSharp.Exceptions.UnauthorizedException ||
-                                       ex1 is DisCatSharp.Exceptions.NotFoundException)
+            catch (Exception ex1) when (ex1 is DisCatSharp.Exceptions.UnauthorizedException or
+                                       DisCatSharp.Exceptions.NotFoundException)
             {
                 HttpClient client = new();
 
@@ -125,8 +125,8 @@ internal sealed class GuildInfoCommand : BaseCommand
 
                     await RespondOrEdit(builder);
                 }
-                catch (Exception ex2) when (ex2 is DisCatSharp.Exceptions.UnauthorizedException ||
-                                            ex2 is DisCatSharp.Exceptions.NotFoundException)
+                catch (Exception ex2) when (ex2 is DisCatSharp.Exceptions.UnauthorizedException or
+                                            DisCatSharp.Exceptions.NotFoundException)
                 {
                     try
                     {
