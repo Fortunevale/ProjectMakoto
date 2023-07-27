@@ -37,7 +37,7 @@ internal sealed class DisCatSharpExtensionsLoader
             HttpTimeout = TimeSpan.FromSeconds(60),
             MessageCacheSize = 4096,
             EnableSentry = true,
-            ReportMissingFields = true,
+            ReportMissingFields = bot.status.LoadedConfig.IsDev,
             AttachUserInfo = true,
             DeveloperUserId = 411950662662881290
         });
