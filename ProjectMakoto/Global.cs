@@ -46,7 +46,6 @@ global using DisCatSharp.Lavalink.Entities;
 global using DisCatSharp.Net;
 global using DisCatSharp.Extensions.TwoFactorCommands;
 global using DisCatSharp.Extensions.TwoFactorCommands.ApplicationCommands;
-global using DisCatSharp.Extensions.TwoFactorCommands.Entities;
 
 global using Microsoft.Extensions.DependencyInjection;
 

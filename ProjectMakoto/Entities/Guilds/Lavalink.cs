@@ -222,11 +222,18 @@ public sealed class Lavalink : RequiresParent<Guild>
                     this.CurrentVideoPosition = (Convert.ToInt64(e.State?.Position.TotalSeconds ?? -1d));
                 }
 
+                bool TrackEnded = false;
+                async Task TrackEnd(LavalinkGuildPlayer sender, LavalinkTrackEndedEventArgs e)
+                {
+                    TrackEnded = true;
+                }
+
                 _logger.LogDebug("Initializing VoiceStateUpdated Event for {Guild}..", this.Guild.Id);
                 sender.VoiceStateUpdated += VoiceStateUpdated;
 
                 _logger.LogDebug("Initializing PlayerUpdated Event for {Guild}..", this.Guild.Id);
                 guildPlayer.StateUpdated += StateUpdated;
+                guildPlayer.TrackEnded += TrackEnd;
 
                 QueueInfo LastPlayedTrack = null;
 
@@ -234,7 +241,7 @@ public sealed class Lavalink : RequiresParent<Guild>
                 {
                     int WaitSeconds = 30;
 
-                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0) && !this.Disposed)
+                    while ((guildPlayer.CurrentTrack is not null || _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0) && !TrackEnded && !this.Disposed)
                     {
                         if (guildPlayer.CurrentTrack is null && _bot.Guilds[this.Guild.Id].MusicModule.SongQueue.Count <= 0)
                         {
@@ -255,12 +262,14 @@ public sealed class Lavalink : RequiresParent<Guild>
                         _logger.LogDebug("Destroying Player for {Guild}..", this.Guild.Id);
                         sender.VoiceStateUpdated -= VoiceStateUpdated;
                         guildPlayer.StateUpdated -= StateUpdated;
+                        guildPlayer.TrackEnded -= TrackEnd;
 
                         _ = guildPlayer.DisconnectAsync();
                         return;
                     }
 
-                    Lavalink.QueueInfo Track;
+                    TrackEnded = false;
+                    QueueInfo Track;
 
                     int skipSongs = 0;
 
