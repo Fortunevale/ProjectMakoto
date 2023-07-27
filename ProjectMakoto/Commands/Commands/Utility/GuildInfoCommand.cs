@@ -84,7 +84,8 @@ internal sealed class GuildInfoCommand : BaseCommand
 
                 await RespondOrEdit(embed);
             }
-            catch (DisCatSharp.Exceptions.UnauthorizedException)
+            catch (Exception ex1) when (ex1 is DisCatSharp.Exceptions.UnauthorizedException ||
+                                       ex1 is DisCatSharp.Exceptions.NotFoundException)
             {
                 HttpClient client = new();
 
@@ -117,32 +118,31 @@ internal sealed class GuildInfoCommand : BaseCommand
 
                     string invite = "";
 
-                    try
-                    { invite = JsonConvert.DeserializeObject<Entities.DiscordWidget>(await client.GetStringAsync($"https://discord.com/api/guilds/{guildId}/widget.json")).instant_invite; }
-                    catch { }
+                    try { invite = (await ctx.Client.GetGuildWidgetAsync(guildId)).InstantInviteUrl; } catch { }
 
                     if (!invite.IsNullOrWhiteSpace())
                         builder.AddComponents(new DiscordLinkButtonComponent(invite, GetString(this.t.Commands.Utility.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
                     await RespondOrEdit(builder);
                 }
-                catch (DisCatSharp.Exceptions.NotFoundException)
+                catch (Exception ex2) when (ex2 is DisCatSharp.Exceptions.UnauthorizedException ||
+                                            ex2 is DisCatSharp.Exceptions.NotFoundException)
                 {
                     try
                     {
-                        Entities.DiscordWidget widget = JsonConvert.DeserializeObject<Entities.DiscordWidget>(await client.GetStringAsync($"https://discord.com/api/guilds/{guildId}/widget.json"));
+                        var widget = await ctx.Client.GetGuildWidgetAsync(guildId);
 
                         var embed = new DiscordEmbedBuilder
                         {
-                            Title = widget.name,
+                            Title = widget.Name,
                         }.AsBotInfo(ctx, "", GetString(this.t.Commands.Utility.GuildInfo.GuildWidgetNotice));
 
-                        embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"🟢 `{widget.presence_count}` **{GetString(this.t.Commands.Utility.GuildInfo.OnlineMembers)}**\n"));
+                        embed.AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.GuildInfo.MemberTitle), $"🟢 `{widget.PresenceCount}` **{GetString(this.t.Commands.Utility.GuildInfo.OnlineMembers)}**\n"));
 
                         DiscordMessageBuilder builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-                        if (!widget.instant_invite.IsNullOrWhiteSpace())
-                            builder.AddComponents(new DiscordLinkButtonComponent(widget.instant_invite, GetString(this.t.Commands.Utility.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
+                        if (!widget.InstantInviteUrl.IsNullOrWhiteSpace())
+                            builder.AddComponents(new DiscordLinkButtonComponent(widget.InstantInviteUrl, GetString(this.t.Commands.Utility.GuildInfo.JoinServer), false, DiscordEmoji.FromUnicode("🔗").ToComponent()));
 
                         await RespondOrEdit(builder);
                     }
