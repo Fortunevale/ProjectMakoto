@@ -2216,7 +2216,7 @@
       "Queue": {
         "QueueCount": {
           "en": "There's currently {Count} song(s) queued. This queue last for {Timespan}.",
-          "de": "Aktuell befinden sich {Count} Lieder in der Warteschlange. Diese Warteschlange wird {Timestamp} dauern."
+          "de": "Aktuell befinden sich {Count} Lieder in der Warteschlange. Diese Warteschlange wird {Timespan} dauern."
         },
         "Track": {
           "en": "{Video} requested by {Requester}",
@@ -2563,7 +2563,7 @@
           },
           "CurrentTrackCount": {
             "en": "There's currently {Count} tracks(s) in this playlist. This playlist lasts for {Timespan}.",
-            "de": "Aktuell befinden sich {Count} Lieder in dieser Wiedergabeliste. Sie wird {Timestamp} dauern."
+            "de": "Aktuell befinden sich {Count} Lieder in dieser Wiedergabeliste. Sie wird {Timespan} dauern."
           },
           "Track": {
             "en": "{Track} added {Timestamp}",
