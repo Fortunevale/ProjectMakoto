@@ -172,7 +172,7 @@ internal sealed class DisCatSharpExtensionsLoader
 
                 try
                 {
-                    _logger.LogInfo("Lavalink is running on {Version}.", await bot.LavalinkSession.Rest.GetVersionAsync());
+                    _logger.LogInfo("Lavalink is running on {Version}.", (await bot.LavalinkSession.GetLavalinkInfoAsync()).Version.Semver);
                 }
                 catch { }
             }
