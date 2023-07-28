@@ -133,13 +133,13 @@ internal sealed class DisCatSharpExtensionsLoader
         }
         else
         {
-            appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
-            appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(bot.status.LoadedConfig.Channels.Assets, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.UtilityAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.MaintainersAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.ConfigurationAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.ModerationAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.SocialAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.ScoreSaberAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
+            appCommands.RegisterGuildCommands<ApplicationCommands.MusicAppCommands>(bot.status.LoadedConfig.Discord.AssetsGuild, GetCommandTranslations);
         }
 
         _logger.LogDebug("Registering Commands..");
@@ -191,7 +191,7 @@ internal sealed class DisCatSharpExtensionsLoader
 
             _ = bot.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
-            while (bot.DiscordClient.GetApplicationCommands().RegisteredCommands.Count == 0)
+            while (bot.DiscordClient.GetApplicationCommands().RegisteredCommands?.Count == 0)
                 Thread.Sleep(1000);
 
             bot.status.DiscordCommandsRegistered = true;

@@ -40,7 +40,7 @@ public sealed class Cooldown : RequiresParent<User>
             return false;
         }
 
-        var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.CancelCommand), false, EmojiTemplates.GetWhiteXMark(ctx.Bot).ToComponent());
+        var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.CancelCommand), false, EmojiTemplates.GetError(ctx.Bot).ToComponent());
         var cancellationTokenSource = new CancellationTokenSource();
         var Cancelled = false;
 

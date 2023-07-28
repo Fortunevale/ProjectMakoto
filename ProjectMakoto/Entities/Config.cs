@@ -48,6 +48,9 @@ public sealed class Config
 
     public sealed class DiscordConfig
     {
+        public ulong AssetsGuild = 0;
+        public ulong DevelopmentGuild = 0;
+
         public uint MaxUploadSize = 8388608;
         public List<string> DisabledCommands = new();
     }
@@ -58,7 +61,6 @@ public sealed class Config
         public ulong GithubLog = 0;
         public ulong News = 0;
 
-        public ulong Assets = 0;
         public ulong GraphAssets = 0;
         public ulong PlaylistAssets = 0;
         public ulong UrlSubmissions = 0;
@@ -69,13 +71,6 @@ public sealed class Config
 
     public sealed class EmojiConfig
     {
-        public string Dot = "🅿";
-
-        public string DisabledRepeat = "🅿";
-        public string DisabledShuffle = "🅿";
-        public string Paused = "🅿";
-        public string DisabledPlay = "🅿";
-
         public string[] JoinEvent = { "🙋‍", "🙋‍" };
         public string Cuddle = "🅿";
         public string Kiss = "🅿";
@@ -83,32 +78,31 @@ public sealed class Config
         public string Proud = "🅿";
         public string Hug = "🅿";
 
-        public ulong WhiteXMark = 1005430134070841395;
+        public ulong DisabledRepeat = 0;
+        public ulong DisabledShuffle = 0;
+        public ulong Paused = 0;
+        public ulong DisabledPlay = 0;
 
-        public ulong CheckboxTickedRedId = 970280327253725184;
-        public ulong CheckboxUntickedRedId = 970280299466481745;
+        public ulong Error = 0;
 
-        public ulong CheckboxTickedBlueId = 970278964755038248;
-        public ulong CheckboxUntickedBlueId = 970278964079767574;
+        public ulong CheckboxTicked = 0;
+        public ulong CheckboxUnticked = 0;
 
-        public ulong CheckboxTickedGreenId = 970280278138449920;
-        public ulong CheckboxUntickedGreenId = 970280278025191454;
+        public ulong PillOn = 0;
+        public ulong PillOff = 0;
 
-        public ulong PillOnId = 1027551252382494741;
-        public ulong PillOffId = 1027551250818015322;
+        public ulong QuestionMark = 0;
 
-        public ulong QuestionMarkId = 1005464121472466984;
+        public ulong Channel = 0;
+        public ulong User = 0;
+        public ulong VoiceState = 0;
+        public ulong Message = 0;
+        public ulong Guild = 0;
+        public ulong Invite = 0;
 
-        public ulong ChannelId = 1005612865975238706;
-        public ulong UserId = 1005612863051800746;
-        public ulong VoiceStateId = 1005612864469487638;
-        public ulong MessageId = 1005612861676077166;
-        public ulong GuildId = 1005612867577458729;
-        public ulong InviteId = 1005612860333899859;
-
-        public ulong YouTubeId = 1011219477834252368;
-        public ulong SoundCloudId = 1011219476001337444;
-        public ulong AbuseIPDBId = 1022142812659126334;
+        public ulong YouTube = 0;
+        public ulong SoundCloud = 0;
+        public ulong AbuseIPDB = 0;
     }
 
     public sealed class AccountIdsConfig

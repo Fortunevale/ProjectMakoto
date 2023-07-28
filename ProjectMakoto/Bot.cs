@@ -177,6 +177,8 @@ public sealed class Bot
 
             this.status.DiscordInitialized = true;
 
+            await Util.Initializers.PostLoginTaskLoader.Load(this);
+
             _ = Task.Run(async () =>
             {
                 if (this.status.LoadedConfig.DontModify.LastStartedVersion == this.status.RunningVersion)

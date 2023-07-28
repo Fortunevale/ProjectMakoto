@@ -11,28 +11,24 @@ namespace ProjectMakoto.Entities;
 
 internal sealed class EmojiTemplates
 {
-    public static DiscordEmoji GetCheckboxTickedRed(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxTickedRedId);
-    public static DiscordEmoji GetCheckboxUntickedRed(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxUntickedRedId);
-    public static DiscordEmoji GetCheckboxTickedBlue(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxTickedBlueId);
-    public static DiscordEmoji GetCheckboxUntickedBlue(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxUntickedBlueId);
-    public static DiscordEmoji GetCheckboxTickedGreen(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxTickedGreenId);
-    public static DiscordEmoji GetCheckboxUntickedGreen(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxUntickedGreenId);
+    public static DiscordEmoji GetCheckboxTickedBlue(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxTicked);
+    public static DiscordEmoji GetCheckboxUntickedBlue(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.CheckboxUnticked);
 
-    public static DiscordEmoji GetPillOff(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.PillOffId);
-    public static DiscordEmoji GetPillOn(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.PillOnId);
+    public static DiscordEmoji GetPillOff(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.PillOff);
+    public static DiscordEmoji GetPillOn(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.PillOn);
 
-    public static DiscordEmoji GetWhiteXMark(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.WhiteXMark);
+    public static DiscordEmoji GetError(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Error);
 
-    public static DiscordEmoji GetQuestionMark(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.QuestionMarkId);
+    public static DiscordEmoji GetQuestionMark(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.QuestionMark);
 
-    public static DiscordEmoji GetGuild(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.GuildId);
-    public static DiscordEmoji GetChannel(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.ChannelId);
-    public static DiscordEmoji GetUser(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.UserId);
-    public static DiscordEmoji GetVoiceState(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.VoiceStateId);
-    public static DiscordEmoji GetMessage(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.MessageId);
-    public static DiscordEmoji GetInvite(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.InviteId);
+    public static DiscordEmoji GetGuild(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Guild);
+    public static DiscordEmoji GetChannel(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Channel);
+    public static DiscordEmoji GetUser(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.User);
+    public static DiscordEmoji GetVoiceState(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.VoiceState);
+    public static DiscordEmoji GetMessage(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Message);
+    public static DiscordEmoji GetInvite(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Invite);
 
-    public static DiscordEmoji GetYouTube(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.YouTubeId);
-    public static DiscordEmoji GetSoundcloud(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.SoundCloudId);
-    public static DiscordEmoji GetAbuseIpDb(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.AbuseIPDBId);
+    public static DiscordEmoji GetYouTube(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.YouTube);
+    public static DiscordEmoji GetSoundcloud(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.SoundCloud);
+    public static DiscordEmoji GetAbuseIpDb(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.AbuseIPDB);
 }

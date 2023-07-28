@@ -132,7 +132,7 @@ internal static class DiscordExtensions
         => $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
 
     internal static DiscordEmoji ToEmote(this bool b, Bot client)
-        => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetWhiteXMark(client);
+        => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetError(client);
 
     internal static DiscordEmoji ToPillEmote(this bool b, Bot client)
         => b ? EmojiTemplates.GetPillOn(client) : EmojiTemplates.GetPillOff(client);
@@ -151,13 +151,13 @@ internal static class DiscordExtensions
 
     internal static string GetCommandMention(this DiscordClient client, Bot bot, string command)
         => (bot.status.LoadedConfig.IsDev ?
-        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value.ToList() :
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.AssetsGuild).Value.ToList() :
         client.GetApplicationCommands().GlobalCommands.ToList())
         .First(x => x.Name == command).Mention;
 
     internal static IReadOnlyList<DiscordApplicationCommand> GetCommandList(this DiscordClient client, Bot bot)
         => (bot.status.LoadedConfig.IsDev ?
-        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value :
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.AssetsGuild).Value :
         client.GetApplicationCommands().GlobalCommands);
 
     internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch

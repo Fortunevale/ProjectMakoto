@@ -58,6 +58,38 @@ internal sealed class ConfigLoader
         while (bot.status.LoadedConfig is null)
             await Task.Delay(100);
 
+        foreach (var field in typeof(Config.DiscordConfig).GetFields())
+        {
+            if (field.FieldType != typeof(ulong))
+                continue;
+
+            ulong v = (ulong)field.GetValue(bot.status.LoadedConfig.Discord);
+            if (v is not 0UL)
+                continue;
+
+            _logger.LogError("No {0} provided.", field.Name);
+            await Task.Delay(1000);
+            Console.Write("> ");
+            field.SetValue(bot.status.LoadedConfig.Discord, Convert.ToUInt64(Console.ReadLine()));
+        }
+
+        foreach (var field in typeof(Config.ChannelsConfig).GetFields())
+        {
+            if (field.FieldType != typeof(ulong))
+                continue;
+
+            ulong v = (ulong)field.GetValue(bot.status.LoadedConfig.Channels);
+            if (v is not 0UL)
+                continue;
+
+            _logger.LogError("No {0} provided.", field.Name);
+            await Task.Delay(1000);
+            Console.Write("> ");
+            field.SetValue(bot.status.LoadedConfig.Channels, Convert.ToUInt64(Console.ReadLine()));
+
+            bot.status.LoadedConfig.Save();
+        }
+
         _logger.AddBlacklist(bot.status.LoadedConfig.Secrets.Database.Password,
             bot.status.LoadedConfig.Secrets.Discord.Token,
             bot.status.LoadedConfig.Secrets.Telegram.Token,
