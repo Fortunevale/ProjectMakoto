@@ -39,17 +39,17 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.143" />
-    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-007" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-007" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-007" />
-    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-007" />
+    <PackageReference Include="DisCatSharp" Version="10.4.2-nightly-009" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-009" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-009" />
+    <PackageReference Include="DisCatSharp.Common" Version="10.4.2-nightly-009" />
     <PackageReference Include="DisCatSharp.Extensions.TwoFactorCommands" Version="1.0.0-alpha-007" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-007" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-007" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-009" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-009" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0-2.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.7.0-2.final" />
     <PackageReference Include="MySql.Data" Version="8.1.0" />
-    <PackageReference Include="Octokit" Version="7.0.1" />
+    <PackageReference Include="Octokit" Version="7.1.0" />
     <PackageReference Include="QuickChart" Version="2.3.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
 	<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.5.0">
@@ -106,10 +106,14 @@
     <None Update="Translations\*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	<None Update="Assets\Emojis\Upload\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
+	<Folder Include="Properties\" />
+	<Folder Include="Assets\Emojis\Upload\" />
   </ItemGroup>
 
 </Project>
