@@ -22,7 +22,8 @@ internal class PostLoginTaskLoader
 
             ulong v = (ulong)field.GetValue(bot.status.LoadedConfig.Emojis);
             if (v is not 0UL)
-                continue;
+                if (emojis.Any(x => x.Id == v))
+                    continue;
 
             try
             {
@@ -39,10 +40,16 @@ internal class PostLoginTaskLoader
 
                 string fileName = $"Assets/Emojis/Upload/{field.Name}.png";
 
-                if (!File.Exists(fileName))
+                if (!Directory.GetFiles("Assets/Emojis/Upload/", "*", 
+                    new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
+                        .Select(x => x.Replace("\\", "//"))
+                        .Any(x => x.Contains(fileName)))
                     fileName = $"Assets/Emojis/Upload/{field.Name}.gif";
 
-                if (!File.Exists(fileName))
+                if (!Directory.GetFiles("Assets/Emojis/Upload/", "*",
+                    new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })
+                        .Select(x => x.Replace("\\", "//"))
+                        .Any(x => x.Contains(fileName)))
                     throw new FileNotFoundException($"The emoji file for '{field.Name}' could not be found.");
 
                 using var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
