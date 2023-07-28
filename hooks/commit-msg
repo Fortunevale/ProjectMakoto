@@ -23,12 +23,12 @@ test "" = "$(grep '^Signed-off-by: ' "$1" |
 	exit 1
 }
 
-if ! head -1 "$1" | grep -qE "^(feat|fix|ci|chore|docs|test|style|refactor|revert|perf)(\(.+?\))?!?: .{1,}$"; then
+if ! head -1 "$1" | grep -qE "^(Merge branch .*)|((feat|fix|ci|chore|docs|test|style|refactor|revert|perf)(\(.+?\))?!?: .{1,})$"; then
     echo "Your commit message is invalid. It must contain any of these prefixes:feat, fix, ci, chore, docs, test, style, refactor, perf or revert. You can suffix a ! to signal a breaking change and/or define the scope of the commit via (scope)." >&2
     exit 1
 fi
 
-if ! head -1 "$1" | grep -qE "^.{1,50}$"; then
+if ! head -1 "$1" | grep -qE "^(Merge branch .*)|(.{1,50})$"; then
     echo "Your commit message is too long." >&2
     exit 1
 fi
