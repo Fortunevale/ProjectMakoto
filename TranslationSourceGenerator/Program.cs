@@ -194,7 +194,7 @@ public sealed class Translations
                                                     $"{new string(' ', depth * 4)}}}\n";
 
                                                 if (addedFields[IndexPath].Contains(line))
-                                                    continue;
+                                                    break;
 
                                                 Insert = Insert.Insert(InsertPosition, line);
                                                 addedFields[IndexPath].Add(line);
@@ -218,25 +218,32 @@ public sealed class Translations
                                         }
                                         case JTokenType.Array:
                                         {
-                                            if (item.Key is "options" or "commands" or "choices" or "groups")
+                                            _logger.LogDebug("Found Array '{0}'", item.Key);
+
+                                            var line = $"\n{new string(' ', depth * 4)}public {className}[] {fieldName};\n" +
+                                                $"{new string(' ', depth * 4)}public sealed class {className}\n" +
+                                                $"{new string(' ', depth * 4)}{{\n" +
+                                                $"{new string(' ', depth * 4)}// {entryPoint} InsertPoint\n" +
+                                                $"{new string(' ', depth * 4)}}}\n";
+
+                                            if (fieldName == "CommandList" && IndexPath == "// /commands InsertPoint")
                                             {
-                                                _logger.LogDebug("Found Command Group '{0}'", item.Key);
-
-                                                var line = $"\n{new string(' ', depth * 4)}public {className}[] {fieldName};\n" +
-                                                    $"{new string(' ', depth * 4)}public sealed class {className}\n" +
-                                                    $"{new string(' ', depth * 4)}{{\n" +
-                                                    $"{new string(' ', depth * 4)}// {entryPoint} InsertPoint\n" +
-                                                    $"{new string(' ', depth * 4)}}}\n";
-
-                                                if (addedFields[IndexPath].Contains(line))
-                                                    continue;
+                                                line = $"\n{new string(' ', depth * 4)}public CommandTranslation[] {fieldName};";
 
                                                 Insert = Insert.Insert(InsertPosition, line);
                                                 addedFields[IndexPath].Add(line);
 
-                                                foreach (var b in item.Value.ToObject<JArray>())
-                                                    RecursiveHandle(b.ToObject<JObject>(), entryPoint, depth + 1);
+                                                continue;
                                             }
+
+                                            if (!addedFields[IndexPath].Contains(line))
+                                            {
+                                                Insert = Insert.Insert(InsertPosition, line);
+                                                addedFields[IndexPath].Add(line);
+                                            }    
+
+                                            foreach (var b in item.Value.ToObject<JArray>())
+                                                RecursiveHandle(b.ToObject<JObject>(), entryPoint, depth + 1);
                                             break;
                                         }
                                         default:
