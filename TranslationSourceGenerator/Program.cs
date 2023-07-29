@@ -15,6 +15,7 @@ global using static Xorog.UniversalExtensions.UniversalExtensions;
 global using Newtonsoft.Json;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace TranslationSourceGenerator;
 
@@ -94,11 +95,16 @@ public sealed class Translations
 
                             JObject jsonFile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(StringsJson));
 
+                            string CreateValidValueName(string str)
+                            {
+                                return Regex.Replace(str, @"[^a-zA-Z0-9]", "_");
+                            }
+
                             void RecursiveHandle(JObject token, string ParentPath, int depth)
                             {
                                 foreach (var item in token)
                                 {
-                                    var className = $"{item.Key.First().ToString().ToLower()}{item.Key.Remove(0, 1)}";
+                                    var className = CreateValidValueName($"{item.Key.First().ToString().ToLower()}{item.Key.Remove(0, 1)}");
 
                                     switch (className)
                                     {
@@ -109,7 +115,7 @@ public sealed class Translations
                                             break;
                                     }
 
-                                    var fieldName = $"{item.Key.FirstLetterToUpper()}";
+                                    var fieldName = CreateValidValueName(item.Key.FirstLetterToUpper());
                                     var entryPoint = $"{ParentPath}/{className}";
 
                                     int InsertPosition = 0;
@@ -144,7 +150,7 @@ public sealed class Translations
                                                 if (!localeCodeIsArray)
                                                 {
                                                     _logger.LogDebug("Found SingleKey '{0}'", item.Key);
-                                                    Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public SingleTranslationKey {item.Key};");
+                                                    Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public SingleTranslationKey {CreateValidValueName(item.Key)};");
 
                                                     if (!tokens.Any(x => x.Key == "de"))
                                                         Warnings.Add($"String at path {entryPoint} has no de translation");
@@ -152,7 +158,7 @@ public sealed class Translations
                                                 else
                                                 {
                                                     _logger.LogDebug("Found MultiKey '{0}'", item.Key);
-                                                    Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public MultiTranslationKey {item.Key};");
+                                                    Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public MultiTranslationKey {CreateValidValueName(item.Key)};");
 
                                                     if (!tokens.Any(x => x.Key == "de"))
                                                         Warnings.Add($"String at path {entryPoint} has no de translation");
@@ -176,7 +182,7 @@ public sealed class Translations
                                         case JTokenType.Integer:
                                         {
                                             _logger.LogDebug("Found Int '{0}'", item.Key);
-                                            Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public int {item.Key};");
+                                            Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public int {CreateValidValueName(item.Key)};");
                                             break;
                                         }
                                         case JTokenType.Array:
