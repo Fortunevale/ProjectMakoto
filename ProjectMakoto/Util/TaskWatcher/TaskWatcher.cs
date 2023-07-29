@@ -180,6 +180,39 @@ public sealed class TaskWatcher
         switch (e.LogEntry.LogLevel)
         {
             case CustomLogLevel.Fatal:
+            {
+                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
+                {
+                    bot.status.DiscordDisconnections++;
+
+                    if (bot.status.DiscordDisconnections >= 3)
+                    {
+                        _logger.LogRaised -= bot.LogHandler;
+                        _ = bot.ExitApplication();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await bot.DiscordClient.ConnectAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogFatal("Failed to reconnect to discord", ex);
+                            _logger.LogRaised -= bot.LogHandler;
+                            _ = bot.ExitApplication();
+                        }
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+
+        switch (e.LogEntry.LogLevel)
+        {
+            case CustomLogLevel.Fatal:
             case CustomLogLevel.Error:
             {
                 try
@@ -281,39 +314,6 @@ public sealed class TaskWatcher
                 catch { }
                 break;
             }
-        }
-
-        switch (e.LogEntry.LogLevel)
-        {
-            case CustomLogLevel.Fatal:
-            {
-                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
-                {
-                    bot.status.DiscordDisconnections++;
-
-                    if (bot.status.DiscordDisconnections >= 3)
-                    {
-                        _logger.LogRaised -= bot.LogHandler;
-                        _ = bot.ExitApplication();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            await bot.DiscordClient.ConnectAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogFatal("Failed to reconnect to discord", ex);
-                            _logger.LogRaised -= bot.LogHandler;
-                            _ = bot.ExitApplication();
-                        }
-                    }
-                }
-                break;
-            }
-            default:
-                break;
         }
     }
 }
