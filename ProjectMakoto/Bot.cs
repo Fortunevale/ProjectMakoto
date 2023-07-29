@@ -173,6 +173,7 @@ public sealed class Bot
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
             await this.DiscordClient.ConnectAsync();
+            await Task.Delay(10000);
             _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
             this.status.DiscordInitialized = true;

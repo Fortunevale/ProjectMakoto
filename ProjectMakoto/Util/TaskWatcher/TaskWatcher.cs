@@ -194,6 +194,7 @@ public sealed class TaskWatcher
                     {
                         try
                         {
+                            await Task.Delay(10000);
                             await bot.DiscordClient.ConnectAsync();
                         }
                         catch (Exception ex)
