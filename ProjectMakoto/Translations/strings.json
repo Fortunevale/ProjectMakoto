@@ -732,7 +732,7 @@
         "Type": 1,
         "Names": {
           "en": "poll",
-          "de": "Umfrage"
+          "de": "umfrage"
         },
         "Descriptions": {
           "en": "Starts a poll.",
@@ -753,7 +753,7 @@
           {
             "Names": {
               "en": "number",
-              "de": "Anzahl"
+              "de": "anzahl"
             },
             "Descriptions": {
               "en": "1-2000 | The number of messages to delete.",
@@ -786,7 +786,7 @@
           {
             "Names": {
               "en": "number",
-              "de": "Anzahl"
+              "de": "anzahl"
             },
             "Descriptions": {
               "en": "1-2000 | The number of messages to delete in every channel.",
@@ -1974,8 +1974,8 @@
                   "de": "interne_seite"
                 },
                 "Descriptions": {
-                  "en": "The internal page of the Leaderboard to fetch. Only really useful when copy-pasting commands.",
-                  "de": "Die interne Seite von der Rangliste die geladen werden soll. Nur nützliche beim kopieren von Befehlen."
+                  "en": "The internal page of the Leaderboard to fetch.",
+                  "de": "Die interne Seite von der Rangliste die geladen werden soll."
                 }
               }
             ]
@@ -2084,16 +2084,18 @@
               "en": "Remove a song from the queue.",
               "de": "Entfernt ein Lied von der Wiedergabeliste."
             },
-            "Options": {
-              "Names": {
-                "en": "video",
-                "de": "lied"
-              },
-              "Descriptions": {
-                "en": "The Index or Video Title",
-                "de": "Der Index oder Video Titel"
+            "Options": [
+              {
+                "Names": {
+                  "en": "video",
+                  "de": "lied"
+                },
+                "Descriptions": {
+                  "en": "The Index or Video Title",
+                  "de": "Der Index oder Video Titel"
+                }
               }
-            }
+            ]
           },
           {
             "Names": {
