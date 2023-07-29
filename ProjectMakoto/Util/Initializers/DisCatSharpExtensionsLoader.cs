@@ -143,7 +143,7 @@ internal sealed class DisCatSharpExtensionsLoader
                     createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "name")).SetValue(translator, nameValues["en"]);
 
                     if (typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.GroupTranslator) || typeToCreate == typeof(DisCatSharp.ApplicationCommands.Entities.CommandTranslator))
-                        createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "type")).SetValue(translator, (ApplicationCommandType)typeValue);
+                        createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "type")).SetValue(translator, (ApplicationCommandType?)typeValue);
 
                     if (createTypeProperties.Any(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description")))
                         createTypeProperties.First(x => x.GetCustomAttributes().Any(attr => attr is JsonPropertyAttribute attribute && attribute.PropertyName == "description")).SetValue(translator, descriptionValues["en"]);
