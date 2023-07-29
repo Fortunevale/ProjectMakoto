@@ -92,17 +92,17 @@ public sealed class ConfigurationAppCommands : ApplicationCommandsModule
             => _ = new PrefixCommand().ExecuteCommand(ctx, this._bot);
     }
 
-    [PrefixCommandAlternative("reactionroles add")]
+    [PrefixCommandAlternative("config reactionroles add")]
     [ContextMenu(ApplicationCommandType.Message, "Add a Reaction Role", (long)Permissions.Administrator, dmPermission: false)]
     public async Task Add(ContextMenuContext ctx)
     => _ = new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "message", ctx.TargetMessage }, });
 
-    [PrefixCommandAlternative("reactionroles remove")]
+    [PrefixCommandAlternative("config reactionroles remove")]
     [ContextMenu(ApplicationCommandType.Message, "Remove a Reaction Role", (long)Permissions.Administrator, dmPermission: false)]
     public async Task Remove(ContextMenuContext ctx)
         => _ = new Commands.ReactionRolesCommand.RemoveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "message", ctx.TargetMessage }, });
 
-    [PrefixCommandAlternative("reactionroles removeall")]
+    [PrefixCommandAlternative("config reactionroles removeall")]
     [ContextMenu(ApplicationCommandType.Message, "Remove all Reaction Roles", (long)Permissions.Administrator, dmPermission: false)]
     public async Task RemoveAll(ContextMenuContext ctx)
         => _ = new Commands.ReactionRolesCommand.RemoveAllCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "message", ctx.TargetMessage }, });

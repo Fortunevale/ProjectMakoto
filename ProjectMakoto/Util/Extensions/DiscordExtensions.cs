@@ -234,6 +234,51 @@ internal static class DiscordExtensions
         return fields;
     }
 
+    internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> embedFields, DiscordEmbedBuilder template = null, bool InvisibleOnDuplicateTitles = false)
+    {
+        template ??= new();
+
+        List<DiscordEmbedBuilder> embeds = new();
+
+        DiscordEmbedBuilder currentBuilder = new(template);
+
+        int CalculateCharacterLimit()
+        {
+            int currentCount = (currentBuilder.Title?.Length ?? 0) +
+                               (currentBuilder.Description?.Length ?? 0) +
+                               (currentBuilder.Author?.Name.Length ?? 0) +
+                               (currentBuilder.Footer?.Text.Length ?? 0);
+
+            foreach (var field in currentBuilder.Fields)
+                currentCount += field.Name.Length + field.Value.Length;
+
+            return currentCount;
+        }
+
+        foreach (var field in embedFields)
+        {
+            if ((currentBuilder.Fields.Any()) && field.Key != (currentBuilder.Fields.LastOrDefault(x => x.Name != "‍", null)?.Name ?? ""))
+            {
+                embeds.Add(currentBuilder);
+                currentBuilder = new(template);
+            }
+
+            if (CalculateCharacterLimit() + field.Key.Length + field.Value.Length > 6000)
+            {
+                embeds.Add(currentBuilder);
+                currentBuilder = new(template);
+            }
+
+            if (InvisibleOnDuplicateTitles && currentBuilder.Fields.Any(x => x.Name == field.Key))
+                currentBuilder.AddField(new DiscordEmbedField("‍", field.Value));
+            else
+                currentBuilder.AddField(new DiscordEmbedField(field.Key, field.Value));
+        }
+
+        embeds.Add(currentBuilder);
+        return embeds;
+    }
+
     internal static DiscordEmoji GetClosestColorEmoji(this DiscordColor discordColor, DiscordClient client)
     {
         Dictionary<Color, string> colorArray = new()

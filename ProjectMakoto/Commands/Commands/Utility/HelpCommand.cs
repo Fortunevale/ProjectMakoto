@@ -23,123 +23,117 @@ internal sealed class HelpCommand : BaseCommand
                 return;
 
             List<KeyValuePair<string, string>> Commands = new();
-
-            var ApplicationCommandsList = ctx.Client.GetApplicationCommands().RegisteredCommands.First(x => x.Value?.Count > 0).Value;
             var PrefixCommandsList = ctx.Client.GetCommandsNext().RegisteredCommands.GroupBy(x => x.Value.Name).Select(x => x.First()).ToList();
 
-            if (!command_filter.IsNullOrWhiteSpace())
+            var ApplicationCommandsList = ctx.Client.GetApplicationCommands().RegisteredCommands.First(x => x.Value?.Count > 0).Value;
+
+            foreach (var appCommand in ApplicationCommandsList
+                .OrderByDescending(x => ((ModulePriorityAttribute)x.ContainingType?.GetCustomAttribute<ModulePriorityAttribute>()).Priority))
             {
-                switch (ctx.CommandType)
-                {
-                    case CommandType.ApplicationCommand:
-                        if (ApplicationCommandsList.Any(x => x.Name.ToLower() == command_filter.ToLower() || (x.NameLocalizations?.Localizations?.Any(x => x.Value.ToLower() == command_filter.ToLower()) ?? false)))
-                        {
-                            var command = ApplicationCommandsList.First(x => x.Name.ToLower() == command_filter.ToLower() || (x.NameLocalizations?.Localizations?.Any(x => x.Value.ToLower() == command_filter.ToLower()) ?? false));
-
-                            string commandName = command.NameLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedName) ?? false ? localizedName : command.Name;
-                            var commandDescription = command.DescriptionLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedDescription) ?? false ? localizedDescription : command.Description;
-
-                            var descBuilder = $"{GetString(this.t.Commands.Utility.Help.Disclaimer)}\n\n" +
-                                       $"`{ctx.Prefix}{command.GenerateUsage(ctx.User.Locale)}` - _{commandDescription}_\n";
-
-                            if (command.Options.Any(x => x.Type == ApplicationCommandOptionType.SubCommand))
-                            {
-                                foreach (var b in command.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommand))
-                                {
-                                    var optionDescription = b.DescriptionLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedOption) ?? false ? localizedOption : b.Description;
-
-                                    descBuilder += $"`{ctx.Prefix}{commandName} {b.GenerateUsage(ctx.User.Locale)}` - _{optionDescription}_\n";
-                                }
-                            }
-
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(descBuilder).AsBotInfo(ctx));
-                            return;
-                        }
-                        else
-                        {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
-                            return;
-                        }
-                    case CommandType.PrefixCommand:
-                        if (PrefixCommandsList.Any(x => x.Value.Name.ToLower() == command_filter.ToLower()))
-                        {
-                            var command = PrefixCommandsList.First(x => x.Value.Name.ToLower() == command_filter.ToLower());
-
-                            var desc = $"{GetString(this.t.Commands.Utility.Help.Disclaimer)}\n\n" +
-                                        $"`{ctx.Prefix}{command.Value.GenerateUsage()}` - _{command.Value.Description}{command.Value.Aliases.GenerateAliases()}_\n";
-
-                            try
-                            {
-                                desc += string.Join("\n", ((CommandGroup)command.Value).Children.Select(x => $"`{ctx.Prefix}{x.Parent.Name} {x.GenerateUsage()}` - _{x.Description}{x.Aliases.GenerateAliases()}_"));
-                            }
-                            catch { }
-
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(desc).AsBotInfo(ctx));
-                            return;
-                        }
-                        else
-                        {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.MissingCommand, true)).AsBotError(ctx));
-                            return;
-                        }
-                }
-            }
-
-            foreach (var command in PrefixCommandsList)
-            {
-                if (command.Value.CustomAttributes.OfType<CommandModuleAttribute>() is null)
-                    continue;
-
-                var module = command.Value.CustomAttributes.OfType<CommandModuleAttribute>()?.FirstOrDefault()?.ModuleString ?? "Unknown";
-
-                switch (module)
-                {
-                    case "configuration":
-                        if (!ctx.Member.IsAdmin(ctx.Bot.status))
-                            continue;
-                        break;
-                    case "maintenance":
-                        if (!ctx.User.IsMaintenance(ctx.Bot.status))
-                            continue;
-                        break;
-                    case "hidden":
-                        continue;
-                    default:
-                        break;
-                }
-
                 try
                 {
-                    var cmd = ApplicationCommandsList.First(x => x.Name.ToLower() == command.Key.ToLower());
-                    var commandDescription = cmd.DescriptionLocalizations?.Localizations?.TryGetValue(ctx.User.Locale, out var localizedDescription) ?? false ? localizedDescription : cmd.Description;
-                    var commandModuleName = module.ToLower() switch
+                    string module = appCommand.ContainingType.Name.Replace("AppCommands", "").ToLower();
+
+                    switch (module)
                     {
-                        "utility" => GetString(this.t.Commands.ModuleNames.Utility),
-                        "social" => GetString(this.t.Commands.ModuleNames.Social),
-                        "music" => GetString(this.t.Commands.ModuleNames.Music),
-                        "moderation" => GetString(this.t.Commands.ModuleNames.Moderation),
-                        "configuration" => GetString(this.t.Commands.ModuleNames.Configuration),
-                        _ => module.FirstLetterToUpper(),
-                    };
-                    Commands.Add(new KeyValuePair<string, string>($"{commandModuleName}", $"{cmd.Mention} - _{commandDescription}_"));
+                        case "configuration":
+                            if (!ctx.Member.IsAdmin(ctx.Bot.status))
+                                continue;
+                            break;
+                        case "maintenance":
+                            if (!ctx.User.IsMaintenance(ctx.Bot.status))
+                                continue;
+                            break;
+                        case "hidden":
+                            continue;
+                        default:
+                            break;
+                    }
+
+                    try
+                    {
+                        var commandKey = t.Commands.CommandList.First(localized => localized.Names.Any(x => x.Value == appCommand.Name));
+
+                        var commandName = GetString(commandKey.Names);
+                        var commandDescription = GetString(commandKey.Descriptions);
+                        var commandUsage = string.Join(" ", commandKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+
+                        if (command_filter is not null)
+                            if (!commandKey.Names.Any(x => x.Value.Contains(command_filter, StringComparison.InvariantCultureIgnoreCase)))
+                                continue;
+
+                        string commandMention;
+
+                        if (appCommand.Options?.Any(x => x.Type == ApplicationCommandOptionType.SubCommand) ?? false)
+                            commandMention = $"`/{commandName}`";
+                        else if (appCommand.Type != ApplicationCommandType.ChatInput)
+                            commandMention = $"`{commandName}`";
+                        else
+                            commandMention = appCommand.Mention;
+
+                        Command? prefixCommand;
+
+                        if (PrefixCommandsList.Any(x => x.Value.Name.ToLower() == appCommand.Name.ToLower()))
+                            prefixCommand = PrefixCommandsList.First(x => x.Value.Name.ToLower() == appCommand.Name.ToLower()).Value;
+                        else if (appCommand.CustomAttributes.Any(x => x is PrefixCommandAlternativeAttribute))
+                            prefixCommand = PrefixCommandsList
+                                .First(x => x.Value.Name.ToLower() == ((PrefixCommandAlternativeAttribute)appCommand.CustomAttributes
+                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAtChar(' ')).Value;
+                        else
+                            prefixCommand = null;
+
+                        var commandModuleName = module.ToLower() switch
+                        {
+                            "utility" => GetString(this.t.Commands.ModuleNames.Utility),
+                            "social" => GetString(this.t.Commands.ModuleNames.Social),
+                            "music" => GetString(this.t.Commands.ModuleNames.Music),
+                            "moderation" => GetString(this.t.Commands.ModuleNames.Moderation),
+                            "configuration" => GetString(this.t.Commands.ModuleNames.Configuration),
+                            _ => module.FirstLetterToUpper(),
+                        };
+                        
+                        DiscordEmoji TypeEmoji = appCommand.Type switch
+                        {
+                            ApplicationCommandType.ChatInput => EmojiTemplates.GetSlashCommand(ctx.Bot),
+                            ApplicationCommandType.Message => EmojiTemplates.GetMessageCommand(ctx.Bot),
+                            ApplicationCommandType.User => EmojiTemplates.GetUserCommand(ctx.Bot),
+                            _ => throw new NotImplementedException(),
+                        };
+
+                        Commands.Add(new KeyValuePair<string, string>($"{commandModuleName}",
+                            $"{TypeEmoji}{((prefixCommand is null) ? EmojiTemplates.GetPrefixCommandDisabled(ctx.Bot) : EmojiTemplates.GetPrefixCommandEnabled(ctx.Bot))} {commandMention}{(commandUsage.IsNullOrWhiteSpace() ? "" : $"`{commandUsage}`")}{(commandDescription.IsNullOrWhiteSpace() ? "" : $" - _{commandDescription}_")}"));
+                    
+                        foreach (var subCmd in appCommand.Options?.Where(x => x.Type == ApplicationCommandOptionType.SubCommand) ?? new List<DiscordApplicationCommandOption>())
+                        {
+                            var subKey = commandKey.Commands.First(localized => localized.Names.Any(x => x.Value == subCmd.Name));
+
+                            var subName = $"{commandName} {GetString(subKey.Names)}";
+                            var subDescription = GetString(subKey.Descriptions);
+                            var subUsage = string.Join(" ", subKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+
+                            Command? subPrefixCommand = null;
+
+                            if (prefixCommand is CommandGroup group)
+                                subPrefixCommand = group.Children.FirstOrDefault(x => x.Name == subCmd.Name);
+
+                            Commands.Add(new KeyValuePair<string, string>($"{commandModuleName}",
+                            $"{EmojiTemplates.GetInVisible(ctx.Bot)}{TypeEmoji}{(subPrefixCommand is null ? EmojiTemplates.GetPrefixCommandDisabled(ctx.Bot) : EmojiTemplates.GetPrefixCommandEnabled(ctx.Bot))} `/{subName}`‍{(subUsage.IsNullOrWhiteSpace() ? "" : $"`{subUsage}`")}{(subDescription.IsNullOrWhiteSpace() ? "" : $" - _{subDescription}_")}"));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Failed to generate help", ex);
+                    }
                 }
                 catch { }
             }
 
+            if (!Commands.Any())
+                throw new NullReferenceException();
+
             var Fields = Commands.PrepareEmbedFields();
 
-            Dictionary<string, DiscordEmbedBuilder> discordEmbeds = new();
-
-            foreach (var b in Fields)
-            {
-                if (!discordEmbeds.ContainsKey(b.Key))
-                    discordEmbeds.Add(b.Key, new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx));
-
-                if (!discordEmbeds[b.Key].Fields.Any())
-                    discordEmbeds[b.Key].AddField(new DiscordEmbedField(GetString(this.t.Commands.Utility.Help.Module, new TVar("Module", b.Key)), b.Value));
-                else
-                    discordEmbeds[b.Key].AddField(new DiscordEmbedField("󠂪 󠂪", b.Value));
-            }
+            List<DiscordEmbedBuilder> discordEmbeds = Fields.PrepareEmbeds(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx), true);
 
             int Page = 0;
 
@@ -148,7 +142,7 @@ internal sealed class HelpCommand : BaseCommand
                 var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
                 var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page).Value).AddComponents(PreviousButton, NextButton));
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page)).AddComponents(PreviousButton, NextButton));
 
                 var Menu = await ctx.WaitForButtonAsync();
 
