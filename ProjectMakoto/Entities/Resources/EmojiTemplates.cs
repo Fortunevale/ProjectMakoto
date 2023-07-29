@@ -19,6 +19,13 @@ internal sealed class EmojiTemplates
 
     public static DiscordEmoji GetError(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Error);
 
+    public static DiscordEmoji GetSlashCommand(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.SlashCommand);
+    public static DiscordEmoji GetMessageCommand(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.MessageCommand);
+    public static DiscordEmoji GetUserCommand(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.UserCommand);
+
+    public static DiscordEmoji GetPrefixCommandDisabled(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.PrefixCommandDisabled);
+    public static DiscordEmoji GetPrefixCommandEnabled(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.PrefixCommandEnabled);
+
     public static DiscordEmoji GetQuestionMark(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.QuestionMark);
 
     public static DiscordEmoji GetGuild(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Guild);

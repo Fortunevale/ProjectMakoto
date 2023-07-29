@@ -93,6 +93,13 @@ public sealed class Config
 
         public ulong QuestionMark = 0;
 
+        public ulong PrefixCommandDisabled = 0;
+        public ulong PrefixCommandEnabled = 0;
+
+        public ulong SlashCommand = 0;
+        public ulong MessageCommand = 0;
+        public ulong UserCommand = 0;
+
         public ulong Channel = 0;
         public ulong User = 0;
         public ulong VoiceState = 0;
