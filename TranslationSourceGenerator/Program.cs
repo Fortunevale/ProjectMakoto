@@ -138,6 +138,7 @@ public sealed class Translations
                                                 }
                                             }
 
+
                                             if (containsLocaleCode)
                                             {
                                                 if (!localeCodeIsArray)
@@ -170,6 +171,29 @@ public sealed class Translations
                                             }
 
                                             RecursiveHandle(item.Value.ToObject<JObject>(), entryPoint, depth + 1);
+                                            break;
+                                        }
+                                        case JTokenType.Integer:
+                                        {
+                                            _logger.LogDebug("Found Int '{0}'", item.Key);
+                                            Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public int {item.Key};");
+                                            break;
+                                        }
+                                        case JTokenType.Array:
+                                        {
+                                            if (item.Key is "options" or "commands" or "choices" or "groups")
+                                            {
+                                                _logger.LogDebug("Found Command Group '{0}'", item.Key);
+
+                                                Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public {className}[] {fieldName};\n" +
+                                                    $"{new string(' ', depth * 4)}public sealed class {className}\n" +
+                                                    $"{new string(' ', depth * 4)}{{\n" +
+                                                    $"{new string(' ', depth * 4)}// {entryPoint} InsertPoint\n" +
+                                                    $"{new string(' ', depth * 4)}}}\n");
+
+                                                foreach (var b in item.Value.ToObject<JArray>())
+                                                    RecursiveHandle(b.ToObject<JObject>(), entryPoint, depth + 1);
+                                            }
                                             break;
                                         }
                                         default:
