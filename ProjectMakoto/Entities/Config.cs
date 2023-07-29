@@ -106,6 +106,7 @@ public sealed class Config
         public ulong Message = 0;
         public ulong Guild = 0;
         public ulong Invite = 0;
+        public ulong In = 0;
 
         public ulong YouTube = 0;
         public ulong SoundCloud = 0;

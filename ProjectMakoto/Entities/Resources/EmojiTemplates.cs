@@ -34,6 +34,7 @@ internal sealed class EmojiTemplates
     public static DiscordEmoji GetVoiceState(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.VoiceState);
     public static DiscordEmoji GetMessage(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Message);
     public static DiscordEmoji GetInvite(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.Invite);
+    public static DiscordEmoji GetInVisible(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.In);
 
     public static DiscordEmoji GetYouTube(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.YouTube);
     public static DiscordEmoji GetSoundcloud(Bot bot) => DiscordEmoji.FromGuildEmote(bot.DiscordClient, bot.status.LoadedConfig.Emojis.SoundCloud);
