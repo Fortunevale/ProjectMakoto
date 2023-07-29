@@ -124,6 +124,19 @@ internal static class GenericExtensions
     internal static string SanitizeForCode(this string str)
         => str.Replace("`", "´");
 
+    internal static string TruncateAtChar(this string str, params char[] chars)
+        => str.TruncateAtChar(false, chars);
+
+    internal static string TruncateAtChar(this string str, bool Reverse, params char[] chars)
+    {
+        if (!chars.IsNotNullAndNotEmpty() || !chars.Any(x => str.Contains(x)))
+            return str;
+
+        List<KeyValuePair<char, int>> indexes = chars.Select(x => new KeyValuePair<char, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
+
+        return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
+    }
+
     internal static string FullSanitize(this string str)
     {
         var proc = str;
