@@ -15,11 +15,12 @@ internal sealed class TranslationLoader
         _bot.LoadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
         _logger.LogDebug("Loaded translations");
 
-        Dictionary<string, int> CalculateTranslationProgress(object? obj)
+        Dictionary<string, int> CalculateTranslationProgress(object? obj, string name, bool isCommandList = false)
         {
             if (obj is null)
             {
-                _logger.LogWarn("A Translation Group was not loaded.");
+                if (!isCommandList)
+                    _logger.LogWarn("A Translation Group was not loaded: {name}.", name);
                 return new Dictionary<string, int>();
             }
 
@@ -36,7 +37,7 @@ internal sealed class TranslationLoader
                 {
                     foreach (var item in elems)
                     {
-                        foreach (var b in CalculateTranslationProgress(item))
+                        foreach (var b in CalculateTranslationProgress(item, field.Name, field.Name == "CommandList" || isCommandList))
                         {
                             if (!counts.ContainsKey(b.Key))
                                 counts.Add(b.Key, 0);
@@ -51,26 +52,28 @@ internal sealed class TranslationLoader
                     {
                         if (field.FieldType == typeof(SingleTranslationKey))
                         {
-                            foreach (var b in ((SingleTranslationKey)fieldValue).t)
-                            {
-                                if (!counts.ContainsKey(b.Key))
-                                    counts.Add(b.Key, 0);
+                            if (fieldValue is not null)
+                                foreach (var b in ((SingleTranslationKey)fieldValue).t)
+                                {
+                                    if (!counts.ContainsKey(b.Key))
+                                        counts.Add(b.Key, 0);
 
-                                counts[b.Key]++;
-                            }
+                                    counts[b.Key]++;
+                                }
                         }
                         else if (field.FieldType == typeof(MultiTranslationKey))
                         {
-                            foreach (var b in ((MultiTranslationKey)fieldValue).t)
-                            {
-                                if (!counts.ContainsKey(b.Key))
-                                    counts.Add(b.Key, 0);
+                            if (fieldValue is not null)
+                                foreach (var b in ((MultiTranslationKey)fieldValue).t)
+                                {
+                                    if (!counts.ContainsKey(b.Key))
+                                        counts.Add(b.Key, 0);
 
-                                counts[b.Key]++;
-                            }
+                                    counts[b.Key]++;
+                                }
                         }
 
-                        foreach (var b in CalculateTranslationProgress(fieldValue))
+                        foreach (var b in CalculateTranslationProgress(fieldValue, field.Name, field.Name == "CommandList" || isCommandList))
                         {
                             if (!counts.ContainsKey(b.Key))
                                 counts.Add(b.Key, 0);
@@ -106,7 +109,7 @@ internal sealed class TranslationLoader
 
             return counts;
         }
-        _bot.LoadedTranslations.Progress = CalculateTranslationProgress(_bot.LoadedTranslations);
+        _bot.LoadedTranslations.Progress = CalculateTranslationProgress(_bot.LoadedTranslations, "root");
         _logger.LogDebug("Loaded translations: {0}", string.Join("; ", _bot.LoadedTranslations.Progress.Select(x => $"{x.Key}:{x.Value}")));
     }
 }

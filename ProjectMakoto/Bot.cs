@@ -90,7 +90,7 @@ public sealed class Bot
 
         if (args.Contains("--debug"))
         {
-            _logger.ChangeLogLevel(CustomLogLevel.Trace);
+            _logger.ChangeLogLevel(CustomLogLevel.Debug);
         }
 
         _logger.LogDebug("Environment Details\n\n" +
@@ -173,9 +173,17 @@ public sealed class Bot
 
             _logger.LogInfo("Connecting and authenticating with Discord..");
             await this.DiscordClient.ConnectAsync();
-            _logger.LogInfo("Connected and authenticated with Discord.");
+            await Task.Delay(10000);
+            _logger.LogInfo("Connected and authenticated with Discord as {User}.", this.DiscordClient.CurrentUser.GetUsernameWithIdentifier());
 
             this.status.DiscordInitialized = true;
+
+            await Util.Initializers.PostLoginTaskLoader.Load(this);
+
+            //foreach (var guild in this.DiscordClient.Guilds.Values)
+            //    await this.DiscordClient.BulkOverwriteGuildApplicationCommandsAsync(guild.Id, Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
+
+            //await this.DiscordClient.BulkOverwriteGlobalApplicationCommandsAsync(Array.Empty<DiscordApplicationCommand>()).ConfigureAwait(false);
 
             _ = Task.Run(async () =>
             {

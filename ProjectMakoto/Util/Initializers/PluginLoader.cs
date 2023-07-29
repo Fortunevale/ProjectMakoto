@@ -428,7 +428,7 @@ internal sealed class PluginLoader
                 case "app_single":
                 case "app_group":
                     if (_bot.status.LoadedConfig.IsDev)
-                        appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Channels.Assets, plugin.EnableCommandTranslations);
+                        appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Discord.AssetsGuild, plugin.EnableCommandTranslations);
                     else
                         appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.EnableCommandTranslations);
                     break;

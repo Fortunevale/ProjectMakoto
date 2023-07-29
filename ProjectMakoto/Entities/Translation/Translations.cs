@@ -1190,6 +1190,7 @@ public sealed class Translations
                 public SingleTranslationKey Generic;
             }
         }
+        public CommandTranslation[] CommandList;
     }
     public common Common;
     public sealed class common

@@ -11,6 +11,8 @@ using ProjectMakoto.Entities.Guilds;
 using ProjectMakoto.Entities.Users;
 
 namespace ProjectMakoto.ApplicationCommands;
+
+[ModulePriority(997)]
 public sealed class MusicAppCommands : ApplicationCommandsModule
 {
     [SlashCommandGroup("music", "Allows to play music and change the current playback settings.", dmPermission: false)]

@@ -16,7 +16,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("help"),
-    CommandModule("utility"),
+    
     Description("Sends you a list of all available commands, their usage and their description.")]
     public async Task Help(CommandContext ctx, [Description("Command")] string command = "")
         => _ = new HelpCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -27,7 +27,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("user-info"), Aliases("userinfo"),
-    CommandModule("utility"),
+    
     Description("Displays information the bot knows about you or the mentioned user.")]
     public async Task UserInfo(CommandContext ctx, DiscordUser victim = null)
         => _ = new UserInfoCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -37,7 +37,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("guild-info"),
-    CommandModule("utility"),
+    
     Description("Displays information this or the mentioned guild.")]
     public async Task GuildInfo(CommandContext ctx, [Description("GuildId")] ulong? guildId = null)
         => _ = new GuildInfoCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -47,14 +47,14 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("reminders"),
-    CommandModule("utility"),
+    
     Description("Allows you to manage your reminders.")]
     public async Task Reminders(CommandContext ctx)
         => _ = new RemindersCommand().ExecuteCommand(ctx, this._bot);
 
 
     [Command("avatar"), Aliases("pfp"),
-    CommandModule("utility"),
+    
     Description("Displays your or the mentioned user's avatar as an embedded image.")]
     public async Task Avatar(CommandContext ctx, DiscordUser victim = null)
         => _ = new AvatarCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -65,7 +65,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("banner"),
-    CommandModule("utility"),
+    
     Description("Displays your or the mentioned user's banner as an embedded image.")]
     public async Task Banner(CommandContext ctx, DiscordUser victim = null)
         => _ = new BannerCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -76,7 +76,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("rank"), Aliases("level", "lvl"),
-    CommandModule("utility"),
+    
     Description("Shows your or the mentioned user's rank and rank progress.")]
     public async Task Rank(CommandContext ctx, DiscordUser victim = null)
         => _ = new RankCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -87,7 +87,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("leaderboard"),
-    CommandModule("utility"),
+    
     Description("Displays the current experience rankings on this server.")]
     public async Task Leaderboard(CommandContext ctx, [Description("3-50")] int ShowAmount = 10)
         => _ = new LeaderboardCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -98,7 +98,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("report-host"),
-    CommandModule("utility"),
+    
     Description("Allows you to contribute a new malicious host to our database.")]
     public async Task ReportHost(CommandContext ctx, [Description("Host")] string url)
         => _ = new ReportHostCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -108,25 +108,8 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
 
-    [Command("report-translation"),
-    CommandModule("utility"),
-    Description("Allows you to report missing, invalid or incorrect translations in Makoto.")]
-    public async Task ReportTranslation(CommandContext ctx,
-    [Description("Affected module")] ReportTranslationType affectedType,
-    [Description("Affected component")] string component,
-    [Description("Type of issue")] ReportTranslationReason reasonType,
-    [Description("Additional information")] string? additionalInformation = null)
-    {
-        DummyCommand dummyCommand = new();
-        await dummyCommand.ExecuteCommand(ctx, this._bot);
-
-        dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
-    }
-
-
-
     [Command("emoji"), Aliases("emojis", "emote", "steal", "grab", "sticker", "stickers"),
-    CommandModule("utility"),
+    
     Description("Steals all emojis and stickers of a message. Reply to a message to select it.")]
     public async Task EmojiStealer(CommandContext ctx)
         => _ = new EmojiStealerCommand().ExecuteCommand(ctx, this._bot);
@@ -134,7 +117,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("translate"),
-    CommandModule("utility"),
+    
     Description("Allows you to translate a message. Reply to a message to select it.")]
     public async Task Translate(CommandContext ctx)
         => _ = new TranslateCommand().ExecuteCommand(ctx, this._bot);
@@ -142,7 +125,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("upload"),
-    CommandModule("utility"),
+    
     Description("Upload a file to the bot. Only use when instructed to.")]
     public async Task Upload(CommandContext ctx)
         => _ = Task.Run(async () =>
@@ -163,7 +146,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("urban-dictionary"),
-    CommandModule("utility"),
+    
     Description("Look up a term on Urban Dictionary.")]
     public async Task UrbanDictionary(CommandContext ctx, [RemainingText] string term)
         => _ = new UrbanDictionaryCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -174,7 +157,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Group("data"),
-    CommandModule("utility"),
+    
     Description("Allows you to request or manage your user data.")]
     public sealed class Join : BaseCommandModule
     {
@@ -200,7 +183,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("language"),
-    CommandModule("utility"),
+    
     Description("Change the language Makoto uses.")]
     public async Task Language(CommandContext ctx)
         => _ = new LanguageCommand().ExecuteCommand(ctx, this._bot);
@@ -208,13 +191,13 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("credits"),
-    CommandModule("utility"),
+    
     Description("Allows you to view who contributed the bot.")]
     public async Task Credits(CommandContext ctx)
         => _ = new CreditsCommand().ExecuteCommand(ctx, this._bot);
 
     [Command("block-user"),
-    CommandModule("utility"),
+    
     Description("Allows you to block a user")]
     public async Task BlockUser(CommandContext ctx, DiscordUser victim)
     => _ = new BlockUserCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -224,7 +207,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Command("unblock-user"), 
-    CommandModule("utility"),
+    
     Description("Allows you to unblock a user")]
     public async Task UnblockUser(CommandContext ctx, DiscordUser victim)
         => _ = new UnblockUserCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -234,7 +217,7 @@ public sealed class UtilityPrefixCommands : BaseCommandModule
 
 
     [Group("vcc"),
-    CommandModule("utility"),
+    
     Description("Allows you to modify your own voice channel.")]
     public sealed class VcCreatorManagement : BaseCommandModule
     {

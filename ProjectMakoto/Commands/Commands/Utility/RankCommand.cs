@@ -41,7 +41,7 @@ internal sealed class RankCommand : BaseCommand
 
             await RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{(victim.Id == ctx.User.Id ? GetString(this.t.Commands.Utility.Rank.Self) : GetString(this.t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.DbGuild.Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.DbGuild.Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
+                Description = $"{(victim.Id == ctx.User.Id ? GetString(this.t.Commands.Utility.Rank.Self, new TVar("Level", ctx.DbGuild.Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.DbGuild.Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))) : GetString(this.t.Commands.Utility.Rank.Other, new TVar("User", victim.Mention), new TVar("Level", ctx.DbGuild.Members[victim.Id].Experience.Level.ToEmotes()), new TVar("Points", ctx.DbGuild.Members[victim.Id].Experience.Points.ToString("N0", CultureInfo.GetCultureInfo("en-US")))))}\n\n" +
                               $"**{GetString(this.t.Commands.Utility.Rank.Progress, new TVar("Level", (ctx.DbGuild.Members[victim.Id].Experience.Level + 1).ToEmotes()))}**\n" +
                               $"`{Math.Floor((decimal)((decimal)((decimal)current / (decimal)max) * 100)).ToString().Replace(",", ".")}%` " +
                               $"`{StringTools.GenerateASCIIProgressbar(current, max, 44)}` " +

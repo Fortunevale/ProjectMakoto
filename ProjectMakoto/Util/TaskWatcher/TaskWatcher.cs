@@ -175,8 +175,42 @@ public sealed class TaskWatcher
         return taskInfo;
     }
 
-    internal async static void LogHandler(Bot bot, object? sender, LogMessageEventArgs e)
+    internal async static void LogHandler(Bot bot, object? sender, LogMessageEventArgs e, int depth = 0)
     {
+        switch (e.LogEntry.LogLevel)
+        {
+            case CustomLogLevel.Fatal:
+            {
+                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
+                {
+                    bot.status.DiscordDisconnections++;
+
+                    if (bot.status.DiscordDisconnections >= 3)
+                    {
+                        _logger.LogRaised -= bot.LogHandler;
+                        _ = bot.ExitApplication();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await Task.Delay(10000);
+                            await bot.DiscordClient.ConnectAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogFatal("Failed to reconnect to discord", ex);
+                            _logger.LogRaised -= bot.LogHandler;
+                            _ = bot.ExitApplication();
+                        }
+                    }
+                }
+                break;
+            }
+            default:
+                break;
+        }
+
         switch (e.LogEntry.LogLevel)
         {
             case CustomLogLevel.Fatal:
@@ -191,7 +225,20 @@ public sealed class TaskWatcher
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Channels.Assets].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.AssetsGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+
+                        if (channel is null)
+                        {
+                            if (depth > 10)
+                            {
+                                _logger.LogWarn("Could not notify of exception in channel");
+                                return;
+                            }
+
+                            await Task.Delay(1000);
+                            LogHandler(bot, sender, e, depth++);
+                            return;
+                        }
 
                         DiscordEmbedBuilder template = new DiscordEmbedBuilder()
                                                     .WithColor(e.LogEntry.LogLevel == CustomLogLevel.Fatal ? new DiscordColor("#FF0000") : EmbedColors.Error)
@@ -268,39 +315,6 @@ public sealed class TaskWatcher
                 catch { }
                 break;
             }
-        }
-
-        switch (e.LogEntry.LogLevel)
-        {
-            case CustomLogLevel.Fatal:
-            {
-                if (e.LogEntry.Message.ToLower().Contains("'not authenticated.'"))
-                {
-                    bot.status.DiscordDisconnections++;
-
-                    if (bot.status.DiscordDisconnections >= 3)
-                    {
-                        _logger.LogRaised -= bot.LogHandler;
-                        _ = bot.ExitApplication();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            await bot.DiscordClient.ConnectAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogFatal("Failed to reconnect to discord", ex);
-                            _logger.LogRaised -= bot.LogHandler;
-                            _ = bot.ExitApplication();
-                        }
-                    }
-                }
-                break;
-            }
-            default:
-                break;
         }
     }
 }

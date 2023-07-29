@@ -15,6 +15,7 @@ global using static Xorog.UniversalExtensions.UniversalExtensions;
 global using Newtonsoft.Json;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace TranslationSourceGenerator;
 
@@ -81,6 +82,8 @@ public sealed class Translations
             {
                 try
                 {
+                    Dictionary<string, List<string>> addedFields = new();
+
                     FileInfo fileInfo = new(this.StringsJson);
 
                     if (lastModify != fileInfo.LastWriteTimeUtc)
@@ -94,11 +97,16 @@ public sealed class Translations
 
                             JObject jsonFile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(StringsJson));
 
+                            string CreateValidValueName(string str)
+                            {
+                                return Regex.Replace(str, @"[^a-zA-Z0-9]", "_");
+                            }
+
                             void RecursiveHandle(JObject token, string ParentPath, int depth)
                             {
                                 foreach (var item in token)
                                 {
-                                    var className = $"{item.Key.First().ToString().ToLower()}{item.Key.Remove(0, 1)}";
+                                    var className = CreateValidValueName($"{item.Key.First().ToString().ToLower()}{item.Key.Remove(0, 1)}");
 
                                     switch (className)
                                     {
@@ -109,15 +117,18 @@ public sealed class Translations
                                             break;
                                     }
 
-                                    var fieldName = $"{item.Key.FirstLetterToUpper()}";
+                                    var fieldName = CreateValidValueName(item.Key.FirstLetterToUpper());
                                     var entryPoint = $"{ParentPath}/{className}";
+                                    var IndexPath = $"// {ParentPath} InsertPoint";
 
                                     int InsertPosition = 0;
                                     if (!ParentPath.IsNullOrWhiteSpace())
                                     {
-                                        var IndexPath = $"// {ParentPath} InsertPoint";
                                         InsertPosition = Insert.IndexOf(IndexPath) + IndexPath.Length;
                                     }
+
+                                    if (!addedFields.ContainsKey(IndexPath))
+                                        addedFields.Add(IndexPath, new());
 
                                     switch (item.Value.Type)
                                     {
@@ -142,16 +153,30 @@ public sealed class Translations
                                             {
                                                 if (!localeCodeIsArray)
                                                 {
+                                                    var line = $"{new string(' ', depth * 4)}public SingleTranslationKey {CreateValidValueName(item.Key)};";
+
+                                                    if (addedFields[IndexPath].Contains(line))
+                                                        continue;
+
                                                     _logger.LogDebug("Found SingleKey '{0}'", item.Key);
-                                                    Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public SingleTranslationKey {item.Key};");
+                                                    Insert = Insert.Insert(InsertPosition, $"\n{line}");
+
+                                                    addedFields[IndexPath].Add(line);
 
                                                     if (!tokens.Any(x => x.Key == "de"))
                                                         Warnings.Add($"String at path {entryPoint} has no de translation");
                                                 }
                                                 else
                                                 {
+                                                    var line = $"{new string(' ', depth * 4)}public MultiTranslationKey {CreateValidValueName(item.Key)};";
+
+                                                    if (addedFields[IndexPath].Contains(line))
+                                                        continue;
+
                                                     _logger.LogDebug("Found MultiKey '{0}'", item.Key);
-                                                    Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public MultiTranslationKey {item.Key};");
+                                                    Insert = Insert.Insert(InsertPosition, $"\n{line}");
+
+                                                    addedFields[IndexPath].Add(line);
 
                                                     if (!tokens.Any(x => x.Key == "de"))
                                                         Warnings.Add($"String at path {entryPoint} has no de translation");
@@ -162,14 +187,63 @@ public sealed class Translations
                                             {
                                                 _logger.LogDebug("Found Group '{0}'", item.Key);
 
-                                                Insert = Insert.Insert(InsertPosition, $"\n{new string(' ', depth * 4)}public {className} {fieldName};\n" +
+                                                var line = $"\n{new string(' ', depth * 4)}public {className} {fieldName};\n" +
                                                     $"{new string(' ', depth * 4)}public sealed class {className}\n" +
                                                     $"{new string(' ', depth * 4)}{{\n" +
                                                     $"{new string(' ', depth * 4)}// {entryPoint} InsertPoint\n" +
-                                                    $"{new string(' ', depth * 4)}}}\n");
+                                                    $"{new string(' ', depth * 4)}}}\n";
+
+                                                if (addedFields[IndexPath].Contains(line))
+                                                    break;
+
+                                                Insert = Insert.Insert(InsertPosition, line);
+                                                addedFields[IndexPath].Add(line);
                                             }
 
                                             RecursiveHandle(item.Value.ToObject<JObject>(), entryPoint, depth + 1);
+                                            break;
+                                        }
+                                        case JTokenType.Integer:
+                                        {
+                                            _logger.LogDebug("Found Int '{0}'", item.Key);
+
+                                            var line = $"\n{new string(' ', depth * 4)}public int {CreateValidValueName(item.Key)};";
+
+                                            if (addedFields[IndexPath].Contains(line))
+                                                continue;
+
+                                            Insert = Insert.Insert(InsertPosition, line);
+                                            addedFields[IndexPath].Add(line);
+                                            break;
+                                        }
+                                        case JTokenType.Array:
+                                        {
+                                            _logger.LogDebug("Found Array '{0}'", item.Key);
+
+                                            var line = $"\n{new string(' ', depth * 4)}public {className}[] {fieldName};\n" +
+                                                $"{new string(' ', depth * 4)}public sealed class {className}\n" +
+                                                $"{new string(' ', depth * 4)}{{\n" +
+                                                $"{new string(' ', depth * 4)}// {entryPoint} InsertPoint\n" +
+                                                $"{new string(' ', depth * 4)}}}\n";
+
+                                            if (fieldName == "CommandList" && IndexPath == "// /commands InsertPoint")
+                                            {
+                                                line = $"\n{new string(' ', depth * 4)}public CommandTranslation[] {fieldName};";
+
+                                                Insert = Insert.Insert(InsertPosition, line);
+                                                addedFields[IndexPath].Add(line);
+
+                                                continue;
+                                            }
+
+                                            if (!addedFields[IndexPath].Contains(line))
+                                            {
+                                                Insert = Insert.Insert(InsertPosition, line);
+                                                addedFields[IndexPath].Add(line);
+                                            }    
+
+                                            foreach (var b in item.Value.ToObject<JArray>())
+                                                RecursiveHandle(b.ToObject<JObject>(), entryPoint, depth + 1);
                                             break;
                                         }
                                         default:

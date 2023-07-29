@@ -9,6 +9,7 @@
 
 namespace ProjectMakoto.ApplicationCommands;
 
+[ModulePriority(996)]
 public sealed class ScoreSaberAppCommands : ApplicationCommandsModule
 {
     [SlashCommandGroup("scoresaber", "Interact with the ScoreSaber API.", dmPermission: false)]

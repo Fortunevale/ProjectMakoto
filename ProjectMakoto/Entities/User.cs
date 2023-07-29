@@ -50,6 +50,10 @@ public sealed class User : BaseSelfFillingListValue<User>
     public string? OverrideLocale { get; set; } = null;
 
     [JsonIgnore]
+    public string? Locale
+        => this.OverrideLocale ?? this.CurrentLocale ?? "en";
+
+    [JsonIgnore]
     public Cooldown Cooldown { get; set; }
 
     [JsonIgnore]

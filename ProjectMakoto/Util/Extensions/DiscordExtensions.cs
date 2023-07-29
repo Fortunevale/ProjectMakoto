@@ -132,7 +132,7 @@ internal static class DiscordExtensions
         => $"{emoji.GetDiscordName().Replace(":", "")}:{emoji.Id}";
 
     internal static DiscordEmoji ToEmote(this bool b, Bot client)
-        => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetWhiteXMark(client);
+        => b ? DiscordEmoji.FromUnicode("✅") : EmojiTemplates.GetError(client);
 
     internal static DiscordEmoji ToPillEmote(this bool b, Bot client)
         => b ? EmojiTemplates.GetPillOn(client) : EmojiTemplates.GetPillOff(client);
@@ -151,13 +151,13 @@ internal static class DiscordExtensions
 
     internal static string GetCommandMention(this DiscordClient client, Bot bot, string command)
         => (bot.status.LoadedConfig.IsDev ?
-        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value.ToList() :
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.AssetsGuild).Value.ToList() :
         client.GetApplicationCommands().GlobalCommands.ToList())
         .First(x => x.Name == command).Mention;
 
     internal static IReadOnlyList<DiscordApplicationCommand> GetCommandList(this DiscordClient client, Bot bot)
         => (bot.status.LoadedConfig.IsDev ?
-        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Channels.Assets).Value :
+        client.GetApplicationCommands().GuildCommands.FirstOrDefault(x => x.Key == bot.status.LoadedConfig.Discord.AssetsGuild).Value :
         client.GetApplicationCommands().GlobalCommands);
 
     internal static string GetIcon(this DiscordChannel discordChannel) => discordChannel.Type switch
@@ -232,6 +232,51 @@ internal static class DiscordExtensions
         }
 
         return fields;
+    }
+
+    internal static List<DiscordEmbedBuilder> PrepareEmbeds(this List<KeyValuePair<string, string>> embedFields, DiscordEmbedBuilder template = null, bool InvisibleOnDuplicateTitles = false)
+    {
+        template ??= new();
+
+        List<DiscordEmbedBuilder> embeds = new();
+
+        DiscordEmbedBuilder currentBuilder = new(template);
+
+        int CalculateCharacterLimit()
+        {
+            int currentCount = (currentBuilder.Title?.Length ?? 0) +
+                               (currentBuilder.Description?.Length ?? 0) +
+                               (currentBuilder.Author?.Name.Length ?? 0) +
+                               (currentBuilder.Footer?.Text.Length ?? 0);
+
+            foreach (var field in currentBuilder.Fields)
+                currentCount += field.Name.Length + field.Value.Length;
+
+            return currentCount;
+        }
+
+        foreach (var field in embedFields)
+        {
+            if ((currentBuilder.Fields.Any()) && field.Key != (currentBuilder.Fields.LastOrDefault(x => x.Name != "‍", null)?.Name ?? ""))
+            {
+                embeds.Add(currentBuilder);
+                currentBuilder = new(template);
+            }
+
+            if (CalculateCharacterLimit() + field.Key.Length + field.Value.Length > 6000)
+            {
+                embeds.Add(currentBuilder);
+                currentBuilder = new(template);
+            }
+
+            if (InvisibleOnDuplicateTitles && currentBuilder.Fields.Any(x => x.Name == field.Key))
+                currentBuilder.AddField(new DiscordEmbedField("‍", field.Value));
+            else
+                currentBuilder.AddField(new DiscordEmbedField(field.Key, field.Value));
+        }
+
+        embeds.Add(currentBuilder);
+        return embeds;
     }
 
     internal static DiscordEmoji GetClosestColorEmoji(this DiscordColor discordColor, DiscordClient client)
