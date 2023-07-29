@@ -9,6 +9,8 @@
 
 namespace ProjectMakoto.ApplicationCommands;
 
+[ModulePriority(-999)]
+
 public sealed class MaintainersAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }

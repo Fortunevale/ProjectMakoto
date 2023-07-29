@@ -1,4 +1,4 @@
-// Project Makoto
+﻿// Project Makoto
 // Copyright (C) 2023  Fortunevale
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -7,15 +7,21 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace ProjectMakoto.Entities;
 
-[AttributeUsage(AttributeTargets.All, AllowMultiple = false)]
-public sealed class CommandModuleAttribute : Attribute
+[AttributeUsage(AttributeTargets.Class)]
+internal class ModulePriorityAttribute : Attribute
 {
-    public readonly string ModuleString;
-
-    public CommandModuleAttribute(string ModuleName)
+    public ModulePriorityAttribute(int Priority)
     {
-        this.ModuleString = ModuleName;
+        this.Priority = Priority;
     }
+
+    public int Priority { get; set; }
 }

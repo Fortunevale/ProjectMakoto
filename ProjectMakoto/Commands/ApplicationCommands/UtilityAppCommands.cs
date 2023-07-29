@@ -8,6 +8,8 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.ApplicationCommands;
+
+[ModulePriority(999)]
 public sealed class UtilityAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
@@ -279,6 +281,7 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
             });
     }
 
+    [PrefixCommandAlternative("emoji")]
     [ContextMenu(ApplicationCommandType.Message, "Steal Emojis", dmPermission: false)]
     public async Task EmojiStealer(ContextMenuContext ctx)
         => _ = new EmojiStealerCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -286,6 +289,7 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
             { "message", ctx.TargetMessage }
         });
 
+    [PrefixCommandAlternative("translate")]
     [ContextMenu(ApplicationCommandType.Message, "Translate Message", dmPermission: false)]
     public async Task Translate(ContextMenuContext ctx)
         => _ = new TranslateCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>

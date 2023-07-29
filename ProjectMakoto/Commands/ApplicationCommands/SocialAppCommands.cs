@@ -8,6 +8,8 @@
 // but WITHOUT ANY WARRANTY
 
 namespace ProjectMakoto.ApplicationCommands;
+
+[ModulePriority(998)]
 public sealed class SocialAppCommands : ApplicationCommandsModule
 {
     public Bot _bot { private get; set; }
