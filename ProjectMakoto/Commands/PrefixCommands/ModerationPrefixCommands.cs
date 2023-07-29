@@ -13,7 +13,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
     public Bot _bot { private get; set; }
 
     [Command("poll"),
-    CommandModule("moderation"),
+    
     Description("Starts a poll.")]
     public async Task Poll(CommandContext ctx)
         => _ = new PollCommand().ExecuteCommand(ctx, this._bot);
@@ -21,7 +21,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("purge"), Aliases("clear"),
-    CommandModule("moderation"),
+    
     Description("Deletes the specified amount of messages.")]
     public async Task Purge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser victim = null)
         => _ = new PurgeCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -33,7 +33,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("guild-purge"), Aliases("guild-clear", "server-purge", "server-clear"),
-    CommandModule("moderation"),
+    
     Description("Scans all channels and deletes the specified user's messages.")]
     public async Task GuildPurge(CommandContext ctx, [Description("1-2000")] int number, DiscordUser victim)
         => _ = new GuildPurgeCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -45,7 +45,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("clearbackup"), Aliases("clearroles", "clearrole", "clearbackuproles", "clearbackuprole"),
-    CommandModule("moderation"),
+    
     Description($"Clears the stored roles and nickname of a user.")]
     public async Task ClearBackup(CommandContext ctx, DiscordUser victim)
         => _ = new ClearBackupCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -56,7 +56,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("timeout"), Aliases("time-out", "mute"),
-    CommandModule("moderation"),
+    
     Description("Sets the specified user into a timeout.")]
     public async Task Timeout(CommandContext ctx, DiscordUser victim, [Description("Duration")] string duration = "", [Description("Reason")][RemainingText] string reason = "")
         => _ = new TimeoutCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -69,7 +69,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("remove-timeout"), Aliases("rm-timeout", "rmtimeout", "removetimeout", "unmute"),
-    CommandModule("moderation"),
+    
     Description("Removes a timeout from the specified user.")]
     public async Task RemoveTimeout(CommandContext ctx, DiscordMember victim)
         => _ = new RemoveTimeoutCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -80,7 +80,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("kick"),
-    CommandModule("moderation"),
+    
     Description("Kicks the specified user.")]
     public async Task Kick(CommandContext ctx, DiscordMember victim, [Description("Reason")][RemainingText] string reason = "")
         => _ = new KickCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -92,7 +92,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("ban"),
-    CommandModule("moderation"),
+    
     Description("Bans the specified user.")]
     public async Task Ban(CommandContext ctx, DiscordUser victim, [Description("Message deletion days")] int days = 0, [Description("Reason")][RemainingText] string reason = "")
         => _ = new BanCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -103,7 +103,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
         });
 
     [Command("ban"),
-    CommandModule("moderation"),
+    
     Description("Bans the specified user.")]
     public async Task Ban(CommandContext ctx, DiscordUser victim, [Description("Reason")][RemainingText] string reason)
         => _ = new BanCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -114,7 +114,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
         });
 
     [Command("softban"),
-    CommandModule("moderation"),
+    
     Description("Soft bans the specified user.")]
     public async Task SoftBan(CommandContext ctx, DiscordUser victim, [Description("Message deletion days")] int days = 0, [Description("Reason")][RemainingText] string reason = "")
         => _ = new SoftBanCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -127,7 +127,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("unban"),
-    CommandModule("moderation"),
+    
     Description("Unbans the specified user.")]
     public async Task Unban(CommandContext ctx, DiscordUser victim)
         => _ = new UnbanCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -138,7 +138,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Group("follow"),
-    CommandModule("moderation"),
+    
     Description("Allows you to follow an announcement channel from our support server.")]
     public sealed class MessageEmbedding : BaseCommandModule
     {
@@ -176,7 +176,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("moveall"),
-    CommandModule("moderation"),
+    
     Description("Move all users in your Voice Channel to another Voice Channel")]
     public async Task MoveAll(CommandContext ctx, DiscordChannel newChannel)
         => _ = new MoveAllCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -187,7 +187,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("movehere"),
-    CommandModule("moderation"),
+    
     Description("Move all users from another Voice Channel to your Voice Channel")]
     public async Task MoveHere(CommandContext ctx, DiscordChannel oldChannel)
         => _ = new MoveHereCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -198,7 +198,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("customembed"),
-    CommandModule("moderation"),
+    
     Description("Create an embedded message")]
     public async Task CustomEmbed(CommandContext ctx)
         => _ = new CustomEmbedCommand().ExecuteCommand(ctx, this._bot);
@@ -206,7 +206,7 @@ public sealed class ModerationPrefixCommands : BaseCommandModule
 
 
     [Command("override-bump-time"),
-    CommandModule("moderation"),
+    
     Description("Allows fixing of the last bump in case Disboard did not properly post a message.")]
     public async Task OverrideBumpTime(CommandContext ctx)
         => _ = new ManualBumpCommand().ExecuteCommand(ctx, this._bot);

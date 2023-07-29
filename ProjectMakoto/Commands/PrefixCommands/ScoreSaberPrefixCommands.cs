@@ -12,7 +12,7 @@ namespace ProjectMakoto.PrefixCommands;
 public sealed class ScoreSaberPrefixCommands : BaseCommandModule
 {
     [Group("scoresaber"), Aliases("ss"),
-    CommandModule("scoresaber"),
+    
     Description("Interact with the ScoreSaber API.")]
     internal sealed class ScoreSaberGroup : BaseCommandModule
     {

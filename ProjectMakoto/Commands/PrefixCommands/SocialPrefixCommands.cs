@@ -14,7 +14,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
     public Bot _bot { private get; set; }
 
     [Command("afk"),
-    CommandModule("social"),
+    
     Description("Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.")]
     public async Task Afk(CommandContext ctx, [RemainingText][Description("Text (<128 characters)")] string reason = "-")
         => _ = new AfkCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -23,7 +23,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
         });
 
     [Command("cuddle"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Cuddle with another user.")]
     public async Task Cuddle(CommandContext ctx, DiscordUser user)
         => _ = new CuddleCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -34,7 +34,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("kiss"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Kiss another user.")]
     public async Task Kiss(CommandContext ctx, DiscordUser user)
         => _ = new KissCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -45,7 +45,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("slap"), Aliases("bonk", "punch"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Slap another user.")]
     public async Task Slap(CommandContext ctx, DiscordUser user)
         => _ = new SlapCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -56,7 +56,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("kill"), Aliases("waste"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Kill another user..?")]
     public async Task Kill(CommandContext ctx, DiscordUser user)
         => _ = new KillCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -67,7 +67,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("boop"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Give another user a boop!")]
     public async Task Boop(CommandContext ctx, DiscordUser user)
         => _ = new BoopCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -78,7 +78,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("highfive"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Give a high five!")]
     public async Task Highfive(CommandContext ctx, DiscordUser user)
         => _ = new HighFiveCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -89,7 +89,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("hug"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Hug another user!")]
     public async Task Hug(CommandContext ctx, DiscordUser user)
         => _ = new HugCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>
@@ -100,7 +100,7 @@ public sealed class SocialPrefixCommands : BaseCommandModule
 
 
     [Command("pat"), Aliases("pet", "headpat", "headpet"), PreventCommandDeletion,
-    CommandModule("social"),
+    
     Description("Give someone some headpats!")]
     public async Task Pat(CommandContext ctx, DiscordUser user)
         => _ = new PatCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object>

@@ -15,7 +15,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
 
     [Group("join"), Aliases("joinsettings", "join-settings"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings in the event somebody joins the server.")]
     public sealed class JoinSettings : BaseCommandModule
     {
@@ -37,7 +37,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("experience"), Aliases("experiencesettings", "experience-settings"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to experience.")]
     public sealed class ExperienceSettings : BaseCommandModule
     {
@@ -59,7 +59,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("levelrewards"), Aliases("level-rewards", "rewards"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review, add and change Level Rewards.")]
     public sealed class LevelRewards : BaseCommandModule
     {
@@ -81,7 +81,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("phishing"), Aliases("phishingsettings", "phishing-settings"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to phishing link protection.")]
     public sealed class PhishingSettings : BaseCommandModule
     {
@@ -103,7 +103,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("bumpreminder"), Aliases("bump-reminder"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review, set up and change settings related to the Bump Reminder.")]
     public sealed class BumpReminder : BaseCommandModule
     {
@@ -125,7 +125,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("actionlog"), Aliases("action-log"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to the actionlog.")]
     public sealed class ActionLog : BaseCommandModule
     {
@@ -148,7 +148,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("autocrosspost"), Aliases("auto-crosspost", "crosspost"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to automatic crossposting.")]
     public sealed class AutoCrosspost : BaseCommandModule
     {
@@ -171,7 +171,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
 
     [Group("reactionroles"), Aliases("reactionrole", "reaction-roles", "reaction-role"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to Reaction Roles.")]
     public sealed class ReactionRoles : BaseCommandModule
     {
@@ -210,7 +210,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
 
     [Group("invoiceprivacy"), Aliases("in-voice-privacy", "vc-privacy", "vcprivacy"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to In-Voice Text Channel Privacy.")]
     public sealed class InVoiceTextPrivacy : BaseCommandModule
     {
@@ -233,7 +233,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
 
 
     [Group("invitetracker"), Aliases("invite-tracker", "invitetracking", "invite-tracking"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to Invite Tracking.")]
     public sealed class InviteTracker : BaseCommandModule
     {
@@ -255,7 +255,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("namenormalizer"), Aliases("name-normalizer"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to automatic name normalization.")]
     public sealed class NameNormalizer : BaseCommandModule
     {
@@ -277,7 +277,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("autounarchive"), Aliases("auto-unarchive"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to automatic thread unarchiving.")]
     public sealed class AutoUnarchive : BaseCommandModule
     {
@@ -299,7 +299,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("embedmessages"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to automatic message embedding.")]
     public sealed class MessageEmbedding : BaseCommandModule
     {
@@ -321,7 +321,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("tokendetection"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to automatic token invalidation.")]
     public sealed class TokenDetection : BaseCommandModule
     {
@@ -343,7 +343,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("invitenotes"),
-    CommandModule("configuration"),
+    
     Description("Allows you to add notes to invite codes.")]
     public sealed class InviteNotes : BaseCommandModule
     {
@@ -363,7 +363,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("vccreator"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to the Voice Channel Creator.")]
     public sealed class VcCreator : BaseCommandModule
     {
@@ -385,7 +385,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("guild-prefix"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to the guild's prefix.")]
     public sealed class GuildPrefix : BaseCommandModule
     {
@@ -407,7 +407,7 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
     }
 
     [Group("guild-language"),
-    CommandModule("configuration"),
+    
     Description("Allows you to review and change settings related to the guild's selected language.")]
     public sealed class GuildLanguage : BaseCommandModule
     {

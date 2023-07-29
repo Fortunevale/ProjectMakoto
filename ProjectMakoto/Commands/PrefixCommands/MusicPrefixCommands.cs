@@ -15,7 +15,7 @@ public sealed class MusicPrefixCommands : BaseCommandModule
 
 
     [Group("music"),
-    CommandModule("music"), Aliases("m"),
+     Aliases("m"),
     Description("Allows to play music and change the current playback settings.")]
     public sealed class MusicCommands : BaseCommandModule
     {
@@ -88,7 +88,7 @@ public sealed class MusicPrefixCommands : BaseCommandModule
     }
 
     [Group("playlists"), Aliases("playlist", "pl"),
-    CommandModule("music"),
+    
     Description("Allows you to manage your personal playlists.")]
     public sealed class Playlists : BaseCommandModule
     {
@@ -102,34 +102,6 @@ public sealed class MusicPrefixCommands : BaseCommandModule
         [Command("manage"), Description("Allows you to use and manage your playlists.")]
         public async Task Manage(CommandContext ctx)
             => _ = new Commands.Playlists.ManageCommand().ExecuteCommand(ctx, this._bot);
-
-        private async Task SendUnavailable(CommandContext ctx)
-        {
-            DummyCommand dummyCommand = new();
-            await dummyCommand.ExecuteCommand(ctx, this._bot);
-
-            dummyCommand.SendSourceError(Enums.CommandType.ApplicationCommand);
-        }
-
-        [Command("add-to-queue"), Description("Adds a playlist to the current song queue.")]
-        public async Task AddToQueue(CommandContext ctx, [Description("Playlist Id")] string id)
-            => _ = SendUnavailable(ctx);
-
-        [Command("share"), Description("Share one of your playlists.")]
-        public async Task Share(CommandContext ctx, [Description("Playlist Id")] string id)
-            => _ = SendUnavailable(ctx);
-
-        [Command("export"), Description("Export one of your playlists.")]
-        public async Task Export(CommandContext ctx, [Description("Playlist Id")] string id)
-            => _ = SendUnavailable(ctx);
-
-        [Command("modify"), Description("Modify one of your playlists.")]
-        public async Task Modify(CommandContext ctx, [Description("Playlist Id")] string id)
-            => _ = SendUnavailable(ctx);
-
-        [Command("delete"), Description("Delete one of your playlists.")]
-        public async Task Delete(CommandContext ctx, [Description("Playlist Id")] string id)
-            => _ = SendUnavailable(ctx);
 
         [Command("create-new"), Description("Create a new playlist from scratch.")]
         public async Task CreateNew(CommandContext ctx)
