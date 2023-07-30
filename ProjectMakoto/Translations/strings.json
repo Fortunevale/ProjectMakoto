@@ -5634,6 +5634,32 @@
           "en": "Select a new language..",
           "de": "Eine neue Sprache wählen.. "
         }
+      },
+      "NameNormalizer": {
+        "Title": {
+          "en": "Name Normalizer"
+        },
+        "DefaultName": {
+          "en": "Pingable Name"
+        },
+        "NameNormalizerEnabled": {
+          "en": "Name Normalizer Enabled"
+        },
+        "ToggleNameNormalizer": {
+          "en": "Toggle Name Normalizer"
+        },
+        "NormalizeNow": {
+          "en": "Normalize Everyone's name now"
+        },
+        "NormalizerRunning": {
+          "en": "A name normalizer is already running."
+        },
+        "RenamingAllMembers": {
+          "en": "Renaming all members. This might take a while.."
+        },
+        "RenamedMembers": {
+          "en": "Renamed {Count} members."
+        }
       }
     }
   }

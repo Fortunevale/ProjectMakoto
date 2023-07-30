@@ -17,6 +17,18 @@ public sealed class Translations
         public config Config;
         public sealed class config
         {
+            public nameNormalizer NameNormalizer;
+            public sealed class nameNormalizer
+            {
+                public SingleTranslationKey RenamedMembers;
+                public SingleTranslationKey RenamingAllMembers;
+                public SingleTranslationKey NormalizerRunning;
+                public SingleTranslationKey NormalizeNow;
+                public SingleTranslationKey ToggleNameNormalizer;
+                public SingleTranslationKey NameNormalizerEnabled;
+                public SingleTranslationKey DefaultName;
+                public SingleTranslationKey Title;
+            }
             public guildLanguage GuildLanguage;
             public sealed class guildLanguage
             {
