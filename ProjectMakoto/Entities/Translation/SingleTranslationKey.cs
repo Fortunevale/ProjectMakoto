@@ -124,4 +124,10 @@ public sealed class SingleTranslationKey : IDictionary<string, string>
 
     IEnumerator IEnumerable.GetEnumerator()
         => this.t.GetEnumerator();
+
+    public override string ToString()
+    {
+        _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", this.t["en"]);
+        return this.t["en"];
+    }
 }

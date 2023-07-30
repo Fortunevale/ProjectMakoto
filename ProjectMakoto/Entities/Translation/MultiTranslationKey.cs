@@ -124,4 +124,10 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
 
     IEnumerator IEnumerable.GetEnumerator()
         => this.t.GetEnumerator();
+
+    public override string ToString()
+    {
+        _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", this.t["en"].Build());
+        return this.t["en"].Build();
+    }
 }
