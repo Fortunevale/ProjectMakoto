@@ -5855,6 +5855,23 @@
         "ToggleTokenDetection": {
           "en": "Toggle Token Detection"
         }
+      },
+      "VcCreator": {
+        "Title": {
+          "en": "Voice Channel Creator"
+        },
+        "SetVcCreator": {
+          "en": "Set Voice Channel Creator"
+        },
+        "DisableVcCreator": {
+          "en": "Disable Voice Channel Creator"
+        },
+        "NoChannels": {
+          "en": "No Voice Channels found in your server."
+        },
+        "CreateNewChannel": {
+          "en": "Create new Channel"
+        }
       }
     }
   }

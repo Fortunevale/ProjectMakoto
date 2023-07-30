@@ -17,6 +17,15 @@ public sealed class Translations
         public config Config;
         public sealed class config
         {
+            public vcCreator VcCreator;
+            public sealed class vcCreator
+            {
+                public SingleTranslationKey CreateNewChannel;
+                public SingleTranslationKey NoChannels;
+                public SingleTranslationKey DisableVcCreator;
+                public SingleTranslationKey SetVcCreator;
+                public SingleTranslationKey Title;
+            }
             public tokenDetection TokenDetection;
             public sealed class tokenDetection
             {
