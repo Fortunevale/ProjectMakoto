@@ -5740,6 +5740,110 @@
         "InvalidDuration": {
           "en": "The duration has to be between 10 seconds and 28 days."
         }
+      },
+      "ReactionRoles": {
+        "Title": {
+          "en": "Reaction Roles"
+        },
+        "LoadingReactionRoles": {
+          "en": "Loading Reaction Roles.."
+        },
+        "AddNewReactionRole": {
+          "en": "Add a new reaction roles"
+        },
+        "RemoveReactionRole": {
+          "en": "Remove a reaction roles"
+        },
+        "ReactionRoleCount": {
+          "en": "{Count} reaction roles are set up."
+        },
+        "SelectMessage": {
+          "en": "Select Message"
+        },
+        "SelectEmoji": {
+          "en": "Select Emoji"
+        },
+        "SelectRole": {
+          "en": "Select Role"
+        },
+        "Message": {
+          "en": "Message"
+        },
+        "Emoji": {
+          "en": "Emoji"
+        },
+        "Role": {
+          "en": "Role"
+        },
+        "JumpToMessage": {
+          "en": "Jump to message"
+        },
+        "MessageUrl": {
+          "en": "Message Url"
+        },
+        "MessageUrlInstructions": {
+          "en": "Please copy and paste the message link of the message you want the reaction role to be added to."
+        },
+        "InvalidMessageUrl": {
+          "en": "This doesn't look correct. A message url should look something like these:"
+        },
+        "MessageUrlWrongGuild": {
+          "en": "The link you provided leads to another server."
+        },
+        "MessageUrlNoChannel": {
+          "en": "The link you provided leads to a channel that doesn't exist."
+        },
+        "MessageUrlNoMessage": {
+          "en": "The link you provided leads to a message that doesn't exist or the bot has no access to."
+        },
+        "AddingReactionRole": {
+          "en": "Adding Reaction Role.."
+        },
+        "SelectRolePrompt": {
+          "en": "Please select the role you want this reaction role to assign below."
+        },
+        "NoRoles": {
+          "en": "Could not find any roles in your server."
+        },
+        "ReactWithEmoji": {
+          "en": "Please react to message you're assigning the reaction role to with the emoji you'd like to use."
+        },
+        "NoAccessToEmoji": {
+          "en": "The bot has no acess to this emoji. Any emoji of this server and built-in discord emojis should work."
+        },
+        "ReactionRoleLimitReached": {
+          "en": "You've reached the limit of 100 reaction roles per guild. You cannot add more reaction roles unless you remove one."
+        },
+        "EmojiAlreadyUsed": {
+          "en": "The specified emoji has already been used for a reaction role on the selected message."
+        },
+        "RoleAlreadyUsed": {
+          "en": "The specified emoji has already been used for a reaction role on the selected message."
+        },
+        "AddedReactionRole": {
+          "en": "Added role {Role} to message sent by {User} in {Channel} with emoji {Emoji}."
+        },
+        "RemovingReactionRole": {
+          "en": "Removing Reaction Role.."
+        },
+        "ReactWithEmojiToRemove": {
+          "en": "Please react with the emoji you want to remove from the target message."
+        },
+        "NoReactionRoleFound": {
+          "en": "The specified message doesn't contain a reaction role with the specified reaction."
+        },
+        "RemovedReactionRole": {
+          "en": "Removed role {Role} from message sent by {User} in {Channel} with emoji {Emoji}."
+        },
+        "RemovingAllReactionRoles": {
+          "en": "Removing all reaction roles.."
+        },
+        "NoReactionRoles": {
+          "en": "The specified message doesn't contain any reaction roles."
+        },        
+        "RemovedAllReactionRoles": {
+          "en": "Removed all reaction roles from message sent by {User} in {Channel}."
+        }
       }
     }
   }

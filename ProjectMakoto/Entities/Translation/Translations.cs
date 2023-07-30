@@ -17,6 +17,44 @@ public sealed class Translations
         public config Config;
         public sealed class config
         {
+            public reactionRoles ReactionRoles;
+            public sealed class reactionRoles
+            {
+                public SingleTranslationKey RemovedAllReactionRoles;
+                public SingleTranslationKey NoReactionRoles;
+                public SingleTranslationKey RemovingAllReactionRoles;
+                public SingleTranslationKey RemovedReactionRole;
+                public SingleTranslationKey NoReactionRoleFound;
+                public SingleTranslationKey ReactWithEmojiToRemove;
+                public SingleTranslationKey RemovingReactionRole;
+                public SingleTranslationKey AddedReactionRole;
+                public SingleTranslationKey RoleAlreadyUsed;
+                public SingleTranslationKey EmojiAlreadyUsed;
+                public SingleTranslationKey ReactionRoleLimitReached;
+                public SingleTranslationKey NoAccessToEmoji;
+                public SingleTranslationKey ReactWithEmoji;
+                public SingleTranslationKey NoRoles;
+                public SingleTranslationKey SelectRolePrompt;
+                public SingleTranslationKey AddingReactionRole;
+                public SingleTranslationKey MessageUrlNoMessage;
+                public SingleTranslationKey MessageUrlNoChannel;
+                public SingleTranslationKey MessageUrlWrongGuild;
+                public SingleTranslationKey InvalidMessageUrl;
+                public SingleTranslationKey MessageUrlInstructions;
+                public SingleTranslationKey MessageUrl;
+                public SingleTranslationKey JumpToMessage;
+                public SingleTranslationKey Role;
+                public SingleTranslationKey Emoji;
+                public SingleTranslationKey Message;
+                public SingleTranslationKey SelectRole;
+                public SingleTranslationKey SelectEmoji;
+                public SingleTranslationKey SelectMessage;
+                public SingleTranslationKey ReactionRoleCount;
+                public SingleTranslationKey RemoveReactionRole;
+                public SingleTranslationKey AddNewReactionRole;
+                public SingleTranslationKey LoadingReactionRoles;
+                public SingleTranslationKey Title;
+            }
             public phishing Phishing;
             public sealed class phishing
             {

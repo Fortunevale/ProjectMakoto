@@ -17,6 +17,8 @@ internal sealed class RemoveCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.ReactionRoles;
+
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
@@ -24,8 +26,8 @@ internal sealed class RemoveCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = "`Removing reaction role..`"
-            }.AsLoading(ctx, "Reaction Roles");
+                Description = GetString(CommandKey.RemovingReactionRole, true)
+            }.AsLoading(ctx, GetString(CommandKey.Title));
 
             await RespondOrEdit(embed);
 
@@ -74,8 +76,8 @@ internal sealed class RemoveCommand : BaseCommand
                 {
                     case Enums.CommandType.ContextMenu:
                     {
-                        embed.Description = $"`Please react with the emoji you want to remove from the target message.`";
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, "Reaction Roles")));
+                        embed.Description = GetString(CommandKey.ReactWithEmojiToRemove, true);
+                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, GetString(CommandKey.Title))));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == message.Id, TimeSpan.FromMinutes(2));
 
@@ -95,8 +97,8 @@ internal sealed class RemoveCommand : BaseCommand
 
             if (!ctx.DbGuild.ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
-                embed.Description = $"`The specified message doesn't contain specified reaction.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
+                embed.Description = GetString(CommandKey.NoReactionRoleFound);
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, GetString(CommandKey.Title))));
                 return;
             }
 
@@ -109,8 +111,12 @@ internal sealed class RemoveCommand : BaseCommand
 
             ctx.DbGuild.ReactionRoles.Remove(obj);
 
-            embed.Description = $"`Removed role` {role.Mention} `from message sent by` {reactionMessage.Author.Mention} `in` {reactionMessage.Channel.Mention} `with emoji` {obj.Value.GetEmoji(ctx.Client)} `.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, "Reaction Roles")));
+            embed.Description = GetString(CommandKey.RemovedReactionRole, true,
+                new TVar("Role", role.Mention),
+                new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
+                new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
+                new TVar("Emoji", obj.Value.GetEmoji(ctx.Client)));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, GetString(CommandKey.Title))));
         });
     }
 }

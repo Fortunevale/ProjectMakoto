@@ -17,6 +17,8 @@ internal sealed class RemoveAllCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.ReactionRoles;
+
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
@@ -57,16 +59,16 @@ internal sealed class RemoveAllCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = "`Removing all reaction roles..`"
-            }.AsLoading(ctx, "Reaction Roles");
+                Description = GetString(CommandKey.RemovingAllReactionRoles)
+            }.AsLoading(ctx, GetString(CommandKey.Title));
 
             await RespondOrEdit(embed);
             embed.Author.IconUrl = ctx.Guild.IconUrl;
 
             if (!ctx.DbGuild.ReactionRoles.Any(x => x.Key == message.Id))
             {
-                embed.Description = $"`The specified message doesn't contain any reaction roles.`";
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Reaction Roles")));
+                embed.Description = GetString(CommandKey.NoReactionRoles, true);
+                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, GetString(CommandKey.Title))));
                 return;
             }
 
@@ -75,8 +77,10 @@ internal sealed class RemoveAllCommand : BaseCommand
 
             _ = message.DeleteAllReactionsAsync();
 
-            embed.Description = $"`Removed all reaction roles from message sent by` {message.Author.Mention} `in` {message.Channel.Mention} `.`";
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, "Reaction Roles")));
+            embed.Description = GetString(CommandKey.RemovedAllReactionRoles, true,
+                new TVar("User", message?.Author.Mention ?? "`/`"),
+                new TVar("Channel", message?.Channel.Mention ?? "`/`"));
+            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, GetString(CommandKey.Title))));
         });
     }
 }
