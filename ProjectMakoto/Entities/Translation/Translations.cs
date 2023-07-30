@@ -17,6 +17,13 @@ public sealed class Translations
         public config Config;
         public sealed class config
         {
+            public tokenDetection TokenDetection;
+            public sealed class tokenDetection
+            {
+                public SingleTranslationKey ToggleTokenDetection;
+                public SingleTranslationKey DetectTokens;
+                public SingleTranslationKey Title;
+            }
             public reactionRoles ReactionRoles;
             public sealed class reactionRoles
             {

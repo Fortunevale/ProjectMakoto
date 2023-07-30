@@ -17,9 +17,11 @@ internal sealed class TokenDetectionCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.TokenDetection;
+
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"⚠ `Detect Tokens`: {ctx.DbGuild.TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
+                return $"⚠ `{GetString(CommandKey.DetectTokens)}`: {ctx.DbGuild.TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
@@ -28,9 +30,9 @@ internal sealed class TokenDetectionCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, "Token Detection");
+            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.DbGuild.TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Token Detection", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var Toggle = new DiscordButtonComponent((ctx.DbGuild.TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleTokenDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>

@@ -5840,9 +5840,20 @@
         },
         "NoReactionRoles": {
           "en": "The specified message doesn't contain any reaction roles."
-        },        
+        },
         "RemovedAllReactionRoles": {
           "en": "Removed all reaction roles from message sent by {User} in {Channel}."
+        }
+      },
+      "TokenDetection": {
+        "Title": {
+          "en": "Token Detection"
+        },
+        "DetectTokens": {
+          "en": "Detect Tokens"
+        },
+        "ToggleTokenDetection": {
+          "en": "Toggle Token Detection"
         }
       }
     }
