@@ -5660,6 +5660,86 @@
         "RenamedMembers": {
           "en": "Renamed {Count} members."
         }
+      },
+      "Phishing": {
+        "Title": {
+          "en": "Phishing Protection"
+        },
+        "DetectPhishingLinks": {
+          "en": "Detect Phishing Links"
+        },
+        "RedirectWarning": {
+          "en": "Redirect Warning"
+        },
+        "AbuseIpDbReports": {
+          "en": "AbuseIPDB Reports"
+        },
+        "PunishmentType": {
+          "en": "Punishment Type"
+        },
+        "PunishmentTypeDelete": {
+          "en": "Delete Message"
+        },
+        "PunishmentTypeTimeout": {
+          "en": "Timeout Member"
+        },
+        "PunishmentTypeKick": {
+          "en": "Kick Member"
+        },
+        "PunishmentTypeBan": {
+          "en": "Ban Member"
+        },
+        "PunishmentTypeSoftban": {
+          "en": "Softban Member"
+        },
+        "PunishmentTypeDeleteDescription": {
+          "en": "Only deletes the message containing the detected phishing link"
+        },
+        "PunishmentTypeTimeoutDescription": {
+          "en": "Times the user out if a phishing link has been detected"
+        },
+        "PunishmentTypeKickDescription": {
+          "en": "Kicks the user if a phishing link has been detected"
+        },
+        "PunishmentTypeBanDescription": {
+          "en": "Bans the user if a phishing link has been detected"
+        },
+        "PunishmentTypeSoftbanDescription": {
+          "en": "Softbans the user if a phishing link has been detected"
+        },
+        "CustomPunishmentReason": {
+          "en": "Custom Punishment Reason"
+        },
+        "CustomTimeoutLength": {
+          "en": "Custom Timeout Length"
+        },
+        "ToggleDetection": {
+          "en": "Toggle Detection"
+        },
+        "ToggleWarning": {
+          "en": "Toggle Redirect Warning"
+        },
+        "ToggleAbuseIpDb": {
+          "en": "Toggle AbuseIPDB Reports"
+        },
+        "ChangePunishmentType": {
+          "en": "Change Punishment"
+        },
+        "ChangePunishmentReason": {
+          "en": "Change Reason"
+        },
+        "ChangeTimeoutLength": {
+          "en": "Change Timeout Length"
+        },
+        "DefineNewReason": {
+          "en": "New reason | Use %R to insert default reason"
+        },
+        "NotUsingType": {
+          "en": "You aren't using '{Type}' as your Punishment"
+        },
+        "InvalidDuration": {
+          "en": "The duration has to be between 10 seconds and 28 days."
+        }
       }
     }
   }

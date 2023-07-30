@@ -227,24 +227,32 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
 
         switch (this.Bot.Guilds[guild.Id].PhishingDetection.PunishmentType)
         {
-            case PhishingPunishmentType.DELETE:
+            case PhishingPunishmentType.Delete:
             {
                 _ = e.DeleteAsync();
                 break;
             }
-            case PhishingPunishmentType.TIMEOUT:
+            case PhishingPunishmentType.Timeout:
             {
                 _ = e.DeleteAsync();
                 _ = member.TimeoutAsync(this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentLength, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
-            case PhishingPunishmentType.KICK:
+            case PhishingPunishmentType.Kick:
             {
                 _ = e.DeleteAsync();
                 _ = member.RemoveAsync(this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
                 break;
             }
-            case PhishingPunishmentType.BAN:
+            case PhishingPunishmentType.SoftBan:
+            {
+                _ = e.DeleteAsync();
+                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));
+                await Task.Delay(1000);
+                _ = member.UnbanAsync();
+                break;
+            }
+            case PhishingPunishmentType.Ban:
             {
                 _ = e.DeleteAsync();
                 _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", $"Detected malicious Url [{url}]"));

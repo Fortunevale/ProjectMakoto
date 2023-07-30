@@ -17,6 +17,36 @@ public sealed class Translations
         public config Config;
         public sealed class config
         {
+            public phishing Phishing;
+            public sealed class phishing
+            {
+                public SingleTranslationKey InvalidDuration;
+                public SingleTranslationKey NotUsingType;
+                public SingleTranslationKey DefineNewReason;
+                public SingleTranslationKey ChangeTimeoutLength;
+                public SingleTranslationKey ChangePunishmentReason;
+                public SingleTranslationKey ChangePunishmentType;
+                public SingleTranslationKey ToggleAbuseIpDb;
+                public SingleTranslationKey ToggleWarning;
+                public SingleTranslationKey ToggleDetection;
+                public SingleTranslationKey CustomTimeoutLength;
+                public SingleTranslationKey CustomPunishmentReason;
+                public SingleTranslationKey PunishmentTypeSoftbanDescription;
+                public SingleTranslationKey PunishmentTypeBanDescription;
+                public SingleTranslationKey PunishmentTypeKickDescription;
+                public SingleTranslationKey PunishmentTypeTimeoutDescription;
+                public SingleTranslationKey PunishmentTypeDeleteDescription;
+                public SingleTranslationKey PunishmentTypeSoftban;
+                public SingleTranslationKey PunishmentTypeBan;
+                public SingleTranslationKey PunishmentTypeKick;
+                public SingleTranslationKey PunishmentTypeTimeout;
+                public SingleTranslationKey PunishmentTypeDelete;
+                public SingleTranslationKey PunishmentType;
+                public SingleTranslationKey AbuseIpDbReports;
+                public SingleTranslationKey RedirectWarning;
+                public SingleTranslationKey DetectPhishingLinks;
+                public SingleTranslationKey Title;
+            }
             public nameNormalizer NameNormalizer;
             public sealed class nameNormalizer
             {

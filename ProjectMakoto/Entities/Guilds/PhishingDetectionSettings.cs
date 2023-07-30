@@ -50,7 +50,7 @@ public sealed class PhishingDetectionSettings : RequiresParent<Guild>
     }
 
 
-    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.KICK;
+    private PhishingPunishmentType _PunishmentType { get; set; } = PhishingPunishmentType.Kick;
     public PhishingPunishmentType PunishmentType
     {
         get => this._PunishmentType;
