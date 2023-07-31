@@ -68,7 +68,6 @@ public sealed class Bot
 
     #endregion Bans
 
-
     public Status status = new();
     internal SelfFillingDictionary<Entities.Guild> Guilds = null;
     internal SelfFillingDictionary<Entities.User> Users = null;

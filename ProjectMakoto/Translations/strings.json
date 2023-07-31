@@ -198,6 +198,56 @@
         "de": "Sprachnachricht senden"
       }
     },
+    "Time": {
+      "Years": {
+        "en": "Years",
+        "de": "Jahre"
+      },
+      "Year": {
+        "en": "Year",
+        "de": "Jahr"
+      },
+      "Months": {
+        "en": "Months",
+        "de": "Monate"
+      },
+      "Month": {
+        "en": "Month",
+        "de": "Monat"
+      },
+      "Days": {
+        "en": "Days",
+        "de": "Tage"
+      },
+      "Day": {
+        "en": "Day",
+        "de": "Tag"
+      },
+      "Hours": {
+        "en": "Hours",
+        "de": "Stunden"
+      },
+      "Hour": {
+        "en": "Hour",
+        "de": "Stunde"
+      },
+      "Minutes": {
+        "en": "Minutes",
+        "de": "Minuten"
+      },
+      "Minute": {
+        "en": "Minute",
+        "de": "Minute"
+      },
+      "Seconds": {
+        "en": "Seconds",
+        "de": "Sekunden"
+      },
+      "Second": {
+        "en": "Second",
+        "de": "Sekunde"
+      }
+    },
     "MissingTranslation": {
       "en": "Missing Translation",
       "de": "Fehlende Übersetzung"
@@ -5872,6 +5922,331 @@
         "CreateNewChannel": {
           "en": "Create new Channel"
         }
+      }
+    }
+  },
+  "Events": {
+    "Actionlog": {
+      "User": {
+        "en": "User"
+      },
+      "UserId": {
+        "en": "User-Id"
+      },
+      "UserJoined": {
+        "en": "User joined"
+      },
+      "UserRejoined": {
+        "en": "User rejoined"
+      },
+      "AccountAge": {
+        "en": "Account Age"
+      },
+      "StaffNotes": {
+        "en": "Makoto Staff Notes"
+      },
+      "InviteNotes": {
+        "en": "Invite Notes"
+      },
+      "InvitedBy": {
+        "en": "Invited by"
+      },
+      "InviteCode": {
+        "en": "Invite Code"
+      },
+      "InviteNote": {
+        "en": "Invite Note"
+      },
+      "UserLeft": {
+        "en": "User left"
+      },
+      "JoinedAt": {
+        "en": "Joined at"
+      },
+      "Roles": {
+        "en": "Roles"
+      },
+      "UserKicked": {
+        "en": "User kicked"
+      },
+      "KickedBy": {
+        "en": "Kicked by"
+      },
+      "Reason": {
+        "en": "Reason"
+      },
+      "FooterAuditLogDisclaimer": {
+        "en": "Please note that the {Fields} may not be accurate as the bot can't differentiate between similar audit log entries that affect the same things."
+      },
+      "MessageDeleted": {
+        "en": "MessageDeleted"
+      },
+      "Channel": {
+        "en": "Channel"
+      },
+      "Content": {
+        "en": "Content"
+      },
+      "Attachments": {
+        "en": "Attachments"
+      },
+      "Stickers": {
+        "en": "Stickers"
+      },
+      "ReplyTo": {
+        "en": "Reply to"
+      },
+      "JumpToMessage": {
+        "en": "Jump to message"
+      },
+      "UserJoinedVoiceChannel": {
+        "en": "User joined Voice Channel"
+      },
+      "UserLeftVoiceChannel": {
+        "en": "User left Voice Channel"
+      },
+      "UserSwitchedVoiceChannel": {
+        "en": "User switched Voice Channel"
+      },
+      "MultipleMessagesDeleted": {
+        "en": "Multiple Messages deleted"
+      },
+      "CheckAttachedFileForDeletedMessages": {
+        "en": "Check the attached file to view the deleted messages"
+      },
+      "MessageUpdated": {
+        "en": "Message updated"
+      },
+      "Message": {
+        "en": "Message"
+      },
+      "PreviousContent": {
+        "en": "Previous Content"
+      },
+      "NewContent": {
+        "en": "New Content"
+      },
+      "NicknameUpdated": {
+        "en": "Nickname updated"
+      },
+      "NicknameAdded": {
+        "en": "Nickname added"
+      },
+      "NicknameRemoved": {
+        "en": "Nickname removed"
+      },
+      "PreviousNickname": {
+        "en": "Previous Nickname"
+      },
+      "NewNickname": {
+        "en": "New Nickname"
+      },
+      "RolesUpdated": {
+        "en": "Roles updated"
+      },
+      "RolesAdded": {
+        "en": "Roles added"
+      },
+      "RolesRemoved": {
+        "en": "Roles removed"
+      },
+      "MembershipApproved": {
+        "en": "Membership approved"
+      },
+      "GuildProfilePictureUpdated": {
+        "en": "Member Guild Profile Picture updated"
+      },
+      "Integration": {
+        "en": "Integration"
+      },
+      "ServerBooster": {
+        "en": "Server Booster"
+      },
+      "RoleCreated": {
+        "en": "Role created"
+      },
+      "Role": {
+        "en": "Role"
+      },
+      "Color": {
+        "en": "Color"
+      },
+      "RoleId": {
+        "en": "Role-Id"
+      },
+      "RoleIsIntegration": {
+        "en": "This role belongs to an integration and cannot be deleted."
+      },
+      "RoleMentionable": {
+        "en": "Role mentionable by everyone"
+      },
+      "DisplayedRoleMembers": {
+        "en": "Display role members separately"
+      },
+      "Permissions": {
+        "en": "Permissions"
+      },
+      "CreatedBy": {
+        "en": "Created by"
+      },
+      "RoleDeleted": {
+        "en": "Role deleted"
+      },
+      "RoleWasIntegration": {
+        "en": "This role belonged to an integration and was therefor deleted automatically."
+      },
+      "DeletedBy": {
+        "en": "Deleted by"
+      },
+      "PermissionsRemoved": {
+        "en": "Permissions removed"
+      },
+      "PermissionsAdded": {
+        "en": "Permissions added"
+      },
+      "PermissionsUpdated": {
+        "en": "Permissions updated"
+      },
+      "RoleUpdated": {
+        "en": "Role updated"
+      },
+      "ModifiedBy": {
+        "en": "Modified by"
+      },
+      "BannedBy": {
+        "en": "Banned by"
+      },
+      "UserBanned": {
+        "en": "User banned"
+      },
+      "UserUnbanned": {
+        "en": "User unbanned"
+      },
+      "UnbannedBy": {
+        "en": "Unbanned by"
+      },
+      "Owner": {
+        "en": "Owner"
+      },
+      "Name": {
+        "en": "Name"
+      },
+      "Description": {
+        "en": "Description"
+      },
+      "PreferredLocale": {
+        "en": "Preferred Locale"
+      },
+      "VanityUrl": {
+        "en": "Vanity Url"
+      },
+      "IconUpdated": {
+        "en": "Icon updated"
+      },
+      "DefaultNotificationSettings": {
+        "en": "Default Notification Settings"
+      },
+      "VerificationLevel": {
+        "en": "Verification Level"
+      },
+      "BannerUpdated": {
+        "en": "Banner updated"
+      },
+      "SplashUpdated": {
+        "en": "Splash updated"
+      },
+      "HomeHeaderUpdated": {
+        "en": "Home Header updated"
+      },
+      "DiscoverySplashUpdated": {
+        "en": "Discovery Splash updated"
+      },
+      "RequiredMfaLevel": {
+        "en": "Require 2-Factor Authentication for Mods"
+      },
+      "ExplicitContentFilter": {
+        "en": "Explicit Content Filter"
+      },
+      "GuildWidgetEnabled": {
+        "en": "Guild Widget Enabled"
+      },
+      "GuildWidgetChannel": {
+        "en": "Guild Widget Channel"
+      },
+      "LargeGuild": {
+        "en": "Large Guild"
+      },
+      "NsfwGuild": {
+        "en": "Nsfw Guild"
+      },
+      "CommunityGuild": {
+        "en": "Community Guild"
+      },
+      "MembershipScreening": {
+        "en": "Membership Screening"
+      },
+      "WelcomeScreen": {
+        "en": "Welcome Screen"
+      },
+      "BoostProgressBar": {
+        "en": "Boost Progress Bar"
+      },
+      "RuleChannel": {
+        "en": "Rules Channeö"
+      },
+      "AfkTimeout": {
+        "en": "Afk Timeout"
+      },
+      "AfkChannel": {
+        "en": "Afk Channel"
+      },
+      "SystemChannel": {
+        "en": "System Channel"
+      },
+      "DiscordUpdateChannel": {
+        "en": "Discord Update Channel"
+      },
+      "SafetyAlertsChannel": {
+        "en": "Safety Alerts Channel"
+      },
+      "MaximumMembers": {
+        "en": "Maximum Members"
+      },
+      "GuildUpdated": {
+        "en": "Guild updated"
+      },
+      "ChannelCreated": {
+        "en": "Channel created"
+      },
+      "ChannelDeleted": {
+        "en": "Channel deleted"
+      },
+      "ChannelModified": {
+        "en": "Channel updated"
+      },
+      "ChannelId": {
+        "en": "Channel-Id"
+      },
+      "NsfwChannel": {
+        "en": "Nsfw Channel"
+      },
+      "Bitrate": {
+        "en": "Bitrate"
+      },
+      "DefaultAutoArchiveDuration": {
+        "en": "Default Auto Archive Duration"
+      },
+      "Invite": {
+        "en": "Invite"
+      },
+      "InviteCreated": {
+        "en": "Invite created"
+      },
+      "InviteDeleted": {
+        "en": "Invite deleted"
+      },
+      "NoInviter": {
+        "en": "No Inviter found."
       }
     }
   }
