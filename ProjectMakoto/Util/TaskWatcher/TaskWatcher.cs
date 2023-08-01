@@ -225,7 +225,7 @@ public sealed class TaskWatcher
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.AssetsGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.DevelopmentGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
 
                         if (channel is null)
                         {
