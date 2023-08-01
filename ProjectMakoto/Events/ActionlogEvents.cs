@@ -333,7 +333,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
         var embed = new DiscordEmbedBuilder()
             .WithAuthor(tKey.MessageUpdated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageEdited)
             .WithColor(EmbedColors.Warning)
-            .WithFooter($"{tKey.UserId}: {e.Message.Author?.Id ?? 0}")
+            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Message.Author?.Id ?? 0}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Message.Author?.AvatarUrl)
             .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Message.Author?.Mention ?? "/"} `{e.Message.Author?.GetUsernameWithIdentifier() ?? "/"}`\n" +
@@ -508,7 +508,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
                     _ = SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
                         .WithAuthor(tKey.MembershipApproved.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
                         .WithColor(EmbedColors.Success)
-                        .WithFooter($"{tKey.UserId}: {e.Member.Id}")
+                        .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
                         .WithTimestamp(DateTime.UtcNow)
                         .WithThumbnail(e.Member.AvatarUrl)
                         .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`")));
@@ -572,7 +572,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
         var embed = new DiscordEmbedBuilder()
             .WithAuthor(tKey.RoleCreated.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserAdded)
             .WithColor(EmbedColors.Success)
-            .WithFooter($"{tKey.RoleId}: {e.Role.Id}")
+            .WithFooter($"{tKey.RoleId.Get(Bot.Guilds[e.Guild.Id])}: {e.Role.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithDescription($"**{tKey.Role.Get(Bot.Guilds[e.Guild.Id])}**: {e.Role.Mention} `{e.Role.Name}`\n" +
                              $"**{tKey.Color.Get(Bot.Guilds[e.Guild.Id])}**: `{e.Role.Color.ToHex()}`\n" +
@@ -827,7 +827,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
         var embed = new DiscordEmbedBuilder()
             .WithAuthor(tKey.UserUnbanned.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.UserBanRemoved)
             .WithColor(EmbedColors.Success)
-            .WithFooter($"{tKey.UserId}: {e.Member.Id}")
+            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
             .WithDescription($"**{tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
