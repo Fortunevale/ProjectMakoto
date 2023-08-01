@@ -19,10 +19,9 @@ public sealed class BasePluginCommand
     /// <param name="Name">The name of the command to be registered.</param>
     /// <param name="Description">The description of the command to be registered.</param>
     /// <param name="Command">The command to be executed.</param>
-    /// <param name="Module">The module of the command to be registered.</param>
     /// <param name="Overloads">The required overloads of the command to be registered.</param>
     /// <exception cref="ArgumentNullException">Thrown if any required argument is <see langword="null"/> or consists only of whitespaces.</exception>
-    public BasePluginCommand(string Name, string Description, string Module, BaseCommand Command, params BaseOverload[] Overloads)
+    public BasePluginCommand(string Name, string Description, BaseCommand Command, params BaseOverload[] Overloads)
     {
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
@@ -30,15 +29,11 @@ public sealed class BasePluginCommand
         if (Description.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Description));
 
-        if (Module.IsNullOrWhiteSpace())
-            throw new ArgumentNullException(nameof(Module));
-
         if (Command is null)
             throw new ArgumentNullException(nameof(Command));
 
         this.Name = Name.Trim();
         this.Description = Description.Trim();
-        this.Module = Module.Trim();
         this.Command = Command;
         this.Overloads = Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
     }
@@ -48,19 +43,14 @@ public sealed class BasePluginCommand
     /// </summary>
     /// <param name="Name">The name of this plugin group.</param>
     /// <param name="Description">The description of this plugin group.</param>
-    /// <param name="Module">The module of this plugin group.</param>
-    /// <param name="UseDefaultHelp">Whether to use the default help for command groups. Requires adding your own help command.</param>
     /// <param name="Commands">The commands of this group.</param>
-    public BasePluginCommand(string Name, string Description, string Module, params BasePluginCommand[] Commands)
+    public BasePluginCommand(string Name, string Description, params BasePluginCommand[] Commands)
     {
         if (Name.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Name));
 
         if (Description.IsNullOrWhiteSpace())
             throw new ArgumentNullException(nameof(Description));
-
-        if (Module.IsNullOrWhiteSpace())
-            throw new ArgumentNullException(nameof(Module));
 
         if ((Commands?.Length ?? 0) == 0)
             throw new ArgumentNullException(nameof(Commands));
@@ -70,7 +60,6 @@ public sealed class BasePluginCommand
 
         this.Name = Name.Trim();
         this.Description = Description.Trim();
-        this.Module = Module.Trim();
         this.SubCommands = Commands;
         this.Overloads = this.Overloads?.ToArray() ?? Array.Empty<BaseOverload>();
         this.UseDefaultHelp = true;
@@ -91,11 +80,6 @@ public sealed class BasePluginCommand
     /// The command's description.
     /// </summary>
     public string Description { get; internal set; }
-
-    /// <summary>
-    /// The command's module.
-    /// </summary>
-    public string Module { get; internal set; }
 
     /// <summary>
     /// This command's parent, if group.

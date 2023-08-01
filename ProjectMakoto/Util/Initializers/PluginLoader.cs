@@ -181,10 +181,10 @@ internal sealed class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                [Group("{{rawCommand.Name}}"), CommandModule("{{rawCommand.Module}}"), Description("{{rawCommand.Description}}")]
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                [{{typeof(GroupAttribute).FullName}}("{{rawCommand.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{rawCommand.Description}}")]
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(BaseCommandModule).FullName}}
                                 {
-                                    public {{nameof(Bot)}} _bot { private get; set; }
+                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
 
                                     // EntryPoint
                                 }
@@ -201,7 +201,7 @@ internal sealed class PluginLoader
                                         continue;
 
                                     rawSubCommand.Parent = rawCommand;
-                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, nameof(CommandContext), rawSubCommand, rawCommand));
+                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, typeof(CommandContext).FullName, rawSubCommand, rawCommand));
                                 }
 
                                 if (rawCommand.UseDefaultHelp)
@@ -209,9 +209,9 @@ internal sealed class PluginLoader
                                     code = code.Insert(InsertPosition,
                                     $$"""
 
-                                    [GroupCommand, Command("help"), Description("Sends a list of available sub-commands")]
-                                    public async Task Help(CommandContext ctx)
-                                        => PrefixCommandUtil.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot, ctx);
+                                    [{{typeof(GroupCommandAttribute).FullName}}, {{typeof(CommandAttribute).FullName}}("help"), {{typeof(DescriptionAttribute).FullName}}("Sends a list of available sub-commands")]
+                                    public async {{typeof(Task).FullName}} Help({{typeof(CommandContext).FullName}} ctx)
+                                        => {{typeof(PrefixCommandUtil).FullName}}.SendGroupHelp(_bot, ctx, "{{rawCommand.Name}}").Add(_bot, ctx);
                                     """);
                                 }
 
@@ -229,11 +229,11 @@ internal sealed class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(BaseCommandModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(BaseCommandModule).FullName}}
                                 {
-                                    public {{nameof(Bot)}} _bot { private get; set; }
+                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
 
-                                    {{GetSingleMethodCode(plugin, nameof(CommandContext), rawCommand)}}
+                                    {{GetSingleMethodCode(plugin, typeof(CommandContext).FullName, rawCommand)}}
                                 }
                                 """;
 
@@ -251,12 +251,12 @@ internal sealed class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
                                 {
-                                    [SlashCommandGroup("{{rawCommand.Name}}", "{{rawCommand.Description}}"{{(rawCommand.RequiredPermissions is null ? "" : $", {(long)rawCommand.RequiredPermissions}")}}, dmPermission: {{rawCommand.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{rawCommand.IsNsfw.ToString().ToLower()}})]
-                                    public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                    [{{typeof(SlashCommandGroupAttribute).FullName}}("{{rawCommand.Name}}", "{{rawCommand.Description}}"{{(rawCommand.RequiredPermissions is null ? "" : $", {(long)rawCommand.RequiredPermissions}")}}, dmPermission: {{rawCommand.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{rawCommand.IsNsfw.ToString().ToLower()}})]
+                                    public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
                                     {
-                                        public {{nameof(Bot)}} _bot { private get; set; }
+                                        public {{typeof(Bot).FullName}} _bot { private get; set; }
 
                                         // EntryPoint
                                     }
@@ -270,7 +270,7 @@ internal sealed class PluginLoader
                                     var IndexPath = $"// EntryPoint";
                                     int InsertPosition = InsertPosition = code.IndexOf(IndexPath) + IndexPath.Length;
 
-                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, nameof(InteractionContext), rawSubCommand, rawCommand));
+                                    code = code.Insert(InsertPosition, GetGroupMethodCode(plugin, typeof(InteractionContext).FullName, rawSubCommand, rawCommand));
                                 }
 
                                 compilationList.Add(CSharpCompilation.Create(GetUniqueCodeCompatibleName())
@@ -285,11 +285,11 @@ internal sealed class PluginLoader
                                 $$"""
                                 {{classUsings}}
 
-                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{nameof(ApplicationCommandsModule)}}
+                                public sealed class {{GetUniqueCodeCompatibleName()}} : {{typeof(ApplicationCommandsModule).FullName}}
                                 {
-                                    public {{nameof(Bot)}} _bot { private get; set; }
+                                    public {{typeof(Bot).FullName}} _bot { private get; set; }
 
-                                    {{GetSingleMethodCode(plugin, nameof(InteractionContext), rawCommand)}}
+                                    {{GetSingleMethodCode(plugin, typeof(InteractionContext).FullName, rawCommand)}}
                                 }
                                 """;
 
@@ -428,7 +428,7 @@ internal sealed class PluginLoader
                 case "app_single":
                 case "app_group":
                     if (_bot.status.LoadedConfig.IsDev)
-                        appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Discord.AssetsGuild, plugin.EnableCommandTranslations);
+                        appCommands.RegisterGuildCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), _bot.status.LoadedConfig.Discord.DevelopmentGuild, plugin.EnableCommandTranslations);
                     else
                         appCommands.RegisterGlobalCommands(assembly.Key.GetTypes().First(x => x.BaseType == typeof(ApplicationCommandsModule)), plugin.EnableCommandTranslations);
                     break;
@@ -456,17 +456,17 @@ internal sealed class PluginLoader
 
         string GetMethodLine()
         {
-            if (ContextName == nameof(InteractionContext))
+            if (ContextName == typeof(InteractionContext).FullName)
                 return
                     $$"""
-                    [SlashCommand("{{Command.Name}}", "{{Command.Description}}"{{(Command.RequiredPermissions is null ? "" : $", {(long)Command.RequiredPermissions}")}}, dmPermission: {{Command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{Command.IsNsfw.ToString().ToLower()}})]
-                    public Task {{TaskName}}_Execute({{ContextName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                    [{{typeof(SlashCommandAttribute).FullName}}("{{Command.Name}}", "{{Command.Description}}"{{(Command.RequiredPermissions is null ? "" : $", {(long)Command.RequiredPermissions}")}}, dmPermission: {{Command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{Command.IsNsfw.ToString().ToLower()}})]
+                    public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
-            else if (ContextName == nameof(CommandContext))
+            else if (ContextName == typeof(CommandContext).FullName)
                 return
                     $$"""
-                    [Command("{{Command.Name}}"), CommandModule("{{Command.Module}}"), Description("{{Command.Description}}")]
-                    public Task a{{TaskName}}_Execute(CommandContext ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                    [{{typeof(CommandAttribute).FullName}}("{{Command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{Command.Description}}")]
+                    public {{typeof(Task).FullName}} a{{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
             else
                 throw new NotImplementedException();
@@ -477,27 +477,27 @@ internal sealed class PluginLoader
             {
                 try
                 {
-                    Task t = (Task){{TaskName}}_CommandMethod.Invoke(Activator.CreateInstance({{TaskName}}_CommandType),
-                        new object[] 
+                    {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType),
+                        new {{typeof(object[]).FullName}} 
                         { ctx, _bot, new Dictionary<string, object>
                             {
                                 {{string.Join(",\n", Command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                            }{{(ContextName == nameof(InteractionContext) ? ", true, true, false" : "")}}
+                            }{{(ContextName == typeof(InteractionContext).FullName ? ", true, true, false" : "")}}
                         });
 
                     t.Add(_bot, ctx);
                 }
-                catch (Exception ex)
+                catch ({{typeof(Exception).FullName}} ex)
                 {
                     _logger.LogError($"Failed to execute plugin's application command", ex);
                 }
 
-                return Task.CompletedTask;
+                return {{typeof(Task).FullName}}.CompletedTask;
             }
 
-            private static Type {{TaskName}}_CommandType { get; set; }
-            private static MethodInfo {{TaskName}}_CommandMethod { get; set; }
-            public static void Populate_{{TaskName}}({{nameof(Bot)}} _bot)
+            private static {{typeof(Type).FullName}} {{TaskName}}_CommandType { get; set; }
+            private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
+            public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
             {
                 _logger.LogDebug("Populating execution properties for '{CommandName}':'{taskname}'", "{{Command.Name}}","{{TaskName}}");
                 {{TaskName}}_CommandType = _bot.PluginCommands["{{PluginIdentifier.Key}}"].First(x => x.Name == "{{Command.Name}}").Command.GetType();
@@ -512,17 +512,17 @@ internal sealed class PluginLoader
 
         string GetMethodLine()
         {
-            if (ContextName == nameof(InteractionContext))
+            if (ContextName == typeof(InteractionContext).FullName)
                 return
                     $$"""
-                    [SlashCommand("{{Command.Name}}", "{{Command.Description}}")]
-                    public Task {{TaskName}}_Execute({{ContextName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[Option(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                    [{{typeof(SlashCommandAttribute).FullName}}("{{Command.Name}}", "{{Command.Description}}")]
+                    public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
-            else if (ContextName == nameof(CommandContext))
+            else if (ContextName == typeof(CommandContext).FullName)
                 return
                     $$"""
-                    [Command("{{Command.Name}}"), CommandModule("{{Command.Module}}"), Description("{{Command.Description}}")]
-                    public Task a{{TaskName}}_Execute(CommandContext ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? "[RemainingText]" : "")} [Description(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
+                    [{{typeof(CommandAttribute).FullName}}("{{Command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{Command.Description}}")]
+                    public {{typeof(Task).FullName}} a{{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
             else
                 throw new NotImplementedException();
@@ -533,27 +533,27 @@ internal sealed class PluginLoader
             {
                 try
                 {
-                    Task t = (Task){{TaskName}}_CommandMethod.Invoke(Activator.CreateInstance({{TaskName}}_CommandType), 
+                    {{typeof(Task).FullName}} t = ({{typeof(Task).FullName}}){{TaskName}}_CommandMethod.Invoke({{typeof(Activator).FullName}}.CreateInstance({{TaskName}}_CommandType), 
                             new object[] 
                             { ctx, _bot, new Dictionary<string, object>
                                 {
                                     {{string.Join(",\n", Command.Overloads.Select(x => $"{{ \"{x.Name}\", {x.Name} }}"))}}
-                                }{{(ContextName == nameof(InteractionContext) ? ", true, true, false" : "")}}
+                                }{{(ContextName == typeof(InteractionContext).FullName ? ", true, true, false" : "")}}
                             });
                     
                     t.Add(_bot, ctx);
                 }
-                catch (Exception ex)
+                catch ({{typeof(Exception).FullName}} ex)
                 {
                     _logger.LogError($"Failed to execute plugin's prefix command", ex);
                 }
                     
-                return Task.CompletedTask;
+                return {{typeof(Task).FullName}}.CompletedTask;
             }
 
-            private static Type {{TaskName}}_CommandType { get; set; }
-            private static MethodInfo {{TaskName}}_CommandMethod { get; set; }
-            public static void Populate_{{TaskName}}({{nameof(Bot)}} _bot)
+            private static {{typeof(Type).FullName}} {{TaskName}}_CommandType { get; set; }
+            private static {{typeof(MethodInfo).FullName}} {{TaskName}}_CommandMethod { get; set; }
+            public static void Populate_{{TaskName}}({{typeof(Bot).FullName}} _bot)
             {
                 _logger.LogDebug("Populating execution properties for '{ParentCommandName} {CommandName}':'{taskname}'", "{{Parent.Name}}", "{{Command.Name}}","{{TaskName}}");
                 {{TaskName}}_CommandType = _bot.PluginCommands["{{PluginIdentifier.Key}}"].First(x => x.Name == "{{Parent.Name}}").SubCommands.First(x => x.Name == "{{Command.Name}}").Command.GetType();
