@@ -78,7 +78,7 @@ internal sealed class HelpCommand : BaseCommand
                         else if (appCommand.CustomAttributes.Any(x => x is PrefixCommandAlternativeAttribute))
                             prefixCommand = PrefixCommandsList
                                 .First(x => x.Value.Name.ToLower() == ((PrefixCommandAlternativeAttribute)appCommand.CustomAttributes
-                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAtChar(' ')).Value;
+                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAt(' ')).Value;
                         else
                             prefixCommand = null;
 

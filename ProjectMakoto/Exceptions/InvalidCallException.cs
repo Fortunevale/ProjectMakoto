@@ -16,7 +16,12 @@ internal class InvalidCallException : Exception
     {
     }
 
-    public InvalidCallException(string? message) : base(message)
+    public InvalidCallException(string? stackTrace)
+    {
+        this.StackTrace = stackTrace;
+    }
+    
+    public InvalidCallException(string? message, string stackTrace) : base(message)
     {
     }
 
@@ -27,4 +32,6 @@ internal class InvalidCallException : Exception
     protected InvalidCallException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
     }
+
+    public override string? StackTrace { get; }
 }

@@ -13,6 +13,14 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    public static string TruncateWithIndication(this string value, int maxLength, string customString = "..")
+    {
+        if (string.IsNullOrEmpty(value))
+            return value;
+
+        return value.Length <= maxLength ? value : $"{value[..(maxLength - customString.Length)]}{customString}";
+    }
+
     internal static Exception AddData(this Exception exception, string key, object? data)
     {
         exception.Data.Add(key, data);
@@ -130,15 +138,28 @@ internal static class GenericExtensions
     internal static string SanitizeForCode(this string str)
         => str.Replace("`", "´");
 
-    internal static string TruncateAtChar(this string str, params char[] chars)
-        => str.TruncateAtChar(false, chars);
+    internal static string TruncateAt(this string str, params char[] chars)
+        => str.TruncateAt(false, chars);
 
-    internal static string TruncateAtChar(this string str, bool Reverse, params char[] chars)
+    internal static string TruncateAt(this string str, params string[] strings)
+        => str.TruncateAt(false, strings);
+
+    internal static string TruncateAt(this string str, bool Reverse, params char[] chars)
     {
         if (!chars.IsNotNullAndNotEmpty() || !chars.Any(x => str.Contains(x)))
             return str;
 
         List<KeyValuePair<char, int>> indexes = chars.Select(x => new KeyValuePair<char, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
+
+        return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
+    }
+
+    internal static string TruncateAt(this string str, bool Reverse, params string[] strings)
+    {
+        if (!strings.IsNotNullAndNotEmpty() || !strings.Any(x => str.Contains(x)))
+            return str;
+
+        List<KeyValuePair<string, int>> indexes = strings.Select(x => new KeyValuePair<string, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
 
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }
