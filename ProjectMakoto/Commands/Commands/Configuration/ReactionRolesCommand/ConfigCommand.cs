@@ -73,7 +73,7 @@ internal sealed class ConfigCommand : BaseCommand
 
                     var action_embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(CommandKey.Message).PadRight(pad)}`: {(selectedMessage is null ? GetString(t.Common.NotSelected, true) : $"[`{GetString(CommandKey.JumpToMessage)}`]({selectedMessage.JumpLink})")}\n" +
+                        Description = $"`{GetString(CommandKey.Message).PadRight(pad)}`: {(selectedMessage is null ? GetString(t.Common.NotSelected, true) : $"[`{GetString(t.Common.JumpToMessage)}`]({selectedMessage.JumpLink})")}\n" +
                                       $"`{GetString(CommandKey.Emoji).PadRight(pad)}`: {(selectedEmoji is null ? GetString(t.Common.NotSelected, true) : selectedEmoji.ToString())}\n" +
                                       $"`{GetString(CommandKey.Role).PadRight(pad)}`: {(selectedRole is null ? GetString(t.Common.NotSelected, true) : selectedRole.Mention)}"
                     }.AsAwaitingInput(ctx, GetString(CommandKey.Title));

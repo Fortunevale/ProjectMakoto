@@ -178,7 +178,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             embed.AddField(new DiscordEmbedField(tKey.Stickers.Get(Bot.Guilds[e.Guild.Id]), $"{string.Join("\n", e.Message.Stickers.Select(x => $"`{x.Name}`"))}"));
 
         if (e.Message.ReferencedMessage is not null)
-            embed.AddField(new DiscordEmbedField(tKey.ReplyTo.Get(Bot.Guilds[e.Guild.Id]), $"{(e.Message.ReferencedMessage.Author is not null ? $"{e.Message.ReferencedMessage.Author.Mention}: " : "")}[`{tKey.JumpToMessage.Get(Bot.Guilds[e.Guild.Id])}`]({e.Message.ReferencedMessage.JumpLink})"));
+            embed.AddField(new DiscordEmbedField(tKey.ReplyTo.Get(Bot.Guilds[e.Guild.Id]), $"{(e.Message.ReferencedMessage.Author is not null ? $"{e.Message.ReferencedMessage.Author.Mention}: " : "")}[`{t.Common.JumpToMessage.Get(Bot.Guilds[e.Guild.Id])}`]({e.Message.ReferencedMessage.JumpLink})"));
 
         if (embed.Fields.Count == 0)
             return;
@@ -338,7 +338,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithThumbnail(e.Message.Author?.AvatarUrl)
             .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Message.Author?.Mention ?? "/"} `{e.Message.Author?.GetUsernameWithIdentifier() ?? "/"}`\n" +
                              $"**{tKey.Channel.Get(Bot.Guilds[e.Guild.Id])}**: {e.Channel.Mention} `[{e.Channel.GetIcon()}{e.Channel.Name}]`\n" +
-                             $"**{tKey.Message.Get(Bot.Guilds[e.Guild.Id])}**: [`{tKey.JumpToMessage.Get(Bot.Guilds[e.Guild.Id])}`]({e.Message.JumpLink})");
+                             $"**{tKey.Message.Get(Bot.Guilds[e.Guild.Id])}**: [`{t.Common.JumpToMessage.Get(Bot.Guilds[e.Guild.Id])}`]({e.Message.JumpLink})");
 
         if (e.MessageBefore.Content != e.Message.Content)
         {

@@ -311,6 +311,10 @@
     "Reason": {
       "en": "Reason",
       "de": "Grund"
+    },
+    "JumpToMessage": {
+      "en": "Jump to message",
+      "de": "Zur Nachricht springen"
     }
   },
   "Commands": {
@@ -5825,9 +5829,6 @@
         "Role": {
           "en": "Role"
         },
-        "JumpToMessage": {
-          "en": "Jump to message"
-        },
         "MessageUrl": {
           "en": "Message Url"
         },
@@ -5995,9 +5996,6 @@
       },
       "ReplyTo": {
         "en": "Reply to"
-      },
-      "JumpToMessage": {
-        "en": "Jump to message"
       },
       "UserJoinedVoiceChannel": {
         "en": "User joined Voice Channel"
@@ -6247,6 +6245,23 @@
       },
       "NoInviter": {
         "en": "No Inviter found."
+      }
+    },
+    "EmbedMessages": {
+      "Delete": {
+        "en": "Delete"
+      },
+      "Lines": {
+        "en": "lines {Start} to {End}"
+      },
+      "Line": {
+        "en": "Line {Start}"
+      },
+      "FailedToDelete": {
+        "en": "Failed to delete message."
+      },
+      "NotAuthor": {
+        "en": "You are not the the message author of the referenced message."
       }
     }
   }

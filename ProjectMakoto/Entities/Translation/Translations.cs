@@ -14,6 +14,15 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public embedMessages EmbedMessages;
+        public sealed class embedMessages
+        {
+            public SingleTranslationKey NotAuthor;
+            public SingleTranslationKey FailedToDelete;
+            public SingleTranslationKey Line;
+            public SingleTranslationKey Lines;
+            public SingleTranslationKey Delete;
+        }
         public actionlog Actionlog;
         public sealed class actionlog
         {
@@ -100,7 +109,6 @@ public sealed class Translations
             public SingleTranslationKey UserSwitchedVoiceChannel;
             public SingleTranslationKey UserLeftVoiceChannel;
             public SingleTranslationKey UserJoinedVoiceChannel;
-            public SingleTranslationKey JumpToMessage;
             public SingleTranslationKey ReplyTo;
             public SingleTranslationKey Stickers;
             public SingleTranslationKey Attachments;
@@ -173,7 +181,6 @@ public sealed class Translations
                 public SingleTranslationKey InvalidMessageUrl;
                 public SingleTranslationKey MessageUrlInstructions;
                 public SingleTranslationKey MessageUrl;
-                public SingleTranslationKey JumpToMessage;
                 public SingleTranslationKey Role;
                 public SingleTranslationKey Emoji;
                 public SingleTranslationKey Message;
@@ -1406,6 +1413,7 @@ public sealed class Translations
     public common Common;
     public sealed class common
     {
+        public SingleTranslationKey JumpToMessage;
         public SingleTranslationKey Reason;
         public SingleTranslationKey NotSelected;
         public SingleTranslationKey Refresh;

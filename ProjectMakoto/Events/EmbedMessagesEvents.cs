@@ -15,12 +15,14 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
     {
     }
 
+    Translations.events.embedMessages tKey => this.t.Events.EmbedMessages;
+
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         if (e.Guild is null)
             return;
 
-        var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", "Delete", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
+        var Delete = new DiscordButtonComponent(ButtonStyle.Danger, "DeleteEmbedMessage", tKey.Delete.Get(this.Bot.Guilds[e.Guild.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗑")));
 
         do
         {
@@ -58,7 +60,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = message.Author.AvatarUrl, Name = $"{message.Author.GetUsernameWithIdentifier()} ({message.Author.Id})" },
                         Color = message.Author.BannerColor ?? EmbedColors.Info,
-                        Description = $"[`Jump to message`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
+                        Description = $"[`{t.Common.JumpToMessage.Get(this.Bot.Guilds[e.Guild.Id])}`]({message.JumpLink})\n\n{message.Content}".TruncateWithIndication(2000),
                         ImageUrl = (message.Attachments?.Count > 0 && (message.Attachments[0].Filename.EndsWith(".png")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpeg")
                                                                     || message.Attachments[0].Filename.EndsWith(".jpg")
@@ -133,7 +135,7 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
 
                 lines = lines.Select(x => x.Remove(0, shortestIndent)).ToList();
 
-                string content = $"`{relativeFilePath}` {(StartLine != EndLine ? $"lines {StartLine} to {EndLine}" : $"line {StartLine}")}\n\n" +
+                string content = $"`{relativeFilePath}` {(StartLine != EndLine ? tKey.Lines.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Start", StartLine), new TVar("End", EndLine)) : tKey.Line.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("Start", StartLine)))}\n\n" +
                                     $"```{fileEnding}\n" +
                                     $"{string.Join("\n", lines)}\n" +
                                     $"```";
@@ -164,12 +166,12 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
                 _ = fullMsg.DeleteAsync().ContinueWith(x =>
                 {
                     if (!x.IsCompletedSuccessfully)
-                        _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `Failed to delete the message.`").AsEphemeral());
+                        _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `{tKey.FailedToDelete.Get(this.Bot.Guilds[e.Guild.Id])}`").AsEphemeral());
                 });
             }
             else
             {
-                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent("❌ `You are not the message author of the referenced message.`").AsEphemeral());
+                _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ `{tKey.NotAuthor.Get(this.Bot.Guilds[e.Guild.Id])}`").AsEphemeral());
             }
         }
     }
