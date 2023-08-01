@@ -142,7 +142,15 @@ internal sealed class HelpCommand : BaseCommand
                 var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
                 var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page)).AddComponents(PreviousButton, NextButton));
+                var builder = new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page));
+
+                if (!PreviousButton.Disabled || !NextButton.Disabled)
+                    builder.AddComponents(PreviousButton, NextButton);
+
+                await RespondOrEdit(builder);
+
+                if (PreviousButton.Disabled && NextButton.Disabled)
+                    return;
 
                 var Menu = await ctx.WaitForButtonAsync();
 
