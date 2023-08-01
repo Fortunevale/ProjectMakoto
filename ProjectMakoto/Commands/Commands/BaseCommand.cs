@@ -1110,7 +1110,7 @@ public abstract class BaseCommand
             }
             default:
             {
-                _ = this.ctx.ResponseMessage.DeleteAsync();
+                _ = this.ctx.ResponseMessage?.DeleteAsync();
                 break;
             }
         }

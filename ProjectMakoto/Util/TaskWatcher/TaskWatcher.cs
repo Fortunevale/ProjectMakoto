@@ -120,7 +120,7 @@ public sealed class TaskWatcher
                                 _ = sctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
                                     .WithContent(sctx.User.Mention)
                                     .AddEmbed(new DiscordEmbedBuilder()
-                                        .WithDescription(sctx.BaseCommand.GetString(sctx.BaseCommand.t.Commands.Common.Errors.UnhandledException, true, 
+                                        .WithDescription(sctx.BaseCommand.GetString(sctx.t.Commands.Common.Errors.UnhandledException, true, 
                                             new TVar("Message", $"```diff\n-{(Exception?.Message?.SanitizeForCode() ?? "No message captured.")}\n```"),
                                             new TVar("Timestamp", DateTime.UtcNow.AddSeconds(11).ToTimestamp())))
                                         .AsBotError(sctx)))

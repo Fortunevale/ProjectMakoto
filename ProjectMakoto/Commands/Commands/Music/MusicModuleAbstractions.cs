@@ -13,7 +13,7 @@ internal sealed class MusicModuleAbstractions
 {
     public static async Task<(List<LavalinkTrack> Tracks, LavalinkTrackLoadingResult oriResult, bool Continue)> GetLoadResult(SharedCommandContext ctx, string searchQuery)
     {
-        var t = ctx.BaseCommand.t;
+        var t = ctx.t;
 
         if (Regex.IsMatch(searchQuery, "{jndi:(ldap[s]?|rmi):\\/\\/[^\n]+") || searchQuery.ToLower().Contains("localhost") || searchQuery.ToLower().Contains("127.0.0.1"))
             throw new Exception();

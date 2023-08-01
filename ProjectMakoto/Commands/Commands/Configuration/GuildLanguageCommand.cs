@@ -19,7 +19,7 @@ internal sealed class GuildLanguageCommand : BaseCommand
         {
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"🗨 `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.GuildLanguage.Disclaimer)}`\n`{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.GuildLanguage.Response)}`: `{(ctx.DbGuild.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbGuild.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbGuild.CurrentLocale} (Discord)") : $"{ctx.DbGuild.OverrideLocale} (Override)")}`";
+                return $"🗨 `{ctx.BaseCommand.GetString(t.Commands.Config.GuildLanguage.Disclaimer)}`\n`{ctx.BaseCommand.GetString(ctx.t.Commands.Config.GuildLanguage.Response)}`: `{(ctx.DbGuild.OverrideLocale.IsNullOrWhiteSpace() ? (ctx.DbGuild.CurrentLocale.IsNullOrWhiteSpace() ? "en (Default)" : $"{ctx.DbGuild.CurrentLocale} (Discord)") : $"{ctx.DbGuild.OverrideLocale} (Override)")}`";
             }
 
             await RespondOrEdit((new DiscordEmbedBuilder()

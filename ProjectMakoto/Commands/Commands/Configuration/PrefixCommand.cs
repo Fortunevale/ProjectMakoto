@@ -19,10 +19,10 @@ internal sealed class PrefixCommand : BaseCommand
         {
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, ctx.BaseCommand.t.Commands.Config.PrefixConfigCommand.CurrentPrefix, ctx.BaseCommand.t.Commands.Config.PrefixConfigCommand.PrefixDisabled);
+                var pad = TranslationUtil.CalculatePadding(ctx.DbUser, t.Commands.Config.PrefixConfigCommand.CurrentPrefix, t.Commands.Config.PrefixConfigCommand.PrefixDisabled);
 
-                return $"⌨ `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.PrefixConfigCommand.PrefixDisabled).PadRight(pad)}` : {ctx.DbGuild.PrefixSettings.PrefixDisabled.ToEmote(ctx.Bot)}\n" +
-                       $"🗝 `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.PrefixConfigCommand.CurrentPrefix).PadRight(pad)}` : `{ctx.DbGuild.PrefixSettings.Prefix}`";
+                return $"⌨ `{GetString(t.Commands.Config.PrefixConfigCommand.PrefixDisabled).PadRight(pad)}` : {ctx.DbGuild.PrefixSettings.PrefixDisabled.ToEmote(ctx.Bot)}\n" +
+                       $"🗝 `{GetString(t.Commands.Config.PrefixConfigCommand.CurrentPrefix).PadRight(pad)}` : `{ctx.DbGuild.PrefixSettings.Prefix}`";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))

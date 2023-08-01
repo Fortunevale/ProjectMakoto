@@ -76,8 +76,11 @@ internal sealed class EmbedMessagesEvents : RequiresTranslation
             if (!this.Bot.Guilds[e.Guild.Id].EmbedMessage.UseGithubEmbedding)
                 return;
 
-            if (await this.Bot.Users[e.Message.Author.Id].Cooldown.WaitForModerate(new SharedCommandContext(e.Message, this.Bot, "github_embed"), true))
+            SharedCommandContext ctx = new(e.Message, this.Bot, "github_embed");
+            if (await this.Bot.Users[e.Message.Author.Id].Cooldown.WaitForModerate(ctx, true))
                 return;
+
+            ctx.BaseCommand.DeleteOrInvalidate();
 
             var matches = RegexTemplates.GitHubUrl.Matches(e.Message.Content);
 

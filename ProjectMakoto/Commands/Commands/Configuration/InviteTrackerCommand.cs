@@ -21,7 +21,7 @@ internal sealed class InviteTrackerCommand : BaseCommand
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"{"📲".UnicodeToEmoji()} `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Config.InviteTracker.InviteTrackerEnabled)}`: {ctx.DbGuild.InviteTracker.Enabled.ToEmote(ctx.Bot)}";
+                return $"{"📲".UnicodeToEmoji()} `{GetString(t.Commands.Config.InviteTracker.InviteTrackerEnabled)}`: {ctx.DbGuild.InviteTracker.Enabled.ToEmote(ctx.Bot)}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
