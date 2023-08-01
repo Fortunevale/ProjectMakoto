@@ -125,9 +125,20 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
     IEnumerator IEnumerable.GetEnumerator()
         => this.t.GetEnumerator();
 
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
+    [Obsolete("Do not call .ToString(). Use the .Get() Method instead.", true)]
     public override string ToString()
     {
-        _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", this.t["en"].Build());
+        StackTrace stackTrace = new();
+        StackFrame[] stackFrames = stackTrace.GetFrames();
+
+        StackFrame callingFrame = stackFrames[1];
+        MethodBase method = callingFrame.GetMethod();
+
+        _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", new InvalidCallException()
+                                                                                                                            .AddData("StackTrace", stackTrace)
+                                                                                                                            .AddData("DeclaryingType", method.DeclaringType)
+                                                                                                                            .AddData("Method", method), this.t["en"].Build());
         return this.t["en"].Build();
     }
 }

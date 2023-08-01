@@ -13,6 +13,12 @@ namespace ProjectMakoto.Util;
 
 internal static class GenericExtensions
 {
+    internal static Exception AddData(this Exception exception, string key, object? data)
+    {
+        exception.Data.Add(key, data);
+        return exception;
+    }
+
     internal static bool ContainsTask(this IReadOnlyList<InternalSheduler.ScheduledTask>? tasks, string type, ulong snowflake, string id) 
         => tasks.Where(x =>
         {
