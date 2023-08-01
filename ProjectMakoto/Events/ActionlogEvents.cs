@@ -162,7 +162,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
         var embed = new DiscordEmbedBuilder()
             .WithAuthor(tKey.MessageDeleted.Get(Bot.Guilds[e.Guild.Id]), null, AuditLogIcons.MessageDeleted)
             .WithColor(EmbedColors.Error)
-            .WithFooter($"{tKey.UserId}: {e.Message.Author.Id}")
+            .WithFooter($"{tKey.UserId.Get(Bot.Guilds[e.Guild.Id])}: {e.Message.Author.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Message.Author.AvatarUrl)
             .WithDescription($"**{tKey.User.Get(Bot.Guilds[e.Guild.Id])}**: {e.Message.Author.Mention} `{e.Message.Author.GetUsernameWithIdentifier()}`\n" +
