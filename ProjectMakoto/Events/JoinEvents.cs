@@ -15,13 +15,16 @@ internal sealed class JoinEvents : RequiresTranslation
     {
     }
 
+    Translations.events.join tKey
+        => this.t.Events.Join;
+
     internal async Task GuildMemberAdded(DiscordClient sender, GuildMemberAddEventArgs e)
     {
         if (this.Bot.Guilds[e.Guild.Id].Join.AutoBanGlobalBans)
         {
             if (this.Bot.globalBans.TryGetValue(e.Member.Id, out BanDetails globalBanDetails))
             {
-                _ = e.Member.BanAsync(7, $"Globalban: {globalBanDetails.Reason}");
+                _ = e.Member.BanAsync(7, $"{tKey.Globalban.Get(Bot.Guilds[e.Guild.Id])}: {globalBanDetails.Reason}");
                 return;
             }
         }
@@ -45,7 +48,7 @@ internal sealed class JoinEvents : RequiresTranslation
                         IconUrl = AuditLogIcons.UserAdded,
                         Name = e.Member.GetUsernameWithIdentifier()
                     },
-                    Description = $"has joined **{e.Guild.Name}**. Welcome! {this.Bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
+                    Description = $"{tKey.UserJoined.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("Guild", $"**{e.Guild.Name}**"))} {this.Bot.status.LoadedConfig.Emojis.JoinEvent.SelectRandom()}",
                     Color = EmbedColors.Success,
                     Thumbnail = new()
                     {
@@ -69,8 +72,9 @@ internal sealed class JoinEvents : RequiresTranslation
                         IconUrl = AuditLogIcons.UserLeft,
                         Name = e.Member.GetUsernameWithIdentifier()
                     },
-                    Description = $"has left **{e.Guild.Name}**.\n" +
-                                    $"They've been on the server for _{e.Member.JoinedAt.GetTotalSecondsSince().GetHumanReadable()}_.",
+                    Description = tKey.UserLeft.Get(Bot.Guilds[e.Guild.Id]).Build(
+                        new TVar("Guild", $"**{e.Guild.Name}**"), 
+                        new TVar("Timestamp", e.Member.JoinedAt.GetTimespanSince().GetHumanReadable(TimeFormat.DAYS, TranslationUtil.GetTranslatedHumanReadableConfig(Bot.Guilds[e.Guild.Id], Bot)))),
                     Color = EmbedColors.Error,
                     Thumbnail = new()
                     {

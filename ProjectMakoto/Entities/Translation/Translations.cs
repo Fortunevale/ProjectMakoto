@@ -14,6 +14,13 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public join Join;
+        public sealed class join
+        {
+            public MultiTranslationKey UserLeft;
+            public SingleTranslationKey UserJoined;
+            public SingleTranslationKey Globalban;
+        }
         public inVoicePrivacy InVoicePrivacy;
         public sealed class inVoicePrivacy
         {

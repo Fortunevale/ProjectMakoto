@@ -6357,7 +6357,8 @@
     "InVoicePrivacy": {
       "CreatedWithSetPermissions": {
         "en": "In-Voice Privacy 'Set permissions' is turned on"
-      },"LeftWithSetPermissions": {
+      },
+      "LeftWithSetPermissions": {
         "en": "Left VC while In-Voice Privacy 'Set permissions' is turned on"
       },
       "JoinedWithSetPermissions": {
@@ -6365,6 +6366,20 @@
       },
       "LeftWithDeleteMessages": {
         "en": "Joined VC while In-Voice Privacy 'Delete messages' is turned on"
+      }
+    },
+    "Join": {
+      "Globalban": {
+        "en": "Globalban"
+      },
+      "UserJoined": {
+        "en": "has joined {Guild}. Welcome!"
+      },
+      "UserLeft": {
+        "en": [
+          "has left {Guild}.",
+          "They've been on the server for _{Timestamp}_."
+        ]
       }
     }
   }
