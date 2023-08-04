@@ -3721,7 +3721,7 @@
         },
         "Events": {
           "DefaultChannelName": {
-            "en": "{User}'s Channel'",
+            "en": "{User}'s Channel",
             "de": "{User}s Kanal"
           }
         },
@@ -6302,7 +6302,7 @@
     "GenericEvent": {
       "PingMessage": {
         "en": [
-          "Hi, i'm {Bot}. I support Slash Commands, but additionally you can use me via `;;` or {BotMention}. To get a list of all commands, type {Help}.",
+          "Hi {User}, i'm {Bot}. I support Slash Commands, but additionally you can use me via `;;` or {BotMention}. To get a list of all commands, type {Help}.",
           "If you need help, feel free to join our Support and Development Server: {Invite}",
           "",
           "To find out more about me, check my Github Repository: {GithubRepo}"
@@ -6332,6 +6332,26 @@
           "",
           "_This message will automatically be deleted {Timestamp}._"
         ]
+      }
+    },
+    "Experience": {
+      "GainedLevel": {
+        "en": "Congrats, {User}! You gained {Count} level."
+      },
+      "GainedLevels": {
+        "en": "Congrats, {User}! You gained {Count} levels."
+      },
+      "NewLevel": {
+        "en": "You're now on Level {Level}."
+      },
+      "AutomaticDeletion": {
+        "en": "This message will be automatically deleted in {Seconds} seconds."
+      },
+      "DisableDirectMessages": {
+        "en": "Disable Direct Message Experience Notifications"
+      },
+      "DirectMessagesDisabled": {
+        "en": "Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run {Command} on any guild with {Bot}."
       }
     }
   }

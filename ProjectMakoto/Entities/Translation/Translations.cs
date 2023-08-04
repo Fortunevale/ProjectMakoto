@@ -14,6 +14,16 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public experience Experience;
+        public sealed class experience
+        {
+            public SingleTranslationKey DirectMessagesDisabled;
+            public SingleTranslationKey DisableDirectMessages;
+            public SingleTranslationKey AutomaticDeletion;
+            public SingleTranslationKey NewLevel;
+            public SingleTranslationKey GainedLevels;
+            public SingleTranslationKey GainedLevel;
+        }
         public genericEvent GenericEvent;
         public sealed class genericEvent
         {
