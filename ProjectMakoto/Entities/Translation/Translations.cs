@@ -23,6 +23,21 @@ public sealed class Translations
             public SingleTranslationKey Lines;
             public SingleTranslationKey Delete;
         }
+        public bumpReminder BumpReminder;
+        public sealed class bumpReminder
+        {
+            public SingleTranslationKey BumpNotification;
+            public SingleTranslationKey LastBumpMissed;
+            public SingleTranslationKey BumpReminderDisabledMessageDeleted;
+            public SingleTranslationKey BumpReminderDisabledNotPinned;
+            public SingleTranslationKey BumpReminderDisabledReactionRemoved;
+            public SingleTranslationKey BumpReminderDisabled;
+            public SingleTranslationKey ServerCanBeBump;
+            public SingleTranslationKey LastBumpBy;
+            public SingleTranslationKey NextBumpTime;
+            public SingleTranslationKey SubscribeRoleNotice;
+            public SingleTranslationKey ServerBumped;
+        }
         public actionlog Actionlog;
         public sealed class actionlog
         {

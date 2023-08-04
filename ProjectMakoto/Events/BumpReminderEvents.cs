@@ -15,6 +15,9 @@ internal sealed class BumpReminderEvents : RequiresTranslation
     {
     }
 
+    Translations.events.bumpReminder tKey 
+        => this.Bot.LoadedTranslations.Events.BumpReminder;
+
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate || !this.Bot.Guilds[e.Guild.Id].BumpReminder.Enabled || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
@@ -62,8 +65,8 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
                 this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId = _bumper.Id;
 
-                _ = e.Channel.SendMessageAsync($"**{_bumper.Mention} Thanks a lot for supporting the server!**\n\n" +
-                                            $"_**You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message!**_");
+                _ = e.Channel.SendMessageAsync($"**{tKey.ServerBumped.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("User", _bumper.Mention))}**\n\n" +
+                                            $"_**{tKey.SubscribeRoleNotice.Get(this.Bot.Guilds[e.Guild.Id])}**_");
 
                 try
                 {
@@ -82,32 +85,34 @@ internal sealed class BumpReminderEvents : RequiresTranslation
                 throw;
             }
         }
-        else
-        {
-            if (this.Bot.Guilds[e.Guild.Id].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-2))
-            {
-                if (e.Message.Embeds[0].Description.ToLower().Contains("please wait another"))
-                {
-                    string _embedDescription = e.Message.Embeds[0].Description.ToLower();
+        // This no longer works, bump errors are now ephemeral.
 
-                    try
-                    {
-                        _embedDescription = _embedDescription.Remove(0, _embedDescription.IndexOf(">"));
-                        int _minutes = Int32.Parse(Regex.Match(_embedDescription, @"\d+").Value);
+        //else
+        //{
+        //    if (this.Bot.Guilds[e.Guild.Id].BumpReminder.LastBump < DateTime.UtcNow.AddHours(-2))
+        //    {
+        //        if (e.Message.Embeds[0].Description.ToLower().Contains("please wait another"))
+        //        {
+        //            string _embedDescription = e.Message.Embeds[0].Description.ToLower();
 
-                        this.Bot.Guilds[e.Guild.Id].BumpReminder.LastBump = DateTime.UtcNow.AddMinutes(_minutes - 120);
-                        this.Bot.Guilds[e.Guild.Id].BumpReminder.LastReminder = DateTime.UtcNow.AddMinutes(_minutes - 120);
-                        this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId = 0;
+        //            try
+        //            {
+        //                _embedDescription = _embedDescription.Remove(0, _embedDescription.IndexOf(">"));
+        //                int _minutes = Int32.Parse(Regex.Match(_embedDescription, @"\d+").Value);
 
-                        e.Channel.SendMessageAsync($"⚠ It seems the last bump was not registered properly.\n" +
-                            $"The last time the server was bumped was determined to be around {Formatter.Timestamp(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}.").Add(this.Bot);
+        //                this.Bot.Guilds[e.Guild.Id].BumpReminder.LastBump = DateTime.UtcNow.AddMinutes(_minutes - 120);
+        //                this.Bot.Guilds[e.Guild.Id].BumpReminder.LastReminder = DateTime.UtcNow.AddMinutes(_minutes - 120);
+        //                this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId = 0;
 
-                        this.Bot.BumpReminder.ScheduleBump(sender, e.Guild.Id);
-                    }
-                    catch (Exception ex) { _logger.LogDebug(ex.ToString()); }
-                }
-            }
-        }
+        //                e.Channel.SendMessageAsync($"⚠ It seems the last bump was not registered properly.\n" +
+        //                    $"The last time the server was bumped was determined to be around {Formatter.Timestamp(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastBump, TimestampFormat.LongDateTime)}.").Add(this.Bot);
+
+        //                this.Bot.BumpReminder.ScheduleBump(sender, e.Guild.Id);
+        //            }
+        //            catch (Exception ex) { _logger.LogDebug(ex.ToString()); }
+        //        }
+        //    }
+        //}
     }
 
     internal async Task MessageDeleted(DiscordClient sender, MessageDeleteEventArgs e)

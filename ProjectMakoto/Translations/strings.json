@@ -6247,6 +6247,41 @@
         "en": "No Inviter found."
       }
     },
+    "BumpReminder": {
+      "ServerBumped": {
+        "en": "Thanks a lot for supporting the server, {User}!"
+      },
+      "SubscribeRoleNotice": {
+        "en": "You can subscribe and unsubscribe to the bump reminder notifications at any time by reacting to the pinned message."
+      },
+      "NextBumpTime": {
+        "en": "The server can be bumped {Timestamp}."
+      },
+      "LastBumpBy": {
+        "en": "The server was last bumped by {User} {RTimestamp} at {FTimestamp}."
+      },
+      "ServerCanBeBump": {
+        "en": "The server can be bumped!"
+      },
+      "BumpReminderDisabled": {
+        "en": "The bump reminder was disabled for the following reason:"
+      },
+      "BumpReminderDisabledReactionRemoved": {
+        "en": "Self Role Message Reaction was removed."
+      },
+      "BumpReminderDisabledNotPinned": {
+        "en": "Self Role Message is not pinned."
+      },
+      "BumpReminderDisabledMessageDeleted": {
+        "en": "Self Role Message was deleted."
+      },
+      "LastBumpMissed": {
+        "en": "The last bump was missed!"
+      },
+      "BumpNotification": {
+        "en": "The server can be bumped again!"
+      }
+    },
     "EmbedMessages": {
       "Delete": {
         "en": "Delete"
