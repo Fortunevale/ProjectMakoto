@@ -6298,6 +6298,41 @@
       "NotAuthor": {
         "en": "You are not the the message author of the referenced message."
       }
+    },
+    "GenericEvent": {
+      "PingMessage": {
+        "en": [
+          "Hi, i'm {Bot}. I support Slash Commands, but additionally you can use me via `;;` or {BotMention}. To get a list of all commands, type {Help}.",
+          "If you need help, feel free to join our Support and Development Server: {Invite}",
+          "",
+          "To find out more about me, check my Github Repository: {GithubRepo}"
+        ]
+      },
+      "LimitedReached": {
+        "en": [
+          "Hi, thanks for adding me to your server.",
+          "Unfortunately, I am not yet verified.",
+          "",
+          "Because i need several intents (read more about that here: {IntentsUrl}) like server members and message content, i am unable to operate in more than 99 servers.",
+          "To see how my verification is going, check our development and support server: {Invite}"
+        ]
+      },
+      "SuccessfulJoin": {
+        "en": [
+          "Hi, i'm {Bot}. I support Slash Commands, but additionally you can use me via `;;` or {BotMention}. To get a list of all commands, type {Help}.",
+          "",
+          "**Important Notes",
+          "",
+          "• **Phishing Protection is enabled by default. To change this run: {Phishing}.",
+          "• **Automatic User/Bot Token invalidation is enabled by default. If you don't know what this means, just leave it on. If you do know what this means and you don't want it to happen, run: {TokenDetection}.",
+          "• Every server is opted into a global ban system. When someone is known to break Discord's TOS, us bot staff can quickly scoop them up and ban them even before their account gets terminated by Discord. You can opt out via {Join}.",
+          "",
+          "If you need help, feel free to join our Support and Development Server: {Invite}",
+          "To find out more about me, check my Github Repository: {GithubRepo}",
+          "",
+          "_This message will automatically be deleted {Timestamp}._"
+        ]
+      }
     }
   }
 }

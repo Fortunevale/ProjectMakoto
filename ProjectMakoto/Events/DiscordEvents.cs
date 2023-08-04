@@ -15,6 +15,9 @@ internal sealed class DiscordEvents : RequiresTranslation
     {
     }
 
+    Translations.events.genericEvent tKey
+        => this.Bot.LoadedTranslations.Events.GenericEvent;
+
     internal async Task GuildCreated(DiscordClient sender, GuildCreateEventArgs e)
     {
         if (this.Bot.objectedUsers.Contains(e.Guild.OwnerId) || this.Bot.bannedUsers.ContainsKey(e.Guild.OwnerId) || this.Bot.bannedGuilds.ContainsKey(e.Guild?.Id ?? 0))
@@ -38,24 +41,25 @@ internal sealed class DiscordEvents : RequiresTranslation
 
         if (sender.Guilds.Count >= 100 && (!sender.CurrentUser.IsVerifiedBot || !this.Bot.status.LoadedConfig.AllowMoreThan100Guilds))
         {
-            await channel.SendMessageAsync($"Hi, thanks for adding me to your server.\n\n" +
-                $"Unfortunately, I am not yet verified.\n\nBecause i need several intents (read more about that here: <https://support.discord.com/hc/en-us/articles/360040720412>) like the server members and message content, " +
-                $"i am unable to operate in more than 99 servers.\nTo see how my verification is going, check our development and support server: <{this.Bot.status.DevelopmentServerInvite}>.");
+            await channel.SendMessageAsync(tKey.LimitedReached.Get(this.Bot.Guilds[e.Guild.Id]).Build(
+                new TVar("IntentsUrl", "<https://support.discord.com/hc/en-us/articles/360040720412>"),
+                new TVar("Invite", $"<{this.Bot.status.DevelopmentServerInvite}>")));
 
             await Task.Delay(1000);
             await e.Guild.LeaveAsync();
             return;
         }
 
-        var msg = await channel.SendMessageAsync(
-            $"Hi! I'm Makoto. I support Slash Commands, but additionally you can use me via `;;`. To get a list of all commands, type {sender.GetCommandMention(this.Bot, "help")}.\n\n" +
-            $"**Important Notes**\n\n" +
-            $"• **Phishing Protection** is **enabled** by default. To change this run: {sender.GetCommandMention(this.Bot, "phishing")}.\n" +
-            $"• **Automatic User/Bot Token invalidation** is **turned on** by default. If you don't know what this means, just leave it on. If you do know what this means and you don't want it to happen, run {sender.GetCommandMention(this.Bot, "tokendetection")}.\n" +
-            $"• Every server is opted into a global ban system. When someone is known to break Discord's TOS, us bot staff can quickly scoop them up and ban them even before their account gets terminated by Discord. You can opt out via {sender.GetCommandMention(this.Bot, "join")}.\n\n" +
-            $"If you need help, feel free to join our Support and Development Server: <{this.Bot.status.DevelopmentServerInvite}>\n" +
-            $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/makoto>.\n\n" +
-            $"_This message will automatically be deleted {DateTime.UtcNow.AddMinutes(60).ToTimestamp()}._");
+        var msg = await channel.SendMessageAsync(tKey.SuccessfulJoin.Get(this.Bot.Guilds[e.Guild.Id]).Build(false, true,
+            new TVar("Bot", sender.CurrentUser.GetUsername()),
+            new TVar("BotMention", sender.CurrentUser.Mention),
+            new TVar("Help", sender.GetCommandMention(this.Bot, "help")),
+            new TVar("Phishing", "`/config phishing`"),
+            new TVar("TokenDetection", "`/config tokendetection`"),
+            new TVar("Join", "`/config join`"),
+            new TVar("Invite", $"<{this.Bot.status.DevelopmentServerInvite}>"),
+            new TVar("GithubRepo", "<https://s.aitsys.dev/makoto>"),
+            new TVar("Timestamp", DateTime.UtcNow.AddMinutes(60).ToTimestamp())));
 
         new Task(async () =>
         {

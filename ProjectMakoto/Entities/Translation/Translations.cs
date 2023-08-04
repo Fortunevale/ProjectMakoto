@@ -14,6 +14,13 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public genericEvent GenericEvent;
+        public sealed class genericEvent
+        {
+            public MultiTranslationKey SuccessfulJoin;
+            public MultiTranslationKey LimitedReached;
+            public MultiTranslationKey PingMessage;
+        }
         public embedMessages EmbedMessages;
         public sealed class embedMessages
         {

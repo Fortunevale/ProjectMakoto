@@ -94,6 +94,10 @@ public static class TranslationUtil
     /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
     internal static string Build(this string[] array)
         => array.Build(false, false, null);
+    
+    /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
+    internal static string Build(this string[] array, params TVar[] vars)
+        => array.Build(false, false, vars);
 
     /// <summary>
     /// Builds a string array into a string, used for MultiTranslationKeys.
