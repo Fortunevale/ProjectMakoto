@@ -14,6 +14,14 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public inVoicePrivacy InVoicePrivacy;
+        public sealed class inVoicePrivacy
+        {
+            public SingleTranslationKey LeftWithDeleteMessages;
+            public SingleTranslationKey JoinedWithSetPermissions;
+            public SingleTranslationKey LeftWithSetPermissions;
+            public SingleTranslationKey CreatedWithSetPermissions;
+        }
         public experience Experience;
         public sealed class experience
         {

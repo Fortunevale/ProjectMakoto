@@ -6353,6 +6353,19 @@
       "DirectMessagesDisabled": {
         "en": "Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run {Command} on any guild with {Bot}."
       }
+    },
+    "InVoicePrivacy": {
+      "CreatedWithSetPermissions": {
+        "en": "In-Voice Privacy 'Set permissions' is turned on"
+      },"LeftWithSetPermissions": {
+        "en": "Left VC while In-Voice Privacy 'Set permissions' is turned on"
+      },
+      "JoinedWithSetPermissions": {
+        "en": "Joined VC while In-Voice Privacy 'Set permissions' is turned on"
+      },
+      "LeftWithDeleteMessages": {
+        "en": "Joined VC while In-Voice Privacy 'Delete messages' is turned on"
+      }
     }
   }
 }
