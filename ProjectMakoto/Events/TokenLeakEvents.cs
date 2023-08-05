@@ -57,16 +57,24 @@ internal sealed class TokenLeakEvents : RequiresTranslation
         foreach (var token in filtered_matches)
         {
             var botId = token.Groups["botid"].Value!;
-            DiscordUser botUser = null!;
-            try
+            DiscordUser? botUser = null;
+            try { botUser = await GetBotInfo(sender, botId); } catch { }
+
+            if (botUser is null)
             {
-                botUser = await GetBotInfo(sender, botId);
+                _logger.LogDebug("Not uploading detected token, no bot user was fetched.");
+                continue;
             }
-            catch { }
 
             string owner = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
             string repo = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
             long seconds = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
+
+            if (this.Bot.TokenInvalidator.SearchForString(token.Value).Item1)
+            {
+                _logger.LogDebug("Not uploading detected token, token already present in repository.");
+                continue;
+            }
 
             string fileName = $"token_leak_{e.Author.Id}_{guild.Id}_{e.Channel.Id}_{seconds}.md";
             string content = $"## Token of {botUser?.Id.ToString() ?? "unknown"} (Owner {e.Author.Id})\n\nBot {token}";
@@ -75,6 +83,9 @@ internal sealed class TokenLeakEvents : RequiresTranslation
             InvalidateCount++;
         }
 
+        if (InvalidateCount > 0)
+            _ = this.Bot.TokenInvalidator.Pull();
+
         string s = (InvalidateCount > 1 ? "s" : "");
 
         _ = e.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(
@@ -82,7 +93,7 @@ internal sealed class TokenLeakEvents : RequiresTranslation
         .WithColor(EmbedColors.Error)
         .WithAuthor(sender.CurrentUser.GetUsername(), null, sender.CurrentUser.AvatarUrl)
         .WithDescription($"`Heads up!`\n\n" +
-                         $"`I've detected {InvalidateCount} authentication token{s} within your last message. The token{s} will soon be invalidated and the owner{(s.IsNullOrWhiteSpace() ? "" : "(s)")} of the bot{s} will receive {(s.IsNullOrWhiteSpace() ? "an " : "")}official notification{s} from Discord.`\n\n" +
+                         $"`I've detected {filtered_matches.Count()} authentication token{s} within your last message. The token{s} will soon be invalidated and the owner{(s.IsNullOrWhiteSpace() ? "" : "(s)")} of the bot{s} will receive {(s.IsNullOrWhiteSpace() ? "an " : "")}official notification{s} from Discord.`\n\n" +
                          $"`You can disable the token check on this server via '/tokendetection config'.`"))
         .WithContent(e.Author.Mention));
     }
