@@ -14,6 +14,11 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public tokenDetection TokenDetection;
+        public sealed class tokenDetection
+        {
+            public MultiTranslationKey TokenInvalidated;
+        }
         public phishing Phishing;
         public sealed class phishing
         {

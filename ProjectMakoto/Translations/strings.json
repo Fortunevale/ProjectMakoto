@@ -6416,6 +6416,17 @@
       "DetectedMalicousHost": {
         "en": "Detected malicious host [{Host}]"
       }
+    },
+    "TokenDetection": {
+      "TokenInvalidated": {
+        "en": [
+          "Heads up!",
+          "",
+          "I've detected {Count} authentication token(s) within your last message. The token(s) will soon be invalidated and the owner(s) of the bot(s) will receive an official notification from Discord",
+          "",
+          "Please be careful sharing your authentication tokens. If you think you know what you're doing, run '/config tokendetection' to disable this functioniality."
+        ]
+      }
     }
   }
 }

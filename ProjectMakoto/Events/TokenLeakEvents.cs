@@ -17,6 +17,9 @@ internal sealed class TokenLeakEvents : RequiresTranslation
     {
     }
 
+    Translations.events.tokenDetection tKey
+        => this.Bot.LoadedTranslations.Events.TokenDetection;
+
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
         CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
@@ -92,9 +95,7 @@ internal sealed class TokenLeakEvents : RequiresTranslation
         new DiscordEmbedBuilder()
         .WithColor(EmbedColors.Error)
         .WithAuthor(sender.CurrentUser.GetUsername(), null, sender.CurrentUser.AvatarUrl)
-        .WithDescription($"`Heads up!`\n\n" +
-                         $"`I've detected {filtered_matches.Count()} authentication token{s} within your last message. The token{s} will soon be invalidated and the owner{(s.IsNullOrWhiteSpace() ? "" : "(s)")} of the bot{s} will receive {(s.IsNullOrWhiteSpace() ? "an " : "")}official notification{s} from Discord.`\n\n" +
-                         $"`You can disable the token check on this server via '/tokendetection config'.`"))
+        .WithDescription(tKey.TokenInvalidated.Get(Bot.Guilds[e.Guild.Id]).Build(true, false, new TVar("Count", filtered_matches.Count()))))
         .WithContent(e.Author.Mention));
     }
 
