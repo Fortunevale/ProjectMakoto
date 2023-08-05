@@ -14,6 +14,21 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public phishing Phishing;
+        public sealed class phishing
+        {
+            public SingleTranslationKey DetectedMalicousHost;
+            public SingleTranslationKey FoundRedirects;
+            public SingleTranslationKey RedirectCheckTimeoutUnknownError;
+            public SingleTranslationKey RedirectCheckTimeoutError;
+            public SingleTranslationKey OpenInBrowser;
+            public SingleTranslationKey DomainName;
+            public SingleTranslationKey ISP;
+            public SingleTranslationKey Country;
+            public SingleTranslationKey ConfidenceOfAbuse;
+            public SingleTranslationKey HostWasFoundInAbuseIpDb;
+            public SingleTranslationKey AbuseIpDbReport;
+        }
         public join Join;
         public sealed class join
         {

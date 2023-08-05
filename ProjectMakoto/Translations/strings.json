@@ -6381,6 +6381,41 @@
           "They've been on the server for _{Timestamp}_."
         ]
       }
+    },
+    "Phishing": {
+      "AbuseIpDbReport": {
+        "en": "AbuseIPDB Report"
+      },
+      "HostWasFoundInAbuseIpDb": {
+        "en": "{Host} was found in AbuseIPDB."
+      },
+      "ConfidenceOfAbuse": {
+        "en": "Confidence of Abuse."
+      },
+      "Country": {
+        "en": "Country"
+      },
+      "ISP": {
+        "en": "ISP"
+      },
+      "DomainName": {
+        "en": "Domain Name"
+      },
+      "OpenInBrowser": {
+        "en": "Open in Browser"
+      },
+      "RedirectCheckTimeoutError": {
+        "en": "Couldn't check this link for malicious redirects. Please proceed with caution."
+      },
+      "RedirectCheckTimeoutUnknownError": {
+        "en": "An unknown error occurred while trying to check for malicious redirects. Please proceed with caution."
+      },
+      "FoundRedirects": {
+        "en": "Found at least one redirected URLs in this message."
+      },
+      "DetectedMalicousHost": {
+        "en": "Detected malicious host [{Host}]"
+      }
     }
   }
 }
