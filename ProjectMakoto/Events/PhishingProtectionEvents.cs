@@ -235,13 +235,13 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
             case PhishingPunishmentType.Kick:
             {
                 _ = e.DeleteAsync();
-                _ = member.RemoveAsync(this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMalicousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
+                _ = member.RemoveAsync(this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMaliciousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
                 break;
             }
             case PhishingPunishmentType.SoftBan:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMalicousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
+                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMaliciousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
                 await Task.Delay(1000);
                 _ = member.UnbanAsync();
                 break;
@@ -249,7 +249,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
             case PhishingPunishmentType.Ban:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMalicousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
+                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMaliciousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
                 break;
             }
         }

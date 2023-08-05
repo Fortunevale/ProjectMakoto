@@ -14,6 +14,15 @@ public sealed class Translations
     public events Events;
     public sealed class events
     {
+        public vcCreator VcCreator;
+        public sealed class vcCreator
+        {
+            public SingleTranslationKey UserLeft;
+            public SingleTranslationKey UserJoined;
+            public SingleTranslationKey NewOwner;
+            public MultiTranslationKey NewChannelNotice;
+            public SingleTranslationKey DefaultChannelName;
+        }
         public tokenDetection TokenDetection;
         public sealed class tokenDetection
         {
@@ -22,7 +31,7 @@ public sealed class Translations
         public phishing Phishing;
         public sealed class phishing
         {
-            public SingleTranslationKey DetectedMalicousHost;
+            public SingleTranslationKey DetectedMaliciousHost;
             public SingleTranslationKey FoundRedirects;
             public SingleTranslationKey RedirectCheckTimeoutUnknownError;
             public SingleTranslationKey RedirectCheckTimeoutError;

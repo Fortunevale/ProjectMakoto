@@ -6413,7 +6413,7 @@
       "FoundRedirects": {
         "en": "Found at least one redirected URLs in this message."
       },
-      "DetectedMalicousHost": {
+      "DetectedMaliciousHost": {
         "en": "Detected malicious host [{Host}]"
       }
     },
@@ -6426,6 +6426,27 @@
           "",
           "Please be careful sharing your authentication tokens. If you think you know what you're doing, run '/config tokendetection' to disable this functioniality."
         ]
+      }
+    },
+    "VcCreator": {
+      "DefaultChannelName": {
+        "en": "{User}'s Channel"
+      },
+      "NewChannelNotice": {
+        "en": [
+          "This is your temporary personal channel.",
+          "",
+          "If this channel becomes empty, it'll be deleted. Use the {Command} commands to manage this channel."
+        ]
+      },
+      "NewOwner": {
+        "en": "The channel is now owned by {User}."
+      },
+      "UserJoined": {
+        "en": "{User} joined."
+      },
+      "UserLeft": {
+        "en": "{User} left."
       }
     }
   }

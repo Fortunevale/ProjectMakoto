@@ -15,6 +15,9 @@ internal sealed class VcCreatorEvents : RequiresTranslation
     {
     }
 
+    Translations.events.vcCreator tKey
+        => Bot.LoadedTranslations.Events.VcCreator;
+
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
         if (e.After?.Channel?.Id == this.Bot.Guilds[e.Guild.Id].VcCreator.Channel)
@@ -34,7 +37,7 @@ internal sealed class VcCreatorEvents : RequiresTranslation
 
                 this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id] = DateTime.UtcNow;
 
-                var name = $"{member.DisplayName.SanitizeForCode()}'s Channel";
+                var name = tKey.DefaultChannelName.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("User", member.DisplayName.SanitizeForCode()));
 
                 foreach (var b in this.Bot.ProfanityList)
                     name = name.Replace(b, new String('*', b.Length));
@@ -49,8 +52,13 @@ internal sealed class VcCreatorEvents : RequiresTranslation
 
                 await Task.Delay(1000);
 
-                await newChannel.SendMessageAsync(new DiscordMessageBuilder().WithContent(e.User.Mention).WithEmbed(new DiscordEmbedBuilder().WithAuthor(e.Guild.Name, "", e.Guild.IconUrl).WithColor(EmbedColors.Info).WithTimestamp(DateTime.UtcNow)
-                    .WithDescription($"This is your temporary personal channel.\n\nIf this channel becomes empty, it'll be deleted. Use the `/vcc` commands to manage this channel.")));
+                await newChannel.SendMessageAsync(new DiscordMessageBuilder()
+                    .WithContent(e.User.Mention)
+                    .WithEmbed(new DiscordEmbedBuilder()
+                        .WithAuthor(e.Guild.Name, "", e.Guild.IconUrl)
+                        .WithColor(EmbedColors.Info)
+                        .WithTimestamp(DateTime.UtcNow)
+                        .WithDescription(tKey.DefaultChannelName.Get(Bot.Guilds[e.Guild.Id]).Build(true, new TVar("Command", "'/vcc'")))));
             }
             catch (Exception)
             {
