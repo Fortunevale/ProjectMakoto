@@ -31,6 +31,7 @@ public sealed class SharedCommandContext
         this.OriginalCommandContext = ctx;
 
         this.Bot = _bot;
+        this.t = _bot.LoadedTranslations;
 
         this.Prefix = ctx.Prefix;
         this.CommandName = ctx.Command.Name;
@@ -38,7 +39,7 @@ public sealed class SharedCommandContext
         if (ctx.Command.Parent != null)
             this.CommandName = this.CommandName.Insert(0, $"{ctx.Command.Parent.Name} ");
 
-        this.BaseCommand = cmd;
+        this._baseCommand = cmd;
 
         try
         {
@@ -63,6 +64,7 @@ public sealed class SharedCommandContext
     {
         this.CommandType = CommandType.Custom;
 
+        this.Client = _bot.DiscordClient;
         this.User = message.Author;
         this.Guild = message.Channel.Guild;
         this.Channel = message.Channel;
@@ -71,12 +73,14 @@ public sealed class SharedCommandContext
         this.CurrentUser = _bot.DiscordClient.CurrentUser;
 
         this.Bot = _bot;
+        this.t = _bot.LoadedTranslations;
 
         this.CommandName = CommandIdentifier;
 
-        this.BaseCommand = new DummyCommand()
+        this._baseCommand = new DummyCommand()
         {
-            ctx = this
+            ctx = this,
+            t = this.t
         };
 
         try
@@ -118,8 +122,9 @@ public sealed class SharedCommandContext
         this.ParentCommandName = ctx.CommandName;
 
         this.Bot = _bot;
+        this.t = _bot.LoadedTranslations;
 
-        this.BaseCommand = cmd;
+        this._baseCommand = cmd;
 
         try
         {
@@ -162,8 +167,9 @@ public sealed class SharedCommandContext
         this.CommandName = commandName;
 
         this.Bot = _bot;
+        this.t = _bot.LoadedTranslations;
 
-        this.BaseCommand = cmd;
+        this._baseCommand = cmd;
 
         try
         {
@@ -204,8 +210,9 @@ public sealed class SharedCommandContext
         this.ParentCommandName = ctx.CommandName;
 
         this.Bot = _bot;
+        this.t = _bot.LoadedTranslations;
 
-        this.BaseCommand = cmd;
+        this._baseCommand = cmd;
 
         try
         {
@@ -227,6 +234,11 @@ public sealed class SharedCommandContext
     }
 
     /// <summary>
+    /// Get's translations.
+    /// </summary>
+    public Translations t { get; set; }
+
+    /// <summary>
     /// From what kind of source this command originated from.
     /// </summary>
     public CommandType CommandType { get; set; }
@@ -234,7 +246,14 @@ public sealed class SharedCommandContext
     /// <summary>
     /// The Command's Environment.
     /// </summary>
-    public BaseCommand BaseCommand { get; set; }
+    public BaseCommand BaseCommand
+        => _baseCommand ?? new DummyCommand()
+        {
+            ctx = this,
+            t = this.t,
+        };
+
+    private BaseCommand? _baseCommand { get; set; }
 
     /// <summary>
     /// What prefix was used to execute this command.

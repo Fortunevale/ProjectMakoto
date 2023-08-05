@@ -23,7 +23,7 @@ internal sealed class NameNormalizerEvents : RequiresTranslation
         string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
         if (PingableName.IsNullOrWhiteSpace())
-            PingableName = "Pingable Name";
+            PingableName = t.Commands.Config.NameNormalizer.DefaultName.Get(Bot.Guilds[e.Guild.Id]);
 
         if (PingableName != e.Member.DisplayName)
             _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
@@ -39,7 +39,7 @@ internal sealed class NameNormalizerEvents : RequiresTranslation
             string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
-                PingableName = "Pingable Name";
+                PingableName = t.Commands.Config.NameNormalizer.DefaultName.Get(Bot.Guilds[e.Guild.Id]);
 
             if (PingableName != e.Member.DisplayName)
                 _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
@@ -61,7 +61,7 @@ internal sealed class NameNormalizerEvents : RequiresTranslation
             string PingableName = RegexTemplates.AllowedNickname.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
-                PingableName = "Pingable Name";
+                PingableName = t.Commands.Config.NameNormalizer.DefaultName.Get(Bot.Guilds[guild.Key]);
 
             if (PingableName != member.DisplayName)
                 _ = member.ModifyAsync(x => x.Nickname = PingableName);

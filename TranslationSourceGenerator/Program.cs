@@ -257,6 +257,8 @@ public sealed class Translations
                                 _logger.LogWarn(b);
                             }
 
+                            _logger.LogWarn("Source Generation finished with {Count} warnings.", Warnings.Count);
+
                             Insert = string.Join("\n", Insert.Split("\n").Where(x => !x.Contains("InsertPoint")));
 
                             File.WriteAllText(TranslationCs, string.Join("\n", SourceOrigin.Replace("// InsertPoint", Insert).ReplaceLineEndings("\n").Split("\n", StringSplitOptions.RemoveEmptyEntries).Where(x => !x.IsNullOrWhiteSpace())));

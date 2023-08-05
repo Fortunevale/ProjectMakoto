@@ -28,11 +28,14 @@ internal sealed class HelpCommand : BaseCommand
             var ApplicationCommandsList = ctx.Client.GetApplicationCommands().RegisteredCommands.First(x => x.Value?.Count > 0).Value;
 
             foreach (var appCommand in ApplicationCommandsList
-                .OrderByDescending(x => ((ModulePriorityAttribute)x.ContainingType?.GetCustomAttribute<ModulePriorityAttribute>()).Priority))
+                .OrderByDescending(x => x.ContainingType?.GetCustomAttribute<ModulePriorityAttribute>()?.Priority ?? 0))
             {
                 try
                 {
                     string module = appCommand.ContainingType.Name.Replace("AppCommands", "").ToLower();
+
+                    if (appCommand.ContainingType.Namespace != "ProjectMakoto.ApplicationCommands")
+                        module = ctx.Bot.Plugins[ctx.Bot.PluginCommands.First(plugin => plugin.Value.Any(cmd => cmd.Name == appCommand.Name)).Key].Name;
 
                     switch (module)
                     {
@@ -52,14 +55,27 @@ internal sealed class HelpCommand : BaseCommand
 
                     try
                     {
-                        var commandKey = t.Commands.CommandList.First(localized => localized.Names.Any(x => x.Value == appCommand.Name));
+                        var commandKey = t.Commands.CommandList.FirstOrDefault(localized => localized.Names.Any(x => x.Value == appCommand.Name), null);
 
-                        var commandName = GetString(commandKey.Names);
-                        var commandDescription = GetString(commandKey.Descriptions);
-                        var commandUsage = string.Join(" ", commandKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+                        string commandName;
+                        string commandDescription;
+                        string commandUsage;
+
+                        if (commandKey is not null)
+                        {
+                            commandName = GetString(commandKey.Names);
+                            commandDescription = GetString(commandKey.Descriptions);
+                            commandUsage = string.Join(" ", commandKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+                        }
+                        else
+                        {
+                            commandName = appCommand.Name;
+                            commandDescription = appCommand.Description;
+                            commandUsage = string.Join(" ", appCommand.Options?.Select(x => $"<{x.Name.FirstLetterToUpper()}>") ?? new List<string>());
+                        }
 
                         if (command_filter is not null)
-                            if (!commandKey.Names.Any(x => x.Value.Contains(command_filter, StringComparison.InvariantCultureIgnoreCase)))
+                            if (!(commandKey?.Names.Any(x => x.Value.Contains(command_filter, StringComparison.InvariantCultureIgnoreCase)) ?? false) && !commandName.Contains(command_filter, StringComparison.InvariantCultureIgnoreCase))
                                 continue;
 
                         string commandMention;
@@ -78,7 +94,7 @@ internal sealed class HelpCommand : BaseCommand
                         else if (appCommand.CustomAttributes.Any(x => x is PrefixCommandAlternativeAttribute))
                             prefixCommand = PrefixCommandsList
                                 .First(x => x.Value.Name.ToLower() == ((PrefixCommandAlternativeAttribute)appCommand.CustomAttributes
-                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAtChar(' ')).Value;
+                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAt(' ')).Value;
                         else
                             prefixCommand = null;
 
@@ -105,11 +121,24 @@ internal sealed class HelpCommand : BaseCommand
                     
                         foreach (var subCmd in appCommand.Options?.Where(x => x.Type == ApplicationCommandOptionType.SubCommand) ?? new List<DiscordApplicationCommandOption>())
                         {
-                            var subKey = commandKey.Commands.First(localized => localized.Names.Any(x => x.Value == subCmd.Name));
+                            var subKey = commandKey?.Commands.FirstOrDefault(localized => localized.Names.Any(x => x.Value == subCmd.Name), null);
 
-                            var subName = $"{commandName} {GetString(subKey.Names)}";
-                            var subDescription = GetString(subKey.Descriptions);
-                            var subUsage = string.Join(" ", subKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+                            string subName;
+                            string subDescription;
+                            string subUsage;
+
+                            if (subKey is not null)
+                            {
+                                subName = $"{commandName} {GetString(subKey.Names)}";
+                                subDescription = GetString(subKey.Descriptions);
+                                subUsage = string.Join(" ", subKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+                            }
+                            else
+                            {
+                                subName = $"{commandName} {subCmd.Name}";
+                                subDescription = subCmd.Description;
+                                subUsage = string.Join(" ", subCmd.Options?.Select(x => $"<{x.Name.FirstLetterToUpper()}>") ?? new List<string>());
+                            }
 
                             Command? subPrefixCommand = null;
 
@@ -142,7 +171,15 @@ internal sealed class HelpCommand : BaseCommand
                 var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
                 var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page)).AddComponents(PreviousButton, NextButton));
+                var builder = new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page));
+
+                if (!PreviousButton.Disabled || !NextButton.Disabled)
+                    builder.AddComponents(PreviousButton, NextButton);
+
+                await RespondOrEdit(builder);
+
+                if (PreviousButton.Disabled && NextButton.Disabled)
+                    return;
 
                 var Menu = await ctx.WaitForButtonAsync();
 

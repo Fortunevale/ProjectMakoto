@@ -17,21 +17,23 @@ internal sealed class NameNormalizerCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
+            var CommandKey = t.Commands.Config.NameNormalizer;
+
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"💬 `Name Normalizer Enabled`: {ctx.DbGuild.NameNormalizer.NameNormalizerEnabled.ToEmote(ctx.Bot)}";
+                return $"💬 `{GetString(CommandKey.NameNormalizerEnabled)}`: {ctx.DbGuild.NameNormalizer.NameNormalizerEnabled.ToEmote(ctx.Bot)}";
             }
 
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, "Name Normalizer");
+            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.DbGuild.NameNormalizer.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), "Toggle Name Normalizer", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var SearchAllNames = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Normalize Everyone's Names", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
+            var Toggle = new DiscordButtonComponent((ctx.DbGuild.NameNormalizer.NameNormalizerEnabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleNameNormalizer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var SearchAllNames = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.NormalizeNow), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
 
             await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
@@ -62,9 +64,8 @@ internal sealed class NameNormalizerCommand : BaseCommand
             {
                 if (ctx.DbGuild.NameNormalizer.NameNormalizerRunning)
                 {
-                    embed = embed.AsError(ctx, "Name Normalizer");
-                    embed.Description = $"`A normalizer is already running.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, GetString(CommandKey.Title))
+                                                                                   .WithDescription(GetString(CommandKey.NormalizerRunning, true))));
                     await Task.Delay(5000);
                     await ExecuteCommand(ctx, arguments);
                     return;
@@ -77,9 +78,8 @@ internal sealed class NameNormalizerCommand : BaseCommand
 
                 try
                 {
-                    embed = embed.AsLoading(ctx, "Name Normalizer");
-                    embed.Description = $"`Renaming all members. This might take a while..`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsLoading(ctx, GetString(CommandKey.Title))
+                                                                                   .WithDescription(GetString(CommandKey.RenamingAllMembers, true))));
 
                     var members = await ctx.Guild.GetAllMembersAsync();
                     int Renamed = 0;
@@ -91,7 +91,7 @@ internal sealed class NameNormalizerCommand : BaseCommand
                         string PingableName = RegexTemplates.AllowedNickname.Replace(b.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
                         if (PingableName.IsNullOrWhiteSpace())
-                            PingableName = "Pingable Name";
+                            PingableName = GetGuildString(CommandKey.DefaultName);
 
                         if (PingableName != b.DisplayName)
                         {
@@ -101,9 +101,8 @@ internal sealed class NameNormalizerCommand : BaseCommand
                         }
                     }
 
-                    embed = embed.AsSuccess(ctx, "Name Normalizer");
-                    embed.Description = $"`Renamed {Renamed} members.`";
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, GetString(CommandKey.Title))
+                                                                                   .WithDescription(GetString(CommandKey.RenamedMembers, true, new TVar("Count", Renamed)))));
                     await Task.Delay(5000);
                     ctx.DbGuild.NameNormalizer.NameNormalizerRunning = false;
                 }

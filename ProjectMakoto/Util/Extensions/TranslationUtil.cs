@@ -94,6 +94,10 @@ public static class TranslationUtil
     /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
     internal static string Build(this string[] array)
         => array.Build(false, false, null);
+    
+    /// <inheritdoc cref="Build(string[], bool, bool, TVar[])"/>
+    internal static string Build(this string[] array, params TVar[] vars)
+        => array.Build(false, false, vars);
 
     /// <summary>
     /// Builds a string array into a string, used for MultiTranslationKeys.
@@ -153,4 +157,22 @@ public static class TranslationUtil
 
         return pad;
     }
+
+    internal static HumanReadableTimeFormatConfig GetTranslatedHumanReadableConfig(User user, Bot bot)
+        => new()
+        {
+            DaysString = bot.LoadedTranslations.Common.Time.Days.Get(user),
+            HoursString = bot.LoadedTranslations.Common.Time.Hours.Get(user),
+            MinutesString = bot.LoadedTranslations.Common.Time.Minutes.Get(user),
+            SecondsString = bot.LoadedTranslations.Common.Time.Seconds.Get(user),
+        };
+
+    internal static HumanReadableTimeFormatConfig GetTranslatedHumanReadableConfig(Guild guild, Bot bot)
+        => new()
+        {
+            DaysString = bot.LoadedTranslations.Common.Time.Days.Get(guild),
+            HoursString = bot.LoadedTranslations.Common.Time.Hours.Get(guild),
+            MinutesString = bot.LoadedTranslations.Common.Time.Minutes.Get(guild),
+            SecondsString = bot.LoadedTranslations.Common.Time.Seconds.Get(guild),
+        };
 }

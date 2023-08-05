@@ -11,8 +11,9 @@ namespace ProjectMakoto.Enums;
 
 public enum PhishingPunishmentType
 {
-    DELETE,
-    TIMEOUT,
-    KICK,
-    BAN
+    Delete,
+    Timeout,
+    Kick,
+    Ban,
+    SoftBan
 }

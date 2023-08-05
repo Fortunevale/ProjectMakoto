@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using System.Collections.Concurrent;
+
 namespace ProjectMakoto.Util;
 
 public sealed class AbuseIpDbClient
@@ -26,7 +28,7 @@ public sealed class AbuseIpDbClient
 
     private Bot _bot { get; set; }
 
-    private readonly Dictionary<string, WebRequestItem> Queue = new();
+    private readonly ConcurrentDictionary<string, WebRequestItem> Queue = new();
 
     private Dictionary<string, Tuple<AbuseIpDbQuery, DateTime>> Cache = new();
 
@@ -61,7 +63,7 @@ public sealed class AbuseIpDbClient
                 this.RequestsRemaining = 1;
             }
 
-            if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            if (this.Queue.IsEmpty || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
             {
                 await Task.Delay(100);
                 continue;
@@ -117,7 +119,7 @@ public sealed class AbuseIpDbClient
     private async Task<string> MakeRequest(string url)
     {
         string key = Guid.NewGuid().ToString();
-        this.Queue.Add(key, new WebRequestItem { Url = url });
+        this.Queue.AddOrUpdate(key, new WebRequestItem { Url = url }, (x1, x2) => { return null; });
 
         while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);
@@ -126,15 +128,14 @@ public sealed class AbuseIpDbClient
             throw new Exception("The request has been removed from the queue prematurely.");
 
         var response = this.Queue[key];
-        this.Queue.Remove(key);
+        this.Queue.Remove(key, out _);
 
         if (response.Resolved)
             return response.Response;
-
-        if (response.Failed)
+        else if (response.Failed)
             throw response.Exception;
-
-        throw new Exception("This exception should be impossible to get.");
+        else
+            throw new Exception("This exception should be impossible to get.");
     }
 
     public async Task<AbuseIpDbQuery> QueryIp(string Ip, bool bypassCache = false)

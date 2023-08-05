@@ -16,7 +16,7 @@ internal sealed class ScoreSaberCommandAbstractions
 {
     internal static async Task SendScoreSaberProfile(SharedCommandContext ctx, string id = "", bool AddLinkButton = true)
     {
-        var t = ctx.BaseCommand.t;
+        var t = ctx.t;
         string GetString(SingleTranslationKey v, bool Code = false, params TVar[] vars)
             => ctx.BaseCommand.GetString(v, Code, vars);
         string GetMString(MultiTranslationKey v)

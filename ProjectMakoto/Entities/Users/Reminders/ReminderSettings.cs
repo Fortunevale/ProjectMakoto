@@ -56,7 +56,7 @@ public sealed class ReminderSettings : RequiresParent<User>
                     DiscordButtonComponent snoozeButton = new(ButtonStyle.Secondary, JsonConvert.SerializeObject(new ReminderSnoozeButton
                     {
                         Description = b.Description.TruncateWithIndication(maxLength)
-                    }), "Snooze", false, DiscordEmoji.FromUnicode("💤").ToComponent());
+                    }), CommandKey.Snooze.Get(this.Bot.Users[user.Id]), false, DiscordEmoji.FromUnicode("💤").ToComponent());
                     var msg = await user.SendMessageAsync(builder.AddComponents(snoozeButton));
                 });
 

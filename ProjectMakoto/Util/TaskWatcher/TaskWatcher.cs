@@ -120,7 +120,7 @@ public sealed class TaskWatcher
                                 _ = sctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
                                     .WithContent(sctx.User.Mention)
                                     .AddEmbed(new DiscordEmbedBuilder()
-                                        .WithDescription(sctx.BaseCommand.GetString(sctx.BaseCommand.t.Commands.Common.Errors.UnhandledException, true, 
+                                        .WithDescription(sctx.BaseCommand.GetString(sctx.t.Commands.Common.Errors.UnhandledException, true, 
                                             new TVar("Message", $"```diff\n-{(Exception?.Message?.SanitizeForCode() ?? "No message captured.")}\n```"),
                                             new TVar("Timestamp", DateTime.UtcNow.AddSeconds(11).ToTimestamp())))
                                         .AsBotError(sctx)))
@@ -225,7 +225,7 @@ public sealed class TaskWatcher
                             or "[111] Connection terminated (1001, 'CloudFlare WebSocket proxy restarting'), reconnecting")
                             break;
 
-                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.AssetsGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
+                        var channel = bot.DiscordClient.Guilds[bot.status.LoadedConfig.Discord.DevelopmentGuild].GetChannel(bot.status.LoadedConfig.Channels.ExceptionLog);
 
                         if (channel is null)
                         {
@@ -268,13 +268,13 @@ public sealed class TaskWatcher
 
                                     if (b.Count > 0)
                                     {
-                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```"));
-                                        embed.AddField(new DiscordEmbedField("File", $"```{b[0].Groups[1]}```"));
-                                        embed.AddField(new DiscordEmbedField("Line", $"`{b[0].Groups[2]}`"));
+                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```".TruncateWithIndication(1024, "``` Stack Trace too long, please check logs.")));
+                                        embed.AddField(new DiscordEmbedField(b.Count > 1 ? "Files & Lines" : "File & Line", $"{string.Join("\n\n", b.Select(x => $"[`{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}`]" +
+                                        $"(https://github.com/{bot.status.LoadedConfig.Secrets.Github.Username}/{bot.status.LoadedConfig.Secrets.Github.Repository}/blob/{bot.status.LoadedConfig.Secrets.Github.Branch ?? "main"}/{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}#L{x.Groups[2]}) at `Line {x.Groups[2]}`"))}".TruncateWithIndication(1024, "`")));
                                     }
                                     else
                                     {
-                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{ex.StackTrace?.SanitizeForCode()}```"));
+                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{ex.StackTrace?.SanitizeForCode()}```".TruncateWithIndication(1024, "```")));
                                     }
                                 }
                                 else
@@ -282,12 +282,12 @@ public sealed class TaskWatcher
                                     embed.AddField(new DiscordEmbedField("Stack Trace", $"```No Stack Trace captured.```"));
                                 }
 
-                                embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`", true));
-                                embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`", true));
+                                embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`".TruncateWithIndication(1024, "`"), true));
+                                embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`".TruncateWithIndication(1024, "`"), true));
                                 embed.WithFooter(ex.HResult.ToString());
 
                                 if ((ex.Data?.Keys?.Count ?? 0) > 0)
-                                    embed.AddFields(ex.Data.Keys.Cast<object>().ToDictionary(k => k.ToString(), v => ex.Data[v]).Select(x => new DiscordEmbedField(x.Key, x.Value.ToString(), true)));
+                                    embed.AddFields(ex.Data.Keys.Cast<object>().ToDictionary(k => k.ToString(), v => ex.Data[v]).Select(x => new DiscordEmbedField(x.Key, x.Value.ToString().TruncateWithIndication(1024))));
 
                                 embeds.Add(embed);
 

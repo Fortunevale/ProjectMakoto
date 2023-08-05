@@ -47,6 +47,9 @@ dotnet_diagnostic.SYSLIB1045.severity = silent
 # DCS0200: [Discord] Requires Features
 dotnet_diagnostic.DCS0200.severity = silent
 
+# IDE0079: Remove unnecessary suppression
+dotnet_diagnostic.IDE0079.severity = silent
+
 [*.{cs,vb}]
 #### Naming styles ####
 

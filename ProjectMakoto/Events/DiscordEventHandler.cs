@@ -13,6 +13,9 @@ internal sealed class DiscordEventHandler : RequiresBotReference
 {
     private DiscordEventHandler(Bot bot) : base(bot) { }
 
+    Translations.events.genericEvent tKey
+        => this.Bot.LoadedTranslations.Events.GenericEvent;
+
     public static void SetupEvents(Bot _bot)
     {
         DiscordEventHandler handler = new(_bot);
@@ -224,9 +227,13 @@ internal sealed class DiscordEventHandler : RequiresBotReference
             {
                 string prefix = e.Guild.GetGuildPrefix(this.Bot);
 
-                _ = e.Message.RespondAsync($"Hi {e.Author.Mention}, i'm Makoto. I support Slash Commands, but additionally you can use me via `{prefix}`. To get a list of all commands, type `;;help` or do a `/` and filter by me.\n" +
-                                $"If you need help, feel free to join our Support and Development Server: <{this.Bot.status.DevelopmentServerInvite}>\n\n" +
-                                $"To find out more about me, check my Github Repo: <https://s.aitsys.dev/makoto>.");
+                _ = e.Message.RespondAsync(tKey.PingMessage.Get(this.Bot.Guilds[e.Guild.Id]).Build(false, true,
+                    new TVar("User", e.Author.Mention),
+                    new TVar("Bot", sender.CurrentUser.GetUsername()),
+                    new TVar("BotMention", sender.CurrentUser.Mention),
+                    new TVar("Help", sender.GetCommandMention(this.Bot, "help")),
+                    new TVar("Invite", $"<{this.Bot.status.DevelopmentServerInvite}>"),
+                    new TVar("GithubRepo", "<https://s.aitsys.dev/makoto>")));
             }
         }).Add(this.Bot);
     }

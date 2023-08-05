@@ -26,6 +26,7 @@ public sealed class Bot
     public ThreadJoinClient ThreadJoinClient { get; internal set; }
     public AbuseIpDbClient AbuseIpDbClient { get; internal set; }
     public MonitorClient MonitorClient { get; internal set; }
+    public TokenInvalidatorRepository TokenInvalidator { get; internal set; }
     internal GitHubClient GithubClient { get; set; }
 
     #endregion Clients
@@ -67,7 +68,6 @@ public sealed class Bot
     internal Dictionary<ulong, List<BanDetails>> globalNotes = new();
 
     #endregion Bans
-
 
     public Status status = new();
     internal SelfFillingDictionary<Entities.Guild> Guilds = null;
@@ -137,6 +137,7 @@ public sealed class Bot
 
                 this.MonitorClient = new MonitorClient(this);
                 this.AbuseIpDbClient = new AbuseIpDbClient(this);
+                this.TokenInvalidator = new TokenInvalidatorRepository(this);
 
                 this.GithubClient = new GitHubClient(new ProductHeaderValue("ProjectMakoto", this.status.RunningVersion));
                 this.GithubClient.Credentials = new Credentials(this.status.LoadedConfig.Secrets.Github.Token);

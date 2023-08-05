@@ -9,11 +9,14 @@
 
 namespace ProjectMakoto.Util;
 
-internal sealed class ExperienceHandler : RequiresBotReference
+internal sealed class ExperienceHandler : RequiresTranslation
 {
     internal ExperienceHandler(Bot _bot) : base(_bot)
     {
     }
+
+    Translations.events.experience tKey
+        => this.Bot.LoadedTranslations.Events.Experience;
 
     private Dictionary<long, long> LevelCache = new();
 
@@ -96,8 +99,14 @@ internal sealed class ExperienceHandler : RequiresBotReference
 
             if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level > PreviousLevel)
             {
-                string build = $":stars: Congrats, {user.Mention}! You gained {(this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel is 1 ? $"{this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel} level" : $"{this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel} levels")}.\n\n" +
-                                $"You're now on Level {this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level}.";
+                string build;
+
+                if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel is 1)
+                    build = $":stars: {tKey.GainedLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("User", user.Mention), new TVar("Count", 1))}\n" +
+                            $"{tKey.NewLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Level", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))}";
+                else
+                    build = $":stars: {tKey.GainedLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("User", user.Mention), new TVar("Count", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel))}\n" +
+                            $"{tKey.NewLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Level", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))}";
 
                 int delete_delay = 10000;
 
@@ -138,7 +147,7 @@ internal sealed class ExperienceHandler : RequiresBotReference
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = user.AvatarUrl },
                     Footer = new DiscordEmbedBuilder.EmbedFooter
                     {
-                        Text = $"This message will be automatically deleted in {delete_delay / 1000} seconds"
+                        Text = tKey.AutomaticDeletion.Get(Bot.Guilds[guild.Id]).Build(new TVar("Seconds", delete_delay / 1000))
                     }
                 };
 
@@ -169,14 +178,16 @@ internal sealed class ExperienceHandler : RequiresBotReference
 
                                 await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                await (await user.CreateDmChannelAsync()).SendMessageAsync($"Alright, i will no longer send you any level up notifications via DM. If you wan't to re-enable this, run `;;levelrewards-optin` on any _bot._guilds with {this.Bot.DiscordClient.CurrentUser.Mention}.");
+                                await (await user.CreateDmChannelAsync()).SendMessageAsync(tKey.AutomaticDeletion.Get(Bot.Users[user.Id]).Build(
+                                    new TVar("Command", "`/levelrewards-optin`"),
+                                    new TVar("Bot", guild.CurrentMember.Mention)));
                             }
                         }).Add(this.Bot);
                     }
 
                     IEnumerable<DiscordComponent> discordComponents = new List<DiscordComponent>
                     {
-                        { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", "Disable Direct Message Experience Notifications", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔"))) },
+                        { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", tKey.DisableDirectMessages.Get(Bot.Users[user.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔"))) },
                     };
 
                     msg = await (await user.CreateDmChannelAsync()).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(discordComponents));
@@ -186,7 +197,7 @@ internal sealed class ExperienceHandler : RequiresBotReference
                     try
                     {
                         await Task.Delay(3600000);
-                        embed.Footer.Text += " • Interaction timed out";
+                        embed.Footer.Text += $" • {t.Commands.Common.InteractionTimeout.Get(Bot.Users[user.Id])}";
                         await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                         this.Bot.DiscordClient.ComponentInteractionCreated -= RunInteraction;

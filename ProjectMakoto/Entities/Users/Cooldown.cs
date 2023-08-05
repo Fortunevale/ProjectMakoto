@@ -25,7 +25,7 @@ public sealed class Cooldown : RequiresParent<User>
 
         if (this.WaitingList.Contains(ctx.CommandName))
         {
-            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} 🛑 `{ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.SlowDown)}`"));
+            var stop_warn = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithContent($"{ctx.User.Mention} 🛑 `{ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.SlowDown)}`"));
             await Task.Delay(3000);
             _ = stop_warn.DeleteAsync();
             return true;
@@ -40,12 +40,12 @@ public sealed class Cooldown : RequiresParent<User>
             return false;
         }
 
-        var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.CancelCommand), false, EmojiTemplates.GetError(ctx.Bot).ToComponent());
+        var cancelButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.CancelCommand), false, EmojiTemplates.GetError(ctx.Bot).ToComponent());
         var cancellationTokenSource = new CancellationTokenSource();
         var Cancelled = false;
 
         var msg = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton));
 
         Task.Run(async () =>
@@ -80,7 +80,7 @@ public sealed class Cooldown : RequiresParent<User>
         try
         {
             await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
-            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.BaseCommand.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
+            .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton.Disable()));
         }
         catch { }

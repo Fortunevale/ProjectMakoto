@@ -10,14 +10,9 @@
 namespace ProjectMakoto.PrefixCommands;
 public sealed class PrefixCommandUtil
 {
-    public static async Task SendGroupHelp(Bot _bot, CommandContext ctx, string CommandName, string CustomText = "", string CustomImageUrl = "", string CustomParentName = "")
-    {
-        if (await _bot.Users[ctx.User.Id].Cooldown.WaitForLight(new SharedCommandContext(ctx.Message, _bot, CommandName)))
-            return;
-
-        if (ctx.Command.Parent is not null)
-            await ctx.Command.Parent.Children.SendCommandGroupHelp(ctx, CustomText, CustomImageUrl, CustomParentName);
-        else
-            await ((CommandGroup)ctx.Command).Children.SendCommandGroupHelp(ctx, CustomText, CustomImageUrl, CustomParentName);
-    }
+    public static async Task SendGroupHelp(Bot _bot, CommandContext ctx, string CommandName)
+        => _ = new HelpCommand().ExecuteCommand(ctx, _bot, new Dictionary<string, object>
+        {
+            { "command", CommandName }
+        });
 }

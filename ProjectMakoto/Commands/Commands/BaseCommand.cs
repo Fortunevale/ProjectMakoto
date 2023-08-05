@@ -706,7 +706,7 @@ public abstract class BaseCommand
         return new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
-    public async Task<InteractionResult<string>> PromptCustomSelection(List<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
+    public async Task<InteractionResult<string>> PromptCustomSelection(IEnumerable<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromSeconds(120);
         CustomPlaceHolder ??= GetString(this.t.Commands.Common.Prompts.SelectAnOption);
@@ -1110,7 +1110,7 @@ public abstract class BaseCommand
             }
             default:
             {
-                _ = this.ctx.ResponseMessage.DeleteAsync();
+                _ = this.ctx.ResponseMessage?.DeleteAsync();
                 break;
             }
         }

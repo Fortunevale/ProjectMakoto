@@ -15,6 +15,9 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
     {
     }
 
+    Translations.events.inVoicePrivacy tKey
+        => this.t.Events.InVoicePrivacy;
+
     private List<Task> JobsQueue = new();
 
     internal async void QueueHandler()
@@ -51,10 +54,10 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                 if (e.After?.Channel?.Id != e.Before?.Channel?.Id)
                 {
                     if (e.Before is not null && e.Before.Channel is not null)
-                        await e.Before.Channel.DeleteOverwriteAsync(await e.User.ConvertToMember(e.Guild), "Left VC while In-Voice Privacy Set permissions is turned on");
+                        await e.Before.Channel.DeleteOverwriteAsync(await e.User.ConvertToMember(e.Guild), tKey.LeftWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
 
                     if (e.After is not null && e.After.Channel is not null)
-                        await e.After?.Channel?.AddOverwriteAsync(await e.User.ConvertToMember(e.Guild), Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, "Joined VC while In-Voice Privacy Set permissions is turned on");
+                        await e.After?.Channel?.AddOverwriteAsync(await e.User.ConvertToMember(e.Guild), Permissions.ReadMessageHistory | Permissions.SendMessages, Permissions.None, tKey.JoinedWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
                 }
             }).Add(this.Bot);
         }
@@ -118,7 +121,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                     try
                                     {
                                         var MessagesToDelete = BulkDeletions.Take(100).ToList();
-                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete, "In Voice Privacy");
+                                        await e.Before.Channel.DeleteMessagesAsync(MessagesToDelete, tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
 
                                         for (int i = 0; i < MessagesToDelete.Count; i++)
                                         {
@@ -149,7 +152,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                                     {
                                         var msg = SingleDeletions[0];
 
-                                        await e.Before.Channel.DeleteMessageAsync(msg, "In Voice Privacy");
+                                        await e.Before.Channel.DeleteMessageAsync(msg, tKey.LeftWithDeleteMessages.Get(this.Bot.Guilds[e.Guild.Id]));
                                         SingleDeletions.Remove(msg);
 
                                         if (SingleDeletions.Any())
@@ -195,7 +198,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                     if (b.Value.Parent?.PermissionOverwrites.Any(x => (x.Type == OverwriteType.Role) && (x.Id == e.Guild.EveryoneRole.Id)) ?? false)
                         present = b.Value.Parent.PermissionOverwrites.First(x => (x.Type == OverwriteType.Role) && (x.Id == e.Guild.EveryoneRole.Id));
 
-                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, (present?.Allowed ?? Permissions.None), (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.SendMessages, "In-Voice Privacy is enabled");
+                    _ = b.Value.AddOverwriteAsync(e.Guild.EveryoneRole, (present?.Allowed ?? Permissions.None), (present?.Denied ?? Permissions.None) | Permissions.ReadMessageHistory | Permissions.SendMessages, tKey.CreatedWithSetPermissions.Get(this.Bot.Guilds[e.Guild.Id]));
                 }
             }
         }).Add(this.Bot);

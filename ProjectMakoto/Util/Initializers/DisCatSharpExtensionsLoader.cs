@@ -315,7 +315,7 @@ internal sealed class DisCatSharpExtensionsLoader
         var commandsNextTypes = new List<Type>();
         var applicationCommandTypes = new List<Type>();
 
-        //await Util.Initializers.PluginLoader.LoadPluginCommands(bot, cNext, appCommands);
+        await Util.Initializers.PluginLoader.LoadPluginCommands(bot, cNext, appCommands);
 
         _ = Task.Run(async () =>
         {
