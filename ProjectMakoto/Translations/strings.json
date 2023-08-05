@@ -6739,7 +6739,7 @@
         ],
         "de": [
           "hat {Guild} verlassen.",
-          "Sie waren _{Timestamp}_ auf dem Server."
+          "Der Benutzer war _{Timestamp}_ auf dem Server."
         ]
       }
     },
