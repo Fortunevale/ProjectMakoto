@@ -108,11 +108,11 @@ public sealed class VcCreatorSettings : RequiresParent<Guild>
                                 {
                                     if (e.After?.Channel?.Id == b.Key)
                                     {
-                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.UserJoined.Get(Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Success).WithAuthor("User joined", "", AuditLogIcons.UserAdded));
+                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.UserJoined.Get(Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Success).WithAuthor(Bot.LoadedTranslations.Events.Actionlog.UserJoined.Get(Parent), "", AuditLogIcons.UserAdded));
                                     }
                                     else
                                     {
-                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.UserLeft.Get(Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Error).WithAuthor("User left", "", AuditLogIcons.UserLeft));
+                                        await channel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription(tKey.UserLeft.Get(Parent).Build(true, new TVar("User", e.User.Mention))).WithColor(EmbedColors.Error).WithAuthor(Bot.LoadedTranslations.Events.Actionlog.UserLeft.Get(Parent), "", AuditLogIcons.UserLeft));
                                     }
                                 }
                             }

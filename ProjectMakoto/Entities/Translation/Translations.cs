@@ -1268,6 +1268,7 @@ public sealed class Translations
                 public SingleTranslationKey CreatedOn;
                 public SingleTranslationKey Count;
                 public SingleTranslationKey DeleteReminder;
+                public SingleTranslationKey Snooze;
                 public SingleTranslationKey NewReminder;
                 public SingleTranslationKey Title;
             }

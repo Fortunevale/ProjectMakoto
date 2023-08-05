@@ -3114,6 +3114,10 @@
           "en": "New Reminder",
           "de": "Neue Erinnerung"
         },
+        "Snooze": {
+          "en": "Snooze",
+          "de": "Schlummern"
+        },
         "DeleteReminder": {
           "en": "Delete a Reminder",
           "de": "Eine Erinnerung löschen"
