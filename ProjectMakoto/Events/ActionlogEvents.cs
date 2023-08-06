@@ -365,7 +365,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
                 .WithTimestamp(DateTime.UtcNow)
                 .WithThumbnail(e.Member.AvatarUrl)
-                .WithDescription($"**{this.tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
+                .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
 
             if (string.IsNullOrWhiteSpace(e.NicknameBefore))
                 embed.Author.Name = this.tKey.NicknameAdded.Get(this.Bot.Guilds[e.Guild.Id]);
@@ -825,7 +825,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
             .WithFooter($"{this.tKey.UserId.Get(this.Bot.Guilds[e.Guild.Id])}: {e.Member.Id}")
             .WithTimestamp(DateTime.UtcNow)
             .WithThumbnail(e.Member.AvatarUrl)
-            .WithDescription($"**{this.tKey.User}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
+            .WithDescription($"**{this.tKey.User.Get(this.Bot.Guilds[e.Guild.Id])}**: {e.Member.Mention} `{e.Member.GetUsernameWithIdentifier()}`");
 
         var msg = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
 
