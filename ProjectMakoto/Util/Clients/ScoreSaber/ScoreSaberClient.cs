@@ -12,89 +12,92 @@ using ProjectMakoto.Enums.ScoreSaber;
 
 namespace ProjectMakoto.Util;
 
-public class ScoreSaberClient
+public class ScoreSaberClient : RequiresBotReference
 {
-    internal ScoreSaberClient()
+    internal ScoreSaberClient(Bot bot) : base(bot)
     {
-        _ = this.QueueHandler();
+        this.QueueHandler();
     }
 
     ~ScoreSaberClient()
     {
-        _disposed = true;
+        this._disposed = true;
     }
 
     bool _disposed = false;
 
     readonly Dictionary<string, WebRequestItem> Queue = new();
 
-    private async Task QueueHandler()
+    private void QueueHandler()
     {
-        HttpClient client = new();
-
-        while (!_disposed)
+        _ = Task.Run(async () =>
         {
-            if (Queue.Count == 0 || !Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            HttpClient client = new();
+
+            while (!this._disposed)
             {
-                await Task.Delay(100);
-                continue;
-            }
-
-            var b = Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
-
-            try
-            {
-                _logger.LogTrace("Sending Request to '{Url}'..", b.Value.Url);
-                var response = await client.GetAsync(b.Value.Url);
-
-                Queue[b.Key].StatusCode = response.StatusCode;
-
-                if (!response.IsSuccessStatusCode)
+                if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
                 {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                        throw new NotFoundException("");
-
-                    if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
-                        throw new UnprocessableEntityException("");
-
-                    if (response.StatusCode == HttpStatusCode.InternalServerError)
-                        throw new InternalServerErrorException("");
-
-                    if (response.StatusCode == HttpStatusCode.Forbidden)
-                        throw new ForbiddenException("");
-
-                    throw new Exception($"Unsuccessful request: {response.StatusCode}");
+                    await Task.Delay(100);
+                    continue;
                 }
 
+                var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
 
-                Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
-                Queue[b.Key].Resolved = true;
+                try
+                {
+                    _logger.LogTrace("Sending Request to '{Url}'..", b.Value.Url);
+                    var response = await client.GetAsync(b.Value.Url);
+
+                    this.Queue[b.Key].StatusCode = response.StatusCode;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                            throw new NotFoundException("");
+
+                        if (response.StatusCode == HttpStatusCode.UnprocessableEntity)
+                            throw new UnprocessableEntityException("");
+
+                        if (response.StatusCode == HttpStatusCode.InternalServerError)
+                            throw new InternalServerErrorException("");
+
+                        if (response.StatusCode == HttpStatusCode.Forbidden)
+                            throw new ForbiddenException("");
+
+                        throw new Exception($"Unsuccessful request: {response.StatusCode}");
+                    }
+
+
+                    this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
+                    this.Queue[b.Key].Resolved = true;
+                }
+                catch (Exception ex)
+                {
+                    this.Queue[b.Key].Failed = true;
+                    this.Queue[b.Key].Exception = ex;
+                }
+                finally
+                {
+                    await Task.Delay(100);
+                }
             }
-            catch (Exception ex)
-            {
-                Queue[b.Key].Failed = true;
-                Queue[b.Key].Exception = ex;
-            }
-            finally
-            {
-                await Task.Delay(100);
-            }
-        }
+        }).Add(this.Bot).IsVital();
     }
 
     private async Task<string> MakeRequest(string url)
     {
-        string key = Guid.NewGuid().ToString();
-        Queue.Add(key, new WebRequestItem { Url = url });
+        var key = Guid.NewGuid().ToString();
+        this.Queue.Add(key, new WebRequestItem { Url = url });
 
-        while (Queue.ContainsKey(key) && !Queue[key].Resolved && !Queue[key].Failed)
+        while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
             await Task.Delay(100);
 
-        if (!Queue.ContainsKey(key))
+        if (!this.Queue.ContainsKey(key))
             throw new Exception("The request has been removed from the queue prematurely.");
 
-        var response = Queue[key];
-        Queue.Remove(key);
+        var response = this.Queue[key];
+        _ = this.Queue.Remove(key);
 
         if (response.Resolved)
             return response.Response;
@@ -112,8 +115,8 @@ public class ScoreSaberClient
     /// <returns>The requested player.</returns>
     public async Task<PlayerInfo> GetPlayerById(string id)
     {
-        var response = await MakeRequest($"https://scoresaber.com/api/player/{id}/full");
-        PlayerInfo request = JsonConvert.DeserializeObject<PlayerInfo>(response);
+        var response = await this.MakeRequest($"https://scoresaber.com/api/player/{id}/full");
+        var request = JsonConvert.DeserializeObject<PlayerInfo>(response);
         return request;
     }
 
@@ -124,8 +127,8 @@ public class ScoreSaberClient
     /// <returns>The requested scoreboard.</returns>
     public async Task<Leaderboard> GetScoreboardById(string id)
     {
-        var response = await MakeRequest($"https://scoresaber.com/api/ranking/request/by-id/{id}");
-        Leaderboard request = JsonConvert.DeserializeObject<Leaderboard>(response);
+        var response = await this.MakeRequest($"https://scoresaber.com/api/ranking/request/by-id/{id}");
+        var request = JsonConvert.DeserializeObject<Leaderboard>(response);
 
         return request;
     }
@@ -137,8 +140,8 @@ public class ScoreSaberClient
     /// <returns>The requested scoreboard.</returns>
     public async Task<Leaderboard> GetScoreboardByHash(string hash)
     {
-        var response = await MakeRequest($"https://scoresaber.com/api/leaderboard/by-hash/{hash}");
-        Leaderboard request = JsonConvert.DeserializeObject<Leaderboard>(response);
+        var response = await this.MakeRequest($"https://scoresaber.com/api/leaderboard/by-hash/{hash}");
+        var request = JsonConvert.DeserializeObject<Leaderboard>(response);
 
         return request;
     }
@@ -163,10 +166,10 @@ public class ScoreSaberClient
         if (country is not null)
             parameters.Add("countries", country.ToLower());
 
-        string query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
+        var query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
 
         var response = await this.MakeRequest($"https://scoresaber.com/api/leaderboard/by-id/{id}/scores?{query}");
-        LeaderboardScores parsedResponse = JsonConvert.DeserializeObject<LeaderboardScores>(response);
+        var parsedResponse = JsonConvert.DeserializeObject<LeaderboardScores>(response);
 
         return parsedResponse;
     }
@@ -193,10 +196,10 @@ public class ScoreSaberClient
         if (country is not null)
             parameters.Add("countries", country.ToLower());
 
-        string query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
+        var query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
 
-        var response = await MakeRequest($"https://scoresaber.com/api/leaderboard/by-hash/{hash}/scores?{query}");
-        LeaderboardScores request = JsonConvert.DeserializeObject<LeaderboardScores>(response);
+        var response = await this.MakeRequest($"https://scoresaber.com/api/leaderboard/by-hash/{hash}/scores?{query}");
+        var request = JsonConvert.DeserializeObject<LeaderboardScores>(response);
 
         return request;
     }
@@ -222,10 +225,10 @@ public class ScoreSaberClient
             { "withMetadata", "true" }
         };
 
-        string query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
+        var query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
 
-        var response = await MakeRequest($"https://scoresaber.com/api/player/{id}/scores?{query}");
-        PlayerScores request = JsonConvert.DeserializeObject<PlayerScores>(response);
+        var response = await this.MakeRequest($"https://scoresaber.com/api/player/{id}/scores?{query}");
+        var request = JsonConvert.DeserializeObject<PlayerScores>(response);
 
         return request;
     }
@@ -251,10 +254,10 @@ public class ScoreSaberClient
         if (country is not null)
             parameters.Add("countries", country.ToLower());
 
-        string query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
+        var query = await new FormUrlEncodedContent(parameters).ReadAsStringAsync();
 
-        var response = await MakeRequest($"https://scoresaber.com/api/players?{query}");
-        PlayerSearch request = JsonConvert.DeserializeObject<PlayerSearch>(response);
+        var response = await this.MakeRequest($"https://scoresaber.com/api/players?{query}");
+        var request = JsonConvert.DeserializeObject<PlayerSearch>(response);
 
         return request;
     }

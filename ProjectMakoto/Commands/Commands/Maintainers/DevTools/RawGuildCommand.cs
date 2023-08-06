@@ -11,16 +11,16 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class RawGuildCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            ulong? guild = (ulong?)arguments["guild"];
+            var guild = (ulong?)arguments["guild"];
             guild ??= ctx.Guild.Id;
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithFile("guild.json", JsonConvert.SerializeObject(ctx.Bot.Guilds[guild.Value], Formatting.Indented, new JsonSerializerSettings
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithFile("guild.json", JsonConvert.SerializeObject(ctx.Bot.Guilds[guild.Value], Formatting.Indented, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             }).ToStream()));

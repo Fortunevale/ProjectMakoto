@@ -17,8 +17,8 @@ internal sealed class LoadShareCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            ulong userid = (ulong)arguments["userid"];
-            string id = ((string)arguments["id"])
+            var userid = (ulong)arguments["userid"];
+            var id = ((string)arguments["id"])
                 .Replace("/", "")
                 .Replace("\\", "")
                 .Replace(">", "")
@@ -30,20 +30,20 @@ internal sealed class LoadShareCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
-                Description = GetString(this.t.Commands.Music.Playlists.LoadShare.Loading, true)
-            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title));
-            await RespondOrEdit(embed);
+                Description = this.GetString(this.t.Commands.Music.Playlists.LoadShare.Loading, true)
+            }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));
+            _ = await this.RespondOrEdit(embed);
 
             if (!Directory.Exists("PlaylistShares"))
-                Directory.CreateDirectory("PlaylistShares");
+                _ = Directory.CreateDirectory("PlaylistShares");
 
             if (!Directory.Exists($"PlaylistShares/{userid}") || !File.Exists($"PlaylistShares/{userid}/{id}.json"))
             {
-                embed.Description = GetString(this.t.Commands.Music.Playlists.LoadShare.NotFound);
-                embed.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title));
-                await RespondOrEdit(embed.Build());
+                embed.Description = this.GetString(this.t.Commands.Music.Playlists.LoadShare.NotFound);
+                _ = embed.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));
+                _ = await this.RespondOrEdit(embed.Build());
                 return;
             }
 
@@ -54,23 +54,23 @@ internal sealed class LoadShareCommand : BaseCommand
 
             var pad = TranslationUtil.CalculatePadding(ctx.DbUser, this.t.Commands.Music.Playlists.LoadShare.PlaylistName, this.t.Commands.Music.Playlists.Tracks, this.t.Commands.Music.Playlists.LoadShare.CreatedBy);
 
-            embed.AsInfo(ctx, GetString(this.t.Commands.Music.Playlists.Title));
+            _ = embed.AsInfo(ctx, this.GetString(this.t.Commands.Music.Playlists.Title));
             embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = ImportJson.PlaylistThumbnail };
             embed.Color = (ImportJson.PlaylistColor is "#FFFFFF" or null or "" ? EmbedColors.Info : new DiscordColor(ImportJson.PlaylistColor.IsValidHexColor()));
-            embed.Description = $"{GetString(this.t.Commands.Music.Playlists.LoadShare.Found, true)}\n\n" +
-                                $"`{GetString(this.t.Commands.Music.Playlists.LoadShare.PlaylistName).PadRight(pad)}`: `{ImportJson.PlaylistName}`\n" +
-                                $"`{GetString(this.t.Commands.Music.Playlists.Tracks).PadRight(pad)}`: `{ImportJson.List.Count}`\n" +
-                                $"`{GetString(this.t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.GetUsernameWithIdentifier()} ({user.Id})`";
+            embed.Description = $"{this.GetString(this.t.Commands.Music.Playlists.LoadShare.Found, true)}\n\n" +
+                                $"`{this.GetString(this.t.Commands.Music.Playlists.LoadShare.PlaylistName).PadRight(pad)}`: `{ImportJson.PlaylistName}`\n" +
+                                $"`{this.GetString(this.t.Commands.Music.Playlists.Tracks).PadRight(pad)}`: `{ImportJson.List.Count}`\n" +
+                                $"`{this.GetString(this.t.Commands.Music.Playlists.LoadShare.CreatedBy).PadRight(pad)}`: {user.Mention} `{user.GetUsernameWithIdentifier()} ({user.Id})`";
 
-            DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
+            DiscordButtonComponent Confirm = new(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Music.Playlists.LoadShare.ImportButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📥")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { Confirm, MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { Confirm, MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot) }));
 
             var e = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut();
+                this.ModifyToTimedOut();
                 return;
             }
 
@@ -79,30 +79,30 @@ internal sealed class LoadShareCommand : BaseCommand
 
             if (e.GetCustomId() == Confirm.CustomId)
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.LoadShare.Importing, true),
-                }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.LoadShare.Importing, true),
+                }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
 
                 if (ctx.DbUser.UserPlaylists.Count >= 10)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
-                    }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
+                        Description = this.GetString(this.t.Commands.Music.Playlists.PlayListLimit, true, new TVar("Count", 10)),
+                    }.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
                     return;
                 }
 
                 ctx.DbUser.UserPlaylists.Add(ImportJson);
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.LoadShare.Imported, true, new TVar("Name", ImportJson.PlaylistName)),
-                }.AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title))));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.LoadShare.Imported, true, new TVar("Name", ImportJson.PlaylistName)),
+                }.AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title))));
             }
             else
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

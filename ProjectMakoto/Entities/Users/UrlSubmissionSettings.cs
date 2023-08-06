@@ -22,7 +22,7 @@ public sealed class UrlSubmissionSettings : RequiresParent<User>
         set
         {
             this._AcceptedTOS = value;
-            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_accepted_tos", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_accepted_tos", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -34,7 +34,7 @@ public sealed class UrlSubmissionSettings : RequiresParent<User>
         set
         {
             this._LastTime = value;
-            _ = Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_last_datetime", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("users", "userid", this.Parent.Id, "submission_last_datetime", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 

@@ -11,15 +11,15 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class SaveCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            await RespondOrEdit("Saving all data to the database..");
+            _ = await this.RespondOrEdit("Saving all data to the database..");
             await ctx.Bot.DatabaseClient.FullSyncDatabase(true);
-            await RespondOrEdit("All data has been saved to the database.");
+            _ = await this.RespondOrEdit("All data has been saved to the database.");
         });
     }
 }

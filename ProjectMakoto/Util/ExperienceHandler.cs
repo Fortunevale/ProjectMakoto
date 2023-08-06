@@ -28,7 +28,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                 return 0;
         }
 
-        int Points = 1;
+        var Points = 1;
 
         if (message.ReferencedMessage is not null)
             Points += 2;
@@ -38,7 +38,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
         if (RegexTemplates.Url.IsMatch(message.Content))
         {
-            string ModifiedString = RegexTemplates.Url.Replace(message.Content, "");
+            var ModifiedString = RegexTemplates.Url.Replace(message.Content, "");
 
             if (ModifiedString.Length > 10)
                 Points += 1;
@@ -70,10 +70,10 @@ internal sealed class ExperienceHandler : RequiresTranslation
         return Points;
     }
 
-    internal async void ModifyExperience(ulong user, DiscordGuild guild, DiscordChannel channel, int Amount) => ModifyExperience(await guild.GetMemberAsync(user), guild, channel, Amount);
-    internal async void ModifyExperience(DiscordUser user, DiscordGuild guild, DiscordChannel channel, int Amount) => ModifyExperience(await user.ConvertToMember(guild), guild, channel, Amount);
+    internal async Task ModifyExperience(ulong user, DiscordGuild guild, DiscordChannel channel, int Amount) => await this.ModifyExperience(await guild.GetMemberAsync(user), guild, channel, Amount);
+    internal async Task ModifyExperience(DiscordUser user, DiscordGuild guild, DiscordChannel channel, int Amount) => await this.ModifyExperience(await user.ConvertToMember(guild), guild, channel, Amount);
 
-    internal async void ModifyExperience(DiscordMember user, DiscordGuild guild, DiscordChannel channel, int Amount)
+    internal async Task ModifyExperience(DiscordMember user, DiscordGuild guild, DiscordChannel channel, int Amount)
     {
         if (user.IsBot)
             return;
@@ -89,9 +89,9 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
         this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Points += Amount;
 
-        long PreviousLevel = this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level;
+        var PreviousLevel = this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level;
 
-        CheckExperience(user.Id, guild);
+        this.CheckExperience(user.Id, guild);
 
         if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level != PreviousLevel && channel != null && channel.Type is ChannelType.Text or ChannelType.PublicThread or ChannelType.PrivateThread)
         {
@@ -99,16 +99,13 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
             if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level > PreviousLevel)
             {
-                string build;
+                var build = this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel is 1
+                    ? $":stars: {this.tKey.GainedLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("User", user.Mention), new TVar("Count", 1))}\n" +
+                            $"{this.tKey.NewLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Level", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))}"
+                    : $":stars: {this.tKey.GainedLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("User", user.Mention), new TVar("Count", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel))}\n" +
+                            $"{this.tKey.NewLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Level", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))}";
 
-                if (this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel is 1)
-                    build = $":stars: {tKey.GainedLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("User", user.Mention), new TVar("Count", 1))}\n" +
-                            $"{tKey.NewLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Level", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))}";
-                else
-                    build = $":stars: {tKey.GainedLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("User", user.Mention), new TVar("Count", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level - PreviousLevel))}\n" +
-                            $"{tKey.NewLevel.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Level", this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))}";
-
-                int delete_delay = 10000;
+                var delete_delay = 10000;
 
                 if (this.Bot.Guilds[guild.Id].LevelRewards.Any(x => x.Level <= this.Bot.Guilds[guild.Id].Members[user.Id].Experience.Level))
                 {
@@ -118,7 +115,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                     {
                         if (!guild.Roles.ContainsKey(reward.RoleId))
                         {
-                            this.Bot.Guilds[guild.Id].LevelRewards.Remove(reward);
+                            _ = this.Bot.Guilds[guild.Id].LevelRewards.Remove(reward);
                             continue;
                         }
 
@@ -147,7 +144,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = user.AvatarUrl },
                     Footer = new DiscordEmbedBuilder.EmbedFooter
                     {
-                        Text = tKey.AutomaticDeletion.Get(Bot.Guilds[guild.Id]).Build(new TVar("Seconds", delete_delay / 1000))
+                        Text = this.tKey.AutomaticDeletion.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Seconds", delete_delay / 1000))
                     }
                 };
 
@@ -159,7 +156,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                             return;
 
                         await Task.Delay(delete_delay);
-                        _ = x.Result.DeleteAsync();
+                        _ = (await x).DeleteAsync();
                     });
                 }
                 else
@@ -168,7 +165,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
                     async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
                     {
-                        Task.Run(async () =>
+                        _ = Task.Run(async () =>
                         {
                             if (msg.Id == e.Message.Id)
                             {
@@ -176,9 +173,9 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
                                 this.Bot.Users[user.Id].ExperienceUser.DirectMessageOptOut = true;
 
-                                await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                                _ = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
-                                await (await user.CreateDmChannelAsync()).SendMessageAsync(tKey.AutomaticDeletion.Get(Bot.Users[user.Id]).Build(
+                                _ = await (await user.CreateDmChannelAsync()).SendMessageAsync(this.tKey.AutomaticDeletion.Get(this.Bot.Users[user.Id]).Build(
                                     new TVar("Command", "`/levelrewards-optin`"),
                                     new TVar("Bot", guild.CurrentMember.Mention)));
                             }
@@ -187,7 +184,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
                     IEnumerable<DiscordComponent> discordComponents = new List<DiscordComponent>
                     {
-                        { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", tKey.DisableDirectMessages.Get(Bot.Users[user.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔"))) },
+                        { new DiscordButtonComponent(ButtonStyle.Secondary, "opt-out-experience-dm", this.tKey.DisableDirectMessages.Get(this.Bot.Users[user.Id]), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔"))) },
                     };
 
                     msg = await (await user.CreateDmChannelAsync()).SendMessageAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(discordComponents));
@@ -197,8 +194,8 @@ internal sealed class ExperienceHandler : RequiresTranslation
                     try
                     {
                         await Task.Delay(3600000);
-                        embed.Footer.Text += $" • {t.Commands.Common.InteractionTimeout.Get(Bot.Users[user.Id])}";
-                        await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
+                        embed.Footer.Text += $" • {this.t.Commands.Common.InteractionTimeout.Get(this.Bot.Users[user.Id])}";
+                        _ = await msg.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
 
                         this.Bot.DiscordClient.ComponentInteractionCreated -= RunInteraction;
                     }
@@ -210,22 +207,22 @@ internal sealed class ExperienceHandler : RequiresTranslation
 
     internal void CheckExperience(ulong user, DiscordGuild guild)
     {
-        long PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
-        long RequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level);
+        var PreviousRequiredRepuationForNextLevel = this.CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
+        var RequiredRepuationForNextLevel = this.CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level);
 
         while (RequiredRepuationForNextLevel <= this.Bot.Guilds[guild.Id].Members[user].Experience.Points)
         {
             this.Bot.Guilds[guild.Id].Members[user].Experience.Level++;
 
-            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
-            RequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level);
+            PreviousRequiredRepuationForNextLevel = this.CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
+            RequiredRepuationForNextLevel = this.CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level);
         }
 
         while (PreviousRequiredRepuationForNextLevel >= this.Bot.Guilds[guild.Id].Members[user].Experience.Points)
         {
             this.Bot.Guilds[guild.Id].Members[user].Experience.Level--;
 
-            PreviousRequiredRepuationForNextLevel = CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
+            PreviousRequiredRepuationForNextLevel = this.CalculateLevelRequirement(this.Bot.Guilds[guild.Id].Members[user].Experience.Level - 1);
         }
     }
 
@@ -233,7 +230,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
     {
         if (!this.LevelCache.ContainsKey(Level))
         {
-            long v = (long)Math.Ceiling(Math.Pow((double)Level, 1.60) * 92);
+            var v = (long)Math.Ceiling(Math.Pow((double)Level, 1.60) * 92);
             this.LevelCache.Add(Level, v);
         }
 

@@ -11,36 +11,36 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class PhishingCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.Phishing;
+            var CommandKey = this.t.Commands.Config.Phishing;
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
                 var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.DetectPhishingLinks, CommandKey.RedirectWarning, CommandKey.AbuseIpDbReports, CommandKey.PunishmentType,
                                                                        CommandKey.CustomPunishmentReason, CommandKey.CustomTimeoutLength);
 
-                return $"💀 `{GetString(CommandKey.DetectPhishingLinks).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.DetectPhishing.ToEmote(ctx.Bot)}\n" +
-                       $"⚠ `{GetString(CommandKey.RedirectWarning).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.WarnOnRedirect.ToEmote(ctx.Bot)}\n" +
-                       $"{EmojiTemplates.GetAbuseIpDb(ctx.Bot)} `{GetString(CommandKey.AbuseIpDbReports).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.AbuseIpDbReports.ToEmote(ctx.Bot)}\n" +
-                       $"🔨 `{GetString(CommandKey.PunishmentType).PadRight(pad)}` : `{GetTypeString(ctx.DbGuild.PhishingDetection.PunishmentType)}`\n" +
-                       $"💬 `{GetString(CommandKey.CustomPunishmentReason).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentReason}`\n" +
-                       $"🕒 `{GetString(CommandKey.CustomTimeoutLength).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentLength.GetHumanReadable()}`";
+                return $"💀 `{this.GetString(CommandKey.DetectPhishingLinks).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.DetectPhishing.ToEmote(ctx.Bot)}\n" +
+                       $"⚠ `{this.GetString(CommandKey.RedirectWarning).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.WarnOnRedirect.ToEmote(ctx.Bot)}\n" +
+                       $"{EmojiTemplates.GetAbuseIpDb(ctx.Bot)} `{this.GetString(CommandKey.AbuseIpDbReports).PadRight(pad)}` : {ctx.DbGuild.PhishingDetection.AbuseIpDbReports.ToEmote(ctx.Bot)}\n" +
+                       $"🔨 `{this.GetString(CommandKey.PunishmentType).PadRight(pad)}` : `{GetTypeString(ctx.DbGuild.PhishingDetection.PunishmentType)}`\n" +
+                       $"💬 `{this.GetString(CommandKey.CustomPunishmentReason).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentReason}`\n" +
+                       $"🕒 `{this.GetString(CommandKey.CustomTimeoutLength).PadRight(pad)}` : `{ctx.DbGuild.PhishingDetection.CustomPunishmentLength.GetHumanReadable()}`";
             }
 
             string GetTypeString(PhishingPunishmentType type)
             {
                 return type switch
                 {
-                    PhishingPunishmentType.Delete => GetString(CommandKey.PunishmentTypeDelete),
-                    PhishingPunishmentType.Timeout => GetString(CommandKey.PunishmentTypeTimeout),
-                    PhishingPunishmentType.Kick => GetString(CommandKey.PunishmentTypeKick),
-                    PhishingPunishmentType.Ban => GetString(CommandKey.PunishmentTypeBan),
-                    PhishingPunishmentType.SoftBan => GetString(CommandKey.PunishmentTypeSoftban),
+                    PhishingPunishmentType.Delete => this.GetString(CommandKey.PunishmentTypeDelete),
+                    PhishingPunishmentType.Timeout => this.GetString(CommandKey.PunishmentTypeTimeout),
+                    PhishingPunishmentType.Kick => this.GetString(CommandKey.PunishmentTypeKick),
+                    PhishingPunishmentType.Ban => this.GetString(CommandKey.PunishmentTypeBan),
+                    PhishingPunishmentType.SoftBan => this.GetString(CommandKey.PunishmentTypeSoftban),
                         _ => throw new NotImplementedException(),
                 };
             }
@@ -49,11 +49,11 @@ internal sealed class PhishingCommand : BaseCommand
             {
                 return type switch
                 {
-                    PhishingPunishmentType.Delete => GetString(CommandKey.PunishmentTypeDeleteDescription),
-                    PhishingPunishmentType.Timeout => GetString(CommandKey.PunishmentTypeTimeoutDescription),
-                    PhishingPunishmentType.Kick => GetString(CommandKey.PunishmentTypeKickDescription),
-                    PhishingPunishmentType.Ban => GetString(CommandKey.PunishmentTypeBanDescription),
-                    PhishingPunishmentType.SoftBan => GetString(CommandKey.PunishmentTypeSoftbanDescription),
+                    PhishingPunishmentType.Delete => this.GetString(CommandKey.PunishmentTypeDeleteDescription),
+                    PhishingPunishmentType.Timeout => this.GetString(CommandKey.PunishmentTypeTimeoutDescription),
+                    PhishingPunishmentType.Kick => this.GetString(CommandKey.PunishmentTypeKickDescription),
+                    PhishingPunishmentType.Ban => this.GetString(CommandKey.PunishmentTypeBanDescription),
+                    PhishingPunishmentType.SoftBan => this.GetString(CommandKey.PunishmentTypeSoftbanDescription),
                         _ => throw new NotImplementedException(),
                 };
             }
@@ -61,19 +61,19 @@ internal sealed class PhishingCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var ToggleDetectionButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
-            var ToggleWarningButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleWarning), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
-            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.AbuseIpDbReports), false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Bot)));
-            var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangePunishmentType), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
-            var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangePunishmentReason), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeTimeoutLength), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+            var ToggleDetectionButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.DetectPhishing ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💀")));
+            var ToggleWarningButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.WarnOnRedirect ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleWarning), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var ToggleAbuseIpDbButton = new DiscordButtonComponent((ctx.DbGuild.PhishingDetection.AbuseIpDbReports ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.AbuseIpDbReports), false, new DiscordComponentEmoji(EmojiTemplates.GetAbuseIpDb(ctx.Bot)));
+            var ChangePunishmentButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangePunishmentType), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔨")));
+            var ChangeReasonButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangePunishmentReason), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ChangeTimeoutLengthButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeTimeoutLength), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { ToggleDetectionButton },
@@ -91,7 +91,7 @@ internal sealed class PhishingCommand : BaseCommand
 
             if (Button.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -100,7 +100,7 @@ internal sealed class PhishingCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 ctx.DbGuild.PhishingDetection.DetectPhishing = !ctx.DbGuild.PhishingDetection.DetectPhishing;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ToggleWarningButton.CustomId)
@@ -108,7 +108,7 @@ internal sealed class PhishingCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 ctx.DbGuild.PhishingDetection.WarnOnRedirect = !ctx.DbGuild.PhishingDetection.WarnOnRedirect;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ToggleAbuseIpDbButton.CustomId)
@@ -116,14 +116,14 @@ internal sealed class PhishingCommand : BaseCommand
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
                 ctx.DbGuild.PhishingDetection.AbuseIpDbReports = !ctx.DbGuild.PhishingDetection.AbuseIpDbReports;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangePunishmentButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                var e = await PromptCustomSelection(Enum.GetNames(typeof(PhishingPunishmentType)).Select(x =>
+                var e = await this.PromptCustomSelection(Enum.GetNames(typeof(PhishingPunishmentType)).Select(x =>
                 {
                     var type = Enum.Parse<PhishingPunishmentType>(x);
                     return new DiscordStringSelectComponentOption(GetTypeString(type), x, GetTypeDescriptionString(type));
@@ -131,7 +131,7 @@ internal sealed class PhishingCommand : BaseCommand
 
                 if (e.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
 
@@ -154,24 +154,24 @@ internal sealed class PhishingCommand : BaseCommand
                         break;
                 }
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangeReasonButton.CustomId)
             {
-                var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.Title), Guid.NewGuid().ToString())
-                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", GetString(CommandKey.DefineNewReason), "", null, null, true, ctx.DbGuild.PhishingDetection.CustomPunishmentReason));
+                var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.Title), Guid.NewGuid().ToString())
+                    .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "new_reason", this.GetString(CommandKey.DefineNewReason), "", null, null, true, ctx.DbGuild.PhishingDetection.CustomPunishmentReason));
 
-                var ModalResult = await PromptModalWithRetry(Button.Result.Interaction, modal, false);
+                var ModalResult = await this.PromptModalWithRetry(Button.Result.Interaction, modal, false);
 
                 if (ModalResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ModalResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ModalResult.Errored)
@@ -181,39 +181,39 @@ internal sealed class PhishingCommand : BaseCommand
 
                 ctx.DbGuild.PhishingDetection.CustomPunishmentReason = ModalResult.Result.Interaction.GetModalValueByCustomId("new_reason");
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangeTimeoutLengthButton.CustomId)
             {
                 if (ctx.DbGuild.PhishingDetection.PunishmentType != PhishingPunishmentType.Timeout)
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(CommandKey.NotUsingType, true, new TVar("Type", GetString(CommandKey.PunishmentTypeTimeout))))));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.NotUsingType, true, new TVar("Type", this.GetString(CommandKey.PunishmentTypeTimeout))))));
                     await Task.Delay(5000);
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
 
-                var ModalResult = await PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
+                var ModalResult = await this.PromptModalForTimeSpan(Button.Result.Interaction, TimeSpan.FromDays(28), TimeSpan.FromSeconds(10), ctx.DbGuild.PhishingDetection.CustomPunishmentLength, false);
 
                 if (ModalResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ModalResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ModalResult.Errored)
                 {
                     if (ModalResult.Exception.GetType() == typeof(InvalidOperationException))
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(GetString(CommandKey.InvalidDuration, true)).AsError(ctx, GetString(CommandKey.Title))));
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.WithDescription(this.GetString(CommandKey.InvalidDuration, true)).AsError(ctx, this.GetString(CommandKey.Title))));
                         await Task.Delay(5000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -222,12 +222,12 @@ internal sealed class PhishingCommand : BaseCommand
 
                 ctx.DbGuild.PhishingDetection.CustomPunishmentLength = ModalResult.Result;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
             }
         });
     }

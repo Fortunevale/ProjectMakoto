@@ -33,7 +33,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
                     Url = this.Bot.SubmittedHosts[e.Message.Id].Url
                 });
 
-                this.Bot.SubmittedHosts.Remove(e.Message.Id);
+                _ = this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 try
                 {
@@ -54,7 +54,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
             }
             else if (e.GetCustomId() == "deny_submission")
             {
-                this.Bot.SubmittedHosts.Remove(e.Message.Id);
+                _ = this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 try
                 {
@@ -78,7 +78,7 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
                 }
                 catch { }
 
-                this.Bot.SubmittedHosts.Remove(e.Message.Id);
+                _ = this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 _ = e.Message.DeleteAsync();
             }
@@ -96,11 +96,10 @@ internal sealed class PhishingSubmissionEvents : RequiresBotReference
                 }
                 catch { }
 
-                this.Bot.SubmittedHosts.Remove(e.Message.Id);
+                _ = this.Bot.SubmittedHosts.Remove(e.Message.Id);
 
                 _ = e.Message.DeleteAsync();
             }
-
         }
     }
 }

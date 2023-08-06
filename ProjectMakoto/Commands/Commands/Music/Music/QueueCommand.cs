@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class QueueCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,45 +26,45 @@ internal sealed class QueueCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
-            int LastInt = 0;
+            var LastInt = 0;
             int GetInt()
             {
                 LastInt++;
                 return LastInt;
             }
 
-            int CurrentPage = 0;
+            var CurrentPage = 0;
 
             async Task UpdateMessage()
             {
-                DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", GetString(this.t.Common.Refresh), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+                DiscordButtonComponent Refresh = new(ButtonStyle.Primary, "Refresh", this.GetString(this.t.Common.Refresh), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
 
-                DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
-                DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                DiscordButtonComponent NextPage = new(ButtonStyle.Primary, "NextPage", this.GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                DiscordButtonComponent PreviousPage = new(ButtonStyle.Primary, "PreviousPage", this.GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
 
                 LastInt = CurrentPage * 10;
 
                 var TotalTimespan = TimeSpan.Zero;
 
-                for (int i = 0; i < ctx.DbGuild.MusicModule.SongQueue.Count; i++)
+                for (var i = 0; i < ctx.DbGuild.MusicModule.SongQueue.Count; i++)
                 {
                     TotalTimespan = TotalTimespan.Add(ctx.DbGuild.MusicModule.SongQueue[i].Length);
                 }
 
-                var Description = $"{GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.DbGuild.MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
-                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
+                var Description = $"{this.GetString(this.t.Commands.Music.Queue.QueueCount, true, new TVar("Count", ctx.DbGuild.MusicModule.SongQueue.Count), new TVar("Timespan", TotalTimespan.GetHumanReadable())).Bold()}\n\n";
+                Description += $"{string.Join("\n", ctx.DbGuild.MusicModule.SongQueue.Skip(CurrentPage * 10).Take(10).Select(x => $"**{GetInt()}**. `{x.Length.GetShortHumanReadable(TimeFormat.HOURS)}` {this.GetString(this.t.Commands.Music.Queue.Track, new TVar("Video", $"[`{x.VideoTitle}`]({x.Url})"), new TVar("Requester", x.user.Mention))}"))}\n\n";
 
                 if (ctx.DbGuild.MusicModule.SongQueue.Count > 0)
-                    Description += $"`{GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Count / 10.0)}`\n\n";
+                    Description += $"`{this.GetString(this.t.Common.Page)} {CurrentPage + 1}/{Math.Ceiling(ctx.DbGuild.MusicModule.SongQueue.Count / 10.0)}`\n\n";
 
-                Description += $"`{GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.Player.Track is not null ? conn.Player.Track.Info.Title : GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.Player.Track is not null ? conn.Player.Track.Info.Uri.ToString() : "")})\n";
+                Description += $"`{this.GetString(this.t.Commands.Music.Queue.CurrentlyPlaying)}:` [`{(conn.Player.Track is not null ? conn.Player.Track.Info.Title : this.GetString(this.t.Commands.Music.Queue.NoSong))}`]({(conn.Player.Track is not null ? conn.Player.Track.Info.Uri.ToString() : "")})\n";
                 Description += $"{(ctx.DbGuild.MusicModule.Repeat ? "🔁" : ctx.Bot.status.LoadedConfig.Emojis.DisabledRepeat)}";
                 Description += $"{(ctx.DbGuild.MusicModule.Shuffle ? "🔀" : ctx.Bot.status.LoadedConfig.Emojis.DisabledShuffle)}";
                 Description += $" `|` {(ctx.DbGuild.MusicModule.IsPaused ? ctx.Bot.status.LoadedConfig.Emojis.Paused : $"{(conn.Player.Track is not null ? "▶" : ctx.Bot.status.LoadedConfig.Emojis.DisabledPlay)} ")}";
@@ -81,7 +81,7 @@ internal sealed class QueueCommand : BaseCommand
                 if ((CurrentPage * 10) + 10 >= ctx.DbGuild.MusicModule.SongQueue.Count)
                     NextPage = NextPage.Disable();
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = Description
                 }.AsInfo(ctx)).AddComponents(Refresh).AddComponents(new List<DiscordComponent> { PreviousPage, NextPage }));
@@ -96,14 +96,14 @@ internal sealed class QueueCommand : BaseCommand
                 if (x.IsCompletedSuccessfully)
                 {
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                 }
             });
 
             ctx.Client.ComponentInteractionCreated += RunInteraction;
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {

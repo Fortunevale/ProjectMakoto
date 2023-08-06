@@ -26,13 +26,13 @@ public sealed class MusicAppCommands : ApplicationCommandsModule
             {
                 try
                 {
-                    if ((ctx.Member?.VoiceState?.Channel?.Id ?? 0) != (ctx.Client.CurrentUser.ConvertToMember(ctx.Guild).Result.VoiceState?.Channel?.Id ?? 1))
+                    if ((ctx.Member?.VoiceState?.Channel?.Id ?? 0) != ((await ctx.Client.CurrentUser.ConvertToMember(ctx.Guild)).VoiceState?.Channel?.Id ?? 1))
                         return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
 
-                    IEnumerable<Lavalink.QueueInfo> Queue = ((Bot)ctx.Services.GetService(typeof(Bot))).Guilds[ctx.Guild.Id].MusicModule.SongQueue
+                    var Queue = ((Bot)ctx.Services.GetService(typeof(Bot))).Guilds[ctx.Guild.Id].MusicModule.SongQueue
                         .Where(x => x.VideoTitle.StartsWith(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
 
-                    List<DiscordApplicationCommandAutocompleteChoice> options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.VideoTitle, x.VideoTitle)).ToList();
+                    var options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.VideoTitle, x.VideoTitle)).ToList();
                     return options.AsEnumerable();
                 }
                 catch (Exception ex)
@@ -114,11 +114,11 @@ public sealed class MusicAppCommands : ApplicationCommandsModule
             {
                 try
                 {
-                    Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
-                    IEnumerable<UserPlaylist> Queue = bot.Users[ctx.User.Id].UserPlaylists
+                    var bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+                    var Queue = bot.Users[ctx.User.Id].UserPlaylists
                         .Where(x => x.PlaylistName.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase)).Take(25);
 
-                    List<DiscordApplicationCommandAutocompleteChoice> options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Count} {bot.LoadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.Users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
+                    var options = Queue.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.PlaylistName} ({x.List.Count} {bot.LoadedTranslations.Commands.Music.Playlists.Tracks.Get(bot.Users[ctx.User.Id]).Build()})", x.PlaylistId)).ToList();
                     return options.AsEnumerable();
                 }
                 catch (Exception ex)

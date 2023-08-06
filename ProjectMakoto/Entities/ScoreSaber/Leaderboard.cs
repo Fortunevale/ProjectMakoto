@@ -124,5 +124,4 @@ public class Leaderboard
         public int requestId { get; set; }
         public int difficulty { get; set; }
     }
-
 }

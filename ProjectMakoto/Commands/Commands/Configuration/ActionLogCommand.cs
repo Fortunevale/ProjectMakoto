@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class ActionLogCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -51,13 +51,13 @@ internal sealed class ActionLogCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.DisableActionLogButton), (ctx.DbGuild.ActionLog.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-            var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.DbGuild.ActionLog.Channel == 0 ? GetString(CommandKey.SetChannelButton) : GetString(CommandKey.ChangeChannelButton))}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var ChangeFilter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeFilterButton), (ctx.DbGuild.ActionLog.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📣")));
+            var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.DisableActionLogButton), (ctx.DbGuild.ActionLog.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), $"{(ctx.DbGuild.ActionLog.Channel == 0 ? this.GetString(CommandKey.SetChannelButton) : this.GetString(CommandKey.ChangeChannelButton))}", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ChangeFilter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeFilterButton), (ctx.DbGuild.ActionLog.Channel == 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📣")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 { Disable }
@@ -72,7 +72,7 @@ internal sealed class ActionLogCommand : BaseCommand
 
             if (Button.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -82,12 +82,12 @@ internal sealed class ActionLogCommand : BaseCommand
             {
                 ctx.DbGuild.ActionLog = new(ctx.Bot, ctx.DbGuild);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangeChannel.CustomId)
             {
-                var ChannelResult = await PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
+                var ChannelResult = await this.PromptChannelSelection(ChannelType.Text, new ChannelPromptConfiguration
                 {
                     CreateChannelOption = new()
                     {
@@ -98,21 +98,21 @@ internal sealed class ActionLogCommand : BaseCommand
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Failed)
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels, true)));
                         await Task.Delay(3000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -127,7 +127,7 @@ internal sealed class ActionLogCommand : BaseCommand
 
                 ctx.DbGuild.ActionLog.Channel = ChannelResult.Result.Id;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == ChangeFilter.CustomId)
@@ -136,33 +136,33 @@ internal sealed class ActionLogCommand : BaseCommand
                 {
                     var Selections = new List<DiscordStringSelectComponentOption>
                     {
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.AttemptGatheringMoreDetails), "attempt_further_detail", GetString(CommandKey.OptionInaccurate), ctx.DbGuild.ActionLog.AttemptGettingMoreDetails, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠"))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.UserStateUpdates), "log_members_modified", null, ctx.DbGuild.ActionLog.MembersModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.UserRoleUpdates), "log_member_modified", null, ctx.DbGuild.ActionLog.MemberModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.UserProfileUpdates), "log_memberprofile_modified", null, ctx.DbGuild.ActionLog.MemberProfileModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.MessageDeletions), "log_message_deleted", null, ctx.DbGuild.ActionLog.MessageDeleted, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.MessageModifications), "log_message_updated", null, ctx.DbGuild.ActionLog.MessageModified, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.RoleUpdates), "log_roles_modified", null, ctx.DbGuild.ActionLog.RolesModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.BanUpdates), "log_banlist_modified", null, ctx.DbGuild.ActionLog.BanlistModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.ServerModifications), "log_guild_modified", null, ctx.DbGuild.ActionLog.GuildModified, new DiscordComponentEmoji(EmojiTemplates.GetGuild(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.ChannelModifications), "log_channels_modified", null, ctx.DbGuild.ActionLog.ChannelsModified, new DiscordComponentEmoji(EmojiTemplates.GetChannel(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.VoiceChannelUpdates), "log_voice_state", null, ctx.DbGuild.ActionLog.VoiceStateUpdated, new DiscordComponentEmoji(EmojiTemplates.GetVoiceState(ctx.Bot))),
-                        new DiscordStringSelectComponentOption(GetString(CommandKey.InviteModifications), "log_invites_modified", null, ctx.DbGuild.ActionLog.InvitesModified, new DiscordComponentEmoji(EmojiTemplates.GetInvite(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.AttemptGatheringMoreDetails), "attempt_further_detail", this.GetString(CommandKey.OptionInaccurate), ctx.DbGuild.ActionLog.AttemptGettingMoreDetails, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠"))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.UserStateUpdates), "log_members_modified", null, ctx.DbGuild.ActionLog.MembersModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.UserRoleUpdates), "log_member_modified", null, ctx.DbGuild.ActionLog.MemberModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.UserProfileUpdates), "log_memberprofile_modified", null, ctx.DbGuild.ActionLog.MemberProfileModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.MessageDeletions), "log_message_deleted", null, ctx.DbGuild.ActionLog.MessageDeleted, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.MessageModifications), "log_message_updated", null, ctx.DbGuild.ActionLog.MessageModified, new DiscordComponentEmoji(EmojiTemplates.GetMessage(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.RoleUpdates), "log_roles_modified", null, ctx.DbGuild.ActionLog.RolesModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.BanUpdates), "log_banlist_modified", null, ctx.DbGuild.ActionLog.BanlistModified, new DiscordComponentEmoji(EmojiTemplates.GetUser(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.ServerModifications), "log_guild_modified", null, ctx.DbGuild.ActionLog.GuildModified, new DiscordComponentEmoji(EmojiTemplates.GetGuild(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.ChannelModifications), "log_channels_modified", null, ctx.DbGuild.ActionLog.ChannelsModified, new DiscordComponentEmoji(EmojiTemplates.GetChannel(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.VoiceChannelUpdates), "log_voice_state", null, ctx.DbGuild.ActionLog.VoiceStateUpdated, new DiscordComponentEmoji(EmojiTemplates.GetVoiceState(ctx.Bot))),
+                        new DiscordStringSelectComponentOption(this.GetString(CommandKey.InviteModifications), "log_invites_modified", null, ctx.DbGuild.ActionLog.InvitesModified, new DiscordComponentEmoji(EmojiTemplates.GetInvite(ctx.Bot))),
                     };
 
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordStringSelectComponent(GetString(CommandKey.NoOptions), Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordStringSelectComponent(this.GetString(CommandKey.NoOptions), Selections, Guid.NewGuid().ToString(), 0, Selections.Count, false)));
 
                     var e = await ctx.Client.GetInteractivity().WaitForSelectAsync(ctx.ResponseMessage, x => x.User.Id == ctx.User.Id, ComponentType.StringSelect, TimeSpan.FromMinutes(2));
 
                     if (e.TimedOut)
                     {
-                        ModifyToTimedOut(true);
+                        this.ModifyToTimedOut(true);
                         return;
                     }
 
                     _ = e.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                    List<string> selected = e.Result.Values.ToList();
+                    var selected = e.Result.Values.ToList();
 
                     ctx.DbGuild.ActionLog.AttemptGettingMoreDetails = selected.Contains("attempt_further_detail");
 
@@ -178,18 +178,18 @@ internal sealed class ActionLogCommand : BaseCommand
                     ctx.DbGuild.ActionLog.VoiceStateUpdated = selected.Contains("log_voice_state");
                     ctx.DbGuild.ActionLog.InvitesModified = selected.Contains("log_invites_modified");
 
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 catch (ArgumentException)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
             }
             else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

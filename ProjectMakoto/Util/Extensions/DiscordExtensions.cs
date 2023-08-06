@@ -12,7 +12,7 @@ namespace ProjectMakoto.Util;
 internal static class DiscordExtensions
 {
     internal static Permissions[] GetEnumeration(this Permissions perms)
-        => Enum.GetValues(perms.GetType()).Cast<Enum>().Where(x => perms.HasFlag(x)).Select(x => (Permissions)x.ToInt32()).ToArray();
+        => Enum.GetValues(perms.GetType()).Cast<Enum>().Where(x => perms.HasFlag(x)).Select(x => (Permissions)x.ToInt64()).ToArray();
 
     internal static Guild GetDbEntry(this DiscordGuild guild, Bot bot)
         => bot.Guilds[guild.Id];
@@ -125,8 +125,8 @@ internal static class DiscordExtensions
     internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
 
-    internal static async Task<DiscordMessage> Refetch(this DiscordMessage msg)
-        => await msg.Channel.GetMessageAsync(msg.Id, true);
+    internal static Task<DiscordMessage> Refetch(this DiscordMessage msg)
+        => msg.Channel.GetMessageAsync(msg.Id, true);
 
     internal static int GetRoleHighestPosition(this DiscordMember member)
         => member is null ? -1 : (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
@@ -182,7 +182,7 @@ internal static class DiscordExtensions
     {
         if (Regex.IsMatch(content, @"<(a?):([\w]*):(\d*)>", RegexOptions.ExplicitCapture))
         {
-            MatchCollection matchCollection = Regex.Matches(content, @"<(a?):([\w]*):(\d*)>");
+            var matchCollection = Regex.Matches(content, @"<(a?):([\w]*):(\d*)>");
             return matchCollection.Select<Match, Tuple<ulong, string, bool>>(x => new Tuple<ulong, string, bool>(Convert.ToUInt64(x.Groups[3].Value), x.Groups[2].Value, !x.Groups[1].Value.IsNullOrWhiteSpace())).GroupBy<Tuple<ulong, string, bool>, ulong>(x => x.Item1).Select<IGrouping<ulong, Tuple<ulong, string, bool>>, Tuple<ulong, string, bool>>(y => y.First<Tuple<ulong, string, bool>>()).ToList<Tuple<ulong, string, bool>>();
         }
         else
@@ -191,10 +191,7 @@ internal static class DiscordExtensions
 
     internal static List<string>? GetMentions(this string content)
     {
-        if (Regex.IsMatch(content, @"(<@\d*>)"))
-            return Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList();
-        else
-            return null;
+        return Regex.IsMatch(content, @"(<@\d*>)") ? Regex.Matches(content, @"(<@\d*>)").Select(x => x.Value).ToList() : (List<string>)null;
     }
 
     internal static List<KeyValuePair<string, string>> PrepareEmbedFields(this List<KeyValuePair<string, string>> list, string startingText = "", string endingText = "")
@@ -206,8 +203,8 @@ internal static class DiscordExtensions
             throw new Exception("endingText cant be more than 1024 characters");
 
         List<KeyValuePair<string, string>> fields = new();
-        string currentBuild = startingText;
-        string lastTitle = list.First().Key;
+        var currentBuild = startingText;
+        var lastTitle = list.First().Key;
 
         foreach (var field in list)
         {
@@ -247,7 +244,7 @@ internal static class DiscordExtensions
 
         int CalculateCharacterLimit()
         {
-            int currentCount = (currentBuilder.Title?.Length ?? 0) +
+            var currentCount = (currentBuilder.Title?.Length ?? 0) +
                                (currentBuilder.Description?.Length ?? 0) +
                                (currentBuilder.Author?.Name.Length ?? 0) +
                                (currentBuilder.Footer?.Text.Length ?? 0);
@@ -273,9 +270,9 @@ internal static class DiscordExtensions
             }
 
             if (InvisibleOnDuplicateTitles && currentBuilder.Fields.Any(x => x.Name == field.Key))
-                currentBuilder.AddField(new DiscordEmbedField("‍", field.Value));
+                _ = currentBuilder.AddField(new DiscordEmbedField("‍", field.Value));
             else
-                currentBuilder.AddField(new DiscordEmbedField(field.Key, field.Value));
+                _ = currentBuilder.AddField(new DiscordEmbedField(field.Key, field.Value));
         }
 
         embeds.Add(currentBuilder);
@@ -334,7 +331,7 @@ internal static class DiscordExtensions
             if (!RegexTemplates.DiscordChannelUrl.IsMatch(link))
                 throw new Exception("Not a discord channel url");
 
-            string processed = link.Remove(0, link.IndexOf("channels/") + 9);
+            var processed = link.Remove(0, link.IndexOf("channels/") + 9);
 
             GuildId = Convert.ToUInt64(processed.Remove(processed.IndexOf("/"), processed.Length - processed.IndexOf("/")));
             processed = processed.Remove(0, processed.IndexOf("/") + 1);
@@ -373,16 +370,16 @@ internal static class DiscordExtensions
                   .Replace("9", "9️⃣");
     }
 
-    public async static Task<DiscordUser> ParseStringAsUser(string str, DiscordClient client)
+    public static Task<DiscordUser> ParseStringAsUser(string str, DiscordClient client)
     {
         if (str.IsDigitsOnly())
-            return await client.GetUserAsync(UInt64.Parse(str));
+            return client.GetUserAsync(UInt64.Parse(str));
         else
         {
             var reg = RegexTemplates.UserMention.Match(str);
 
             if (reg.Success)
-                return await client.GetUserAsync(UInt64.Parse(reg.Groups[3].Value));
+                return client.GetUserAsync(UInt64.Parse(reg.Groups[3].Value));
         }
 
         throw new ArgumentException("");

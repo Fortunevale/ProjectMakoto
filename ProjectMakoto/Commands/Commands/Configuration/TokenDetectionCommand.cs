@@ -11,17 +11,17 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class TokenDetectionCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.TokenDetection;
+            var CommandKey = this.t.Commands.Config.TokenDetection;
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"⚠ `{GetString(CommandKey.DetectTokens)}`: {ctx.DbGuild.TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
+                return $"⚠ `{this.GetString(CommandKey.DetectTokens)}`: {ctx.DbGuild.TokenLeakDetection.DetectTokens.ToEmote(ctx.Bot)}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
@@ -30,11 +30,11 @@ internal sealed class TokenDetectionCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.DbGuild.TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleTokenDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
+            var Toggle = new DiscordButtonComponent((ctx.DbGuild.TokenLeakDetection.DetectTokens ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleTokenDetection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⚠")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Toggle
@@ -45,7 +45,7 @@ internal sealed class TokenDetectionCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -55,12 +55,12 @@ internal sealed class TokenDetectionCommand : BaseCommand
             {
                 ctx.DbGuild.TokenLeakDetection.DetectTokens = !ctx.DbGuild.TokenLeakDetection.DetectTokens;
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

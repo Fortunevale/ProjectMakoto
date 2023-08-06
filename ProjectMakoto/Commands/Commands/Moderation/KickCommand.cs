@@ -11,14 +11,14 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class KickCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.KickMembers) && await CheckOwnPermissions(Permissions.KickMembers));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.KickMembers) && await this.CheckOwnPermissions(Permissions.KickMembers));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
-            string reason = (string)arguments["reason"];
+            var victim = (DiscordUser)arguments["victim"];
+            var reason = (string)arguments["reason"];
 
             var CommandKey = this.t.Commands.Moderation.Kick;
 
@@ -30,7 +30,7 @@ internal sealed class KickCommand : BaseCommand
             }
             catch (DisCatSharp.Exceptions.NotFoundException)
             {
-                SendNoMemberError();
+                this.SendNoMemberError();
                 return;
             }
             catch (Exception)
@@ -39,27 +39,27 @@ internal sealed class KickCommand : BaseCommand
             }
 
             var embed = new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Kicking, true, new TVar("Victim", victim.Mention)))
+                .WithDescription(this.GetString(CommandKey.Kicking, true, new TVar("Victim", victim.Mention)))
                 .WithThumbnail(victim.AvatarUrl)
                 .AsLoading(ctx);
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
 
             try
             {
                 if (ctx.Member.GetRoleHighestPosition() <= bMember.GetRoleHighestPosition())
                     throw new Exception();
 
-                var newReason = (reason.IsNullOrWhiteSpace() ? GetGuildString(this.t.Commands.Moderation.NoReason) : reason);
-                await bMember.RemoveAsync(GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
+                var newReason = (reason.IsNullOrWhiteSpace() ? this.GetGuildString(this.t.Commands.Moderation.NoReason) : reason);
+                await bMember.RemoveAsync(this.GetGuildString(CommandKey.AuditLog, new TVar("Reason", newReason)));
 
-                embed = embed.WithDescription(GetString(CommandKey.Kicked, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);
+                embed = embed.WithDescription(this.GetString(CommandKey.Kicked, true, new TVar("Victim", victim.Mention), new TVar("Reason", newReason))).AsSuccess(ctx);
             }
             catch (Exception)
             {
-                embed = embed.WithDescription(GetString(CommandKey.Errored, true, new TVar("Victim", victim.Mention))).AsError(ctx);
+                embed = embed.WithDescription(this.GetString(CommandKey.Errored, true, new TVar("Victim", victim.Mention))).AsError(ctx);
             }
 
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
         });
     }
 }

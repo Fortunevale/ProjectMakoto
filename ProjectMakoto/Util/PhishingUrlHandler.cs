@@ -17,14 +17,14 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
 
     public async Task UpdatePhishingUrlDatabase()
     {
-        new Task(new Action(async () =>
+        _ = new Func<Task>(async () =>
         {
-            _ = UpdatePhishingUrlDatabase();
-        })).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
+            _ = this.UpdatePhishingUrlDatabase();
+        }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
 
-        var urls = await GetUrls();
+        var urls = await this.GetUrls();
 
-        bool DatabaseUpdated = false;
+        var DatabaseUpdated = false;
 
         foreach (var b in urls)
         {
@@ -53,7 +53,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
             foreach (var b in this.Bot.PhishingHosts.Where(x => x.Value.Origin.Count != 0 && x.Value.Submitter != 0 && !urls.Any(y => y.Url == x.Value.Url)).ToList())
             {
                 DatabaseUpdated = true;
-                this.Bot.PhishingHosts.Remove(b.Key);
+                _ = this.Bot.PhishingHosts.Remove(b.Key);
                 dropUrls.Add(b.Key);
             }
 
@@ -64,7 +64,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
 
         try
         {
-            await UpdateDatabase(dropUrls);
+            await this.UpdateDatabase(dropUrls);
         }
         catch (Exception ex)
         {
@@ -131,7 +131,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
         {
             try
             {
-                var list = await DownloadList(url);
+                var list = await this.DownloadList(url);
 
                 foreach (var b in list)
                 {
@@ -149,7 +149,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
 
         try
         {
-            var urls = await DownloadList("https://fortunevale.de/discord-scam-urls-whitelist.txt");
+            var urls = await this.DownloadList("https://fortunevale.de/discord-scam-urls-whitelist.txt");
             WhitelistedDomains.AddRange(urls);
         }
         catch (Exception ex) { throw new Exception($"An exception occurred while trying to download URLs from 'https://fortunevale.de/discord-scam-urls-whitelist.txt'", ex); }
@@ -160,7 +160,7 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
                 throw new Exception($"An exception occurred while trying to remove white listed URLs from blacklist: WhitelistedDomains is empty or null");
 
             foreach (var b in WhitelistedDomains)
-                SanitizedMatches.Remove(b);
+                _ = SanitizedMatches.Remove(b);
         }
         catch (Exception ex) { throw new Exception($"Failed to remove whitelisted domains from blacklist", ex); }
 

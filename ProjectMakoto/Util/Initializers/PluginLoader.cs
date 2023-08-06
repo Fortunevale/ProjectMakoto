@@ -30,18 +30,18 @@ internal sealed class PluginLoader
 
             foreach (var pluginPath in pluginsToLoad)
             {
-                int count = 0;
+                var count = 0;
                 _logger.LogDebug("Loading Plugin from '{0}'", pluginPath);
 
                 PluginLoadContext pluginLoadContext = new(pluginPath);
                 var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginPath)));
 
-                foreach (Type type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypes())
                 {
                     if (typeof(BasePlugin).IsAssignableFrom(type))
                     {
                         count++;
-                        BasePlugin result = Activator.CreateInstance(type) as BasePlugin;
+                        var result = Activator.CreateInstance(type) as BasePlugin;
                         result.LoadedFile = new FileInfo(pluginPath);
                         bot._Plugins.Add(Path.GetFileNameWithoutExtension(pluginPath), result);
                     }
@@ -49,7 +49,7 @@ internal sealed class PluginLoader
 
                 if (count == 0)
                 {
-                    string availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+                    var availableTypes = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
                     _logger.LogWarn("Cannot load Plugin '{0}': Plugin Assembly does not contain type that inherits BasePlugin. Types found: {1}", assembly.GetName(), availableTypes);
                 }
 
@@ -149,7 +149,7 @@ internal sealed class PluginLoader
                     continue;
                 }
 
-                bot.status.LoadedConfig.PluginCache.TryAdd(plugin.Key, new());
+                _ = bot.status.LoadedConfig.PluginCache.TryAdd(plugin.Key, new());
                 pluginInfo = bot.status.LoadedConfig.PluginCache[plugin.Key];
 
                 pluginInfo.LastKnownHash = pluginHash;
@@ -159,7 +159,7 @@ internal sealed class PluginLoader
 
                 pluginInfo.CompiledCommands = new();
 
-                string classUsings = GetUsings();
+                var classUsings = GetUsings();
 
                 if (pluginCommands.IsNotNullAndNotEmpty())
                 {
@@ -307,7 +307,7 @@ internal sealed class PluginLoader
                         {
                             using (var stream = new MemoryStream())
                             {
-                                EmitResult result = compilation.Key.Emit(stream);
+                                var result = compilation.Key.Emit(stream);
                                 if (!result.Success)
                                 {
                                     _logger.LogError("Failed to emit compilation\n{diagnostics}",
@@ -318,16 +318,16 @@ internal sealed class PluginLoader
                                     throw exception;
                                 }
 
-                                byte[] assemblyBytes = stream.ToArray();
-                                Assembly assembly = Assembly.Load(assemblyBytes);
+                                var assemblyBytes = stream.ToArray();
+                                var assembly = Assembly.Load(assemblyBytes);
                                 assemblyList.Add(assembly, compilation.Value.type);
 
-                                Directory.CreateDirectory("CompiledPluginCommands");
+                                _ = Directory.CreateDirectory("CompiledPluginCommands");
 
                                 var path = $"CompiledPluginCommands/{assembly.GetName().Name}.dll";
                                 using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite))
                                 {
-                                    stream.Seek(0, SeekOrigin.Begin);
+                                    _ = stream.Seek(0, SeekOrigin.Begin);
                                     await stream.CopyToAsync(fileStream);
                                     await fileStream.FlushAsync();
 
@@ -348,9 +348,9 @@ internal sealed class PluginLoader
                             await Task.Delay(1000);
 
                             Console.WriteLine();
-                            for (int i = 0; i < compilation.Value.code.Length; i++)
+                            for (var i = 0; i < compilation.Value.code.Length; i++)
                             {
-                                Diagnostic? foundDiagnostic = diagnostics.FirstOrDefault(x => i >= x.Location.SourceSpan.Start && i <= x.Location.SourceSpan.End, null);
+                                var foundDiagnostic = diagnostics.FirstOrDefault(x => i >= x.Location.SourceSpan.Start && i <= x.Location.SourceSpan.End, null);
 
                                 if (foundDiagnostic is not null)
                                     switch (foundDiagnostic.Severity)
@@ -402,7 +402,7 @@ internal sealed class PluginLoader
                 foreach (var method in parentType.GetMethods())
                 {
                     if (method.Name.StartsWith("Populate"))
-                        method.Invoke(null, new object[] { _bot });
+                        _ = method.Invoke(null, new object[] { _bot });
                 }
 
                 foreach (var subType in parentType.GetNestedTypes())
@@ -410,7 +410,7 @@ internal sealed class PluginLoader
                     foreach (var method in subType.GetMethods())
                     {
                         if (method.Name.StartsWith("Populate"))
-                            method.Invoke(null, new object[] { _bot });
+                            _ = method.Invoke(null, new object[] { _bot });
                     }
                 }
             }
@@ -462,14 +462,13 @@ internal sealed class PluginLoader
                     [{{typeof(SlashCommandAttribute).FullName}}("{{Command.Name}}", "{{Command.Description}}"{{(Command.RequiredPermissions is null ? "" : $", {(long)Command.RequiredPermissions}")}}, dmPermission: {{Command.AllowPrivateUsage.ToString().ToLower()}}, isNsfw: {{Command.IsNsfw.ToString().ToLower()}})]
                     public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
-            else if (ContextName == typeof(CommandContext).FullName)
-                return
-                    $$"""
+            else
+                return ContextName == typeof(CommandContext).FullName
+                ? $$"""
                     [{{typeof(CommandAttribute).FullName}}("{{Command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{Command.Description}}")]
                     public {{typeof(Task).FullName}} a{{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                    """;
-            else
-                throw new NotImplementedException();
+                    """
+                : throw new NotImplementedException();
         }
         return $$"""
 
@@ -518,14 +517,13 @@ internal sealed class PluginLoader
                     [{{typeof(SlashCommandAttribute).FullName}}("{{Command.Name}}", "{{Command.Description}}")]
                     public {{typeof(Task).FullName}} {{TaskName}}_Execute({{typeof(InteractionContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"[{typeof(OptionAttribute).FullName}(\"{x.Name}\", \"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
                     """;
-            else if (ContextName == typeof(CommandContext).FullName)
-                return
-                    $$"""
+            else
+                return ContextName == typeof(CommandContext).FullName
+                ? $$"""
                     [{{typeof(CommandAttribute).FullName}}("{{Command.Name}}"), {{typeof(DescriptionAttribute).FullName}}("{{Command.Description}}")]
                     public {{typeof(Task).FullName}} a{{TaskName}}_Execute({{typeof(CommandContext).FullName}} ctx{{(Command.Overloads.Length > 0 ? ", " : "")}}{{string.Join(", ", Command.Overloads.Select(x => $"{(x.UseRemainingString ? $"[{typeof(RemainingTextAttribute).FullName}]" : "")} [{typeof(DescriptionAttribute).FullName}(\"{x.Description}\")] {x.Type.Name} {x.Name} {(x.Required ? "" : " = null")}"))}})
-                    """;
-            else
-                throw new NotImplementedException();
+                    """
+                : throw new NotImplementedException();
         }
         return $$"""
 

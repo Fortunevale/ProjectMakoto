@@ -20,23 +20,23 @@ internal sealed class AddToQueueCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            string playlistId = (string)arguments["id"];
+            var playlistId = (string)arguments["id"];
 
             if (!ctx.DbUser.UserPlaylists.Any(x => x.PlaylistId == playlistId))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
-                }.AsError(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+                    Description = this.GetString(this.t.Commands.Music.Playlists.NoPlaylist, true),
+                }.AsError(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
                 return;
             }
 
             var SelectedPlaylist = ctx.DbUser.UserPlaylists.First(x => x.PlaylistId == playlistId);
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.Play.Preparing, true),
-            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+                Description = this.GetString(this.t.Commands.Music.Play.Preparing, true),
+            }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
 
             try
             {
@@ -44,27 +44,27 @@ internal sealed class AddToQueueCommand : BaseCommand
             }
             catch (CancelException)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.Playlists.AddToQueue.Adding, true,
+                Description = this.GetString(this.t.Commands.Music.Playlists.AddToQueue.Adding, true,
                 new TVar("Name", SelectedPlaylist.PlaylistName),
                 new TVar("", SelectedPlaylist.List.Count)),
-            }.AsLoading(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+            }.AsLoading(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
 
             ctx.DbGuild.MusicModule.SongQueue.AddRange(SelectedPlaylist.List.Select(x => new Lavalink.QueueInfo(x.Title, x.Url, x.Length.Value, ctx.Guild, ctx.User)));
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
+                Description = this.GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
                 new TVar("Count", SelectedPlaylist.List.Count),
                 new TVar("Playlist", SelectedPlaylist.PlaylistName))
             }
-            .AddField(new DiscordEmbedField($"📜 {GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}"))
-            .AsSuccess(ctx, GetString(this.t.Commands.Music.Playlists.Title)));
+            .AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - SelectedPlaylist.List.Count + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}"))
+            .AsSuccess(ctx, this.GetString(this.t.Commands.Music.Playlists.Title)));
         });
     }
 }

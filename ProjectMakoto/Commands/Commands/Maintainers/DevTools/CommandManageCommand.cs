@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class CommandManageCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -20,7 +20,7 @@ internal sealed class CommandManageCommand : BaseCommand
             var EnableCommandButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), "Enable Command", !ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Any(), "➕".UnicodeToEmoji().ToComponent());
             var DisableCommandButton = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), "Disable Command", false, "➖".UnicodeToEmoji().ToComponent());
 
-            await RespondOrEdit(new DiscordMessageBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder()
                 .AddEmbed(new DiscordEmbedBuilder()
                     .WithTitle("Disabled Commands")
                     .WithDescription($"{(ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Any() ? string.Join(", ", ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Select(x => $"`{x}`")) : "`No commands disabled.`")}")
@@ -32,7 +32,7 @@ internal sealed class CommandManageCommand : BaseCommand
 
             if (Button.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -40,16 +40,16 @@ internal sealed class CommandManageCommand : BaseCommand
 
             if (Button.GetCustomId() == EnableCommandButton.CustomId)
             {
-                var SelectionResult = await PromptCustomSelection(ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Select(x => new DiscordStringSelectComponentOption(x, x)).ToList());
+                var SelectionResult = await this.PromptCustomSelection(ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Select(x => new DiscordStringSelectComponentOption(x, x)).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (SelectionResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (SelectionResult.Errored)
@@ -59,17 +59,17 @@ internal sealed class CommandManageCommand : BaseCommand
 
                 if (!ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(SelectionResult.Result))
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder()
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
                         .WithDescription("`That command is already enabled.`")
                         .AsError(ctx));
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
-                ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Remove(SelectionResult.Result);
+                _ = ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Remove(SelectionResult.Result);
                 ctx.Bot.status.LoadedConfig.Save();
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == DisableCommandButton.CustomId)
@@ -94,22 +94,22 @@ internal sealed class CommandManageCommand : BaseCommand
 
                 if (!CommandList.Any())
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
-                var SelectionResult = await PromptCustomSelection(CommandList.Select(x =>
+                var SelectionResult = await this.PromptCustomSelection(CommandList.Select(x =>
                     new DiscordStringSelectComponentOption(x.FirstLetterToUpper(), x,
                         (x.Contains(' ') ? "Sub Command" : (CommandList.Where(y => y.StartsWith(x)).Count() >= 2 ? "Command Group" : "Single Command")))).ToList(), "Select a command to disable..");
 
                 if (SelectionResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (SelectionResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (SelectionResult.Errored)
@@ -119,22 +119,22 @@ internal sealed class CommandManageCommand : BaseCommand
 
                 if (ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(SelectionResult.Result))
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder()
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
                         .WithDescription("`That command is already disabled.`")
                         .AsError(ctx));
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
 
                 ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Add(SelectionResult.Result);
                 ctx.Bot.status.LoadedConfig.Save();
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

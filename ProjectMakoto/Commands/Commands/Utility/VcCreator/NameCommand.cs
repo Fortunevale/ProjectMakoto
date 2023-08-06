@@ -18,26 +18,26 @@ internal sealed class NameCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
-            string newName = (string)arguments["newName"];
-            DiscordChannel channel = ctx.Member.VoiceState?.Channel;
+            var newName = (string)arguments["newName"];
+            var channel = ctx.Member.VoiceState?.Channel;
 
-            newName = (newName.IsNullOrWhiteSpace() ? GetGuildString(this.t.Commands.Utility.VoiceChannelCreator.Events.DefaultChannelName, new TVar("User", ctx.Member.DisplayName)) : newName);
+            newName = (newName.IsNullOrWhiteSpace() ? this.GetGuildString(this.t.Commands.Utility.VoiceChannelCreator.Events.DefaultChannelName, new TVar("User", ctx.Member.DisplayName)) : newName);
 
             if (!ctx.DbGuild.VcCreator.CreatedChannels.ContainsKey(channel?.Id ?? 0))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannel, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].OwnerId != ctx.User.Id)
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.NotAVccChannelOwner, true)).AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].LastRename.GetTimespanSince() < TimeSpan.FromMinutes(5))
             {
-                _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Name.Cooldown, true,
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Name.Cooldown, true,
                     new TVar("Timestamp", ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].LastRename.AddMinutes(5).ToTimestamp()))).AsError(ctx));
                 return;
             }
@@ -47,7 +47,7 @@ internal sealed class NameCommand : BaseCommand
 
             ctx.DbGuild.VcCreator.CreatedChannels[channel.Id].LastRename = DateTime.UtcNow;
             await channel.ModifyAsync(x => x.Name = newName.TruncateWithIndication(25));
-            _ = await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.VoiceChannelCreator.Name.Success, true,
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.VoiceChannelCreator.Name.Success, true,
                 new TVar("Name", newName, true))).AsSuccess(ctx));
         });
     }

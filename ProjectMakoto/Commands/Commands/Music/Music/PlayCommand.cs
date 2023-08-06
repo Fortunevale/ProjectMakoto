@@ -11,28 +11,28 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class PlayCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckVoiceState() && await CheckOwnPermissions(Permissions.UseVoice) && await CheckOwnPermissions(Permissions.UseVoiceDetection));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckVoiceState() && await this.CheckOwnPermissions(Permissions.UseVoice) && await this.CheckOwnPermissions(Permissions.UseVoiceDetection));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            string search = (string)arguments["search"];
+            var search = (string)arguments["search"];
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             if (search.IsNullOrWhiteSpace())
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.Play.Preparing, true),
+                Description = this.GetString(this.t.Commands.Music.Play.Preparing, true),
             }.AsLoading(ctx);
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
 
             try
             {
@@ -45,7 +45,7 @@ internal sealed class PlayCommand : BaseCommand
 
             var (Tracks, oriResult, Continue) = await MusicModuleAbstractions.GetLoadResult(ctx, search);
 
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
 
             try
             {
@@ -60,13 +60,13 @@ internal sealed class PlayCommand : BaseCommand
 
             if (!Continue || !Tracks.IsNotNullAndNotEmpty())
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
 
             if (Tracks.Count > 1)
             {
-                int added = 0;
+                var added = 0;
 
                 foreach (var b in Tracks)
                 {
@@ -74,14 +74,14 @@ internal sealed class PlayCommand : BaseCommand
                     ctx.DbGuild.MusicModule.SongQueue.Add(new(b.Info.Title, b.Info.Uri.ToString(), b.Info.Length, ctx.Guild, ctx.User));
                 }
 
-                embed.Description = GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
+                embed.Description = this.GetString(this.t.Commands.Music.Play.QueuedMultiple, true,
                     new TVar("Count", added),
                     new TVar("Playlist", new EmbeddedLink(search, oriResult.GetResultAs<LavalinkPlaylist>().Info.Name)));
 
-                embed.AddField(new DiscordEmbedField($"📜 {GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - added + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}", true));
+                _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePositions)}", $"{(ctx.DbGuild.MusicModule.SongQueue.Count - added + 1)} - {ctx.DbGuild.MusicModule.SongQueue.Count}", true));
 
-                embed.AsSuccess(ctx);
-                await ctx.BaseCommand.RespondOrEdit(embed);
+                _ = embed.AsSuccess(ctx);
+                _ = await ctx.BaseCommand.RespondOrEdit(embed);
             }
             else if (Tracks.Count == 1)
             {
@@ -89,15 +89,15 @@ internal sealed class PlayCommand : BaseCommand
 
                 ctx.DbGuild.MusicModule.SongQueue.Add(new(track.Info.Title, track.Info.Uri.ToString(), track.Info.Length, ctx.Guild, ctx.User));
 
-                embed.Description = GetString(this.t.Commands.Music.Play.QueuedSingle, true,
+                embed.Description = this.GetString(this.t.Commands.Music.Play.QueuedSingle, true,
                     new TVar("Track", new EmbeddedLink(track.Info.Uri.ToString(), track.Info.Title)));
 
-                embed.AddField(new DiscordEmbedField($"📜 {GetString(this.t.Commands.Music.Play.QueuePosition)}", $"{ctx.DbGuild.MusicModule.SongQueue.Count}", true));
-                embed.AddField(new DiscordEmbedField($"🔼 {GetString(this.t.Commands.Music.Play.Uploader)}", $"{track.Info.Author}", true));
-                embed.AddField(new DiscordEmbedField($"🕒 {GetString(this.t.Commands.Music.Play.Duration)}", $"{track.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
+                _ = embed.AddField(new DiscordEmbedField($"📜 {this.GetString(this.t.Commands.Music.Play.QueuePosition)}", $"{ctx.DbGuild.MusicModule.SongQueue.Count}", true));
+                _ = embed.AddField(new DiscordEmbedField($"🔼 {this.GetString(this.t.Commands.Music.Play.Uploader)}", $"{track.Info.Author}", true));
+                _ = embed.AddField(new DiscordEmbedField($"🕒 {this.GetString(this.t.Commands.Music.Play.Duration)}", $"{track.Info.Length.GetHumanReadable(TimeFormat.MINUTES)}", true));
 
-                embed.AsSuccess(ctx);
-                await ctx.BaseCommand.RespondOrEdit(embed.Build());
+                _ = embed.AsSuccess(ctx);
+                _ = await ctx.BaseCommand.RespondOrEdit(embed.Build());
             }
         });
     }

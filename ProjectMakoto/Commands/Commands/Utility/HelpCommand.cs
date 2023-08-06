@@ -32,7 +32,7 @@ internal sealed class HelpCommand : BaseCommand
             {
                 try
                 {
-                    string module = appCommand.ContainingType.Name.Replace("AppCommands", "").ToLower();
+                    var module = appCommand.ContainingType.Name.Replace("AppCommands", "").ToLower();
 
                     if (appCommand.ContainingType.Namespace != "ProjectMakoto.ApplicationCommands")
                         module = ctx.Bot.Plugins[ctx.Bot.PluginCommands.First(plugin => plugin.Value.Any(cmd => cmd.Name == appCommand.Name)).Key].Name;
@@ -55,7 +55,7 @@ internal sealed class HelpCommand : BaseCommand
 
                     try
                     {
-                        var commandKey = t.Commands.CommandList.FirstOrDefault(localized => localized.Names.Any(x => x.Value == appCommand.Name), null);
+                        var commandKey = this.t.Commands.CommandList.FirstOrDefault(localized => localized.Names.Any(x => x.Value == appCommand.Name), null);
 
                         string commandName;
                         string commandDescription;
@@ -63,9 +63,9 @@ internal sealed class HelpCommand : BaseCommand
 
                         if (commandKey is not null)
                         {
-                            commandName = GetString(commandKey.Names);
-                            commandDescription = GetString(commandKey.Descriptions);
-                            commandUsage = string.Join(" ", commandKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+                            commandName = this.GetString(commandKey.Names);
+                            commandDescription = this.GetString(commandKey.Descriptions);
+                            commandUsage = string.Join(" ", commandKey.Options?.Select(x => $"<{this.GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
                         }
                         else
                         {
@@ -82,33 +82,29 @@ internal sealed class HelpCommand : BaseCommand
 
                         if (appCommand.Options?.Any(x => x.Type == ApplicationCommandOptionType.SubCommand) ?? false)
                             commandMention = $"`/{commandName}`";
-                        else if (appCommand.Type != ApplicationCommandType.ChatInput)
-                            commandMention = $"`{commandName}`";
-                        else
-                            commandMention = appCommand.Mention;
+                        else commandMention = appCommand.Type != ApplicationCommandType.ChatInput ? $"`{commandName}`" : appCommand.Mention;
 
                         Command? prefixCommand;
 
                         if (PrefixCommandsList.Any(x => x.Value.Name.ToLower() == appCommand.Name.ToLower()))
                             prefixCommand = PrefixCommandsList.First(x => x.Value.Name.ToLower() == appCommand.Name.ToLower()).Value;
-                        else if (appCommand.CustomAttributes.Any(x => x is PrefixCommandAlternativeAttribute))
-                            prefixCommand = PrefixCommandsList
+                        else prefixCommand = appCommand.CustomAttributes.Any(x => x is PrefixCommandAlternativeAttribute)
+                            ? PrefixCommandsList
                                 .First(x => x.Value.Name.ToLower() == ((PrefixCommandAlternativeAttribute)appCommand.CustomAttributes
-                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAt(' ')).Value;
-                        else
-                            prefixCommand = null;
+                                    .First(x => x is PrefixCommandAlternativeAttribute)).PrefixCommand.ToLower().TruncateAt(' ')).Value
+                            : null;
 
                         var commandModuleName = module.ToLower() switch
                         {
-                            "utility" => GetString(this.t.Commands.ModuleNames.Utility),
-                            "social" => GetString(this.t.Commands.ModuleNames.Social),
-                            "music" => GetString(this.t.Commands.ModuleNames.Music),
-                            "moderation" => GetString(this.t.Commands.ModuleNames.Moderation),
-                            "configuration" => GetString(this.t.Commands.ModuleNames.Configuration),
+                            "utility" => this.GetString(this.t.Commands.ModuleNames.Utility),
+                            "social" => this.GetString(this.t.Commands.ModuleNames.Social),
+                            "music" => this.GetString(this.t.Commands.ModuleNames.Music),
+                            "moderation" => this.GetString(this.t.Commands.ModuleNames.Moderation),
+                            "configuration" => this.GetString(this.t.Commands.ModuleNames.Configuration),
                             _ => module.FirstLetterToUpper(),
                         };
                         
-                        DiscordEmoji TypeEmoji = appCommand.Type switch
+                        var TypeEmoji = appCommand.Type switch
                         {
                             ApplicationCommandType.ChatInput => EmojiTemplates.GetSlashCommand(ctx.Bot),
                             ApplicationCommandType.Message => EmojiTemplates.GetMessageCommand(ctx.Bot),
@@ -129,9 +125,9 @@ internal sealed class HelpCommand : BaseCommand
 
                             if (subKey is not null)
                             {
-                                subName = $"{commandName} {GetString(subKey.Names)}";
-                                subDescription = GetString(subKey.Descriptions);
-                                subUsage = string.Join(" ", subKey.Options?.Select(x => $"<{GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
+                                subName = $"{commandName} {this.GetString(subKey.Names)}";
+                                subDescription = this.GetString(subKey.Descriptions);
+                                subUsage = string.Join(" ", subKey.Options?.Select(x => $"<{this.GetString(x.Names).FirstLetterToUpper()}>") ?? new List<string>());
                             }
                             else
                             {
@@ -162,21 +158,21 @@ internal sealed class HelpCommand : BaseCommand
 
             var Fields = Commands.PrepareEmbedFields();
 
-            List<DiscordEmbedBuilder> discordEmbeds = Fields.PrepareEmbeds(new DiscordEmbedBuilder().WithDescription(GetString(this.t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx), true);
+            var discordEmbeds = Fields.PrepareEmbeds(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Utility.Help.Disclaimer)).AsBotInfo(ctx), true);
 
-            int Page = 0;
+            var Page = 0;
 
             while (true)
             {
-                var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
-                var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
+                var PreviousButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Common.PreviousPage), (Page <= 0), DiscordEmoji.FromUnicode("◀").ToComponent());
+                var NextButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Common.NextPage), (Page >= discordEmbeds.Count - 1), DiscordEmoji.FromUnicode("▶").ToComponent());
 
                 var builder = new DiscordMessageBuilder().WithEmbed(discordEmbeds.ElementAt(Page));
 
                 if (!PreviousButton.Disabled || !NextButton.Disabled)
-                    builder.AddComponents(PreviousButton, NextButton);
+                    _ = builder.AddComponents(PreviousButton, NextButton);
 
-                await RespondOrEdit(builder);
+                _ = await this.RespondOrEdit(builder);
 
                 if (PreviousButton.Disabled && NextButton.Disabled)
                     return;
@@ -185,7 +181,7 @@ internal sealed class HelpCommand : BaseCommand
 
                 if (Menu.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                     return;
                 }
 

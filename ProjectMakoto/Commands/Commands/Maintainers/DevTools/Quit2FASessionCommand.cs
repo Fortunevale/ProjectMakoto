@@ -11,15 +11,15 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class Quit2FASessionCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx)
-        => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx)
+        => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
             ctx.DbUser.LastSuccessful2FA = DateTime.MinValue;
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Your active 2FA Session, if present, has been quit.`").AsBotSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Your active 2FA Session, if present, has been quit.`").AsBotSuccess(ctx));
         });
     }
 }

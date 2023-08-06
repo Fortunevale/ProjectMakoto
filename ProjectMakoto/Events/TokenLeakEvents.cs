@@ -22,18 +22,18 @@ internal sealed class TokenLeakEvents : RequiresTranslation
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
+        _ = this.CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore?.Content != e.Message?.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
+            _ = this.CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
     }
 
     internal async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        string prefix = guild.GetGuildPrefix(this.Bot);
+        var prefix = guild.GetGuildPrefix(this.Bot);
 
         if (e?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
@@ -55,13 +55,13 @@ internal sealed class TokenLeakEvents : RequiresTranslation
 
         _ = e.DeleteAsync();
 
-        int InvalidateCount = 0;
+        var InvalidateCount = 0;
 
         foreach (var token in filtered_matches)
         {
             var botId = token.Groups["botid"].Value!;
             DiscordUser? botUser = null;
-            try { botUser = await GetBotInfo(sender, botId); } catch { }
+            try { botUser = await this.GetBotInfo(sender, botId); } catch { }
 
             if (botUser is null)
             {
@@ -69,9 +69,9 @@ internal sealed class TokenLeakEvents : RequiresTranslation
                 continue;
             }
 
-            string owner = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
-            string repo = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
-            long seconds = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
+            var owner = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepoOwner;
+            var repo = this.Bot.status.LoadedConfig.Secrets.Github.TokenLeakRepo;
+            var seconds = (long)DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
 
             if (this.Bot.TokenInvalidator.SearchForString(token.Value).Item1)
             {
@@ -79,23 +79,23 @@ internal sealed class TokenLeakEvents : RequiresTranslation
                 continue;
             }
 
-            string fileName = $"token_leak_{e.Author.Id}_{guild.Id}_{e.Channel.Id}_{seconds}.md";
-            string content = $"## Token of {botUser?.Id.ToString() ?? "unknown"} (Owner {e.Author.Id})\n\nBot {token}";
+            var fileName = $"token_leak_{e.Author.Id}_{guild.Id}_{e.Channel.Id}_{seconds}.md";
+            var content = $"## Token of {botUser?.Id.ToString() ?? "unknown"} (Owner {e.Author.Id})\n\nBot {token}";
 
-            await this.Bot.GithubClient.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
+            _ = await this.Bot.GithubClient.Repository.Content.CreateFile(owner, repo, $"automatic/{fileName}", new CreateFileRequest("Upload token to invalidate", content, "main"));
             InvalidateCount++;
         }
 
         if (InvalidateCount > 0)
             _ = this.Bot.TokenInvalidator.Pull();
 
-        string s = (InvalidateCount > 1 ? "s" : "");
+        var s = (InvalidateCount > 1 ? "s" : "");
 
         _ = e.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(
         new DiscordEmbedBuilder()
         .WithColor(EmbedColors.Error)
         .WithAuthor(sender.CurrentUser.GetUsername(), null, sender.CurrentUser.AvatarUrl)
-        .WithDescription(tKey.TokenInvalidated.Get(Bot.Guilds[e.Guild.Id]).Build(true, false, new TVar("Count", filtered_matches.Count()))))
+        .WithDescription(this.tKey.TokenInvalidated.Get(this.Bot.Guilds[e.Guild.Id]).Build(true, false, new TVar("Count", filtered_matches.Count()))))
         .WithContent(e.Author.Mention));
     }
 
@@ -111,5 +111,4 @@ internal sealed class TokenLeakEvents : RequiresTranslation
         var base64Bytes = Convert.FromBase64String(base64);
         return Encoding.UTF8.GetString(base64Bytes);
     }
-
 }

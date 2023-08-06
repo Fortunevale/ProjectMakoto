@@ -13,8 +13,8 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class EnrollTwoFactorCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx)
-        => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx)
+        => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -22,17 +22,17 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
         {
             if (ctx.Client.CheckTwoFactorEnrollmentFor(ctx.User.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You're already enrolled in Two Factor Authentication.`").AsBotError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`You're already enrolled in Two Factor Authentication.`").AsBotError(ctx));
                 return;
             }
 
-            bool Confirmed = false;
+            var Confirmed = false;
 
             var ConfirmButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Confirm Two Factor Authentication", false, DiscordEmoji.FromUnicode("✅").ToComponent());
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolling you into Two Factor Authentication..`").AsBotLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolling you into Two Factor Authentication..`").AsBotLoading(ctx));
             var (Secret, QrCode) = ctx.Client.EnrollTwoFactor(ctx.User);
-            await RespondOrEdit(new DiscordMessageBuilder().WithContent($"Please scan this QR Code or use the Secret below to register the Two Factor in an App of your choosing." +
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithContent($"Please scan this QR Code or use the Secret below to register the Two Factor in an App of your choosing." +
                 $"\n\n`{Secret}`\n\n" +
                 $"When you're done, please press the button below to confirm the success of the registration.")
                 .WithFile("2fa.png", QrCode, false, "This is a QR Code for an Authenticator App.")
@@ -45,7 +45,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
                 if (!Confirmed)
                 {
                     ctx.Client.DisenrollTwoFactor(ctx.User.Id);
-                    _ = RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsBotError(ctx));
+                    _ = this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsBotError(ctx));
                 }
             });
 
@@ -67,7 +67,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
                                 if (tfa_result.Result == TwoFactorResult.ValidCode)
                                 {
                                     Confirmed = true;
-                                    await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolled successfully.`").AsBotSuccess(ctx));
+                                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Enrolled successfully.`").AsBotSuccess(ctx));
                                     return;
                                 }
 
@@ -81,7 +81,7 @@ internal sealed class EnrollTwoFactorCommand : BaseCommand
                         catch (Exception)
                         {
                             ctx.Client.DisenrollTwoFactor(ctx.User.Id);
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsBotError(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Failed to authenticate. Enrollment reverted.`").AsBotError(ctx));
                         }
                     }
                 });

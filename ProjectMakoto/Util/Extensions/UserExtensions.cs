@@ -16,10 +16,7 @@ internal static class UserExtensions
 
     internal static bool IsTeamOwner(this DiscordUser user, Status _status)
     {
-        if (_status.TeamOwner == user.Id)
-            return true;
-
-        return false;
+        return _status.TeamOwner == user.Id;
     }
 
     internal static bool IsMaintenance(this DiscordMember member, Status _status)
@@ -27,27 +24,18 @@ internal static class UserExtensions
 
     internal static bool IsMaintenance(this DiscordUser user, Status _status)
     {
-        if (_status.TeamMembers.Contains(user.Id))
-            return true;
-
-        return false;
+        return _status.TeamMembers.Contains(user.Id);
     }
 
     internal static bool IsAdmin(this DiscordMember member, Status _status)
     {
-        if ((member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed || x.CheckPermission(Permissions.ManageGuild) == PermissionLevel.Allowed)) ||
+        return (member.Roles.Any(x => x.CheckPermission(Permissions.Administrator) == PermissionLevel.Allowed || x.CheckPermission(Permissions.ManageGuild) == PermissionLevel.Allowed)) ||
             (member.IsMaintenance(_status)) ||
-            member.IsOwner)
-            return true;
-
-        return false;
+            member.IsOwner;
     }
 
     internal static bool IsDJ(this DiscordMember member, Status _status)
     {
-        if (member.IsAdmin(_status) || member.Roles.Any(x => x.Name.ToLower() == "dj"))
-            return true;
-
-        return false;
+        return member.IsAdmin(_status) || member.Roles.Any(x => x.Name.ToLower() == "dj");
     }
 }

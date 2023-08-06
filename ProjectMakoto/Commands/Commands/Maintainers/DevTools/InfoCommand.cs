@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class InfoCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -20,12 +20,12 @@ internal sealed class InfoCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsBotLoading(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription("`Fetching system details..`").AsBotLoading(ctx));
 
             var currentSystemStats = await ctx.Bot.MonitorClient.GetCurrent();
             var history = ctx.Bot.MonitorClient.GetHistory();
 
-            string ServerUptime = "";
+            var ServerUptime = "";
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
                 ProcessStartInfo info = new()
@@ -41,7 +41,7 @@ internal sealed class InfoCommand : BaseCommand
 
                 b.WaitForExit();
 
-                string Output = b.StandardOutput.ReadToEnd();
+                var Output = b.StandardOutput.ReadToEnd();
                 ServerUptime = Output.Remove(Output.IndexOf(','), Output.Length - Output.IndexOf(',')).TrimStart();
             }
 
@@ -91,11 +91,11 @@ internal sealed class InfoCommand : BaseCommand
 
             var memoryEmbed = new DiscordEmbedBuilder().WithTitle("Memory").WithDescription($"`Usage`: `{currentSystemStats.Memory.Used.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}/{currentSystemStats.Memory.Total.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))} MB`").AsBotLoading(ctx);
 
-            await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(new List<DiscordEmbed>() { miscEmbed, cpuEmbed1, memoryEmbed }));
 
             try
             {
-                string prev = "";
+                var prev = "";
                 Chart qc = new()
                 {
                     Width = 1000,
@@ -106,7 +106,7 @@ internal sealed class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                    {string.Join(",", history.Select(x => { var value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                 ],
                                 datasets: 
                                 [
@@ -155,13 +155,13 @@ internal sealed class InfoCommand : BaseCommand
             }
             finally
             {
-                cpuEmbed1.AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
+                _ = cpuEmbed1.AsBotInfo(ctx).WithFooter().WithTimestamp(null).WithAuthor();
             }
 
             if (currentSystemStats.Cpu.Temperature != 0)
                 try
                 {
-                    string prev = "";
+                    var prev = "";
                     Chart qc = new()
                     {
                         Width = 1000,
@@ -172,7 +172,7 @@ internal sealed class InfoCommand : BaseCommand
                                 {{
                                     labels: 
                                     [
-                                        {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                        {string.Join(",", history.Select(x => { var value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                     ],
                                     datasets: 
                                     [
@@ -222,7 +222,7 @@ internal sealed class InfoCommand : BaseCommand
 
             try
             {
-                string prev = "";
+                var prev = "";
                 Chart qc = new()
                 {
                     Width = 1000,
@@ -233,7 +233,7 @@ internal sealed class InfoCommand : BaseCommand
                             {{
                                 labels: 
                                 [
-                                    {string.Join(",", history.Select(x => { string value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
+                                    {string.Join(",", history.Select(x => { var value = x.Key.GetTimespanSince().TotalMinutes.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")); if (prev == value) return "' '"; prev = value; return $"'{value}m ago'"; }))}
                                 ],
                                 datasets: 
                                 [
@@ -282,7 +282,7 @@ internal sealed class InfoCommand : BaseCommand
             }
             finally
             {
-                memoryEmbed.AsBotInfo(ctx).WithAuthor();
+                _ = memoryEmbed.AsBotInfo(ctx).WithAuthor();
             }
 
             var list = new List<DiscordEmbed>();
@@ -294,7 +294,7 @@ internal sealed class InfoCommand : BaseCommand
 
             list.Add(memoryEmbed);
 
-            await RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().AddEmbeds(list));
         });
     }
 }

@@ -15,25 +15,25 @@ internal sealed class BlockUserCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Utility.BlockUser;
+            var CommandKey = this.t.Commands.Utility.BlockUser;
 
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             if (ctx.DbUser.BlockedUsers.Contains(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.AlreadyBlocked, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.AlreadyBlocked, true)).AsError(ctx));
                 return;
             }
 
             if (victim.Id == ctx.Client.CurrentUser.Id)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.CannotBlock, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.CannotBlock, true)).AsError(ctx));
                 return;
             }
 
             ctx.DbUser.BlockedUsers.Add(victim.Id);
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.Blocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Blocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });
     }
 }

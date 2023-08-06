@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class GlobalNotesCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -20,11 +20,11 @@ internal sealed class GlobalNotesCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx, true))
                 return;
 
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             var ModeratorCache = new Dictionary<ulong, DiscordUser>();
 
-            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out List<BanDetails> globalNotes))
+            if (ctx.Bot.globalNotes.TryGetValue(victim.Id, out var globalNotes))
                 foreach (var b in globalNotes)
                 {
                     if (ModeratorCache.ContainsKey(b.Moderator))
@@ -43,7 +43,7 @@ internal sealed class GlobalNotesCommand : BaseCommand
             var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Add Notes", false, DiscordEmoji.FromUnicode("➕").ToComponent());
             var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), "Remove Notes", (!ctx.Bot.globalNotes.ContainsKey(victim.Id)), DiscordEmoji.FromUnicode("➖").ToComponent());
 
-            await RespondOrEdit(new DiscordMessageBuilder()
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder()
                 .WithEmbed(new DiscordEmbedBuilder()
                     .WithDescription($"{victim.Mention} `has {(ctx.Bot.globalNotes.TryGetValue(victim.Id, out var list) ? list.Count : 0)} global notes.`")
                     .AddFields((list is not null ? list.Take(20).Select(x => new DiscordEmbedField("󠂪 󠂪", $"{x.Reason.FullSanitize()} - `{(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())}` {x.Timestamp.ToTimestamp()}")) : new List<DiscordEmbedField>())))
@@ -54,23 +54,23 @@ internal sealed class GlobalNotesCommand : BaseCommand
 
             if (Button.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
             if (Button.GetCustomId() == AddButton.CustomId)
             {
-                var ModalResult = await PromptModalWithRetry(Button.Result.Interaction,
+                var ModalResult = await this.PromptModalWithRetry(Button.Result.Interaction,
                         new DiscordInteractionModalBuilder().AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", "New Note", "", 1, 256, true)), false);
 
                 if (ModalResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ModalResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ModalResult.Errored)
@@ -88,24 +88,24 @@ internal sealed class GlobalNotesCommand : BaseCommand
 
                 user.Add(new BanDetails { Moderator = ctx.User.Id, Reason = note });
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == RemoveButton.CustomId)
             {
                 _ = Button.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                var SelectionResult = await PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
+                var SelectionResult = await this.PromptCustomSelection(ctx.Bot.globalNotes[victim.Id]
                     .Select(x => new DiscordStringSelectComponentOption(x.Reason.TruncateWithIndication(100), x.Timestamp.Ticks.ToString(), $"Added by {(ModeratorCache[x.Moderator] is null ? "Unknown#0000" : ModeratorCache[x.Moderator].GetUsernameWithIdentifier())} {x.Timestamp.GetTimespanSince().GetHumanReadable()} ago")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (SelectionResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (SelectionResult.Errored)
@@ -113,13 +113,13 @@ internal sealed class GlobalNotesCommand : BaseCommand
                     throw SelectionResult.Exception;
                 }
 
-                ctx.Bot.globalNotes[victim.Id].Remove(ctx.Bot.globalNotes[victim.Id].First(x => x.Timestamp.Ticks.ToString() == SelectionResult.Result));
-                await ExecuteCommand(ctx, arguments);
+                _ = ctx.Bot.globalNotes[victim.Id].Remove(ctx.Bot.globalNotes[victim.Id].First(x => x.Timestamp.Ticks.ToString() == SelectionResult.Result));
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (Button.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

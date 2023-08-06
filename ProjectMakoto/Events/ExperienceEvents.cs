@@ -38,7 +38,7 @@ internal sealed class ExperienceEvents : RequiresTranslation
             if (exp > 0)
             {
                 this.Bot.Guilds[e.Guild.Id].Members[e.Author.Id].Experience.Last_Message = DateTime.UtcNow;
-                this.Bot.ExperienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
+                _ = this.Bot.ExperienceHandler.ModifyExperience(e.Author, e.Guild, e.Channel, exp);
             }
         }
     }

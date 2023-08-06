@@ -15,24 +15,24 @@ internal sealed class AfkCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            string reason = (string)arguments["reason"];
+            var reason = (string)arguments["reason"];
 
             if (await ctx.DbUser.Cooldown.WaitForModerate(ctx))
                 return;
 
             if (reason.Length > 128)
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
             ctx.DbUser.AfkStatus.Reason = reason.FullSanitize();
             ctx.DbUser.AfkStatus.TimeStamp = DateTime.UtcNow;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = $"{ctx.User.Mention} {GetString(this.t.Commands.Social.Afk.SetAfk, true)}"
-            }.AsSuccess(ctx, GetString(this.t.Commands.Social.Afk.Title)));
+                Description = $"{ctx.User.Mention} {this.GetString(this.t.Commands.Social.Afk.SetAfk, true)}"
+            }.AsSuccess(ctx, this.GetString(this.t.Commands.Social.Afk.Title)));
             await Task.Delay(10000);
             _ = ctx.ResponseMessage.DeleteAsync();
         });

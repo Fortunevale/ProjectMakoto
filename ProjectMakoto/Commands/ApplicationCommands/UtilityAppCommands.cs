@@ -21,15 +21,15 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
         {
             try
             {
-                Bot bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
+                var bot = ((Bot)ctx.Services.GetService(typeof(Bot)));
 
-                IEnumerable<DiscordApplicationCommand> filteredCommands = bot.DiscordClient.GetCommandList(bot)
+                var filteredCommands = bot.DiscordClient.GetCommandList(bot)
                     .Where(x => x.Name.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     .Where(x => !x.DefaultMemberPermissions.HasValue || ctx.Member.Permissions.HasPermission(x.DefaultMemberPermissions.Value))
                     .Where(x => x.Type == ApplicationCommandType.ChatInput)
                     .Take(25);
 
-                List<DiscordApplicationCommandAutocompleteChoice> options = filteredCommands
+                var options = filteredCommands
                     .Select(x => new DiscordApplicationCommandAutocompleteChoice(string.Join("-", x.Name.Split(new string[] { "-", "_" }, StringSplitOptions.None)
                         .Select(x => x.FirstLetterToUpper())), x.Name))
                     .ToList();
@@ -130,7 +130,7 @@ public sealed class UtilityAppCommands : ApplicationCommandsModule
                             .Where(x => x.Name.Contains(ctx.FocusedOption.Value.ToString(), StringComparison.InvariantCultureIgnoreCase))
                             .Take(25);
 
-                        List<DiscordApplicationCommandAutocompleteChoice> options = filteredTypes
+                        var options = filteredTypes
                             .Select(x => new DiscordApplicationCommandAutocompleteChoice(x.Name.Replace("Events", ""), x.FullName))
                             .ToList();
 

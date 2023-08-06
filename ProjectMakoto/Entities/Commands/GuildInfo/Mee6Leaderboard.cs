@@ -47,5 +47,4 @@ internal sealed class Mee6Leaderboard
         public string username { get; set; }
         public int xp { get; set; }
     }
-
 }

@@ -11,31 +11,31 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class GlobalUnbanCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordUser victim = (DiscordUser)arguments["victim"];
-            bool UnbanFromGuilds = (bool)arguments["UnbanFromGuilds"];
+            var victim = (DiscordUser)arguments["victim"];
+            var UnbanFromGuilds = (bool)arguments["UnbanFromGuilds"];
 
             if (!ctx.Bot.globalBans.ContainsKey(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
                     Description = $"`'{victim.GetUsernameWithIdentifier()}' is not global banned.`"
                 }.AsError(ctx, "Global Ban"));
                 return;
             }
 
-            ctx.Bot.globalBans.Remove(victim.Id);
+            _ = ctx.Bot.globalBans.Remove(victim.Id);
             await ctx.Bot.DatabaseClient._helper.DeleteRow(ctx.Bot.DatabaseClient.mainDatabaseConnection, "globalbans", "id", $"{victim.Id}");
 
-            int Success = 0;
-            int Failed = 0;
+            var Success = 0;
+            var Failed = 0;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Removing global ban for '{victim.GetUsernameWithIdentifier()}' ({victim.Id})`.."
             }.AsLoading(ctx, "Global Ban"));
@@ -65,13 +65,13 @@ internal sealed class GlobalUnbanCommand : BaseCommand
                     }
                 }
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
                 Description = $"`Removed '{victim.GetUsernameWithIdentifier()}' from global bans.`"
             }.AsSuccess(ctx, "Global Ban"));
 
             var announceChannel = await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GlobalBanAnnouncements);
-            await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
+            _ = await announceChannel.SendMessageAsync(new DiscordEmbedBuilder
             {
                 Author = new DiscordEmbedBuilder.EmbedAuthor
                 {

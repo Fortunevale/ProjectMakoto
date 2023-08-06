@@ -9,16 +9,16 @@
 
 namespace ProjectMakoto.Util;
 
-public sealed class GoogleTranslateClient
+public sealed class GoogleTranslateClient : RequiresBotReference
 {
-    internal GoogleTranslateClient()
+    internal GoogleTranslateClient(Bot bot) : base(bot)
     {
-        _ = this.QueueHandler();
+        this.QueueHandler();
     }
 
     ~GoogleTranslateClient()
     {
-        _disposed = true;
+        this._disposed = true;
     }
 
     bool _disposed = false;
@@ -26,62 +26,65 @@ public sealed class GoogleTranslateClient
     internal DateTime LastRequest = DateTime.MinValue;
     internal readonly Dictionary<string, WebRequestItem> Queue = new();
 
-    private async Task QueueHandler()
+    private void QueueHandler()
     {
-        HttpClient client = new();
-
-        client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36");
-
-        while (!_disposed)
+        _ = Task.Run(async () =>
         {
-            if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
+            HttpClient client = new();
+
+            client.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36");
+
+            while (!this._disposed)
             {
-                await Task.Delay(100);
-                continue;
-            }
-
-            var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
-
-            try
-            {
-                var response = await client.PostAsync(b.Value.Url, null);
-
-                this.Queue[b.Key].StatusCode = response.StatusCode;
-
-                if (!response.IsSuccessStatusCode)
+                if (this.Queue.Count == 0 || !this.Queue.Any(x => !x.Value.Resolved && !x.Value.Failed))
                 {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                        throw new Exceptions.NotFoundException("");
-
-                    if (response.StatusCode == HttpStatusCode.InternalServerError)
-                        throw new Exceptions.InternalServerErrorException("");
-
-                    if (response.StatusCode == HttpStatusCode.Forbidden)
-                        throw new Exceptions.ForbiddenException("");
-
-                    throw new Exception($"Unsuccessful request: {response.StatusCode}");
+                    await Task.Delay(100);
+                    continue;
                 }
 
+                var b = this.Queue.First(x => !x.Value.Resolved && !x.Value.Failed);
 
-                this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
-                this.Queue[b.Key].Resolved = true;
+                try
+                {
+                    var response = await client.PostAsync(b.Value.Url, null);
+
+                    this.Queue[b.Key].StatusCode = response.StatusCode;
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                            throw new Exceptions.NotFoundException("");
+
+                        if (response.StatusCode == HttpStatusCode.InternalServerError)
+                            throw new Exceptions.InternalServerErrorException("");
+
+                        if (response.StatusCode == HttpStatusCode.Forbidden)
+                            throw new Exceptions.ForbiddenException("");
+
+                        throw new Exception($"Unsuccessful request: {response.StatusCode}");
+                    }
+
+
+                    this.Queue[b.Key].Response = await response.Content.ReadAsStringAsync();
+                    this.Queue[b.Key].Resolved = true;
+                }
+                catch (Exception ex)
+                {
+                    this.Queue[b.Key].Failed = true;
+                    this.Queue[b.Key].Exception = ex;
+                }
+                finally
+                {
+                    this.LastRequest = DateTime.UtcNow;
+                    await Task.Delay(10000);
+                }
             }
-            catch (Exception ex)
-            {
-                this.Queue[b.Key].Failed = true;
-                this.Queue[b.Key].Exception = ex;
-            }
-            finally
-            {
-                this.LastRequest = DateTime.UtcNow;
-                await Task.Delay(10000);
-            }
-        }
+        }).Add(this.Bot).IsVital();
     }
 
     private async Task<string> MakeRequest(string url)
     {
-        string key = Guid.NewGuid().ToString();
+        var key = Guid.NewGuid().ToString();
         this.Queue.Add(key, new WebRequestItem { Url = url });
 
         while (this.Queue.ContainsKey(key) && !this.Queue[key].Resolved && !this.Queue[key].Failed)
@@ -91,7 +94,7 @@ public sealed class GoogleTranslateClient
             throw new Exception("The request has been removed from the queue prematurely.");
 
         var response = this.Queue[key];
-        this.Queue.Remove(key);
+        _ = this.Queue.Remove(key);
 
         if (response.Resolved)
             return response.Response;
@@ -116,13 +119,13 @@ public sealed class GoogleTranslateClient
             query = await content.ReadAsStringAsync();
         }
 
-        var translateResponse = await MakeRequest($"https://translate.google.com/translate_a/single?client=gtx&{query}&dt=t&ie=UTF-8&oe=UTF-8");
+        var translateResponse = await this.MakeRequest($"https://translate.google.com/translate_a/single?client=gtx&{query}&dt=t&ie=UTF-8&oe=UTF-8");
 
         var parsedResponse = JsonConvert.DeserializeObject<object[]>(translateResponse);
         var parsedTextStep1 = JsonConvert.DeserializeObject<object[]>(parsedResponse[0].ToString());
-        string translatedText = string.Join(" ", parsedTextStep1.Select(x => JsonConvert.DeserializeObject<object[]>(x.ToString())[0].ToString()));
+        var translatedText = string.Join(" ", parsedTextStep1.Select(x => JsonConvert.DeserializeObject<object[]>(x.ToString())[0].ToString()));
 
-        string translationSource = "";
+        var translationSource = "";
 
         if (SourceLanguage == "auto")
         {

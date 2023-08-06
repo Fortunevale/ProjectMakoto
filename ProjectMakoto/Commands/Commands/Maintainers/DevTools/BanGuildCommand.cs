@@ -11,21 +11,21 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class BanGuildCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            ulong guild = (ulong)arguments["guild"];
-            string reason = (string)arguments["reason"];
+            var guild = (ulong)arguments["guild"];
+            var reason = (string)arguments["reason"];
 
             if (reason.IsNullOrWhiteSpace())
                 reason = "No reason provided.";
 
             if (ctx.Bot.bannedGuilds.ContainsKey(guild))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is already banned from using the bot.`").AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' is already banned from using the bot.`").AsError(ctx));
                 return;
             }
 
@@ -37,7 +37,7 @@ internal sealed class BanGuildCommand : BaseCommand
                 await b.Value.LeaveAsync();
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was banned from using the bot.`").AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"`Guild '{guild}' was banned from using the bot.`").AsSuccess(ctx));
         });
     }
 }

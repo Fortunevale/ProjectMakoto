@@ -22,7 +22,7 @@ public sealed class InviteTrackerSettings : RequiresParent<Guild>
         set
         {
             this._Enabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_enabled", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +33,7 @@ public sealed class InviteTrackerSettings : RequiresParent<Guild>
         set
         {
             this._Cache = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_cache", JsonConvert.SerializeObject(value), Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "invitetracker_cache", JsonConvert.SerializeObject(value), this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

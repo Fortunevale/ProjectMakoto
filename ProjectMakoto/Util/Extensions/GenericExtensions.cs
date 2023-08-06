@@ -15,10 +15,9 @@ internal static class GenericExtensions
 {
     public static string TruncateWithIndication(this string value, int maxLength, string customString = "..")
     {
-        if (string.IsNullOrEmpty(value))
-            return value;
-
-        return value.Length <= maxLength ? value : $"{value[..(maxLength - customString.Length)]}{customString}";
+        return string.IsNullOrEmpty(value)
+            ? value
+            : value.Length <= maxLength ? value : $"{value[..(maxLength - customString.Length)]}{customString}";
     }
 
     internal static Exception AddData(this Exception exception, string key, object? data)
@@ -27,7 +26,7 @@ internal static class GenericExtensions
         return exception;
     }
 
-    internal static bool ContainsTask(this IReadOnlyList<InternalSheduler.ScheduledTask>? tasks, string type, ulong snowflake, string id) 
+    internal static bool ContainsTask(this IReadOnlyList<ScheduledTask>? tasks, string type, ulong snowflake, string id) 
         => tasks.Where(x =>
         {
             if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)
@@ -36,10 +35,7 @@ internal static class GenericExtensions
             if (scheduledTaskIdentifier.Type != type)
                 return false;
 
-            if (scheduledTaskIdentifier.Snowflake != snowflake)
-                return false;
-
-            return true;
+            return scheduledTaskIdentifier.Snowflake == snowflake;
         }).Any(x => ((ScheduledTaskIdentifier)x.CustomData).Id == id);
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "<Pending>")]
@@ -95,7 +91,7 @@ internal static class GenericExtensions
     private static string GetHumanReadableSize(this long size)
     {
         string[] sizes = { "B", "KB", "MB", "GB", "TB" };
-        int order = 0;
+        var order = 0;
         while (size >= 1024 && order < sizes.Length - 1)
         {
             order++;
@@ -107,11 +103,11 @@ internal static class GenericExtensions
     internal static string GetSHA256(this string value)
     {
         StringBuilder Sb = new();
-        Encoding enc = Encoding.UTF8;
-        byte[] result = SHA256.HashData(enc.GetBytes(value));
+        var enc = Encoding.UTF8;
+        var result = SHA256.HashData(enc.GetBytes(value));
 
-        foreach (byte b in result)
-            Sb.Append(b.ToString("x2"));
+        foreach (var b in result)
+            _ = Sb.Append(b.ToString("x2"));
 
         return Sb.ToString();
     }
@@ -149,7 +145,7 @@ internal static class GenericExtensions
         if (!chars.IsNotNullAndNotEmpty() || !chars.Any(x => str.Contains(x)))
             return str;
 
-        List<KeyValuePair<char, int>> indexes = chars.Select(x => new KeyValuePair<char, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
+        var indexes = chars.Select(x => new KeyValuePair<char, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
 
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }
@@ -159,7 +155,7 @@ internal static class GenericExtensions
         if (!strings.IsNotNullAndNotEmpty() || !strings.Any(x => str.Contains(x)))
             return str;
 
-        List<KeyValuePair<string, int>> indexes = strings.Select(x => new KeyValuePair<string, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
+        var indexes = strings.Select(x => new KeyValuePair<string, int>(x, !Reverse ? str.IndexOf(x) : str.LastIndexOf(x))).ToList();
 
         return str[..(!Reverse ? indexes.Min(x => x.Value) : indexes.Max(x => x.Value))];
     }

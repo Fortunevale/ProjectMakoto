@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class ForceClearQueueCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,18 +26,18 @@ internal sealed class ForceClearQueueCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             if (!ctx.Member.IsDJ(ctx.Bot.status))
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
+                    Description = this.GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
                 }.AsError(ctx));
                 return;
             }
@@ -45,9 +45,9 @@ internal sealed class ForceClearQueueCommand : BaseCommand
             ctx.DbGuild.MusicModule.SongQueue.Clear();
             ctx.DbGuild.MusicModule.collectedClearQueueVotes.Clear();
 
-            await RespondOrEdit(embed: new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.ForceClearQueue.Cleared, true),
+                Description = this.GetString(this.t.Commands.Music.ForceClearQueue.Cleared, true),
             }.AsSuccess(ctx));
         });
     }

@@ -11,19 +11,19 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class LogCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            CustomLogLevel Level = (CustomLogLevel)arguments["Level"];
+            var Level = (CustomLogLevel)arguments["Level"];
 
             if (Level > CustomLogLevel.Trace2)
                 throw new Exception("Invalid Log Level");
 
             _logger.ChangeLogLevel(Level);
-            await RespondOrEdit($"`Changed LogLevel to '{(CustomLogLevel)Level}'`");
+            _ = await this.RespondOrEdit($"`Changed LogLevel to '{(CustomLogLevel)Level}'`");
         });
     }
 }

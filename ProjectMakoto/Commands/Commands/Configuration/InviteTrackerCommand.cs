@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class InviteTrackerCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -21,7 +21,7 @@ internal sealed class InviteTrackerCommand : BaseCommand
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                return $"{"📲".UnicodeToEmoji()} `{GetString(t.Commands.Config.InviteTracker.InviteTrackerEnabled)}`: {ctx.DbGuild.InviteTracker.Enabled.ToEmote(ctx.Bot)}";
+                return $"{"📲".UnicodeToEmoji()} `{this.GetString(this.t.Commands.Config.InviteTracker.InviteTrackerEnabled)}`: {ctx.DbGuild.InviteTracker.Enabled.ToEmote(ctx.Bot)}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
@@ -30,11 +30,11 @@ internal sealed class InviteTrackerCommand : BaseCommand
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+            }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-            var Toggle = new DiscordButtonComponent((ctx.DbGuild.InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), GetString(CommandKey.ToggleInviteTrackerButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
+            var Toggle = new DiscordButtonComponent((ctx.DbGuild.InviteTracker.Enabled ? ButtonStyle.Danger : ButtonStyle.Success), Guid.NewGuid().ToString(), this.GetString(CommandKey.ToggleInviteTrackerButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📲")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
             .AddComponents(new List<DiscordComponent>
             {
                 Toggle
@@ -45,7 +45,7 @@ internal sealed class InviteTrackerCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -58,12 +58,12 @@ internal sealed class InviteTrackerCommand : BaseCommand
                 if (ctx.DbGuild.InviteTracker.Enabled)
                     _ = InviteTrackerEvents.UpdateCachedInvites(ctx.Bot, ctx.Guild);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

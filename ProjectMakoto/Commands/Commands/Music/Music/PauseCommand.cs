@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class PauseCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,23 +26,20 @@ internal sealed class PauseCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             ctx.DbGuild.MusicModule.IsPaused = !ctx.DbGuild.MusicModule.IsPaused;
 
-            if (ctx.DbGuild.MusicModule.IsPaused)
-                _ = conn.PauseAsync();
-            else
-                _ = conn.ResumeAsync();
+            _ = ctx.DbGuild.MusicModule.IsPaused ? conn.PauseAsync() : conn.ResumeAsync();
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.DbGuild.MusicModule.IsPaused ? GetString(this.t.Commands.Music.Pause.Paused, true) : GetString(this.t.Commands.Music.Pause.Resumed, true)),
+                Description = (ctx.DbGuild.MusicModule.IsPaused ? this.GetString(this.t.Commands.Music.Pause.Paused, true) : this.GetString(this.t.Commands.Music.Pause.Resumed, true)),
             }.AsSuccess(ctx));
         });
     }

@@ -109,7 +109,7 @@ public static class TranslationUtil
     internal static string Build(this string[] array, bool Code = false, bool UseBoldMarker = false, params TVar[] Tvars)
         => string.Join("\n", array.Select(x =>
         {
-            bool boldLine = false;
+            var boldLine = false;
 
             var y = x;
 
@@ -121,10 +121,7 @@ public static class TranslationUtil
 
             y = y.Build(Code, Tvars);
 
-            if (x.IsNullOrWhiteSpace())
-                return x;
-
-            return $"{(boldLine ? "**" : "")}{y}{(boldLine ? "**" : "")}";
+            return x.IsNullOrWhiteSpace() ? x : $"{(boldLine ? "**" : "")}{y}{(boldLine ? "**" : "")}";
         }));
 
     /// <summary>
@@ -145,7 +142,7 @@ public static class TranslationUtil
     /// <returns></returns>
     internal static int CalculatePadding(User user, params SingleTranslationKey[] pairs)
     {
-        int pad = 0;
+        var pad = 0;
 
         foreach (var b in pairs)
         {

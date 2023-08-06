@@ -20,10 +20,10 @@ internal sealed class NameNormalizerEvents : RequiresTranslation
         if (!this.Bot.Guilds[e.Guild.Id].NameNormalizer.NameNormalizerEnabled)
             return;
 
-        string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
+        var PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
         if (PingableName.IsNullOrWhiteSpace())
-            PingableName = t.Commands.Config.NameNormalizer.DefaultName.Get(Bot.Guilds[e.Guild.Id]);
+            PingableName = this.t.Commands.Config.NameNormalizer.DefaultName.Get(this.Bot.Guilds[e.Guild.Id]);
 
         if (PingableName != e.Member.DisplayName)
             _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
@@ -36,10 +36,10 @@ internal sealed class NameNormalizerEvents : RequiresTranslation
 
         if (e.NicknameBefore != e.NicknameAfter)
         {
-            string PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
+            var PingableName = RegexTemplates.AllowedNickname.Replace(e.Member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
-                PingableName = t.Commands.Config.NameNormalizer.DefaultName.Get(Bot.Guilds[e.Guild.Id]);
+                PingableName = this.t.Commands.Config.NameNormalizer.DefaultName.Get(this.Bot.Guilds[e.Guild.Id]);
 
             if (PingableName != e.Member.DisplayName)
                 _ = e.Member.ModifyAsync(x => x.Nickname = PingableName);
@@ -58,10 +58,10 @@ internal sealed class NameNormalizerEvents : RequiresTranslation
 
             var member = await e.UserAfter.ConvertToMember(guild.Value);
 
-            string PingableName = RegexTemplates.AllowedNickname.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), "");
+            var PingableName = RegexTemplates.AllowedNickname.Replace(member.DisplayName.Normalize(NormalizationForm.FormKC), "");
 
             if (PingableName.IsNullOrWhiteSpace())
-                PingableName = t.Commands.Config.NameNormalizer.DefaultName.Get(Bot.Guilds[guild.Key]);
+                PingableName = this.t.Commands.Config.NameNormalizer.DefaultName.Get(this.Bot.Guilds[guild.Key]);
 
             if (PingableName != member.DisplayName)
                 _ = member.ModifyAsync(x => x.Nickname = PingableName);

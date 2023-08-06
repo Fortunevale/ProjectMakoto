@@ -16,7 +16,7 @@ internal sealed class VcCreatorEvents : RequiresTranslation
     }
 
     Translations.events.vcCreator tKey
-        => Bot.LoadedTranslations.Events.VcCreator;
+        => this.Bot.LoadedTranslations.Events.VcCreator;
 
     internal async Task VoiceStateUpdated(DiscordClient sender, VoiceStateUpdateEventArgs e)
     {
@@ -24,7 +24,7 @@ internal sealed class VcCreatorEvents : RequiresTranslation
         {
             try
             {
-                DiscordMember member = await e.User.ConvertToMember(e.Guild);
+                var member = await e.User.ConvertToMember(e.Guild);
 
                 if (!this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel.ContainsKey(e.User.Id))
                     this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel.Add(e.User.Id, DateTime.MinValue);
@@ -37,7 +37,7 @@ internal sealed class VcCreatorEvents : RequiresTranslation
 
                 this.Bot.Guilds[e.Guild.Id].VcCreator.LastCreatedChannel[e.User.Id] = DateTime.UtcNow;
 
-                var name = tKey.DefaultChannelName.Get(Bot.Guilds[e.Guild.Id]).Build(new TVar("User", member.DisplayName.SanitizeForCode()));
+                var name = this.tKey.DefaultChannelName.Get(this.Bot.Guilds[e.Guild.Id]).Build(new TVar("User", member.DisplayName.SanitizeForCode()));
 
                 foreach (var b in this.Bot.ProfanityList)
                     name = name.Replace(b, new String('*', b.Length));
@@ -52,13 +52,13 @@ internal sealed class VcCreatorEvents : RequiresTranslation
 
                 await Task.Delay(1000);
 
-                await newChannel.SendMessageAsync(new DiscordMessageBuilder()
+                _ = await newChannel.SendMessageAsync(new DiscordMessageBuilder()
                     .WithContent(e.User.Mention)
                     .WithEmbed(new DiscordEmbedBuilder()
                         .WithAuthor(e.Guild.Name, "", e.Guild.IconUrl)
                         .WithColor(EmbedColors.Info)
                         .WithTimestamp(DateTime.UtcNow)
-                        .WithDescription(tKey.DefaultChannelName.Get(Bot.Guilds[e.Guild.Id]).Build(true, new TVar("Command", "'/vcc'")))));
+                        .WithDescription(this.tKey.DefaultChannelName.Get(this.Bot.Guilds[e.Guild.Id]).Build(true, new TVar("Command", "'/vcc'")))));
             }
             catch (Exception)
             {

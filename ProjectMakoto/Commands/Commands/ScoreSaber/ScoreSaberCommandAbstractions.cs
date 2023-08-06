@@ -40,7 +40,7 @@ internal sealed class ScoreSaberCommandAbstractions
             Description = GetString(t.Commands.ScoreSaber.Profile.LoadingPlayer, true)
         }.AsLoading(ctx, "Score Saber");
 
-        await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+        _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
         try
         {
@@ -82,7 +82,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
@@ -91,7 +91,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         if (e.GetCustomId() == "thats_me")
                         {
                             AddLinkButton = false;
-                            ShowProfile().Add(ctx.Bot, ctx);
+                            _ = ShowProfile().Add(ctx.Bot, ctx);
                             ctx.DbUser.ScoreSaber.Id = Convert.ToUInt64(player.id);
 
                             var new_msg = await ctx.Channel.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
@@ -114,7 +114,7 @@ internal sealed class ScoreSaberCommandAbstractions
                             {
                                 CachedTopScores ??= await ctx.Bot.ScoreSaberClient.GetScoresById(id, ScoreType.Top);
 
-                                ShowScores(CachedTopScores, ScoreType.Top).Add(ctx.Bot, ctx);
+                                _ = ShowScores(CachedTopScores, ScoreType.Top).Add(ctx.Bot, ctx);
                             }
                             catch (InternalServerErrorException)
                             {
@@ -123,7 +123,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
                                 embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
-                                await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
                                 return;
                             }
@@ -134,7 +134,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
                                 embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
-                                await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
                             catch (Exception)
@@ -148,7 +148,7 @@ internal sealed class ScoreSaberCommandAbstractions
                             {
                                 CachedRecentScores ??= await ctx.Bot.ScoreSaberClient.GetScoresById(id, ScoreType.Recent);
 
-                                ShowScores(CachedRecentScores, ScoreType.Recent).Add(ctx.Bot, ctx);
+                                _ = ShowScores(CachedRecentScores, ScoreType.Recent).Add(ctx.Bot, ctx);
                             }
                             catch (InternalServerErrorException)
                             {
@@ -157,7 +157,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
                                 embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
-                                await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
                             catch (ForbiddenException)
@@ -167,7 +167,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
                                 embed = embed.AsError(ctx, "Score Saber");
                                 embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
-                                await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+                                _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
                                 return;
                             }
                             catch (Exception)
@@ -177,7 +177,7 @@ internal sealed class ScoreSaberCommandAbstractions
                         }
                         else if (e.GetCustomId() == "getmain")
                         {
-                            ShowProfile().Add(ctx.Bot, ctx);
+                            _ = ShowProfile().Add(ctx.Bot, ctx);
                         }
 
                         cancellationTokenSource.Cancel();
@@ -198,19 +198,19 @@ internal sealed class ScoreSaberCommandAbstractions
 
             async Task ShowScores(PlayerScores scores, ScoreType scoreType)
             {
-                embed.ClearFields();
+                _ = embed.ClearFields();
                 embed.ImageUrl = "";
                 embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n\n" +
                                     $"{(scoreType == ScoreType.Top ? $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**" : $"**{GetString(t.Commands.ScoreSaber.Profile.TopScores)}**")}";
 
                 foreach (var score in scores.playerScores.Take(5))
                 {
-                    decimal page = Math.Ceiling((decimal)score.score.rank / (decimal)12);
+                    var page = Math.Ceiling((decimal)score.score.rank / (decimal)12);
 
                     decimal rank = score.score.rank / 6;
-                    bool odd = (rank % 2 != 0);
+                    var odd = (rank % 2 != 0);
 
-                    embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName.FullSanitize()}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $" {score.leaderboard.songSubName.FullSanitize()}" : "")} - {score.leaderboard.songAuthorName.FullSanitize()} [{score.leaderboard.levelAuthorName.FullSanitize()}]".TruncateWithIndication(256),
+                    _ = embed.AddField(new DiscordEmbedField($"{score.leaderboard.songName.FullSanitize()}{(!string.IsNullOrWhiteSpace(score.leaderboard.songSubName) ? $" {score.leaderboard.songSubName.FullSanitize()}" : "")} - {score.leaderboard.songAuthorName.FullSanitize()} [{score.leaderboard.levelAuthorName.FullSanitize()}]".TruncateWithIndication(256),
                         $":globe_with_meridians: **#{score.score.rank}**  󠂪 󠂪| 󠂪 󠂪 {Formatter.Timestamp(score.score.timeSet, TimestampFormat.RelativeTime)}\n" +
                         $"{(score.leaderboard.ranked ? $"**`{((decimal)((decimal)score.score.modifiedScore / (decimal)score.leaderboard.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.score.pp).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp [{(score.score.pp * score.score.weight).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp]`**\n" : "\n")}" +
                         $"`{score.score.modifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}` 󠂪 󠂪| 󠂪 󠂪 **{(score.score.fullCombo ? "✅ `FC`" : $"{false.ToEmote(ctx.Bot)} `{score.score.missedNotes + score.score.badCuts}`")}**\n" +
@@ -220,47 +220,47 @@ internal sealed class ScoreSaberCommandAbstractions
                 DiscordMessageBuilder builder = new();
 
                 if (ctx.DbUser.ScoreSaber.Id == 0 && AddLinkButton)
-                    builder.AddComponents(LinkButton);
+                    _ = builder.AddComponents(LinkButton);
 
-                await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed).AddComponents((scoreType == ScoreType.Top ? TopScoreInteractionRow : RecentScoreInteractionRow)));
+                _ = await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed).AddComponents((scoreType == ScoreType.Top ? TopScoreInteractionRow : RecentScoreInteractionRow)));
             }
 
-            string LoadedGraph = "";
+            var LoadedGraph = "";
 
             async Task ShowProfile()
             {
                 embed = embed.AsInfo(ctx, "Score Saber");
 
-                embed.ClearFields();
+                _ = embed.ClearFields();
                 embed.Title = $"{player.name.FullSanitize()} 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪`{player.pp.ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`";
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = player.profilePicture };
                 embed.Description = $":globe_with_meridians: **#{player.rank}** 󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪:flag_{player.country.ToLower()}: **#{player.countryRank}**\n";
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.RankedPlayCount), $"`{player.scoreStats.rankedPlayCount}`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalRankedScore), $"`{player.scoreStats.totalRankedScore.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.AverageRankedAccuracy), $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalPlayCount), $"`{player.scoreStats.totalPlayCount}`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalScore), $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
-                embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.ReplaysWatched), $"`{player.scoreStats.replaysWatched}`", true));
+                _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.RankedPlayCount), $"`{player.scoreStats.rankedPlayCount}`", true));
+                _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalRankedScore), $"`{player.scoreStats.totalRankedScore.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}`", true));
+                _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.AverageRankedAccuracy), $"`{Math.Round(player.scoreStats.averageRankedAccuracy, 2).ToString().Replace(",", ".")}%`", true));
+                _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalPlayCount), $"`{player.scoreStats.totalPlayCount}`", true));
+                _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.TotalScore), $"`{player.scoreStats.totalScore.ToString("N", CultureInfo.GetCultureInfo("en-US")).Replace(".000", "")}`", true));
+                _ = embed.AddField(new DiscordEmbedField(GetString(t.Commands.ScoreSaber.Profile.ReplaysWatched), $"`{player.scoreStats.replaysWatched}`", true));
 
                 DiscordMessageBuilder builder = new();
 
                 if (ctx.DbUser.ScoreSaber.Id == 0 && AddLinkButton)
-                    builder.AddComponents(LinkButton);
+                    _ = builder.AddComponents(LinkButton);
 
                 if (!string.IsNullOrWhiteSpace(LoadedGraph))
                 {
                     embed = embed.AsInfo(ctx, "Score Saber");
                     embed.ImageUrl = LoadedGraph;
-                    builder.AddComponents(ProfileInteractionRow);
+                    _ = builder.AddComponents(ProfileInteractionRow);
                 }
 
-                await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed));
+                _ = await ctx.BaseCommand.RespondOrEdit(builder.WithEmbed(embed));
 
                 var file = $"{Guid.NewGuid()}.png";
 
-                string labels = "";
+                var labels = "";
 
-                for (int i = 50; i >= 0; i -= 2)
+                for (var i = 50; i >= 0; i -= 2)
                 {
                     if (i == 0)
                     {
@@ -337,7 +337,7 @@ internal sealed class ScoreSaberCommandAbstractions
 
                         qc.ToFile(file);
 
-                        using FileStream stream = File.Open(file, FileMode.Open);
+                        using var stream = File.Open(file, FileMode.Open);
 
                         var asset = await (await ctx.Client.GetChannelAsync(ctx.Bot.status.LoadedConfig.Channels.GraphAssets)).SendMessageAsync(new DiscordMessageBuilder().WithFile(file, stream));
 
@@ -346,14 +346,14 @@ internal sealed class ScoreSaberCommandAbstractions
                         embed = embed.AsInfo(ctx, "Score Saber");
                         embed.ImageUrl = asset.Attachments[0].Url;
                         builder = builder.WithEmbed(embed);
-                        builder.AddComponents(ProfileInteractionRow);
-                        await ctx.BaseCommand.RespondOrEdit(builder);
+                        _ = builder.AddComponents(ProfileInteractionRow);
+                        _ = await ctx.BaseCommand.RespondOrEdit(builder);
                     }
                     catch (Exception ex)
                     {
                         embed = embed.AsInfo(ctx, "Score Saber");
-                        builder.AddComponents(ProfileInteractionRow);
-                        await ctx.BaseCommand.RespondOrEdit(builder);
+                        _ = builder.AddComponents(ProfileInteractionRow);
+                        _ = await ctx.BaseCommand.RespondOrEdit(builder);
                         _logger.LogError(ex.ToString());
                     }
 
@@ -365,7 +365,7 @@ internal sealed class ScoreSaberCommandAbstractions
                 catch { }
             }
 
-            ShowProfile().Add(ctx.Bot, ctx);
+            _ = ShowProfile().Add(ctx.Bot, ctx);
 
             ctx.Client.ComponentInteractionCreated += RunInteraction;
 
@@ -382,22 +382,22 @@ internal sealed class ScoreSaberCommandAbstractions
         catch (InternalServerErrorException)
         {
             embed.Description = GetString(t.Commands.ScoreSaber.InternalServerError, true);
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (ForbiddenException)
         {
             embed.Description = GetString(t.Commands.ScoreSaber.ForbiddenError, true);
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (NotFoundException)
         {
             embed.Description = GetString(t.Commands.ScoreSaber.Profile.InvalidId, true);
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (UnprocessableEntityException)
         {
             embed.Description = GetString(t.Commands.ScoreSaber.Profile.InvalidId, true);
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
         }
         catch (Exception)
         {

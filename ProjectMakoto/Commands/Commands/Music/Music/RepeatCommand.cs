@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class RepeatCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,18 +26,18 @@ internal sealed class RepeatCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             ctx.DbGuild.MusicModule.Repeat = !ctx.DbGuild.MusicModule.Repeat;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.DbGuild.MusicModule.Repeat ? GetString(this.t.Commands.Music.Repeat.On, true) : GetString(this.t.Commands.Music.Repeat.Off, true)),
+                Description = (ctx.DbGuild.MusicModule.Repeat ? this.GetString(this.t.Commands.Music.Repeat.On, true) : this.GetString(this.t.Commands.Music.Repeat.Off, true)),
             }.AsSuccess(ctx));
         });
     }

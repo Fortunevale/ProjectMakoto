@@ -79,13 +79,14 @@ public sealed class Bot
     internal async Task Init(string[] args)
     {
         _logger = LoggerClient.StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Info, DateTime.UtcNow.AddDays(-3), false);
-        _logger.LogRaised += LogHandler;
+        _logger.LogRaised += this.LogHandler;
 
+        ScheduledTaskExtensions.TaskStarted += this.TaskStarted;
         UniversalExtensions.AttachLogger(_logger);
 
         RenderAsciiArt();
 
-        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
+        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
         _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
 
         if (args.Contains("--debug"))
@@ -123,12 +124,12 @@ public sealed class Bot
 
                 this.Users = new(this);
                 this.Guilds = new(this);
-                await DatabaseClient.InitializeDatabase(this);
+                _ = await DatabaseClient.InitializeDatabase(this);
 
                 this.BumpReminder = new(this);
 
-                this.ScoreSaberClient = new ScoreSaberClient();
-                this.TranslationClient = new GoogleTranslateClient();
+                this.ScoreSaberClient = new ScoreSaberClient(this);
+                this.TranslationClient = new GoogleTranslateClient(this);
                 this.ThreadJoinClient = new ThreadJoinClient();
 
                 await Util.Initializers.ListLoader.Load(this);
@@ -195,7 +196,7 @@ public sealed class Bot
                 this.status.LoadedConfig.Save();
 
                 var channel = await this.DiscordClient.GetChannelAsync(this.status.LoadedConfig.Channels.GithubLog);
-                await channel.SendMessageAsync(new DiscordEmbedBuilder
+                _ = await channel.SendMessageAsync(new DiscordEmbedBuilder
                 {
                     Color = EmbedColors.Success,
                     Title = $"Successfully updated to `{this.status.RunningVersion}`."
@@ -230,7 +231,7 @@ public sealed class Bot
                 }
             });
 
-            ProcessDeletionRequests().Add(this);
+            _ = this.ProcessDeletionRequests().Add(this);
         }).Add(this).IsVital();
 
         while (!loadDatabase.Task.IsCompleted || !logInToDiscord.Task.IsCompleted)
@@ -252,24 +253,28 @@ public sealed class Bot
 
         AppDomain.CurrentDomain.ProcessExit += delegate
         {
-            ExitApplication(true).Wait();
+#pragma warning disable AsyncFixer02 // Long-running or blocking operations inside an async method
+            this.ExitApplication(true).Wait();
+#pragma warning restore AsyncFixer02 // Long-running or blocking operations inside an async method
         };
 
         Console.CancelKeyPress += delegate
         {
             _logger.LogInfo("Exiting, please wait..");
-            ExitApplication().Wait();
+#pragma warning disable AsyncFixer02 // Long-running or blocking operations inside an async method
+            this.ExitApplication().Wait();
+#pragma warning restore AsyncFixer02 // Long-running or blocking operations inside an async method
         };
 
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             while (true)
             {
                 if (File.Exists("updated"))
                 {
                     File.Delete("updated");
-                    await ExitApplication();
+                    await this.ExitApplication();
                     return;
                 }
 
@@ -284,7 +289,7 @@ public sealed class Bot
     {
         try
         {
-            string ASCII = File.ReadAllText("Assets/ASCII.txt");
+            var ASCII = File.ReadAllText("Assets/ASCII.txt");
             Console.WriteLine();
             foreach (var b in ASCII)
             {
@@ -325,9 +330,9 @@ public sealed class Bot
             //    if (!_status.TeamMembers.Any(x => x == message.Author.Id))
             //        return -1;
 
-            string currentPrefix = this.Guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.PrefixSettings.Prefix : this.Prefix;
+            var currentPrefix = this.Guilds.TryGetValue(message.GuildId ?? 0, out var guild) ? guild.PrefixSettings.Prefix : this.Prefix;
 
-            int CommandStart = -1;
+            var CommandStart = -1;
 
             if (!(guild?.PrefixSettings.PrefixDisabled ?? false))
                 CommandStart = CommandsNextUtilities.GetStringPrefixLength(message, currentPrefix);
@@ -404,7 +409,7 @@ public sealed class Bot
                 await this.DatabaseClient.FullSyncDatabase(true);
                 _logger.LogDebug("Flushed to database.");
 
-                Thread.Sleep(500);
+                await Task.Delay(500);
 
                 _logger.LogInfo("Closing database..");
                 await this.DatabaseClient.Dispose();
@@ -416,19 +421,19 @@ public sealed class Bot
             }
         }
 
-        Thread.Sleep(500);
+        await Task.Delay(500);
         _logger.LogInfo("Goodbye!");
 
-        Thread.Sleep(500);
+        await Task.Delay(500);
         Environment.Exit(0);
     }
 
     private async Task ProcessDeletionRequests()
     {
-        new Task(new Action(async () =>
+        _ = new Func<Task>(async () =>
         {
-            ProcessDeletionRequests().Add(this);
-        })).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
+            _ = this.ProcessDeletionRequests().Add(this);
+        }).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
 
         lock (this.Users)
         {
@@ -438,13 +443,13 @@ public sealed class Bot
                 {
                     _logger.LogInfo("Deleting profile of '{Key}'", b.Key);
 
-                    this.Users.Remove(b.Key);
-                    this.DatabaseClient._helper.DeleteRow(this.DatabaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
+                    _ = this.Users.Remove(b.Key);
+                    _ = this.DatabaseClient._helper.DeleteRow(this.DatabaseClient.mainDatabaseConnection, "users", "userid", $"{b.Key}").Add(this);
                     this.objectedUsers.Add(b.Key);
                     foreach (var c in this.DiscordClient.Guilds.Where(x => x.Value.OwnerId == b.Key))
                     {
                         try
-                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); c.Value.LeaveAsync().Add(this); }
+                        { _logger.LogInfo("Leaving guild '{guild}'..", c.Key); _ = c.Value.LeaveAsync().Add(this); }
                         catch { }
                     }
                 }
@@ -456,5 +461,8 @@ public sealed class Bot
         => Util.Initializers.SyncTasks.GuildDownloadCompleted(this, sender, e);
 
     internal void LogHandler(object? sender, LogMessageEventArgs e)
-        => TaskWatcher.LogHandler(this, sender, e);
+        => this.Watcher.LogHandler(this, sender, e);
+
+    internal void TaskStarted(object? sender, Xorog.UniversalExtensions.EventArgs.ScheduledTaskStartedEventArgs e)
+        => this.Watcher.TaskStarted(this, sender, e);
 }

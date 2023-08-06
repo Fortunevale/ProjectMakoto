@@ -13,44 +13,47 @@ public sealed class ThreadJoinClient
 {
     internal ThreadJoinClient()
     {
-        _ = this.QueueHandler();
+        this.QueueHandler();
     }
 
     ~ThreadJoinClient()
     {
-        _disposed = true;
+        this._disposed = true;
     }
 
     bool _disposed = false;
 
     internal readonly Dictionary<ulong, DiscordThreadChannel> Queue = new();
 
-    private async Task QueueHandler()
+    private void QueueHandler()
     {
-        while (!_disposed)
+        _ = Task.Run(async () =>
         {
-            if (this.Queue.Count == 0)
+            while (!this._disposed)
             {
-                await Task.Delay(100);
-                continue;
-            }
-
-            var b = this.Queue.First();
-
-            try
-            {
-                await b.Value.JoinAsync();
-
-                lock (this.Queue)
+                if (this.Queue.Count == 0)
                 {
-                    this.Queue.Remove(b.Key);
+                    Thread.Sleep(100);
+                    continue;
+                }
+
+                var b = this.Queue.First();
+
+                try
+                {
+                    await b.Value.JoinAsync();
+
+                    lock (this.Queue)
+                    {
+                        _ = this.Queue.Remove(b.Key);
+                    }
+                }
+                finally
+                {
+                    await Task.Delay(1000);
                 }
             }
-            finally
-            {
-                await Task.Delay(1000);
-            }
-        }
+        });
     }
 
     public async Task JoinThread(DiscordThreadChannel channel)

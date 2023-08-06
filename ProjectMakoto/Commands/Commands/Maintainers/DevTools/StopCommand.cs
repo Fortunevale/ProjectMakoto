@@ -11,23 +11,23 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class StopCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var msg = await RespondOrEdit(new DiscordMessageBuilder().WithContent("Confirm?").AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, "Shutdown", "Confirm shutdown", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")))));
+            var msg = await this.RespondOrEdit(new DiscordMessageBuilder().WithContent("Confirm?").AddComponents(new DiscordButtonComponent(ButtonStyle.Danger, "Shutdown", "Confirm shutdown", false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")))));
 
             var x = await ctx.WaitForButtonAsync(TimeSpan.FromMinutes(1));
 
             if (x.TimedOut)
             {
-                await RespondOrEdit("_Interaction timed out._");
+                _ = await this.RespondOrEdit("_Interaction timed out._");
                 return;
             }
 
-            await RespondOrEdit("Shutting down!");
+            _ = await this.RespondOrEdit("Shutting down!");
 
             await ctx.Bot.ExitApplication(true);
         });

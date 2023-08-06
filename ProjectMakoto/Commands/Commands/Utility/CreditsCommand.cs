@@ -18,9 +18,9 @@ internal sealed class CreditsCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx, true))
                 return;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.Credits.Fetching, true)
+                Description = this.GetString(this.t.Commands.Utility.Credits.Fetching, true)
             }.AsBotLoading(ctx));
 
             var contributors = await ctx.Bot.GithubClient.Repository.GetAllContributors(ctx.Bot.status.LoadedConfig.Secrets.Github.Username, ctx.Bot.status.LoadedConfig.Secrets.Github.Repository);
@@ -32,9 +32,9 @@ internal sealed class CreditsCommand : BaseCommand
             foreach (var b in ctx.Bot.status.TeamMembers.Reverse<ulong>())
                 userlist.Add(await ctx.Client.GetUserAsync(b));
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.Credits.Credits, false, false,
+                Description = this.GetString(this.t.Commands.Utility.Credits.Credits, false, false,
                 new TVar("BotName", ctx.CurrentUser.GetUsername(), false),
                 new TVar("Developer", "<@411950662662881290> ([`TheXorog`](https://github.com/TheXorog))", false),
                 new TVar("DiscordStaffList", string.Join(", ", userlist.Select(x => $"{x.Mention} [`{x.GetUsernameWithIdentifier()}`]({x.ProfileUrl})")), false),

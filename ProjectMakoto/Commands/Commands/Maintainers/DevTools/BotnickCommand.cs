@@ -11,26 +11,26 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class BotnickCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckMaintenance();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckMaintenance();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            string newNickname = (string)arguments["newNickname"];
+            var newNickname = (string)arguments["newNickname"];
 
             try
             {
                 await ctx.Guild.CurrentMember.ModifyAsync(x => x.Nickname = newNickname);
 
                 if (newNickname.IsNullOrWhiteSpace())
-                    await RespondOrEdit($"My nickname on this server has been reset.");
+                    _ = await this.RespondOrEdit($"My nickname on this server has been reset.");
                 else
-                    await RespondOrEdit($"My nickname on this server has been changed to **{newNickname}**.");
+                    _ = await this.RespondOrEdit($"My nickname on this server has been changed to **{newNickname}**.");
             }
             catch (Exception)
             {
-                await RespondOrEdit($"My nickname could not be changed.");
+                _ = await this.RespondOrEdit($"My nickname could not be changed.");
             }
         });
     }

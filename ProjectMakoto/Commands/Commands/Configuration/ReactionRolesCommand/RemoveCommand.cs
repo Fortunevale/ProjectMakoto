@@ -11,13 +11,13 @@ namespace ProjectMakoto.Commands.ReactionRolesCommand;
 
 internal sealed class RemoveCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Config.ReactionRoles;
+            var CommandKey = this.t.Commands.Config.ReactionRoles;
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
@@ -26,10 +26,10 @@ internal sealed class RemoveCommand : BaseCommand
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(CommandKey.RemovingReactionRole, true)
-            }.AsLoading(ctx, GetString(CommandKey.Title));
+                Description = this.GetString(CommandKey.RemovingReactionRole, true)
+            }.AsLoading(ctx, this.GetString(CommandKey.Title));
 
-            await RespondOrEdit(embed);
+            _ = await this.RespondOrEdit(embed);
 
             DiscordEmoji emoji_parameter;
 
@@ -49,7 +49,7 @@ internal sealed class RemoveCommand : BaseCommand
                         }
                         else
                         {
-                            SendSyntaxError();
+                            this.SendSyntaxError();
                             return;
                         }
 
@@ -62,7 +62,7 @@ internal sealed class RemoveCommand : BaseCommand
 
             if (message is null)
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
@@ -76,14 +76,14 @@ internal sealed class RemoveCommand : BaseCommand
                 {
                     case Enums.CommandType.ContextMenu:
                     {
-                        embed.Description = GetString(CommandKey.ReactWithEmojiToRemove, true);
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, GetString(CommandKey.Title))));
+                        embed.Description = this.GetString(CommandKey.ReactWithEmojiToRemove, true);
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsAwaitingInput(ctx, this.GetString(CommandKey.Title))));
 
                         var emoji_wait = await ctx.Client.GetInteractivity().WaitForReactionAsync(x => x.Channel.Id == ctx.Channel.Id && x.User.Id == ctx.User.Id && x.Message.Id == message.Id, TimeSpan.FromMinutes(2));
 
                         if (emoji_wait.TimedOut)
                         {
-                            ModifyToTimedOut();
+                            this.ModifyToTimedOut();
                             return;
                         }
 
@@ -97,8 +97,8 @@ internal sealed class RemoveCommand : BaseCommand
 
             if (!ctx.DbGuild.ReactionRoles.Any(x => x.Key == message.Id && x.Value.EmojiName == emoji_parameter.GetUniqueDiscordName()))
             {
-                embed.Description = GetString(CommandKey.NoReactionRoleFound);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, GetString(CommandKey.Title))));
+                embed.Description = this.GetString(CommandKey.NoReactionRoleFound);
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, this.GetString(CommandKey.Title))));
                 return;
             }
 
@@ -109,14 +109,14 @@ internal sealed class RemoveCommand : BaseCommand
             var reactionMessage = await channel.GetMessageAsync(obj.Key);
             _ = reactionMessage.DeleteReactionsEmojiAsync(obj.Value.GetEmoji(ctx.Client));
 
-            ctx.DbGuild.ReactionRoles.Remove(obj);
+            _ = ctx.DbGuild.ReactionRoles.Remove(obj);
 
-            embed.Description = GetString(CommandKey.RemovedReactionRole, true,
+            embed.Description = this.GetString(CommandKey.RemovedReactionRole, true,
                 new TVar("Role", role.Mention),
                 new TVar("User", reactionMessage?.Author.Mention ?? "`/`"),
                 new TVar("Channel", reactionMessage?.Channel.Mention ?? "`/`"),
                 new TVar("Emoji", obj.Value.GetEmoji(ctx.Client)));
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, GetString(CommandKey.Title))));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsSuccess(ctx, this.GetString(CommandKey.Title))));
         });
     }
 }

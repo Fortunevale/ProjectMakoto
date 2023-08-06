@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class ShuffleCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,18 +26,18 @@ internal sealed class ShuffleCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             ctx.DbGuild.MusicModule.Shuffle = !ctx.DbGuild.MusicModule.Shuffle;
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = (ctx.DbGuild.MusicModule.Shuffle ? GetString(this.t.Commands.Music.Shuffle.On, true) : GetString(this.t.Commands.Music.Shuffle.Off, true)),
+                Description = (ctx.DbGuild.MusicModule.Shuffle ? this.GetString(this.t.Commands.Music.Shuffle.On, true) : this.GetString(this.t.Commands.Music.Shuffle.Off, true)),
             }.AsSuccess(ctx));
         });
     }

@@ -12,7 +12,7 @@ internal class PostLoginTaskLoader
 {
     public static async Task Load(Bot bot)
     {
-        DiscordGuild guild = await bot.DiscordClient.GetGuildAsync(bot.status.LoadedConfig.Discord.AssetsGuild);
+        var guild = await bot.DiscordClient.GetGuildAsync(bot.status.LoadedConfig.Discord.AssetsGuild);
         var emojis = await guild.GetEmojisAsync();
 
         foreach (var field in typeof(Config.EmojiConfig).GetFields())
@@ -20,7 +20,7 @@ internal class PostLoginTaskLoader
             if (field.FieldType != typeof(ulong))
                 continue;
 
-            ulong v = (ulong)field.GetValue(bot.status.LoadedConfig.Emojis);
+            var v = (ulong)field.GetValue(bot.status.LoadedConfig.Emojis);
             if (v is not 0UL)
                 if (emojis.Any(x => x.Id == v))
                     continue;
@@ -38,7 +38,7 @@ internal class PostLoginTaskLoader
 
                 _logger.LogInfo("Uploading '{emojiName}' Emoji to '{guild}'..", field.Name, guild.Name);
 
-                string fileName = $"Assets/Emojis/Upload/{field.Name}.png";
+                var fileName = $"Assets/Emojis/Upload/{field.Name}.png";
 
                 if (!Directory.GetFiles("Assets/Emojis/Upload/", "*", 
                     new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive })

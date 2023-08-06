@@ -17,32 +17,32 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            int boardId = (int)arguments["boardId"];
-            uint Page = (uint)arguments["Page"];
-            int Internal_Page = (int)arguments["Internal_Page"];
+            var boardId = (int)arguments["boardId"];
+            var Page = (uint)arguments["Page"];
+            var Internal_Page = (int)arguments["Internal_Page"];
 
             if (await ctx.DbUser.Cooldown.WaitForHeavy(ctx))
                 return;
 
             if (Page <= 0 || !(Internal_Page is 0 or 1))
             {
-                SendSyntaxError();
+                this.SendSyntaxError();
                 return;
             }
 
             var embed = new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.ScoreSaber.MapLeaderboard.LoadingScoreboard, true)
+                Description = this.GetString(this.t.Commands.ScoreSaber.MapLeaderboard.LoadingScoreboard, true)
             }.AsLoading(ctx, "Score Saber");
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
-            string NextPageId = Guid.NewGuid().ToString();
-            string PrevPageId = Guid.NewGuid().ToString();
+            var NextPageId = Guid.NewGuid().ToString();
+            var PrevPageId = Guid.NewGuid().ToString();
 
-            int InternalPage = Internal_Page;
+            var InternalPage = Internal_Page;
 
-            uint scoreSaberPage = Page;
+            var scoreSaberPage = Page;
 
             Leaderboard leaderboard;
 
@@ -51,26 +51,26 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
             try
             {
                 leaderboard = await ctx.Bot.ScoreSaberClient.GetScoreboardById(boardId.ToString());
-                LeaderboardScores scores = await ctx.Bot.ScoreSaberClient.GetScoreboardScoresById(boardId.ToString());
+                var scores = await ctx.Bot.ScoreSaberClient.GetScoreboardScoresById(boardId.ToString());
 
                 TotalPages = scores.Metadata.TotalPages / scores.Metadata.ItemCount;
             }
             catch (InternalServerErrorException)
             {
-                embed.Description = GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                embed.Description = this.GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
             catch (NotFoundException)
             {
-                embed.Description = GetString(this.t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                embed.Description = this.GetString(this.t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 throw;
             }
             catch (ForbiddenException)
             {
-                embed.Description = GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                embed.Description = this.GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                 return;
             }
             catch (Exception)
@@ -85,7 +85,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (e.Message?.Id == ctx.ResponseMessage.Id && e.User.Id == ctx.User.Id)
                     {
@@ -131,7 +131,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 
                             ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                            ModifyToTimedOut();
+                            this.ModifyToTimedOut();
                         }
                         catch { }
                     }
@@ -142,8 +142,8 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
             {
                 if (scoreSaberPage > TotalPages)
                 {
-                    embed.Description = GetString(this.t.Commands.ScoreSaber.MapLeaderboard.PageNotExist, true, new TVar("Page", scoreSaberPage));
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                    embed.Description = this.GetString(this.t.Commands.ScoreSaber.MapLeaderboard.PageNotExist, true, new TVar("Page", scoreSaberPage));
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
 
@@ -157,20 +157,20 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                 }
                 catch (InternalServerErrorException)
                 {
-                    embed.Description = GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                    embed.Description = this.GetString(this.t.Commands.ScoreSaber.InternalServerError, true);
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
                 catch (NotFoundException)
                 {
-                    embed.Description = GetString(this.t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                    embed.Description = this.GetString(this.t.Commands.ScoreSaber.MapLeaderboard.ScoreboardNotExist, true);
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     throw;
                 }
                 catch (ForbiddenException)
                 {
-                    embed.Description = GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
+                    embed.Description = this.GetString(this.t.Commands.ScoreSaber.ForbiddenError, true);
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.AsError(ctx, "Score Saber")));
                     return;
                 }
                 catch (Exception)
@@ -183,20 +183,20 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
                 embed.Description = "";
                 embed.Author.IconUrl = ctx.Guild.IconUrl;
                 embed.Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail { Url = leaderboard.leaderboardInfo.coverImage };
-                embed.Footer = ctx.GenerateUsedByFooter($"{GetString(this.t.Common.Page)} {scoreSaberPage}/{TotalPages}");
-                embed.ClearFields();
+                embed.Footer = ctx.GenerateUsedByFooter($"{this.GetString(this.t.Common.Page)} {scoreSaberPage}/{TotalPages}");
+                _ = embed.ClearFields();
                 foreach (var score in scores.Scores.ToList().Skip(internalPage * 6).Take(6))
                 {
-                    embed.AddField(new DiscordEmbedField($"**#{score.Rank}** {score.Player.Country.IsoCountryCodeToFlagEmoji()} `{score.Player.Name.SanitizeForCode()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.Timestamp, TimestampFormat.RelativeTime)}",
+                    _ = embed.AddField(new DiscordEmbedField($"**#{score.Rank}** {score.Player.Country.IsoCountryCodeToFlagEmoji()} `{score.Player.Name.SanitizeForCode()}`󠂪 󠂪| 󠂪 󠂪{Formatter.Timestamp(score.Timestamp, TimestampFormat.RelativeTime)}",
                         $"{(leaderboard.leaderboardInfo.ranked ? $"**`{((decimal)((decimal)score.ModifiedScore / (decimal)leaderboard.leaderboardInfo.maxScore) * 100).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}%`**󠂪 󠂪 󠂪| 󠂪 󠂪 󠂪**`{(score.PP).ToString("N2", CultureInfo.CreateSpecificCulture("en-US"))}pp`**󠂪 󠂪| 󠂪 󠂪" : "󠂪 󠂪| 󠂪 󠂪")}" +
                         $"`{score.ModifiedScore.ToString("N0", CultureInfo.CreateSpecificCulture("en-US"))}`󠂪 󠂪| 󠂪 󠂪**{(score.FullCombo ? "✅ `FC`" : $"{false.ToEmote(ctx.Bot)} `{score.MissedNotes + score.BadCuts}`")}**\n" +
-                        $"{GetString(this.t.Commands.ScoreSaber.MapLeaderboard.Profile)}: `{ctx.Prefix}scoresaber profile {score.Player.Id}`"));
+                        $"{this.GetString(this.t.Commands.ScoreSaber.MapLeaderboard.Profile)}: `{ctx.Prefix}scoresaber profile {score.Player.Id}`"));
                 }
 
-                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, GetString(this.t.Common.PreviousPage), (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, GetString(this.t.Common.NextPage), (scoreSaberPage + 1 > scores.Metadata.TotalPages / scores.Metadata.ItemCount), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+                var previousPageButton = new DiscordButtonComponent(ButtonStyle.Primary, PrevPageId, this.GetString(this.t.Common.PreviousPage), (scoreSaberPage + InternalPage - 1 <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+                var nextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, NextPageId, this.GetString(this.t.Common.NextPage), (scoreSaberPage + 1 > scores.Metadata.TotalPages / scores.Metadata.ItemCount), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new List<DiscordComponent> { previousPageButton, nextPageButton }));
             };
 
             await SendPage(InternalPage, scoreSaberPage);
@@ -207,7 +207,7 @@ internal sealed class ScoreSaberMapLeaderboardCommand : BaseCommand
 
                 ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-                ModifyToTimedOut();
+                this.ModifyToTimedOut();
             }
             catch { }
         });

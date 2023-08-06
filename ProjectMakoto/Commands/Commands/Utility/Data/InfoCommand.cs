@@ -20,21 +20,21 @@ internal sealed class InfoCommand : BaseCommand
 
             if (ctx.Bot.RawFetchedPrivacyPolicy.IsNullOrWhiteSpace())
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.GetUsername())),
+                    Description = this.GetString(this.t.Commands.Utility.Data.Policy.NoPolicy, true, new TVar("Bot", ctx.CurrentUser.GetUsername())),
                 }.AsBotError(ctx));
                 return;
             }
 
             var RawPolicy = ctx.Bot.RawFetchedPrivacyPolicy.Replace("#", "");
 
-            List<string> PolicyStrings = RawPolicy.ReplaceLineEndings("\n").Split("\n\n").ToList();
+            var PolicyStrings = RawPolicy.ReplaceLineEndings("\n").Split("\n\n").ToList();
 
-            string Title = "";
+            var Title = "";
             List<DiscordEmbed> embeds = new();
 
-            for (int i = 0; i < PolicyStrings.Count; i++)
+            for (var i = 0; i < PolicyStrings.Count; i++)
             {
                 if (i == 0)
                 {
@@ -52,13 +52,13 @@ internal sealed class InfoCommand : BaseCommand
             try
             {
                 foreach (var b in embeds)
-                    await ctx.User.SendMessageAsync(b);
+                    _ = await ctx.User.SendMessageAsync(b);
 
-                SendDmRedirect();
+                this.SendDmRedirect();
             }
             catch (DisCatSharp.Exceptions.UnauthorizedException)
             {
-                SendDmError();
+                this.SendDmError();
             }
         });
     }

@@ -17,38 +17,22 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
 
     public string[] Get(User user)
     {
-        string? Locale;
-
-        if (!user.OverrideLocale.IsNullOrWhiteSpace())
-            Locale = user.OverrideLocale;
-        else
-            Locale = user.CurrentLocale;
+        var Locale = !user.OverrideLocale.IsNullOrWhiteSpace() ? user.OverrideLocale : user.CurrentLocale;
 
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        if (!this.t.ContainsKey(Locale))
-            return new string[] { "Missing Translation. Please report to the developer." };
-
-        return this.t[Locale];
+        return !this.t.ContainsKey(Locale) ? (new string[] { "Missing Translation. Please report to the developer." }) : this.t[Locale];
     }
 
     public string[] Get(Guild user)
     {
-        string? Locale;
-
-        if (!user.OverrideLocale.IsNullOrWhiteSpace())
-            Locale = user.OverrideLocale;
-        else
-            Locale = user.CurrentLocale;
+        var Locale = !user.OverrideLocale.IsNullOrWhiteSpace() ? user.OverrideLocale : user.CurrentLocale;
 
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        if (!this.t.ContainsKey(Locale))
-            return new string[] { "Missing Translation. Please report to the developer." };
-
-        return this.t[Locale];
+        return !this.t.ContainsKey(Locale) ? (new string[] { "Missing Translation. Please report to the developer." }) : this.t[Locale];
     }
 
     public string[] Get(DiscordGuild guild)
@@ -61,15 +45,12 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        if (!this.t.ContainsKey(Locale))
-            return new string[] { "Missing Translation. Please report to the developer." };
-
-        return this.t[Locale];
+        return !this.t.ContainsKey(Locale) ? (new string[] { "Missing Translation. Please report to the developer." }) : this.t[Locale];
     }
 
     public string[] Get(DiscordUser user)
     {
-        string? Locale = user.Locale;
+        var Locale = user.Locale;
 
         if (Locale is null && !this.t.ContainsKey("en"))
             return new string[] { "Missing Translation. Please report to the developer." };
@@ -77,10 +58,7 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
         if (Locale is null || !this.t.ContainsKey(Locale))
             Locale = "en";
 
-        if (!this.t.ContainsKey(Locale))
-            return new string[] { "Missing Translation. Please report to the developer." };
-
-        return this.t[Locale];
+        return !this.t.ContainsKey(Locale) ? (new string[] { "Missing Translation. Please report to the developer." }) : this.t[Locale];
     }
 
     public ICollection<string> Keys => this.t.Keys;
@@ -130,10 +108,10 @@ public sealed class MultiTranslationKey : IDictionary<string, string[]>
     public override string ToString()
     {
         StackTrace stackTrace = new();
-        StackFrame[] stackFrames = stackTrace.GetFrames();
+        var stackFrames = stackTrace.GetFrames();
 
-        StackFrame callingFrame = stackFrames[1];
-        MethodBase method = callingFrame.GetMethod();
+        var callingFrame = stackFrames[1];
+        var method = callingFrame.GetMethod();
 
         _logger.LogError("Key with english text '{text}' was incorrectly accessed. Defaulting to english translation.", new InvalidCallException()
                                                                                                                             .AddData("StackTrace", stackTrace)

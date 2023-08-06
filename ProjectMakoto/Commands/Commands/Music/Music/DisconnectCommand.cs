@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class DisconnectCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,18 +26,18 @@ internal sealed class DisconnectCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             if (ctx.DbGuild.MusicModule.collectedDisconnectVotes.Contains(ctx.User.Id))
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Disconnect.AlreadyVoted, true),
+                    Description = this.GetString(this.t.Commands.Music.Disconnect.AlreadyVoted, true),
                 }.AsError(ctx));
                 return;
             }
@@ -48,34 +48,34 @@ internal sealed class DisconnectCommand : BaseCommand
             {
                 ctx.DbGuild.MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
 
-                await conn.StopAsync();
+                _ = await conn.StopAsync();
                 await conn.DisconnectAsync();
 
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.Disconnect.Disconnected, true),
+                    Description = this.GetString(this.t.Commands.Music.Disconnect.Disconnected, true),
                 }.AsSuccess(ctx));
                 return;
             }
 
-            DiscordEmbedBuilder embed = new DiscordEmbedBuilder()
+            var embed = new DiscordEmbedBuilder()
             {
-                Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
+                Description = $"`{this.GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`",
             }.AsAwaitingInput(ctx);
 
             var builder = new DiscordMessageBuilder().WithEmbed(embed);
 
-            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetGuildString(this.t.Commands.Music.Disconnect.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")));
-            builder.AddComponents(DisconnectVote);
+            DiscordButtonComponent DisconnectVote = new(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetGuildString(this.t.Commands.Music.Disconnect.VoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("⛔")));
+            _ = builder.AddComponents(DisconnectVote);
 
-            await RespondOrEdit(builder);
+            _ = await this.RespondOrEdit(builder);
 
             _ = Task.Delay(TimeSpan.FromMinutes(10)).ContinueWith(x =>
             {
                 if (x.IsCompletedSuccessfully)
                 {
                     ctx.Client.ComponentInteractionCreated -= RunInteraction;
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                 }
             });
 
@@ -83,7 +83,7 @@ internal sealed class DisconnectCommand : BaseCommand
 
             async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
             {
-                Task.Run(async () =>
+                _ = Task.Run(async () =>
                 {
                     if (e.Message.Id == ctx.ResponseMessage.Id)
                     {
@@ -91,7 +91,7 @@ internal sealed class DisconnectCommand : BaseCommand
 
                         if (ctx.DbGuild.MusicModule.collectedDisconnectVotes.Contains(e.User.Id))
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.Disconnect.AlreadyVoted, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {this.GetString(this.t.Commands.Music.Disconnect.AlreadyVoted, true)}").AsEphemeral());
                             return;
                         }
 
@@ -99,7 +99,7 @@ internal sealed class DisconnectCommand : BaseCommand
 
                         if (member.VoiceState is null || member.VoiceState.Channel.Id != conn.Channel.Id)
                         {
-                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {GetString(this.t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
+                            _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().WithContent($"❌ {this.GetString(this.t.Commands.Music.NotSameChannel, true)}").AsEphemeral());
                             return;
                         }
 
@@ -109,18 +109,18 @@ internal sealed class DisconnectCommand : BaseCommand
                         {
                             ctx.DbGuild.MusicModule.Dispose(ctx.Bot, ctx.Guild.Id, "Graceful Disconnect");
 
-                            await conn.StopAsync();
+                            _ = await conn.StopAsync();
                             await conn.DisconnectAsync();
 
-                            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                             {
-                                Description = GetString(this.t.Commands.Music.Disconnect.Disconnected, true)
+                                Description = this.GetString(this.t.Commands.Music.Disconnect.Disconnected, true)
                             }.AsSuccess(ctx)));
                             return;
                         }
 
-                        embed.Description = $"`{GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
-                        await RespondOrEdit(embed.Build());
+                        embed.Description = $"`{this.GetGuildString(this.t.Commands.Music.Disconnect.VoteStarted, true)} ({ctx.DbGuild.MusicModule.collectedDisconnectVotes.Count}/{Math.Ceiling((conn.Channel.Users.Count - 1.0) * 0.51)})`";
+                        _ = await this.RespondOrEdit(embed.Build());
                     }
                 }).Add(ctx.Bot);
             }

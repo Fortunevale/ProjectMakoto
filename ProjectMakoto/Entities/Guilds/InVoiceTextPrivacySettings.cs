@@ -22,7 +22,7 @@ public sealed class InVoiceTextPrivacySettings : RequiresParent<Guild>
         set
         {
             this._ClearTextEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_clear", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_clear", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -33,7 +33,7 @@ public sealed class InVoiceTextPrivacySettings : RequiresParent<Guild>
         set
         {
             this._SetPermissionsEnabled = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_perms", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "vc_privacy_perms", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

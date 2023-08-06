@@ -20,18 +20,18 @@ internal sealed class RequestCommand : BaseCommand
 
             if (ctx.DbUser.Data.LastDataRequest.GetTimespanSince() < TimeSpan.FromDays(14))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Utility.Data.Request.TimeError, true,
+                    Description = this.GetString(this.t.Commands.Utility.Data.Request.TimeError, true,
                         new TVar("RequestTimestamp", ctx.DbUser.Data.LastDataRequest.ToTimestamp(TimestampFormat.ShortDateTime)),
                         new TVar("WaitTimestamp", ctx.DbUser.Data.LastDataRequest.AddDays(14).ToTimestamp(TimestampFormat.ShortDateTime)))
                 }.AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Utility.Data.Request.Fetching, true)
+                Description = this.GetString(this.t.Commands.Utility.Data.Request.Fetching, true)
             }.AsLoading(ctx));
 
             RequestData requestData = new();
@@ -55,9 +55,9 @@ internal sealed class RequestCommand : BaseCommand
             {
                 case Enums.CommandType.ApplicationCommand:
                 {
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                     {
-                        Description = GetString(this.t.Commands.Utility.Data.Request.Confirm, true)
+                        Description = this.GetString(this.t.Commands.Utility.Data.Request.Confirm, true)
                     }.AsSuccess(ctx)).WithFile("userdata.json", stream));
                     ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
                     break;
@@ -66,17 +66,17 @@ internal sealed class RequestCommand : BaseCommand
                 {
                     try
                     {
-                        await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                        _ = await ctx.User.SendMessageAsync(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                         {
-                            Description = GetString(this.t.Commands.Utility.Data.Request.Confirm, true)
+                            Description = this.GetString(this.t.Commands.Utility.Data.Request.Confirm, true)
                         }.AsSuccess(ctx)).WithFile("userdata.json", stream));
                         ctx.DbUser.Data.LastDataRequest = DateTime.UtcNow;
 
-                        SendDmRedirect();
+                        this.SendDmRedirect();
                     }
                     catch (DisCatSharp.Exceptions.UnauthorizedException)
                     {
-                        SendDmError();
+                        this.SendDmError();
                     }
                     break;
                 }

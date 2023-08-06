@@ -24,7 +24,7 @@ internal sealed class ReminderEvents : RequiresTranslation
         try
         {
             var v = JsonConvert.DeserializeObject<object[]>(e.Id)[0];
-            PrivateButtonType privateButtonType = (PrivateButtonType)v.ToInt32();
+            var privateButtonType = (PrivateButtonType)v.ToInt32();
             if (privateButtonType != PrivateButtonType.ReminderSnooze)
                 return;
         }
@@ -33,9 +33,9 @@ internal sealed class ReminderEvents : RequiresTranslation
             return;
         }
 
-        ReminderSnoozeButton reminder = JsonConvert.DeserializeObject<ReminderSnoozeButton>(e.Id);
+        var reminder = JsonConvert.DeserializeObject<ReminderSnoozeButton>(e.Id);
 
-        new RemindersCommand().ExecuteCommand(e, sender, "reminders", this.Bot, new Dictionary<string, object>
+        _ = new RemindersCommand().ExecuteCommand(e, sender, "reminders", this.Bot, new Dictionary<string, object>
         {
             { "description", reminder.Description },
         }).Add(this.Bot);

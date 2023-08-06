@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class ForceSkipCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -26,27 +26,27 @@ internal sealed class ForceSkipCommand : BaseCommand
 
             if (conn is null || conn.Channel.Id != ctx.Member.VoiceState.Channel.Id)
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.NotSameChannel, true),
+                    Description = this.GetString(this.t.Commands.Music.NotSameChannel, true),
                 }.AsError(ctx));
                 return;
             }
 
             if (!ctx.Member.IsDJ(ctx.Bot.status))
             {
-                await RespondOrEdit(embed: new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
                 {
-                    Description = GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
+                    Description = this.GetString(this.t.Commands.Music.DjRole, true, new TVar("Role", "DJ")),
                 }.AsError(ctx));
                 return;
             }
 
-            await conn.StopAsync();
+            _ = await conn.StopAsync();
 
-            await RespondOrEdit(embed: new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(embed: new DiscordEmbedBuilder
             {
-                Description = GetString(this.t.Commands.Music.ForceSkip.Skipped, true),
+                Description = this.GetString(this.t.Commands.Music.ForceSkip.Skipped, true),
             }.AsSuccess(ctx));
         });
     }

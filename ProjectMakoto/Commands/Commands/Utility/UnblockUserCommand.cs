@@ -15,19 +15,19 @@ internal sealed class UnblockUserCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            var CommandKey = t.Commands.Utility.UnblockUser;
+            var CommandKey = this.t.Commands.Utility.UnblockUser;
 
-            DiscordUser victim = (DiscordUser)arguments["victim"];
+            var victim = (DiscordUser)arguments["victim"];
 
             if (!ctx.DbUser.BlockedUsers.Contains(victim.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.NotBlocked, true)).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.NotBlocked, true)).AsError(ctx));
                 return;
             }
 
-            ctx.DbUser.BlockedUsers.Remove(victim.Id);
+            _ = ctx.DbUser.BlockedUsers.Remove(victim.Id);
 
-            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.Unblocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.Unblocked, true, new TVar("User", victim.Mention))).AsSuccess(ctx));
         });
     }
 }

@@ -15,29 +15,29 @@ internal sealed class HighFiveCommand : BaseCommand
     {
         return Task.Run(async () =>
         {
-            DiscordUser user = (DiscordUser)arguments["user"];
+            var user = (DiscordUser)arguments["user"];
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
             if (ctx.DbUser.BlockedUsers.Contains(user.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Social.BlockedVictim, true, new TVar("User", user.Mention))).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Social.BlockedVictim, true, new TVar("User", user.Mention))).AsError(ctx));
                 return;
             }
 
             if (ctx.Bot.Users[user.Id].BlockedUsers.Contains(ctx.User.Id))
             {
-                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(t.Commands.Social.BlockedByVictim, true, new TVar("User", user.Mention))).AsError(ctx));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(this.t.Commands.Social.BlockedByVictim, true, new TVar("User", user.Mention))).AsError(ctx));
                 return;
             }
 
-            string[] phrases = this.t.Commands.Social.HighFive.Other.Get(ctx.DbGuild);
-            string[] self_phrases = this.t.Commands.Social.HighFive.Self.Get(ctx.DbGuild);
+            var phrases = this.t.Commands.Social.HighFive.Other.Get(ctx.DbGuild);
+            var self_phrases = this.t.Commands.Social.HighFive.Self.Get(ctx.DbGuild);
 
             if (ctx.Member.Id == user.Id)
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Title = self_phrases.SelectRandom().Build(
                         new TVar("User1", ctx.Member.DisplayName)),
@@ -49,7 +49,7 @@ internal sealed class HighFiveCommand : BaseCommand
 
             var response = await SocialCommandAbstractions.GetGif(ctx.Bot, "highfive");
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
             {
                 Description = phrases.SelectRandom().Build(
                     new TVar("User1", ctx.User.Mention, false),

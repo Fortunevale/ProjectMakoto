@@ -247,7 +247,7 @@ public sealed class SharedCommandContext
     /// The Command's Environment.
     /// </summary>
     public BaseCommand BaseCommand
-        => _baseCommand ?? new DummyCommand()
+        => this._baseCommand ?? new DummyCommand()
         {
             ctx = this,
             t = this.t,

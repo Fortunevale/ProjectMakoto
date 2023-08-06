@@ -11,34 +11,34 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class MoveHereCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.MoveMembers) && await CheckOwnPermissions(Permissions.MoveMembers) && await CheckVoiceState());
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.MoveMembers) && await this.CheckOwnPermissions(Permissions.MoveMembers) && await this.CheckVoiceState());
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordChannel oldChannel = (DiscordChannel)arguments["oldChannel"];
+            var oldChannel = (DiscordChannel)arguments["oldChannel"];
 
             var CommandKey = this.t.Commands.Moderation.Move;
 
             if (oldChannel.Type != ChannelType.Voice)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.NotAVc, true))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.NotAVc, true))
                     .AsError(ctx));
                 return;
             }
 
             if (!oldChannel.Users.IsNotNullAndNotEmpty())
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.VcEmpty, true))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.VcEmpty, true))
                     .AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Moving, true,
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Moving, true,
                     new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
                     new TVar("Destination", ctx.Member.VoiceState.Channel.Mention),
                     new TVar("Origin", oldChannel.Mention)))
@@ -49,8 +49,8 @@ internal sealed class MoveHereCommand : BaseCommand
                 _ = b.ModifyAsync(x => x.VoiceChannel = ctx.Member.VoiceState.Channel);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Moved, true,
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Moved, true,
                     new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
                     new TVar("Destination", ctx.Member.VoiceState.Channel.Mention),
                     new TVar("Origin", oldChannel.Mention)))

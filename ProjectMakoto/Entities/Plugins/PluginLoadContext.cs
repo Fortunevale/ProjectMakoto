@@ -21,23 +21,13 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
-        string assemblyPath = this._resolver.ResolveAssemblyToPath(assemblyName);
-        if (assemblyPath != null)
-        {
-            return LoadFromAssemblyPath(assemblyPath);
-        }
-
-        return null;
+        var assemblyPath = this._resolver.ResolveAssemblyToPath(assemblyName);
+        return assemblyPath != null ? this.LoadFromAssemblyPath(assemblyPath) : null;
     }
 
     protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
     {
-        string libraryPath = this._resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
-        if (libraryPath != null)
-        {
-            return LoadUnmanagedDllFromPath(libraryPath);
-        }
-
-        return IntPtr.Zero;
+        var libraryPath = this._resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+        return libraryPath != null ? this.LoadUnmanagedDllFromPath(libraryPath) : IntPtr.Zero;
     }
 }

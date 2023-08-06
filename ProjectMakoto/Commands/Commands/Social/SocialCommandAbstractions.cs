@@ -22,7 +22,7 @@ internal sealed class SocialCommandAbstractions
 
         try
         {
-            KawaiiResponse request = JsonConvert.DeserializeObject<KawaiiResponse>(await httpClient.GetStringAsync($"https://kawaii.red/api/gif/{action}/token={bot.status.LoadedConfig.Secrets.KawaiiRedToken}/"));
+            var request = JsonConvert.DeserializeObject<KawaiiResponse>(await httpClient.GetStringAsync($"https://kawaii.red/api/gif/{action}/token={bot.status.LoadedConfig.Secrets.KawaiiRedToken}/"));
             return new Tuple<string, string>("kawaii.red", request.response);
         }
         catch (Exception ex)
@@ -34,7 +34,7 @@ internal sealed class SocialCommandAbstractions
                 if (!new string[] { "cuddle", "slap", "pat", "hug", "kiss" }.Contains(action))
                     throw new NotSupportedException("Unsupported gif type");
 
-                NekosLifeRequest request = JsonConvert.DeserializeObject<NekosLifeRequest>(await httpClient.GetStringAsync($"https://nekos.life/api/v2/img/{action}"));
+                var request = JsonConvert.DeserializeObject<NekosLifeRequest>(await httpClient.GetStringAsync($"https://nekos.life/api/v2/img/{action}"));
                 return new Tuple<string, string>("nekos.life", request.url);
             }
             catch (Exception ex1)

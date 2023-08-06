@@ -7,18 +7,20 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Xorog.UniversalExtensions.EventArgs;
+
 namespace ProjectMakoto.Util;
 
 public sealed class TaskWatcher
 {
     internal TaskWatcher()
     {
-        Start();
+        this.Start();
     }
 
     private List<TaskInfo> TaskList = new();
 
-    internal async void Start()
+    internal void Start()
     {
         _ = Task.Run(async () =>
         {
@@ -26,23 +28,23 @@ public sealed class TaskWatcher
             {
                 Thread.Sleep(100);
 
-                if (TaskList is null)
+                if (this.TaskList is null)
                 {
                     Environment.Exit((int)ExitCodes.VitalTaskFailed);
                 }
 
-                if (TaskList.Count <= 0)
+                if (this.TaskList.Count <= 0)
                 {
                     continue;
                 }
 
-                for (int i = 0; i < TaskList.Count; i++)
+                for (var i = 0; i < this.TaskList.Count; i++)
                 {
-                    var b = TaskList[i];
+                    var b = this.TaskList[i];
 
                     if (b is null)
                     {
-                        lock (this.TaskList) { this.TaskList.Remove(b); }
+                        lock (this.TaskList) { _ = this.TaskList.Remove(b); }
                         i--;
                         continue;
                     }
@@ -50,13 +52,13 @@ public sealed class TaskWatcher
                     if (!b.Task.IsCompleted)
                         continue;
 
-                    lock (this.TaskList) { this.TaskList.Remove(b); }
+                    lock (this.TaskList) { _ = this.TaskList.Remove(b); }
                     i--;
 
                     if (b.Task.IsCompletedSuccessfully)
                     {
                         _logger.LogTrace("Successfully executed Task:{Id} '{Uuid}' in {Elapsed}ms, Task Count now at {Count}.", 
-                            b.Task.Id, b.GetName(), b.CreationTime.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")), TaskList.Count);
+                            b.Task.Id, b.GetName(), b.CreationTime.GetTimespanSince().TotalMilliseconds.ToString("N0", CultureInfo.CreateSpecificCulture("en-US")), this.TaskList.Count);
 
                         if (b.CustomData is SharedCommandContext sctx)
                         {
@@ -113,7 +115,7 @@ public sealed class TaskWatcher
                                 sctx?.CommandName,
                                 sctx?.User?.Id,
                                 sctx?.Guild?.Id,
-                                TaskList.Count);
+                                this.TaskList.Count);
 
                             try
                             {
@@ -175,7 +177,7 @@ public sealed class TaskWatcher
         return taskInfo;
     }
 
-    internal async static void LogHandler(Bot bot, object? sender, LogMessageEventArgs e, int depth = 0)
+    internal async void LogHandler(Bot bot, object? sender, LogMessageEventArgs e, int depth = 0)
     {
         switch (e.LogEntry.LogLevel)
         {
@@ -236,11 +238,11 @@ public sealed class TaskWatcher
                             }
 
                             await Task.Delay(1000);
-                            LogHandler(bot, sender, e, depth++);
+                            this.LogHandler(bot, sender, e, depth++);
                             return;
                         }
 
-                        DiscordEmbedBuilder template = new DiscordEmbedBuilder()
+                        var template = new DiscordEmbedBuilder()
                                                     .WithColor(e.LogEntry.LogLevel == CustomLogLevel.Fatal ? new DiscordColor("#FF0000") : EmbedColors.Error)
                                                     .WithTitle(e.LogEntry.LogLevel.GetName().ToLower().FirstLetterToUpper())
                                                     .WithTimestamp(e.LogEntry.TimeOfEvent);
@@ -254,40 +256,40 @@ public sealed class TaskWatcher
                                 var embed = new DiscordEmbedBuilder(template);
 
                                 if (First)
-                                    embed.WithDescription($"`{e.LogEntry.Message.SanitizeForCode()}`");
+                                    _ = embed.WithDescription($"`{e.LogEntry.Message.SanitizeForCode()}`");
                                 else
                                 {
                                     embed.Title = "";
                                 }
 
-                                embed.AddField(new DiscordEmbedField("Message", $"```{ex.Message.SanitizeForCode()}```"));
+                                _ = embed.AddField(new DiscordEmbedField("Message", $"```{ex.Message.SanitizeForCode()}```"));
                                 if (!ex.StackTrace.IsNullOrWhiteSpace())
                                 {
-                                    string regex = @"((?:(?:(?:[A-Z]:\\)|(?:\/))[^\\\/]*[\\\/]).*):line (\d{0,10})";
+                                    var regex = @"((?:(?:(?:[A-Z]:\\)|(?:\/))[^\\\/]*[\\\/]).*):line (\d{0,10})";
                                     var b = Regex.Matches(ex.StackTrace, regex);
 
                                     if (b.Count > 0)
                                     {
-                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```".TruncateWithIndication(1024, "``` Stack Trace too long, please check logs.")));
-                                        embed.AddField(new DiscordEmbedField(b.Count > 1 ? "Files & Lines" : "File & Line", $"{string.Join("\n\n", b.Select(x => $"[`{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}`]" +
-                                        $"(https://github.com/{bot.status.LoadedConfig.Secrets.Github.Username}/{bot.status.LoadedConfig.Secrets.Github.Repository}/blob/{bot.status.LoadedConfig.Secrets.Github.Branch ?? "main"}/{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}#L{x.Groups[2]}) at `Line {x.Groups[2]}`"))}".TruncateWithIndication(1024, "`")));
+                                        _ = embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```".TruncateWithIndication(1024, "``` Stack Trace too long, please check logs.")));
+                                        _ = embed.AddField(new DiscordEmbedField(b.Count > 1 ? "Files & Lines" : "File & Line", $"{string.Join("\n\n", b.Select(x => $"[`{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}`]" +
+                                        $"(https://github.com/{bot.status.LoadedConfig.Secrets.Github.Username}/{bot.status.LoadedConfig.Secrets.Github.Repository}/blob/{(bot.status.LoadedConfig.Secrets.Github.Branch.IsNullOrWhiteSpace() ? "main" : bot.status.LoadedConfig.Secrets.Github.Branch)}/{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}#L{x.Groups[2]}) at `Line {x.Groups[2]}`"))}".TruncateWithIndication(1024, "`")));
                                     }
                                     else
                                     {
-                                        embed.AddField(new DiscordEmbedField("Stack Trace", $"```{ex.StackTrace?.SanitizeForCode()}```".TruncateWithIndication(1024, "```")));
+                                        _ = embed.AddField(new DiscordEmbedField("Stack Trace", $"```{ex.StackTrace?.SanitizeForCode()}```".TruncateWithIndication(1024, "```")));
                                     }
                                 }
                                 else
                                 {
-                                    embed.AddField(new DiscordEmbedField("Stack Trace", $"```No Stack Trace captured.```"));
+                                    _ = embed.AddField(new DiscordEmbedField("Stack Trace", $"```No Stack Trace captured.```"));
                                 }
 
-                                embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`".TruncateWithIndication(1024, "`"), true));
-                                embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`".TruncateWithIndication(1024, "`"), true));
-                                embed.WithFooter(ex.HResult.ToString());
+                                _ = embed.AddField(new DiscordEmbedField("Source", $"`{ex.Source?.SanitizeForCode() ?? "No Source captured."}`".TruncateWithIndication(1024, "`"), true));
+                                _ = embed.AddField(new DiscordEmbedField("Throwing Method", $"`{ex.TargetSite?.Name ?? "No Method captured"}` in `{ex.TargetSite?.DeclaringType?.Name ?? "No Type captured."}`".TruncateWithIndication(1024, "`"), true));
+                                _ = embed.WithFooter(ex.HResult.ToString());
 
                                 if ((ex.Data?.Keys?.Count ?? 0) > 0)
-                                    embed.AddFields(ex.Data.Keys.Cast<object>().ToDictionary(k => k.ToString(), v => ex.Data[v]).Select(x => new DiscordEmbedField(x.Key, x.Value.ToString().TruncateWithIndication(1024))));
+                                    _ = embed.AddFields(ex.Data.Keys.Cast<object>().ToDictionary(k => k.ToString(), v => ex.Data[v]).Select(x => new DiscordEmbedField(x.Key, x.Value.ToString().TruncateWithIndication(1024))));
 
                                 embeds.Add(embed);
 
@@ -303,7 +305,7 @@ public sealed class TaskWatcher
                             BuildEmbed(e.LogEntry.Exception, true);
                         }
 
-                        int index = 0;
+                        var index = 0;
 
                         while (index < embeds.Count)
                         {
@@ -317,4 +319,7 @@ public sealed class TaskWatcher
             }
         }
     }
+
+    internal void TaskStarted(Bot bot, object sender, ScheduledTaskStartedEventArgs e)
+        => _ = e.Task.Add(bot);
 }

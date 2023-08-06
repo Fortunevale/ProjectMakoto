@@ -11,26 +11,26 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class MoveAllCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.MoveMembers) && await CheckOwnPermissions(Permissions.MoveMembers) && await CheckVoiceState());
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.MoveMembers) && await this.CheckOwnPermissions(Permissions.MoveMembers) && await this.CheckVoiceState());
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
         return Task.Run(async () =>
         {
-            DiscordChannel newChannel = (DiscordChannel)arguments["newChannel"];
+            var newChannel = (DiscordChannel)arguments["newChannel"];
 
             var CommandKey = this.t.Commands.Moderation.Move;
 
             if (newChannel.Type != ChannelType.Voice)
             {
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.NotAVc, true))
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.NotAVc, true))
                     .AsError(ctx));
                 return;
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Moving, true,
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Moving, true,
                     new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
                     new TVar("Origin", ctx.Member.VoiceState.Channel.Mention),
                     new TVar("Destination", newChannel.Mention)))
@@ -41,8 +41,8 @@ internal sealed class MoveAllCommand : BaseCommand
                 _ = b.ModifyAsync(x => x.VoiceChannel = newChannel);
             }
 
-            await RespondOrEdit(new DiscordEmbedBuilder()
-                .WithDescription(GetString(CommandKey.Moved, true,
+            _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                .WithDescription(this.GetString(CommandKey.Moved, true,
                     new TVar("Count", ctx.Member.VoiceState.Channel.Users.Count),
                     new TVar("Origin", ctx.Member.VoiceState.Channel.Mention),
                     new TVar("Destination", newChannel.Mention)))

@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class InviteNotesCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -21,26 +21,25 @@ internal sealed class InviteNotesCommand : BaseCommand
 
             string GetCurrentConfiguration(SharedCommandContext ctx)
             {
-                if (!ctx.DbGuild.InviteNotes.Notes.Any())
-                    return ctx.BaseCommand.GetString(t.Commands.Config.InviteNotes.NoNotesDefined, true);
-
-                return $"{string.Join('\n', ctx.DbGuild.InviteNotes.Notes.Select(x => $"> `{x.Key}`\n{x.Value.Note.FullSanitize()}"))}";
+                return !ctx.DbGuild.InviteNotes.Notes.Any()
+                    ? ctx.BaseCommand.GetString(this.t.Commands.Config.InviteNotes.NoNotesDefined, true)
+                    : $"{string.Join('\n', ctx.DbGuild.InviteNotes.Notes.Select(x => $"> `{x.Key}`\n{x.Value.Note.FullSanitize()}"))}";
             }
 
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.AddNoteButton), false, DiscordEmoji.FromUnicode("➕").ToComponent());
-            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveNoteButton), false, DiscordEmoji.FromUnicode("➖").ToComponent());
+            var AddButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddNoteButton), false, DiscordEmoji.FromUnicode("➕").ToComponent());
+            var RemoveButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveNoteButton), false, DiscordEmoji.FromUnicode("➖").ToComponent());
 
             var embed = new DiscordEmbedBuilder
             {
                 Description = GetCurrentConfiguration(ctx)
-            }.AsInfo(ctx, GetString(CommandKey.Title));
+            }.AsInfo(ctx, this.GetString(CommandKey.Title));
 
             if (!(ctx.DbGuild.InviteNotes.Notes.Count > 19))
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                 .AddComponents(new List<DiscordComponent>
                 {
                     AddButton,
@@ -49,7 +48,7 @@ internal sealed class InviteNotesCommand : BaseCommand
             }
             else
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                     .AddComponents(new List<DiscordComponent> { RemoveButton }).AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
             }
 
@@ -57,7 +56,7 @@ internal sealed class InviteNotesCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -70,19 +69,19 @@ internal sealed class InviteNotesCommand : BaseCommand
 
                 while (true)
                 {
-                    var SelectTextButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SetNoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
-                    var SelectInviteButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), GetString(CommandKey.SelectInviteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.CreateButton), (SelectedText.IsNullOrWhiteSpace() || SelectedInvite is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                    var SelectTextButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), this.GetString(CommandKey.SetNoteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🗯")));
+                    var SelectInviteButton = new DiscordButtonComponent((SelectedText.IsNullOrWhiteSpace() ? ButtonStyle.Primary : ButtonStyle.Secondary), Guid.NewGuid().ToString(), this.GetString(CommandKey.SelectInviteButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var Finish = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(CommandKey.CreateButton), (SelectedText.IsNullOrWhiteSpace() || SelectedInvite is null), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
                     var pad = TranslationUtil.CalculatePadding(ctx.DbUser, CommandKey.Note, CommandKey.Invite);
 
                     embed = new DiscordEmbedBuilder
                     {
-                        Description = $"`{GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? GetString(this.t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
-                                      $"`{GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? GetString(this.t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
-                    }.AsAwaitingInput(ctx, GetString(CommandKey.Title));
+                        Description = $"`{this.GetString(CommandKey.Note).PadRight(pad)}`: `{(SelectedText.IsNullOrWhiteSpace() ? this.GetString(this.t.Common.NotSelected) : SelectedText).SanitizeForCode()}`\n" +
+                                      $"`{this.GetString(CommandKey.Invite).PadRight(pad)}`: `{(SelectedInvite is null ? this.GetString(this.t.Common.NotSelected) : $"{SelectedInvite.Code}")}`"
+                    }.AsAwaitingInput(ctx, this.GetString(CommandKey.Title));
 
-                    await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
+                    _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed)
                         .AddComponents(new List<DiscordComponent> { SelectTextButton, SelectInviteButton, Finish })
                         .AddComponents(MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot)));
 
@@ -90,23 +89,23 @@ internal sealed class InviteNotesCommand : BaseCommand
 
                     if (Menu.TimedOut)
                     {
-                        ModifyToTimedOut();
+                        this.ModifyToTimedOut();
                         return;
                     }
 
                     if (Menu.GetCustomId() == SelectTextButton.CustomId)
                     {
-                        var ModalResult = await PromptModalWithRetry(Menu.Result.Interaction, new DiscordInteractionModalBuilder()
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", GetString(CommandKey.Note), "", 1, 128, true)), false);
+                        var ModalResult = await this.PromptModalWithRetry(Menu.Result.Interaction, new DiscordInteractionModalBuilder()
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "Note", this.GetString(CommandKey.Note), "", 1, 128, true)), false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
                         {
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
                         else if (ModalResult.Errored)
@@ -122,17 +121,17 @@ internal sealed class InviteNotesCommand : BaseCommand
 
                         var invites = await ctx.Guild.GetInvitesAsync();
 
-                        var SelectionResult = await PromptCustomSelection(invites.Where(x => !ctx.DbGuild.InviteNotes.Notes.ContainsKey(x.Code))
-                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, GetString(CommandKey.InviteDescription, new TVar("Uses", x.Uses), new TVar("Creator", x.Inviter.GetUsernameWithIdentifier())))).ToList());
+                        var SelectionResult = await this.PromptCustomSelection(invites.Where(x => !ctx.DbGuild.InviteNotes.Notes.ContainsKey(x.Code))
+                            .Select(x => new DiscordStringSelectComponentOption(x.Code, x.Code, this.GetString(CommandKey.InviteDescription, new TVar("Uses", x.Uses), new TVar("Creator", x.Inviter.GetUsernameWithIdentifier())))).ToList());
 
                         if (SelectionResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (SelectionResult.Cancelled)
                         {
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
                         else if (SelectionResult.Errored)
@@ -153,23 +152,23 @@ internal sealed class InviteNotesCommand : BaseCommand
                             Note = SelectedText
                         });
 
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
                 }
             }
             else if (e.GetCustomId() == RemoveButton.CustomId)
             {
-                var SelectionResult = await PromptCustomSelection(ctx.DbGuild.InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
+                var SelectionResult = await this.PromptCustomSelection(ctx.DbGuild.InviteNotes.Notes.Select(x => new DiscordStringSelectComponentOption(x.Key, x.Key, $"{x.Value.Note.TruncateWithIndication(50)}")).ToList());
 
                 if (SelectionResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (SelectionResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (SelectionResult.Errored)
@@ -177,14 +176,14 @@ internal sealed class InviteNotesCommand : BaseCommand
                     throw SelectionResult.Exception;
                 }
 
-                ctx.DbGuild.InviteNotes.Notes.Remove(SelectionResult.Result);
+                _ = ctx.DbGuild.InviteNotes.Notes.Remove(SelectionResult.Result);
 
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

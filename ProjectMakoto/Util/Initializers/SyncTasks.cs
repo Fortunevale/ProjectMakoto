@@ -14,13 +14,13 @@ internal sealed class SyncTasks
 {
     internal static async Task GuildDownloadCompleted(Bot bot, DiscordClient sender, GuildDownloadCompletedEventArgs e)
     {
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             bot.status.DiscordGuildDownloadCompleted = true;
 
             _logger.LogInfo("I'm on {GuildsCount} guilds.", e.Guilds.Count);
 
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 while (!bot.status.LavalinkInitialized)
                     await Task.Delay(1000);
@@ -44,7 +44,7 @@ internal sealed class SyncTasks
 
                                     if (loadResult.LoadType != LavalinkLoadResultType.Track)
                                     {
-                                        list.List.Remove(b);
+                                        _ = list.List.Remove(b);
                                         _logger.LogError("Failed to load video length for '{Url}'", b.Url);
                                         continue;
                                     }
@@ -60,9 +60,9 @@ internal sealed class SyncTasks
                 }
             }).Add(bot);
 
-            for (int i = 0; i < 501; i++)
+            for (var i = 0; i < 501; i++)
             {
-                bot.ExperienceHandler.CalculateLevelRequirement(i);
+                _ = bot.ExperienceHandler.CalculateLevelRequirement(i);
             }
 
             foreach (var guild in e.Guilds)
@@ -77,9 +77,9 @@ internal sealed class SyncTasks
 
                 if (bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Any())
                 {
-                    Task.Run(async () =>
+                    _ = Task.Run(async () =>
                     {
-                        for (int i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
+                        for (var i = 0; i < bot.Guilds[guild.Key].Crosspost.CrosspostChannels.Count; i++)
                         {
                             if (guild.Value is null)
                                 return;
@@ -106,24 +106,7 @@ internal sealed class SyncTasks
                                     if (bot.Guilds[guild.Value.Id].Crosspost.DelayBeforePosting > 3)
                                         _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
-                                    bool ReactionAdded = false;
-
-                                    var task = bot.Guilds[guild.Value.Id].Crosspost.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
-                                    {
-                                        if (ReactionAdded)
-                                            _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                    });
-
-                                    await Task.Delay(5000);
-
-                                    if (!task.IsCompleted)
-                                    {
-                                        await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                        ReactionAdded = true;
-                                    }
-
-                                    while (!task.IsCompleted)
-                                        task.Wait();
+                                    await bot.Guilds[guild.Key].Crosspost.CrosspostWithRatelimit(sender, msg);
                                 }
                         }
                     }).Add(bot);
@@ -208,10 +191,10 @@ internal sealed class SyncTasks
                             if (loadResult.LoadType is LavalinkLoadResultType.Error or LavalinkLoadResultType.Empty)
                                 return;
 
-                            await conn.PlayAsync(loadResult.GetResultAs<LavalinkTrack>());
+                            _ = await conn.PlayAsync(loadResult.GetResultAs<LavalinkTrack>());
 
                             await Task.Delay(2000);
-                            await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
+                            _ = await conn.SeekAsync(TimeSpan.FromSeconds(bot.Guilds[guild.Key].MusicModule.CurrentVideoPosition));
 
                             bot.Guilds[guild.Key].MusicModule.QueueHandler(bot, bot.DiscordClient, node, conn);
                         }
@@ -235,15 +218,15 @@ internal sealed class SyncTasks
         void runningTasksUpdated(object sender, ObservableListUpdate<Task> e)
         {
             if (e is not null && e.NewItems is not null)
-                foreach (Task b in e.NewItems)
+                foreach (var b in e.NewItems)
                 {
-                    b.Add(bot);
+                    _ = b.Add(bot);
                 }
         }
 
         runningTasks.ItemsChanged += runningTasksUpdated;
 
-        int startupTasksSuccess = 0;
+        var startupTasksSuccess = 0;
 
         foreach (var guild in Guilds)
         {
@@ -252,7 +235,7 @@ internal sealed class SyncTasks
 
             foreach (var task in runningTasks.ToList())
                 if (task.IsCompleted)
-                    runningTasks.Remove(task);
+                    _ = runningTasks.Remove(task);
 
             runningTasks.Add(Task.Run(async () =>
             {

@@ -230,7 +230,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static string GenerateUsage(this Command cmd)
     {
-        string Usage = cmd.Name;
+        var Usage = cmd.Name;
 
         if (cmd.Overloads.Count > 0)
         {
@@ -268,7 +268,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static string GenerateUsage(this DiscordApplicationCommand cmd, string? locale = null)
     {
-        string Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
+        var Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
 
         if (cmd.Options.Count > 0)
         {
@@ -289,7 +289,7 @@ internal static class PreMadeEmbedsExtensions
 
     public static string GenerateUsage(this DiscordApplicationCommandOption cmd, string? locale = null)
     {
-        string Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
+        var Usage = cmd.NameLocalizations?.Localizations?.TryGetValue(locale ?? "-", out var localizedName) ?? false ? localizedName : cmd.Name;
 
         if (cmd.Options?.Count > 0)
         {

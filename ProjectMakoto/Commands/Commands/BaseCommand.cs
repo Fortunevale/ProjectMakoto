@@ -31,8 +31,8 @@ public abstract class BaseCommand
 
         ctx.Transferred = true;
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+        if (await this.BasePreExecutionCheck())
+            await this.ExecuteCommand(this.ctx, arguments);
     }
 
     public async Task ExecuteCommand(CommandContext ctx, Bot _bot, Dictionary<string, object> arguments = null)
@@ -40,8 +40,8 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        if (await BasePreExecutionCheck())
-            await ExecuteCommand(this.ctx, arguments);
+        if (await this.BasePreExecutionCheck())
+            await this.ExecuteCommand(this.ctx, arguments);
     }
 
     public async Task ExecuteCommand(InteractionContext ctx, Bot _bot, Dictionary<string, object> arguments = null, bool Ephemeral = true, bool InitiateInteraction = true, bool InteractionInitiated = false)
@@ -49,7 +49,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -62,8 +62,8 @@ public abstract class BaseCommand
             if (InteractionInitiated)
                 this.ctx.RespondedToInitial = true;
 
-            if (await BasePreExecutionCheck())
-                await ExecuteCommand(this.ctx, arguments);
+            if (await this.BasePreExecutionCheck())
+                await this.ExecuteCommand(this.ctx, arguments);
         }).Add(_bot, this.ctx);
     }
 
@@ -72,7 +72,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             this.ctx.RespondedToInitial = false;
 
@@ -93,11 +93,11 @@ public abstract class BaseCommand
                         var tfa = await ctx.RequestTwoFactorAsync();
 
                         if (tfa.Result is TwoFactorResult.ValidCode or TwoFactorResult.InvalidCode)
-                            await SwitchToEvent(tfa.ComponentInteraction);
+                            await this.SwitchToEvent(tfa.ComponentInteraction);
 
                         if (tfa.Result != TwoFactorResult.ValidCode)
                         {
-                            _ = RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
+                            _ = this.RespondOrEdit(new DiscordMessageBuilder().WithContent("Invalid Code."));
                             return;
                         }
                         _bot.Users[ctx.User.Id].LastSuccessful2FA = DateTime.UtcNow;
@@ -110,8 +110,8 @@ public abstract class BaseCommand
                     IsEphemeral = true
                 });
 
-            if (await BasePreExecutionCheck())
-                await ExecuteCommand(this.ctx, arguments);
+            if (await this.BasePreExecutionCheck())
+                await this.ExecuteCommand(this.ctx, arguments);
         }).Add(_bot, this.ctx);
     }
 
@@ -120,7 +120,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, _bot);
         this.t = _bot.LoadedTranslations;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -133,8 +133,8 @@ public abstract class BaseCommand
             if (InteractionInitiated)
                 this.ctx.RespondedToInitial = true;
 
-            if (await BasePreExecutionCheck())
-                await ExecuteCommand(this.ctx, arguments);
+            if (await this.BasePreExecutionCheck())
+                await this.ExecuteCommand(this.ctx, arguments);
         }).Add(_bot, this.ctx);
     }
 
@@ -143,7 +143,7 @@ public abstract class BaseCommand
         this.ctx = new SharedCommandContext(this, ctx, client, commandName, _bot);
         this.t = _bot.LoadedTranslations;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             if (InitiateInteraction)
                 await ctx.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder()
@@ -156,17 +156,17 @@ public abstract class BaseCommand
             if (InteractionInitiated)
                 this.ctx.RespondedToInitial = true;
 
-            if (await BasePreExecutionCheck())
-                await ExecuteCommand(this.ctx, arguments);
+            if (await this.BasePreExecutionCheck())
+                await this.ExecuteCommand(this.ctx, arguments);
         }).Add(_bot, ctx);
     }
 
     private async Task<bool> BasePreExecutionCheck()
     {
-        if (t is null)
+        if (this.t is null)
         {
             _logger.LogWarn($"The translation were not set before the BasePreExecutionCheck()!");
-            this.t = ctx.Bot.LoadedTranslations;
+            this.t = this.ctx.Bot.LoadedTranslations;
         }
 
         if (this.ctx.Bot.Users.ContainsKey(this.ctx.User.Id) && !this.ctx.User.Locale.IsNullOrWhiteSpace() && this.ctx.DbUser.CurrentLocale != this.ctx.User.Locale)
@@ -177,13 +177,13 @@ public abstract class BaseCommand
 
         if (this.ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(this.ctx.ParentCommandName))
         {
-            SendDisabledCommandError(this.ctx.ParentCommandName);
+            this.SendDisabledCommandError(this.ctx.ParentCommandName);
             return false;
         }
 
         if (this.ctx.Bot.status.LoadedConfig.Discord.DisabledCommands.Contains(this.ctx.CommandName))
         {
-            SendDisabledCommandError(this.ctx.CommandName);
+            this.SendDisabledCommandError(this.ctx.CommandName);
             return false;
         }
 
@@ -195,51 +195,48 @@ public abstract class BaseCommand
                 _logger.LogDebug("Updated language for Guild '{Guild}' to '{Locale}'", this.ctx.Guild.Id, this.ctx.Guild.PreferredLocale);
             }
 
-            if (!(await CheckOwnPermissions(Permissions.SendMessages)))
+            if (!(await this.CheckOwnPermissions(Permissions.SendMessages)))
                 return false;
 
-            if (!(await CheckOwnPermissions(Permissions.EmbedLinks)))
+            if (!(await this.CheckOwnPermissions(Permissions.EmbedLinks)))
                 return false;
 
-            if (!(await CheckOwnPermissions(Permissions.AddReactions)))
+            if (!(await this.CheckOwnPermissions(Permissions.AddReactions)))
                 return false;
 
-            if (!(await CheckOwnPermissions(Permissions.AccessChannels)))
+            if (!(await this.CheckOwnPermissions(Permissions.AccessChannels)))
                 return false;
 
-            if (!(await CheckOwnPermissions(Permissions.AttachFiles)))
+            if (!(await this.CheckOwnPermissions(Permissions.AttachFiles)))
                 return false;
 
-            if (!(await CheckOwnPermissions(Permissions.ManageMessages)))
+            if (!(await this.CheckOwnPermissions(Permissions.ManageMessages)))
                 return false;
 
-            if (!(await BeforeExecution(this.ctx)))
+            if (!(await this.BeforeExecution(this.ctx)))
                 return false;
         }
 
         if ((this.ctx.Bot.objectedUsers.Contains(this.ctx.User.Id) || this.ctx.DbUser.Data.DeletionRequested) && this.ctx.CommandName != "data" && this.ctx.CommandName != "delete")
         {
-            SendDataError();
+            this.SendDataError();
             return false;
         }
 
-        if (this.ctx.Bot.bannedUsers.TryGetValue(this.ctx.User.Id, out BanDetails blacklistedUserDetails))
+        if (this.ctx.Bot.bannedUsers.TryGetValue(this.ctx.User.Id, out var blacklistedUserDetails))
         {
-            SendUserBanError(blacklistedUserDetails);
+            this.SendUserBanError(blacklistedUserDetails);
             return false;
         }
 
-        if (this.ctx.Bot.bannedGuilds.TryGetValue(this.ctx.Guild?.Id ?? 0, out BanDetails blacklistedGuildDetails))
+        if (this.ctx.Bot.bannedGuilds.TryGetValue(this.ctx.Guild?.Id ?? 0, out var blacklistedGuildDetails))
         {
-            SendGuildBanError(blacklistedGuildDetails);
+            this.SendGuildBanError(blacklistedGuildDetails);
             return false;
         }
 
 
-        if (this.ctx.User.IsBot)
-            return false;
-
-        return true;
+        return !this.ctx.User.IsBot;
     }
     #endregion
 
@@ -255,14 +252,14 @@ public abstract class BaseCommand
     }
 
     #region RespondOrEdit
-    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
-        => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+    public Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
+        => this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
-    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
-        => await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
+    public Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
+        => this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
 
-    public async Task<DiscordMessage> RespondOrEdit(string content)
-        => await RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
+    public Task<DiscordMessage> RespondOrEdit(string content)
+        => this.RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
 
     public async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
     {
@@ -277,9 +274,9 @@ public abstract class BaseCommand
                 foreach (var b in discordMessageBuilder.Files)
                     files.Add(b.Filename, b.Stream);
 
-                discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
-                discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
-                discordWebhookBuilder.AddFiles(files);
+                _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                _ = discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
+                _ = discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
                 var msg = await this.ctx.OriginalInteractionContext.EditResponseAsync(discordWebhookBuilder);
@@ -296,9 +293,9 @@ public abstract class BaseCommand
                 foreach (var b in discordMessageBuilder.Files)
                     files.Add(b.Filename, b.Stream);
 
-                discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
-                discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
-                discordWebhookBuilder.AddFiles(files);
+                _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                _ = discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
+                _ = discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
                 var msg = await this.ctx.OriginalContextMenuContext.EditResponseAsync(discordWebhookBuilder);
@@ -315,12 +312,12 @@ public abstract class BaseCommand
                 foreach (var b in discordMessageBuilder.Files)
                     files.Add(b.Filename, b.Stream);
 
-                discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
-                discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
-                discordWebhookBuilder.AddFiles(files);
+                _ = discordWebhookBuilder.AddComponents(discordMessageBuilder.Components);
+                _ = discordWebhookBuilder.AddEmbeds(discordMessageBuilder.Embeds);
+                _ = discordWebhookBuilder.AddFiles(files);
                 discordWebhookBuilder.Content = discordMessageBuilder.Content;
 
-                DiscordMessage msg = await this.ctx.OriginalComponentInteractionCreateEventArgs.Interaction.EditOriginalResponseAsync(discordWebhookBuilder);
+                var msg = await this.ctx.OriginalComponentInteractionCreateEventArgs.Interaction.EditOriginalResponseAsync(discordWebhookBuilder);
                 this.ctx.ResponseMessage = msg;
                 return msg;
             }
@@ -337,7 +334,7 @@ public abstract class BaseCommand
                         return this.ctx.ResponseMessage;
                     }
 
-                    await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
+                    _ = await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
                     this.ctx.ResponseMessage = await this.ctx.ResponseMessage.Refetch();
 
                     return this.ctx.ResponseMessage;
@@ -362,7 +359,7 @@ public abstract class BaseCommand
                         return this.ctx.ResponseMessage;
                     }
 
-                    await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
+                    _ = await this.ctx.ResponseMessage.ModifyAsync(discordMessageBuilder);
                     this.ctx.ResponseMessage = await this.ctx.ResponseMessage.Refetch();
 
                     return this.ctx.ResponseMessage;
@@ -396,52 +393,52 @@ public abstract class BaseCommand
         };
 
     public string GetString(SingleTranslationKey key)
-        => GetString(key, false, Array.Empty<TVar>());
+        => this.GetString(key, false, Array.Empty<TVar>());
 
     public string GetString(SingleTranslationKey key, params TVar[] vars)
-        => GetString(key, false, vars);
+        => this.GetString(key, false, vars);
 
     public string GetString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
-        => key.Get(this.ctx.DbUser).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(this.ctx.DbUser).Build(Code, vars.Concat(this.GetDefaultVars()).ToArray());
 
 
 
     public string GetString(MultiTranslationKey key)
-        => GetString(key, false, false, Array.Empty<TVar>());
+        => this.GetString(key, false, false, Array.Empty<TVar>());
 
     public string GetString(MultiTranslationKey key, params TVar[] vars)
-        => GetString(key, false, false, vars);
+        => this.GetString(key, false, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
-        => GetString(key, true, false, vars);
+        => this.GetString(key, true, false, vars);
 
     public string GetString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
-        => key.Get(this.ctx.DbUser).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(this.ctx.DbUser).Build(Code, UseBoldMarker, vars.Concat(this.GetDefaultVars()).ToArray());
 
 
 
     public string GetGuildString(SingleTranslationKey key)
-        => GetGuildString(key, false, Array.Empty<TVar>());
+        => this.GetGuildString(key, false, Array.Empty<TVar>());
 
     public string GetGuildString(SingleTranslationKey key, params TVar[] vars)
-        => GetGuildString(key, false, vars);
+        => this.GetGuildString(key, false, vars);
 
     public string GetGuildString(SingleTranslationKey key, bool Code = false, params TVar[] vars)
-        => key.Get(this.ctx.DbGuild).Build(Code, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(this.ctx.DbGuild).Build(Code, vars.Concat(this.GetDefaultVars()).ToArray());
 
 
 
     public string GetGuildString(MultiTranslationKey key)
-        => GetGuildString(key, false, false, Array.Empty<TVar>());
+        => this.GetGuildString(key, false, false, Array.Empty<TVar>());
 
     public string GetGuildString(MultiTranslationKey key, params TVar[] vars)
-        => GetGuildString(key, false, false, vars);
+        => this.GetGuildString(key, false, false, vars);
 
     public string GetGuildString(MultiTranslationKey key, bool Code = false, params TVar[] vars)
-        => GetGuildString(key, Code, false, vars);
+        => this.GetGuildString(key, Code, false, vars);
 
     public string GetGuildString(MultiTranslationKey key, bool Code = false, bool UseBoldMarker = false, params TVar[] vars)
-        => key.Get(this.ctx.DbGuild).Build(Code, UseBoldMarker, vars.Concat(GetDefaultVars()).ToArray());
+        => key.Get(this.ctx.DbGuild).Build(Code, UseBoldMarker, vars.Concat(this.GetDefaultVars()).ToArray());
     #endregion
 
     #region Selections
@@ -450,31 +447,31 @@ public abstract class BaseCommand
         configuration ??= new();
         timeOutOverride ??= TimeSpan.FromSeconds(120);
 
-        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.CreateRoleForMe), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? GetString(this.t.Commands.Common.Prompts.Disable), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
-        var EveryoneButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.SelectEveryone), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.CreateRoleForMe), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? this.GetString(this.t.Commands.Common.Prompts.Disable), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+        var EveryoneButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.SelectEveryone), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👥")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
 
-        string SelectionInteractionId = Guid.NewGuid().ToString();
+        var SelectionInteractionId = Guid.NewGuid().ToString();
 
         DiscordRole FinalSelection = null;
 
-        string Selected = "";
+        var Selected = "";
 
-        bool FinishedSelection = false;
-        bool ExceptionOccurred = false;
+        var FinishedSelection = false;
+        var ExceptionOccurred = false;
         Exception ThrownException = null;
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordRoleSelectComponent(GetString(this.t.Commands.Common.Prompts.SelectARole), SelectionInteractionId, 1, 1, false);
+            var dropdown = new DiscordRoleSelectComponent(this.GetString(this.t.Commands.Common.Prompts.SelectARole), SelectionInteractionId, 1, 1, false);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
             if (Selected.IsNullOrWhiteSpace())
-                ConfirmSelectionButton.Disable();
+                _ = ConfirmSelectionButton.Disable();
             else
-                ConfirmSelectionButton.Enable();
+                _ = ConfirmSelectionButton.Enable();
 
             List<DiscordComponent> components = new();
 
@@ -488,11 +485,11 @@ public abstract class BaseCommand
                 components.Add(EveryoneButton);
 
             if (components.Any())
-                builder.AddComponents(components);
+                _ = builder.AddComponents(components);
 
-            builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
+            _ = builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
 
-            await RespondOrEdit(builder);
+            _ = await this.RespondOrEdit(builder);
         }
 
         _ = RefreshMessage();
@@ -517,12 +514,12 @@ public abstract class BaseCommand
 
                             try
                             {
-                                DiscordRole role = this.ctx.Guild.GetRole(Convert.ToUInt64(Selected));
+                                var role = this.ctx.Guild.GetRole(Convert.ToUInt64(Selected));
 
                                 if (role.IsManaged || this.ctx.Member.GetRoleHighestPosition() <= role.Position)
                                 {
                                     Selected = "";
-                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ {GetString(this.t.Commands.Common.Prompts.SelectedRoleUnavailable, true)}"));
+                                    _ = e.Interaction.CreateFollowupMessageAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"❌ {this.GetString(this.t.Commands.Common.Prompts.SelectedRoleUnavailable, true)}"));
                                 }
                             }
                             catch { }
@@ -573,19 +570,18 @@ public abstract class BaseCommand
 
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
             return new InteractionResult<DiscordRole>(ThrownException);
 
-        if (sw.Elapsed >= timeOutOverride)
-            return new InteractionResult<DiscordRole>(new TimedOutException());
-
-        return new InteractionResult<DiscordRole>(FinalSelection);
+        return sw.Elapsed >= timeOutOverride
+            ? new InteractionResult<DiscordRole>(new TimedOutException())
+            : new InteractionResult<DiscordRole>(FinalSelection);
     }
 
-    public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
-        => await PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
+    public Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+        => this.PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
 
     public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
@@ -594,29 +590,29 @@ public abstract class BaseCommand
 
         List<DiscordStringSelectComponentOption> FetchedChannels = new();
 
-        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.CreateChannelForMe), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? GetString(this.t.Commands.Common.Prompts.Disable), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+        var CreateNewButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.CreateChannelForMe), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+        var DisableButton = new DiscordButtonComponent(ButtonStyle.Secondary, Guid.NewGuid().ToString(), configuration.DisableOption ?? this.GetString(this.t.Commands.Common.Prompts.Disable), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("❌")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        string SelectionInteractionId = Guid.NewGuid().ToString();
+        var SelectionInteractionId = Guid.NewGuid().ToString();
 
         DiscordChannel FinalSelection = null;
 
-        string Selected = "";
+        var Selected = "";
 
-        bool FinishedSelection = false;
-        bool ExceptionOccurred = false;
+        var FinishedSelection = false;
+        var ExceptionOccurred = false;
         Exception ThrownException = null;
 
         async Task RefreshMessage()
         {
-            var dropdown = new DiscordChannelSelectComponent(GetString(this.t.Commands.Common.Prompts.SelectAChannel), channelTypes, SelectionInteractionId);
+            var dropdown = new DiscordChannelSelectComponent(this.GetString(this.t.Commands.Common.Prompts.SelectAChannel), channelTypes, SelectionInteractionId);
             var builder = new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).AsAwaitingInput(this.ctx)).AddComponents(dropdown).WithContent(this.ctx.ResponseMessage.Content);
 
             if (Selected.IsNullOrWhiteSpace())
-                ConfirmSelectionButton.Disable();
+                _ = ConfirmSelectionButton.Disable();
             else
-                ConfirmSelectionButton.Enable();
+                _ = ConfirmSelectionButton.Enable();
 
             List<DiscordComponent> components = new();
 
@@ -627,11 +623,11 @@ public abstract class BaseCommand
                 components.Add(DisableButton);
 
             if (components.Any())
-                builder.AddComponents(components);
+                _ = builder.AddComponents(components);
 
-            builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
+            _ = builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
 
-            await RespondOrEdit(builder);
+            _ = await this.RespondOrEdit(builder);
         }
 
         _ = RefreshMessage();
@@ -695,37 +691,36 @@ public abstract class BaseCommand
         }
 
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
             return new InteractionResult<DiscordChannel>(ThrownException);
 
-        if (sw.Elapsed >= timeOutOverride)
-            return new InteractionResult<DiscordChannel>(new TimedOutException());
-
-        return new InteractionResult<DiscordChannel>(FinalSelection);
+        return sw.Elapsed >= timeOutOverride
+            ? new InteractionResult<DiscordChannel>(new TimedOutException())
+            : new InteractionResult<DiscordChannel>(FinalSelection);
     }
 
     public async Task<InteractionResult<string>> PromptCustomSelection(IEnumerable<DiscordStringSelectComponentOption> options, string? CustomPlaceHolder = null, TimeSpan? timeOutOverride = null)
     {
         timeOutOverride ??= TimeSpan.FromSeconds(120);
-        CustomPlaceHolder ??= GetString(this.t.Commands.Common.Prompts.SelectAnOption);
+        CustomPlaceHolder ??= this.GetString(this.t.Commands.Common.Prompts.SelectAnOption);
 
-        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+        var ConfirmSelectionButton = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ConfirmSelection), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
-        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
-        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
+        var PrevPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Common.PreviousPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("◀")));
+        var NextPageButton = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Common.NextPage), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("▶")));
 
-        int CurrentPage = 0;
-        string SelectionInteractionId = Guid.NewGuid().ToString();
+        var CurrentPage = 0;
+        var SelectionInteractionId = Guid.NewGuid().ToString();
 
 
         string FinalSelection = null;
 
-        string Selected = options.FirstOrDefault(x => x.Default, null)?.Value ?? "";
+        var Selected = options.FirstOrDefault(x => x.Default, null)?.Value ?? "";
 
-        bool FinishedSelection = false;
-        bool ExceptionOccurred = false;
+        var FinishedSelection = false;
+        var ExceptionOccurred = false;
         Exception ThrownException = null;
 
         async Task RefreshMessage()
@@ -735,16 +730,16 @@ public abstract class BaseCommand
 
             NextPageButton.Disabled = options.Skip(CurrentPage * 25).Count() <= 25;
             PrevPageButton.Disabled = CurrentPage == 0;
-            builder.AddComponents(PrevPageButton, NextPageButton);
+            _ = builder.AddComponents(PrevPageButton, NextPageButton);
 
             if (Selected.IsNullOrWhiteSpace())
-                ConfirmSelectionButton.Disable();
+                _ = ConfirmSelectionButton.Disable();
             else
-                ConfirmSelectionButton.Enable();
+                _ = ConfirmSelectionButton.Enable();
 
-            builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
+            _ = builder.AddComponents(MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot), ConfirmSelectionButton);
 
-            await RespondOrEdit(builder);
+            _ = await this.RespondOrEdit(builder);
         }
 
         _ = RefreshMessage();
@@ -808,21 +803,20 @@ public abstract class BaseCommand
 
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(this.ctx.ResponseMessage.Embeds[0]).WithContent(this.ctx.ResponseMessage.Content));
 
         if (ExceptionOccurred)
             return new InteractionResult<string>(ThrownException);
 
-        if (sw.Elapsed >= timeOutOverride)
-            return new InteractionResult<string>(new TimedOutException());
-
-        return new InteractionResult<string>(FinalSelection);
+        return sw.Elapsed >= timeOutOverride
+            ? new InteractionResult<string>(new TimedOutException())
+            : new InteractionResult<string>(FinalSelection);
     }
     #endregion
 
     #region Modals
-    public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null)
-        => await PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
+    public Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null)
+        => this.PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
     public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
     {
@@ -830,18 +824,18 @@ public abstract class BaseCommand
 
         var oriEmbed = this.ctx.ResponseMessage.Embeds[0];
 
-        var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(this.t.Commands.Common.Prompts.ReOpenModal), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
+        var ReOpen = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(this.t.Commands.Common.Prompts.ReOpenModal), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔄")));
 
-        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
+        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(customEmbed ?? new DiscordEmbedBuilder
         {
-            Description = GetString(this.t.Commands.Common.Prompts.WaitingForModalResponse, true)
+            Description = this.GetString(this.t.Commands.Common.Prompts.WaitingForModalResponse, true)
         }.AsAwaitingInput(this.ctx)).AddComponents(new List<DiscordComponent> { ReOpen, MessageComponents.GetCancelButton(this.ctx.DbUser, this.ctx.Bot) }));
 
         ComponentInteractionCreateEventArgs FinishedInteraction = null;
 
-        bool FinishedSelection = false;
-        bool ExceptionOccurred = false;
-        bool Cancelled = false;
+        var FinishedSelection = false;
+        var ExceptionOccurred = false;
+        var Cancelled = false;
         Exception ThrownException = null;
 
         if (open)
@@ -851,7 +845,7 @@ public abstract class BaseCommand
 
         async Task RunInteraction(DiscordClient s, ComponentInteractionCreateEventArgs e)
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 try
                 {
@@ -886,7 +880,7 @@ public abstract class BaseCommand
             }).Add(this.ctx.Bot, this.ctx);
         }
 
-        int TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
+        var TimeoutSeconds = (int)(timeOutOverride.Value.TotalSeconds * 2);
 
         while (!FinishedSelection && !ExceptionOccurred && !Cancelled && TimeoutSeconds >= 0)
         {
@@ -897,15 +891,14 @@ public abstract class BaseCommand
         this.ctx.Client.ComponentInteractionCreated -= RunInteraction;
 
         if (ResetToOriginalEmbed)
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(oriEmbed));
 
         if (ExceptionOccurred)
             return new InteractionResult<ComponentInteractionCreateEventArgs>(ThrownException);
 
-        if (TimeoutSeconds <= 0)
-            return new InteractionResult<ComponentInteractionCreateEventArgs>(new TimeoutException());
-
-        return new InteractionResult<ComponentInteractionCreateEventArgs>(FinishedInteraction);
+        return TimeoutSeconds <= 0
+            ? new InteractionResult<ComponentInteractionCreateEventArgs>(new TimeoutException())
+            : new InteractionResult<ComponentInteractionCreateEventArgs>(FinishedInteraction);
     }
 
 
@@ -915,20 +908,20 @@ public abstract class BaseCommand
         MaxTime ??= TimeSpan.FromDays(356);
         DefaultTime ??= TimeSpan.FromSeconds(30);
 
-        var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(this.t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
+        var modal = new DiscordInteractionModalBuilder().WithTitle(this.GetString(this.t.Commands.Common.Prompts.SelectATimeSpan)).WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", GetString(this.t.Commands.Common.Prompts.TimespanSeconds).Build(new TVar("Max", 59)), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
+        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "seconds", this.GetString(this.t.Commands.Common.Prompts.TimespanSeconds).Build(new TVar("Max", 59)), "0", 1, 2, true, $"{DefaultTime.Value.Seconds}"));
 
         if (MaxTime.Value.TotalMinutes >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", GetString(this.t.Commands.Common.Prompts.TimespanMinutes).Build(new TVar("Max", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}"))), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
+            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minutes", this.GetString(this.t.Commands.Common.Prompts.TimespanMinutes).Build(new TVar("Max", (MaxTime.Value.TotalMinutes >= 60 ? "59" : $"{((int)MaxTime.Value.TotalMinutes)}"))), $"0", 1, 2, true, $"{DefaultTime.Value.Minutes}"));
 
         if (MaxTime.Value.TotalHours >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", GetString(this.t.Commands.Common.Prompts.TimespanHours).Build(new TVar("Max", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}"))), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
+            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hours", this.GetString(this.t.Commands.Common.Prompts.TimespanHours).Build(new TVar("Max", (MaxTime.Value.TotalHours >= 24 ? "23" : $"{((int)MaxTime.Value.TotalHours)}"))), "0", 1, 2, true, $"{DefaultTime.Value.Hours}"));
 
         if (MaxTime.Value.TotalDays >= 1)
-            modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", GetString(this.t.Commands.Common.Prompts.TimespanDays).Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
+            _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "days", this.GetString(this.t.Commands.Common.Prompts.TimespanDays).Build(new TVar("Max", ((int)MaxTime.Value.TotalDays))), "0", 1, 3, true, $"{DefaultTime.Value.Days}"));
 
-        var ModalResult = await PromptModalWithRetry(interaction, modal, false);
+        var ModalResult = await this.PromptModalWithRetry(interaction, modal, false);
 
         if (ModalResult.TimedOut)
         {
@@ -945,7 +938,7 @@ public abstract class BaseCommand
 
         InteractionCreateEventArgs Response = ModalResult.Result;
 
-        TimeSpan length = TimeSpan.FromSeconds(0);
+        var length = TimeSpan.FromSeconds(0);
 
         try
         {
@@ -955,10 +948,10 @@ public abstract class BaseCommand
                 (Response.Interaction.Data.Components.Any(x => x.CustomId == "days") && !Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value.IsDigitsOnly()))
                 throw new InvalidOperationException("Invalid TimeSpan");
 
-            double seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
-            double minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
-            double hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
-            double days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
+            var seconds = Response.Interaction.Data.Components.Any(x => x.CustomId == "seconds") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "seconds").Value)) : 0;
+            var minutes = Response.Interaction.Data.Components.Any(x => x.CustomId == "minutes") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "minutes").Value)) : 0;
+            var hours = Response.Interaction.Data.Components.Any(x => x.CustomId == "hours") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "hours").Value)) : 0;
+            var days = Response.Interaction.Data.Components.Any(x => x.CustomId == "days") ? Convert.ToDouble(Convert.ToUInt32(Response.Interaction.Data.Components.First(x => x.CustomId == "days").Value)) : 0;
 
             length = length.Add(TimeSpan.FromSeconds(seconds));
             length = length.Add(TimeSpan.FromMinutes(minutes));
@@ -970,24 +963,23 @@ public abstract class BaseCommand
             return new InteractionResult<TimeSpan>(ex);
         }
 
-        if (length > MaxTime || length < MinTime)
-            return new InteractionResult<TimeSpan>(new InvalidOperationException("Invalid TimeSpan"));
-
-        return new InteractionResult<TimeSpan>(length);
+        return length > MaxTime || length < MinTime
+            ? new InteractionResult<TimeSpan>(new InvalidOperationException("Invalid TimeSpan"))
+            : new InteractionResult<TimeSpan>(length);
     }
 
     public async Task<InteractionResult<DateTime>> PromptModalForDateTime(DiscordInteraction interaction, bool ResetToOriginalEmbed = true, TimeSpan? timeOutOverride = null)
     {
-        var modal = new DiscordInteractionModalBuilder().WithTitle(GetString(this.t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
+        var modal = new DiscordInteractionModalBuilder().WithTitle(this.GetString(this.t.Commands.Common.Prompts.SelectADateTime)).WithCustomId(Guid.NewGuid().ToString());
 
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", GetString(this.t.Commands.Common.Prompts.DateTimeMinute), GetString(this.t.Commands.Common.Prompts.DateTimeMinute), 1, 2, true, $"{DateTime.UtcNow.Minute}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", GetString(this.t.Commands.Common.Prompts.DateTimeHour), GetString(this.t.Commands.Common.Prompts.DateTimeHour), 1, 2, true, $"{DateTime.UtcNow.Hour}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", GetString(this.t.Commands.Common.Prompts.DateTimeDay), GetString(this.t.Commands.Common.Prompts.DateTimeDay), 1, 2, true, $"{DateTime.UtcNow.Day}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", GetString(this.t.Commands.Common.Prompts.DateTimeMonth), GetString(this.t.Commands.Common.Prompts.DateTimeMonth), 1, 2, true, $"{DateTime.UtcNow.Month}"));
-        modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", GetString(this.t.Commands.Common.Prompts.DateTimeYear), GetString(this.t.Commands.Common.Prompts.DateTimeYear), 1, 4, true, $"{DateTime.UtcNow.Year}"));
+        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "minute", this.GetString(this.t.Commands.Common.Prompts.DateTimeMinute), this.GetString(this.t.Commands.Common.Prompts.DateTimeMinute), 1, 2, true, $"{DateTime.UtcNow.Minute}"));
+        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "hour", this.GetString(this.t.Commands.Common.Prompts.DateTimeHour), this.GetString(this.t.Commands.Common.Prompts.DateTimeHour), 1, 2, true, $"{DateTime.UtcNow.Hour}"));
+        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "day", this.GetString(this.t.Commands.Common.Prompts.DateTimeDay), this.GetString(this.t.Commands.Common.Prompts.DateTimeDay), 1, 2, true, $"{DateTime.UtcNow.Day}"));
+        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "month", this.GetString(this.t.Commands.Common.Prompts.DateTimeMonth), this.GetString(this.t.Commands.Common.Prompts.DateTimeMonth), 1, 2, true, $"{DateTime.UtcNow.Month}"));
+        _ = modal.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "year", this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), this.GetString(this.t.Commands.Common.Prompts.DateTimeYear), 1, 4, true, $"{DateTime.UtcNow.Year}"));
 
 
-        var ModalResult = await PromptModalWithRetry(interaction, modal, false);
+        var ModalResult = await this.PromptModalWithRetry(interaction, modal, false);
 
         if (ModalResult.TimedOut)
         {
@@ -1015,11 +1007,11 @@ public abstract class BaseCommand
                 (Response.Interaction.Data.Components.Any(x => x.CustomId == "year") && !Response.Interaction.Data.Components.First(x => x.CustomId == "year").Value.IsDigitsOnly()))
                 throw new ArgumentException("Invalid date time");
 
-            int hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
-            int minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
-            int day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
-            int month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
-            int year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
+            var hour = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("hour"));
+            var minute = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("minute"));
+            var day = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("day"));
+            var month = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("month"));
+            var year = Convert.ToInt32(Response.Interaction.GetModalValueByCustomId("year"));
 
             dateTime = new DateTime(year, month, day, hour, minute, 0, DateTimeKind.Utc);
         }
@@ -1044,7 +1036,7 @@ public abstract class BaseCommand
         {
             if (this.ctx.DbUser.PendingUserUpload.TimeOut.GetTotalSecondsUntil() > 0 && !this.ctx.DbUser.PendingUserUpload.InteractionHandled)
             {
-                await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+                _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
                 {
                     Description = $"`An upload interaction is already taking place. Please finish it beforehand.`",
                 }.AsError(this.ctx)));
@@ -1068,8 +1060,8 @@ public abstract class BaseCommand
         if (!this.ctx.DbUser.PendingUserUpload?.InteractionHandled ?? true)
             throw new ArgumentException("");
 
-        int size = this.ctx.DbUser.PendingUserUpload.FileSize;
-        Stream stream = this.ctx.DbUser.PendingUserUpload.UploadedData;
+        var size = this.ctx.DbUser.PendingUserUpload.FileSize;
+        var stream = this.ctx.DbUser.PendingUserUpload.UploadedData;
 
         this.ctx.DbUser.PendingUserUpload = null;
         return (stream, size);
@@ -1078,19 +1070,19 @@ public abstract class BaseCommand
     #region FinishInteraction
     public void ModifyToTimedOut(bool Delete = false)
     {
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).WithFooter(this.ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {GetString(this.t.Commands.Common.InteractionTimeout)}").WithColor(DiscordColor.Gray)));
+        _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder(this.ctx.ResponseMessage.Embeds[0]).WithFooter(this.ctx.ResponseMessage.Embeds[0]?.Footer?.Text + $" • {this.GetString(this.t.Commands.Common.InteractionTimeout)}").WithColor(DiscordColor.Gray)));
 
         if (Delete)
-            Task.Delay(5000).ContinueWith(_ =>
+            _ = Task.Delay(5000).ContinueWith(_ =>
             {
                 if (!this.ctx.ResponseMessage?.Flags.Value.HasMessageFlag(MessageFlags.Ephemeral) ?? false)
-                    this.ctx.ResponseMessage.DeleteAsync();
+                    _ = this.ctx.ResponseMessage.DeleteAsync();
             });
     }
 
     public void DeleteOrInvalidate()
     {
-        _ = RespondOrEdit($"✅ _{GetString(this.t.Commands.Common.InteractionFinished, true)}_");
+        _ = this.RespondOrEdit($"✅ _{this.GetString(this.t.Commands.Common.InteractionFinished, true)}_");
         switch (this.ctx.CommandType)
         {
             case Enums.CommandType.ContextMenu:
@@ -1122,7 +1114,7 @@ public abstract class BaseCommand
     {
         if (this.ctx.Member.VoiceState is null)
         {
-            SendVoiceStateError();
+            this.SendVoiceStateError();
             return false;
         }
 
@@ -1133,7 +1125,7 @@ public abstract class BaseCommand
     {
         if (!this.ctx.User.IsMaintenance(this.ctx.Bot.status))
         {
-            SendMaintenanceError();
+            this.SendMaintenanceError();
             return false;
         }
 
@@ -1144,7 +1136,7 @@ public abstract class BaseCommand
     {
         if (!this.ctx.User.IsMaintenance(this.ctx.Bot.status))
         {
-            SendBotOwnerError();
+            this.SendBotOwnerError();
             return false;
         }
 
@@ -1155,7 +1147,7 @@ public abstract class BaseCommand
     {
         if (!this.ctx.Member.IsAdmin(this.ctx.Bot.status))
         {
-            SendAdminError();
+            this.SendAdminError();
             return false;
         }
 
@@ -1166,7 +1158,7 @@ public abstract class BaseCommand
     {
         if (!this.ctx.Member.Permissions.HasPermission(perms))
         {
-            SendPermissionError(perms);
+            this.SendPermissionError(perms);
             return false;
         }
 
@@ -1177,7 +1169,7 @@ public abstract class BaseCommand
     {
         if (!this.ctx.CurrentMember.Permissions.HasPermission(perms))
         {
-            SendOwnPermissionError(perms);
+            this.SendOwnPermissionError(perms);
             return false;
         }
 
@@ -1188,7 +1180,7 @@ public abstract class BaseCommand
     {
         if (this.ctx.CommandType != commandType)
         {
-            SendSourceError(commandType);
+            this.SendSourceError(commandType);
             return false;
         }
 
@@ -1199,90 +1191,90 @@ public abstract class BaseCommand
     #region ErrorTemplates
 
     public void SendDisabledCommandError(string disabledCommand)
-        => _ = RespondOrEdit(new DiscordEmbedBuilder()
+        => _ = this.RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(this.t.Commands.Common.Errors.CommandDisabled, true, new TVar("Command", disabledCommand))
+            Description = this.GetString(this.t.Commands.Common.Errors.CommandDisabled, true, new TVar("Command", disabledCommand))
         }.AsError(this.ctx));
 
     public void SendNoMemberError()
-    => _ = RespondOrEdit(new DiscordEmbedBuilder()
+    => _ = this.RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(this.t.Commands.Common.Errors.NoMember)
+        Description = this.GetString(this.t.Commands.Common.Errors.NoMember)
     }.AsError(this.ctx));
 
     public void SendMaintenanceError()
-        => _ = RespondOrEdit(new DiscordEmbedBuilder()
+        => _ = this.RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"{this.ctx.CurrentUser.GetUsername()} Staff"))
+            Description = this.GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"{this.ctx.CurrentUser.GetUsername()} Staff"))
         }.AsError(this.ctx));
 
     public void SendBotOwnerError()
-    => _ = RespondOrEdit(new DiscordEmbedBuilder()
+    => _ = this.RespondOrEdit(new DiscordEmbedBuilder()
     {
-        Description = GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"<@{this.ctx.Bot.status.TeamOwner}>", false)),
+        Description = this.GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", $"<@{this.ctx.Bot.status.TeamOwner}>", false)),
     }.AsError(this.ctx));
 
     public void SendAdminError()
-        => _ = RespondOrEdit(new DiscordEmbedBuilder()
+        => _ = this.RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", "Administrator")),
+            Description = this.GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", "Administrator")),
         }.AsError(this.ctx));
 
     public void SendPermissionError(Permissions perms)
-        => _ = RespondOrEdit(new DiscordEmbedBuilder()
+        => _ = this.RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToTranslatedPermissionString(this.ctx.DbUser, this.ctx.Bot))),
+            Description = this.GetString(this.t.Commands.Common.Errors.Generic).Build(true, new TVar("Required", perms.ToTranslatedPermissionString(this.ctx.DbUser, this.ctx.Bot))),
         }.AsError(this.ctx));
 
     public void SendVoiceStateError()
-        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = GetString(this.t.Commands.Common.Errors.VoiceChannel).Build(true),
+            Description = this.GetString(this.t.Commands.Common.Errors.VoiceChannel).Build(true),
         }.AsError(this.ctx)));
 
     public void SendUserBanError(BanDetails entry)
-        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
+            Description = this.GetString(this.t.Commands.Common.Errors.UserBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
     public void SendGuildBanError(BanDetails entry)
-        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = GetString(this.t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),
+            Description = this.GetString(this.t.Commands.Common.Errors.GuildBan, true, new TVar("Reason", entry.Reason)),
         }.AsError(this.ctx)));
 
     public void SendSourceError(Enums.CommandType commandType)
         => _ = commandType switch
         {
-            Enums.CommandType.ApplicationCommand => RespondOrEdit(new DiscordEmbedBuilder()
+            Enums.CommandType.ApplicationCommand => this.RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = GetString(this.t.Commands.Common.Errors.ExclusiveApp).Build(true),
+                Description = this.GetString(this.t.Commands.Common.Errors.ExclusiveApp).Build(true),
             }.AsError(this.ctx)),
-            Enums.CommandType.PrefixCommand => RespondOrEdit(new DiscordEmbedBuilder()
+            Enums.CommandType.PrefixCommand => this.RespondOrEdit(new DiscordEmbedBuilder()
             {
-                Description = GetString(this.t.Commands.Common.Errors.ExclusivePrefix).Build(true)
+                Description = this.GetString(this.t.Commands.Common.Errors.ExclusivePrefix).Build(true)
             }.AsError(this.ctx)),
             _ => throw new ArgumentException("Invalid Source defined."),
         };
 
     public void SendDataError()
-        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = GetString(this.t.Commands.Common.Errors.Data, true, new TVar("Command", $"{this.ctx.Prefix}data delete")),
+            Description = this.GetString(this.t.Commands.Common.Errors.Data, true, new TVar("Command", $"{this.ctx.Prefix}data delete")),
         }.AsError(this.ctx)));
 
     public void SendDmError()
-        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"📩 {GetString(this.t.Commands.Common.Errors.DirectMessage, true)}",
+            Description = $"📩 {this.GetString(this.t.Commands.Common.Errors.DirectMessage, true)}",
             ImageUrl = (this.ctx.User.Presence.ClientStatus.Mobile.HasValue ? "https://cdn.discordapp.com/attachments/712761268393738301/867143225868681226/1q3uUtPAUU_4.gif" : "https://cdn.discordapp.com/attachments/712761268393738301/867133233984569364/1q3uUtPAUU_1.gif")
         }.AsError(this.ctx)));
 
     public void SendDmRedirect()
-        => _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
+        => _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder
         {
-            Description = $"📩 {GetString(this.t.Commands.Common.DirectMessageRedirect, true)}",
+            Description = $"📩 {this.GetString(this.t.Commands.Common.DirectMessageRedirect, true)}",
         }.AsSuccess(this.ctx)));
 
     public void SendOwnPermissionError(Permissions perms)
@@ -1290,9 +1282,9 @@ public abstract class BaseCommand
         if (perms is Permissions.AccessChannels or Permissions.SendMessages or Permissions.EmbedLinks)
             return;
 
-        _ = RespondOrEdit(new DiscordEmbedBuilder()
+        _ = this.RespondOrEdit(new DiscordEmbedBuilder()
         {
-            Description = GetString(this.t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToTranslatedPermissionString(this.ctx.DbUser, this.ctx.Bot)))
+            Description = this.GetString(this.t.Commands.Common.Errors.BotPermissions, true, new TVar("Required", perms.ToTranslatedPermissionString(this.ctx.DbUser, this.ctx.Bot)))
         }.AsError(this.ctx));
     }
 
@@ -1308,7 +1300,7 @@ public abstract class BaseCommand
             Description = $"**`{ctx.Prefix}{ctx.Command.Name}{(ctx.RawArgumentString != "" ? $" {ctx.RawArgumentString.SanitizeForCode().Replace("\\", "")}" : "")}` is not a valid way of using this command.**\nUse it like this instead: `{ctx.Prefix}{ctx.Command.GenerateUsage()}`\n\nArguments wrapped in `[]` are optional while arguments wrapped in `<>` are required.\n**Do not include the brackets when using commands, they're merely an indicator for requirement.**",
         }.AsError(this.ctx);
 
-        _ = RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
+        _ = this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed).WithContent(this.ctx.User.Mention));
     }
     #endregion
 }

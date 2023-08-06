@@ -11,7 +11,7 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class CustomEmbedCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await CheckPermissions(Permissions.EmbedLinks));
+    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => (await this.CheckPermissions(Permissions.EmbedLinks));
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -19,32 +19,32 @@ internal sealed class CustomEmbedCommand : BaseCommand
         {
             var CommandKey = this.t.Commands.Moderation.CustomEmbed;
 
-            var GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.New));
+            var GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.New));
 
             while (true)
             {
                 try
                 {
-                    var SetTitle = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetTitleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖋")));
-                    var SetAuthor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAuthorButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                    var SetThumbnail = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetThumbnailButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                    var SetTitle = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetTitleButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖋")));
+                    var SetAuthor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAuthorButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                    var SetThumbnail = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetThumbnailButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                    var SetDescription = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetDescriptionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📝")));
-                    var SetImage = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetImageButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
-                    var SetColor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetColorButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎨")));
+                    var SetDescription = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetDescriptionButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("📝")));
+                    var SetImage = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetImageButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                    var SetColor = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetColorButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🎨")));
 
-                    var SetTimestamp = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetTimestampButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
-                    var SetFooter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetFooterButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✒")));
+                    var SetTimestamp = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetTimestampButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🕒")));
+                    var SetFooter = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetFooterButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✒")));
 
-                    var AddField = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.AddFieldButton), (GeneratedEmbed.Fields.Count >= 25), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-                    var ModifyField = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ModifyFieldButton), (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
-                    var RemoveField = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.RemoveFieldButton), (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➖")));
+                    var AddField = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(CommandKey.AddFieldButton), (GeneratedEmbed.Fields.Count >= 25), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+                    var ModifyField = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ModifyFieldButton), (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🔁")));
+                    var RemoveField = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.RemoveFieldButton), (GeneratedEmbed.Fields.Count <= 0), new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➖")));
 
-                    var FinishAndSend = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SendEmbedButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
+                    var FinishAndSend = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(CommandKey.SendEmbedButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✅")));
 
                     try
                     {
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                                         .AddComponents(new List<DiscordComponent> { SetTitle, SetAuthor, SetThumbnail })
                                         .AddComponents(new List<DiscordComponent> { SetDescription, SetImage, SetColor })
                                         .AddComponents(new List<DiscordComponent> { SetFooter, SetTimestamp })
@@ -53,7 +53,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     catch (Exception)
                     {
-                        GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.New));
+                        GeneratedEmbed = new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.New));
                         continue;
                     }
 
@@ -61,21 +61,21 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                     if (Menu1.TimedOut)
                     {
-                        ModifyToTimedOut();
+                        this.ModifyToTimedOut();
                         return;
                     }
 
                     if (Menu1.GetCustomId() == SetTitle.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingTitle), Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", GetString(CommandKey.TitleField), "", 0, 256, false, GeneratedEmbed.Title))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", GetString(CommandKey.UrlField), "", 0, 256, false, GeneratedEmbed.Url));
+                        var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingTitle), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", this.GetString(CommandKey.TitleField), "", 0, 256, false, GeneratedEmbed.Title))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", this.GetString(CommandKey.UrlField), "", 0, 256, false, GeneratedEmbed.Url));
 
-                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                        var ModalResult = await this.PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
@@ -112,14 +112,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        var SetName = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetNameButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                        var SetUrl = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetUrlButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
-                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetIconButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                        var SetName = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetNameButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                        var SetUrl = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetUrlButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("↘")));
+                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetIconButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
 
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetName, SetUrl, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
                             .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot) }));
@@ -128,20 +128,20 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         if (Menu2.TimedOut)
                         {
-                            ModifyToTimedOut();
+                            this.ModifyToTimedOut();
                             return;
                         }
 
                         if (Menu2.GetCustomId() == SetName.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorName), Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", GetString(CommandKey.NameField), "", 0, 256, false, GeneratedEmbed.Author.Name));
+                            var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingAuthorName), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "name", this.GetString(CommandKey.NameField), "", 0, 256, false, GeneratedEmbed.Author.Name));
 
-                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                            var ModalResult = await this.PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
                             if (ModalResult.TimedOut)
                             {
-                                ModifyToTimedOut(true);
+                                this.ModifyToTimedOut(true);
                                 return;
                             }
                             else if (ModalResult.Cancelled)
@@ -160,14 +160,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         }
                         else if (Menu2.GetCustomId() == SetUrl.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorUrl), Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", GetString(CommandKey.UrlField), "", 0, 256, false, GeneratedEmbed.Author.Url));
+                            var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingAuthorUrl), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "url", this.GetString(CommandKey.UrlField), "", 0, 256, false, GeneratedEmbed.Author.Url));
 
-                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                            var ModalResult = await this.PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
                             if (ModalResult.TimedOut)
                             {
-                                ModifyToTimedOut(true);
+                                this.ModifyToTimedOut(true);
                                 return;
                             }
                             else if (ModalResult.Cancelled)
@@ -194,14 +194,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
-                                $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                                $"⚠ {this.GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
 
                             try
                             {
-                                stream = await PromptForFileUpload(TimeSpan.FromMinutes(1));
+                                stream = await this.PromptForFileUpload(TimeSpan.FromMinutes(1));
                             }
                             catch (AlreadyAppliedException)
                             {
@@ -209,16 +209,16 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             }
                             catch (ArgumentException)
                             {
-                                ModifyToTimedOut();
+                                this.ModifyToTimedOut();
                                 continue;
                             }
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                             if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
-                                                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
+                                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                                                              $"{this.GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -230,14 +230,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         }
                         else if (Menu2.GetCustomId() == SetByUser.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorbyUserId), Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", GetString(CommandKey.UserIdField), "", 0, 20, false));
+                            var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingAuthorbyUserId), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", this.GetString(CommandKey.UserIdField), "", 0, 20, false));
 
-                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                            var ModalResult = await this.PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
                             if (ModalResult.TimedOut)
                             {
-                                ModifyToTimedOut(true);
+                                this.ModifyToTimedOut(true);
                                 return;
                             }
                             else if (ModalResult.Cancelled)
@@ -289,14 +289,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
-                            $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                            $"⚠ {this.GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
 
                         try
                         {
-                            stream = await PromptForFileUpload(TimeSpan.FromMinutes(1));
+                            stream = await this.PromptForFileUpload(TimeSpan.FromMinutes(1));
                         }
                         catch (AlreadyAppliedException)
                         {
@@ -304,16 +304,16 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         }
                         catch (ArgumentException)
                         {
-                            ModifyToTimedOut();
+                            this.ModifyToTimedOut();
                             continue;
                         }
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                         if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
-                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                              $"{this.GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -325,14 +325,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetDescription.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingDescription), Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", GetString(CommandKey.DescriptionField), "", 0, 4000, false, GeneratedEmbed.Description));
+                        var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingDescription), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", this.GetString(CommandKey.DescriptionField), "", 0, 4000, false, GeneratedEmbed.Description));
 
-                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                        var ModalResult = await this.PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
@@ -353,14 +353,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
-                            $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                            $"⚠ {this.GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                         (Stream stream, int fileSize) stream;
 
                         try
                         {
-                            stream = await PromptForFileUpload(TimeSpan.FromMinutes(1));
+                            stream = await this.PromptForFileUpload(TimeSpan.FromMinutes(1));
                         }
                         catch (AlreadyAppliedException)
                         {
@@ -368,16 +368,16 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         }
                         catch (ArgumentException)
                         {
-                            ModifyToTimedOut();
+                            this.ModifyToTimedOut();
                             continue;
                         }
 
-                        await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                         if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                         {
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
-                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                              $"{this.GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                             await Task.Delay(5000);
                             continue;
                         }
@@ -389,14 +389,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetColor.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingColor), Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", GetString(CommandKey.ColorField), "#FF0000", 1, 100, false));
+                        var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingColor), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "color", this.GetString(CommandKey.ColorField), "#FF0000", 1, 100, false));
 
-                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                        var ModalResult = await this.PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
@@ -419,13 +419,13 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        var SetText = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetTextButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖊")));
-                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetIconButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
+                        var SetText = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetTextButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖊")));
+                        var SetIcon = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetIconButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖼")));
 
-                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
-                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
+                        var SetByUser = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsUserButton), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+                        var SetByGuild = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetAsServer), false, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("🖥")));
 
-                        await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
+                        _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(GeneratedEmbed)
                             .AddComponents(new List<DiscordComponent> { SetText, SetIcon })
                             .AddComponents(new List<DiscordComponent> { SetByUser, SetByGuild })
                             .AddComponents(new List<DiscordComponent> { MessageComponents.GetBackButton(ctx.DbUser, ctx.Bot) }));
@@ -434,20 +434,20 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         if (Menu2.TimedOut)
                         {
-                            ModifyToTimedOut();
+                            this.ModifyToTimedOut();
                             return;
                         }
 
                         if (Menu2.GetCustomId() == SetText.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingFooterText), Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "text", GetString(CommandKey.TextField), "", 0, 2048, false, GeneratedEmbed.Footer.Text));
+                            var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingFooterText), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "text", this.GetString(CommandKey.TextField), "", 0, 2048, false, GeneratedEmbed.Footer.Text));
 
-                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                            var ModalResult = await this.PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
                             if (ModalResult.TimedOut)
                             {
-                                ModifyToTimedOut(true);
+                                this.ModifyToTimedOut(true);
                                 return;
                             }
                             else if (ModalResult.Cancelled)
@@ -468,14 +468,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         {
                             _ = Menu2.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
-                                $"⚠ {GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.UploadImage, true, new TVar("Command", $"{ctx.Prefix}upload"))}\n\n" +
+                                $"⚠ {this.GetString(CommandKey.UploadNotice, true)}").AsAwaitingInput(ctx));
 
                             (Stream stream, int fileSize) stream;
 
                             try
                             {
-                                stream = await PromptForFileUpload(TimeSpan.FromMinutes(1));
+                                stream = await this.PromptForFileUpload(TimeSpan.FromMinutes(1));
                             }
                             catch (AlreadyAppliedException)
                             {
@@ -483,16 +483,16 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             }
                             catch (ArgumentException)
                             {
-                                ModifyToTimedOut();
+                                this.ModifyToTimedOut();
                                 continue;
                             }
 
-                            await RespondOrEdit(new DiscordEmbedBuilder().WithDescription(GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
+                            _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription(this.GetString(CommandKey.ImportingUpload, true)).AsAwaitingInput(ctx));
 
                             if (stream.fileSize > ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize)
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
-                                                              $"{GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
+                                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().WithDescription($"{this.GetString(CommandKey.ImportSizeError, true, new TVar("Size", ctx.Bot.status.LoadedConfig.Discord.MaxUploadSize.FileSizeToHumanReadable()))}\n\n" +
+                                                              $"{this.GetString(CommandKey.ContinueTimer, true, new TVar("Timestamp", DateTime.UtcNow.AddSeconds(6).ToTimestamp()))}").AsError(ctx));
                                 await Task.Delay(5000);
                                 continue;
                             }
@@ -504,14 +504,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                         }
                         else if (Menu2.GetCustomId() == SetByUser.CustomId)
                         {
-                            var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingAuthorbyUserId), Guid.NewGuid().ToString())
-                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", GetString(CommandKey.UserIdField), "", 0, 20, false));
+                            var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingAuthorbyUserId), Guid.NewGuid().ToString())
+                                .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "userid", this.GetString(CommandKey.UserIdField), "", 0, 20, false));
 
-                            var ModalResult = await PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
+                            var ModalResult = await this.PromptModalWithRetry(Menu2.Result.Interaction, modal, false);
 
                             if (ModalResult.TimedOut)
                             {
-                                ModifyToTimedOut(true);
+                                this.ModifyToTimedOut(true);
                                 return;
                             }
                             else if (ModalResult.Cancelled)
@@ -558,16 +558,16 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == SetTimestamp.CustomId)
                     {
-                        var ModalResult = await PromptModalForDateTime(Menu1.Result.Interaction, false);
+                        var ModalResult = await this.PromptModalForDateTime(Menu1.Result.Interaction, false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
                         {
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
                         else if (ModalResult.Errored)
@@ -580,16 +580,16 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     }
                     else if (Menu1.GetCustomId() == AddField.CustomId)
                     {
-                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingField), Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", GetString(CommandKey.TitleField), "", 0, 256, true))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", GetString(CommandKey.DescriptionField), "", 0, 1024, true))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "inline", GetString(CommandKey.InlineField), "", 4, 5, true, false.ToString()));
+                        var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingField), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "title", this.GetString(CommandKey.TitleField), "", 0, 256, true))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", this.GetString(CommandKey.DescriptionField), "", 0, 1024, true))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "inline", this.GetString(CommandKey.InlineField), "", 4, 5, true, false.ToString()));
 
-                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
+                        var ModalResult = await this.PromptModalWithRetry(Menu1.Result.Interaction, modal, false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
@@ -605,14 +605,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
 
                         try
                         {
-                            GeneratedEmbed.AddField(new DiscordEmbedField(Response.Interaction.GetModalValueByCustomId("title"), Response.Interaction.GetModalValueByCustomId("description"), Convert.ToBoolean(Response.Interaction.GetModalValueByCustomId("inline"))));
+                            _ = GeneratedEmbed.AddField(new DiscordEmbedField(Response.Interaction.GetModalValueByCustomId("title"), Response.Interaction.GetModalValueByCustomId("description"), Convert.ToBoolean(Response.Interaction.GetModalValueByCustomId("inline"))));
                         }
                         catch { }
                         continue;
                     }
                     else if (Menu1.GetCustomId() == ModifyField.CustomId)
                     {
-                        int Count = -1;
+                        var Count = -1;
 
                         int GetInt()
                         {
@@ -620,12 +620,12 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             return Count;
                         }
 
-                        var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
+                        var FieldResult = await this.PromptCustomSelection(GeneratedEmbed.Fields
                             .Select(x => new DiscordStringSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
                         if (FieldResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (FieldResult.Cancelled)
@@ -637,18 +637,18 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             throw FieldResult.Exception;
                         }
 
-                        DiscordEmbedField FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)];
+                        var FieldToEdit = GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)];
 
-                        var modal = new DiscordInteractionModalBuilder(GetString(CommandKey.ModifyingField), Guid.NewGuid().ToString())
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", GetString(CommandKey.TitleField), "", 1, 256, true, FieldToEdit.Name))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", GetString(CommandKey.DescriptionField), "", 1, 1024, true, FieldToEdit.Value))
-                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "inline", GetString(CommandKey.InlineField), "", 4, 5, true, FieldToEdit.Inline.ToString()));
+                        var modal = new DiscordInteractionModalBuilder(this.GetString(CommandKey.ModifyingField), Guid.NewGuid().ToString())
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "title", this.GetString(CommandKey.TitleField), "", 1, 256, true, FieldToEdit.Name))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "description", this.GetString(CommandKey.DescriptionField), "", 1, 1024, true, FieldToEdit.Value))
+                            .AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "inline", this.GetString(CommandKey.InlineField), "", 4, 5, true, FieldToEdit.Inline.ToString()));
 
-                        var ModalResult = await PromptModalWithRetry(Menu1.Result.Interaction, modal, null, false, null, false);
+                        var ModalResult = await this.PromptModalWithRetry(Menu1.Result.Interaction, modal, null, false, null, false);
 
                         if (ModalResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ModalResult.Cancelled)
@@ -675,7 +675,7 @@ internal sealed class CustomEmbedCommand : BaseCommand
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        int Count = -1;
+                        var Count = -1;
 
                         int GetInt()
                         {
@@ -683,12 +683,12 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             return Count;
                         }
 
-                        var FieldResult = await PromptCustomSelection(GeneratedEmbed.Fields
+                        var FieldResult = await this.PromptCustomSelection(GeneratedEmbed.Fields
                             .Select(x => new DiscordStringSelectComponentOption($"{x.Name}", GetInt().ToString(), x.Value.TruncateWithIndication(10))).ToList());
 
                         if (FieldResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (FieldResult.Cancelled)
@@ -700,30 +700,30 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             throw FieldResult.Exception;
                         }
 
-                        GeneratedEmbed.RemoveField(GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)]);
+                        _ = GeneratedEmbed.RemoveField(GeneratedEmbed.Fields[Convert.ToInt32(FieldResult.Result)]);
                         continue;
                     }
                     else if (Menu1.GetCustomId() == FinishAndSend.CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 
-                        var ChannelResult = await PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
+                        var ChannelResult = await this.PromptChannelSelection(new ChannelType[] { ChannelType.Text, ChannelType.News });
 
                         if (ChannelResult.TimedOut)
                         {
-                            ModifyToTimedOut(true);
+                            this.ModifyToTimedOut(true);
                             return;
                         }
                         else if (ChannelResult.Cancelled)
                         {
-                            await ExecuteCommand(ctx, arguments);
+                            await this.ExecuteCommand(ctx, arguments);
                             return;
                         }
                         else if (ChannelResult.Failed)
                         {
                             if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                             {
-                                await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.NoValidChannels, true)));
+                                _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.NoValidChannels, true)));
                                 await Task.Delay(3000);
                                 continue;
                             }
@@ -731,14 +731,14 @@ internal sealed class CustomEmbedCommand : BaseCommand
                             throw ChannelResult.Exception;
                         }
 
-                        await ChannelResult.Result.SendMessageAsync(GeneratedEmbed);
-                        DeleteOrInvalidate();
+                        _ = await ChannelResult.Result.SendMessageAsync(GeneratedEmbed);
+                        this.DeleteOrInvalidate();
                         return;
                     }
                     else if (Menu1.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
                     {
                         _ = Menu1.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-                        DeleteOrInvalidate();
+                        this.DeleteOrInvalidate();
                         return;
                     }
                 }

@@ -11,7 +11,8 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class BumpReminderCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) 
+        => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {
@@ -36,13 +37,13 @@ internal sealed class BumpReminderCommand : BaseCommand
             if (await ctx.DbUser.Cooldown.WaitForLight(ctx))
                 return;
 
-            var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), GetString(CommandKey.SetupBumpReminderButton), ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
-            var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), GetString(CommandKey.DisableBumpReminderButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
-            var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeChannelButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
-            var ChangeRole = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), GetString(CommandKey.ChangeRoleButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
+            var Setup = new DiscordButtonComponent(ButtonStyle.Success, Guid.NewGuid().ToString(), this.GetString(CommandKey.SetupBumpReminderButton), ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("➕")));
+            var Disable = new DiscordButtonComponent(ButtonStyle.Danger, Guid.NewGuid().ToString(), this.GetString(CommandKey.DisableBumpReminderButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("✖")));
+            var ChangeChannel = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeChannelButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("💬")));
+            var ChangeRole = new DiscordButtonComponent(ButtonStyle.Primary, Guid.NewGuid().ToString(), this.GetString(CommandKey.ChangeRoleButton), !ctx.DbGuild.BumpReminder.Enabled, new DiscordComponentEmoji(DiscordEmoji.FromUnicode("👤")));
 
-            await RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
-                .WithDescription(GetCurrentConfiguration(ctx)).AsAwaitingInput(ctx, GetString(CommandKey.Title)))
+            _ = await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(new DiscordEmbedBuilder()
+                .WithDescription(GetCurrentConfiguration(ctx)).AsAwaitingInput(ctx, this.GetString(CommandKey.Title)))
             .AddComponents(new List<DiscordComponent>
             {
                 { Setup },
@@ -58,7 +59,7 @@ internal sealed class BumpReminderCommand : BaseCommand
 
             if (e.TimedOut)
             {
-                ModifyToTimedOut(true);
+                this.ModifyToTimedOut(true);
                 return;
             }
 
@@ -68,38 +69,38 @@ internal sealed class BumpReminderCommand : BaseCommand
             {
                 if (!(await ctx.Guild.GetAllMembersAsync()).Any(x => x.Id == ctx.Bot.status.LoadedConfig.Accounts.Disboard))
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder()
-                        .WithDescription(GetString(CommandKey.DisboardMissing, true))
-                        .AsError(ctx, GetString(CommandKey.Title)));
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                        .WithDescription(this.GetString(CommandKey.DisboardMissing, true))
+                        .AsError(ctx, this.GetString(CommandKey.Title)));
                     return;
                 }
 
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.SettingUp, true))
-                    .AsLoading(ctx, GetString(CommandKey.Title)));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.SettingUp, true))
+                    .AsLoading(ctx, this.GetString(CommandKey.Title)));
 
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.SelectRole, true))
-                    .AsAwaitingInput(ctx, GetString(CommandKey.Title)));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.SelectRole, true))
+                    .AsAwaitingInput(ctx, this.GetString(CommandKey.Title)));
 
 
-                var RoleResult = await PromptRoleSelection(new() { CreateRoleOption = "BumpReminder" });
+                var RoleResult = await this.PromptRoleSelection(new() { CreateRoleOption = "BumpReminder" });
 
                 if (RoleResult.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                     return;
                 }
                 else if (RoleResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (RoleResult.Failed)
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels, true)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels, true)));
                         await Task.Delay(3000);
                         return;
                     }
@@ -109,12 +110,12 @@ internal sealed class BumpReminderCommand : BaseCommand
 
                 if (RoleResult.Result.Id == ctx.DbGuild.Join.AutoAssignRoleId || ctx.DbGuild.LevelRewards.Any(x => x.RoleId == RoleResult.Result.Id))
                 {
-                    await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(CommandKey.CantUseRole, true)));
+                    _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(CommandKey.CantUseRole, true)));
                     await Task.Delay(3000);
                     return;
                 }
 
-                var bump_reaction_msg = await ctx.Channel.SendMessageAsync(GetGuildString(CommandKey.ReactionRoleMessage, new TVar("Emoji", "✅".UnicodeToEmoji())));
+                var bump_reaction_msg = await ctx.Channel.SendMessageAsync(this.GetGuildString(CommandKey.ReactionRoleMessage, new TVar("Emoji", "✅".UnicodeToEmoji())));
                 _ = bump_reaction_msg.CreateReactionAsync(DiscordEmoji.FromUnicode("✅"));
                 _ = bump_reaction_msg.PinAsync();
 
@@ -129,13 +130,13 @@ internal sealed class BumpReminderCommand : BaseCommand
 
                 ctx.DbGuild.BumpReminder.Enabled = true;
 
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.SetupComplete, true))
-                    .AsSuccess(ctx, GetString(CommandKey.Title)));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.SetupComplete, true))
+                    .AsSuccess(ctx, this.GetString(CommandKey.Title)));
 
                 await Task.Delay(5000);
                 ctx.Bot.BumpReminder.SendPersistentMessage(ctx.Client, ctx.Channel, null);
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == Disable.CustomId)
@@ -151,35 +152,35 @@ internal sealed class BumpReminderCommand : BaseCommand
                         b.Delete();
                 }
 
-                await RespondOrEdit(new DiscordEmbedBuilder()
-                    .WithDescription(GetString(CommandKey.DisableBumpReminderButton, true))
-                    .AsSuccess(ctx, GetString(CommandKey.Title)));
+                _ = await this.RespondOrEdit(new DiscordEmbedBuilder()
+                    .WithDescription(this.GetString(CommandKey.DisableBumpReminderButton, true))
+                    .AsSuccess(ctx, this.GetString(CommandKey.Title)));
 
                 await Task.Delay(5000);
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ChangeChannel.CustomId)
             {
-                var ChannelResult = await PromptChannelSelection(ChannelType.Text);
+                var ChannelResult = await this.PromptChannelSelection(ChannelType.Text);
 
                 if (ChannelResult.TimedOut)
                 {
-                    ModifyToTimedOut(true);
+                    this.ModifyToTimedOut(true);
                     return;
                 }
                 else if (ChannelResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (ChannelResult.Failed)
                 {
                     if (ChannelResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoChannels)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoChannels)));
                         await Task.Delay(3000);
-                        await ExecuteCommand(ctx, arguments);
+                        await this.ExecuteCommand(ctx, arguments);
                         return;
                     }
 
@@ -187,29 +188,29 @@ internal sealed class BumpReminderCommand : BaseCommand
                 }
 
                 ctx.DbGuild.BumpReminder.ChannelId = ChannelResult.Result.Id;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == ChangeRole.CustomId)
             {
 
-                var RoleResult = await PromptRoleSelection();
+                var RoleResult = await this.PromptRoleSelection();
 
                 if (RoleResult.TimedOut)
                 {
-                    ModifyToTimedOut();
+                    this.ModifyToTimedOut();
                     return;
                 }
                 else if (RoleResult.Cancelled)
                 {
-                    await ExecuteCommand(ctx, arguments);
+                    await this.ExecuteCommand(ctx, arguments);
                     return;
                 }
                 else if (RoleResult.Failed)
                 {
                     if (RoleResult.Exception.GetType() == typeof(NullReferenceException))
                     {
-                        await RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(GetString(this.t.Commands.Common.Errors.NoRoles, true)));
+                        _ = await this.RespondOrEdit(new DiscordEmbedBuilder().AsError(ctx).WithDescription(this.GetString(this.t.Commands.Common.Errors.NoRoles, true)));
                         await Task.Delay(3000);
                         return;
                     }
@@ -218,12 +219,12 @@ internal sealed class BumpReminderCommand : BaseCommand
                 }
 
                 ctx.DbGuild.BumpReminder.RoleId = RoleResult.Result.Id;
-                await ExecuteCommand(ctx, arguments);
+                await this.ExecuteCommand(ctx, arguments);
                 return;
             }
             else if (e.GetCustomId() == MessageComponents.GetCancelButton(ctx.DbUser, ctx.Bot).CustomId)
             {
-                DeleteOrInvalidate();
+                this.DeleteOrInvalidate();
                 return;
             }
         });

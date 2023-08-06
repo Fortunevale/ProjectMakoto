@@ -22,7 +22,7 @@ public sealed class ExperienceSettings : RequiresParent<Guild>
         set
         {
             this._UseExperience = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_use", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_use", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -35,7 +35,7 @@ public sealed class ExperienceSettings : RequiresParent<Guild>
         set
         {
             this._BoostXpForBumpReminder = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "experience_boost_bumpreminder", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

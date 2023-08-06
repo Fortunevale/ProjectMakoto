@@ -22,7 +22,7 @@ public sealed class JoinSettings : RequiresParent<Guild>
         set
         {
             this._AutoAssignRoleId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "auto_assign_role_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "auto_assign_role_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -34,7 +34,7 @@ public sealed class JoinSettings : RequiresParent<Guild>
         set
         {
             this._JoinlogChannelId = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "joinlog_channel_id", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -46,7 +46,7 @@ public sealed class JoinSettings : RequiresParent<Guild>
         set
         {
             this._AutoBanGlobalBans = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "autoban_global_ban", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "autoban_global_ban", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -59,7 +59,7 @@ public sealed class JoinSettings : RequiresParent<Guild>
         set
         {
             this._ReApplyRoles = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplyroles", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplyroles", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 
@@ -72,7 +72,7 @@ public sealed class JoinSettings : RequiresParent<Guild>
         set
         {
             this._ReApplyNickname = value;
-            _ = Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplynickname", value, Bot.DatabaseClient.mainDatabaseConnection);
+            _ = this.Bot.DatabaseClient.UpdateValue("guilds", "serverid", this.Parent.Id, "reapplynickname", value, this.Bot.DatabaseClient.mainDatabaseConnection);
         }
     }
 }

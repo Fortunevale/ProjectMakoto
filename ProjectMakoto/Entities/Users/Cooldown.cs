@@ -48,7 +48,7 @@ public sealed class Cooldown : RequiresParent<User>
             .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton));
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             var result = await msg.WaitForButtonAsync(ctx.User);
 
@@ -62,7 +62,7 @@ public sealed class Cooldown : RequiresParent<User>
             cancellationTokenSource.Cancel();
         }).Add(ctx.Bot);
 
-        double milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
+        var milliseconds = this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).GetTimespanUntil().TotalMilliseconds;
         if (milliseconds <= 0)
             milliseconds = 500;
 
@@ -74,12 +74,12 @@ public sealed class Cooldown : RequiresParent<User>
         catch { }
         finally
         {
-            this.WaitingList.Remove(ctx.CommandName);
+            _ = this.WaitingList.Remove(ctx.CommandName);
         }
 
         try
         {
-            await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
+            _ = await ctx.BaseCommand.RespondOrEdit(new DiscordMessageBuilder()
             .WithContent($"{ctx.User.Mention} ⏳ {ctx.BaseCommand.GetString(ctx.t.Commands.Common.Cooldown.WaitingForCooldown, true, new TVar("Timestamp", this.LastUseByCommand[ctx.CommandName].ToUniversalTime().AddSeconds(CooldownTime).ToTimestamp()))}")
             .AddComponents(cancelButton.Disable()));
         }
@@ -95,12 +95,12 @@ public sealed class Cooldown : RequiresParent<User>
         return false;
     }
 
-    public async Task<bool> WaitForLight(SharedCommandContext ctx, bool IgnoreStaff = false)
-        => await Wait(ctx, 1, IgnoreStaff);
+    public Task<bool> WaitForLight(SharedCommandContext ctx, bool IgnoreStaff = false)
+        => this.Wait(ctx, 1, IgnoreStaff);
 
-    public async Task<bool> WaitForModerate(SharedCommandContext ctx, bool IgnoreStaff = false)
-        => await Wait(ctx, 6, IgnoreStaff);
+    public Task<bool> WaitForModerate(SharedCommandContext ctx, bool IgnoreStaff = false)
+        => this.Wait(ctx, 6, IgnoreStaff);
 
-    public async Task<bool> WaitForHeavy(SharedCommandContext ctx, bool IgnoreStaff = false)
-        => await Wait(ctx, 20, IgnoreStaff);
+    public Task<bool> WaitForHeavy(SharedCommandContext ctx, bool IgnoreStaff = false)
+        => this.Wait(ctx, 20, IgnoreStaff);
 }

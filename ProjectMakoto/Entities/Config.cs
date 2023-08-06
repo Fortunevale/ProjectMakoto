@@ -23,7 +23,7 @@ public sealed class Config
                 return;
 
             Thread.Sleep(500);
-            Save(retry + 1);
+            this.Save(retry + 1);
         }
     }
 
@@ -147,7 +147,7 @@ public sealed class Config
             public DateTimeOffset TokenExperiation = new(0001, 01, 01, 15, 00, 00, TimeSpan.Zero);
             public string Username = "";
             public string Repository = "";
-            public string? Branch = "";
+            public string? Branch = null;
             public string TokenLeakRepoOwner = "";
             public string TokenLeakRepo = "";
         }

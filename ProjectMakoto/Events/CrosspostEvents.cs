@@ -22,7 +22,7 @@ internal sealed class CrosspostEvents : RequiresTranslation
 
         foreach (var b in this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.ToList())
             if (!e.Guild.Channels.ContainsKey(b))
-                this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
+                _ = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Remove(b);
 
         if (!this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostChannels.Contains(e.Channel.Id))
             return;
@@ -35,8 +35,6 @@ internal sealed class CrosspostEvents : RequiresTranslation
             if (this.Bot.Guilds[e.Guild.Id].Crosspost.ExcludeBots)
                 if (e.Message.WebhookMessage || e.Message.Author.IsBot)
                     return;
-
-            ulong MessageId = e.Message.Id;
 
             if (this.Bot.Guilds[e.Guild.Id].Crosspost.DelayBeforePosting > 3)
                 _ = e.Message.CreateReactionAsync(DiscordEmoji.FromUnicode("🕒"));
@@ -61,24 +59,7 @@ internal sealed class CrosspostEvents : RequiresTranslation
                 throw;
             }
 
-            bool ReactionAdded = false;
-
-            var task = this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostWithRatelimit(e.Channel, e.Message).ContinueWith(s =>
-            {
-                if (ReactionAdded)
-                    _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-            });
-
-            await Task.Delay(5000);
-
-            if (!task.IsCompleted)
-            {
-                if (!ReactionAdded)
-                {
-                    await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                    ReactionAdded = true;
-                }
-            }
+            await this.Bot.Guilds[e.Guild.Id].Crosspost.CrosspostWithRatelimit(sender, msg);
         }
     }
 }

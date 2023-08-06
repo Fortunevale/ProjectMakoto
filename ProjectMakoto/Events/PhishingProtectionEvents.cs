@@ -16,22 +16,22 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
     }
 
     Translations.events.phishing tKey
-        => t.Events.Phishing;
+        => this.t.Events.Phishing;
 
     internal async Task MessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
-        CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
+        _ = this.CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
     }
 
     internal async Task MessageUpdated(DiscordClient sender, MessageUpdateEventArgs e)
     {
         if (e.MessageBefore?.Content != e.Message?.Content)
-            CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
+            _ = this.CheckMessage(sender, e.Guild, e.Message).Add(this.Bot);
     }
 
     private async Task CheckMessage(DiscordClient sender, DiscordGuild guild, DiscordMessage e)
     {
-        string prefix = guild.GetGuildPrefix(this.Bot);
+        var prefix = guild.GetGuildPrefix(this.Bot);
 
         if (e?.Content?.StartsWith(prefix) ?? false)
             foreach (var command in sender.GetCommandsNext().RegisteredCommands)
@@ -44,25 +44,23 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
         if (!this.Bot.Guilds[guild.Id].PhishingDetection.DetectPhishing)
             return;
 
-        DiscordMember member = await guild.GetMemberAsync(e.Author.Id);
+        var member = await guild.GetMemberAsync(e.Author.Id);
 
-        async void CheckDb(Uri uri)
+        async Task CheckDb(Uri uri)
         {
             if (!this.Bot.Guilds[guild.Id].PhishingDetection.AbuseIpDbReports)
                 return;
 
-            var task = Dns.GetHostAddressesAsync(uri.Host);
+            IPAddress[] parsedIp;
 
             try
             {
-                task.Wait();
+                parsedIp = await Dns.GetHostAddressesAsync(uri.Host);
             }
-            catch { }
-
-            if (task.IsFaulted || task.Result.Length <= 0)
+            catch (Exception)
+            {
                 return;
-
-            var parsedIp = task.Result;
+            }
 
             var query = await this.Bot.AbuseIpDbClient.QueryIp(parsedIp[0].ToString());
 
@@ -72,12 +70,12 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
 
                 DiscordEmbedBuilder embed = new()
                 {
-                    Title = tKey.AbuseIpDbReport.Get(Bot.Guilds[guild.Id]),
-                    Description = $"**{tKey.HostWasFoundInAbuseIpDb.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", $"`{uri.Host} ({parsedIp[0]})`"))}**\n" +
-                                  $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**{tKey.ConfidenceOfAbuse.Get(Bot.Guilds[guild.Id])}**: {query.data.abuseConfidenceScore}%\n\n")}" +
-                                  $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**{tKey.Country.Get(Bot.Guilds[guild.Id])}**: {query.data.countryCode.IsoCountryCodeToFlagEmoji()} {query.data.countryName}\n")}" +
-                                  $"{(query.data.isp.IsNullOrWhiteSpace() ? "" : $"**{tKey.ISP.Get(Bot.Guilds[guild.Id])}**: {query.data.isp}\n")}" +
-                                  $"{(query.data.domain.IsNullOrWhiteSpace() ? "" : $"**{tKey.DomainName.Get(Bot.Guilds[guild.Id])}**: {query.data.domain}\n")}",
+                    Title = this.tKey.AbuseIpDbReport.Get(this.Bot.Guilds[guild.Id]),
+                    Description = $"**{this.tKey.HostWasFoundInAbuseIpDb.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Host", $"`{uri.Host} ({parsedIp[0]})`"))}**\n" +
+                                  $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**{this.tKey.ConfidenceOfAbuse.Get(this.Bot.Guilds[guild.Id])}**: {query.data.abuseConfidenceScore}%\n\n")}" +
+                                  $"{(query.data.countryName.IsNullOrWhiteSpace() ? "" : $"**{this.tKey.Country.Get(this.Bot.Guilds[guild.Id])}**: {query.data.countryCode.IsoCountryCodeToFlagEmoji()} {query.data.countryName}\n")}" +
+                                  $"{(query.data.isp.IsNullOrWhiteSpace() ? "" : $"**{this.tKey.ISP.Get(this.Bot.Guilds[guild.Id])}**: {query.data.isp}\n")}" +
+                                  $"{(query.data.domain.IsNullOrWhiteSpace() ? "" : $"**{this.tKey.DomainName.Get(this.Bot.Guilds[guild.Id])}**: {query.data.domain}\n")}",
                     Color = new DiscordColor("#FF0000"),
                     Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
                     {
@@ -85,9 +83,9 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                     },
                 };
 
-                embed.AddFields(report_fields.Take(2));
+                _ = embed.AddFields(report_fields.Take(2));
 
-                _ = e.RespondAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordLinkButtonComponent($"https://www.abuseipdb.com/check/{parsedIp[0]}", tKey.OpenInBrowser.Get(Bot.Guilds[guild.Id]))));
+                _ = e.RespondAsync(new DiscordMessageBuilder().WithEmbed(embed).AddComponents(new DiscordLinkButtonComponent($"https://www.abuseipdb.com/check/{parsedIp[0]}", this.tKey.OpenInBrowser.Get(this.Bot.Guilds[guild.Id]))));
             }
         }
 
@@ -102,7 +100,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
             {
                 if (word.ToLower() == url.Key.ToLower())
                 {
-                    _ = PunishMember(guild, member, e, url.Key);
+                    _ = this.PunishMember(guild, member, e, url.Key);
                     return;
                 }
 
@@ -114,7 +112,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
 
                     if (regex.Replace(word.ToLower(), "", 1) == url.Key.ToLower())
                     {
-                        _ = PunishMember(guild, member, e, url.Key);
+                        _ = this.PunishMember(guild, member, e, url.Key);
                         return;
                     }
                 }
@@ -125,11 +123,11 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
         {
             if (match.Uri.ToString().Contains('⁄'))
             {
-                _ = PunishMember(guild, member, e, match.Uri.ToString());
+                _ = this.PunishMember(guild, member, e, match.Uri.ToString());
                 return;
             }
 
-            CheckDb(match.Uri);
+            _ = CheckDb(match.Uri);
         }
 
         foreach (var url in this.Bot.PhishingHosts)
@@ -138,7 +136,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
             {
                 if (match.Host.ToLower() == url.Key.ToLower())
                 {
-                    _ = PunishMember(guild, member, e, url.Key);
+                    _ = this.PunishMember(guild, member, e, url.Key);
                     return;
                 }
             }
@@ -148,14 +146,14 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
         {
             Dictionary<string, string> redirectUrls = new();
 
-            foreach (Match match in matches.Cast<Match>())
+            foreach (var match in matches.Cast<Match>())
             {
                 try
                 {
                     var unshortened_url = await WebTools.UnshortenUrl(match.Value);
                     var parsedUri = new UriBuilder(unshortened_url);
 
-                    CheckDb(parsedUri.Uri);
+                    _ = CheckDb(parsedUri.Uri);
 
                     if (unshortened_url != match.Value)
                     {
@@ -163,7 +161,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                         {
                             if (parsedUri.Host.ToLower() == url.Key.ToLower())
                             {
-                                _ = PunishMember(guild, member, e, url.Key);
+                                _ = this.PunishMember(guild, member, e, url.Key);
                                 return;
                             }
                         }
@@ -178,7 +176,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                     if (this.Bot.Guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                         {
-                            Title = $":no_entry: {tKey.RedirectCheckTimeoutError.Get(Bot.Guilds[guild.Id])}",
+                            Title = $":no_entry: {this.tKey.RedirectCheckTimeoutError.Get(this.Bot.Guilds[guild.Id])}",
                             Color = EmbedColors.Error
                         });
                 }
@@ -189,7 +187,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                     if (this.Bot.Guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                         _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                         {
-                            Title = $":no_entry: {tKey.RedirectCheckTimeoutUnknownError.Get(Bot.Guilds[guild.Id])}",
+                            Title = $":no_entry: {this.tKey.RedirectCheckTimeoutUnknownError.Get(this.Bot.Guilds[guild.Id])}",
                             Color = EmbedColors.Error
                         });
                 }
@@ -206,7 +204,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                 if (this.Bot.Guilds[guild.Id].PhishingDetection.WarnOnRedirect)
                     _ = e.RespondAsync(embed: new DiscordEmbedBuilder
                     {
-                        Title = $":warning: {tKey.FoundRedirects.Get(Bot.Guilds[guild.Id])}",
+                        Title = $":warning: {this.tKey.FoundRedirects.Get(this.Bot.Guilds[guild.Id])}",
                         Description = $"`{string.Join("`\n`", redirectUrls.Select(x => x.Value))}`",
                         Color = EmbedColors.Warning
                     });
@@ -235,13 +233,13 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
             case PhishingPunishmentType.Kick:
             {
                 _ = e.DeleteAsync();
-                _ = member.RemoveAsync(this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMaliciousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
+                _ = member.RemoveAsync(this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", this.tKey.DetectedMaliciousHost.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
                 break;
             }
             case PhishingPunishmentType.SoftBan:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMaliciousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
+                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", this.tKey.DetectedMaliciousHost.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
                 await Task.Delay(1000);
                 _ = member.UnbanAsync();
                 break;
@@ -249,7 +247,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
             case PhishingPunishmentType.Ban:
             {
                 _ = e.DeleteAsync();
-                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", tKey.DetectedMaliciousHost.Get(Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
+                _ = member.BanAsync(7, this.Bot.Guilds[guild.Id].PhishingDetection.CustomPunishmentReason.Replace("%R", this.tKey.DetectedMaliciousHost.Get(this.Bot.Guilds[guild.Id]).Build(new TVar("Host", url))));
                 break;
             }
         }
