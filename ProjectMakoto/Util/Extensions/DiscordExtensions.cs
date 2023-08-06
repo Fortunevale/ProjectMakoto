@@ -12,7 +12,7 @@ namespace ProjectMakoto.Util;
 internal static class DiscordExtensions
 {
     internal static Permissions[] GetEnumeration(this Permissions perms)
-        => Enum.GetValues(perms.GetType()).Cast<Enum>().Where(x => perms.HasFlag(x)).Select(x => (Permissions)x.ToInt32()).ToArray();
+        => Enum.GetValues(perms.GetType()).Cast<Enum>().Where(x => perms.HasFlag(x)).Select(x => (Permissions)x.ToInt64()).ToArray();
 
     internal static Guild GetDbEntry(this DiscordGuild guild, Bot bot)
         => bot.Guilds[guild.Id];
