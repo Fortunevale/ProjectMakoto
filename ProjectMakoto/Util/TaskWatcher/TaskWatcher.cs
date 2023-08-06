@@ -272,7 +272,7 @@ public sealed class TaskWatcher
                                     {
                                         _ = embed.AddField(new DiscordEmbedField("Stack Trace", $"```{Regex.Replace(ex.StackTrace, "in " + regex, "").Replace("   at ", "")}```".TruncateWithIndication(1024, "``` Stack Trace too long, please check logs.")));
                                         _ = embed.AddField(new DiscordEmbedField(b.Count > 1 ? "Files & Lines" : "File & Line", $"{string.Join("\n\n", b.Select(x => $"[`{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}`]" +
-                                        $"(https://github.com/{bot.status.LoadedConfig.Secrets.Github.Username}/{bot.status.LoadedConfig.Secrets.Github.Repository}/blob/{bot.status.LoadedConfig.Secrets.Github.Branch ?? "main"}/{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}#L{x.Groups[2]}) at `Line {x.Groups[2]}`"))}".TruncateWithIndication(1024, "`")));
+                                        $"(https://github.com/{bot.status.LoadedConfig.Secrets.Github.Username}/{bot.status.LoadedConfig.Secrets.Github.Repository}/blob/{(bot.status.LoadedConfig.Secrets.Github.Branch.IsNullOrWhiteSpace() ? "main" : bot.status.LoadedConfig.Secrets.Github.Branch)}/{x.Groups[1].Value[(x.Groups[1].Value.LastIndexOf("ProjectMakoto"))..].Replace("\\", "/")}#L{x.Groups[2]}) at `Line {x.Groups[2]}`"))}".TruncateWithIndication(1024, "`")));
                                     }
                                     else
                                     {
