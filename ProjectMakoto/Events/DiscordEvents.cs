@@ -60,7 +60,7 @@ internal sealed class DiscordEvents : RequiresTranslation
             new TVar("GithubRepo", "<https://s.aitsys.dev/makoto>"),
             new TVar("Timestamp", DateTime.UtcNow.AddMinutes(60).ToTimestamp())));
 
-        _ = new Task(async () =>
+        _ = new Func<Task>(async () =>
         {
             _ = msg.DeleteAsync();
         }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(60));

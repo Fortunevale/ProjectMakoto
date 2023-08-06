@@ -117,7 +117,7 @@ internal sealed class DatabaseHelper
         }
     }
 
-    public async Task DeleteRow(MySqlConnection connection, string table, string row_match, string value)
+    public Task DeleteRow(MySqlConnection connection, string table, string row_match, string value)
     {
         if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
@@ -125,10 +125,10 @@ internal sealed class DatabaseHelper
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DELETE FROM `{table}` WHERE {row_match}='{value}'";
         cmd.Connection = connection;
-        await this._databaseClient._queue.RunCommand(cmd);
+        return this._databaseClient._queue.RunCommand(cmd);
     }
 
-    public async Task DropTable(MySqlConnection connection, string table)
+    public Task DropTable(MySqlConnection connection, string table)
     {
         if (this._databaseClient.IsDisposed())
             throw new Exception("DatabaseHelper is disposed");
@@ -136,7 +136,7 @@ internal sealed class DatabaseHelper
         var cmd = connection.CreateCommand();
         cmd.CommandText = $"DROP TABLE IF EXISTS `{table}`";
         cmd.Connection = connection;
-        await this._databaseClient._queue.RunCommand(cmd);
+        return this._databaseClient._queue.RunCommand(cmd);
     }
 
     public async Task SelectDatabase(MySqlConnection connection, string databaseName, bool CreateIfNotExist = false)

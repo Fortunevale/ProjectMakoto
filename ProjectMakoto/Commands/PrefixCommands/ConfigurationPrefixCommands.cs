@@ -69,8 +69,8 @@ public sealed class ConfigurationPrefixCommands : BaseCommandModule
                 => _ = new Commands.ReactionRolesCommand.AddCommand().ExecuteCommand(ctx, this._bot, new Dictionary<string, object> { { "emoji_parameter", emoji_parameter }, { "role_parameter", role_parameter }, });
 
             [Command("add"), Description("Allows you to add a reaction role to a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message."), Priority(1)]
-            public async Task Add2(CommandContext ctx, DiscordRole role_parameter, DiscordEmoji emoji_parameter)
-                => await this.Add(ctx, emoji_parameter, role_parameter);
+            public Task Add2(CommandContext ctx, DiscordRole role_parameter, DiscordEmoji emoji_parameter)
+                => this.Add(ctx, emoji_parameter, role_parameter);
 
             [Command("remove"), Description("Allows you to remove a specific reaction role from a message directly, skipping the lengthy questioning. Reply to a message with this command to select the message.")]
             public async Task Remove(CommandContext ctx, DiscordEmoji emoji_parameter)

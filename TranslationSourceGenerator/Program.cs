@@ -51,10 +51,8 @@ public sealed class Translations
     public string TranslationCs
         => Path.Combine(this.SourceDirectory, "Entities", "Translation", "Translations.cs");
 
-    static void Main(string[] args)
-    {
-        new Program().Execute(args).GetAwaiter().GetResult();
-    }
+    static void Main(string[] args) 
+        => new Program().Execute(args).GetAwaiter().GetResult();
 
     public async Task Execute(string[] args)
     {
@@ -97,10 +95,8 @@ public sealed class Translations
 
                             var jsonFile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(this.StringsJson));
 
-                            string CreateValidValueName(string str)
-                            {
-                                return Regex.Replace(str, @"[^a-zA-Z0-9]", "_");
-                            }
+                            string CreateValidValueName(string str) 
+                                => Regex.Replace(str, @"[^a-zA-Z0-9]", "_");
 
                             void RecursiveHandle(JObject token, string ParentPath, int depth)
                             {

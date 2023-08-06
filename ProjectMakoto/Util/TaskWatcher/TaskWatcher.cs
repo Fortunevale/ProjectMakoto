@@ -7,6 +7,8 @@
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
 
+using Xorog.UniversalExtensions.EventArgs;
+
 namespace ProjectMakoto.Util;
 
 public sealed class TaskWatcher
@@ -18,7 +20,7 @@ public sealed class TaskWatcher
 
     private List<TaskInfo> TaskList = new();
 
-    internal async void Start()
+    internal void Start()
     {
         _ = Task.Run(async () =>
         {
@@ -175,7 +177,7 @@ public sealed class TaskWatcher
         return taskInfo;
     }
 
-    internal async static void LogHandler(Bot bot, object? sender, LogMessageEventArgs e, int depth = 0)
+    internal async void LogHandler(Bot bot, object? sender, LogMessageEventArgs e, int depth = 0)
     {
         switch (e.LogEntry.LogLevel)
         {
@@ -236,7 +238,7 @@ public sealed class TaskWatcher
                             }
 
                             await Task.Delay(1000);
-                            LogHandler(bot, sender, e, depth++);
+                            this.LogHandler(bot, sender, e, depth++);
                             return;
                         }
 
@@ -317,4 +319,7 @@ public sealed class TaskWatcher
             }
         }
     }
+
+    internal void TaskStarted(Bot bot, object sender, ScheduledTaskStartedEventArgs e)
+        => _ = e.Task.Add(bot);
 }

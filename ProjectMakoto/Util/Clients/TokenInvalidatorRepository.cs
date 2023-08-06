@@ -13,20 +13,18 @@ public class TokenInvalidatorRepository : RequiresBotReference
 {
     internal TokenInvalidatorRepository(Bot bot) : base(bot)
     {
-        _ = this.SyncRepository().Add(bot);
+        this.SyncRepository();
     }
 
-    private async Task SyncRepository()
+    private void SyncRepository()
     {
-        Task task = new(() =>
+        _ = new Func<Task>(() =>
         {
-            _ = this.SyncRepository();
-        });
+            this.SyncRepository();
+            return Task.CompletedTask;
+        }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
 
-        _ = task.CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
-        _ = task.Add(this.Bot);
-
-        await this.Pull();
+        _ = Task.Run(this.Pull);
     }
 
     public (bool, FileInfo?) SearchForString(string searchQuery, string? startDirectory = null)

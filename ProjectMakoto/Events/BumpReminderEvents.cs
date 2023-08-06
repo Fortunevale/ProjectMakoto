@@ -23,15 +23,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
         if (e.Guild is null || e.Channel is null || e.Channel.IsPrivate || !this.Bot.Guilds[e.Guild.Id].BumpReminder.Enabled || e.Channel.Id != this.Bot.Guilds[e.Guild.Id].BumpReminder.ChannelId)
             return;
 
-        DiscordUser bUser = null;
-
-        var getuser = sender.GetUserAsync(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId, true).ContinueWith(x =>
-        {
-            if (x.IsCompletedSuccessfully)
-                bUser = x.Result;
-        });
-
-        _ = getuser.Wait(10000);
+        var bUser = await sender.GetUserAsync(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId);
 
         if (!(e.Author.Id == sender.CurrentUser.Id && e.Message.Embeds.Any()))
             this.Bot.BumpReminder.SendPersistentMessage(sender, e.Channel, bUser);
@@ -71,7 +63,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
                 try
                 {
                     if (this.Bot.Guilds[e.Guild.Id].Experience.UseExperience && this.Bot.Guilds[e.Guild.Id].Experience.BoostXpForBumpReminder)
-                        this.Bot.ExperienceHandler.ModifyExperience(_bumper, e.Guild, e.Channel, 50);
+                        _ = this.Bot.ExperienceHandler.ModifyExperience(_bumper, e.Guild, e.Channel, 50);
                 }
                 catch { }
 
@@ -122,15 +114,7 @@ internal sealed class BumpReminderEvents : RequiresTranslation
 
         if (e.Message.Id == this.Bot.Guilds[e.Guild.Id].BumpReminder.PersistentMessageId)
         {
-            DiscordUser bUser = null;
-
-            var getuser = sender.GetUserAsync(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId, true).ContinueWith(x =>
-            {
-                if (x.IsCompletedSuccessfully)
-                    bUser = x.Result;
-            });
-
-            _ = getuser.Wait(10000);
+            var bUser = await sender.GetUserAsync(this.Bot.Guilds[e.Guild.Id].BumpReminder.LastUserId);
 
             this.Bot.BumpReminder.SendPersistentMessage(sender, e.Channel, bUser);
         }

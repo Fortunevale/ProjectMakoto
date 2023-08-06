@@ -19,7 +19,7 @@ internal sealed class ConfigLoader
         {
             DateTime lastModify = new();
 
-            bot.status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+            bot.status.LoadedConfig = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync("config.json"));
             await Task.Delay(500);
             bot.status.LoadedConfig.Save();
 
@@ -34,7 +34,7 @@ internal sealed class ConfigLoader
                         try
                         {
                             _logger.LogDebug("Reloading config..");
-                            bot.status.LoadedConfig = JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+                            bot.status.LoadedConfig = JsonConvert.DeserializeObject<Config>(await File.ReadAllTextAsync("config.json"));
                             _logger.LogInfo("Config reloaded.");
                         }
                         catch (Exception ex)

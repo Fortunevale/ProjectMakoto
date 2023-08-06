@@ -106,24 +106,7 @@ internal sealed class SyncTasks
                                     if (bot.Guilds[guild.Value.Id].Crosspost.DelayBeforePosting > 3)
                                         _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromUnicode("🕒"));
 
-                                    var ReactionAdded = false;
-
-                                    var task = bot.Guilds[guild.Value.Id].Crosspost.CrosspostWithRatelimit(msg.Channel, msg).ContinueWith(s =>
-                                    {
-                                        if (ReactionAdded)
-                                            _ = msg.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                    });
-
-                                    await Task.Delay(5000);
-
-                                    if (!task.IsCompleted)
-                                    {
-                                        await msg.CreateReactionAsync(DiscordEmoji.FromGuildEmote(sender, 974029756355977216));
-                                        ReactionAdded = true;
-                                    }
-
-                                    while (!task.IsCompleted)
-                                        task.Wait();
+                                    await bot.Guilds[guild.Key].Crosspost.CrosspostWithRatelimit(sender, msg);
                                 }
                         }
                     }).Add(bot);

@@ -73,7 +73,7 @@ internal sealed class BumpReminderHandler: RequiresBotReference
             _logger.LogError("An exception occurred while trying to un-queue previous bump messages for '{Guild}'", ex, ServerId);
         }
 
-        var task = new Task(new Action(async () =>
+        _ = new Func<Task>(async () =>
         {
             _logger.LogDebug("Executing Bump Message for '{Guild}'", ServerId);
             var Guild = await client.GetGuildAsync(ServerId);
@@ -118,6 +118,6 @@ internal sealed class BumpReminderHandler: RequiresBotReference
             this.Bot.Guilds[ServerId].BumpReminder.LastReminder = DateTime.UtcNow;
 
             this.ScheduleBump(client, ServerId);
-        })).CreateScheduledTask(this.Bot.Guilds[ServerId].BumpReminder.LastReminder.AddHours(2), new ScheduledTaskIdentifier(ServerId, "", "bumpmsg"));
+        }).CreateScheduledTask(this.Bot.Guilds[ServerId].BumpReminder.LastReminder.AddHours(2), new ScheduledTaskIdentifier(ServerId, "", "bumpmsg"));
     }
 }

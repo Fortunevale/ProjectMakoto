@@ -117,12 +117,12 @@ public sealed class DatabaseClient : RequiresBotReference
 
         await databaseClient.CheckGuildTables();
 
-        _ = new Task(new Action(async () =>
+        _ = new Func<Task>(async () =>
         {
             _ = databaseClient.CheckDatabaseConnection(databaseClient.mainDatabaseConnection);
             await Task.Delay(10000);
             _ = databaseClient.CheckDatabaseConnection(databaseClient.guildDatabaseConnection);
-        })).CreateScheduledTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
+        }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(10), "database-connection-watcher");
 
         bot.DatabaseClient = databaseClient;
         bot.status.DatabaseInitialized = true;
@@ -235,9 +235,9 @@ public sealed class DatabaseClient : RequiresBotReference
 
     private async Task CheckDatabaseConnection(MySqlConnection connection)
     {
-        _ = new Task(async () =>
+        _ = new Func<Task>(async () =>
         {
-            _ = this.CheckDatabaseConnection(connection);
+            await this.CheckDatabaseConnection(connection);
         }).CreateScheduledTask(DateTime.UtcNow.AddSeconds(120), "database-connection-watcher");
 
         if (this.Disposed)

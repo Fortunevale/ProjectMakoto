@@ -26,7 +26,7 @@ internal static class GenericExtensions
         return exception;
     }
 
-    internal static bool ContainsTask(this IReadOnlyList<InternalSheduler.ScheduledTask>? tasks, string type, ulong snowflake, string id) 
+    internal static bool ContainsTask(this IReadOnlyList<ScheduledTask>? tasks, string type, ulong snowflake, string id) 
         => tasks.Where(x =>
         {
             if (x.CustomData is not ScheduledTaskIdentifier scheduledTaskIdentifier)

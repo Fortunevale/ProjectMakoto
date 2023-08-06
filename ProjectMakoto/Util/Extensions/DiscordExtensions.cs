@@ -125,8 +125,8 @@ internal static class DiscordExtensions
     internal static DiscordComponentEmoji ToComponent(this DiscordEmoji emoji)
         => new(emoji);
 
-    internal static async Task<DiscordMessage> Refetch(this DiscordMessage msg)
-        => await msg.Channel.GetMessageAsync(msg.Id, true);
+    internal static Task<DiscordMessage> Refetch(this DiscordMessage msg)
+        => msg.Channel.GetMessageAsync(msg.Id, true);
 
     internal static int GetRoleHighestPosition(this DiscordMember member)
         => member is null ? -1 : (member.IsOwner ? 9999 : (!member.Roles.Any() ? 0 : member.Roles.OrderByDescending(x => x.Position).First().Position));
@@ -370,16 +370,16 @@ internal static class DiscordExtensions
                   .Replace("9", "9️⃣");
     }
 
-    public async static Task<DiscordUser> ParseStringAsUser(string str, DiscordClient client)
+    public static Task<DiscordUser> ParseStringAsUser(string str, DiscordClient client)
     {
         if (str.IsDigitsOnly())
-            return await client.GetUserAsync(UInt64.Parse(str));
+            return client.GetUserAsync(UInt64.Parse(str));
         else
         {
             var reg = RegexTemplates.UserMention.Match(str);
 
             if (reg.Success)
-                return await client.GetUserAsync(UInt64.Parse(reg.Groups[3].Value));
+                return client.GetUserAsync(UInt64.Parse(reg.Groups[3].Value));
         }
 
         throw new ArgumentException("");

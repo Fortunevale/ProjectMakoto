@@ -72,15 +72,14 @@ internal sealed class AfkEvents : RequiresTranslation
                 this.Bot.Users[e.Author.Id].AfkStatus.Messages = new();
             }
 
-            _ = e.Message.RespondAsync(embed).ContinueWith(async x =>
-            {
-                if (ExtendDelay)
-                    await Task.Delay(30000);
-                else
-                    await Task.Delay(10000);
+            var message = await e.Message.RespondAsync(embed);
 
-                _ = x.Result.DeleteAsync();
-            });
+            if (ExtendDelay)
+                await Task.Delay(30000);
+            else
+                await Task.Delay(10000);
+
+            _ = message.DeleteAsync();
         }
 
         if (e.MentionedUsers != null && e.MentionedUsers.Count > 0)
@@ -110,7 +109,7 @@ internal sealed class AfkEvents : RequiresTranslation
 
                     this.Bot.Users[e.Author.Id].AfkStatus.LastMentionTrigger = DateTime.UtcNow;
 
-                    _ = e.Message.RespondAsync(new DiscordEmbedBuilder
+                    var message = await e.Message.RespondAsync(new DiscordEmbedBuilder
                     {
                         Author = new DiscordEmbedBuilder.EmbedAuthor { IconUrl = e.Guild.IconUrl, Name = $"{AfkKey.Title.Get(this.Bot.Users[e.Author.Id])} • {e.Guild.Name}" },
                         Color = EmbedColors.Info,
@@ -119,11 +118,9 @@ internal sealed class AfkEvents : RequiresTranslation
                             new TVar("User", b.Mention),
                             new TVar("Timestamp", this.Bot.Users[b.Id].AfkStatus.TimeStamp.ToTimestamp()),
                             new TVar("Reason", this.Bot.Users[b.Id].AfkStatus.Reason.FullSanitize()))
-                    }).ContinueWith(async x =>
-                    {
-                        await Task.Delay(10000);
-                        _ = x.Result.DeleteAsync();
                     });
+                    await Task.Delay(10000);
+                    _ = message.DeleteAsync();
                     return;
                 }
             }

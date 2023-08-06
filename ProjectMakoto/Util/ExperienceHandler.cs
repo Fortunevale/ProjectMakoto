@@ -70,10 +70,10 @@ internal sealed class ExperienceHandler : RequiresTranslation
         return Points;
     }
 
-    internal async void ModifyExperience(ulong user, DiscordGuild guild, DiscordChannel channel, int Amount) => this.ModifyExperience(await guild.GetMemberAsync(user), guild, channel, Amount);
-    internal async void ModifyExperience(DiscordUser user, DiscordGuild guild, DiscordChannel channel, int Amount) => this.ModifyExperience(await user.ConvertToMember(guild), guild, channel, Amount);
+    internal async Task ModifyExperience(ulong user, DiscordGuild guild, DiscordChannel channel, int Amount) => await this.ModifyExperience(await guild.GetMemberAsync(user), guild, channel, Amount);
+    internal async Task ModifyExperience(DiscordUser user, DiscordGuild guild, DiscordChannel channel, int Amount) => await this.ModifyExperience(await user.ConvertToMember(guild), guild, channel, Amount);
 
-    internal async void ModifyExperience(DiscordMember user, DiscordGuild guild, DiscordChannel channel, int Amount)
+    internal async Task ModifyExperience(DiscordMember user, DiscordGuild guild, DiscordChannel channel, int Amount)
     {
         if (user.IsBot)
             return;
@@ -156,7 +156,7 @@ internal sealed class ExperienceHandler : RequiresTranslation
                             return;
 
                         await Task.Delay(delete_delay);
-                        _ = x.Result.DeleteAsync();
+                        _ = (await x).DeleteAsync();
                     });
                 }
                 else

@@ -81,11 +81,12 @@ public sealed class Bot
         _logger = LoggerClient.StartLogger($"logs/{DateTime.UtcNow:dd-MM-yyyy_HH-mm-ss}.log", CustomLogLevel.Info, DateTime.UtcNow.AddDays(-3), false);
         _logger.LogRaised += this.LogHandler;
 
+        ScheduledTaskExtensions.TaskStarted += this.TaskStarted;
         UniversalExtensions.AttachLogger(_logger);
 
         RenderAsciiArt();
 
-        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? File.ReadLines("LatestGitPush.cfg") : new List<string> { "Development-Build" }).ToList()[0].Trim();
+        this.status.RunningVersion = (File.Exists("LatestGitPush.cfg") ? await File.ReadAllLinesAsync("LatestGitPush.cfg") : new string[] { "Development-Build" })[0].Trim();
         _logger.LogInfo("Starting up Makoto {RunningVersion}..\n", this.status.RunningVersion);
 
         if (args.Contains("--debug"))
@@ -252,13 +253,17 @@ public sealed class Bot
 
         AppDomain.CurrentDomain.ProcessExit += delegate
         {
+#pragma warning disable AsyncFixer02 // Long-running or blocking operations inside an async method
             this.ExitApplication(true).Wait();
+#pragma warning restore AsyncFixer02 // Long-running or blocking operations inside an async method
         };
 
         Console.CancelKeyPress += delegate
         {
             _logger.LogInfo("Exiting, please wait..");
+#pragma warning disable AsyncFixer02 // Long-running or blocking operations inside an async method
             this.ExitApplication().Wait();
+#pragma warning restore AsyncFixer02 // Long-running or blocking operations inside an async method
         };
 
 
@@ -404,7 +409,7 @@ public sealed class Bot
                 await this.DatabaseClient.FullSyncDatabase(true);
                 _logger.LogDebug("Flushed to database.");
 
-                Thread.Sleep(500);
+                await Task.Delay(500);
 
                 _logger.LogInfo("Closing database..");
                 await this.DatabaseClient.Dispose();
@@ -416,19 +421,19 @@ public sealed class Bot
             }
         }
 
-        Thread.Sleep(500);
+        await Task.Delay(500);
         _logger.LogInfo("Goodbye!");
 
-        Thread.Sleep(500);
+        await Task.Delay(500);
         Environment.Exit(0);
     }
 
     private async Task ProcessDeletionRequests()
     {
-        _ = new Task(new Action(async () =>
+        _ = new Func<Task>(async () =>
         {
             _ = this.ProcessDeletionRequests().Add(this);
-        })).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
+        }).CreateScheduledTask(DateTime.UtcNow.AddHours(24));
 
         lock (this.Users)
         {
@@ -456,5 +461,8 @@ public sealed class Bot
         => Util.Initializers.SyncTasks.GuildDownloadCompleted(this, sender, e);
 
     internal void LogHandler(object? sender, LogMessageEventArgs e)
-        => TaskWatcher.LogHandler(this, sender, e);
+        => this.Watcher.LogHandler(this, sender, e);
+
+    internal void TaskStarted(object? sender, Xorog.UniversalExtensions.EventArgs.ScheduledTaskStartedEventArgs e)
+        => this.Watcher.TaskStarted(this, sender, e);
 }

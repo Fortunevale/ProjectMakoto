@@ -15,7 +15,7 @@ namespace ProjectMakoto.Commands.DevTools;
 
 internal sealed class EvaluationCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckBotOwner();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckBotOwner();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

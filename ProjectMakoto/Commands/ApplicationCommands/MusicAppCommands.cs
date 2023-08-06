@@ -26,7 +26,7 @@ public sealed class MusicAppCommands : ApplicationCommandsModule
             {
                 try
                 {
-                    if ((ctx.Member?.VoiceState?.Channel?.Id ?? 0) != (ctx.Client.CurrentUser.ConvertToMember(ctx.Guild).Result.VoiceState?.Channel?.Id ?? 1))
+                    if ((ctx.Member?.VoiceState?.Channel?.Id ?? 0) != ((await ctx.Client.CurrentUser.ConvertToMember(ctx.Guild)).VoiceState?.Channel?.Id ?? 1))
                         return new List<DiscordApplicationCommandAutocompleteChoice>().AsEnumerable();
 
                     var Queue = ((Bot)ctx.Services.GetService(typeof(Bot))).Guilds[ctx.Guild.Id].MusicModule.SongQueue

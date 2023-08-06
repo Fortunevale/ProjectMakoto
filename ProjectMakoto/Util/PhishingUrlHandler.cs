@@ -17,10 +17,10 @@ internal sealed class PhishingUrlHandler : RequiresBotReference
 
     public async Task UpdatePhishingUrlDatabase()
     {
-        _ = new Task(new Action(async () =>
+        _ = new Func<Task>(async () =>
         {
             _ = this.UpdatePhishingUrlDatabase();
-        })).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
+        }).CreateScheduledTask(DateTime.UtcNow.AddMinutes(30));
 
         var urls = await this.GetUrls();
 

@@ -12,7 +12,7 @@ internal sealed class TranslationLoader
 {
     internal static async Task Load(Bot _bot)
     {
-        _bot.LoadedTranslations = JsonConvert.DeserializeObject<Translations>(File.ReadAllText("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
+        _bot.LoadedTranslations = JsonConvert.DeserializeObject<Translations>(await File.ReadAllTextAsync("Translations/strings.json"), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
         _logger.LogDebug("Loaded translations");
 
         Dictionary<string, int> CalculateTranslationProgress(object? obj, string name, bool isCommandList = false)

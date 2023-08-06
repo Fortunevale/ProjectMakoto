@@ -59,7 +59,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
 
                     if (b is null)
                     {
-                        Thread.Sleep(50);
+                        await Task.Delay(50);
                         continue;
                     }
 
@@ -175,7 +175,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
             if (value.Executed || value.Failed || sw.ElapsedMilliseconds > 30000)
                 break;
 
-            Thread.Sleep(50);
+            await Task.Delay(50);
         }
 
         sw.Stop();
@@ -207,7 +207,7 @@ internal sealed class DatabaseQueue : RequiresBotReference
             if (value.Executed || value.Failed || sw.ElapsedMilliseconds > 30000)
                 break;
 
-            Thread.Sleep(50);
+            await Task.Delay(50);
         }
 
         sw.Stop();

@@ -252,14 +252,14 @@ public abstract class BaseCommand
     }
 
     #region RespondOrEdit
-    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
-        => await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
+    public Task<DiscordMessage> RespondOrEdit(DiscordEmbed embed)
+        => this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed));
 
-    public async Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
-        => await this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
+    public Task<DiscordMessage> RespondOrEdit(DiscordEmbedBuilder embed)
+        => this.RespondOrEdit(new DiscordMessageBuilder().WithEmbed(embed.Build()));
 
-    public async Task<DiscordMessage> RespondOrEdit(string content)
-        => await this.RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
+    public Task<DiscordMessage> RespondOrEdit(string content)
+        => this.RespondOrEdit(new DiscordMessageBuilder().WithContent(content));
 
     public async Task<DiscordMessage> RespondOrEdit(DiscordMessageBuilder discordMessageBuilder)
     {
@@ -580,8 +580,8 @@ public abstract class BaseCommand
             : new InteractionResult<DiscordRole>(FinalSelection);
     }
 
-    public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
-        => await this.PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
+    public Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType? channelType = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
+        => this.PromptChannelSelection(((channelType is null || !channelType.HasValue) ? null : new ChannelType[] { channelType.Value }), configuration, timeOutOverride);
 
     public async Task<InteractionResult<DiscordChannel>> PromptChannelSelection(ChannelType[]? channelTypes = null, ChannelPromptConfiguration configuration = null, TimeSpan? timeOutOverride = null)
     {
@@ -815,8 +815,8 @@ public abstract class BaseCommand
     #endregion
 
     #region Modals
-    public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null)
-        => await this.PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
+    public Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null)
+        => this.PromptModalWithRetry(interaction, builder, null, ResetToOriginalEmbed, timeOutOverride);
 
     public async Task<InteractionResult<ComponentInteractionCreateEventArgs>> PromptModalWithRetry(DiscordInteraction interaction, DiscordInteractionModalBuilder builder, DiscordEmbedBuilder customEmbed = null, bool ResetToOriginalEmbed = false, TimeSpan? timeOutOverride = null, bool open = true)
     {

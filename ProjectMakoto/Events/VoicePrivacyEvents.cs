@@ -13,14 +13,15 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
 {
     public VoicePrivacyEvents(Bot bot) : base(bot)
     {
+        this.QueueHandler();
     }
 
     Translations.events.inVoicePrivacy tKey
         => this.t.Events.InVoicePrivacy;
 
-    private List<Task> JobsQueue = new();
+    private List<Func<Task>> JobsQueue = new();
 
-    internal async void QueueHandler()
+    internal void QueueHandler()
     {
         _ = Task.Run(async () =>
         {
@@ -34,8 +35,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                     var task = this.JobsQueue[0];
                     _ = this.JobsQueue.Remove(task);
 
-                    task.Start();
-                    _ = task.Add(this.Bot);
+                    _ = Task.Run(task).Add(this.Bot);
                 }
                 catch (Exception ex)
                 {
@@ -64,7 +64,7 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
 
         if (this.Bot.Guilds[e.Guild.Id].InVoiceTextPrivacy.ClearTextEnabled)
         {
-            this.JobsQueue.Add(new Task(async () =>
+            this.JobsQueue.Add(async () =>
             {
                 try
                 {
@@ -179,7 +179,9 @@ internal sealed class VoicePrivacyEvents : RequiresTranslation
                 {
                     _logger.LogError("Failed to execute a In-Voice Text Privacy Cleaner", ex);
                 }
-            }));
+
+                return;
+            });
         }
     }
 

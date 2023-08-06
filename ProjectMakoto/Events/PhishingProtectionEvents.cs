@@ -46,23 +46,21 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
 
         var member = await guild.GetMemberAsync(e.Author.Id);
 
-        async void CheckDb(Uri uri)
+        async Task CheckDb(Uri uri)
         {
             if (!this.Bot.Guilds[guild.Id].PhishingDetection.AbuseIpDbReports)
                 return;
 
-            var task = Dns.GetHostAddressesAsync(uri.Host);
+            IPAddress[] parsedIp;
 
             try
             {
-                task.Wait();
+                parsedIp = await Dns.GetHostAddressesAsync(uri.Host);
             }
-            catch { }
-
-            if (task.IsFaulted || task.Result.Length <= 0)
+            catch (Exception)
+            {
                 return;
-
-            var parsedIp = task.Result;
+            }
 
             var query = await this.Bot.AbuseIpDbClient.QueryIp(parsedIp[0].ToString());
 
@@ -129,7 +127,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                 return;
             }
 
-            CheckDb(match.Uri);
+            _ = CheckDb(match.Uri);
         }
 
         foreach (var url in this.Bot.PhishingHosts)
@@ -155,7 +153,7 @@ internal sealed class PhishingProtectionEvents : RequiresTranslation
                     var unshortened_url = await WebTools.UnshortenUrl(match.Value);
                     var parsedUri = new UriBuilder(unshortened_url);
 
-                    CheckDb(parsedUri.Uri);
+                    _ = CheckDb(parsedUri.Uri);
 
                     if (unshortened_url != match.Value)
                     {

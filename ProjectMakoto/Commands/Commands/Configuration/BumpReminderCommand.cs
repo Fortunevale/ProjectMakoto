@@ -11,7 +11,8 @@ namespace ProjectMakoto.Commands;
 
 internal sealed class BumpReminderCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckAdmin();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) 
+        => this.CheckAdmin();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

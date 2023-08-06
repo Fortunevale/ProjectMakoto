@@ -34,8 +34,8 @@ internal sealed class ActionlogEvents : RequiresTranslation
 
     Translations.events.actionlog tKey => this.t.Events.Actionlog;
 
-    private async Task<DiscordMessage> SendActionlog(DiscordGuild guild, DiscordMessageBuilder builder)
-        => await guild.GetChannel(this.Bot.Guilds[guild.Id].ActionLog.Channel).SendMessageAsync(builder);
+    private Task<DiscordMessage> SendActionlog(DiscordGuild guild, DiscordMessageBuilder builder)
+        => guild.GetChannel(this.Bot.Guilds[guild.Id].ActionLog.Channel).SendMessageAsync(builder);
 
     internal async Task UserJoined(DiscordClient sender, GuildMemberAddEventArgs e)
     {
@@ -58,35 +58,31 @@ internal sealed class ActionlogEvents : RequiresTranslation
                 $"{string.Join("\n\n", globalNote.Select(x => $"{x.Reason.FullSanitize()} - <@{x.Moderator}> {x.Timestamp.ToTimestamp()}"))}".TruncateWithIndication(512)));
         }
 
-        _ = this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed)).ContinueWith(async x =>
+        var message = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed));
+
+        await Task.Delay(5000);
+
+        var Wait = 0;
+
+        if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
+            this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+
+        while (Wait < 10 && this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
         {
-            if (!x.IsCompletedSuccessfully || !this.Bot.Guilds[e.Guild.Id].InviteTracker.Enabled)
-                return;
+            Wait++;
+            await Task.Delay(1000);
+        }
 
-            await Task.Delay(5000);
+        if (this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
+            return;
 
-            var Wait = 0;
+        embed.Description += $"\n\n**{this.tKey.InvitedBy.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: <@{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
+        embed.Description += $"**{this.tKey.InviteCode.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: `{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
 
-            if (!this.Bot.Guilds[e.Guild.Id].Members.ContainsKey(e.Member.Id))
-                this.Bot.Guilds[e.Guild.Id].Members.Add(e.Member.Id, new(this.Bot, this.Bot.Guilds[e.Guild.Id], e.Member.Id));
+        if (this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.TryGetValue(this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code, out var inviteNote))
+            embed.Description += $"**{this.tKey.InviteNote.Get(this.Bot.Guilds[e.Guild.Id])}**: `{inviteNote.Note.SanitizeForCode()}`";
 
-            while (Wait < 10 && this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
-            {
-                Wait++;
-                await Task.Delay(1000);
-            }
-
-            if (this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code == "")
-                return;
-
-            embed.Description += $"\n\n**{this.tKey.InvitedBy.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: <@{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.UserId}>\n";
-            embed.Description += $"**{this.tKey.InviteCode.Get(this.Bot.Guilds[e.Guild.Id]).Build()}**: `{this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code}`";
-
-            if (this.Bot.Guilds[e.Guild.Id].InviteNotes.Notes.TryGetValue(this.Bot.Guilds[e.Guild.Id].Members[e.Member.Id].InviteTracker.Code, out var inviteNote))
-                embed.Description += $"**{this.tKey.InviteNote.Get(this.Bot.Guilds[e.Guild.Id])}**: `{inviteNote.Note.SanitizeForCode()}`";
-
-            _ = x.Result.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
-        });
+        _ = message.ModifyAsync(new DiscordMessageBuilder().WithEmbed(embed));
     }
 
     internal async Task UserLeft(DiscordClient sender, GuildMemberRemoveEventArgs e)
@@ -291,7 +287,7 @@ internal sealed class ActionlogEvents : RequiresTranslation
                              $"{Messages}";
 
         var FileName = $"{Guid.NewGuid()}.txt";
-        File.WriteAllText(FileName, FileContent);
+        await File.WriteAllTextAsync(FileName, FileContent);
         using (FileStream fileStream = new(FileName, FileMode.Open))
         {
             _ = await this.SendActionlog(e.Guild, new DiscordMessageBuilder().WithEmbed(embed).WithFile(FileName, fileStream));

@@ -320,7 +320,7 @@ internal sealed class DisCatSharpExtensionsLoader
         _ = Task.Run(async () =>
         {
             while (!bot.status.DiscordInitialized)
-                Thread.Sleep(100);
+                await Task.Delay(100);
 
             try
             {
@@ -346,12 +346,12 @@ internal sealed class DisCatSharpExtensionsLoader
         _ = Task.Run(async () =>
         {
             while (!bot.status.DiscordInitialized)
-                Thread.Sleep(100);
+                await Task.Delay(100);
 
             _ = bot.DiscordClient.UpdateStatusAsync(userStatus: UserStatus.Online, activity: new DiscordActivity("Registering commands..", ActivityType.Playing));
 
             while (bot.DiscordClient.GetApplicationCommands()?.RegisteredCommands?.Count == 0)
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
 
             bot.status.DiscordCommandsRegistered = true;
 

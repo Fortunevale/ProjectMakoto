@@ -13,7 +13,7 @@ namespace ProjectMakoto.Commands.Music;
 
 internal sealed class RemoveQueueCommand : BaseCommand
 {
-    public override async Task<bool> BeforeExecution(SharedCommandContext ctx) => await this.CheckVoiceState();
+    public override Task<bool> BeforeExecution(SharedCommandContext ctx) => this.CheckVoiceState();
 
     public override Task ExecuteCommand(SharedCommandContext ctx, Dictionary<string, object> arguments)
     {

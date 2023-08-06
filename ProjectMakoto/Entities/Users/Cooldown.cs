@@ -95,12 +95,12 @@ public sealed class Cooldown : RequiresParent<User>
         return false;
     }
 
-    public async Task<bool> WaitForLight(SharedCommandContext ctx, bool IgnoreStaff = false)
-        => await this.Wait(ctx, 1, IgnoreStaff);
+    public Task<bool> WaitForLight(SharedCommandContext ctx, bool IgnoreStaff = false)
+        => this.Wait(ctx, 1, IgnoreStaff);
 
-    public async Task<bool> WaitForModerate(SharedCommandContext ctx, bool IgnoreStaff = false)
-        => await this.Wait(ctx, 6, IgnoreStaff);
+    public Task<bool> WaitForModerate(SharedCommandContext ctx, bool IgnoreStaff = false)
+        => this.Wait(ctx, 6, IgnoreStaff);
 
-    public async Task<bool> WaitForHeavy(SharedCommandContext ctx, bool IgnoreStaff = false)
-        => await this.Wait(ctx, 20, IgnoreStaff);
+    public Task<bool> WaitForHeavy(SharedCommandContext ctx, bool IgnoreStaff = false)
+        => this.Wait(ctx, 20, IgnoreStaff);
 }

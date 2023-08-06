@@ -33,9 +33,9 @@ public sealed class MonitorClient
         return this.History.OrderBy(x => x.Key.Ticks).ToDictionary(x => x.Key, x => x.Value);
     }
 
-    public async Task<SystemInfo> GetCurrent()
+    public Task<SystemInfo> GetCurrent()
     {
-        return await ReadSystemInfoAsync();
+        return ReadSystemInfoAsync();
     }
 
     private Dictionary<DateTime, SystemInfo> History = new();
@@ -87,9 +87,9 @@ public sealed class MonitorClient
         });
     }
 
-    private static async Task<SystemInfo> ReadSystemInfoAsync()
+    private static Task<SystemInfo> ReadSystemInfoAsync()
     {
-        return await Task.Run<SystemInfo>(() =>
+        return Task.Run<SystemInfo>(() =>
         {
             SystemInfo systemInfo = new();
 

@@ -87,17 +87,17 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
                         return;
 
                     r.PostsRemaining--;
-                    var task = channel.CrosspostMessageAsync(message);
+                    var crossPostTask = channel.CrosspostMessageAsync(message);
 
                     Stopwatch sw = new();
                     sw.Start();
-                    while (!task.IsCompleted && sw.ElapsedMilliseconds < 3000)
-                        Thread.Sleep(50);
+                    while (!crossPostTask.IsCompleted && sw.ElapsedMilliseconds < 3000)
+                        await Task.Delay(50);
                     sw.Stop();
 
                     _logger.LogDebug("It took {Milliseconds}ms to process a crosspost", sw.ElapsedMilliseconds);
 
-                    if (!task.IsCompleted)
+                    if (!crossPostTask.IsCompleted)
                     {
                         _logger.LogWarn("Crosspost Ratelimit tripped for '{Channel}': {Message}", channel.Id, message.Id);
 
@@ -105,8 +105,7 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
                         r.PostsRemaining = 0;
                     }
 
-                    while (!task.IsCompleted)
-                        task.Wait();
+                    _ = await crossPostTask;
 
                     _ = this._queue.Remove(message);
                     _logger.LogDebug("Crossposted message in '{Channel}': {Message}", channel.Id, message.Id);
@@ -151,16 +150,39 @@ public sealed class CrosspostSettings : RequiresParent<Guild>
         }
     }
 
-    public async Task CrosspostWithRatelimit(DiscordChannel channel, DiscordMessage message)
+    public async Task CrosspostWithRatelimit(DiscordClient client, DiscordMessage message)
     {
+        if (message.Reference is not null || message.MessageType is not MessageType.Default)
+            return;
+
+        if (this.Parent.Crosspost.ExcludeBots)
+            if (message.WebhookMessage || message.Author.IsBot)
+                return;
+
+        var ReactionAdded = false;
+
         if (!this.QueueInitialized)
             _ = this.CrosspostQueue();
 
-        this._queue.Add(message, channel);
+        this._queue.Add(message, message.Channel);
+
+        await Task.Delay(5000);
+
+        if (this._queue.ContainsKey(message))
+        {
+            if (!ReactionAdded)
+            {
+                await message.CreateReactionAsync(DiscordEmoji.FromGuildEmote(client, 974029756355977216));
+                ReactionAdded = true;
+            }
+        }
 
         while (this._queue.ContainsKey(message))
         {
             await Task.Delay(1000);
         }
+
+        if (ReactionAdded)
+            _ = message.DeleteReactionsEmojiAsync(DiscordEmoji.FromGuildEmote(client, 974029756355977216));
     }
 }
